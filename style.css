@@ -1,4 +1,14 @@
 /* Space Game Styles */
+
+* {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none;   /* Safari, Chrome, Opera */
+  -khtml-user-select: none;    /* Konqueror HTML */
+  -moz-user-select: none;      /* Firefox */
+  -ms-user-select: none;       /* Internet Explorer/Edge */
+  user-select: none;           /* Standard syntax */
+}
+
 body {
     background-color: #000;
     color: #0ff;
@@ -30,6 +40,7 @@ li {
     box-shadow: 0 0 10px #0ff;
     font-size: 1em;
     line-height: 1.4;
+    min-width: 350px;
 }
 
 
@@ -94,21 +105,10 @@ button:disabled {
 
 /* === INFO BAR AT TOP === */
 
-.starmap-infobar {
-    width: 100%;
-    padding: 8px 14px;
-    background: #1a1a20;
-    border-bottom: 1px solid #333;
-    font-size: 14px;
+.starmap-info {
+    padding: 8px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
 }
-
-.starmap-infobar span {
-    margin-right: 20px;
-}
-
 
 /* === BUTTON BAR (Zoom + Dock) === */
 
@@ -266,3 +266,31 @@ button:disabled {
 .ui-table-row.selected {
     background-color: #066 !important;
 }
+
+
+/* Full-screen darkened background */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999; /* on top of everything */
+    pointer-events: all;
+}
+
+/* Modal container */
+/*.modal-box {
+    background: #111;
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow: auto;
+    box-shadow: 0 0 30px rgba(0,0,0,0.4);
+}*/

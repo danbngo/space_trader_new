@@ -6,10 +6,12 @@ class StarMap {
         this.selectedObject = autoSelectObject || gameState.fleet;
 
         this.zoom = 100; //default zoom = 1 px = 1 au
+        this.cameraX = this.selectedObject.x;
+        this.cameraY = this.selectedObject.y;
         this.mapWidth = 1200
         this.mapHeight = 600
         this.minZoom = 1
-        this.maxZoom = 5000*1000*1000
+        this.maxZoom = 5000*1000
         this.noOrbitsAtZoom = 5000
         this.paused = true
         this.yearsPerTick = 1/4/24/365 //15 minutes per tick
@@ -23,6 +25,10 @@ class StarMap {
         this.leftPane = createElement({parent:this.root, classNames:['starmap-left']})
         this.leftPane.style.width = this.mapWidth+'px';
         this.leftPane.style.height = this.mapHeight+'px';
+        attachDragHandler(this.leftPane, (x,y)=>this.onDragMap(x,y), 5)
+        attachMouseWheelHandler(this.leftPane, (direction=1)=>{
+            this.adjustZoom(direction > 0 ? 1.33 : direction < 0 ? 0.66 : 1.0)
+        })
 
         this.rightPane = createElement({parent:this.root, classNames:['starmap-right']})
 
@@ -63,21 +69,17 @@ class StarMap {
         const endYear = route?.endYear
         const yearsRemaining = describeTimespan(endYear-year)
 
-        this.infoBar.innerHTML = ''
-        createElement({
-            parent:this.infoBar,
-            style: {
-                display: 'flex',
-                gap: '8px'
-            },
-            children: [
-                createElement({innerHTML: `Date: ${describeDate(year)}`}),
-                createElement({innerHTML: ` | Location: ${location ? coloredName(location, false) : '(Space)'}`, onClick: ()=>this.selectObject(location)}),
-                createElement({innerHTML: ` | Destination: ${destination ? coloredName(destination, false) : '(None)'}`, onClick: destination ? ()=>this.selectObject(destination) : undefined}),
-                createElement({innerHTML: !destination ? '' : ` | Distance: ${distance} AU`}),
-                createElement({innerHTML: !destination ? '' : ` | ETA: ${yearsRemaining}`}),
-            ]
-        })
+        this.infoBar.innerHTML = ""
+
+        const children = [
+            createElement({innerHTML: `Date: ${describeDate(year)}`}),
+            createElement({innerHTML: ` | Location: ${location ? coloredName(location, false) : '(Space)'}`, onClick: ()=>this.selectObject(location)}),
+            createElement({innerHTML: ` | Destination: ${destination ? coloredName(destination, false) : '(None)'}`, onClick: destination ? ()=>this.selectObject(destination) : undefined}),
+            createElement({innerHTML: !destination ? '' : ` | Distance: ${distance} AU`}),
+            createElement({innerHTML: !destination ? '' : ` | ETA: ${yearsRemaining}`}),
+        ]
+
+        for (const child of children) this.infoBar.appendChild(child)
     }
 
     rebuildLeftPane() {
@@ -129,7 +131,7 @@ class StarMap {
         //draw objects
         objects.forEach((obj,index) => {
             //if (obj.location) return //dont display docked fleets
-            const objIsFleet = obj instanceof Fleet
+            const objIsTriangle = obj.graphics?.shape == 'triangle'
             const id = `obj${index}`
             const wrapperId = `wrapper${index}`
             console.log('rebuilding an obj')
@@ -140,7 +142,7 @@ class StarMap {
                 classNames: ['starmap-object'],
                 onClick: ()=>this.selectObject(obj),
                 children: [
-                    !objIsFleet ? 
+                    !objIsTriangle ? 
                         createElement({id, classNames: ['starmap-circle'], style: {background: color}})
                         : createElement({
                             id,
@@ -159,13 +161,13 @@ class StarMap {
     }
 
     refreshLeftPane() {
-        const {zoom, mapWidth, mapHeight, selectedObject, starSystem, leftPane, noOrbitsAtZoom} = this
+        const {zoom, mapWidth, mapHeight, starSystem, noOrbitsAtZoom} = this
         const {stars, planets, fleets} = starSystem
         const objects = [...stars, ...planets, ...fleets];
         const hw = mapWidth/2
         const hh = mapHeight/2
-        const cx = selectedObject ? selectedObject.x : 0
-        const cy = selectedObject ? selectedObject.y : 0
+        const cx = this.cameraX;
+        const cy = this.cameraY;
 
         //draw orbits
         const orbits = []
@@ -247,7 +249,16 @@ class StarMap {
 
     selectObject(obj) {
         this.selectedObject = obj;
+        this.cameraX = obj.x;
+        this.cameraY = obj.y;
         this.refresh();
+    }
+
+    onDragMap(x = 0, y = 0) {
+        console.log('move map:',x,y)
+        this.cameraX -= x/this.zoom
+        this.cameraY -= y/this.zoom
+        this.refreshLeftPane()
     }
 
     adjustZoom(factor) {
@@ -271,13 +282,15 @@ class StarMap {
         else this.refresh()
     }
 
-    togglePause(newPausedState) {
-        this.paused = (newPausedState !== undefined ? newPausedState : !this.paused)
+    togglePause(newPausedState = !this.paused) {
+        console.log('setting paused to:',newPausedState)
+        this.paused = newPausedState
         if (!this.paused) this.tick()
         this.refresh() //always do first refresh, as fleets launch during pause/unpause
     }
 
     tick() {
+        console.log('tick')
         if (this.paused) return
         const playerWasDocked = (gameState.fleet.location !== undefined)
 
@@ -288,11 +301,25 @@ class StarMap {
         this.refreshInfoBar()
 
         //pause if player reached his destination
-        let shouldPause = false
-        if (!playerWasDocked && gameState.fleet.location) shouldPause = true
+        if (!playerWasDocked && gameState.fleet.location) {
+            console.log('pausing since player reached destination')
+            this.togglePause(true)
+            return
+        }
 
-        if (shouldPause) this.togglePause(true)
-        else setTimeout(()=>{this.tick(), this.msPerTick})
+        if (!playerWasDocked) { //dont have encounters while docked or tick after launch
+            const elapsedDays = this.yearsPerTick*365
+            const encounterChance = 1 - Math.pow(1-ENCOUNTER_CHANCE_PER_DAY, elapsedDays)
+            const didEncounter = Math.random() < encounterChance
+            console.log('encounter chance:',encounterChance,elapsedDays,didEncounter)
+            if (didEncounter) {
+                this.togglePause(true)
+                startEncounter()
+                return
+            }
+        }
+
+        setTimeout(()=>{this.tick(), this.msPerTick})
     }
 }
 
@@ -301,3 +328,4 @@ function showStarMap(autoSelectObject = gameState.fleet) {
     const starMap = new StarMap(gameState.system, autoSelectObject)
     showElement(starMap.root)
 }
+

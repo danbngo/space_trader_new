@@ -14,7 +14,7 @@ function generateShip(planet = new Planet(), shipType = rndMember(SHIP_TYPES_ALL
 
     const name = `${planet.name} ${shipType.name}`
 
-    return new Ship(name, hull, shields, lasers, thrusters, cargoSpace, new Cargo());
+    return new Ship(name, new Graphics("triangle", "white", SPACE_SHIP_SIZE_IN_EARTH_RADII), hull, shields, lasers, thrusters, cargoSpace, new Cargo());
 }
 
 function generateOfficerName(planet = new Planet()) {
@@ -68,7 +68,8 @@ function generateCulture(planet = new Planet()) {
     for (const ct of CARGO_TYPES_ALL) {
         cargoPriceModifiers.setAmount(ct, Math.random() > .5 ? 1/rng(5,1,false) : rng(5,1,false))
     }
-    return new Culture(cargoPriceModifiers, shipQuality, )
+    const patrolRange = rng(10,2,false)
+    return new Culture(cargoPriceModifiers, shipQuality, patrolRange)
 }
 
 function generateSettlement(planet = new Planet()) {
@@ -77,4 +78,31 @@ function generateSettlement(planet = new Planet()) {
     const blackMarket = generateMarket(planet);
     const guild = generateGuild(planet);
     return new Settlement(shipyard, market, blackMarket, guild)
+}
+
+function generateFleet(planet = new Planet(), fleetType = rndMember(FLEET_TYPES_ALL)) {
+    const ships = []
+    const numShips = rng(fleetType.minShips, fleetType.maxShips)
+    for (let i = 0; i < numShips; i++) {
+        const shipType = i == 0 ? fleetType.shipTypes[0] : rndMember(fleetType.shipTypes)
+        ships.push(generateShip(planet, shipType))
+    }
+    const cargo = new Cargo()
+    const fleet = new Fleet(fleetType.name, new Graphics('triangle', planet.graphics.color, FLEET_SIZE_IN_EARTH_RADII), 0, 0, ships, cargo)
+
+    const maxCargo = fleet.calcTotalCargoSpace()
+    const cargoTypes = fleetType.cargoTypes.filter(()=>(Math.random() > .5))
+    const totalCargo = cargoTypes.length > 0 ? rng(0, maxCargo*0.8) : 0
+    for (let i = 0; i < totalCargo; i++) {
+        const ct = rndMember(cargoTypes)
+        cargo.increment(ct, 1)
+    }
+
+    return fleet
+}
+
+function generateEncounter(planet = rndMember(PLANETS), encounterType = rndMember(ENCOUNTER_TYPES_ALL)) {
+    const {fleetType} = encounterType
+    const fleet = generateFleet(planet, fleetType)
+    return new Encounter(encounterType, planet, fleet)
 }

@@ -5,12 +5,12 @@ class GameState {
 
         // Create captain
         this.captain = new Officer("Captain", 5000, 0, 0, 0, 0, 0, 0);
-        const playerShip = new Ship("Starting Ship", [25,25], [25,25], 5, 5, 5)
+        const playerShip = new Ship("Starting Ship", new Graphics("triangle", "white", SPACE_SHIP_SIZE_IN_EARTH_RADII), [25,25], [25,25], 5, 5, 5)
 
         // Create fleet
         this.fleet = new Fleet(
             "Player Fleet",
-            new Graphics("circle", "white", 0.1),
+            new Graphics("triangle", "white", FLEET_SIZE_IN_EARTH_RADII),
             0, 0,
             [playerShip],
             new Cargo(),
@@ -28,6 +28,9 @@ class GameState {
         // Initial planet setup
         this._initializePlanets();
         this.fleet.dock(EARTH);
+
+        this.encounter = new Encounter()
+        null //shouldnt be relevant to serialize/deserialize, cant save during encounters
     }
 
     /** Internal helper to randomize guild/market/shipyard generation */
@@ -92,7 +95,7 @@ class GameState {
 
         // Restore fleet
         this.fleet = Object.assign(
-            new Fleet("Player Fleet", 0, 0, [], [], 0, null, EARTH, 0),
+            new Fleet("Player Fleet", new Graphics('triangle', 'white', FLEET_SIZE_IN_EARTH_RADII), 0, 0, [], [], 0, null, EARTH, 0),
             data.fleet
         );
 

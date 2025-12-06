@@ -2,7 +2,10 @@
 
 // Creates a UI panel with title, text, and buttons
 
-function removeChildren(parent) {
+const UI_CONTAINER = document.getElementById("game-container");
+
+
+function removeChildren(parent = createElement()) {
     while (parent.firstChild) parent.removeChild(parent.firstChild)
 }
 
@@ -21,7 +24,7 @@ function refreshPanelButtons (panelId = '', buttons = []) {
     });
 }
 
-function createPanel(title = '', text = '', buttons = [['Okay', ()=>{}, false]], id = '') {
+function createPanel(title = '', text = '', buttons = [['Continue', ()=>{}, false]], id = '') {
     const panel = createElement({
         id,
         classNames: ['panel'],
@@ -35,16 +38,15 @@ function createPanel(title = '', text = '', buttons = [['Okay', ()=>{}, false]],
     return panel;
 }
 
-function showPanel(title = '', text = '', buttons = ['Okay', ()=>{}], id = '') {
+function showPanel(title = '', text = '', buttons = ['Continue', ()=>{}], id = '') {
     const panel = createPanel(title, text, buttons, id);
     showElement(panel)
     return panel
 }
 
-function showElement(element) {
-    const container = document.getElementById("game-container");
-    container.innerHTML = "";
-    container.appendChild(element);
+function showElement(element = createElement()) {
+    UI_CONTAINER.innerHTML = "";
+    UI_CONTAINER.appendChild(element);
 }
 
 function statColorSpan(text = '', ratio = 1.0) {
@@ -122,7 +124,7 @@ function applyStyle(element, style = {}) {
 }
 
 // utils.js or tableUtil.js
-function createTable(rows = [], onSelectRow = (index = 0)=>{}) {
+function createTable(rows = [createElement()], onSelectRow = (index = 0)=>{}) {
     const table = document.createElement("table");
     table.className = "ui-table";
 
@@ -159,4 +161,84 @@ function createTable(rows = [], onSelectRow = (index = 0)=>{}) {
     });
 
     return table;
+}
+
+let currentModal = null;
+
+function showModal(title = '', text = '', buttons = [['Continue', ()=>{}, false]], id = '') {
+    // Close existing modal if open
+    if (currentModal) closeModal();
+    // Create overlay
+    return createElement({parent:UI_CONTAINER, classNames:['modal-overlay'], children:[
+        createPanel(title, text, buttons, id)
+    ]})
+}
+
+function closeModal() {
+    if (currentModal) {
+        currentModal.remove();
+        currentModal = null;
+    }
+}
+
+function attachDragHandler(element = createElement(), callback = (dx=0,dy=0)=>{}) {
+    let isDown = false;
+    let lastX = 0;
+    let lastY = 0;
+
+    element.addEventListener("mousedown", (ev) => {
+        if (ev.button !== 0) return; // left mouse only
+
+        isDown = true;
+        lastX = ev.clientX;
+        lastY = ev.clientY;
+
+        function onMouseMove(moveEv) {
+            if (!isDown) return;
+
+            const dx = moveEv.clientX - lastX;
+            const dy = moveEv.clientY - lastY;
+
+            // Update last position for next delta
+            lastX = moveEv.clientX;
+            lastY = moveEv.clientY;
+
+            callback(dx,dy);
+        }
+
+        function onMouseUp() {
+            isDown = false;
+            document.removeEventListener("mousemove", onMouseMove);
+            document.removeEventListener("mouseup", onMouseUp);
+        }
+
+        document.addEventListener("mousemove", onMouseMove);
+        document.addEventListener("mouseup", onMouseUp);
+    });
+}
+
+
+function attachMouseWheelHandler(element = createElement(), callback = (direction = 1)=>{}) {
+    if (!element || typeof callback !== "function") return;
+
+    const handler = (event) => {
+        event.preventDefault();
+
+        // Standard: wheelDeltaY or deltaY
+        let delta = event.deltaY || event.wheelDelta || (-event.detail);
+
+        // Normalize to +1 / -1
+        const direction = delta < 0 ? 1 : -1;
+
+        callback(direction, event);
+    };
+
+    // Modern browsers
+    element.addEventListener("wheel", handler, { passive: false });
+
+    // Older WebKit/IE
+    element.addEventListener("mousewheel", handler, { passive: false });
+
+    // Older Firefox
+    element.addEventListener("DOMMouseScroll", handler, { passive: false });
 }

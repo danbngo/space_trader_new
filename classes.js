@@ -50,6 +50,40 @@ class Cargo {
     calcTotalCargo() {
         return calcMapValuesTotal(this.cargoCounts)
     }
+    
+    randomItem() {
+        const ctWeights = []
+        for (const ct of CARGO_TYPES_ALL) weights.push(this.getAmount(ct))
+        const ctIndex = rndIndexWeighted(ctWeights)
+        const ct = CARGO_TYPES_ALL[ctIndex]
+        return ct
+    }
+
+    //probably not mathematically correct but oh well
+    randomSubset(amount = 0) {
+        const subset = new Cargo()
+        amount = Math.min(this.calcTotalCargo(), amount)
+        while (amount > 0) {
+            const ct = this.randomItem()
+            if (subset.getAmount(ct) > this.getAmount(ct)) continue
+            subset.increment(ct, 1)
+        }
+        return subset
+    }
+
+    add(addedCargo = new Cargo()) {
+        for (const ct of CARGO_TYPES_ALL) {
+            const amount = addedCargo.getAmount(ct)
+            this.increment(ct, amount)
+        }
+    }
+
+    subtract(subtractedCargo = new Cargo()) {
+        for (const ct of CARGO_TYPES_ALL) {
+            const amount = subtractedCargo.getAmount(ct)
+            this.increment(ct, -amount)
+        }
+    }
 }
 
 // SpaceObject class
@@ -114,17 +148,32 @@ class Orbit {
 
 // Ship class
 class Ship {
-    constructor(name = "Unnamed", hull = [0, 0], shields = [0, 0], lasers = 0, thrusters = 0, cargoSpace = 0) {
+    constructor(name = "Unnamed", graphics = new Graphics('triangle', 'white', SPACE_SHIP_SIZE_IN_EARTH_RADII), hull = [0, 0], shields = [0, 0], lasers = 0, thrusters = 0, cargoSpace = 0) {
         this.name = name;
+        this.graphics = graphics;
         this.hull = hull;
         this.shields = shields;
         this.lasers = lasers;
         this.thrusters = thrusters;
         this.cargoSpace = cargoSpace;
+        this.x = 0; //used for encounters, only fleets travel in systems
+        this.y = 0;
+        this.destinationX = 0;
+        this.destinationY = 0;
+        this.target = null; //ship that this one's trying to attack
     }
 
     get value() {
         return Math.pow(this.hull[1]/5 + this.shields[1]/5 + this.lasers + this.thrusters + this.cargoSpace, 2)*10
+    }
+
+    //in AU per years. your ship moves slower if your fleet is carrying too much cargo
+    calcSpeed(fleet = new Fleet()) {
+        //each thruster makes your fleet go 1 AU per MINUTE if there was no weight
+        let thrusters = this.thrusters
+        let weight = this.value
+        weight += fleet.cargo.calcTotalCargo() / fleet.ships.length
+        return 60 * 24 * 365 * thrusters / weight
     }
 }
 
@@ -207,9 +256,10 @@ class Market {
 }
 
 class Culture {
-    constructor(cargoPriceModifiers = new Cargo(), shipQuality = 1.0) {
-        this.shipQuality = shipQuality;
+    constructor(cargoPriceModifiers = new Cargo(), shipQuality = 1.0, patrolRange = 1) {
         this.cargoPriceModifiers = cargoPriceModifiers
+        this.shipQuality = shipQuality;
+        this.patrolRange = patrolRange; //AUs, recall that neptune is 30
     }
 }
 
@@ -233,7 +283,7 @@ class Planet extends OrbitingObject {
 
 // Fleet class extends SpaceObject
 class Fleet extends SpaceObject {
-    constructor(name = "Unnamed", graphics = new Graphics(), x = 0, y = 0, ships = [], cargo = new Cargo(), captain = null, officers = [], location = null) {
+    constructor(name = "Unnamed", graphics = new Graphics(), x = 0, y = 0, ships = [new Ship()], cargo = new Cargo(), captain = new Officer(), officers = [new Officer()], location = null) {
         super(name, graphics, 0, x, y);
         this.ships = ships; // Ship[]
         this.cargo = cargo;
@@ -252,6 +302,10 @@ class Fleet extends SpaceObject {
 
     calcTotalCargoSpace() {
         return this.ships.reduce((total, ship) => total + ship.cargoSpace, 0);
+    }
+
+    calcAvailableCargoSpace() {
+        return this.calcTotalCargoSpace() - this.cargo.calcTotalCargo()
     }
 
     calcTotalThrusters() {
@@ -411,3 +465,35 @@ class Route {
     }
 }
 
+class Encounter {
+    constructor(encounterType = ENCOUNTER_TYPES_ALL[0], planet = new Planet(), fleet = new Fleet()) {
+        this.encounterType = encounterType;
+        this.planet = planet;
+        this.fleet = fleet;
+        this.combatEnabled = false;
+    }
+}
+
+class ShipPath {
+    constructor(ship = new Ship(), toX = 0, toY = 0) {
+        this.ship = ship
+        this.startX = ship.x
+        this.startY = ship.y
+        this.toX = toX
+        this.toY = toY
+
+        this.left = Math.min(this.startX, this.endX)
+        this.top = Math.min(this.startY, this.endY)
+        this.right = Math.max(this.startX, this.endX)
+        this.bottom = Math.max(this.startY, this.endY)
+        this.width = (this.right-this.left)
+        this.height = (this.bottom-this.top)
+        this.distance = Math.sqrt(this.width*this.width + this.height*this.height);
+        this.dx = this.toX - this.startX
+        this.dy = this.toY - this.startY
+        this.angle = Math.atan2(this.dy, this.dx);
+        this.angleDeg = this.angle * (180 / Math.PI); // convert to degrees
+
+        console.log('created route:',this.angleDeg,this)
+    }
+}

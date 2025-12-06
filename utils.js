@@ -36,3 +36,38 @@ function rndMember(arr = []) {
     const idx = Math.floor(Math.random() * arr.length);
     return arr[idx];
 }
+
+function rotatePoint(x = 0, y = 0, originX = 0, originY = 0, angleRadians = 2*Math.PI) {
+    // translate point back to origin
+    const translatedX = x - originX;
+    const translatedY = y - originY;
+
+    // apply rotation
+    const cosA = Math.cos(angleRadians);
+    const sinA = Math.sin(angleRadians);
+
+    const rotX = translatedX * cosA - translatedY * sinA;
+    const rotY = translatedX * sinA + translatedY * cosA;
+
+    // translate back to original position
+    return [
+        rotX + originX,
+        rotY + originY
+    ];
+}
+
+function rndIndexWeighted(weights = [1]) {
+    if (!weights || weights.length === 0) return -1;
+
+    const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+    if (totalWeight <= 0) return -1;
+
+    let r = Math.random() * totalWeight;
+    for (let i = 0; i < weights.length; i++) {
+        if (r < weights[i]) return i;
+        r -= weights[i];
+    }
+
+    // fallback in case of floating point errors
+    return weights.length - 1;
+}

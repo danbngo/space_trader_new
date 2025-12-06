@@ -18,3 +18,7 @@ const SOLAR_SYSTEM = new StarSystem('Sol System', new Graphics('circle', '#fffff
 
 const SOLAR_RADII_PER_AU = 215.032
 const EARTH_RADII_PER_AU = 23454.8
+const ENCOUNTER_CHANCE_PER_DAY = 0.2;
+const ENCOUNTER_MAP_SIZE_AU = 2/(1000*1000) // about 200 miles
+const SPACE_SHIP_SIZE_IN_EARTH_RADII = 1/(1000*1000)
+const FLEET_SIZE_IN_EARTH_RADII = 1/1000

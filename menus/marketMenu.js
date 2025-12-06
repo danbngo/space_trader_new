@@ -44,7 +44,7 @@ function showMarketMenu(planet = new Planet(), blackMarket = false) {
 
     function onSelectCargoType(ct = CARGO_TYPES_ALL[0]) {
         if (!isDocked) return
-        const remainingCargoSpace = fleet.calcTotalCargoSpace() - fleet.cargo.calcTotalCargo();
+        const remainingCargoSpace = fleet.calcAvailableCargoSpace();
         const playerAmount = fleet.cargo.getAmount(ct)
         const marketAmount = market.cargo.getAmount(ct)
         const buyPrice = buyPrices.getAmount(ct)

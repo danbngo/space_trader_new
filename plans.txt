@@ -1,0 +1,53 @@
+need a combat system
+
+i think what makes sense for this game is somewhere between ships flying around zapping each other, and turn based
+
+i want something like this:
+each ship gets a turn based on its initiative ???
+
+ships can move within a circle based on their thruster AMOUNT
+moving directly into a ship in range lets you ram it - hurts their hull a lot and yours a bit, ignores shields
+when 2 ships are right next to each other neither can shoot, and ramming is somewhat ineffective.
+ships can shoot lasers at other ships. higher chance to miss if further away.
+
+shooting or moving uses ALL accumulated laser/thrusters
+lasers, shields and thrusters regen by UP TO 50% the missing amt each turn
+
+ships can also try to escape near the edge of the screen.
+fleeing has higher % chance near the edge, and you auto flee if you reach the very edge
+ships start near-ish the center so it's hard to flee right away
+
+at any time, you can surrender. surrendering means all your remaining ships get looted or whatever the enemy has in store.
+not surrendering means the ships still on the battlefield may be damaged further.
+when a ship has 0 hull it becomes disabled (NOT destroyed)
+disabled ships cant be fixed until you pull into port and they cant be used for thrusters, carrying cargo, combat etc.
+if ALL your ships are disabled, you're automatically towed to the nearest planet at high expense.
+if you can't afford to fix any ships, the galactic bank automatically gives you an exorbitant loan.
+
+generally before the encounter goes to combat mode, you can choose diplomacy/avoidance
+-if the other side is neutral (merchants, etc) you can ignore them, attack them
+-if the other side is hostile, you can sometimes appease them by surrendering up front, submitting to inspection, etc.
+
+the main threats are: pirates, bounty hunters (if you have one), authorities (if you're doing anything bad or have a bounty)
+when you surrender some of the following may happen:
+-authorities will confiscate contraband
+-pirates may loot any cargo you're carrying
+-slavers may pressgang some of your officers
+-authorities, bounty hunters may capture your officers that have bounties
+-ANYONE who beats you will take some of your credits
+-if you have a bounty, authorities may take you to jail (nearest planet) - forcing you to lose time or legal fees
+
+
+this will get more strategic in the future because:
+-being able to laser through multiple enemies if you line them up
+-gas clouds, less chance to hit or be hit in them
+-asteroids, cannot shoot through them, they can be purposely shot and broken to create debris
+-debris hurts you to move through, and slows thrusters if you're in it
+-rockets that follow enemies, but can be shot down with lasers or other rockets
+-aoe attacks like bombs/mines that go off after a certain amount of time or when near an enemy
+-stealth mode, ships that cant be seen unless they leave stealth (to attack) or you're close to them
+-tractor beams, nuff said
+-etc, etc.
+
+this will also be USEFUL in the future because:
+-we can use it for asteroid mining, prospecting, exploring alien ruins, etc.
