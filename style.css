@@ -1,0 +1,266 @@
+/* Space Game Styles */
+body {
+    background-color: #000;
+    color: #0ff;
+    font-family: monospace;
+    margin: 0;
+    padding: 20px;
+}
+
+div {
+    font-family: monospace;
+    color: #0ff;
+}
+
+#game-container {
+    margin: auto;
+}
+
+li {
+    margin-left: 24px;
+}
+
+/* Panel UI Styles */
+.panel {
+    border: 2px solid #0ff;
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+    background: rgba(0, 20, 30, 0.7);
+    box-shadow: 0 0 10px #0ff;
+    font-size: 1em;
+    line-height: 1.4;
+}
+
+
+.panel-title {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+
+.panel-buttons {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+
+button {
+    background: black;
+}
+
+button, .starmap-label {
+    color: #0ff;
+    border: 1px solid #0ff;
+    padding: 8px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+button:hover {
+    background: #022;
+}
+
+button:hover, .starmap-label:hover {
+    border: 1px solid #0ff;
+    box-shadow: 0 0 6px #0ff;
+}
+
+button:disabled {
+    background: black;
+    color: #888;
+    border: 1px solid #888;
+    box-shadow: none;
+    cursor: default;
+}
+
+
+/* === STAR MAP ROOT CONTAINER === */
+
+.starmap-root {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #0d0d10;
+    color: #ddd;
+    overflow: hidden;
+}
+
+
+/* === INFO BAR AT TOP === */
+
+.starmap-infobar {
+    width: 100%;
+    padding: 8px 14px;
+    background: #1a1a20;
+    border-bottom: 1px solid #333;
+    font-size: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.starmap-infobar span {
+    margin-right: 20px;
+}
+
+
+/* === BUTTON BAR (Zoom + Dock) === */
+
+.starmap-buttons {
+    width: 100%;
+    padding: 10px;
+    display: flex;
+    gap: 10px;
+}
+
+/* === MAIN SPLIT: MAP + SIDEBAR === */
+
+.starmap-main {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+
+/* === CANVAS AREA (Left Side) === */
+
+.starmap-left {
+    flex: 3;
+    position: relative;
+    background: #000;
+    border-right: 1px solid #333;
+    overflow: hidden;
+}
+
+
+/* === OBJECT circleS ON MAP === */
+.starmap-object {
+    position: relative;
+}
+
+.starmap-circle {
+    position: absolute;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+}
+
+.starmap-orbit {
+    position: absolute;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    background-color: transparent;
+    /* Define everything except color */
+    border-style: solid;
+    border-width: 1px;
+}
+
+.starmap-ship {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    background-image: linear-gradient(to bottom right, currentColor 50%, transparent 50%);
+}
+
+.starmap-label {
+    position: absolute;
+    transform: translate(-50%, 0);
+    top: 100%;
+    margin-top: -24px;
+    font-size: 12px;
+    white-space: nowrap;
+    padding: 1px;
+    border: 0;
+}
+
+.starmap-label:hover {
+    color: white;
+}
+
+.starmap-line {
+    position: absolute;
+    height: 1px;           /* line thickness */
+    background-color: #fff; /* line color, can override in JS */
+    transform-origin: 0 50%; /* rotate around the left edge */
+    pointer-events: none;   /* so it doesn't block clicks */
+}
+
+
+/* === RIGHT SIDE INFO PANEL === */
+
+.starmap-right {
+    flex: 1;
+    background: #111;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.starmap-selected-info {
+    background: #1a1a20;
+    padding: 12px;
+    border: 1px solid #333;
+    border-radius: 6px;
+}
+
+.starmap-selected-info h2 {
+    margin-top: 0;
+    font-size: 18px;
+}
+
+.starmap-selected-info p {
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+/* === ACTION BUTTONS IN SIDEBAR === */
+
+.starmap-sidebar button {
+    padding: 8px 14px;
+    margin-top: 10px;
+    background: #444;
+    border: 1px solid #666;
+    color: #eee;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.starmap-sidebar button:hover {
+    background: #666;
+}
+
+
+.ui-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+}
+
+.ui-table-row {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.ui-table-cell {
+    padding: 8px 8px;
+    border: 1px solid #444;
+}
+
+.ui-table-row:hover {
+    background-color: #1c3333;
+}
+
+.ui-table-row:active {
+    background-color: #1c1c1c;
+}
+
+.ui-table-row.selected {
+    background-color: #066 !important;
+}
