@@ -164,6 +164,8 @@ button:disabled {
 .starmap-ship {
     position: absolute;
     transform: translate(-50%, -50%);
+    margin-left: -4px;
+    margin-top: -2px;
     cursor: pointer;
     background-image: linear-gradient(to bottom right, currentColor 50%, transparent 50%);
 }

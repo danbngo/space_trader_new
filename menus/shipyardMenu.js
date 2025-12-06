@@ -40,7 +40,7 @@ function createSellShipMenu(ships = [new Ship()], shipyard = new Shipyard(), onS
 
 function showShipyardBuyMenu(planet) {
     console.log('displaying shipyard menu:',planet,gameState)
-    const {shipyard} = planet
+    const {shipyard} = planet.settlement
     const {fleet, captain} = gameState
     const isDocked = fleet.location == planet
 
@@ -72,6 +72,8 @@ function showShipyardBuyMenu(planet) {
             `Your # ships: ${fleet.ships.length}`,
             `Your credits: ${captain.credits}`,
             `Shipyard credits: ${shipyard.credits}`,
+            `Buy Penalty: ${round(100*shipyard.rake, 2)}%`,
+            `Local Ship Quality: ${round(100*shipyard.planet.culture.shipQuality, 2)}%`,
         ]}),
         [
             ["Sell Ships", ()=>showShipyardSellMenu(planet)],
@@ -83,7 +85,7 @@ function showShipyardBuyMenu(planet) {
 
 function showShipyardSellMenu(planet) {
     console.log('displaying shipyard menu:',planet,gameState)
-    const {shipyard} = planet
+    const {shipyard} = planet.settlement
     const {fleet, captain} = gameState
     const isDocked = fleet.location == planet
 
@@ -101,7 +103,7 @@ function showShipyardSellMenu(planet) {
         const sellPrice = shipyard.calcSellPrice(ship)
         const shipyardCanAfford = shipyard.credits >= sellPrice
         const buttons = [
-            [`Sell ${ship.name}${shipyardCanAfford ? '' : ` (For only ${shipyard.credits} credits)`}`, ()=>sellShip(ship), (shipyard.credits <= 0)],
+            [`Sell ${ship.name}${shipyardCanAfford ? '' : ` (For only ${shipyard.credits}CR)`}`, ()=>sellShip(ship), (shipyard.credits <= 0)],
             ["Buy Ships", ()=>showShipyardBuyMenu(planet)],
             ["Back", () => showPlanetMenu(planet)],
         ]
@@ -116,6 +118,7 @@ function showShipyardSellMenu(planet) {
             `Your # ships: ${fleet.ships.length}`,
             `Your credits: ${captain.credits}`,
             `Shipyard credits: ${shipyard.credits}`,
+            `Sell Penalty: ${round(100/shipyard.rake, 2)}%`,
         ]}),
         [
             ["Buy Ships", ()=>showShipyardBuyMenu(planet)],

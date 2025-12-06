@@ -3,7 +3,7 @@
 function showGuildMenu(planet = new Planet()) {
     const options = [];
     const {fleet, captain} = gameState
-    const {guild} = planet
+    const {guild} = planet.settlement
 
     // Purchase officers from the guild
     guild.officers.forEach((officer, index) => {

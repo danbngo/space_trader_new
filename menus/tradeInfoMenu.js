@@ -6,14 +6,14 @@ function createTradeInfoBuyTable(cargoType = CARGO_TYPES_ALL[0], onSelectPlanet 
         ['Planet', 'Market Amt.', 'Buy Price', 'Distance', 'ETA']
     ]
     for (const planet of planets) {
-        const market = illegal ? planet.blackMarket : planet.market
+        const market = illegal ? planet.settlement.blackMarket : planet.settlement.market
         const buyPrice = market ? market.calcCargoBuyPrices().getAmount(cargoType) : -1
         rows.push([
             coloredName(planet),
             !market ? 'N/A' : market.cargo.getAmount(cargoType),
             !market ? 'N/A' : statColorSpan(buyPrice, cargoType.value/buyPrice),
             round(calcDistance(fleet.x, fleet.y, planet.x, planet.y), 2),
-            describeTime(new Route(fleet, planet).travelTime)
+            describeTimespan(new Route(fleet, planet).travelTime)
         ])
     }
     return createTable(rows, (rowIndex = 0)=>onSelectPlanet(planets[rowIndex]))
@@ -27,14 +27,14 @@ function createTradeInfoSellTable(cargoType = CARGO_TYPES_ALL[0], onSelectPlanet
         ['Planet', 'Sell Price', 'Market Credits', 'Distance', 'ETA']
     ]
     for (const planet of planets) {
-        const market = illegal ? planet.blackMarket : planet.market
+        const market = illegal ? planet.settlement.blackMarket : planet.settlement.market
         const sellPrice = market ? market.calcCargoSellPrices().getAmount(cargoType) : -1
         rows.push([
             coloredName(planet),
             !market ? 'N/A' : statColorSpan(sellPrice, sellPrice/cargoType.value),
             !market ? 'N/A' : market.credits,
             round(calcDistance(fleet.x, fleet.y, planet.x, planet.y), 2),
-            describeTime(new Route(fleet, planet).travelTime)
+            describeTimespan(new Route(fleet, planet).travelTime)
         ])
     }
     return createTable(rows, (rowIndex = 0)=>onSelectPlanet(planets[rowIndex]))
@@ -88,7 +88,7 @@ function showTradeInfoBuyMenu(cargoType = CARGO_TYPES_ALL[0]) {
         createElement({children:[
             createTradeInfoBuyTable(cargoType, onSelectPlanet),
             `Your ${cargoType.name} amount: ${fleet.cargo.getAmount(cargoType)}`,
-            `Your Cargo Space: ${fleet.cargo.calcTotalCargo()} / ${fleet.calcTotalCargoSpace()}`,
+            `Your Cargo Space: ${fleet.cargo.calcTotalCargo()}/${fleet.calcTotalCargoSpace()}`,
             `Your credits: ${captain.credits}`,
         ]}),
         options

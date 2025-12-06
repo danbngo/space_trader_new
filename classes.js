@@ -154,42 +154,42 @@ class Star extends OrbitingObject {
 
 // Shipyard class
 class Shipyard {
-    constructor(ships = [], credits = 0, priceModifier = 0, rake = 0) {
+    constructor(planet = new Planet(), ships = [], credits = 0, rake = 0) {
+        this.planet = planet
         this.ships = ships; // Ship[]
         this.credits = credits;
-        this.priceModifier = priceModifier
         this.rake = rake
     }
     calcBuyPrice(ship = new Ship()) {
-        return Math.round(ship.value * this.priceModifier / (1+this.rake))
+        return Math.round(ship.value / (1+this.rake))
     }
     calcSellPrice(ship = new Ship()) {
-        return Math.round(ship.value * this.priceModifier * (1+this.rake))
+        return Math.round(ship.value * (1+this.rake))
     }
 }
 
 // Guild class
 class Guild {
-    constructor(officers = [], priceModifier = 0, rake = 0) {
+    constructor(planet = new Planet(), officers = [], rake = 0) {
+        this.planet = planet
         this.officers = officers; // Officer[]
-        this.priceModifier = priceModifier
         this.rake = rake
     }
 }
 
 // Market class
 class Market {
-    constructor(cargo = [], credits = 0,  cargoPriceModifiers = new Cargo(), rake = 0) {
+    constructor(planet = new Planet(), cargo = [], credits = 0, rake = 0) {
+        this.planet = planet
         this.cargo = cargo; // Cargo[]
         this.credits = credits;
-        this.cargoPriceModifiers = cargoPriceModifiers
         this.rake = rake
     }
 
     calcCargoBuyPrices() {
         const prices = new Cargo()
         for (const cargoType of CARGO_TYPES_ALL) {
-            const price = Math.round(cargoType.value * this.cargoPriceModifiers.getAmount(cargoType) / (1+this.rake))
+            const price = Math.round(cargoType.value * this.planet.culture.cargoPriceModifiers.getAmount(cargoType) * (1+this.rake))
             prices.setAmount(cargoType, price)
         }
         return prices
@@ -198,7 +198,7 @@ class Market {
     calcCargoSellPrices() {
         const prices = new Cargo()
         for (const cargoType of CARGO_TYPES_ALL) {
-            const price = Math.round(cargoType.value * this.cargoPriceModifiers.getAmount(cargoType) * (1+this.rake))
+            const price = Math.round(cargoType.value * this.planet.culture.cargoPriceModifiers.getAmount(cargoType) / (1+this.rake))
             prices.setAmount(cargoType, price)
         }
         return prices
@@ -206,14 +206,28 @@ class Market {
 
 }
 
-// Planet class extends SpaceObject
-class Planet extends OrbitingObject {
-    constructor(name = "Unnamed", graphics = new Graphics(), radius = 0, x = 0, y = 0, orbit = null, shipyard = null, market = null, blackMarket = null, guild = null) {
-        super(name, graphics, radius, x, y, orbit);
+class Culture {
+    constructor(cargoPriceModifiers = new Cargo(), shipQuality = 1.0) {
+        this.shipQuality = shipQuality;
+        this.cargoPriceModifiers = cargoPriceModifiers
+    }
+}
+
+class Settlement {
+    constructor(shipyard = null, market = null, blackMarket = null, guild = null) {
         this.shipyard = shipyard;
         this.market = market;
         this.blackMarket = blackMarket;
         this.guild = guild;
+    }
+}
+
+// Planet class extends SpaceObject
+class Planet extends OrbitingObject {
+    constructor(name = "Unnamed", graphics = new Graphics(), radius = 0, x = 0, y = 0, orbit = null, settlement = new Settlement(), culture = new Culture()) {
+        super(name, graphics, radius, x, y, orbit);
+        this.settlement = settlement
+        this.culture = culture
     }
 }
 
@@ -277,12 +291,18 @@ class StarSystem extends SpaceObject {
 
         const fleets = this.fleets
         for (const fleet of fleets) {
-            if (!fleet.route) continue
+            //if docked, move with planet
+            if (fleet.location && !fleet.route) {
+                fleet.x = fleet.location.x
+                fleet.y = fleet.location.y
+                continue
+            }
+            if (!fleet.route) continue //if floating in space, do nothing
             //if route not started yet, do nothing
             if (year <= fleet.route.startYear) continue
             //check if route completed, if so arrive at destination and dock
             if (year >= fleet.route.endYear) {
-                fleet.location = route.destination
+                fleet.location = fleet.route.destination
                 fleet.route = undefined
                 continue
             }
@@ -334,7 +354,8 @@ class Route {
         const duration = this.endYear - this.startYear
         const elapsedTime = year - this.startYear
         const progressRatio = elapsedTime/duration
-        return [this.startX + this.dx*progressRatio, this.startY + this.dy*progressRatio]
+        const normalProgress = applyNormalCurve(progressRatio)
+        return [this.startX + this.dx*normalProgress, this.startY + this.dy*normalProgress]
     }
 
     static estimateTravelTimeToOrbitingBody(

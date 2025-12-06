@@ -13,13 +13,13 @@ function createCargoTable(blackMarket = false, playerCargo = new Cargo(), market
         ])
     }
     console.log('creating cargo table w rows:',rows)
-    return createTable(rows, (rowIndex = 0)=>onSelectCargoType(CARGO_TYPES_ALL[rowIndex]))
+    return createTable(rows, (rowIndex = 0)=>onSelectCargoType(cargoTypes[rowIndex]))
 }
 
 function showMarketMenu(planet = new Planet(), blackMarket = false) {
     console.log('showing market menu:',planet,planet.market,gameState)
     const {fleet, captain} = gameState;
-    const market = blackMarket ? planet.blackMarket : planet.market
+    const market = blackMarket ? planet.settlement.blackMarket : planet.settlement.market
     const isDocked = fleet.location == planet
     const buyPrices = market.calcCargoBuyPrices()
     const sellPrices = market.calcCargoSellPrices()
@@ -34,7 +34,7 @@ function showMarketMenu(planet = new Planet(), blackMarket = false) {
     }
 
     function sellCargo(ct = CARGO_TYPES_ALL[0], amount = 0) {
-        const sellPrice = buyPrices.getAmount(ct)
+        const sellPrice = Math.min(market.credits, sellPrices.getAmount(ct))
         captain.credits += amount * sellPrice;
         market.credits -= amount * sellPrice;
         fleet.cargo.increment(ct, -amount)
@@ -51,14 +51,16 @@ function showMarketMenu(planet = new Planet(), blackMarket = false) {
         const sellPrice = sellPrices.getAmount(ct)
         const playerAffordableAmount = Math.floor(captain.credits/buyPrice)
         const buyableAmount = Math.min(marketAmount, playerAffordableAmount, remainingCargoSpace)
-        const marketAffordableAmount = Math.floor(planet.market.credits/sellPrice)
+        const marketAffordableAmount = Math.floor(market.credits/sellPrice)
         const sellableAmount = Math.min(playerAmount, marketAffordableAmount)
+        console.log({playerAmount,marketAmount,buyPrice,sellPrice,playerAffordableAmount,buyableAmount,marketAffordableAmount,sellableAmount})
         const buttons = []
         for (const amount of [1, 5, 10, 25]) {
             buttons.push([`Buy ${amount} ${ct.name}`, ()=>buyCargo(ct, amount), (amount > buyableAmount)])
         }
         for (const amount of [1, 5, 10, 25]) {
-            buttons.push([`Sell ${amount} ${ct.name}`, ()=>sellCargo(ct, amount), (amount > sellableAmount)])
+            const shipyardCanAfford = market.credits >= sellPrice*amount
+            buttons.push([`Sell ${amount} ${ct.name}${shipyardCanAfford ? '' : ` (For only ${market.credits}CR)`}`, ()=>sellCargo(ct, amount), (amount > sellableAmount)])
         }
         buttons.push(['Back', ()=>showPlanetMenu(planet)])
         refreshPanelButtons('market_panel', buttons)
@@ -67,9 +69,11 @@ function showMarketMenu(planet = new Planet(), blackMarket = false) {
     let infoContainer = createElement({
         children: [
             createCargoTable(blackMarket, fleet.cargo, market.cargo, buyPrices, sellPrices, onSelectCargoType),
-            `Your Cargo Space: ${fleet.cargo.calcTotalCargo()} / ${fleet.calcTotalCargoSpace()}`,
+            `Your Cargo Space: ${fleet.cargo.calcTotalCargo()}/${fleet.calcTotalCargoSpace()}`,
             `Your Credits: ${captain.credits}`,
-            `Market Credits: ${market.credits}`
+            `Market Credits: ${market.credits}`,
+            `Buy Penalty: ${round(100*market.rake, 2)}%`,
+            `Sell Penalty: ${round(100/market.rake, 2)}%`,
         ]
     })
 

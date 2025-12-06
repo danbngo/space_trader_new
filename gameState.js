@@ -34,10 +34,9 @@ class GameState {
     _initializePlanets() {
         this.system.refreshPositions(this.year);
         for (const planet of PLANETS) {
-            planet.shipyard    = Math.random() > 0.2 ? generateShipyard() : null;
-            planet.market      = Math.random() > 0.2 ? generateMarket()   : null;
-            planet.blackMarket = Math.random() > 0.2 ? generateMarket()   : null;
-            planet.guild       = Math.random() > 0.2 ? generateGuild()    : null;
+            //dont modify order
+            planet.culture = generateCulture(planet)
+            planet.settlement = generateSettlement(planet)
         }
     }
 

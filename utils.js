@@ -22,3 +22,17 @@ function round(num = 0, places = 0) {
     return Math.round(num * factor) / factor;
 }
 
+// Smooth S-curve (slow → fast → slow)
+function applyNormalCurve(ratio = 0) {
+    if (ratio <= 0) return 0;
+    if (ratio >= 1) return 1;
+
+    // Smoothstep (3x² – 2x³)
+    return ratio * ratio * (3 - 2 * ratio);
+}
+
+function rndMember(arr = []) {
+    if (!Array.isArray(arr) || arr.length === 0) return undefined;
+    const idx = Math.floor(Math.random() * arr.length);
+    return arr[idx];
+}

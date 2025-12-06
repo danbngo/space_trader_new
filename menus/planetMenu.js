@@ -1,17 +1,18 @@
 function showPlanetMenu(planet = new Planet()) {
     const isDocked = gameState.fleet.location == planet
+    const {settlement} = planet
 
     const options = [];
-    if (planet.shipyard) {
+    if (settlement.shipyard) {
         options.push(["Shipyard", () => showShipyardBuyMenu(planet)]);
     }
-    if (planet.market) {
+    if (settlement.market) {
         options.push(["Market", () => showMarketMenu(planet, false)]);
     }
-    if (planet.blackMarket) {
+    if (settlement.blackMarket) {
         options.push(["Black Market", () => showMarketMenu(planet, true)]);
     }
-    if (planet.guild) {
+    if (settlement.guild) {
         options.push(["Guild", () => showGuildMenu(planet)]);
     }
     options.push([isDocked ? "Depart" : "Stop Scanning", () => departPlanet(planet)]);

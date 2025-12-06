@@ -106,17 +106,19 @@ function createElement({tag = 'div', id = '', innerHTML = '', children = [], par
     const el = document.createElement(tag)
     if (innerHTML !== undefined) el.innerHTML = ''+innerHTML
     if (id && id.length > 0) el.id = ''+id
-    if (children && children.length > 0) for (const child of children) el.appendChild(child instanceof HTMLElement ? child : createElement({innerHTML: child}))
+    if (children && children.length > 0) for (const child of children) if (child !== undefined && child !== null) el.appendChild(child instanceof HTMLElement ? child : createElement({innerHTML: child}))
     if (parent) parent.appendChild(el)
     if (classNames && classNames.length > 0) for (const className of classNames) el.classList.add(className)
     if (onClick) el.onclick = onClick
-    if (style) {
-        for (const key in style) {
-            el.style[key] = style[key]
-        }
-    }
+    if (style) applyStyle(el, style)
     if (disabled) el.disabled = true
     return el
+}
+
+function applyStyle(element, style = {}) {
+    for (const key in style) {
+        element.style[key] = style[key]
+    }
 }
 
 // utils.js or tableUtil.js
