@@ -103,7 +103,7 @@ function generateFleet(planet = new Planet(), fleetType = rndMember(FLEET_TYPES_
 function generateEncounter(planet = rndMember(PLANETS), encounterType = rndMember(ENCOUNTER_TYPES_ALL)) {
     const {fleetType} = encounterType
     const fleet = generateFleet(planet, fleetType)
-    return new Encounter(encounterType, planet, fleet)
+    return new Encounter(gameState, encounterType, planet, fleet)
 }
 
 function generateBackgroundStars(radius = 1, numStars = 1) {

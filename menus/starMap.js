@@ -19,8 +19,8 @@ class StarMap {
         this.mapHeight = 600
         this.noOrbitsAtZoom = 5000
         this.paused = true
-        this.yearsPerTick = 1/4/24/365 //15 minutes per tick
-        this.msPerTick = 250
+        this.lastTickMs = Date.now()
+        this.gameYearsPerMs = 1/365/24/60 * 2
 
         this.root = createElement({classNames: ['starmap-root']})
         this.infoBar = createElement({parent: this.root, classNames:['starmap-info']})
@@ -322,16 +322,26 @@ class StarMap {
     togglePause(newPausedState = !this.paused) {
         console.log('setting paused to:',newPausedState)
         this.paused = newPausedState
-        if (!this.paused) this.tick()
+        if (!this.paused) {
+            this.lastTickMs = Date.now()
+            this.tick()
+        }
         this.refresh() //always do first refresh, as fleets launch during pause/unpause
     }
 
     tick() {
-        console.log('tick')
+        console.log('tick:',this.lastTickMs)
         if (this.paused) return
         const playerWasDocked = (gameState.fleet.location !== undefined)
 
-        gameState.year += this.yearsPerTick
+        const currentTime = Date.now()
+        const elapsedMs = currentTime - this.lastTickMs
+        this.lastTickMs = currentTime
+        const elapsedYears = elapsedMs * this.gameYearsPerMs;
+
+        console.log(elapsedMs, this.lastTickMs, elapsedYears)
+
+        gameState.year += elapsedYears
         gameState.system.refreshPositions()
 
         this.refreshLeftPaneObjLayer()
@@ -345,7 +355,7 @@ class StarMap {
         }
 
         if (!playerWasDocked) { //dont have encounters while docked or tick after launch
-            const elapsedDays = this.yearsPerTick*365
+            const elapsedDays = elapsedYears*365
             const encounterChance = 1 - Math.pow(1-ENCOUNTER_CHANCE_PER_DAY, elapsedDays)
             const didEncounter = Math.random() < encounterChance
             console.log('encounter chance:',encounterChance,elapsedDays,didEncounter)
@@ -355,8 +365,7 @@ class StarMap {
                 return
             }
         }
-
-        setTimeout(()=>{this.tick(), this.msPerTick})
+        requestAnimationFrame(()=>this.tick())
     }
 }
 

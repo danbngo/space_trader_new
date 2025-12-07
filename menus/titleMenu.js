@@ -11,7 +11,7 @@ function showTitleScreen() {
 }
 
 function startNewGame() {
-    gameState = new GameState()
+    gameState = new GameState(SOLAR_SYSTEM)
     console.log("New game started.");
     showStarMap()
 }

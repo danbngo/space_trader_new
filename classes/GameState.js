@@ -1,7 +1,7 @@
 class GameState {
-    constructor() {
+    constructor(starSystem = new StarSystem()) {
         this.year = 3000;
-        this.system = SOLAR_SYSTEM;
+        this.system = starSystem
 
         // Create captain
         this.captain = new Officer("Captain", 5000, 0, 0, 0, 0, 0, 0);
@@ -29,7 +29,7 @@ class GameState {
         this._initializePlanets();
         this.fleet.dock(EARTH);
 
-        this.encounter = new Encounter() //dont need to serialize this, cant save during encounters
+        this.encounter = null//new Encounter() //dont need to serialize this, cant save during encounters
         const bgStars = generateBackgroundStars(SOLAR_SYSTEM_RADIUS_IN_AU, 1000)
         this.system.backgroundStars = bgStars
     }
@@ -104,7 +104,7 @@ class GameState {
         this.fleet.officers = [this.captain];
 
         // Restore system reference
-        this.system = SOLAR_SYSTEM;
+        this.system = new StarSystem();
 
         // Restore location/destination
         const locName = data.location;
@@ -117,5 +117,3 @@ class GameState {
         this.system.refreshPositions(this.year);
     }
 }
-
-let gameState = new GameState()
