@@ -138,6 +138,13 @@ button:disabled {
     overflow: hidden;
 }
 
+.starmap-layer {
+    background: transparent;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
 
 /* === OBJECT circleS ON MAP === */
 .starmap-object {
@@ -151,6 +158,19 @@ button:disabled {
     cursor: pointer;
 }
 
+.starmap-circle-empty {
+    position: absolute;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    border: 1px solid currentColor;
+}
+
+.starmap-dot {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+}
+
 .starmap-orbit {
     position: absolute;
     border-radius: 50%;
@@ -161,13 +181,15 @@ button:disabled {
     border-width: 1px;
 }
 
+/* the ship faces right by default. so we need to add -90 to angle to make it point up instead
+however, when we apply angle from a path to the ship, we don't add -90. why?
+because 0 is not up geometrically. 0 is right. so if we just apply the angle the ship will face the expected direction */
 .starmap-ship {
     position: absolute;
+    margin-left: -6px;
+    margin-top: -6px;
     transform: translate(-50%, -50%);
-    margin-left: -4px;
-    margin-top: -2px;
-    cursor: pointer;
-    background-image: linear-gradient(to bottom right, currentColor 50%, transparent 50%);
+    clip-path: polygon(100% 50%, 0% 0%, 0% 100%);
 }
 
 .starmap-label {

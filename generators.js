@@ -1,7 +1,6 @@
 function generateShip(planet = new Planet(), shipType = rndMember(SHIP_TYPES_ALL)) {
     const {culture} = planet
     const {shipQuality} = culture
-    console.log('culture, shipquality:',culture,shipQuality)
 
     let maxHull =    round(rng(125, 25)*shipType.hull*shipQuality) 
     let maxShields = round(rng(125, 25)*shipType.shields*shipQuality)
@@ -105,4 +104,20 @@ function generateEncounter(planet = rndMember(PLANETS), encounterType = rndMembe
     const {fleetType} = encounterType
     const fleet = generateFleet(planet, fleetType)
     return new Encounter(encounterType, planet, fleet)
+}
+
+function generateBackgroundStars(radius = 1, numStars = 1) {
+    const backgroundStars = []
+    for (let i = 0; i < numStars; i++) {
+        const distance = Math.random()*Math.random()*radius
+        let [x,y] = rotatePoint(distance, 0, 0, 0, Math.PI*4*Math.random())
+        y *= Math.random()
+        const r = rng(255,128)
+        const g = rng(255,128)
+        const b = rng(255,128)
+        const color = `rgba(${r},${g},${b})`
+        const bgStar = new BackgroundStar('', new Graphics('circle', color, 0), 0, x, y)
+        backgroundStars.push(bgStar)
+    }
+    return backgroundStars
 }

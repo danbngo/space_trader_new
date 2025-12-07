@@ -1,17 +1,22 @@
-// Star Map using a class instead of a single function
-
+/*
+StarMap
+ticket speed: 1 hour per real life second
+default zoom distances: 1200px = half the size of the solar system
+*/
 class StarMap {
     constructor(starSystem = new StarSystem(), autoSelectObject = gameState.fleet) {
         this.starSystem = starSystem
         this.selectedObject = autoSelectObject || gameState.fleet;
 
-        this.zoom = 100; //default zoom = 1 px = 1 au
+        this.zoom = 100; //default zoom: 3000 px from sol to neptune
+        this.maxZoom = this.zoom*10
+        this.minZoom = this.zoom/10
+        this.cameraPanLimit = NEPTUNE.orbit.radius * 2
+
         this.cameraX = this.selectedObject.x;
         this.cameraY = this.selectedObject.y;
         this.mapWidth = 1200
         this.mapHeight = 600
-        this.minZoom = 1
-        this.maxZoom = 5000*1000
         this.noOrbitsAtZoom = 5000
         this.paused = true
         this.yearsPerTick = 1/4/24/365 //15 minutes per tick
@@ -30,6 +35,12 @@ class StarMap {
             this.adjustZoom(direction > 0 ? 1.33 : direction < 0 ? 0.66 : 1.0)
         })
 
+        this.leftPaneBGLayer = createElement({parent:this.leftPane, classNames:['starmap-layer']})
+        this.leftPaneBGLayerCvs = createElement({parent:this.leftPaneBGLayer, tag:'canvas'})
+        this.leftPaneBGLayerCvs.height = this.mapHeight;
+        this.leftPaneBGLayerCvs.width = this.mapWidth;
+        this.leftPaneObjLayer = createElement({parent:this.leftPane, classNames:['starmap-layer']})
+
         this.rightPane = createElement({parent:this.root, classNames:['starmap-right']})
 
         this.main.appendChild(this.leftPane);
@@ -39,11 +50,12 @@ class StarMap {
     }
 
     refresh() {
-        this.rebuildLeftPane();
+        this.rebuildLeftPaneObjLayer();
         this.refreshControls();
         this.refreshInfoBar();
         this.refreshRightPane();
-        this.refreshLeftPane();
+        this.refreshLeftPaneBGLayer();
+        this.refreshLeftPaneObjLayer();
     }
 
     refreshControls() {
@@ -82,8 +94,8 @@ class StarMap {
         for (const child of children) this.infoBar.appendChild(child)
     }
 
-    rebuildLeftPane() {
-        const {starSystem, leftPane} = this
+    rebuildLeftPaneObjLayer() {
+        const {starSystem, leftPaneObjLayer} = this
         const {stars, planets, fleets} = starSystem
         const objects = [...stars, ...planets, ...fleets];
 
@@ -93,7 +105,7 @@ class StarMap {
             if (obj.orbit) orbits.push([obj, obj.orbit])
         }
 
-        leftPane.innerHTML = ""
+        leftPaneObjLayer.innerHTML = ""
 
         orbits.forEach( ([obj, orbit], index) => {
             const id = `orbit${index}`
@@ -101,7 +113,7 @@ class StarMap {
             const color = obj.graphics?.color || '#ffffff'
             createElement({
                 id,
-                parent: leftPane,
+                parent: leftPaneObjLayer,
                 classNames: ['starmap-orbit'],
                 style: {
                     borderColor: color
@@ -116,10 +128,10 @@ class StarMap {
             const id = `route${index}`
             console.log('rebuilding a route')
             const color = route.fleet.graphics?.color || '#ffffff'
-            let {angleDeg} = route
+            let {angleDeg} = route.path
             createElement({
                 id,
-                parent: leftPane,
+                parent: leftPaneObjLayer,
                 classNames: ['starmap-line'],
                 style: {
                     backgroundColor: color,
@@ -131,27 +143,27 @@ class StarMap {
         //draw objects
         objects.forEach((obj,index) => {
             //if (obj.location) return //dont display docked fleets
-            const objIsTriangle = obj.graphics?.shape == 'triangle'
+            const shape = obj.graphics.shape
             const id = `obj${index}`
             const wrapperId = `wrapper${index}`
             console.log('rebuilding an obj')
             const color = obj.graphics?.color || '#ffffff'
             createElement({
                 id: wrapperId,
-                parent: leftPane,
+                parent: leftPaneObjLayer,
                 classNames: ['starmap-object'],
                 onClick: ()=>this.selectObject(obj),
                 children: [
-                    !objIsTriangle ? 
-                        createElement({id, classNames: ['starmap-circle'], style: {background: color}})
-                        : createElement({
+                    shape == 'circle' ? createElement({id, classNames: ['starmap-circle'], style: {background: color}})
+                    : shape == 'triangle' ? createElement({
                             id,
                             classNames: ['starmap-ship'],
                             style: {
-                                color: color,
-                                transform: `rotate(${(obj.route ? obj.route.angleDeg : 0)+135}deg)`
+                                backgroundColor: color,
+                                transform: `rotate(${(obj.route ? obj.route.path.angleDeg : -90)}deg)`
                             }
-                        }),
+                        })
+                    : createElement(),
                     !(obj instanceof Fleet) || obj.location == undefined ?
                         createElement({classNames: ['starmap-label'], innerHTML: coloredName(obj)})
                         : null
@@ -160,7 +172,26 @@ class StarMap {
         })
     }
 
-    refreshLeftPane() {
+    refreshLeftPaneBGLayer() {
+        const {zoom, mapWidth, mapHeight, starSystem} = this
+        const hw = mapWidth/2
+        const hh = mapHeight/2
+        const cx = this.cameraX;
+        const cy = this.cameraY;
+        const objs = [...starSystem.backgroundStars]
+        const canvas = this.leftPaneBGLayerCvs;
+        const ctx = this.leftPaneBGLayerCvs.getContext("2d");
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        objs.forEach((obj, index)=>{
+            ctx.fillStyle = obj.graphics.color;
+            ctx.beginPath();
+            ctx.arc((obj.x-cx)*zoom+hw, (obj.y-cy)*zoom+hh, 1, 0, Math.PI * 2);
+            ctx.fill();
+        })
+    }
+
+    refreshLeftPaneObjLayer() {
         const {zoom, mapWidth, mapHeight, starSystem, noOrbitsAtZoom} = this
         const {stars, planets, fleets} = starSystem
         const objects = [...stars, ...planets, ...fleets];
@@ -177,11 +208,11 @@ class StarMap {
 
         orbits.forEach( ([obj, orbit], index) => {
             const id = `orbit${index}`
-            let gfx = this.leftPane.querySelector('#'+id)
+            let gfx = this.leftPaneObjLayer.querySelector('#'+id)
             if (!gfx) return
             if (zoom > noOrbitsAtZoom) gfx.style.display = 'none'
             else {
-                const size = Math.max(8, (orbit.radius || 0) * 2 * zoom);
+                const size = Math.max(12, (orbit.radius || 0) * 2 * zoom);
                 applyStyle(gfx, {
                     display: '',
                     left: ((obj.parent.x-cx) * zoom + hw) + 'px',
@@ -197,11 +228,12 @@ class StarMap {
         routes.forEach( (route,index) =>{
             if (!route) return
             const id = `route${index}`
-            let gfx = this.leftPane.querySelector('#'+id)
+            let gfx = this.leftPaneObjLayer.querySelector('#'+id)
             if (!gfx) return
             if (zoom > noOrbitsAtZoom) gfx.style.display = 'none'
             else {
-                let {startX, startY, distance} = route
+                let {startX, startY, distance} = route.path
+                console.log('route stats:',startX,startY,distance)
                 applyStyle(gfx, {
                     display: '',
                     width: `${distance * zoom}px`,
@@ -216,17 +248,18 @@ class StarMap {
             //if (obj.location) return //dont display docked fleets
             const id = `obj${index}`
             const wrapperId = `wrapper${index}`
-            let gfx = this.leftPane.querySelector('#'+id)
-            let wrapperGfx = this.leftPane.querySelector('#'+wrapperId)
+            let gfx = this.leftPaneObjLayer.querySelector('#'+id)
+            let wrapperGfx = this.leftPaneObjLayer.querySelector('#'+wrapperId)
             if (!gfx || !wrapperGfx) return
-            const size = Math.max(8, (obj.graphics?.size || 0) * zoom / EARTH_RADII_PER_AU);
-            applyStyle(gfx, {
-                width: (size) + 'px',
-                height: (size) + 'px',
-            })
             applyStyle(wrapperGfx, {
                 left: ((obj.x-cx) * zoom + hw) + 'px',
                 top: ((obj.y-cy) * zoom + hh) + 'px',
+            })
+            if (obj.graphics.shape == 'dot') return
+            const size = Math.max(12, (obj.graphics?.size || 0) * zoom / EARTH_RADII_PER_AU);
+            applyStyle(gfx, {
+                width: (size) + 'px',
+                height: (size) + 'px',
             })
         })
     }
@@ -248,6 +281,7 @@ class StarMap {
     }
 
     selectObject(obj) {
+        console.log('selected:',obj)
         this.selectedObject = obj;
         this.cameraX = obj.x;
         this.cameraY = obj.y;
@@ -255,17 +289,20 @@ class StarMap {
     }
 
     onDragMap(x = 0, y = 0) {
-        console.log('move map:',x,y)
         this.cameraX -= x/this.zoom
         this.cameraY -= y/this.zoom
-        this.refreshLeftPane()
+        this.cameraX = Math.min(this.cameraPanLimit, Math.max(-this.cameraPanLimit, this.cameraX))
+        this.cameraY = Math.min(this.cameraPanLimit, Math.max(-this.cameraPanLimit, this.cameraY))
+        this.refreshLeftPaneBGLayer()
+        this.refreshLeftPaneObjLayer()
     }
 
     adjustZoom(factor) {
         this.zoom *= factor;
         this.zoom = Math.min(this.maxZoom, this.zoom)
         this.zoom = Math.max(this.minZoom, this.zoom)
-        this.refreshLeftPane();
+        this.refreshLeftPaneBGLayer()
+        this.refreshLeftPaneObjLayer();
     }
 
     explore(planet = gameState.fleet.location) {
@@ -297,7 +334,7 @@ class StarMap {
         gameState.year += this.yearsPerTick
         gameState.system.refreshPositions()
 
-        this.refreshLeftPane()
+        this.refreshLeftPaneObjLayer()
         this.refreshInfoBar()
 
         //pause if player reached his destination
@@ -326,6 +363,6 @@ class StarMap {
 
 function showStarMap(autoSelectObject = gameState.fleet) {
     const starMap = new StarMap(gameState.system, autoSelectObject)
-    showElement(starMap.root)
+    showMap(starMap)
 }
 

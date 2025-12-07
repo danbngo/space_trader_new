@@ -87,6 +87,9 @@ const ENCOUNTER_TYPES = {
                 }],
                 ['Resist', ()=>{
                     startCombat()
+                }],
+                ['View', ()=>{
+                    closeModal()
                 }]
             ])
         },
@@ -126,3 +129,20 @@ const ENCOUNTER_TYPES = {
 }
 
 const ENCOUNTER_TYPES_ALL = Object.values(ENCOUNTER_TYPES)
+
+class CombatStrategy {
+    constructor(name = '') {
+        this.name = name
+    }
+}
+
+const COMBAT_STRATEGIES = {
+    //AUTO: new CombatStrategy('(Automatic)'), //let the AI fight
+    ATTACK_NEAREST: new CombatStrategy('Attack Nearest'), //attack and ram closest enemy
+    //ATTACK_FURTHEST: new CombatStrategy('Attack Furthest'), //chase stragglers
+    //RECOVER: new CombatStrategy('Recover'), //hold still to recharge shields
+    //EVADE: new CombatStrategy('Evade'), //get as far away as possible from enemy ships
+    //FLEE: new CombatStrategy('Flee'), //head for the edges of the map
+}
+
+const COMBAT_STRATEGIES_ALL = Object.values(COMBAT_STRATEGIES)

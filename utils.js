@@ -71,3 +71,7 @@ function rndIndexWeighted(weights = [1]) {
     // fallback in case of floating point errors
     return weights.length - 1;
 }
+
+function radiansToDegrees(rads = 0) {
+    return rads * (180 / Math.PI);
+}

@@ -1,7 +1,7 @@
 
 
 class Graphics {
-    constructor(shape = "Circle", color = "White", size = 1) {
+    constructor(shape = "circle", color = "White", size = 1) {
         this.shape = shape
         this.color = color
         this.size = size
@@ -114,6 +114,8 @@ class SpaceObject {
     }
 }
 
+class BackgroundStar extends SpaceObject {}
+
 // Orbit class
 class Orbit {
     constructor(radius = 0, progressOffset = Math.random()) {
@@ -160,20 +162,80 @@ class Ship {
         this.y = 0;
         this.destinationX = 0;
         this.destinationY = 0;
+        this.angle = Math.PI*2; //direction ship is facing in. it can only accelerate/decelerate and shoot in that direction
+        this.speedX = 0; //ships have momentum!
+        this.speedY = 0;
         this.target = null; //ship that this one's trying to attack
+        this.isShooting = false; //ships shoot laser in a stream
+        this.currentLaser = 0;
+        this.combatStrategy = COMBAT_STRATEGIES[0];
+        this.autoCombat = true;
+        this.laserRechargeProgress = 0;
+        this.shieldRechargeProgress = 0;
     }
 
     get value() {
         return Math.pow(this.hull[1]/5 + this.shields[1]/5 + this.lasers + this.thrusters + this.cargoSpace, 2)*10
     }
 
-    //in AU per years. your ship moves slower if your fleet is carrying too much cargo
-    calcSpeed(fleet = new Fleet()) {
-        //each thruster makes your fleet go 1 AU per MINUTE if there was no weight
-        let thrusters = this.thrusters
+    resetCombatVars() {
+        this.destinationX = undefined;
+        this.destinationY = undefined;
+        this.angle = Math.PI*2;
+        this.speedX = 0;
+        this.speedY = 0;
+        this.target = null;
+        this.isShooting = false; 
+        this.currentLaser = 0;
+        this.combatStrategy = COMBAT_STRATEGIES_ALL[0];
+        this.autoCombat = true;
+        this.shieldRechargeProgress = 0;
+        this.laserRechargeProgress = 0;
+    }
+
+    //in AU per years. during combat etc. baggage train is left behind.
+    calcSpeed() {
+        //in SPACE, each thruster makes your fleet go 1 AU per MINUTE if there was no weight
+        //in COMBAT, same value = 1,549,263.45  IN  miles per second
+        const mod = 1549263
+        let thrusters = this.thrusters * mod * ENCOUNTER_THRUSTER_PENALTY
         let weight = this.value
-        weight += fleet.cargo.calcTotalCargo() / fleet.ships.length
-        return 60 * 24 * 365 * thrusters / weight
+        return thrusters / weight
+    }
+
+    calcAngleDeg() {
+        return radiansToDegrees(this.angle)
+    }
+
+    accelerate(elapsedSeconds = 1, decel = false) {
+        const speed = this.calcSpeed()
+        const force = speed*elapsedSeconds
+        const forceDims = rotatePoint(force,0,0,0,this.angle)
+        this.speedX += (decel ? -1 : 1) * forceDims[0]
+        this.speedY += (decel ? -1 : 1) * forceDims[1]
+    }
+
+    turn(elapsedSeconds = 1, counterClockwise = false) {
+        const speed = this.calcSpeed()
+        const force = speed*elapsedSeconds/TIME_TO_TURN_SHIP_WITH_ONE_THRUSTER_IN_SECONDS
+        const turnRatio = force * (counterClockwise ? -1 : 1)
+        this.angle += turnRatio*Math.PI*2
+    }
+
+    rechargeShields(elapsedSeconds = 1) {
+        if (this.shields[0] >= this.shields[1]) return
+        const rechargeProgress = elapsedSeconds/TIME_TO_RECHARGE_SHIELDS_IN_SECONDS
+        this.shieldRechargeProgress += rechargeProgress
+        const shieldChargedAmt = Math.floor(this.shieldRechargeProgress)
+        if (shieldChargedAmt <= 0) return
+        this.shieldRechargeProgress -= shieldChargedAmt
+        this.shields[0] = Math.max(this.shields[1], this.shields[0]+this.shieldChargedAmt)
+    }
+
+    rechargeLaser(elapsedSeconds = 1) {
+        if (this.laserRechargeProgress >= 1) return
+        const rechargeProgress = elapsedSeconds/TIME_TO_RECHARGE_LASER_IN_SECONDS
+        this.laserRechargeProgress = Math.min(1, this.laserRechargeProgress+rechargeProgress)
     }
 }
 
@@ -327,12 +389,13 @@ class Fleet extends SpaceObject {
 }
 
 class StarSystem extends SpaceObject {
-    constructor(name = "Unnamed", graphics = new Graphics(), radius = 0, x = 0, y = 0, barycenter = null, stars = [], planets = [], fleets = []) {
+    constructor(name = "Unnamed", graphics = new Graphics(), radius = 0, x = 0, y = 0, barycenter = null, stars = [], planets = [], fleets = [], backgroundStars = []) {
         super(name, graphics, radius, x, y)
         this.barycenter = barycenter
         this.stars = stars
         this.planets = planets
         this.fleets = fleets
+        this.backgroundStars = backgroundStars
     }
 
     refreshPositions(year = gameState.year) {
@@ -369,23 +432,12 @@ class StarSystem extends SpaceObject {
     }
 }
 
-class Route {
-    constructor(fleet = new Fleet(), destination = new Planet(), startYear = gameState.year) {
-        //run simu
-        const naiveDistance = calcDistance(fleet.x, fleet.y, destination.x, destination.y)
-        const naiveTravelTime = naiveDistance/fleet.calcSpeed()
-        const {endX, endY, endYear, bestTime} = Route.estimateTravelTimeToOrbitingBody(startYear, fleet, destination, 100, naiveTravelTime*2+1)
-
-        this.fleet = fleet
-        this.destination = destination
-        this.startYear = startYear
-        this.startX = fleet.x
-        this.startY = fleet.y
+class Path {
+    constructor(startX = 0, startY = 0, endX = 0, endY = 0) {
+        this.startX = startX
+        this.startY = startY
         this.endX = endX
         this.endY = endY
-        this.endYear = endYear
-        this.travelTime = bestTime
-
         this.left = Math.min(this.startX, this.endX)
         this.top = Math.min(this.startY, this.endY)
         this.right = Math.max(this.startX, this.endX)
@@ -396,20 +448,32 @@ class Route {
         this.dx = this.endX - this.startX
         this.dy = this.endY - this.startY
         this.angle = Math.atan2(this.dy, this.dx);
-        this.angleDeg = this.angle * (180 / Math.PI); // convert to degrees
-        //if (this.angleDeg < 0) this.angleDeg += 360
+        this.angleDeg = radiansToDegrees(this.angle) // convert to degrees
+    }
+}
 
-        console.log('created route:',this.angleDeg,this)
+class Route {
+    constructor(fleet = new Fleet(), destination = new Planet(), startYear = gameState.year) {
+        //run simu
+        const naiveDistance = calcDistance(fleet.x, fleet.y, destination.x, destination.y)
+        const naiveTravelTime = naiveDistance/fleet.calcSpeed()
+        const {endX, endY, endYear, bestTime} = Route.estimateTravelTimeToOrbitingBody(startYear, fleet, destination, 100, naiveTravelTime*2+1)
+        this.fleet = fleet
+        this.destination = destination
+        this.startYear = startYear
+        this.endYear = endYear
+        this.travelTime = bestTime
+        this.path = new Path(fleet.x, fleet.y, endX, endY)
     }
 
     positionAtYear(year = 0) {
-        if (year < this.startYear) return [this.startX, this.startY]
-        if (year > this.endYear) return [this.endX, this.endY]
+        if (year < this.startYear) return [this.path.startX, this.path.startY]
+        if (year > this.endYear) return [this.path.endX, this.path.endY]
         const duration = this.endYear - this.startYear
         const elapsedTime = year - this.startYear
         const progressRatio = elapsedTime/duration
         const normalProgress = applyNormalCurve(progressRatio)
-        return [this.startX + this.dx*normalProgress, this.startY + this.dy*normalProgress]
+        return [this.path.startX + this.path.dx*normalProgress, this.path.startY + this.path.dy*normalProgress]
     }
 
     static estimateTravelTimeToOrbitingBody(
@@ -471,29 +535,90 @@ class Encounter {
         this.planet = planet;
         this.fleet = fleet;
         this.combatEnabled = false;
+        this.mapDimensions = ENCOUNTER_MAP_RADIUS_MILES;
+        this.time = 0;
     }
+
+    applyPhysics(elapsedSeconds = 0) {
+        const playerShips = gameState.fleet.ships
+        const enemyShips = this.fleet.ships
+        const ships = [...playerShips, ...enemyShips]
+        for (const ship of ships) {
+            ship.x += ship.speedX * elapsedSeconds
+            ship.y += ship.speedY * elapsedSeconds
+        }
+    }
+
+    calcNearestTarget(ship = new Ship(), targetShips = [new Ship()]) {
+        let closestDistance = Infinity
+        let closest = targetShips[0]
+        const {x,y} = ship
+        for (const target of targetShips) {
+            const distance = calcDistance(x, y, target.x, target.y)
+            if (distance < closestDistance) {
+                closestDistance = distance
+                closest = target
+            }
+        }
+        return closest
+    }
+
+    makeShipsAct(elapsedSeconds = 0) {
+        const playerFleet = gameState.fleet
+        const playerShips = playerFleet.ships
+        const enemyFleet = this.fleet
+        const enemyShips = enemyFleet.ships
+        const ships = [...playerShips, ...enemyShips]
+
+        console.log('~~make ships act~~')
+
+        for (const ship of ships) {
+            console.log('making ship act:',ship)
+            //const fleet = playerShips.includes(ship) ? playerFleet : enemyFleet
+            const opposingFleet = playerShips.includes(ship) ? enemyFleet : playerFleet
+            //assigning a combat strategy for ships in auto
+            if (ship.autoCombat) {
+                ship.combatStrategy = COMBAT_STRATEGIES.ATTACK_NEAREST
+            }
+            //choose a target
+            if (ship.combatStrategy == COMBAT_STRATEGIES.ATTACK_NEAREST) {
+                const target = this.calcNearestTarget(ship, opposingFleet.ships)
+                ship.target = target
+                ship.destinationX = target.x
+                ship.destinationY = target.y
+                console.log('set target for ship:',target)
+            }
+            const {x,y,destinationX,destinationY,angle} = ship //do not move to the top
+            if (destinationX !== undefined && destinationY !== undefined) {
+                //thrust towards target
+                const angleToDestination = new Path(x, y, destinationX, destinationY).angle
+                const distanceToDestination = calcDistance(x, y, destinationX, destinationY)
+
+                //how much is our current angle different from the angle we need to be facing in?
+                let dAngle = angleToDestination - angle;
+                // Normalize angle difference to the range (-PI, PI]
+                dAngle = Math.atan2(Math.sin(dAngle), Math.cos(dAngle)); 
+
+                //if destination is behind us, decelerate, otherwise accelerate
+                const shouldDecel = (Math.abs(dAngle) > Math.PI / 2);
+                //if destination is to the left of us, turn left, otherwise turn right
+                const shouldTurnCounterClockwise = (dAngle < 0);
+
+                ship.rechargeLaser(elapsedSeconds)
+                if (false) {
+                    console.log('close enough to the enemy, so holding still')
+                    ship.rechargeShields(elapsedSeconds) //shields only recharge when not moving
+                }
+                else {
+                    console.log('too far from enemy, so chasing:',elapsedSeconds,shouldDecel)
+                    ship.accelerate(elapsedSeconds, shouldDecel)
+                }
+                ship.turn(elapsedSeconds, shouldTurnCounterClockwise)
+            }
+        }
+    }
+
+
+
 }
 
-class ShipPath {
-    constructor(ship = new Ship(), toX = 0, toY = 0) {
-        this.ship = ship
-        this.startX = ship.x
-        this.startY = ship.y
-        this.toX = toX
-        this.toY = toY
-
-        this.left = Math.min(this.startX, this.endX)
-        this.top = Math.min(this.startY, this.endY)
-        this.right = Math.max(this.startX, this.endX)
-        this.bottom = Math.max(this.startY, this.endY)
-        this.width = (this.right-this.left)
-        this.height = (this.bottom-this.top)
-        this.distance = Math.sqrt(this.width*this.width + this.height*this.height);
-        this.dx = this.toX - this.startX
-        this.dy = this.toY - this.startY
-        this.angle = Math.atan2(this.dy, this.dx);
-        this.angleDeg = this.angle * (180 / Math.PI); // convert to degrees
-
-        console.log('created route:',this.angleDeg,this)
-    }
-}

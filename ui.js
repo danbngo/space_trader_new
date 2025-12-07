@@ -49,6 +49,13 @@ function showElement(element = createElement()) {
     UI_CONTAINER.appendChild(element);
 }
 
+let currentMap;
+
+function showMap(map = new StarMap()) {
+    currentMap = map
+    showElement(map.root)
+}
+
 function statColorSpan(text = '', ratio = 1.0) {
     // clamp ratio so interpolation works cleanly
     const r = Math.max(0, Math.min(ratio, 4.0));
@@ -163,15 +170,16 @@ function createTable(rows = [createElement()], onSelectRow = (index = 0)=>{}) {
     return table;
 }
 
-let currentModal = null;
+let currentModal = createElement()
 
 function showModal(title = '', text = '', buttons = [['Continue', ()=>{}, false]], id = '') {
     // Close existing modal if open
     if (currentModal) closeModal();
     // Create overlay
-    return createElement({parent:UI_CONTAINER, classNames:['modal-overlay'], children:[
+    currentModal = createElement({parent:UI_CONTAINER, classNames:['modal-overlay'], children:[
         createPanel(title, text, buttons, id)
     ]})
+    return currentModal
 }
 
 function closeModal() {
@@ -242,3 +250,4 @@ function attachMouseWheelHandler(element = createElement(), callback = (directio
     // Older Firefox
     element.addEventListener("DOMMouseScroll", handler, { passive: false });
 }
+
