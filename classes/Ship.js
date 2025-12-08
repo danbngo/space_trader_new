@@ -1,8 +1,9 @@
 
 // Ship class
 class Ship {
-    constructor(name = "Unnamed", graphics = new Graphics('triangle', 'white', SPACE_SHIP_SIZE_IN_EARTH_RADII), hull = [0, 0], shields = [0, 0], lasers = 0, thrusters = 0, cargoSpace = 0) {
+    constructor(name = "Unnamed", graphics = new Graphics('triangle', 'white', SPACE_SHIP_RADIUS_IN_MILES), radius = SPACE_SHIP_RADIUS_IN_MILES, hull = [0, 0], shields = [0, 0], lasers = 0, thrusters = 0, cargoSpace = 0) {
         this.name = name;
+        this.radius = radius;
         this.graphics = graphics;
         this.hull = hull;
         this.shields = shields;
@@ -17,15 +18,16 @@ class Ship {
         this.speedX = 0; //ships have momentum!
         this.speedY = 0;
         this.target = null; //ship that this one's trying to attack
-        this.firingTimeRemaining = null; //ships shoot in a stream
         this.currentLaser = 0;
-        this.combatStrategy = COMBAT_STRATEGIES[0];
+        this.combatStrategy = COMBAT_STRATEGIES.AttackNearest
         this.autoCombat = true;
+        this.manualCombat = false;
         this.laserRechargeProgress = 0;
         this.shieldRechargeProgress = 0;
         this.accelerating = false;
         this.turning = false;
         this.beingHit = false;
+        this.escaped = false;
     }
 
     get mass() {
@@ -43,16 +45,17 @@ class Ship {
         this.speedX = 0;
         this.speedY = 0;
         this.target = null;
-        this.firingTimeRemaining = null; 
         this.currentLaser = 0;
-        this.combatStrategy = COMBAT_STRATEGIES_ALL[0];
+        this.combatStrategy = COMBAT_STRATEGIES.AttackNearest
         this.autoCombat = true;
         this.shieldRechargeProgress = 0;
         this.laserRechargeProgress = 0;
+        this.escaped = false;
         this.resetCombatVarsTurn()
     }
 
     resetCombatVarsTurn() {
+        //todo: show visuals for these states
         this.accelerating = false;
         this.turning = false;
         this.beingHit = false;
@@ -98,14 +101,13 @@ class Ship {
         this.turning = true
         const speed = this.calcSpeed()
         const force = speed*elapsedSeconds/TIME_TO_TURN_SHIP_WITH_ONE_THRUSTER_IN_SECONDS
-        const turnRatio = force * (counterClockwise ? -1 : 1)
+        const turnRatio = force * (counterClockwise ? 1 : -1)
         this.angle += turnRatio*Math.PI*2
     }
 
-    canFireAt(target = new Ship()) {
+    /*canFireAt(target = new Ship()) {
         if (this.isDisabled()) return false
         if (!target) return false
-        if (this.firingTimeRemaining) return false
         if (this.laserRechargeProgress < 1) return false
         const angleToTarget = new Path(this.x, this.y, target.x, target.y).angle
         let dAngle = angleToTarget - this.angle;
@@ -113,29 +115,24 @@ class Ship {
         dAngle = Math.atan2(Math.sin(dAngle), Math.cos(dAngle)); 
         if (Math.abs(dAngle) > Math.PI/2) return false //have to shoot in front of you
         return true
+    }*/
+
+    canFire() {
+        if (this.isDisabled()) return false
+        if (this.laserRechargeProgress < 1) return false
+        return true
     }
 
-    fire(target = this.target) {
-        console.log('ship attempting to fire:',this,target,this.firingTimeRemaining,this.laserRechargeProgress)
-        if (!this.canFireAt(target)) return
+    fire() {//target = this.target) {
+        //if (!this.canFireAt(target)) return false
+        if (!this.canFire()) return false
         this.laserRechargeProgress = 0
-        this.firingTimeRemaining = TIME_TO_SHOOT_LASER_IN_SECONDS
-        console.log('ship firing:',this,this.firingTimeRemaining)
-    }
-    
-    checkDoneFiring(elapsedSeconds = 1) {
-        if (!this.firingTimeRemaining) return
-        const firingProgress = elapsedSeconds*Math.random()
-        this.firingTimeRemaining = this.firingTimeRemaining - firingProgress
-        if (this.firingTimeRemaining <= 0) {
-            console.log('done firing! applying damage')
-            const dmg = rng(this.lasers, 1)
-            this.target.takeDamage(dmg)
-            this.firingTimeRemaining = null
-        }
+        return true
+        //spawn a projectile
     }
 
     takeDamage(dmg = 0) {
+        console.log('applying dmg to ship:',this,dmg)
         if (this.isDisabled()) return
         this.beingHit = true
         if (this.shields[0] > 0) {
@@ -160,10 +157,11 @@ class Ship {
 
     rechargeLaser(elapsedSeconds = 1) {
         if (this.isDisabled()) return
-        if (this.firingTimeRemaining) return
         if (this.laserRechargeProgress >= 1) return
         const rechargeProgress = elapsedSeconds/TIME_TO_RECHARGE_LASER_IN_SECONDS * Math.random()
         this.laserRechargeProgress = Math.min(1, this.laserRechargeProgress+rechargeProgress)
         //console.log('new laser recharge progress:',this.laserRechargeProgress)
     }
 }
+
+

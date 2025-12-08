@@ -184,12 +184,50 @@ button:disabled {
 /* the ship faces right by default. so we need to add -90 to angle to make it point up instead
 however, when we apply angle from a path to the ship, we don't add -90. why?
 because 0 is not up geometrically. 0 is right. so if we just apply the angle the ship will face the expected direction */
-.starmap-ship {
+.starmap-triangle {
     position: absolute;
-    margin-left: -6px;
-    margin-top: -6px;
     transform: translate(-50%, -50%);
     clip-path: polygon(100% 50%, 0% 0%, 0% 100%);
+}
+
+.starmap-thruster-forward::after {
+    content: " ";
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: orange;
+    clip-path: polygon(100% 50%, 0% 0%, 0% 100%);
+    transform: translate(-50%, -150%) rotate(-90deg);
+}
+
+.starmap-thruster-back::after {
+    content: "";
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: orange;
+    clip-path: polygon(100% 50%, 0% 0%, 0% 100%);
+    transform: translate(-50%, 50%) rotate(90deg);
+}
+
+.starmap-thruster-left::after {
+    content: "";
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: orange;
+    clip-path: polygon(100% 50%, 0% 0%, 0% 100%);
+    transform: translate(-140%, -50%) rotate(180deg);
+}
+
+.starmap-thruster-right::after {
+    content: "";
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: orange;
+    clip-path: polygon(100% 50%, 0% 0%, 0% 100%);
+    transform: translate(40%, -50%) rotate(0deg);
 }
 
 .starmap-label {

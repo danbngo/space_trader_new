@@ -5,13 +5,14 @@ class GameState {
 
         // Create captain
         this.captain = new Officer("Captain", 5000, 0, 0, 0, 0, 0, 0);
-        const playerShip = new Ship("Starting Ship", new Graphics("triangle", "white", SPACE_SHIP_SIZE_IN_EARTH_RADII), [25,25], [25,25], 5, 5, 5)
+        const playerShip = new Ship("Starting Ship", new Graphics("triangle", "white", SPACE_SHIP_RADIUS_IN_MILES), SPACE_SHIP_RADIUS_IN_MILES, [25,25], [25,25], 5, 5, 5)
 
         // Create fleet
         this.fleet = new Fleet(
             "Player Fleet",
-            new Graphics("triangle", "white", FLEET_SIZE_IN_EARTH_RADII),
+            new Graphics("triangle", "white", FLEET_RADIUS_IN_EARTH_RADII),
             0, 0,
+            playerShip,
             [playerShip],
             new Cargo(),
             this.captain,
@@ -96,7 +97,7 @@ class GameState {
 
         // Restore fleet
         this.fleet = Object.assign(
-            new Fleet("Player Fleet", new Graphics('triangle', 'white', FLEET_SIZE_IN_EARTH_RADII), 0, 0, [], [], 0, null, EARTH, 0),
+            new Fleet("Player Fleet", new Graphics('triangle', 'white', FLEET_RADIUS_IN_EARTH_RADII), 0, 0, [], [], 0, null, EARTH, 0),
             data.fleet
         );
 

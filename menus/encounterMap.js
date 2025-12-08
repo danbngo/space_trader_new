@@ -10,7 +10,7 @@ class EncounterMap {
         this.encounter = encounter
         this.selectedObject = autoSelectObject || gameState.fleet;
 
-        this.zoom = 1200*100*1000/MILES_PER_AU;
+        this.zoom = 1200*10*1000/MILES_PER_AU;
         this.maxZoom = this.zoom*10
         this.minZoom = this.zoom/10
         this.cameraPanLimit = encounter.mapDimensions
@@ -48,6 +48,8 @@ class EncounterMap {
         this.main.appendChild(this.leftPane);
         this.main.appendChild(this.rightPane);
 
+        this.projectileGfxMap = new Map()
+
         this.refresh()
     }
 
@@ -70,7 +72,7 @@ class EncounterMap {
                 createElement({tag:'button', innerHTML:'+', onClick: () => this.adjustZoom(1.33)}),
                 createElement({tag:'button', innerHTML:'-', onClick: () => this.adjustZoom(0.66)}),
                 //ship info button?
-                createElement({tag:'button', innerHTML:'Hail', onClick: ()=> this.onHail()})
+                createElement({tag:'button', innerHTML: !gameState.encounter.combatEnabled ? 'Hail' : 'Surrender', onClick: ()=> this.onHail()})
             ]
         })
     }
@@ -106,19 +108,7 @@ class EncounterMap {
 
         leftPaneObjLayer.innerHTML = ""
 
-        //draw lasers
-        ships.forEach((ship,index)=>{
-            const id = `shiplaser${index}`
-            const isAllied = playerShips.includes(ship)
-            createElement({
-                id,
-                parent: leftPaneObjLayer,
-                classNames: ['starmap-line'],
-                style: {
-                    backgroundColor: isAllied ? 'blue' : 'red',
-                },
-            })
-        })
+        //we can't do projectiles here since they phase in and out of existence
 
         //draw objects
         ships.forEach((ship,index) => {
@@ -140,7 +130,7 @@ class EncounterMap {
                     }),
                     createElement({
                         id,
-                        classNames: ['starmap-ship'],
+                        classNames: ['starmap-triangle'],
                         style: {
                             backgroundColor: color,
                             zIndex: '99',
@@ -153,7 +143,7 @@ class EncounterMap {
     }
 
     refreshLeftPaneBGLayer() {
-        const {zoom, mapWidth, mapHeight, starSystem} = this
+        const {zoom, mapWidth, mapHeight, starSystem, encounter} = this
         const hw = mapWidth/2
         const hh = mapHeight/2
         const cx = this.cameraX;
@@ -161,24 +151,34 @@ class EncounterMap {
         const objs = [...starSystem.backgroundStars]
         const canvas = this.leftPaneBGLayerCvs;
         const ctx = this.leftPaneBGLayerCvs.getContext("2d");
-        const mod = 2000 //hacky =/
+        const mod = 2000 //hacky way to position stars intended for starmap onto the encounter map
 
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+
         objs.forEach((obj, index)=>{
             ctx.fillStyle = obj.graphics.color;
             ctx.beginPath();
             ctx.arc((mod*obj.x-cx)*zoom+hw, (mod*obj.y-cy)*zoom+hh, 1, 0, Math.PI * 2);
             ctx.fill();
         })
+
+        //draw map edge
+        ctx.beginPath();
+        //ctx.arc(hw, hh, mapDimensions*zoom, 0, Math.PI * 2);
+        ctx.arc(hw-cx*zoom, hh-cy*zoom, encounter.mapDimensions*zoom, 0, Math.PI * 2);
+        ctx.strokeStyle = '#00ffff';
+        ctx.lineWidth = 1;
+        ctx.stroke();
     }
 
     refreshLeftPaneObjLayer() {
-        const {zoom, mapWidth, mapHeight, encounter, noOrbitsAtZoom} = this
+        const {zoom, mapWidth, mapHeight, encounter, leftPaneObjLayer} = this
         const playerFleet = gameState.fleet
         const playerShips = playerFleet.ships
         const enemyFleet = encounter.fleet
         const enemyShips = enemyFleet.ships
         const ships = [...playerShips, ...enemyShips];
+        const {projectiles} = encounter
 
         const hw = mapWidth/2
         const hh = mapHeight/2
@@ -190,23 +190,32 @@ class EncounterMap {
             return new Path(ship.x, ship.y, ship.destinationX, ship.destinationY)
         })*/
 
-        //draw ship lasers
-        ships.forEach( (ship, index) => {
-            const id = `shiplaser${index}`
-            let gfx = this.leftPaneObjLayer.querySelector('#'+id)
-            if (!gfx) return
-            if (!ship.firingTimeRemaining || !ship.target) {
-                gfx.style.display = 'none'
-                return
+        const liveProjectileUuids = []
+
+        projectiles.forEach( (proj)=> {
+            const {uuid, graphics} = proj
+            liveProjectileUuids.push(uuid)
+            const id = 'proj'+uuid
+            const {color} = graphics
+            let gfx = leftPaneObjLayer.querySelector('#'+id)
+            if (!gfx) {
+                gfx = createElement({
+                    id,
+                    parent: leftPaneObjLayer,
+                    classNames: ['starmap-circle'],
+                    style: {
+                        backgroundColor: color,
+                        zIndex: '99',
+                    }
+                })
+                this.projectileGfxMap.set(uuid, gfx)
             }
-            const laserPath = new Path(ship.x, ship.y, ship.target.x, ship.target.y)
-            let {startX, startY, distance, angleDeg} = laserPath
+            const size = Math.max(4, (graphics?.size || 0) * zoom);
             applyStyle(gfx, {
-                display: '',
-                width: `${distance * zoom}px`,
-                transform: `rotate(${angleDeg}deg)`,
-                left: ((startX-cx) * zoom + hw) + 'px',
-                top: ((startY-cy) * zoom + hh) + 'px',
+                width: (size) + 'px',
+                height: (size) + 'px',
+                left: ((proj.x-cx) * zoom + hw) + 'px',
+                top: ((proj.y-cy) * zoom + hh) + 'px',
             })
         })
 
@@ -216,21 +225,24 @@ class EncounterMap {
             const id = `ship${index}`
             const shieldId = `shipshield${index}`
             const wrapperId = `wrapper${index}`
-            let gfx = this.leftPaneObjLayer.querySelector('#'+id)
+            let gfx = leftPaneObjLayer.querySelector('#'+id)
             if (!gfx) return
-            let shieldGfx = this.leftPaneObjLayer.querySelector('#'+shieldId)
-            let wrapperGfx = this.leftPaneObjLayer.querySelector('#'+wrapperId)
+            let shieldGfx = leftPaneObjLayer.querySelector('#'+shieldId)
+            let wrapperGfx = leftPaneObjLayer.querySelector('#'+wrapperId)
             if (!gfx || !wrapperGfx) return
-            const size = Math.max(12, (ship.graphics?.size || 0) * zoom / EARTH_RADII_PER_AU);
+            const size = Math.max(12, (ship.graphics?.size || 0) * zoom);
             const shieldsRatio = ship.shields[0]/ship.shields[1]
             const shield255 = Math.round(255*shieldsRatio)
-            const hullRatio = 0.5 + (0.5*ship.hull[0]/ship.hull[1])
+            const hullRatio = 0.25 + (0.75*ship.hull[0]/ship.hull[1])
+            const invisible = ship.escaped
 
-            applyStyle(gfx, {
-                width: (size) + 'px',
-                height: (size) + 'px',
-                transform: `rotate(${ship.calcAngleDeg()}deg)`,
-            })
+            if (invisible) {
+                applyStyle(wrapperGfx, {
+                    display: 'none'
+                })
+                return
+            }
+
             applyStyle(shieldGfx, {
                 width: (size+4) + 'px',
                 height: (size+4) + 'px',
@@ -240,13 +252,23 @@ class EncounterMap {
                 width: (size) + 'px',
                 height: (size) + 'px',
                 filter: `brightness(${hullRatio})`,
-                transform: `rotate(${ship.calcAngleDeg()}deg)`,
+                transform: `translate(-50%, -50%) rotate(${ship.calcAngleDeg()}deg)`,
             })
             applyStyle(wrapperGfx, {
+                display: '',
                 left: ((ship.x-cx) * zoom + hw) + 'px',
                 top: ((ship.y-cy) * zoom + hh) + 'px',
             })
         })
+
+        //clean up unused projectile gfx
+        const deadProjectileUuids = this.projectileGfxMap.keys().filter(k=>(!liveProjectileUuids.includes(k)))
+        for (const uuid of deadProjectileUuids) {
+            const id = 'proj'+uuid
+            let gfx = leftPaneObjLayer.querySelector('#'+id)
+            if (gfx) gfx.remove()
+            this.projectileGfxMap.delete(uuid)
+        }
     }
 
     refreshRightPane() {
@@ -269,7 +291,6 @@ class EncounterMap {
     onDragMap(x = 0, y = 0) {
         this.cameraX -= x/this.zoom
         this.cameraY -= y/this.zoom
-        console.log('camera x,y vs limit:',this.cameraX,this.cameraY,this.cameraPanLimit)
         this.cameraX = Math.min(this.cameraPanLimit, Math.max(-this.cameraPanLimit, this.cameraX))
         this.cameraY = Math.min(this.cameraPanLimit, Math.max(-this.cameraPanLimit, this.cameraY))
         this.refreshLeftPaneBGLayer()
@@ -294,13 +315,18 @@ class EncounterMap {
     }
 
     tick() {
-        if (this.paused || !gameState.encounter.combatEnabled) return
+        if (this.paused || gameState.encounter.result || !gameState.encounter.combatEnabled) return
 
         const currentTime = Date.now()
         const elapsedMs = currentTime - this.lastTickMs
         this.lastTickMs = currentTime
         const elapsedSeconds = elapsedMs * this.gameSecondsPerMs;
         gameState.encounter.tick(elapsedSeconds)
+
+        if (gameState.encounter.result) {
+            endCombat()
+            return
+        }
 
         this.refreshLeftPaneObjLayer()
         this.refreshInfoBar()
@@ -310,7 +336,11 @@ class EncounterMap {
 
     onHail() {
         if (gameState.encounter.combatEnabled) {
-            //surrender logic
+            this.togglePause(true)
+            showModal(`Surrender?`, `Surrender to the ${gameState.encounter.encounterType.name}?`, [
+                ['Surrender', ()=>gameState.encounter.encounterType.onSurrender()],
+                ['Cancel', ()=>closeModal()]
+            ])
         }
         else gameState.encounter.encounterType.onStart()
     }
@@ -325,7 +355,7 @@ function startEncounter() {
     const playerShips = playerFleet.ships
     const enemyFleet = encounter.fleet
     const enemyShips = enemyFleet.ships
-    const spawnDistance = encounter.mapDimensions*0.25
+    const spawnDistance = encounter.mapDimensions*ENCOUNTER_SHIP_MAX_SPAWN_DISTANCE_RATIO
 
     for (const ship of playerShips) {
         const [x,y] = rotatePoint(-rng(spawnDistance, 0, false), 0, 0, 0, rng(Math.PI/2, -Math.PI/2, false))
@@ -334,6 +364,11 @@ function startEncounter() {
         ship.y = y
         const randomTarget = rndMember(enemyShips)
         ship.angle = new Path(ship.x, ship.y, randomTarget.x, randomTarget.y).angle
+        //make first player ship controllable. TODO: make this more configurable later
+        if (ship == playerShips[0]) {
+            ship.autoCombat = false;
+            ship.manualCombat = true;
+        }
     }
     for (const ship of enemyShips) {
         const [x,y] = rotatePoint(rng(spawnDistance, 0, false), 0, 0, 0, rng(Math.PI/2, -Math.PI/2, false))
@@ -354,6 +389,25 @@ function startEncounter() {
 function endEncounter() {
     gameState.encounter = undefined
     showStarMap()
+    //pause and show modal if player has no working ships, cant move
+    if (gameState.fleet.isStranded()) {
+        handlePlayerStranded()
+        return
+    }
+}
+
+function handlePlayerStranded() {
+    const [nearestPlanet, nearestDistance] = gameState.system.calcNearestPlanet(gameState.fleet)
+    const creditCost = rng(20*nearestDistance, 10*nearestDistance)
+    const dayCost = rng(1.5*nearestDistance, 0.75*nearestDistance)
+    console.log('player is stranded:',nearestPlanet,nearestDistance,creditCost,dayCost)
+    gameState.fleet.dock(nearestPlanet)
+
+    let msg = `You have no working ships remaining, so you have to call a tow ship.<br/>`
+    msg += `It tows your ships to the nearest planet for ${creditCost}CR.<br/>`
+    msg += `You also lose ${dayCost} days while waiting.<br/>`
+
+    showModal(`Stranded`, msg, [['Continue', ()=>showPlanetMenu(nearestPlanet)]])
 }
 
 function showEncounterMap() {
@@ -367,10 +421,17 @@ function startCombat() {
     currentMap.togglePause(false)
 }
 
-function endCombat(playerVictory = false) {
-    gameState.encounter.combatEnabled = false;
-    if (playerVictory) {
-        //showVictoryMenu()
+function endCombat() {
+    const {encounter} = gameState
+    const {result} = encounter
+    if (result == ENCOUNTER_RESULTS.Defeat) {
+        showModal(`Defeat`, `All your ships have been disabled!`, [['Continue', ()=>encounter.encounterType.onDefeat()]])
     }
-    else gameState.encounter.encounterType.afterDefeated()
+    else if (result == ENCOUNTER_RESULTS.Victory) {
+        showModal(`Victory`, `All enemy ships have been disabled! You win!`, [['Continue', ()=>encounter.encounterType.onVictory()]])
+    }
+    else if (result == ENCOUNTER_RESULTS.Escaped) {
+        showModal(`Escape`, `You fled from the battlefield!`, [['Continue', ()=>encounter.encounterType.onEscape()]])
+    }
+    //else if (result == ENCOUNTER_RESULTS.Surrendered) encounter.encounterType.onSurrender() //handled elsewhere
 }

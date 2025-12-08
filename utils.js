@@ -75,3 +75,17 @@ function rndIndexWeighted(weights = [1]) {
 function radiansToDegrees(rads = 0) {
     return rads * (180 / Math.PI);
 }
+
+function calcCirclesIntersecting(x1 = 0, y1 = 0, r1 = 1, x2 = 0, y2 = 0, r2 = 1) {
+    const dx = x1 - x2;
+    const dy = y1 - y2;
+    const distSq = dx*dx + dy*dy;
+    const rad = r1 + r2;
+    return distSq <= rad * rad;
+}
+
+function calcSpeedAlongAngle(speedX = 0, speedY = 0, angle = Math.PI*2) {
+    const ux = Math.cos(angle);  // unit vector in that angle
+    const uy = Math.sin(angle);
+    return speedX * ux + speedY * uy;    // dot product = speed along angle
+}

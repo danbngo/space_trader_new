@@ -31,9 +31,13 @@ function describeTimespan(years = 0) {
 }
 
 function coloredName(obj = new SpaceObject(), includeSuffixes = true) {
-    return `${colorSpan(obj.name, obj.graphics.color)}${
+    let name = obj.name
+    if (obj instanceof Ship) name = name.substring(name.lastIndexOf(" ") + 1);
+
+    return `${colorSpan(name, obj.graphics.color)}${
         includeSuffixes && obj == gameState.fleet.location ? ` (Docked)`
         : includeSuffixes && obj == gameState.fleet.route?.destination ? ` (Destination)`
+        : obj == gameState.fleet.flagship || obj == gameState.encounter?.fleet.flagship ? '⚑'
         : ''
     }`
 }

@@ -157,10 +157,10 @@ class StarMap {
                     shape == 'circle' ? createElement({id, classNames: ['starmap-circle'], style: {background: color}})
                     : shape == 'triangle' ? createElement({
                             id,
-                            classNames: ['starmap-ship'],
+                            classNames: ['starmap-triangle'],
                             style: {
                                 backgroundColor: color,
-                                transform: `rotate(${(obj.route ? obj.route.path.angleDeg : -90)}deg)`
+                                transform: `translate(-50%, -50%) rotate(${(obj.route ? obj.route.path.angleDeg : -90)}deg)`
                             }
                         })
                     : createElement(),
@@ -233,7 +233,6 @@ class StarMap {
             if (zoom > noOrbitsAtZoom) gfx.style.display = 'none'
             else {
                 let {startX, startY, distance} = route.path
-                console.log('route stats:',startX,startY,distance)
                 applyStyle(gfx, {
                     display: '',
                     width: `${distance * zoom}px`,
@@ -261,6 +260,12 @@ class StarMap {
                 width: (size) + 'px',
                 height: (size) + 'px',
             })
+            if (obj instanceof Fleet) {
+                if (obj.location) gfx.classList.remove('starmap-thruster-forward')
+                else gfx.classList.add('starmap-thruster-forward')
+            }
+
+
         })
     }
 
@@ -330,7 +335,6 @@ class StarMap {
     }
 
     tick() {
-        console.log('tick:',this.lastTickMs)
         if (this.paused) return
         const playerWasDocked = (gameState.fleet.location !== undefined)
 
@@ -338,8 +342,6 @@ class StarMap {
         const elapsedMs = currentTime - this.lastTickMs
         this.lastTickMs = currentTime
         const elapsedYears = elapsedMs * this.gameYearsPerMs;
-
-        console.log(elapsedMs, this.lastTickMs, elapsedYears)
 
         gameState.year += elapsedYears
         gameState.system.refreshPositions()
@@ -358,7 +360,6 @@ class StarMap {
             const elapsedDays = elapsedYears*365
             const encounterChance = 1 - Math.pow(1-ENCOUNTER_CHANCE_PER_DAY, elapsedDays)
             const didEncounter = Math.random() < encounterChance
-            console.log('encounter chance:',encounterChance,elapsedDays,didEncounter)
             if (didEncounter) {
                 this.togglePause(true)
                 startEncounter()

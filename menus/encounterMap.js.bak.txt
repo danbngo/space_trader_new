@@ -140,7 +140,7 @@ class EncounterMap {
                     }),
                     createElement({
                         id,
-                        classNames: ['starmap-ship'],
+                        classNames: ['starmap-triangle'],
                         style: {
                             backgroundColor: color,
                             zIndex: '99',
@@ -224,7 +224,7 @@ class EncounterMap {
             const size = Math.max(12, (ship.graphics?.size || 0) * zoom / EARTH_RADII_PER_AU);
             const shieldsRatio = ship.shields[0]/ship.shields[1]
             const shield255 = Math.round(255*shieldsRatio)
-            const hullRatio = 0.5 + (0.5*ship.hull[0]/ship.hull[1])
+            const hullRatio = 0.25 + (0.75*ship.hull[0]/ship.hull[1])
 
             applyStyle(gfx, {
                 width: (size) + 'px',
@@ -372,5 +372,5 @@ function endCombat(playerVictory = false) {
     if (playerVictory) {
         //showVictoryMenu()
     }
-    else gameState.encounter.encounterType.afterDefeated()
+    else gameState.encounter.encounterType.onDefeat()
 }
