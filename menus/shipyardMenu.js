@@ -65,7 +65,7 @@ function showShipyardBuyMenu(planet) {
     }
 
     showPanel(
-        `${colorSpan(planet.name, planet.graphics.color)} - Shipyard`,
+        `${colorSpan(planet.name, planet.color)} - Shipyard`,
         createElement({children:[
             `Shipyard ships`,
             createBuyShipMenu(shipyard.ships, shipyard, (ship)=>onSelectShipyardShip(ship)),
@@ -111,7 +111,7 @@ function showShipyardSellMenu(planet) {
     }
 
     showPanel(
-        `${colorSpan(planet.name, planet.graphics.color)} - Shipyard`,
+        `${colorSpan(planet.name, planet.color)} - Shipyard`,
         createElement({children:[
             `Your ships`,
             createSellShipMenu(fleet.ships, shipyard, (ship)=>onSelectPlayerShip(ship)),

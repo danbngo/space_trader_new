@@ -1,8 +1,8 @@
 // SpaceObject class
 class SpaceObject {
-    constructor(name = "Unnamed", graphics = new Graphics(), radius = 0, x = 0, y = 0) {
+    constructor(name = "Unnamed", color = 'white', radius = 0, x = 0, y = 0) {
         this.name = name;
-        this.graphics = graphics
+        this.color = color
         this.radius = radius;
         this.x = x;
         this.y = y;
@@ -30,8 +30,8 @@ class BackgroundStar extends SpaceObject {}
 
 
 class OrbitingObject extends SpaceObject {
-    constructor(name = "Unnamed", graphics = new Graphics(), radius = 0, x = 0, y = 0, orbit = null) {
-        super(name, graphics, radius, x, y);
+    constructor(name = "Unnamed", color = 'white', radius = 0, x = 0, y = 0, orbit = null) {
+        super(name, color, radius, x, y);
         this.orbit = orbit;
     }
     calcAbsPositionAtYear(year = 0) {
@@ -48,15 +48,15 @@ class OrbitingObject extends SpaceObject {
 
 // Star class extends SpaceObject
 class Star extends OrbitingObject {
-    constructor(name = "Unnamed", graphics = new Graphics(), radius = 0, x = 0, y = 0, orbit = null) {
-        super(name, graphics, radius, x, y, orbit);
+    constructor(name = "Unnamed", color = 'white', radius = 0, x = 0, y = 0, orbit = null) {
+        super(name, color, radius, x, y, orbit);
     }
 }
 
 // Planet class extends SpaceObject
 class Planet extends OrbitingObject {
-    constructor(name = "Unnamed", graphics = new Graphics(), radius = 0, x = 0, y = 0, orbit = null, settlement = new Settlement(), culture = new Culture()) {
-        super(name, graphics, radius, x, y, orbit);
+    constructor(name = "Unnamed", color = 'white', radius = 0, x = 0, y = 0, orbit = null, settlement = new Settlement(), culture = new Culture()) {
+        super(name, color, radius, x, y, orbit);
         this.settlement = settlement
         this.culture = culture
     }

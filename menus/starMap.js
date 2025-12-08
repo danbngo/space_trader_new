@@ -8,16 +8,6 @@ class StarMap {
         this.starSystem = starSystem
         this.selectedObject = autoSelectObject || gameState.fleet;
 
-        this.zoom = 100; //default zoom: 3000 px from sol to neptune
-        this.maxZoom = this.zoom*10
-        this.minZoom = this.zoom/10
-        this.cameraPanLimit = NEPTUNE.orbit.radius * 2
-
-        this.cameraX = this.selectedObject.x;
-        this.cameraY = this.selectedObject.y;
-        this.mapWidth = 1200
-        this.mapHeight = 600
-        this.noOrbitsAtZoom = 5000
         this.paused = true
         this.lastTickMs = Date.now()
         this.gameYearsPerMs = 1/365/24/60 * 2
@@ -27,19 +17,8 @@ class StarMap {
         this.controls = createElement({parent: this.root})
         this.main = createElement({parent: this.root, classNames:['starmap-main']})
 
-        this.leftPane = createElement({parent:this.root, classNames:['starmap-left']})
-        this.leftPane.style.width = this.mapWidth+'px';
-        this.leftPane.style.height = this.mapHeight+'px';
-        attachDragHandler(this.leftPane, (x,y)=>this.onDragMap(x,y), 5)
-        attachMouseWheelHandler(this.leftPane, (direction=1)=>{
-            this.adjustZoom(direction > 0 ? 1.33 : direction < 0 ? 0.66 : 1.0)
-        })
-
-        this.leftPaneBGLayer = createElement({parent:this.leftPane, classNames:['starmap-layer']})
-        this.leftPaneBGLayerCvs = createElement({parent:this.leftPaneBGLayer, tag:'canvas'})
-        this.leftPaneBGLayerCvs.height = this.mapHeight;
-        this.leftPaneBGLayerCvs.width = this.mapWidth;
-        this.leftPaneObjLayer = createElement({parent:this.leftPane, classNames:['starmap-layer']})
+        this.cvs = new CanvasWrapper(1200, 600, 'black', 100, 10, 1000, NEPTUNE.orbit.radius*2)
+        this.leftPane = createElement({parent:this.root, classNames:['starmap-left'], children:[this.cvs.root]})
 
         this.rightPane = createElement({parent:this.root, classNames:['starmap-right']})
 
@@ -54,7 +33,6 @@ class StarMap {
         this.refreshControls();
         this.refreshInfoBar();
         this.refreshRightPane();
-        this.refreshLeftPaneBGLayer();
         this.refreshLeftPaneObjLayer();
     }
 
@@ -65,8 +43,8 @@ class StarMap {
             classNames: ['starmap-buttons'],
             children: [
                 createElement({tag:'button', innerHTML:this.paused ? '▶' : '⏸', onClick: () => this.togglePause()}),
-                createElement({tag:'button', innerHTML:'+', onClick: () => this.adjustZoom(1.33)}),
-                createElement({tag:'button', innerHTML:'-', onClick: () => this.adjustZoom(0.66)}),
+                createElement({tag:'button', innerHTML:'+', onClick: () => this.cvs.adjustZoom(1.33)}),
+                createElement({tag:'button', innerHTML:'-', onClick: () => this.cvs.adjustZoom(0.66)}),
                 createElement({tag:'button', innerHTML:'Dock', onClick: ()=> this.explore(), disabled: (!gameState.fleet.location)}),
                 createElement({tag:'button', innerHTML:'Trade Info', onClick: ()=> this.onTradeInfo()})
             ]
@@ -95,178 +73,103 @@ class StarMap {
     }
 
     rebuildLeftPaneObjLayer() {
-        const {starSystem, leftPaneObjLayer} = this
-        const {stars, planets, fleets} = starSystem
-        const objects = [...stars, ...planets, ...fleets];
+        const {starSystem, cvs} = this
+        const {stars, planets, fleets, backgroundStars} = starSystem
+        //const routes = [gameState.fleet.route]
+        const orbitingBodies = [...stars, ...planets].filter(b=>(b.orbit))
 
-        //draw orbits
-        const orbits = []
-        for (const obj of objects) {
-            if (obj.orbit) orbits.push([obj, obj.orbit])
-        }
+        cvs.clearObjects()
 
-        leftPaneObjLayer.innerHTML = ""
+        backgroundStars.forEach( (bgStar, index) => {
+            cvs.addDot(`orbit${index}`, bgStar.x, bgStar.y, bgStar.color)
+        });
 
-        orbits.forEach( ([obj, orbit], index) => {
-            const id = `orbit${index}`
+        orbitingBodies.forEach( (orbitingBody, index) => {
             console.log('rebuilding an orbit')
-            const color = obj.graphics?.color || '#ffffff'
-            createElement({
-                id,
-                parent: leftPaneObjLayer,
-                classNames: ['starmap-orbit'],
-                style: {
-                    borderColor: color
-                },
-            })
+            cvs.addEmptyCircle(`orbit${index}`, orbitingBody.parent.x, orbitingBody.parent.y, orbitingBody.orbit.radius, 1, orbitingBody.color)
         });
         
-        //draw routes
-        const routes = [gameState.fleet.route]
-        routes.forEach((route,index)=>{
-            if (!route) return
-            const id = `route${index}`
+        fleets.forEach((fleet,index)=>{
             console.log('rebuilding a route')
-            const color = route.fleet.graphics?.color || '#ffffff'
-            let {angleDeg} = route.path
-            createElement({
-                id,
-                parent: leftPaneObjLayer,
-                classNames: ['starmap-line'],
-                style: {
-                    backgroundColor: color,
-                    transform: `rotate(${angleDeg}deg)`
+            cvs.addLine(`fleetpath${index}`, 0, 0, 0, 0, fleet.color, 1) 
+        })
+
+        stars.forEach((body,index)=>{
+            cvs.addFilledCircle(`star${index}`, body.x, body.y, body.radius/EARTH_RADII_PER_AU, 12, body.color, ()=>this.selectObject(body))
+        })
+
+        planets.forEach((body,index)=>{
+            cvs.addFilledCircle(`planet${index}`, body.x, body.y, body.radius/EARTH_RADII_PER_AU, 8, body.color, ()=>this.selectObject(body))
+        })
+
+        fleets.forEach((fleet, index)=>{
+            cvs.addTriangle(`fleet${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU, 8, fleet.color, fleet.route ? fleet.route.path.angle : -Math.PI/2, ()=>this.selectObject(fleet))
+            cvs.addText(`fleetlabel${index}`, fleet.x, fleet.y, 0, -32, fleet.name, fleet.color, DEFAULT_FONT_SIZE,
+                ()=>this.selectObject(fleet),
+                /*()=>{
+                    cvs.getObject(`fleetlabel${index}`).color = 'red'
+                    cvs.redraw()
                 },
-            })
+                ()=>{
+                    cvs.getObject(`fleetlabel${index}`).color = fleet.color
+                    cvs.redraw()
+                },*/
+            )
         })
 
-        //draw objects
-        objects.forEach((obj,index) => {
-            //if (obj.location) return //dont display docked fleets
-            const shape = obj.graphics.shape
-            const id = `obj${index}`
-            const wrapperId = `wrapper${index}`
-            console.log('rebuilding an obj')
-            const color = obj.graphics?.color || '#ffffff'
-            createElement({
-                id: wrapperId,
-                parent: leftPaneObjLayer,
-                classNames: ['starmap-object'],
-                onClick: ()=>this.selectObject(obj),
-                children: [
-                    shape == 'circle' ? createElement({id, classNames: ['starmap-circle'], style: {background: color}})
-                    : shape == 'triangle' ? createElement({
-                            id,
-                            classNames: ['starmap-triangle'],
-                            style: {
-                                backgroundColor: color,
-                                transform: `translate(-50%, -50%) rotate(${(obj.route ? obj.route.path.angleDeg : -90)}deg)`
-                            }
-                        })
-                    : createElement(),
-                    !(obj instanceof Fleet) || obj.location == undefined ?
-                        createElement({classNames: ['starmap-label'], innerHTML: coloredName(obj)})
-                        : null
-                ]
-            })
-        })
-    }
-
-    refreshLeftPaneBGLayer() {
-        const {zoom, mapWidth, mapHeight, starSystem} = this
-        const hw = mapWidth/2
-        const hh = mapHeight/2
-        const cx = this.cameraX;
-        const cy = this.cameraY;
-        const objs = [...starSystem.backgroundStars]
-        const canvas = this.leftPaneBGLayerCvs;
-        const ctx = this.leftPaneBGLayerCvs.getContext("2d");
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        objs.forEach((obj, index)=>{
-            ctx.fillStyle = obj.graphics.color;
-            ctx.beginPath();
-            ctx.arc((obj.x-cx)*zoom+hw, (obj.y-cy)*zoom+hh, 1, 0, Math.PI * 2);
-            ctx.fill();
-        })
+        cvs.recalculateDrawOrder()
     }
 
     refreshLeftPaneObjLayer() {
-        const {zoom, mapWidth, mapHeight, starSystem, noOrbitsAtZoom} = this
+        const {cvs, starSystem} = this
         const {stars, planets, fleets} = starSystem
-        const objects = [...stars, ...planets, ...fleets];
-        const hw = mapWidth/2
-        const hh = mapHeight/2
-        const cx = this.cameraX;
-        const cy = this.cameraY;
+        const orbitingBodies = [...stars, ...planets].filter(b=>(b.orbit))
 
-        //draw orbits
-        const orbits = []
-        for (const obj of objects) {
-            if (obj.orbit) orbits.push([obj, obj.orbit])
-        }
-
-        orbits.forEach( ([obj, orbit], index) => {
-            const id = `orbit${index}`
-            let gfx = this.leftPaneObjLayer.querySelector('#'+id)
-            if (!gfx) return
-            if (zoom > noOrbitsAtZoom) gfx.style.display = 'none'
-            else {
-                const size = Math.max(12, (orbit.radius || 0) * 2 * zoom);
-                applyStyle(gfx, {
-                    display: '',
-                    left: ((obj.parent.x-cx) * zoom + hw) + 'px',
-                    top: ((obj.parent.y-cy) * zoom + hh) + 'px',
-                    width: (size) + 'px',
-                    height: (size) + 'px',
-                })
-            }
+        orbitingBodies.forEach( (orbitingBody, index) => {
+            const cvsObject = cvs.getObject(`orbit${index}`)
+            cvsObject.x = orbitingBody.parent.x
+            cvsObject.y = orbitingBody.parent.y
         });
-        
-        //draw routes
-        const routes = [gameState.fleet.route]
-        routes.forEach( (route,index) =>{
-            if (!route) return
-            const id = `route${index}`
-            let gfx = this.leftPaneObjLayer.querySelector('#'+id)
-            if (!gfx) return
-            if (zoom > noOrbitsAtZoom) gfx.style.display = 'none'
+
+        stars.forEach((body,index)=>{
+            const cvsObject = cvs.getObject(`star${index}`)
+            cvsObject.x = body.x
+            cvsObject.y = body.y
+        })
+
+        planets.forEach((body,index)=>{
+            const cvsObject = cvs.getObject(`planet${index}`)
+            cvsObject.x = body.x
+            cvsObject.y = body.y
+        })
+
+        fleets.forEach((fleet, index)=>{
+            let cvsObject = cvs.getObject(`fleet${index}`)
+            cvsObject.x = fleet.x
+            cvsObject.y = fleet.y
+
+            cvsObject = cvs.getObject(`fleetlabel${index}`)
+            cvsObject.x = fleet.x
+            cvsObject.y = fleet.y
+
+            cvsObject = cvs.getObject(`fleetpath${index}`)
+            if (!fleet.route) cvsObject.visible = false
             else {
-                let {startX, startY, distance} = route.path
-                applyStyle(gfx, {
-                    display: '',
-                    width: `${distance * zoom}px`,
-                    left: ((startX-cx) * zoom + hw) + 'px',
-                    top: ((startY-cy) * zoom + hh) + 'px',
-                })
+                let {startX, startY, endX, endY} = fleet.route.path
+                cvsObject.visible = true
+                cvsObject.x = startX
+                cvsObject.y = startY
+                cvsObject.x2 = endX
+                cvsObject.y2 = endY
             }
         })
 
-        //draw objects
-        objects.forEach( (obj, index) => {
-            //if (obj.location) return //dont display docked fleets
-            const id = `obj${index}`
-            const wrapperId = `wrapper${index}`
-            let gfx = this.leftPaneObjLayer.querySelector('#'+id)
-            let wrapperGfx = this.leftPaneObjLayer.querySelector('#'+wrapperId)
-            if (!gfx || !wrapperGfx) return
-            applyStyle(wrapperGfx, {
-                left: ((obj.x-cx) * zoom + hw) + 'px',
-                top: ((obj.y-cy) * zoom + hh) + 'px',
-            })
-            if (obj.graphics.shape == 'dot') return
-            const size = Math.max(12, (obj.graphics?.size || 0) * zoom / EARTH_RADII_PER_AU);
-            applyStyle(gfx, {
-                width: (size) + 'px',
-                height: (size) + 'px',
-            })
-            if (obj instanceof Fleet) {
-                if (obj.location) gfx.classList.remove('starmap-thruster-forward')
-                else gfx.classList.add('starmap-thruster-forward')
-            }
+        cvs.redraw()
 
-
-        })
+        /*if (obj instanceof Fleet) {
+            if (obj.location) gfx.classList.remove('starmap-thruster-forward')
+            else gfx.classList.add('starmap-thruster-forward')
+        }*/
     }
 
     refreshRightPane() {
@@ -288,26 +191,8 @@ class StarMap {
     selectObject(obj) {
         console.log('selected:',obj)
         this.selectedObject = obj;
-        this.cameraX = obj.x;
-        this.cameraY = obj.y;
+        this.cvs.moveCameraTo(obj.x, obj.y)
         this.refresh();
-    }
-
-    onDragMap(x = 0, y = 0) {
-        this.cameraX -= x/this.zoom
-        this.cameraY -= y/this.zoom
-        this.cameraX = Math.min(this.cameraPanLimit, Math.max(-this.cameraPanLimit, this.cameraX))
-        this.cameraY = Math.min(this.cameraPanLimit, Math.max(-this.cameraPanLimit, this.cameraY))
-        this.refreshLeftPaneBGLayer()
-        this.refreshLeftPaneObjLayer()
-    }
-
-    adjustZoom(factor) {
-        this.zoom *= factor;
-        this.zoom = Math.min(this.maxZoom, this.zoom)
-        this.zoom = Math.max(this.minZoom, this.zoom)
-        this.refreshLeftPaneBGLayer()
-        this.refreshLeftPaneObjLayer();
     }
 
     explore(planet = gameState.fleet.location) {

@@ -131,10 +131,6 @@ button:disabled {
 /* === CANVAS AREA (Left Side) === */
 
 .starmap-left {
-    flex: 3;
-    position: relative;
-    background: #000;
-    border-right: 1px solid #333;
     overflow: hidden;
 }
 

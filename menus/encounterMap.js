@@ -117,7 +117,7 @@ class EncounterMap {
             const shieldId = `shipshield${index}`
             const wrapperId = `wrapper${index}`
             console.log('rebuilding a ship')
-            const color = ship.graphics?.color || '#ffffff'
+            const color = ship.color || '#ffffff'
             createElement({
                 id: wrapperId,
                 parent: leftPaneObjLayer,
@@ -156,7 +156,7 @@ class EncounterMap {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         objs.forEach((obj, index)=>{
-            ctx.fillStyle = obj.graphics.color;
+            ctx.fillStyle = obj.color;
             ctx.beginPath();
             ctx.arc((mod*obj.x-cx)*zoom+hw, (mod*obj.y-cy)*zoom+hh, 1, 0, Math.PI * 2);
             ctx.fill();
@@ -193,10 +193,9 @@ class EncounterMap {
         const liveProjectileUuids = []
 
         projectiles.forEach( (proj)=> {
-            const {uuid, graphics} = proj
+            const {uuid, color, radius} = proj
             liveProjectileUuids.push(uuid)
             const id = 'proj'+uuid
-            const {color} = graphics
             let gfx = leftPaneObjLayer.querySelector('#'+id)
             if (!gfx) {
                 gfx = createElement({
@@ -210,7 +209,7 @@ class EncounterMap {
                 })
                 this.projectileGfxMap.set(uuid, gfx)
             }
-            const size = Math.max(4, (graphics?.size || 0) * zoom);
+            const size = Math.max(4, (radius || 1) * zoom);
             applyStyle(gfx, {
                 width: (size) + 'px',
                 height: (size) + 'px',
@@ -230,7 +229,7 @@ class EncounterMap {
             let shieldGfx = leftPaneObjLayer.querySelector('#'+shieldId)
             let wrapperGfx = leftPaneObjLayer.querySelector('#'+wrapperId)
             if (!gfx || !wrapperGfx) return
-            const size = Math.max(12, (ship.graphics?.size || 0) * zoom);
+            const size = Math.max(12, (ship.radius || 1) * zoom);
             const shieldsRatio = ship.shields[0]/ship.shields[1]
             const shield255 = Math.round(255*shieldsRatio)
             const hullRatio = 0.25 + (0.75*ship.hull[0]/ship.hull[1])
@@ -375,7 +374,7 @@ function startEncounter() {
         ship.resetCombatVars()
         ship.x = x
         ship.y = y
-        ship.graphics.color = 'orange'
+        ship.color = 'orange'
         const randomTarget = rndMember(playerShips)
         ship.angle = new Path(ship.x, ship.y, randomTarget.x, randomTarget.y).angle
     }

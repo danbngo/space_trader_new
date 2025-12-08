@@ -13,7 +13,7 @@ function generateShip(planet = new Planet(), shipType = rndMember(SHIP_TYPES_ALL
 
     const name = `${planet.name} ${shipType.name}`
 
-    return new Ship(name, new Graphics("triangle", "white", SPACE_SHIP_RADIUS_IN_MILES), SPACE_SHIP_RADIUS_IN_MILES, hull, shields, lasers, thrusters, cargoSpace, new Cargo());
+    return new Ship(name, 'white', SPACE_SHIP_RADIUS_IN_MILES, hull, shields, lasers, thrusters, cargoSpace, new Cargo());
 }
 
 function generateOfficerName(planet = new Planet()) {
@@ -88,7 +88,7 @@ function generateFleet(planet = new Planet(), fleetType = rndMember(FLEET_TYPES_
     }
     const flagship = ships[0]
     const cargo = new Cargo()
-    const fleet = new Fleet(fleetType.name, new Graphics('triangle', planet.graphics.color, FLEET_RADIUS_IN_EARTH_RADII), 0, 0, flagship, ships, cargo)
+    const fleet = new Fleet(fleetType.name, planet.color, 0, 0, flagship, ships, cargo)
 
     const maxCargo = fleet.calcTotalCargoSpace()
     const cargoTypes = fleetType.cargoTypes.filter(()=>(Math.random() > .5))
@@ -117,7 +117,7 @@ function generateBackgroundStars(radius = 1, numStars = 1) {
         const g = rng(255,128)
         const b = rng(255,128)
         const color = `rgba(${r},${g},${b})`
-        const bgStar = new BackgroundStar('', new Graphics('circle', color, 0), 0, x, y)
+        const bgStar = new BackgroundStar('', color, 0, x, y)
         backgroundStars.push(bgStar)
     }
     return backgroundStars

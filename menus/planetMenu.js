@@ -18,7 +18,7 @@ function showPlanetMenu(planet = new Planet()) {
     options.push([isDocked ? "Depart" : "Stop Scanning", () => departPlanet(planet)]);
 
     showPanel(
-        colorSpan(planet.name, planet.graphics.color),
+        colorSpan(planet.name, planet.color),
         isDocked ?
             `You have arrived at ${coloredName(planet, false)}. What would you like to do?`
             : `You are scanning ${coloredName(planet)}.`,

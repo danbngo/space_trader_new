@@ -88,7 +88,7 @@ class Encounter {
         const isAllied = playerShips.includes(firedBy)
         const color = isAllied ? 'blue' : 'red'
         const [speedX, speedY] = this.calcProjectileSpeed(firedBy)
-        const proj = new Projectile(new Graphics('circle', color, 0.1), SPACE_SHIP_RADIUS_IN_MILES, firedBy.x, firedBy.y, speedX, speedY, firedBy.angle, firedBy)
+        const proj = new Projectile(color, SPACE_SHIP_RADIUS_IN_MILES, firedBy.x, firedBy.y, speedX, speedY, firedBy.angle, firedBy)
         this.projectiles.push(proj)
     }
 

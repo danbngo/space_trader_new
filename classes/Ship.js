@@ -1,10 +1,10 @@
 
 // Ship class
 class Ship {
-    constructor(name = "Unnamed", graphics = new Graphics('triangle', 'white', SPACE_SHIP_RADIUS_IN_MILES), radius = SPACE_SHIP_RADIUS_IN_MILES, hull = [0, 0], shields = [0, 0], lasers = 0, thrusters = 0, cargoSpace = 0) {
+    constructor(name = "Unnamed", color = 'white', radius = SPACE_SHIP_RADIUS_IN_MILES, hull = [0, 0], shields = [0, 0], lasers = 0, thrusters = 0, cargoSpace = 0) {
         this.name = name;
         this.radius = radius;
-        this.graphics = graphics;
+        this.color = color;
         this.hull = hull;
         this.shields = shields;
         this.lasers = lasers;

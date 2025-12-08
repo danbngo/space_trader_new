@@ -89,3 +89,8 @@ function calcSpeedAlongAngle(speedX = 0, speedY = 0, angle = Math.PI*2) {
     const uy = Math.sin(angle);
     return speedX * ux + speedY * uy;    // dot product = speed along angle
 }
+
+function isPointInRect(px, py, rx, ry, rw, rh) {
+    return px >= rx && px <= rx + rw &&
+           py >= ry && py <= ry + rh;
+}

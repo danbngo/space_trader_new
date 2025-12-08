@@ -1,0 +1,375 @@
+/*
+StarMap
+ticket speed: 1 hour per real life second
+default zoom distances: 1200px = half the size of the solar system
+*/
+class StarMap {
+    constructor(starSystem = new StarSystem(), autoSelectObject = gameState.fleet) {
+        this.starSystem = starSystem
+        this.selectedObject = autoSelectObject || gameState.fleet;
+
+
+
+        this.cameraX = this.selectedObject.x;
+        this.cameraY = this.selectedObject.y;
+        this.mapWidth = 1200
+        this.mapHeight = 600
+        this.noOrbitsAtZoom = 5000
+        this.paused = true
+        this.lastTickMs = Date.now()
+        this.gameYearsPerMs = 1/365/24/60 * 2
+
+        this.root = createElement({classNames: ['starmap-root']})
+        this.infoBar = createElement({parent: this.root, classNames:['starmap-info']})
+        this.controls = createElement({parent: this.root})
+        this.main = createElement({parent: this.root, classNames:['starmap-main']})
+
+        this.leftPane = createElement({parent:this.root, classNames:['starmap-left']})
+        this.leftPane.style.width = this.mapWidth+'px';
+        this.leftPane.style.height = this.mapHeight+'px';
+        attachDragHandler(this.leftPane, (x,y)=>this.onDragMap(x,y), 5)
+        attachMouseWheelHandler(this.leftPane, (direction=1)=>{
+            this.adjustZoom(direction > 0 ? 1.33 : direction < 0 ? 0.66 : 1.0)
+        })
+
+        this.leftPaneBGLayer = createElement({parent:this.leftPane, classNames:['starmap-layer']})
+        this.leftPaneBGLayerCvs = createElement({parent:this.leftPaneBGLayer, tag:'canvas'})
+        this.leftPaneBGLayerCvs.height = this.mapHeight;
+        this.leftPaneBGLayerCvs.width = this.mapWidth;
+        this.leftPaneObjLayer = createElement({parent:this.leftPane, classNames:['starmap-layer']})
+
+        this.rightPane = createElement({parent:this.root, classNames:['starmap-right']})
+
+        this.main.appendChild(this.leftPane);
+        this.main.appendChild(this.rightPane);
+
+        this.refresh()
+    }
+
+    refresh() {
+        this.rebuildLeftPaneObjLayer();
+        this.refreshControls();
+        this.refreshInfoBar();
+        this.refreshRightPane();
+        this.refreshLeftPaneBGLayer();
+        this.refreshLeftPaneObjLayer();
+    }
+
+    refreshControls() {
+        this.controls.innerHTML = ""
+        createElement({
+            parent:this.controls,
+            classNames: ['starmap-buttons'],
+            children: [
+                createElement({tag:'button', innerHTML:this.paused ? '▶' : '⏸', onClick: () => this.togglePause()}),
+                createElement({tag:'button', innerHTML:'+', onClick: () => this.adjustZoom(1.33)}),
+                createElement({tag:'button', innerHTML:'-', onClick: () => this.adjustZoom(0.66)}),
+                createElement({tag:'button', innerHTML:'Dock', onClick: ()=> this.explore(), disabled: (!gameState.fleet.location)}),
+                createElement({tag:'button', innerHTML:'Trade Info', onClick: ()=> this.onTradeInfo()})
+            ]
+        })
+    }
+
+    refreshInfoBar() {
+        const {fleet, year} = gameState
+        const {location, route} = fleet
+        const destination = route?.destination
+        const distance = round(route?.distance, 2)
+        const endYear = route?.endYear
+        const yearsRemaining = describeTimespan(endYear-year)
+
+        this.infoBar.innerHTML = ""
+
+        const children = [
+            createElement({innerHTML: `Date: ${describeDate(year)}`}),
+            createElement({innerHTML: ` | Location: ${location ? coloredName(location, false) : '(Space)'}`, onClick: ()=>this.selectObject(location)}),
+            createElement({innerHTML: ` | Destination: ${destination ? coloredName(destination, false) : '(None)'}`, onClick: destination ? ()=>this.selectObject(destination) : undefined}),
+            createElement({innerHTML: !destination ? '' : ` | Distance: ${distance} AU`}),
+            createElement({innerHTML: !destination ? '' : ` | ETA: ${yearsRemaining}`}),
+        ]
+
+        for (const child of children) this.infoBar.appendChild(child)
+    }
+
+    rebuildLeftPaneObjLayer() {
+        const {starSystem, leftPaneObjLayer} = this
+        const {stars, planets, fleets} = starSystem
+        const objects = [...stars, ...planets, ...fleets];
+
+        //draw orbits
+        const orbits = []
+        for (const obj of objects) {
+            if (obj.orbit) orbits.push([obj, obj.orbit])
+        }
+
+        leftPaneObjLayer.innerHTML = ""
+
+        orbits.forEach( ([obj, orbit], index) => {
+            const id = `orbit${index}`
+            console.log('rebuilding an orbit')
+            const color = obj..color || '#ffffff'
+            createElement({
+                id,
+                parent: leftPaneObjLayer,
+                classNames: ['starmap-orbit'],
+                style: {
+                    borderColor: color
+                },
+            })
+        });
+        
+        //draw routes
+        const routes = [gameState.fleet.route]
+        routes.forEach((route,index)=>{
+            if (!route) return
+            const id = `route${index}`
+            console.log('rebuilding a route')
+            const color = route.fleet..color || '#ffffff'
+            let {angleDeg} = route.path
+            createElement({
+                id,
+                parent: leftPaneObjLayer,
+                classNames: ['starmap-line'],
+                style: {
+                    backgroundColor: color,
+                    transform: `rotate(${angleDeg}deg)`
+                },
+            })
+        })
+
+        //draw objects
+        objects.forEach((obj,index) => {
+            //if (obj.location) return //dont display docked fleets
+            const shape = obj.graphics.shape
+            const id = `obj${index}`
+            const wrapperId = `wrapper${index}`
+            console.log('rebuilding an obj')
+            const color = obj..color || '#ffffff'
+            createElement({
+                id: wrapperId,
+                parent: leftPaneObjLayer,
+                classNames: ['starmap-object'],
+                onClick: ()=>this.selectObject(obj),
+                children: [
+                    shape == SHAPES.Circle ? createElement({id, classNames: ['starmap-circle'], style: {background: color}})
+                    : shape == SHAPES.Triangle ? createElement({
+                            id,
+                            classNames: ['starmap-triangle'],
+                            style: {
+                                backgroundColor: color,
+                                transform: `translate(-50%, -50%) rotate(${(obj.route ? obj.route.path.angleDeg : -90)}deg)`
+                            }
+                        })
+                    : createElement(),
+                    !(obj instanceof Fleet) || obj.location == undefined ?
+                        createElement({classNames: ['starmap-label'], innerHTML: coloredName(obj)})
+                        : null
+                ]
+            })
+        })
+    }
+
+    refreshLeftPaneBGLayer() {
+        const {zoom, mapWidth, mapHeight, starSystem} = this
+        const hw = mapWidth/2
+        const hh = mapHeight/2
+        const cx = this.cameraX;
+        const cy = this.cameraY;
+        const objs = [...starSystem.backgroundStars]
+        const canvas = this.leftPaneBGLayerCvs;
+        const ctx = this.leftPaneBGLayerCvs.getContext("2d");
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        objs.forEach((obj, index)=>{
+            ctx.fillStyle = obj.color;
+            ctx.beginPath();
+            ctx.arc((obj.x-cx)*zoom+hw, (obj.y-cy)*zoom+hh, 1, 0, Math.PI * 2);
+            ctx.fill();
+        })
+    }
+
+    refreshLeftPaneObjLayer() {
+        const {zoom, mapWidth, mapHeight, starSystem, noOrbitsAtZoom} = this
+        const {stars, planets, fleets} = starSystem
+        const objects = [...stars, ...planets, ...fleets];
+        const hw = mapWidth/2
+        const hh = mapHeight/2
+        const cx = this.cameraX;
+        const cy = this.cameraY;
+
+        //draw orbits
+        const orbits = []
+        for (const obj of objects) {
+            if (obj.orbit) orbits.push([obj, obj.orbit])
+        }
+
+        orbits.forEach( ([obj, orbit], index) => {
+            const id = `orbit${index}`
+            let gfx = this.leftPaneObjLayer.querySelector('#'+id)
+            if (!gfx) return
+            if (zoom > noOrbitsAtZoom) gfx.style.display = 'none'
+            else {
+                const size = Math.max(12, (orbit.radius || 0) * 2 * zoom);
+                applyStyle(gfx, {
+                    display: '',
+                    left: ((obj.parent.x-cx) * zoom + hw) + 'px',
+                    top: ((obj.parent.y-cy) * zoom + hh) + 'px',
+                    width: (size) + 'px',
+                    height: (size) + 'px',
+                })
+            }
+        });
+        
+        //draw routes
+        const routes = [gameState.fleet.route]
+        routes.forEach( (route,index) =>{
+            if (!route) return
+            const id = `route${index}`
+            let gfx = this.leftPaneObjLayer.querySelector('#'+id)
+            if (!gfx) return
+            if (zoom > noOrbitsAtZoom) gfx.style.display = 'none'
+            else {
+                let {startX, startY, distance} = route.path
+                applyStyle(gfx, {
+                    display: '',
+                    width: `${distance * zoom}px`,
+                    left: ((startX-cx) * zoom + hw) + 'px',
+                    top: ((startY-cy) * zoom + hh) + 'px',
+                })
+            }
+        })
+
+        //draw objects
+        objects.forEach( (obj, index) => {
+            //if (obj.location) return //dont display docked fleets
+            const id = `obj${index}`
+            const wrapperId = `wrapper${index}`
+            let gfx = this.leftPaneObjLayer.querySelector('#'+id)
+            let wrapperGfx = this.leftPaneObjLayer.querySelector('#'+wrapperId)
+            if (!gfx || !wrapperGfx) return
+            applyStyle(wrapperGfx, {
+                left: ((obj.x-cx) * zoom + hw) + 'px',
+                top: ((obj.y-cy) * zoom + hh) + 'px',
+            })
+            if (obj.graphics.shape == SHAPES.Dot) return
+            const size = Math.max(12, (obj.graphics.size || 0) * zoom / EARTH_RADII_PER_AU);
+            applyStyle(gfx, {
+                width: (size) + 'px',
+                height: (size) + 'px',
+            })
+            if (obj instanceof Fleet) {
+                if (obj.location) gfx.classList.remove('starmap-thruster-forward')
+                else gfx.classList.add('starmap-thruster-forward')
+            }
+
+
+        })
+    }
+
+    refreshRightPane() {
+        this.rightPane.innerHTML = '';
+        if (!this.selectedObject) {
+            this.rightPane.textContent = '(Select an object on the map.)';
+            return;
+        }
+        createElement({parent:this.rightPane, tag:'h2', innerHTML: coloredName(this.selectedObject)})
+        // Planet-specific actions
+        const isDockedHere = this.selectedObject == gameState.fleet.location
+        if (this.selectedObject instanceof Planet) {
+            createElement({parent:this.rightPane, tag:'button', innerHTML:isDockedHere ? 'Dock' : 'Scan', onClick:()=>this.explore(this.selectedObject)})
+            createElement({parent:this.rightPane, tag:'button', innerHTML:'Set Destination', onClick:()=>this.setDestination(this.selectedObject), disabled: (this.selectedObject == gameState.fleet.location)})
+            createElement({parent:this.rightPane, tag:'button', innerHTML:'Travel (Unpause)', onClick:()=>this.setDestination(this.selectedObject, true), disabled: (this.selectedObject == gameState.fleet.location)})
+        }
+    }
+
+    selectObject(obj) {
+        console.log('selected:',obj)
+        this.selectedObject = obj;
+        this.cameraX = obj.x;
+        this.cameraY = obj.y;
+        this.refresh();
+    }
+
+    onDragMap(x = 0, y = 0) {
+        this.cameraX -= x/this.zoom
+        this.cameraY -= y/this.zoom
+        this.cameraX = Math.min(this.cameraPanLimit, Math.max(-this.cameraPanLimit, this.cameraX))
+        this.cameraY = Math.min(this.cameraPanLimit, Math.max(-this.cameraPanLimit, this.cameraY))
+        this.refreshLeftPaneBGLayer()
+        this.refreshLeftPaneObjLayer()
+    }
+
+    adjustZoom(factor) {
+        this.zoom *= factor;
+        this.zoom = Math.min(this.maxZoom, this.zoom)
+        this.zoom = Math.max(this.minZoom, this.zoom)
+        this.refreshLeftPaneBGLayer()
+        this.refreshLeftPaneObjLayer();
+    }
+
+    explore(planet = gameState.fleet.location) {
+        showPlanetMenu(planet)
+    }
+
+    onTradeInfo() {
+        showTradeInfoSellMenu()
+    }
+
+    setDestination(obj = new SpaceObject(), unpause = false) {
+        if (obj instanceof Planet) gameState.fleet.route = new Route(gameState.fleet, obj)
+        if (unpause) this.togglePause(false)
+        else this.refresh()
+    }
+
+    togglePause(newPausedState = !this.paused) {
+        console.log('setting paused to:',newPausedState)
+        this.paused = newPausedState
+        if (!this.paused) {
+            this.lastTickMs = Date.now()
+            this.tick()
+        }
+        this.refresh() //always do first refresh, as fleets launch during pause/unpause
+    }
+
+    tick() {
+        if (this.paused) return
+        const playerWasDocked = (gameState.fleet.location !== undefined)
+
+        const currentTime = Date.now()
+        const elapsedMs = currentTime - this.lastTickMs
+        this.lastTickMs = currentTime
+        const elapsedYears = elapsedMs * this.gameYearsPerMs;
+
+        gameState.year += elapsedYears
+        gameState.system.refreshPositions()
+
+        this.refreshLeftPaneObjLayer()
+        this.refreshInfoBar()
+
+        //pause if player reached his destination
+        if (!playerWasDocked && gameState.fleet.location) {
+            console.log('pausing since player reached destination')
+            this.togglePause(true)
+            return
+        }
+
+        if (!playerWasDocked) { //dont have encounters while docked or tick after launch
+            const elapsedDays = elapsedYears*365
+            const encounterChance = 1 - Math.pow(1-ENCOUNTER_CHANCE_PER_DAY, elapsedDays)
+            const didEncounter = Math.random() < encounterChance
+            if (didEncounter) {
+                this.togglePause(true)
+                startEncounter()
+                return
+            }
+        }
+        requestAnimationFrame(()=>this.tick())
+    }
+}
+
+
+function showStarMap(autoSelectObject = gameState.fleet) {
+    const starMap = new StarMap(gameState.system, autoSelectObject)
+    showMap(starMap)
+}
+
