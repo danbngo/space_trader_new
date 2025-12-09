@@ -1,0 +1,27 @@
+button {
+    /*background: black;*/
+    background-color: rgba(0,0,0,0.33);
+    color: #0ff;
+    border: 1px solid #0ff;
+    padding: 8px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-family: "Google Sans Code", monospace;
+}
+
+button:hover {
+    background: #022;
+}
+
+button:hover, .starmap-label:hover {
+    border: 1px solid #0ff;
+    box-shadow: 0 0 6px #0ff;
+}
+
+button:disabled {
+    color: #888;
+    border: 1px solid #888;
+    box-shadow: none;
+    cursor: default;
+}

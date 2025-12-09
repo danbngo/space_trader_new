@@ -4,7 +4,7 @@ class GameState {
         this.system = starSystem
 
         // Create captain
-        this.captain = new Officer("Captain", 5000, 0, 0, 0, 0, 0, 0);
+        this.captain = new Officer("Captain", 5000, 0, 0, 0);
         const playerShip = new Ship("Starting Ship", 'white', SPACE_SHIP_RADIUS_IN_MILES, [25,25], [25,25], 5, 5, 5)
 
         // Create fleet
@@ -14,7 +14,7 @@ class GameState {
             0, 0,
             playerShip,
             [playerShip],
-            new Cargo(),
+            new CountsMap(),
             this.captain,
             [this.captain],
             EARTH,

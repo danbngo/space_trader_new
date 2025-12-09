@@ -19,3 +19,14 @@ const SHAPES = Object.freeze({
     Text: 'Text', //renders some text in monospace
     Line: 'Line'
 })
+
+const SKILLS = Object.freeze({
+    Navigation: 'Navigation', //avoid bad encounters if desired
+    Diplomacy: 'Diplomacy', //lowers prices in markets, shipyards etc.
+    Engineering: 'Engineering', //your ships gain hull% during travel
+    //Science: 'Science', //hmmm
+    //Doctor: 'Doctor', //your officers gain health during travel - add this later w/ more officer-specific content
+    //Leadership: 'Leadership' //lets you have more officers - would like a better system for this
+})
+
+const SKILLS_ALL = Object.values(SKILLS)

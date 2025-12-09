@@ -1,4 +1,4 @@
-function createCargoTable(blackMarket = false, playerCargo = new Cargo(), marketCargo = new Cargo(), buyPrices = new Cargo(), sellPrices = new Cargo(), onSelectCargoType = (ct = CARGO_TYPES_ALL[0])=>{}) {
+function createCargoTable(blackMarket = false, playerCargo = new CountsMap(), marketCargo = new CountsMap(), buyPrices = new CountsMap(), sellPrices = new CountsMap(), onSelectCargoType = (ct = CARGO_TYPES_ALL[0])=>{}) {
     const rows = [
         ['Cargo Type', 'Market Amt.', 'Buy Price', 'Your Amt.', 'Sell Price']
     ]
@@ -69,7 +69,7 @@ function showMarketMenu(planet = new Planet(), blackMarket = false) {
     let infoContainer = createElement({
         children: [
             createCargoTable(blackMarket, fleet.cargo, market.cargo, buyPrices, sellPrices, onSelectCargoType),
-            `Your Cargo Space: ${fleet.cargo.calcTotalCargo()}/${fleet.calcTotalCargoSpace()}`,
+            `Your Cargo Space: ${fleet.cargo.total}/${fleet.calcTotalCargoSpace()}`,
             `Your Credits: ${captain.credits}`,
             `Market Credits: ${market.credits}`,
             `Buy Penalty: ${round(100*market.rake, 2)}%`,
@@ -77,7 +77,7 @@ function showMarketMenu(planet = new Planet(), blackMarket = false) {
         ]
     })
 
-    panel = showPanel(
+    panel = showModal(
         `${coloredName(planet)} - ${blackMarket ? 'Black Market' : 'Market'}`,
         infoContainer,
         [['Back', ()=>showPlanetMenu(planet)]],

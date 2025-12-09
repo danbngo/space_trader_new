@@ -57,7 +57,7 @@ function showTradeInfoSellMenu(cargoType = CARGO_TYPES_ALL[0]) {
         ["Back", () => showStarMap()],
     )
 
-    showPanel(
+    showModal(
         `Trade Info - Sell ${cargoType.name}`,
         createElement({children:[
             createTradeInfoSellTable(cargoType, onSelectPlanet),
@@ -83,7 +83,7 @@ function showTradeInfoBuyMenu(cargoType = CARGO_TYPES_ALL[0]) {
         ["Back", () => showStarMap()],
     )
 
-    showPanel(
+    showModal(
         `Trade Info - Buy ${cargoType.name}`,
         createElement({children:[
             createTradeInfoBuyTable(cargoType, onSelectPlanet),

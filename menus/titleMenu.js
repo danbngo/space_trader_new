@@ -1,5 +1,5 @@
 function showTitleScreen() {
-    showPanel(
+    showModal(
         "Space Game",
         "A text‑based space adventure.",
         [
@@ -23,7 +23,7 @@ function continueGame() {
 }
 
 function showAbout() {
-    showPanel(
+    showModal(
         "About This Game",
         "A text-based space adventure where you trade, explore, pirate, and shape your own destiny among the stars.",
         [

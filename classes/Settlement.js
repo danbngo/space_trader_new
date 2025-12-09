@@ -33,7 +33,7 @@ class Market {
     }
 
     calcCargoBuyPrices() {
-        const prices = new Cargo()
+        const prices = new CountsMap()
         for (const cargoType of CARGO_TYPES_ALL) {
             const price = Math.round(cargoType.value * this.planet.culture.cargoPriceModifiers.getAmount(cargoType) * (1+this.rake))
             prices.setAmount(cargoType, price)
@@ -42,7 +42,7 @@ class Market {
     }
 
     calcCargoSellPrices() {
-        const prices = new Cargo()
+        const prices = new CountsMap()
         for (const cargoType of CARGO_TYPES_ALL) {
             const price = Math.round(cargoType.value * this.planet.culture.cargoPriceModifiers.getAmount(cargoType) / (1+this.rake))
             prices.setAmount(cargoType, price)

@@ -64,14 +64,14 @@ function showShipyardBuyMenu(planet) {
         refreshPanelButtons('shipyard_buy_panel', buttons)
     }
 
-    showPanel(
-        `${colorSpan(planet.name, planet.color)} - Shipyard`,
+    showModal(
+        `${coloredName(planet)} - Shipyard`,
         createElement({children:[
             `Shipyard ships`,
             createBuyShipMenu(shipyard.ships, shipyard, (ship)=>onSelectShipyardShip(ship)),
             `Your # ships: ${fleet.ships.length}`,
             `Your credits: ${captain.credits}`,
-            `Shipyard credits: ${shipyard.credits}`,
+            //`Shipyard credits: ${shipyard.credits}`,
             `Buy Penalty: ${round(100*shipyard.rake, 2)}%`,
             `Local Ship Quality: ${round(100*shipyard.planet.culture.shipQuality, 2)}%`,
         ]}),
@@ -100,24 +100,25 @@ function showShipyardSellMenu(planet) {
 
     function onSelectPlayerShip(ship = new Ship()) {
         if (!isDocked) return
+        const playerShips = gameState.fleet.ships
         const sellPrice = shipyard.calcSellPrice(ship)
         const shipyardCanAfford = shipyard.credits >= sellPrice
         const buttons = [
-            [`Sell ${ship.name}${shipyardCanAfford ? '' : ` (For only ${shipyard.credits}CR)`}`, ()=>sellShip(ship), (shipyard.credits <= 0)],
+            [`Sell ${ship.name}${shipyardCanAfford ? '' : ` (For only ${shipyard.credits}CR)`}`, ()=>sellShip(ship), (shipyard.credits <= 0 || playerShips.length < 2)],
             ["Buy Ships", ()=>showShipyardBuyMenu(planet)],
             ["Back", () => showPlanetMenu(planet)],
         ]
         refreshPanelButtons('shipyard_sell_panel', buttons)
     }
 
-    showPanel(
-        `${colorSpan(planet.name, planet.color)} - Shipyard`,
+    showModal(
+        `${coloredName(planet)} - Shipyard`,
         createElement({children:[
             `Your ships`,
             createSellShipMenu(fleet.ships, shipyard, (ship)=>onSelectPlayerShip(ship)),
-            `Your # ships: ${fleet.ships.length}`,
-            `Your credits: ${captain.credits}`,
-            `Shipyard credits: ${shipyard.credits}`,
+            `Your # ships: ${fleet.ships.length}` + fleet.ships.length < 2 ? colorSpan(` (You can't sell your last ship!)`, 'Yellow') : '',
+            colorSpan(`Your credits: ${captain.credits}`, captain.credits == 0 ? 'red' : ''),
+            colorSpan(`Shipyard credits: ${shipyard.credits}`, shipyard.credits == 0 ? 'red' : ''),
             `Sell Penalty: ${round(100/shipyard.rake, 2)}%`,
         ]}),
         [

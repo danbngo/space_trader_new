@@ -41,7 +41,7 @@ const ENCOUNTER_TYPES = {
             const {fleet, encounter} = gameState
             let msg = ''  
             msg += 'The pirates eagerly board your ships.<br/>'
-            const lootableCargoAmount = fleet.cargo.calcTotalCargo()
+            const lootableCargoAmount = fleet.cargo.total
             if (lootableCargoAmount <= 0) {
                 msg += 'They are disgusted to find nothing worth looting.<br/>'
             }

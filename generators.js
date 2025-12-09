@@ -13,7 +13,7 @@ function generateShip(planet = new Planet(), shipType = rndMember(SHIP_TYPES_ALL
 
     const name = `${planet.name} ${shipType.name}`
 
-    return new Ship(name, 'white', SPACE_SHIP_RADIUS_IN_MILES, hull, shields, lasers, thrusters, cargoSpace, new Cargo());
+    return new Ship(name, 'white', SPACE_SHIP_RADIUS_IN_MILES, hull, shields, lasers, thrusters, cargoSpace, new CountsMap());
 }
 
 function generateOfficerName(planet = new Planet()) {
@@ -27,7 +27,11 @@ function generateOfficerName(planet = new Planet()) {
 }
 
 function generateOfficer() {
-    return new Officer(generateOfficerName(), rng(100), 0, 0, rng(10), rng(10), rng(10));
+    const skills = new CountsMap()
+    for (let i = 0; i < SKILLS_ALL.length; i++) {
+        skills.setAmount(skills[i], rng(10, 1))
+    }
+    return new Officer(generateOfficerName(), rng(100), 0, 0, skills);
 }
 
 function generateShipyard(planet = new Planet()) {
@@ -42,7 +46,7 @@ function generateShipyard(planet = new Planet()) {
 }
 
 function generateMarket(planet = new Planet()) {
-    const marketCargo = new Cargo();
+    const marketCargo = new CountsMap();
     for (const ct of CARGO_TYPES_ALL) {
         marketCargo.setAmount(ct, Math.random() > .2 ? rng(50) : 0)
     }
@@ -63,7 +67,7 @@ function generateGuild(planet = new Planet()) {
 
 function generateCulture(planet = new Planet()) {
     const shipQuality = Math.random() > .5 ? 1/rng(3,1,false) : rng(3,1,false)
-    const cargoPriceModifiers = new Cargo()
+    const cargoPriceModifiers = new CountsMap()
     for (const ct of CARGO_TYPES_ALL) {
         cargoPriceModifiers.setAmount(ct, Math.random() > .5 ? 1/rng(5,1,false) : rng(5,1,false))
     }
@@ -87,7 +91,7 @@ function generateFleet(planet = new Planet(), fleetType = rndMember(FLEET_TYPES_
         ships.push(generateShip(planet, shipType))
     }
     const flagship = ships[0]
-    const cargo = new Cargo()
+    const cargo = new CountsMap()
     const fleet = new Fleet(fleetType.name, planet.color, 0, 0, flagship, ships, cargo)
 
     const maxCargo = fleet.calcTotalCargoSpace()

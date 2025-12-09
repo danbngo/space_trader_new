@@ -1,5 +1,3 @@
-
-
 class CanvasObject {
     constructor({
         id = '',
@@ -20,7 +18,8 @@ class CanvasObject {
         screenOffsetX = 0,
         screenOffsetY = 0,
         minScreenSize = 1,
-        visible = true
+        visible = true,
+        filter = null
     } = {}) {
         this.id = id;
         this.shape = shape;
@@ -46,31 +45,22 @@ class CanvasObject {
         this.screenOffsetY = screenOffsetY;
         this.minScreenSize = minScreenSize;
         this.visible = visible
+
+        this.filter = filter
     }
 }
 
 
 class CanvasWrapper {
     constructor(
-        width = 800,
-        height = 600,
-        background = "#000",
         zoom = 100,
         minZoom = 10,
         maxZoom = 1000,
         cameraPanLimit = 500,
     ) {
         // Root element for the user to attach anywhere
-        this.root = document.createElement('div');
-        this.root.style.position = 'relative';
-        this.root.style.display = 'inline-block';
-
-        // Create canvas element inside root
-        this.canvas = document.createElement('canvas');
-        this.canvas.width = width;
-        this.canvas.height = height;
-        this.canvas.style.background = background;
-        this.root.appendChild(this.canvas);
+        this.root = createElement({classNames:['canvas-root']})
+        this.canvas = createElement({parent:this.root, tag:'canvas'})
 
         this.ctx = this.canvas.getContext('2d');
         this.ctx.globalAlpha = 1;
@@ -96,6 +86,21 @@ class CanvasWrapper {
         attachMouseWheelHandler(this.canvas, (direction=1)=>{
             this.adjustZoom(direction > 0 ? 1.33 : direction < 0 ? 0.66 : 1.0)
         })
+
+        this.autoResize()
+    }
+
+    autoResize() {
+        // Get container size in pixels
+        const width = this.root.clientWidth - 16;
+        const height = this.root.clientHeight - 8;
+
+        // Update the canvas *pixel buffer*
+        this.canvas.width = width;
+        this.canvas.height = height;
+
+        // (Optional) redraw your scene here
+        this.redraw()
     }
 
     // ----------------------
@@ -166,6 +171,13 @@ class CanvasWrapper {
         this.objectMap.set(obj.id, obj);
         this.drawOrder.push(obj);
         return obj;
+    }
+
+    deleteObject(id) {
+        const obj = this.getObject(id)
+        if (!obj) return
+        this.objectMap.delete(obj.id)
+        this.drawOrder = this.drawOrder.filter(o=>(o !== obj))
     }
 
     getObject(id) {
@@ -274,6 +286,8 @@ class CanvasWrapper {
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
         const drawOrder = this.drawOrder
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
 
         for (const obj of drawOrder) {
             if (!obj.visible) continue
@@ -287,7 +301,6 @@ class CanvasWrapper {
                 y2Offset = sy2 - sy
             }
 
-            let size = 1;
             sx += obj.screenOffsetX;
             sy += obj.screenOffsetY;
 
@@ -297,38 +310,33 @@ class CanvasWrapper {
             ctx.save();
             ctx.translate(sx, sy);
 
-            switch (obj.shape) {
+            ctx.fillStyle = obj.color;
+            if (obj.filter) ctx.filter = obj.filter
+            ctx.strokeStyle = obj.color;
+            ctx.lineWidth = obj.lineWidth;
+            const size = Math.max(obj.minScreenSize, obj.size * this.zoom)
+            if (obj.rotation) ctx.rotate(obj.rotation + Math.PI/2);
 
+            switch (obj.shape) {
                 case SHAPES.Dot:
-                    ctx.fillStyle = obj.color;
                     ctx.fillRect(-1, -1, 2, 2);
                     break;
 
                 case SHAPES.FilledCircle:
-                    size = Math.max(obj.minScreenSize, obj.size * this.zoom)
-                    ctx.fillStyle = obj.color;
                     ctx.beginPath();
                     ctx.arc(0, 0, size, 0, Math.PI * 2);
                     ctx.fill();
                     break;
 
                 case SHAPES.EmptyCircle:
-                    size = Math.max(obj.minScreenSize, obj.size * this.zoom)
-                    ctx.strokeStyle = obj.color;
-                    ctx.lineWidth = obj.lineWidth;
                     ctx.beginPath();
                     ctx.arc(0, 0, size, 0, Math.PI * 2);
                     ctx.stroke();
                     break;
 
                 case SHAPES.Triangle:
-                    size = Math.max(obj.minScreenSize, obj.size * this.zoom)
-                    ctx.fillStyle = obj.color;
-                    ctx.rotate(obj.rotation + Math.PI/2);
-
                     const r = size;
                     const h = (Math.sqrt(3) / 2) * r;
-
                     ctx.beginPath();
                     ctx.moveTo(0, -h / 2);
                     ctx.lineTo(-r / 2, h / 2);
@@ -338,10 +346,8 @@ class CanvasWrapper {
                     break;
 
                 case SHAPES.Text:
-                    ctx.fillStyle = obj.color;
-                    ctx.font = `${obj.size}px monospace`;
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
+                    ctx.font = `${obj.size}px "Google Sans Code"`;
+                    ctx.font
                     ctx.strokeStyle = "black";
                     ctx.lineWidth = 2;
                     ctx.strokeText(obj.textContent, 0, 0);
@@ -349,13 +355,10 @@ class CanvasWrapper {
                     break;
 
                 case SHAPES.Line:
-                    ctx.strokeStyle = obj.color;
-                    ctx.lineWidth = obj.lineWidth;
                     ctx.beginPath();
                     ctx.moveTo(0, 0); // start point
                     ctx.lineTo(x2Offset, y2Offset); // end point
                     ctx.stroke();       // actually draw it
-                    console.log('drew a line:',x2Offset,y2Offset)
             }
 
             ctx.restore();

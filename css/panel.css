@@ -1,0 +1,29 @@
+
+
+/* Panel UI Styles */
+.panel {
+    border: 2px solid #0ff;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px;
+    background: rgba(0, 20, 30, 0.7);
+    box-shadow: 0 0 10px #0ff;
+    font-size: 1em;
+    line-height: 1.4;
+    min-width: 350px;
+}
+
+
+.panel-title {
+    font-size: 1.5em;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+
+.panel-buttons {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}

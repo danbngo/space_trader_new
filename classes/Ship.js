@@ -25,7 +25,9 @@ class Ship {
         this.laserRechargeProgress = 0;
         this.shieldRechargeProgress = 0;
         this.accelerating = false;
-        this.turning = false;
+        this.braking = false;
+        this.turningLeft = false;
+        this.turningRight = false;
         this.beingHit = false;
         this.escaped = false;
     }
@@ -38,7 +40,20 @@ class Ship {
         return Math.pow(this.mass, 2)*10
     }
 
+    isDamaged() {
+        this.hull[0] < this.hull[1]
+    }
+
+    repairHull(amount = this.hull[1]) {
+        this.hull[0] = Math.max(this.hull[0]+amount, this.hull[1])
+    }
+    
+    restoreShields(amount = this.shields[1]) {
+        this.shields[0] = Math.max(this.shields[0]+amount, this.shields[1])
+    }
+
     resetCombatVars() {
+        this.restoreShields()
         this.destinationX = undefined;
         this.destinationY = undefined;
         this.angle = Math.PI*2;
@@ -57,7 +72,9 @@ class Ship {
     resetCombatVarsTurn() {
         //todo: show visuals for these states
         this.accelerating = false;
-        this.turning = false;
+        this.braking = false;
+        this.turningLeft = false;
+        this.turningRight = false;
         this.beingHit = false;
     }
 
@@ -88,7 +105,8 @@ class Ship {
 
     accelerate(elapsedSeconds = 1, decel = false) {
         if (this.isDisabled()) return
-        this.accelerating = true
+        if (decel) this.braking = true;
+        else this.accelerating = true
         const speed = this.calcSpeed()
         const force = speed*elapsedSeconds
         const forceDims = rotatePoint(force,0,0,0,this.angle)
@@ -98,7 +116,8 @@ class Ship {
 
     turn(elapsedSeconds = 1, counterClockwise = false) {
         if (this.isDisabled()) return
-        this.turning = true
+        if (counterClockwise) this.turningLeft = true
+        else this.turningRight = true
         const speed = this.calcSpeed()
         const force = speed*elapsedSeconds/TIME_TO_TURN_SHIP_WITH_ONE_THRUSTER_IN_SECONDS
         const turnRatio = force * (counterClockwise ? 1 : -1)
@@ -145,7 +164,7 @@ class Ship {
 
     rechargeShields(elapsedSeconds = 1) {
         if (this.isDisabled()) return
-        if (this.accelerating) return
+        if (this.accelerating || this.braking) return
         if (this.shields[0] >= this.shields[1]) return
         const rechargeProgress = elapsedSeconds/TIME_TO_RECHARGE_SHIELDS_IN_SECONDS * Math.random()
         this.shieldRechargeProgress += rechargeProgress

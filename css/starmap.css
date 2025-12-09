@@ -1,0 +1,38 @@
+
+
+/* === STAR MAP ROOT CONTAINER === */
+
+.starmap-root {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* === INFO BAR AT TOP === */
+
+.starmap-info-bar {
+    background-color: rgba(0,0,0,0.33);
+    padding: 10px;
+    width: 100%;
+    display: flex;
+    gap: 8px;
+}
+
+/* === BUTTON BAR (Zoom + Dock) === */
+
+.starmap-buttons {
+    width: 100%;
+    padding: 10px;
+    display: flex;
+    gap: 10px;
+}
+
+.starmap-object-panel {
+    background-color: rgba(0,0,0,0.33);
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}

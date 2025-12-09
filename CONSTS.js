@@ -8,7 +8,7 @@ const MILES_PER_AU = 432288*EARTH_RADII_PER_AU
 
 //TODO: try to make some of these vars more dynamic in future - different sizes for ships, projectiles etc.
 const SPACE_SHIP_RADIUS_IN_MILES = 800
-const PROJECTILE_RADIUS_IN_MILES = 50
+const BASE_PROJECTILE_RADIUS_IN_MILES = 25
 const FLEET_RADIUS_IN_EARTH_RADII = 1/1000
 
 const ENCOUNTER_CHANCE_PER_DAY = 0.2;

@@ -12,28 +12,26 @@ class StarMap {
         this.lastTickMs = Date.now()
         this.gameYearsPerMs = 1/365/24/60 * 2
 
-        this.root = createElement({classNames: ['starmap-root']})
-        this.infoBar = createElement({parent: this.root, classNames:['starmap-info']})
-        this.controls = createElement({parent: this.root})
-        this.main = createElement({parent: this.root, classNames:['starmap-main']})
-
-        this.cvs = new CanvasWrapper(1200, 600, 'black', 100, 10, 1000, NEPTUNE.orbit.radius*2)
-        this.leftPane = createElement({parent:this.root, classNames:['starmap-left'], children:[this.cvs.root]})
-
-        this.rightPane = createElement({parent:this.root, classNames:['starmap-right']})
-
-        this.main.appendChild(this.leftPane);
-        this.main.appendChild(this.rightPane);
+        this.cvs = new CanvasWrapper(100, 10, 1000, NEPTUNE.orbit.radius*2)
+        this.root = createElement({classNames: ['starmap-root'], children: [this.cvs.root]})
+        this.controls = createElement({parent: this.root, style: {position: 'absolute', top: 0, left: 0}})
+        this.infoBar = createElement({parent: this.root, style:{position:'absolute', bottom: 0, left: 0}})
+        this.objectPane = createElement({parent: this.root, style: {position: 'absolute', top: 0, right: 0, height: '100%'}})
 
         this.refresh()
+
+        window.addEventListener("resize", ()=>this.cvs.autoResize());
+        setTimeout(()=>{
+            this.cvs.autoResize()
+        }, 1)
     }
 
     refresh() {
-        this.rebuildLeftPaneObjLayer();
+        this.rebuildCanvas();
         this.refreshControls();
         this.refreshInfoBar();
-        this.refreshRightPane();
-        this.refreshLeftPaneObjLayer();
+        this.refreshObjectPane();
+        this.refreshCanvas();
     }
 
     refreshControls() {
@@ -45,10 +43,17 @@ class StarMap {
                 createElement({tag:'button', innerHTML:this.paused ? '▶' : '⏸', onClick: () => this.togglePause()}),
                 createElement({tag:'button', innerHTML:'+', onClick: () => this.cvs.adjustZoom(1.33)}),
                 createElement({tag:'button', innerHTML:'-', onClick: () => this.cvs.adjustZoom(0.66)}),
-                createElement({tag:'button', innerHTML:'Dock', onClick: ()=> this.explore(), disabled: (!gameState.fleet.location)}),
-                createElement({tag:'button', innerHTML:'Trade Info', onClick: ()=> this.onTradeInfo()})
+                createElement({tag:'button', innerHTML:'?', onClick: () => this.openAssistant()}),
             ]
         })
+    }
+
+    openAssistant() {
+        this.togglePause(true)
+        showModal(`Assistant`, 'How can I help you captain?', [
+            ['Trade Info', ()=>this.onTradeInfo()],
+            ['Cancel', ()=>closeModal()],
+        ])
     }
 
     refreshInfoBar() {
@@ -59,20 +64,31 @@ class StarMap {
         const endYear = route?.endYear
         const yearsRemaining = describeTimespan(endYear-year)
 
+        const planetLink = (planet = new Planet())=> {
+            return createElement({innerHTML: coloredName(planet), onClick: ()=>this.selectObject(planet), style: {color: planet.color}, classNames:['clickable-text']})
+        }
+
         this.infoBar.innerHTML = ""
-
-        const children = [
-            createElement({innerHTML: `Date: ${describeDate(year)}`}),
-            createElement({innerHTML: ` | Location: ${location ? coloredName(location, false) : '(Space)'}`, onClick: ()=>this.selectObject(location)}),
-            createElement({innerHTML: ` | Destination: ${destination ? coloredName(destination, false) : '(None)'}`, onClick: destination ? ()=>this.selectObject(destination) : undefined}),
-            createElement({innerHTML: !destination ? '' : ` | Distance: ${distance} AU`}),
-            createElement({innerHTML: !destination ? '' : ` | ETA: ${yearsRemaining}`}),
-        ]
-
-        for (const child of children) this.infoBar.appendChild(child)
+        createElement({
+            parent:this.infoBar,
+            classNames: ['starmap-info-bar'],
+            children: [
+                `${describeDate(year)} | `,
+                destination ? createElement({
+                    style: {display:'flex', gap:'6px', paddingBottom:'8px'},
+                    children: [
+                        `→`,
+                        planetLink(destination),
+                        ` | Distance: ${distance} AU | ETA: ${yearsRemaining}`
+                    ]
+                })
+                : location ? planetLink(location)
+                : '(Space)',
+            ]
+        })
     }
 
-    rebuildLeftPaneObjLayer() {
+    rebuildCanvas() {
         const {starSystem, cvs} = this
         const {stars, planets, fleets, backgroundStars} = starSystem
         //const routes = [gameState.fleet.route]
@@ -89,21 +105,22 @@ class StarMap {
             cvs.addEmptyCircle(`orbit${index}`, orbitingBody.parent.x, orbitingBody.parent.y, orbitingBody.orbit.radius, 1, orbitingBody.color)
         });
         
-        fleets.forEach((fleet,index)=>{
-            console.log('rebuilding a route')
-            cvs.addLine(`fleetpath${index}`, 0, 0, 0, 0, fleet.color, 1) 
-        })
-
         stars.forEach((body,index)=>{
             cvs.addFilledCircle(`star${index}`, body.x, body.y, body.radius/EARTH_RADII_PER_AU, 12, body.color, ()=>this.selectObject(body))
         })
 
         planets.forEach((body,index)=>{
             cvs.addFilledCircle(`planet${index}`, body.x, body.y, body.radius/EARTH_RADII_PER_AU, 8, body.color, ()=>this.selectObject(body))
+            cvs.addText(`planetlabel${index}`, body.x, body.y, 0, -32, body.name, body.color, DEFAULT_FONT_SIZE, ()=>this.selectObject(body))
         })
 
         fleets.forEach((fleet, index)=>{
-            cvs.addTriangle(`fleet${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU, 8, fleet.color, fleet.route ? fleet.route.path.angle : -Math.PI/2, ()=>this.selectObject(fleet))
+            const fleetAngle = fleet.route ? fleet.route.path.angle : -Math.PI/2
+            cvs.addTriangle(`fleet${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU, 12, fleet.color, fleetAngle, ()=>this.selectObject(fleet))
+            cvs.addLine(`fleetpath${index}`, 0, 0, 0, 0, fleet.color, 1)
+            cvs.addTriangle(`fleetthruster${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU*0.5, 6, 'orange', fleetAngle - Math.PI)
+            //cvs.addTriangle(`fleetbrakeleft${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU*0.5, 6, 'orange', fleetAngle - Math.PI*1/2)
+            //cvs.addTriangle(`fleetbrakeright${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU*0.5, 6, 'orange', fleetAngle - Math.PI*3/2)
             cvs.addText(`fleetlabel${index}`, fleet.x, fleet.y, 0, -32, fleet.name, fleet.color, DEFAULT_FONT_SIZE,
                 ()=>this.selectObject(fleet),
                 /*()=>{
@@ -120,7 +137,7 @@ class StarMap {
         cvs.recalculateDrawOrder()
     }
 
-    refreshLeftPaneObjLayer() {
+    refreshCanvas() {
         const {cvs, starSystem} = this
         const {stars, planets, fleets} = starSystem
         const orbitingBodies = [...stars, ...planets].filter(b=>(b.orbit))
@@ -138,12 +155,20 @@ class StarMap {
         })
 
         planets.forEach((body,index)=>{
-            const cvsObject = cvs.getObject(`planet${index}`)
+            let cvsObject = cvs.getObject(`planet${index}`)
+            cvsObject.x = body.x
+            cvsObject.y = body.y
+
+            Object.assign(cvsObject, {x: body.x, y:body.y})
+
+            cvsObject = cvs.getObject(`planetlabel${index}`)
             cvsObject.x = body.x
             cvsObject.y = body.y
         })
 
         fleets.forEach((fleet, index)=>{
+            const fleetAngle = fleet.route ? fleet.route.path.angle : -Math.PI/2
+
             let cvsObject = cvs.getObject(`fleet${index}`)
             cvsObject.x = fleet.x
             cvsObject.y = fleet.y
@@ -162,29 +187,38 @@ class StarMap {
                 cvsObject.x2 = endX
                 cvsObject.y2 = endY
             }
+
+            cvsObject = cvs.getObject(`fleetthruster${index}`)
+            if (fleet.location || !fleet.route) {
+                cvsObject.visible = false
+            }
+            else {
+                const [screenOffsetX, screenOffsetY] = rotatePoint(10, 0, 0, 0, fleetAngle-Math.PI)
+                cvsObject.x = fleet.x
+                cvsObject.y = fleet.y
+                cvsObject.visible = true
+                cvsObject.screenOffsetX = screenOffsetX
+                cvsObject.screenOffsetY = screenOffsetY
+            }
         })
 
         cvs.redraw()
-
-        /*if (obj instanceof Fleet) {
-            if (obj.location) gfx.classList.remove('starmap-thruster-forward')
-            else gfx.classList.add('starmap-thruster-forward')
-        }*/
     }
 
-    refreshRightPane() {
-        this.rightPane.innerHTML = '';
+    refreshObjectPane() {
+        this.objectPane.innerHTML = '';
         if (!this.selectedObject) {
-            this.rightPane.textContent = '(Select an object on the map.)';
+            this.objectPane.textContent = '(Select an object on the map.)';
             return;
         }
-        createElement({parent:this.rightPane, tag:'h2', innerHTML: coloredName(this.selectedObject)})
-        // Planet-specific actions
         const isDockedHere = this.selectedObject == gameState.fleet.location
+        const cantTravelHere = (this.selectedObject == gameState.fleet.location) || gameState.fleet.isStranded()
+        const container = createElement({parent:this.objectPane, classNames:['starmap-object-panel']})
+        createElement({parent:container, tag:'h3', innerHTML: coloredName(this.selectedObject)})
+        // Planet-specific actions
         if (this.selectedObject instanceof Planet) {
-            createElement({parent:this.rightPane, tag:'button', innerHTML:isDockedHere ? 'Dock' : 'Scan', onClick:()=>this.explore(this.selectedObject)})
-            createElement({parent:this.rightPane, tag:'button', innerHTML:'Set Destination', onClick:()=>this.setDestination(this.selectedObject), disabled: (this.selectedObject == gameState.fleet.location)})
-            createElement({parent:this.rightPane, tag:'button', innerHTML:'Travel (Unpause)', onClick:()=>this.setDestination(this.selectedObject, true), disabled: (this.selectedObject == gameState.fleet.location)})
+            createElement({parent:container, tag:'button', innerHTML:isDockedHere ? 'Dock' : 'Scan', onClick:()=>this.explore(this.selectedObject)})
+            createElement({parent:container, tag:'button', innerHTML:'Travel', onClick:()=>this.setDestination(this.selectedObject, true), disabled: cantTravelHere})
         }
     }
 
@@ -231,13 +265,13 @@ class StarMap {
         gameState.year += elapsedYears
         gameState.system.refreshPositions()
 
-        this.refreshLeftPaneObjLayer()
+        this.refreshCanvas()
         this.refreshInfoBar()
 
         //pause if player reached his destination
         if (!playerWasDocked && gameState.fleet.location) {
             console.log('pausing since player reached destination')
-            this.togglePause(true)
+            showPlanetMenu(gameState.fleet.location)
             return
         }
 
