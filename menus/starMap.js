@@ -106,11 +106,12 @@ class StarMap {
         });
         
         stars.forEach((body,index)=>{
-            cvs.addFilledCircle(`star${index}`, body.x, body.y, body.radius/EARTH_RADII_PER_AU, 12, body.color, ()=>this.selectObject(body))
+            //for fun, make bodies a bit bigger so they're visually different sizes instead of all being min size
+            cvs.addFilledCircle(`star${index}`, body.x, body.y, body.radius/EARTH_RADII_PER_AU * 25, 8, body.color, ()=>this.selectObject(body))
         })
 
         planets.forEach((body,index)=>{
-            cvs.addFilledCircle(`planet${index}`, body.x, body.y, body.radius/EARTH_RADII_PER_AU, 8, body.color, ()=>this.selectObject(body))
+            cvs.addFilledCircle(`planet${index}`, body.x, body.y, body.radius/EARTH_RADII_PER_AU * 150, 4, body.color, ()=>this.selectObject(body))
             cvs.addText(`planetlabel${index}`, body.x, body.y, 0, -32, body.name, body.color, DEFAULT_FONT_SIZE, ()=>this.selectObject(body))
         })
 
@@ -215,6 +216,10 @@ class StarMap {
         const cantTravelHere = (this.selectedObject == gameState.fleet.location) || gameState.fleet.isStranded()
         const container = createElement({parent:this.objectPane, classNames:['starmap-object-panel']})
         createElement({parent:container, tag:'h3', innerHTML: coloredName(this.selectedObject)})
+        if (this.selectedObject == gameState.fleet) {
+            if (gameState.fleet.location) createElement({parent:container, tag:'button', innerHTML:`Dock (${coloredName(gameState.fleet.location)})`, onClick:()=>this.explore(gameState.fleet.location)})
+        }
+
         // Planet-specific actions
         if (this.selectedObject instanceof Planet) {
             createElement({parent:container, tag:'button', innerHTML:isDockedHere ? 'Dock' : 'Scan', onClick:()=>this.explore(this.selectedObject)})

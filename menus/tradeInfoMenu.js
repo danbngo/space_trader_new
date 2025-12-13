@@ -87,9 +87,7 @@ function showTradeInfoBuyMenu(cargoType = CARGO_TYPES_ALL[0]) {
         `Trade Info - Buy ${cargoType.name}`,
         createElement({children:[
             createTradeInfoBuyTable(cargoType, onSelectPlanet),
-            `Your ${cargoType.name} amount: ${fleet.cargo.getAmount(cargoType)}`,
-            `Your Cargo Space: ${fleet.cargo.calcTotalCargo()}/${fleet.calcTotalCargoSpace()}`,
-            `Your credits: ${captain.credits}`,
+            `Your ${cargoType.name} amount: ${fleet.cargo.getAmount(cargoType)} | Your Cargo Space: ${fleet.cargo.calcTotalCargo()}/${fleet.calcTotalCargoSpace()} | Your credits: ${captain.credits}`,
         ]}),
         options
     );

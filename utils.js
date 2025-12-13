@@ -94,3 +94,18 @@ function isPointInRect(px, py, rx, ry, rw, rh) {
     return px >= rx && px <= rx + rw &&
            py >= ry && py <= ry + rh;
 }
+
+function safeRemove(arr = [], item) {
+    if (!Array.isArray(arr) || arr.length === 0) return false;
+    const idx = arr.indexOf(item);
+    if (idx === -1) return false;
+    arr.splice(idx, 1);
+    return true;
+}
+
+function safeAdd(arr = [], item) {
+    if (!Array.isArray(arr)) return false;
+    if (arr.includes(item)) return false;
+    arr.push(item);
+    return true;
+}

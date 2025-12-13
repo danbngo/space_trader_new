@@ -87,19 +87,19 @@ class Encounter {
         //const {playerShips} = this
         //const isAllied = playerShips.includes(firedBy)
         const color = firedBy.color //isAllied ? 'blue' : 'red'
-        const [speedX, speedY] = this.calcProjectileSpeed(firedBy)
+        const [speedX, speedY] = rotatePoint(PROJECTILE_SPEED_IN_MILES_PER_SECOND, 0, 0, 0, firedBy.angle)//this.calcProjectileSpeed(firedBy)
         //more lasers = bigger projectile
-        const radius = BASE_PROJECTILE_RADIUS_IN_MILES * (1+firedBy.lasers)/10
+        const radius = BASE_PROJECTILE_RADIUS_IN_MILES * (1+firedBy.lasers)/25
         const proj = new Projectile(color, radius, firedBy.x, firedBy.y, speedX, speedY, firedBy.angle, firedBy)
         this.projectiles.push(proj)
     }
 
-    calcProjectileSpeed(firedBy = new Ship()) {
+    /*calcProjectileSpeed(firedBy = new Ship()) {
         const inertia = Math.max(0, calcSpeedAlongAngle(firedBy.speedX, firedBy.speedY, firedBy.angle))
         const [sx,sy] = rotatePoint(PROJECTILE_SPEED_IN_MILES_PER_SECOND + inertia, 0, 0, 0, firedBy.angle)
         const speed = calcDistance(sx, sy, 0, 0)
         return [sx, sy, speed]
-    }
+    }*/
 
     handleProjectileCollisions() {
         //not allowing friendly fire for now

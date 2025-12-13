@@ -6,7 +6,8 @@ class CanvasObject {
         y = 0,
         size = 1,        // for triangle
         rotation = 0,    // radians for triangle
-        color = '#fff',
+        fillColor = '#fff',
+        strokeColor = '',
         textContent = '',
         onClick = null,
         onHover = null,
@@ -30,7 +31,7 @@ class CanvasObject {
         this.size = size;
         this.rotation = rotation;
 
-        this.color = color;
+        this.fillColor = strokeColor;
 
         this.textContent = textContent;
         this.onClick = onClick;
@@ -121,7 +122,7 @@ class CanvasWrapper {
         this.redraw();
     }
 
-    moveCameraTo(x, y) {
+    moveCameraTo(x = 0, y = 0) {
         this.cameraX = x;
         this.cameraY = y;
         this.redraw();
@@ -131,32 +132,32 @@ class CanvasWrapper {
     // Object Creation Helpers
     // ----------------------
 
-    addFilledCircle(id, x, y, size, minScreenSize, color, onClick = null) {
-        const obj = new CanvasObject({ id, shape: SHAPES.FilledCircle, x, y, size, minScreenSize, color, onClick });
+    addFilledCircle(id = "", x = 0, y = 0, size = 0, minScreenSize = 0, fillColor = '#fff', onClick = null) {
+        const obj = new CanvasObject({ id, shape: SHAPES.FilledCircle, x, y, size, minScreenSize, fillColor, onClick });
         return this.addObject(obj)
     }
 
-    addEmptyCircle(id, x, y, size, minScreenSize, color, onClick = null) {
-        const obj = new CanvasObject({ id, shape: SHAPES.EmptyCircle, x, y, size, minScreenSize, color, onClick });
+    addEmptyCircle(id = "", x = 0, y = 0, size = 0, minScreenSize = 0, fillColor = '#fff', onClick = null) {
+        const obj = new CanvasObject({ id, shape: SHAPES.EmptyCircle, x, y, size, minScreenSize, fillColor, onClick });
         return this.addObject(obj)
     }
 
-    addTriangle(id, x, y, size, minScreenSize, color, rotation = 0, onClick = null) {
-        const obj = new CanvasObject({ id, shape: SHAPES.Triangle, x, y, size, minScreenSize, color, rotation, onClick });
+    addTriangle(id = "", x = 0, y = 0, size = 0, minScreenSize = 0, fillColor = '#fff', rotation = 0, onClick = null) {
+        const obj = new CanvasObject({ id, shape: SHAPES.Triangle, x, y, size, minScreenSize, fillColor, rotation, onClick });
         return this.addObject(obj)
     }
 
-    addDot(id, x, y, color) {
+    addDot(id = "", x = 0, y = 0, color = '#fff') {
         const obj = new CanvasObject({ id, shape: SHAPES.Dot, x, y, size: 1, color });
         return this.addObject(obj)
     }
 
-    addText(id, x, y, screenOffsetX = 0, screenOffsetY = 0, textContent, color, size = DEFAULT_FONT_SIZE, onClick = null, onHover = null, onHoverEnd = null) {
+    addText(id = "", x = 0, y = 0, screenOffsetX = 0, screenOffsetY = 0, textContent = "", color = '#fff', size = 0, onClick = null, onHover = null, onHoverEnd = null) {
         const obj = new CanvasObject({ id, shape: SHAPES.Text, size, x, y, screenOffsetX, screenOffsetY, textContent, color, onClick, onHover, onHoverEnd });
         return this.addObject(obj)
     }
 
-    addLine(id, x, y, x2, y2, color, lineWidth = 1) {
+    addLine(id = "", x = 0, y = 0, x2 = 0, y2 = 0, color = '#fff', lineWidth = 0) {
         const obj = new CanvasObject({
             id,
             shape: SHAPES.Line,
@@ -173,14 +174,14 @@ class CanvasWrapper {
         return obj;
     }
 
-    deleteObject(id) {
+    deleteObject(id = "") {
         const obj = this.getObject(id)
         if (!obj) return
         this.objectMap.delete(obj.id)
         this.drawOrder = this.drawOrder.filter(o=>(o !== obj))
     }
 
-    getObject(id) {
+    getObject(id = "") {
         return this.objectMap.get(id) || null;
     }
 
@@ -193,14 +194,14 @@ class CanvasWrapper {
     // Internal Helpers
     // ----------------------
 
-    worldToScreen(x, y) {
+    worldToScreen(x = 0, y = 0) {
         return {
             sx: (x - this.cameraX) * this.zoom + this.canvas.width / 2,
             sy: (y - this.cameraY) * this.zoom + this.canvas.height / 2
         };
     }
 
-    isMouseOverObject(obj, mouseX, mouseY) {
+    isMouseOverObject(obj, mouseX = 0, mouseY = 0) {
         let { sx: ox, sy: oy } = this.worldToScreen(obj.x, obj.y);
         ox += obj.screenOffsetX;
         oy += obj.screenOffsetY;

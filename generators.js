@@ -13,7 +13,7 @@ function generateShip(planet = new Planet(), shipType = rndMember(SHIP_TYPES_ALL
 
     const name = `${planet.name} ${shipType.name}`
 
-    return new Ship(name, 'white', SPACE_SHIP_RADIUS_IN_MILES, hull, shields, lasers, thrusters, cargoSpace, new CountsMap());
+    return new Ship(name, 'white', hull, shields, lasers, thrusters, cargoSpace, new CountsMap());
 }
 
 function generateOfficerName(planet = new Planet()) {
@@ -23,19 +23,29 @@ function generateOfficerName(planet = new Planet()) {
     for(let i=0;i<syllableCount;i++) {
         name += syllables[rng(syllables.length-1)];
     }
+    name += ' of ' + planet.name
     return name.charAt(0).toUpperCase() + name.slice(1);
 }
 
-function generateOfficer() {
+function generateOfficer(planet = new Planet()) {
+    const {culture} = planet
+    const {officerQuality} = culture
+
     const skills = new CountsMap()
-    for (let i = 0; i < SKILLS_ALL.length; i++) {
-        skills.setAmount(skills[i], rng(10, 1))
+    const level = rng(10*officerQuality, 1)
+    const skillCount = level*5
+    for (let i = 0; i < skillCount; i++) {
+        skills.increment(rndMember(SKILLS_ALL), 1)
     }
-    return new Officer(generateOfficerName(), rng(100), 0, 0, skills);
+    const fame = rng(level, -level)
+    const infamy = rng(level, -level)
+    const credits = 0
+    const bounty = 0
+    return new Officer(generateOfficerName(planet), level, credits, fame, infamy, bounty, skills)
 }
 
 function generateShipyard(planet = new Planet()) {
-    const count = Math.floor(Math.random() * 4);
+    const count = rng(5, 1)
     const ships = [];
     for(let i=0;i<count;i++) {
         ships.push(generateShip(planet));
@@ -56,10 +66,10 @@ function generateMarket(planet = new Planet()) {
 }
 
 function generateGuild(planet = new Planet()) {
-    const count = rng()
+    const count = rng(5, 1)
     const officers = [];
     for(let i=0;i<count;i++) {
-        officers.push(generateOfficer());
+        officers.push(generateOfficer(planet));
     }
     const rake = rng(2, 1, false);
     return new Guild(planet, officers, rake);
@@ -67,12 +77,14 @@ function generateGuild(planet = new Planet()) {
 
 function generateCulture(planet = new Planet()) {
     const shipQuality = Math.random() > .5 ? 1/rng(3,1,false) : rng(3,1,false)
+    const officerQuality = Math.random() > .5 ? 1/rng(3,1,false) : rng(3,1,false)
+
     const cargoPriceModifiers = new CountsMap()
     for (const ct of CARGO_TYPES_ALL) {
         cargoPriceModifiers.setAmount(ct, Math.random() > .5 ? 1/rng(5,1,false) : rng(5,1,false))
     }
     const patrolRange = rng(10,2,false)
-    return new Culture(cargoPriceModifiers, shipQuality, patrolRange)
+    return new Culture(cargoPriceModifiers, shipQuality, officerQuality, patrolRange)
 }
 
 function generateSettlement(planet = new Planet()) {

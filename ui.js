@@ -44,6 +44,50 @@ function showPanel(title = '', text = '', buttons = ['Continue', ()=>{}], id = '
     return panel
 }
 
+function showSliderModal(min = 0, max = 10, title = '', description = '', footerGenerator = (value = 0)=>'', acceptLabel = 'Accept', cancelLabel = 'Cancel', onAccept = () => {}, onCancel = () => ()=>closeModal()) {
+    let currentValue = min;
+    
+    const slider = createElement({tag: 'input', style: {width: '100%'}});
+    slider.type = 'range';
+    slider.min = min;
+    slider.max = max;
+    slider.value = min;
+    slider.oninput = (e) => {
+        const footerText = footerGenerator(currentValue)
+        currentValue = parseInt(e.target.value);
+        document.getElementById('slider-value').textContent = `${currentValue} / ${max}`;
+        document.getElementById('slider-footer').innerHTML = footerText;
+    };
+    slider.disabled = (min >= max)
+
+    const buttons = [
+        [acceptLabel, () => {
+            closeModal()
+            onAccept(currentValue)
+        }, false],
+        [cancelLabel, () => {
+            closeModal()
+            onCancel()
+        }, false]
+    ];
+
+    const panel = showModal(
+        title,
+        createElement({children:[
+            description,
+            createElement({id: 'slider-value', style: {textAlign: 'center', marginTop: '16px'}}),
+            slider,
+            createElement({id: 'slider-footer'}),
+            createElement({classNames:['panel-buttons']})
+        ]}),
+        buttons,
+    );
+    
+    refreshPanelButtons(panel, buttons);
+    slider.oninput({target:{value:slider.value}})
+    return panel;
+}
+
 function showElement(element = createElement()) {
     UI_CONTAINER.innerHTML = "";
     UI_CONTAINER.appendChild(element);
@@ -56,7 +100,7 @@ function showMap(map = new StarMap()) {
     showElement(map.root)
 }
 
-function statColorSpan(text = '', ratio = 1.0) {
+function statColorSpan(text = '', ratio = 1.0, asHtmlText = false) {
     // clamp ratio so interpolation works cleanly
     const r = Math.max(0, Math.min(ratio, 4.0));
     // helper: linear interpolation between two hex colors
@@ -87,7 +131,7 @@ function statColorSpan(text = '', ratio = 1.0) {
             break;
         }
     }
-    return colorSpan(text, color, false)
+    return colorSpan(text, color, asHtmlText)
 }
 
 function colorSpan(text = '', color = '', asHtmlText = true) {

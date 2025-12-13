@@ -23,6 +23,7 @@ function showMarketMenu(planet = new Planet(), blackMarket = false) {
     const isDocked = fleet.location == planet
     const buyPrices = market.calcCargoBuyPrices()
     const sellPrices = market.calcCargoSellPrices()
+    const reloadMenu = ()=>showMarketMenu(planet, blackMarket)
 
     function buyCargo(ct = CARGO_TYPES_ALL[0], amount = 0) {
         const buyPrice = buyPrices.getAmount(ct)
@@ -30,7 +31,7 @@ function showMarketMenu(planet = new Planet(), blackMarket = false) {
         market.credits += amount * buyPrice;
         fleet.cargo.increment(ct, amount)
         market.cargo.increment(ct, -amount)
-        showMarketMenu(planet, blackMarket); // refresh menu
+        reloadMenu()
     }
 
     function sellCargo(ct = CARGO_TYPES_ALL[0], amount = 0) {
@@ -39,7 +40,28 @@ function showMarketMenu(planet = new Planet(), blackMarket = false) {
         market.credits -= amount * sellPrice;
         fleet.cargo.increment(ct, -amount)
         market.cargo.increment(ct, amount)
-        showMarketMenu(planet, blackMarket); // refresh menu
+        reloadMenu()
+    }
+
+    //TODO: when player clicks buy or sell, open a NEW modal and then let him use a slider to select the actual amount
+    //TODO: colorize buy and sell penalties
+    
+    function showSellCargoSlider(ct = CARGO_TYPES_ALL[0], sellableAmount = 0, sellPrice = 0) {
+        showSliderModal(
+            1, sellableAmount, `Sell ${ct.name}`, 
+            `How many ${ct.name} would you like to sell?`,
+            (amount)=>`Price: ${amount*sellPrice}CR`,
+            'Sell', 'Cancel', (amount = 0)=>sellCargo(ct, amount), ()=>reloadMenu(),
+        )
+    }
+
+    function showBuyCargoSlider(ct = CARGO_TYPES_ALL[0], buyableAmount = 0, buyPrice = 0) {
+        showSliderModal(
+            1, buyableAmount, `Buy ${ct.name}`, 
+            `How many ${ct.name} would you like to buy?`,
+            (amount)=>`Price: ${amount*buyPrice}CR`,
+            'Buy', 'Cancel', (amount = 0)=>buyCargo(ct, amount), ()=>reloadMenu(),
+        )
     }
 
     function onSelectCargoType(ct = CARGO_TYPES_ALL[0]) {
@@ -54,26 +76,19 @@ function showMarketMenu(planet = new Planet(), blackMarket = false) {
         const marketAffordableAmount = Math.floor(market.credits/sellPrice)
         const sellableAmount = Math.min(playerAmount, marketAffordableAmount)
         console.log({playerAmount,marketAmount,buyPrice,sellPrice,playerAffordableAmount,buyableAmount,marketAffordableAmount,sellableAmount})
-        const buttons = []
-        for (const amount of [1, 5, 10, 25]) {
-            buttons.push([`Buy ${amount} ${ct.name}`, ()=>buyCargo(ct, amount), (amount > buyableAmount)])
-        }
-        for (const amount of [1, 5, 10, 25]) {
-            const shipyardCanAfford = market.credits >= sellPrice*amount
-            buttons.push([`Sell ${amount} ${ct.name}${shipyardCanAfford ? '' : ` (For only ${market.credits}CR)`}`, ()=>sellCargo(ct, amount), (amount > sellableAmount)])
-        }
-        buttons.push(['Back', ()=>showPlanetMenu(planet)])
+        const buttons = [
+            ['Buy', ()=>showBuyCargoSlider(ct, buyableAmount, buyPrice), buyableAmount == 0],
+            ['Sell', ()=>showSellCargoSlider(ct, sellableAmount, sellPrice), sellableAmount == 0],
+            ['Back', ()=>showPlanetMenu(planet)],
+        ]
         refreshPanelButtons('market_panel', buttons)
     }
 
     let infoContainer = createElement({
         children: [
             createCargoTable(blackMarket, fleet.cargo, market.cargo, buyPrices, sellPrices, onSelectCargoType),
-            `Your Cargo Space: ${fleet.cargo.total}/${fleet.calcTotalCargoSpace()}`,
-            `Your Credits: ${captain.credits}`,
-            `Market Credits: ${market.credits}`,
-            `Buy Penalty: ${round(100*market.rake, 2)}%`,
-            `Sell Penalty: ${round(100/market.rake, 2)}%`,
+            `Your Cargo Space: ${fleet.cargo.total}/${fleet.calcTotalCargoSpace()} | Your Credits: ${captain.credits}`,
+            `Market Credits: ${market.credits} | Buy Penalty: ${round(100*market.rake, 2)}% | Sell Penalty: ${round(100/market.rake, 2)}%`,
         ]
     })
 

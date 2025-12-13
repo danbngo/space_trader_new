@@ -11,7 +11,7 @@ class CountsMap {
     }
 
     increment(key = 'key', amount = 0) {
-        this.counts.set(key, this.counts.get(key) + amount)
+        this.counts.set(key, this.getAmount(key) + amount)
     }
 
     setAmount(key = 'key', amount = 0) {

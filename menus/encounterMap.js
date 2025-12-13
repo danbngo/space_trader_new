@@ -99,7 +99,7 @@ class EncounterMap {
 
         ships.forEach((ship,index) => {
             cvs.addTriangle(`ship${index}`, ship.x, ship.y, ship.radius, 12, ship.color, ship.angle, ()=>this.selectObject(ship))
-            cvs.addEmptyCircle(`shipshield${index}`, ship.x, ship.y, 10, 10, 'cyan')
+            cvs.addEmptyCircle(`shipshield${index}`, ship.x, ship.y, ship.radius*1.1, 10, 'cyan')
             cvs.addText(`shiplabel${index}`, ship.x, ship.y, 0, -32, ship.name, ship.color, DEFAULT_FONT_SIZE)
             cvs.addTriangle(`shipthruster${index}`, ship.x, ship.y, ship.radius/EARTH_RADII_PER_AU*0.5, 6, 'orange', ship.angle - Math.PI)
             cvs.addTriangle(`shipbrakeleft${index}`, ship.x, ship.y, ship.radius/EARTH_RADII_PER_AU*0.5, 6, 'orange', ship.angle - Math.PI*1/2)
@@ -147,7 +147,7 @@ class EncounterMap {
             const cvsLabelObject = cvs.getObject(labelId)
 
             if (invisible) {
-                cvsObject.visible = false
+                cvsLabelObject.visible = false
                 cvsShieldObject.visible = false
                 cvsLabelObject.visible = false
                 return
@@ -174,21 +174,24 @@ class EncounterMap {
             let cvsObject = cvs.getObject(`shipthruster${index}`)
             if (!ship.accelerating) cvsObject.visible = false
             else {
-                const [screenOffsetX, screenOffsetY] = rotatePoint(10, 0, 0, 0, ship.angle-Math.PI)
+                const [screenOffsetX, screenOffsetY] = rotatePoint(4, 0, 0, 0, ship.angle-Math.PI)
+                const [oX, oY] = rotatePoint(ship.radius, 0, 0, 0, ship.angle-Math.PI)
                 cvsObject.visible = true
-                cvsObject.x = ship.x
-                cvsObject.y = ship.y
+                cvsObject.x = ship.x + oX
+                cvsObject.y = ship.y + oY
                 cvsObject.screenOffsetX = screenOffsetX
                 cvsObject.screenOffsetY = screenOffsetY
             }
 
+            //TODO: brake triangles seem pointed in the wrong directions
             cvsObject = cvs.getObject(`shipbrakeleft${index}`)
             if (!ship.braking && !ship.turningLeft) cvsObject.visible = false
             else {
-                const [screenOffsetX, screenOffsetY] = rotatePoint(10, 0, 0, 0, ship.angle-Math.PI/2)
+                const [screenOffsetX, screenOffsetY] = rotatePoint(4, 0, 0, 0, ship.angle-Math.PI/2)
+                const [oX, oY] = rotatePoint(ship.radius, 0, 0, 0, ship.angle-Math.PI/2)
                 cvsObject.visible = true
-                cvsObject.x = ship.x
-                cvsObject.y = ship.y
+                cvsObject.x = ship.x + oX
+                cvsObject.y = ship.y + oY
                 cvsObject.screenOffsetX = screenOffsetX
                 cvsObject.screenOffsetY = screenOffsetY
             }
@@ -196,10 +199,11 @@ class EncounterMap {
             cvsObject = cvs.getObject(`shipbrakeright${index}`)
             if (!ship.braking && !ship.turningRight) cvsObject.visible = false
             else {
-                const [screenOffsetX, screenOffsetY] = rotatePoint(10, 0, 0, 0, ship.angle-Math.PI*3/2)
+                const [screenOffsetX, screenOffsetY] = rotatePoint(4, 0, 0, 0, ship.angle-Math.PI*3/2)
+                const [oX, oY] = rotatePoint(ship.radius, 0, 0, 0, ship.angle-Math.PI*3/2)
                 cvsObject.visible = true
-                cvsObject.x = ship.x
-                cvsObject.y = ship.y
+                cvsObject.x = ship.x + oX
+                cvsObject.y = ship.y + oY
                 cvsObject.screenOffsetX = screenOffsetX
                 cvsObject.screenOffsetY = screenOffsetY
             }
@@ -217,14 +221,22 @@ class EncounterMap {
     }
 
     refreshObjectPane() {
+        //const playerShips = gameState.fleet.ships
+        const obj = this.selectedObject
         this.objectPane.innerHTML = '';
         if (!this.selectedObject) {
             return;
         }
         createElement({
-            parent:this.objectPane, tag:'h2', innerHTML: coloredName(this.selectedObject), classNames: ['clickable-text'],
-            onClick: ()=>this.selectObject(this.selectedObject)
+            parent:this.objectPane, tag:'h2', innerHTML: coloredName(obj), classNames: ['clickable-text'],
+            onClick: ()=>this.selectObject(obj)
         })
+        if (obj instanceof Ship) {
+            const {hull, shields} = obj
+            createElement({parent:this.objectPane, innerHTML: `Hull: ${statColorSpan(round(100 * hull[0]/hull[1]), hull[0]/hull[1], true)}%`})
+            createElement({parent:this.objectPane, innerHTML: `Shields: ${statColorSpan(round(100 * obj.shields[0]/obj.shields[1]), shields[0]/shields[1], true)}%`})
+            createElement({parent:this.objectPane, innerHTML: obj.isDisabled() ? `(Disabled)` : obj.escaped ? '(Escaped)' : ''})
+        }
     }
 
     selectObject(obj) {
@@ -258,6 +270,7 @@ class EncounterMap {
         }
 
         this.refreshCanvas()
+        this.refreshObjectPane();
 
         requestAnimationFrame(()=>this.tick())
     }
@@ -285,12 +298,19 @@ function startEncounter() {
     const enemyShips = enemyFleet.ships
     const spawnDistance = encounter.mapDimensions*ENCOUNTER_SHIP_MAX_SPAWN_DISTANCE_RATIO
 
+    //ships never have backward momentum
+    for (const ship of [...enemyShips, ...playerShips]) {
+        ship.resetCombatVars()
+        const [speedX, speedY] = rotatePoint(rng(spawnDistance/10, spawnDistance/10, false), 0, 0, 0, rng(0, Math.PI*4, false))
+        Object.assign(ship, {speedX,speedY})
+    }
+
 
     for (const ship of playerShips) {
-        const [x,y] = rotatePoint(-rng(spawnDistance, 0, false), 0, 0, 0, rng(Math.PI/2, -Math.PI/2, false))
+        const [x,y] = rotatePoint(-rng(spawnDistance, spawnDistance/2, false), 0, 0, 0, rng(Math.PI/2, -Math.PI/2, false))
+        const [speedX, speedY] = rotatePoint(rng(spawnDistance/10, spawnDistance/20, false), 0, 0, 0, rng(Math.PI/2, -Math.PI/2, false))
         const randomTarget = rndMember(enemyShips)
-        ship.resetCombatVars()
-        Object.assign(ship, {x, y, angle: new Path(ship.x, ship.y, randomTarget.x, randomTarget.y).angle})
+        Object.assign(ship, {x, y, speedX, speedY, angle: new Path(ship.x, ship.y, randomTarget.x, randomTarget.y).angle})
         //make first player ship controllable. TODO: make this more configurable later
         if (ship == playerShips[0]) {
             ship.autoCombat = false;
@@ -298,11 +318,11 @@ function startEncounter() {
         }
     }
     for (const ship of enemyShips) {
-        const [x,y] = rotatePoint(rng(spawnDistance, 0, false), 0, 0, 0, rng(Math.PI/2, -Math.PI/2, false))
-        ship.resetCombatVars()
+        const [x,y] = rotatePoint(rng(spawnDistance, spawnDistance/2, false), 0, 0, 0, rng(Math.PI/2, -Math.PI/2, false))
+        const [speedX, speedY] = rotatePoint(-rng(spawnDistance/10, spawnDistance/20, false), 0, 0, 0, rng(Math.PI/2, -Math.PI/2, false))
         const randomTarget = rndMember(playerShips)
         const angle = new Path(ship.x, ship.y, randomTarget.x, randomTarget.y).angle
-        Object.assign(ship, {x, y, color: 'red', angle})
+        Object.assign(ship, {x, y, speedX, speedY, color: 'red', angle})
     }
 
     showModal(encounter.encounterType.name, encounter.encounterType.description, [['Ok', ()=>{

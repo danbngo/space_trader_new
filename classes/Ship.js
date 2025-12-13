@@ -1,9 +1,8 @@
 
 // Ship class
 class Ship {
-    constructor(name = "Unnamed", color = 'white', radius = SPACE_SHIP_RADIUS_IN_MILES, hull = [0, 0], shields = [0, 0], lasers = 0, thrusters = 0, cargoSpace = 0) {
+    constructor(name = "Unnamed", color = 'white', hull = [0, 0], shields = [0, 0], lasers = 0, thrusters = 0, cargoSpace = 0) {
         this.name = name;
-        this.radius = radius;
         this.color = color;
         this.hull = hull;
         this.shields = shields;
@@ -30,6 +29,7 @@ class Ship {
         this.turningRight = false;
         this.beingHit = false;
         this.escaped = false;
+        this.radius = BASE_SPACE_SHIP_RADIUS_IN_MILES * (1+this.hull[1]/50)
     }
 
     get mass() {
@@ -45,11 +45,11 @@ class Ship {
     }
 
     repairHull(amount = this.hull[1]) {
-        this.hull[0] = Math.max(this.hull[0]+amount, this.hull[1])
+        this.hull[0] = Math.min(this.hull[0]+amount, this.hull[1])
     }
     
     restoreShields(amount = this.shields[1]) {
-        this.shields[0] = Math.max(this.shields[0]+amount, this.shields[1])
+        this.shields[0] = Math.min(this.shields[0]+amount, this.shields[1])
     }
 
     resetCombatVars() {
@@ -107,7 +107,7 @@ class Ship {
         if (this.isDisabled()) return
         if (decel) this.braking = true;
         else this.accelerating = true
-        const speed = this.calcSpeed()
+        const speed = this.calcSpeed() * (decel ? DECELERATION_SPEED_RATIO : 1)
         const force = speed*elapsedSeconds
         const forceDims = rotatePoint(force,0,0,0,this.angle)
         this.speedX += (decel ? -1 : 1) * forceDims[0]
@@ -123,18 +123,6 @@ class Ship {
         const turnRatio = force * (counterClockwise ? 1 : -1)
         this.angle += turnRatio*Math.PI*2
     }
-
-    /*canFireAt(target = new Ship()) {
-        if (this.isDisabled()) return false
-        if (!target) return false
-        if (this.laserRechargeProgress < 1) return false
-        const angleToTarget = new Path(this.x, this.y, target.x, target.y).angle
-        let dAngle = angleToTarget - this.angle;
-        // Normalize angle difference to the range (-PI, PI]
-        dAngle = Math.atan2(Math.sin(dAngle), Math.cos(dAngle)); 
-        if (Math.abs(dAngle) > Math.PI/2) return false //have to shoot in front of you
-        return true
-    }*/
 
     canFire() {
         if (this.isDisabled()) return false

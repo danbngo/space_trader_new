@@ -32,9 +32,14 @@ class EncounterAI {
         return false
     }
 
-    /*calcEffectiveProjectileSpeed(firedBy = new Ship(), distance = 1, accelPerSecond=PROJECTILE_SPEED_INCREASE_FACTOR_PER_SECOND) {
+    calcEffectiveProjectileSpeed(firedBy = new Ship(), distance = 1, accelPerSecond=PROJECTILE_SPEED_INCREASE_FACTOR_PER_SECOND) {
+
+
+        
         const [speedX,speedY,speed] = this.encounter.calcProjectileSpeed(firedBy)
         
+        //projectile is moving in the same inertial frame as firedBy
+
         const r = accelPerSecond;
         const v0 = speed;
 
@@ -46,7 +51,7 @@ class EncounterAI {
         const vImpact = v0 * Math.pow(r, t);
 
         return vImpact;
-    }*/
+    }
 
     calcFuturePosition(firedBy = new Ship(), target = new Ship(), projectileSpeed = PROJECTILE_SPEED_IN_MILES_PER_SECOND) {
         const sx = firedBy.x;
@@ -103,8 +108,8 @@ class EncounterAI {
                 if (!target) continue
                 ship.target = target
                 //estimate the target's future position
-                //const dist = calcDistance(ship.x, ship.y, target.x, target.y)
-                const effectiveProjectileSpeed = PROJECTILE_SPEED_IN_MILES_PER_SECOND//this.calcEffectiveProjectileSpeed(ship, dist)
+                const dist = calcDistance(ship.x, ship.y, target.x, target.y)
+                const effectiveProjectileSpeed = this.calcEffectiveProjectileSpeed(ship, dist)
                 const [fx,fy] = this.calcFuturePosition(ship, target, effectiveProjectileSpeed)
                 ship.destinationX = fx//target.x
                 ship.destinationY = fy//target.y
