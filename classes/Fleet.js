@@ -19,6 +19,14 @@ class Fleet extends SpaceObject {
         planet.addChildren([this])
     }
 
+    calcTotalCRShare(ofCR = 1, rounded = true) {
+        if (this.officers.length == 0) return 0
+        const shareRatio = this.officers.reduce((total, officer) => total + officer.crShare, 0)
+        console.log('share ratio:',shareRatio,this.officers)
+        const share = Math.min(1, shareRatio) * ofCR
+        return rounded ? round(share) : share
+    }
+
     calcTotalCargoSpace() {
         return this.ships.reduce((total, ship) => total + ship.cargoSpace, 0);
     }
@@ -28,7 +36,6 @@ class Fleet extends SpaceObject {
     }
 
     calcTotalThrusters() {
-        console.log(this)
         return this.ships.reduce((total, ship) => total + ship.thrusters, 0);
     }
 
@@ -46,5 +53,9 @@ class Fleet extends SpaceObject {
     
     isStranded() {
         return this.ships.filter(s=>(!s.isDisabled())).length <= 0
+    }
+
+    get numPilots() {
+        return this.officers.length + this.captain ? 1 : 0
     }
 }

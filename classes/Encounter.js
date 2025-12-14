@@ -76,6 +76,7 @@ class Encounter {
         const {activeShips} = this
         for (const ship of activeShips) {
             ship.rechargeLaser(elapsedSeconds)
+            ship.rechargeShields(elapsedSeconds)
             ship.resetCombatVarsTurn() //always last, otherwise recharge ALWAYS works
         }
     }

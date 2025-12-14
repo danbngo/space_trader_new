@@ -6,7 +6,7 @@ function createMarketCargoTable(blackMarket = false, playerCargo = new CountsMap
     for (const ct of cargoTypes) {
         rows.push([
             ct.name,
-            marketCargo.getAmount(ct),
+            statColorSpan(marketCargo.getAmount(ct), marketCargo.getAmount(ct)/MARKET_MAX_CARGO_PER_TYPE),
             statColorSpan(buyPrices.getAmount(ct), ct.value/buyPrices.getAmount(ct)),
             playerCargo.getAmount(ct),
             statColorSpan(sellPrices.getAmount(ct), sellPrices.getAmount(ct)/ct.value),
@@ -16,14 +16,13 @@ function createMarketCargoTable(blackMarket = false, playerCargo = new CountsMap
     return createTable(rows, (rowIndex = 0)=>onSelectCargoType(cargoTypes[rowIndex]))
 }
 
-function showMarketMenu(planet = new Planet(), blackMarket = false) {
-    console.log('showing market menu:',planet,planet.market,gameState)
+function showMarketMenu(market = new Market()) {
+    const {blackMarket, planet} = market
     const {fleet, captain} = gameState;
-    const market = blackMarket ? planet.settlement.blackMarket : planet.settlement.market
     const isDocked = fleet.location == planet
     const buyPrices = market.calcCargoBuyPrices()
     const sellPrices = market.calcCargoSellPrices()
-    const reloadMenu = ()=>showMarketMenu(planet, blackMarket)
+    const reloadMenu = ()=>showMarketMenu(market)
 
     function buyCargo(ct = CARGO_TYPES_ALL[0], amount = 0) {
         const buyPrice = buyPrices.getAmount(ct)
@@ -34,10 +33,10 @@ function showMarketMenu(planet = new Planet(), blackMarket = false) {
         reloadMenu()
     }
 
-    function sellCargo(ct = CARGO_TYPES_ALL[0], amount = 0) {
-        const sellPrice = Math.min(market.credits, sellPrices.getAmount(ct))
-        captain.credits += amount * sellPrice;
-        market.credits -= amount * sellPrice;
+    function sellCargo(ct = CARGO_TYPES_ALL[0], amount = 0, totalSalePrice = 0) {
+        const officersShare = gameState.fleet.calcTotalCRShare(totalSalePrice, true)
+        captain.credits += totalSalePrice - officersShare;
+        market.credits -= totalSalePrice;
         fleet.cargo.increment(ct, -amount)
         market.cargo.increment(ct, amount)
         reloadMenu()
@@ -47,11 +46,20 @@ function showMarketMenu(planet = new Planet(), blackMarket = false) {
     //TODO: colorize buy and sell penalties
     
     function showSellCargoSlider(ct = CARGO_TYPES_ALL[0], sellableAmount = 0, sellPrice = 0) {
+        const credits = gameState.credits
         showSliderModal(
             1, sellableAmount, `Sell ${ct.name}`, 
             `How many ${ct.name} would you like to sell?`,
-            (amount)=>`Price: ${amount*sellPrice}CR`,
-            'Sell', 'Cancel', (amount = 0)=>sellCargo(ct, amount), ()=>reloadMenu(),
+            (amount)=>{
+                const totalSalePrice = amount*sellPrice
+                const officersShare = gameState.fleet.calcTotalCRShare(totalSalePrice, true)
+                const finalSale = totalSalePrice - officersShare
+                return `
+                    Sale Price: ${finalSale}CR ${officersShare ? `(-${officersShare}CR for officers)` : ''}<br/>
+                    CR After Sale: ${credits+finalSale}CR <br/>
+                `
+            },
+            'Sell', 'Cancel', (amount = 0)=>sellCargo(ct, amount, totalSalePrice), ()=>reloadMenu(),
         )
     }
 

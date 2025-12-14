@@ -33,7 +33,7 @@ const ENCOUNTER_TYPES = {
             const disabledEnemyShips = gameState.fleet.ships.filter(s=>s.isDisabled())
             let msg = `You defeated the pirates!<br/>`
             msg += `Your victory gains you ${fameAmount} fame.`
-            gameState.fleet.captain.fame += fameAmount
+            gameState.captain.fame += fameAmount
             if (disabledEnemyShips > 0) msg += `The pirates left behind ${disabledEnemyShips.length} disabled ships!<br/>`
             showModal('Pirates', msg, [['Continue', ()=>endEncounter()]])
         },
@@ -43,7 +43,7 @@ const ENCOUNTER_TYPES = {
             msg += 'The pirates eagerly board your ships.<br/>'
             const lootableCargoAmount = fleet.cargo.total
             if (lootableCargoAmount <= 0) {
-                msg += 'They are disgusted to find nothing worth looting.<br/>'
+                msg += 'They are disgusted to find nothing worth looting!<br/>'
             }
             else {
                 const piratesCanLootAmount = encounter.fleet.calcAvailableCargoSpace()
@@ -61,13 +61,13 @@ const ENCOUNTER_TYPES = {
                 }
             }
             if (fleet.captain.credits <= 10) {
-                msg += `They note with contempt that you have ${fleet.captain.credits == 0 ? 'no' : 'barely any'} credits to steal.<br/>`
+                msg += `They note with contempt that you have ${fleet.captain.credits == 0 ? 'no' : 'barely any'} credits to steal!<br/>`
             }
             else {
                 const stolenCreditsAmount = rng(fleet.captain.credits*0.5, fleet.captain.credits*0.1)
-                msg += `They gleefully help themselves to ${stolenCreditsAmount} of your credits.<br/>`
+                msg += `They help themselves to ${stolenCreditsAmount} of your credits.<br/>`
             }
-            msg += `The pirates thank you sardonically for your time and depart.<br/>`
+            msg += `The pirates thank you for your time and depart.<br/>`
             showModal('Pirates', msg, [['Continue', ()=>endEncounter()]])
         },
         ()=>{
@@ -75,7 +75,7 @@ const ENCOUNTER_TYPES = {
             const disabledPlayerShips = gameState.fleet.ships.filter(s=>s.isDisabled())
             let msg = `You escaped from the pirates.<br/>`
             msg += `Your daring escape gains you ${fameAmount} fame.`
-            gameState.fleet.captain.fame += fameAmount
+            gameState.captain.fame += fameAmount
             if (disabledPlayerShips > 0) msg += `You left behind ${disabledPlayerShips.length} disabled ships!<br/>`
             //TODO: remove some cargo from the player's holds depending on the ships left behind
             gameState.fleet.ships = gameState.fleet.ships.filter(s=>(!s.isDisabled()))
@@ -85,7 +85,7 @@ const ENCOUNTER_TYPES = {
             let msg = ''
             const famePenalty = 5
             msg += `Submitting to the ravages of the pirates causes you to lose ${famePenalty} fame.`
-            gameState.fleet.captain.fame -= famePenalty
+            gameState.captain.fame -= famePenalty
             showModal('Pirates', msg, [['Continue', ()=>gameState.encounter.encounterType.onDefeat()]])
         }
     )

@@ -217,6 +217,7 @@ function createTable(rows = [createElement()], onSelectRow = (index = 0)=>{}) {
 let currentModal = createElement()
 
 function showModal(title = '', text = '', buttons = [['Continue', ()=>{}, false]], id = '') {
+    if (currentMap) currentMap.refresh()
     // Close existing modal if open
     if (currentModal) closeModal();
     // Create overlay
@@ -231,6 +232,7 @@ function closeModal() {
         currentModal.remove();
         currentModal = null;
     }
+    if (currentMap) currentMap.refresh()
 }
 
 function attachDragHandler(element = createElement(), callback = (dx=0,dy=0)=>{}) {

@@ -34,7 +34,7 @@ function showCargoMenu(cargo = gameState.fleet.cargo) {
         const dumpableAmount = cargo.getAmount(ct)
         const buttons = [
             ['Dump', ()=>showDumpCargoSlider(ct, dumpableAmount), dumpableAmount == 0],
-            ['Back', ()=>showPlanetMenu(planet)],
+            ["Close", () => closeModal()],
         ]
         refreshPanelButtons('cargo_panel', buttons)
     }

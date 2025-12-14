@@ -4,8 +4,8 @@ class GameState {
         this.system = starSystem
 
         // Create captain
-        this.captain = new Officer("Captain", 1, 500000, 0, 0, 0);
-        const playerShip = new Ship("Starting Ship", '#ccc', [25,25], [25,25], 5, 5, 5)
+        const captain = new Officer("Captain", STARTING_CREDITS);
+        const playerShip = new Ship("Starting Ship", '#ccc', [20,20], [10,10], 5, 5, 5)
 
         // Create fleet
         this.fleet = new Fleet(
@@ -15,13 +15,13 @@ class GameState {
             playerShip,
             [playerShip],
             new CountsMap(),
-            this.captain,
-            [this.captain],
+            captain,
+            [],
             EARTH,
         )
 
         this.fleet.captain = this.captain;
-        this.fleet.officers = [this.captain];
+        this.fleet.officers = [];
 
         // Add player's fleet to system
         this.system.fleets = [this.fleet];
@@ -43,6 +43,21 @@ class GameState {
             planet.culture = generateCulture(planet)
             planet.settlement = generateSettlement(planet)
         }
+    }
+
+    get captain() {
+        return this.fleet.captain;
+    }
+
+    set captain(captain = new Officer()) {
+        this.fleet.captain = captain
+    }
+
+    get credits() {
+        return this.captain.credits;
+    }
+    set credits(amount = 0) {
+        this.captain.credits = amount
     }
 
     /** Save to localStorage */
@@ -102,7 +117,7 @@ class GameState {
         );
 
         this.fleet.captain = this.captain;
-        this.fleet.officers = [this.captain];
+        this.fleet.officers = [];
 
         // Restore system reference
         this.system = new StarSystem();

@@ -7,7 +7,6 @@ class ShipyardState {
     }
 }
 
-// Shipyard class
 class Shipyard {
     constructor(planet = new Planet(), ships = [], credits = 0, rake = 0) {
         this.planet = planet
@@ -20,20 +19,20 @@ class Shipyard {
 
     static recordState(shipyard = new Shipyard()) {
         if (gameState.fleet.ships.length == 0) return //dont record if player has no ships left, to allow him to restore
-        this.state = new ShipyardState([...gameState.fleet.ships], gameState.fleet.captain.credits, [...shipyard.ships], shipyard.credits)
+        this.state = new ShipyardState([...gameState.fleet.ships], gameState.credits, [...shipyard.ships], shipyard.credits)
     }
     static restoreState() {
         gameState.fleet.ships = [...this.state.playerShips]
-        gameState.fleet.captain.credits = this.state.playerCredits
+        gameState.credits = this.state.playerCredits
         this.ships = [...this.state.shipyardShips]
         this.credits = this.state.shipyardCredits
     }
 
     calcBuyPrice(ship = new Ship()) {
-        return Math.round(ship.value / (1+this.rake))
+        return Math.round(ship.value * (1+this.rake))
     }
     calcSellPrice(ship = new Ship()) {
-        return Math.round(ship.value * (1+this.rake))
+        return Math.round(ship.value / (1+this.rake))
     }
 }
 
@@ -45,14 +44,14 @@ class Guild {
         this.rake = rake
     }
     calcHirePrice(officer = new Officer()) {
-        return Math.round(officer.value / (1+this.rake))
+        return Math.round(officer.value * (1+this.rake))
     }
 }
 
-// Market class
 class Market {
-    constructor(planet = new Planet(), cargo = [], credits = 0, rake = 0) {
+    constructor(planet = new Planet(), blackMarket = false, cargo = [], credits = 0, rake = 0) {
         this.planet = planet
+        this.blackMarket = blackMarket;
         this.cargo = cargo; // Cargo[]
         this.credits = credits;
         this.rake = rake
@@ -77,11 +76,26 @@ class Market {
     }
 }
 
+class Bank {
+    constructor(planet = new Planet(), credits = 0, rake = 0) {
+        this.planet = planet;
+        this.credits = credits;
+    }
+}
+
+class BankLoan {
+    constructor(amount = 0, dueYear = 0) {
+        this.amount = amount
+        this.dueYear = dueYear
+    }
+}
+
 class Settlement {
-    constructor(shipyard = null, market = null, blackMarket = null, guild = null) {
+    constructor(shipyard = null, market = null, blackMarket = null, guild = null, bank = null) {
         this.shipyard = shipyard;
         this.market = market;
         this.blackMarket = blackMarket;
         this.guild = guild;
+        this.bank = bank;
     }
 }

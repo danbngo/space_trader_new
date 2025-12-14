@@ -29,11 +29,14 @@ class Ship {
         this.turningRight = false;
         this.beingHit = false;
         this.escaped = false;
-        this.radius = BASE_SPACE_SHIP_RADIUS_IN_MILES * (1+this.hull[1]/50)
+    }
+
+    get radius() {
+        return BASE_SPACE_SHIP_RADIUS_IN_MILES * Math.pow(1+this.hull[1]/AVERAGE_SHIP_HULL, 0.5)
     }
 
     get mass() {
-        return this.hull[1]/5 + this.shields[1]/5 + this.lasers + this.thrusters + this.cargoSpace
+        return this.hull[1]/AVERAGE_SHIP_HULL + this.shields[1]/AVERAGE_SHIP_SHIELDS + this.lasers + this.thrusters + this.cargoSpace
     }
 
     get value() {
@@ -41,7 +44,7 @@ class Ship {
     }
 
     isDamaged() {
-        this.hull[0] < this.hull[1]
+        return this.hull[0] < this.hull[1]
     }
 
     repairHull(amount = this.hull[1]) {
@@ -53,7 +56,7 @@ class Ship {
     }
 
     resetCombatVars() {
-        this.restoreShields()
+        //this.restoreShields() //looks weird visually
         this.destinationX = undefined;
         this.destinationY = undefined;
         this.angle = Math.PI*2;
@@ -152,14 +155,14 @@ class Ship {
 
     rechargeShields(elapsedSeconds = 1) {
         if (this.isDisabled()) return
-        if (this.accelerating || this.braking) return
+        if (this.accelerating || this.braking || this.turningLeft || this.turningRight) return
         if (this.shields[0] >= this.shields[1]) return
         const rechargeProgress = elapsedSeconds/TIME_TO_RECHARGE_SHIELDS_IN_SECONDS * Math.random()
         this.shieldRechargeProgress += rechargeProgress
         const shieldChargedAmt = Math.floor(this.shieldRechargeProgress)
         if (shieldChargedAmt <= 0) return
         this.shieldRechargeProgress -= shieldChargedAmt
-        this.shields[0] = Math.max(this.shields[1], this.shields[0]+this.shieldChargedAmt)
+        this.shields[0] = Math.min(this.shields[1], this.shields[0]+shieldChargedAmt)
     }
 
     rechargeLaser(elapsedSeconds = 1) {

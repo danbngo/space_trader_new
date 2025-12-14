@@ -13,6 +13,7 @@ class EncounterMap {
         this.paused = true
         this.lastTickMs = Date.now()
         this.gameSecondsPerMs = 1/1000
+        this.maxMsPerTick = 100
 
         /*this.root = createElement({classNames: ['starmap-root']})
         this.infoBar = createElement({parent: this.root, classNames:['starmap-info-bar']})
@@ -34,14 +35,15 @@ class EncounterMap {
         this.root = createElement({classNames: ['starmap-root'], children: [this.cvs.root]})
         this.controls = createElement({parent: this.root, style: {position: 'absolute', top: 0, left: 0}})
         this.infoBar = createElement({parent: this.root, style:{position:'absolute', bottom: 0, left: 0}})
-        this.objectPane = createElement({parent: this.root, style: {position: 'absolute', top: 0, right: 0, height: '100%'}})
-
+        this.objectPane = createElement({parent: this.root, style: {position: 'absolute', top: 0, right: 0, height: '100%', pointerEvents: 'none'}})
 
         this.refresh()
         window.addEventListener("resize", ()=>this.cvs.autoResize());
-        setTimeout(()=>{
-            this.cvs.autoResize()
-        }, 1)
+        
+        requestAnimationFrame(()=> requestAnimationFrame(()=>{
+            this.cvs.autoResize();
+            this.refresh();
+        }));
     }
 
     refresh() {
@@ -49,7 +51,7 @@ class EncounterMap {
         this.refreshControls();
         this.refreshInfoBar();
         this.refreshObjectPane();
-        this.refreshCanvas();
+        this.refreshCanvas(true);
     }
 
     refreshControls() {
@@ -87,14 +89,14 @@ class EncounterMap {
         const enemyFleet = encounter.fleet
         const enemyShips = enemyFleet.ships
         const ships = [...playerShips, ...enemyShips];
-        const mod = 2000 //hacky way to position stars intended for starmap onto the encounter map
+        const BG_STAR_DISTANCE_MOD = 20000 //hacky way to position stars intended for starmap onto the encounter map
 
         cvs.clear()
 
         cvs.addEmptyCircle('maplimits', 0, 0, this.encounter.mapDimensions, 24, 'cyan')
 
         starSystem.backgroundStars.forEach( (bgStar, index) => {
-            cvs.addPixel(`bgstar${index}`, bgStar.x * mod, bgStar.y * mod, bgStar.calcColor())
+            cvs.addPixel(bgStar.x*BG_STAR_DISTANCE_MOD, bgStar.y*BG_STAR_DISTANCE_MOD, bgStar.r, bgStar.g, bgStar.b, bgStar.a, bgStar.size)
         });
 
         ships.forEach((ship,index) => {
@@ -118,7 +120,7 @@ class EncounterMap {
         cvs.recalculateDrawOrder()
     }
 
-    refreshCanvas() {
+    refreshCanvas(forceRedraw = false) {
         const {encounter, cvs} = this
         const playerFleet = gameState.fleet
         const playerShips = playerFleet.ships
@@ -155,7 +157,7 @@ class EncounterMap {
             const cvsBrakeRightObject = cvs.getObject(`shipbrakeright${index}`)
 
             if (invisible) {
-                cvsLabelObject.visible = false
+                cvsShipObject.visible = false
                 cvsShieldObject.visible = false
                 cvsLabelObject.visible = false
                 cvsThrusterObject.visible = false
@@ -165,7 +167,6 @@ class EncounterMap {
             }
 
             const shieldsRatio = ship.shields[0]/ship.shields[1]
-            const shield255 = Math.round(255*shieldsRatio)
             const hullRatio = 0.25 + (0.75*ship.hull[0]/ship.hull[1])
 
             cvsShipObject.x = ship.x
@@ -175,7 +176,7 @@ class EncounterMap {
             
             cvsShieldObject.x = ship.x
             cvsShieldObject.y = ship.y
-            cvsShieldObject.color =  `rgba(0,${shield255},${shield255})`
+            cvsShieldObject.filters.set('opacity', shieldsRatio)
 
             cvsLabelObject.x = ship.x
             cvsLabelObject.y = ship.y
@@ -223,7 +224,16 @@ class EncounterMap {
             this.projectileGfxMap.delete(uuid)
         }
 
-        cvs.redraw()
+        cvs.redraw(forceRedraw)
+    }
+
+    refreshAnimations(year = 0) {
+        const {starSystem, cvs} = this
+        const {backgroundStars} = starSystem
+        backgroundStars.forEach( (bgStar, index) => {
+            bgStar.twinkle(year)
+            cvs.pixels[index].a = bgStar.a
+        });
     }
 
     refreshObjectPane() {
@@ -241,6 +251,8 @@ class EncounterMap {
             const {hull, shields} = obj
             createElement({parent:this.objectPane, innerHTML: `Hull: ${statColorSpan(round(100 * hull[0]/hull[1]), hull[0]/hull[1], true)}%`})
             createElement({parent:this.objectPane, innerHTML: `Shields: ${statColorSpan(round(100 * obj.shields[0]/obj.shields[1]), shields[0]/shields[1], true)}%`})
+            createElement({parent:this.objectPane, innerHTML: `Laser Recharge: ${statColorSpan(round(100 * obj.laserRechargeProgress), obj.laserRechargeProgress, true)}%`})
+            createElement({parent:this.objectPane, innerHTML: `Shield Recharge: ${statColorSpan(round(100 * obj.shieldRechargeProgress), obj.shieldRechargeProgress, true)}%`})
             createElement({parent:this.objectPane, innerHTML: obj.isDisabled() ? `(Disabled)` : obj.escaped ? '(Escaped)' : ''})
         }
     }
@@ -265,7 +277,7 @@ class EncounterMap {
         if (this.paused || gameState.encounter.result || !gameState.encounter.combatEnabled) return
 
         const currentTime = Date.now()
-        const elapsedMs = currentTime - this.lastTickMs
+        const elapsedMs = Math.min(this.maxMsPerTick, currentTime - this.lastTickMs)
         this.lastTickMs = currentTime
         const elapsedSeconds = elapsedMs * this.gameSecondsPerMs;
         gameState.encounter.tick(elapsedSeconds)
@@ -275,6 +287,7 @@ class EncounterMap {
             return
         }
 
+        this.refreshAnimations(currentTime/200000) //hack to make stars twinkle at a reasonable speed
         this.refreshCanvas()
         this.refreshObjectPane();
 
@@ -351,14 +364,15 @@ function endEncounter() {
 
 function handlePlayerStranded() {
     const [nearestPlanet, nearestDistance] = gameState.system.calcNearestPlanet(gameState.fleet)
-    const creditCost = rng(20*nearestDistance, 10*nearestDistance)
-    const dayCost = rng(1.5*nearestDistance, 0.75*nearestDistance, false)
+    const creditCost = 10 + rng(200*nearestDistance, 100*nearestDistance)
+    const dayCost = 0.25 + rng(1.5*nearestDistance, 0.75*nearestDistance, false)
     console.log('player is stranded:',nearestPlanet,nearestDistance,creditCost,dayCost)
     gameState.fleet.dock(nearestPlanet)
 
     let msg = `You have no working ships remaining, so you have to call a tow ship.<br/>`
     msg += `It tows your ships to the nearest planet for ${creditCost}CR.<br/>`
     msg += `You also lose ${round(dayCost,1)} days while waiting.<br/>`
+    currentMap.refresh()
 
     showModal(`Stranded`, msg, [['Continue', ()=>showPlanetMenu(nearestPlanet)]])
 }

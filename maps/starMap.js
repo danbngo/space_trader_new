@@ -11,21 +11,24 @@ class StarMap {
         this.paused = true
         this.lastTickMs = Date.now()
         this.gameYearsPerMs = 1/365/24/60 * 2
+        this.maxMsPerTick = 100
 
         this.cvs = new CanvasWrapper(100, 10, 1000, NEPTUNE.orbit.radius*2)
         this.root = createElement({classNames: ['starmap-root'], children: [this.cvs.root]})
         this.controls = createElement({parent: this.root, style: {position: 'absolute', top: 0, left: 0}})
         this.infoBar = createElement({parent: this.root, style:{position:'absolute', bottom: 0, left: 0}})
-        this.objectPane = createElement({parent: this.root, style: {position: 'absolute', top: 0, right: 0, height: '100%'}})
+        this.objectPane = createElement({parent: this.root, style: {position: 'absolute', top: 0, right: 0, height: '100%', pointerEvents: 'none'}})
 
         for (const bgStar of starSystem.backgroundStars) bgStar.reset()
 
         this.refresh()
 
         window.addEventListener("resize", ()=>this.cvs.autoResize());
-        setTimeout(()=>{
-            this.cvs.autoResize()
-        }, 1)
+
+        requestAnimationFrame(()=> requestAnimationFrame(()=>{
+            this.cvs.autoResize();
+            this.refresh();
+        }));
     }
 
     refresh() {
@@ -33,8 +36,8 @@ class StarMap {
         this.refreshControls();
         this.refreshInfoBar();
         this.refreshObjectPane();
-        this.refreshCanvas();
         this.refreshAnimations(gameState.year)
+        this.refreshCanvas(true);
     }
 
     refreshControls() {
@@ -57,6 +60,8 @@ class StarMap {
             ['Trade Info', ()=>showTradeInfoSellMenu()],
             ['Ships Manifest', ()=>showShipsMenu()],
             ['Cargo Manifest', ()=>showCargoMenu()],
+            ['Officer Roster', ()=>showOfficersMenu()],
+            ['Captain Overview', ()=>showCaptainMenu()],
             ['Cancel', ()=>closeModal()],
         ])
     }
@@ -112,11 +117,11 @@ class StarMap {
         
         stars.forEach((body,index)=>{
             //for fun, make bodies a bit bigger so they're visually different sizes instead of all being min size
-            cvs.addFilledCircle(`star${index}`, body.x, body.y, body.radius/EARTH_RADII_PER_AU * 25, 8, body.color, ()=>this.selectObject(body))
+            cvs.addFilledCircle(`star${index}`, body.x, body.y, body.radius/EARTH_RADII_PER_AU * 25, 12, body.color, ()=>this.selectObject(body))
         })
 
         planets.forEach((body,index)=>{
-            const planetObj = cvs.addFilledCircle(`planet${index}`, body.x, body.y, body.radius/EARTH_RADII_PER_AU * 150, 4, body.color, ()=>this.selectObject(body))
+            const planetObj = cvs.addFilledCircle(`planet${index}`, body.x, body.y, body.radius/EARTH_RADII_PER_AU * 150, 8, body.color, ()=>this.selectObject(body))
             const labelObj = cvs.addText(`planetlabel${index}`, body.x, body.y, 0, -32, body.name, body.color, DEFAULT_FONT_SIZE, ()=>this.selectObject(body))
             const objs = [planetObj, labelObj]
             for (const obj of objs) {
@@ -151,7 +156,7 @@ class StarMap {
         cvs.recalculateDrawOrder()
     }
 
-    refreshCanvas() {
+    refreshCanvas(forceRedraw = true) {
         const {cvs, starSystem} = this
         const {stars, planets, fleets} = starSystem
         const orbitingBodies = [...stars, ...planets].filter(b=>(b.orbit))
@@ -213,7 +218,6 @@ class StarMap {
                 cvsObject.visible = false
             }
             else {
-                console.log('fleet state:',fleet)
                 const [screenOffsetX, screenOffsetY] = rotatePoint(10, 0, 0, 0, fleetAngle-Math.PI)
                 cvsObject.visible = true
                 cvsObject.x = fleet.x
@@ -223,7 +227,7 @@ class StarMap {
             }
         })
 
-        cvs.redraw()
+        cvs.redraw(forceRedraw)
     }
 
     refreshAnimations(year = 0) {
@@ -232,9 +236,6 @@ class StarMap {
         backgroundStars.forEach( (bgStar, index) => {
             bgStar.twinkle(year)
             cvs.pixels[index].a = bgStar.a
-            if (index == 0) console.log('alpha:',bgStar.a,'pixel:',cvs.pixels[index])
-            //cvsObject.filters.set('brightness', bgStar.twinkleProgress)
-            //cvsObject.filters.set('opacity', opacity)
         });
     }
 
@@ -291,7 +292,7 @@ class StarMap {
         const playerWasDocked = (gameState.fleet.location !== undefined)
 
         const currentTime = Date.now()
-        const elapsedMs = currentTime - this.lastTickMs
+        const elapsedMs = Math.min(this.maxMsPerTick, currentTime - this.lastTickMs)
         this.lastTickMs = currentTime
         const elapsedYears = elapsedMs * this.gameYearsPerMs;
 
@@ -299,8 +300,8 @@ class StarMap {
         gameState.system.refreshPositions()
 
         this.refreshAnimations(gameState.year)
-        this.refreshCanvas()
         this.refreshInfoBar()
+        this.refreshCanvas()
 
         //pause if player reached his destination
         if (!playerWasDocked && gameState.fleet.location) {

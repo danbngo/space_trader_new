@@ -103,6 +103,10 @@ class CanvasWrapper {
         })
 
         this.pixelRatio = CanvasWrapper.getPixelRatio(this.ctx);
+
+        this.maxFrameRate = 30; //do not refresh more than 30 times per second
+        this.lastRedrawAt = 0;
+
         this.autoResize()
     }
 
@@ -117,7 +121,7 @@ class CanvasWrapper {
     }
 
     autoResize() {
-        const pixelRatio = this.pixelRatio//CanvasWrapper.getPixelRatio(this.ctx);
+        const pixelRatio = this.pixelRatio
         console.log('pixelRatio:', pixelRatio);
         const styleWidth = this.root.clientWidth - 16;
         const styleHeight = this.root.clientHeight - 8;
@@ -130,13 +134,8 @@ class CanvasWrapper {
         this.canvas.height = height
         this.ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
 
-        // (Optional) redraw your scene here
         this.redraw()
     }
-
-    // ----------------------
-    // Camera + Zoom Controls
-    // ----------------------
 
     onDragMap(x = 0, y = 0) {
         this.cameraX -= x/this.zoom
@@ -222,10 +221,6 @@ class CanvasWrapper {
         this.pixels = []
     }
 
-    // ----------------------
-    // Internal Helpers
-    // ----------------------
-
     worldToScreen(x = 0, y = 0) {
         return {
             sx: ((x - this.cameraX) * this.zoom + (this.canvas.width / 2)) / this.pixelRatio,
@@ -246,7 +241,7 @@ class CanvasWrapper {
         else {
             // basic circular hitbox for all shapes for now
             const dist = Math.hypot(ox - mouseX, oy - mouseY);
-            const hitRadius = Math.max(obj.minScreenSize, obj.size * this.zoom)
+            const hitRadius = Math.max(obj.minScreenSize, obj.size * this.zoom)/this.pixelRatio
             if (dist > hitRadius) return false
         }
         return true
@@ -318,11 +313,14 @@ class CanvasWrapper {
         this.drawOrder = sorted
     }
 
-    // ----------------------
-    // Drawing
-    // ----------------------
+    redraw(forceRedraw = false) {
+        const now = Date.now()
+        const msSinceLastRedraw = now - this.lastRedrawAt
+        if (msSinceLastRedraw < 1000/this.maxFrameRate && !forceRedraw) {
+            return
+        }
+        this.lastRedrawAt = now
 
-    redraw() {
         const {ctx, canvas, pixels, zoom, pixelRatio} = this
         const {width, height} = canvas
         ctx.clearRect(0, 0, width, height);

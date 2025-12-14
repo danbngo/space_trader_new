@@ -18,8 +18,29 @@ function createShipsListMenu(ships = [new Ship()], onSelectShip = (s = new Ship(
 
 
 function showShipsMenu(ships = [...gameState.fleet.ships]) {
+    const reloadMenu = ()=>showShipsMenu(ships)
+
+    function dumpShip(ship = new Ship()) {
+        safeRemove(ships, ship)
+        showShipsMenu(ships) //DONT use reloadMenu here, wont reflect changes to ship list
+    }
+
+    function showDumpShipModal(ship = new Ship()) {
+        showModal(`Dump ${ship.name}`, 
+            `Are you sure you want to dump ${ship.name}?`,
+            [
+                ["Dump", () => dumpShip(ship)],
+                ["Cancel", () => reloadMenu()],
+            ]
+        )
+    }
+
     function onSelectShip(ship = new Ship()) {
-        console.log(`Selected ship: ${ship}`)
+        const buttons = [
+            ['Dump', ()=>showDumpShipModal(ship), gameState.fleet.ships.length < 2],
+            ["Close", () => closeModal()],
+        ]
+        refreshPanelButtons('ships_panel', buttons)
     }
 
     showModal(
@@ -29,6 +50,7 @@ function showShipsMenu(ships = [...gameState.fleet.ships]) {
         ]}),
         [
             ["Close", () => closeModal()],
-        ]
+        ],
+        'ships_panel'
     );
 }

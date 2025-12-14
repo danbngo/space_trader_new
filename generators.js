@@ -2,11 +2,11 @@ function generateShip(planet = new Planet(), shipType = rndMember(SHIP_TYPES_ALL
     const {culture} = planet
     const {shipQuality} = culture
 
-    let maxHull =    round(rng(125, 25)*shipType.hull*shipQuality) 
-    let maxShields = round(rng(125, 25)*shipType.shields*shipQuality)
-    let lasers =     round(rng(25, 5)*shipType.lasers*shipQuality)
-    let thrusters =  round(rng(25, 5)*shipType.thrusters*shipQuality)
-    let cargoSpace = round(rng(25, 5)*shipType.cargoSpace*shipQuality)
+    let maxHull =    round(AVERAGE_SHIP_HULL*rng(2, 0.5, false)*shipType.hull*shipQuality) 
+    let maxShields = round(AVERAGE_SHIP_SHIELDS*rng(2, 0.5, false)*shipType.shields*shipQuality)
+    let lasers =     round(rng(2, 0.5, false)*shipType.lasers*shipQuality)
+    let thrusters =  round(rng(2, 0.5, false)*shipType.thrusters*shipQuality)
+    let cargoSpace = round(rng(2, 0.5, false)*shipType.cargoSpace*shipQuality)
 
     const shields = [maxShields, maxShields]
     const hull = [maxHull, maxHull]
@@ -30,18 +30,17 @@ function generateOfficerName(planet = new Planet()) {
 function generateOfficer(planet = new Planet()) {
     const {culture} = planet
     const {officerQuality} = culture
-
-    const skills = new CountsMap()
     const level = rng(10*officerQuality, 1)
-    const skillCount = level*5
-    for (let i = 0; i < skillCount; i++) {
-        skills.increment(rndMember(SKILLS_ALL), 1)
-    }
     const fame = rng(level, -level)
     const infamy = rng(level, -level)
-    const credits = 0
     const bounty = 0
-    return new Officer(generateOfficerName(planet), level, credits, fame, infamy, bounty, skills)
+    const credits = 0
+    const officer = new Officer(generateOfficerName(planet), credits, fame, infamy, bounty)
+    for (let i = 0; i < level; i++) {
+        officer.levelUp(true)
+    }
+    officer.expPoints = 0
+    return officer
 }
 
 function generateShipyard(planet = new Planet()) {
@@ -55,14 +54,14 @@ function generateShipyard(planet = new Planet()) {
     return new Shipyard(planet, ships, credits, rake);
 }
 
-function generateMarket(planet = new Planet()) {
+function generateMarket(planet = new Planet(), blackMarket = false) {
     const marketCargo = new CountsMap();
     for (const ct of CARGO_TYPES_ALL) {
-        marketCargo.setAmount(ct, Math.random() > .2 ? rng(50) : 0)
+        marketCargo.setAmount(ct, Math.random() > .2 ? rng(MARKET_MAX_CARGO_PER_TYPE) : 0)
     }
-    const credits = rng(200*1000, 10*1000);
+    const credits = rng(MARKET_MAX_CREDITS, MARKET_MAX_CREDITS/10);
     const rake = rng(2, 1, false);
-    return new Market(planet, marketCargo, credits, rake);
+    return new Market(planet, blackMarket, marketCargo, credits, rake);
 }
 
 function generateGuild(planet = new Planet()) {
@@ -89,8 +88,8 @@ function generateCulture(planet = new Planet()) {
 
 function generateSettlement(planet = new Planet()) {
     const shipyard = generateShipyard(planet);
-    const market = generateMarket(planet);
-    const blackMarket = generateMarket(planet);
+    const market = generateMarket(planet, false);
+    const blackMarket = generateMarket(planet, true);
     const guild = generateGuild(planet);
     return new Settlement(shipyard, market, blackMarket, guild)
 }
@@ -128,17 +127,17 @@ function generateBackgroundStars(radius = 1, numStars = 1) {
     let totalX = 0;
     let totalY = 0;
     for (let i = 0; i < numStars; i++) {
-        const distance = Math.random()*Math.random()*radius
+        const distance = radius*Math.random()//*Math.random()*radius
         let [x,y] = rotatePoint(distance, 0, 0, 0, Math.PI*4*Math.random())
         totalX += x
         totalY += y
-        y *= Math.random()
+        //y *= Math.random()
         const r = rng(255,128)
         const g = rng(255,128)
         const b = rng(255,128)
         //minutes
         const twinkleDurationYear = 1/365/24 * rng(5*1000,5,false)
-        const size = Math.min(rng(0.5, 2.5, false), rng(0.5, 2.5, false), rng(0.5, 2.5, false))
+        const size = Math.min(rng(0.5, 2.5, false), rng(0.5, 2.5, false), rng(0.5, 2.5, false), rng(0.5, 2.5, false), rng(0.5, 2.5, false), )
         //const color = `rgba(${r},${g},${b})`
         const bgStar = new BackgroundStar(r, g, b, x, y, size, twinkleDurationYear)
         backgroundStars.push(bgStar)

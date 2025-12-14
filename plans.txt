@@ -1,3 +1,47 @@
+DONE: fix the shields never diminishing bug - use opacity
+DONE: make shield regen actually work - make shiled more expensive than hull
+
+next up:
+
+banks, so players dont lose all their credits to pirates and the like
+-charges you a deposit fee, NO INTEREST.
+-can take out loans, but if you don't pay on time you get a bounty equivalent to the loan
+more encounter types
+ -miners - you can attack and loot them
+ -merchants - same as above but will offer to trade with you
+ -cops - will check you for contraband or arrest if you have a bounty
+ -bounty hunters - will just straight attack you if you OR your officers have a bounty
+ -asteroid encounters so you can mine raw resources
+ -dead/stranded ships - you can loot them but may be ambushed while doing so
+allow player to retire after 50 years and get an ending
+taverns, hire more interesting characters via the tavern
+missions - via the guild, etc.
+-infamy/fame should factor into what missions you can take on
+-escort missions? adds a temporary ship/officer? if they're disabled or die you lose rep?
+courthouses, so you can pay off your bounty or take on bounty missions
+add government buildings and make cultures more fleshed out
+-split up bounties, maybe reputation, by planet
+-have a grand narrative of some sort - political change, war, etc between planets
+academy improvements - let players pay money for skills, some are cheaper than others
+maybe look into making ships look different visually - and less enormous ships, use sqrt of hull or something
+add dwarf planets?
+add asteroid belt? oort cloud?
+-if asteroid belts, then add arbitrary travel destinations?
+give officers and ships perks - not just boring levelups
+
+EVENTUALLY TURN THIS INTO A ROGUELIKE LOL.
+
+
+
+
+
+
+
+
+
+
+---
+
 need a combat system
 
 i think what makes sense for this game is somewhere between ships flying around zapping each other, and turn based

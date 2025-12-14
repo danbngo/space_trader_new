@@ -5,13 +5,14 @@ function createHireOfficerMenu(officers = [new Officer()], guild = new Guild(), 
     console.log('creating hire officer menu:',officers)
     if (officers.length == 0) return `(None)`
     const rows = [
-        ['Name', 'Level', ...SKILLS_ALL, 'Hire Price']
+        ['Name', 'Level', 'CR Share', ...SKILLS_ALL, 'Hire Price']
     ]
     for (const officer of officers) {
         const hirePrice = guild.calcHirePrice(officer)
         rows.push([
             officer.name,
             statColorSpan(officer.level, officer.level/5),
+            statColorSpan(officer.crShare*100+'%', 5/officer.level),
             ...SKILLS_ALL.map(sk=>statColorSpan(officer.skills.getAmount(sk), officer.skills.getAmount(sk)*SKILLS_ALL.length/5/SKILL_POINTS_PER_LEVEL)),
             statColorSpan(hirePrice, officer.value/hirePrice)
         ])
@@ -20,16 +21,15 @@ function createHireOfficerMenu(officers = [new Officer()], guild = new Guild(), 
     return createTable(rows, (rowIndex = 0)=>onSelectOfficer(officers[rowIndex]))
 }
 
-function showGuildMenu(planet) {
-    console.log('displaying guild menu:',planet,gameState)
-    const {guild} = planet.settlement
+function showGuildMenu(guild = new Guild()) {
+    const {planet} = guild
     const {fleet, captain} = gameState
     const isDocked = fleet.location == planet
-    const rebuildMenu = ()=>showGuildMenu(planet)
+    const rebuildMenu = ()=>showGuildMenu(guild)
 
     function hireOfficer(officer = new Officer()) {
         const hirePrice = guild.calcHirePrice(officer)
-        gameState.captain.credits -= hirePrice;
+        gameState.credits -= hirePrice;
         //guild.credits += hirePrice;
         safeAdd(fleet.officers, officer)
         safeRemove(guild.officers, officer)
@@ -53,7 +53,7 @@ function showGuildMenu(planet) {
         if (!isDocked) return
         const hirePrice = guild.calcHirePrice(officer)
         const buttons = [
-            [`Hire`, ()=>showHireOfficerModal(officer), (captain.credits < hirePrice && fleet.officers.length-1 < captain.maxSubordinates)],
+            [`Hire`, ()=>showHireOfficerModal(officer), (captain.credits < hirePrice || fleet.officers.length >= captain.maxSubordinates)],
             ["Back", () => showPlanetMenu(planet)],
         ]
         refreshPanelButtons('guild_hire_panel', buttons)
@@ -66,7 +66,7 @@ function showGuildMenu(planet) {
         createElement({children:[
             `Guild officers`,
             createHireOfficerMenu(guild.officers, guild, (officer)=>onSelectGuildOfficer(officer)),
-            `Your # officers: ${fleet.officers.length-1}/${captain.maxSubordinates} | Your credits: ${captain.credits}`,
+            `Your # officers: ${fleet.officers.length}/${captain.maxSubordinates} | Your credits: ${captain.credits}`,
             //`Guild credits: ${guild.credits}`,
             `Hire Penalty: ${round(100*guild.rake, 2)}% | Local Officer Level: ${round(100*guild.planet.culture.officerQuality, 2)}%`,
         ]}),

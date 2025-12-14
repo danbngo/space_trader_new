@@ -8,13 +8,11 @@ button {
     cursor: pointer;
     transition: 0.2s;
     font-family: "Google Sans Code", monospace;
+    pointer-events: auto;
 }
 
-button:hover {
-    background: #022;
-}
-
-button:hover, .starmap-label:hover {
+button:not(:disabled):hover {
+    background: #00ffff22;
     border: 1px solid #0ff;
     box-shadow: 0 0 6px #0ff;
 }

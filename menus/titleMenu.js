@@ -1,4 +1,5 @@
 function showTitleScreen() {
+    showBackgroundMap()
     showModal(
         "Space Game",
         "A text‑based space adventure.",
@@ -13,7 +14,11 @@ function showTitleScreen() {
 function startNewGame() {
     gameState = new GameState(SOLAR_SYSTEM)
     console.log("New game started.");
-    showStarMap()
+    createCharacter()
+}
+
+function createCharacter() {
+    showCaptainCreationMenu(gameState.captain, ()=>showStarMap())
 }
 
 function continueGame() {
