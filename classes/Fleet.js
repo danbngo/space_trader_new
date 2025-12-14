@@ -1,6 +1,6 @@
 // Fleet class extends SpaceObject
 class Fleet extends SpaceObject {
-    constructor(name = "Unnamed", color = 'white', x = 0, y = 0, flagship = new Ship(), ships = [new Ship()], cargo = new CountsMap(), captain = new Officer(), officers = [new Officer()], location = null) {
+    constructor(name = "Unnamed", color = '#ccc', x = 0, y = 0, flagship = new Ship(), ships = [new Ship()], cargo = new CountsMap(), captain = new Officer(), officers = [new Officer()], location = null) {
         super(name, color, 0, x, y);
         this.flagship = flagship;
         this.ships = ships; // Ship[]

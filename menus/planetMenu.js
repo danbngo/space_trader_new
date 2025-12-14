@@ -33,5 +33,5 @@ function showPlanetMenu(planet = new Planet()) {
 
 
 function departPlanet(planet) {
-    showStarMap(planet)
+    closeModal()
 }

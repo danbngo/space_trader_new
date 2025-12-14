@@ -1,7 +1,7 @@
 
 // Ship class
 class Ship {
-    constructor(name = "Unnamed", color = 'white', hull = [0, 0], shields = [0, 0], lasers = 0, thrusters = 0, cargoSpace = 0) {
+    constructor(name = "Unnamed", color = '#ccc', hull = [0, 0], shields = [0, 0], lasers = 0, thrusters = 0, cargoSpace = 0) {
         this.name = name;
         this.color = color;
         this.hull = hull;

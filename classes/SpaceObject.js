@@ -1,6 +1,6 @@
 // SpaceObject class
 class SpaceObject {
-    constructor(name = "Unnamed", color = 'white', radius = 0, x = 0, y = 0) {
+    constructor(name = "Unnamed", color = '#ccc', radius = 0, x = 0, y = 0) {
         this.name = name;
         this.color = color
         this.radius = radius;
@@ -26,11 +26,32 @@ class SpaceObject {
     }
 }
 
-class BackgroundStar extends SpaceObject {}
+class BackgroundStar extends SpaceObject {
+    constructor(r = 0, g = 0, b = 0, x = 0, y = 0, size = 1, twinkleDurationYear = 1) {
+        super("Unnamed", 'rgba(255,0,0,0.5)', 0, x, y);
+        this.twinkleDurationYear = twinkleDurationYear;
+        this.twinkleProgress = 0;
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        this.a = 255;
+        this.size = size;
+        this.twinkleProgressOffset = Math.random()
+        this.reset()
+    }
+    twinkle(year = 0) {
+        const inner = (year / this.twinkleDurationYear) % 1
+        this.twinkleProgress = (inner + this.twinkleProgressOffset) % 1
+        this.a = Math.round(255*Math.abs(1-this.twinkleProgress*2))
+    }
+    reset() {
+        this.twinkleProgress = Math.random()
+    }
+}
 
 
 class OrbitingObject extends SpaceObject {
-    constructor(name = "Unnamed", color = 'white', radius = 0, x = 0, y = 0, orbit = null) {
+    constructor(name = "Unnamed", color = '#ccc', radius = 0, x = 0, y = 0, orbit = null) {
         super(name, color, radius, x, y);
         this.orbit = orbit;
     }
@@ -48,14 +69,14 @@ class OrbitingObject extends SpaceObject {
 
 // Star class extends SpaceObject
 class Star extends OrbitingObject {
-    constructor(name = "Unnamed", color = 'white', radius = 0, x = 0, y = 0, orbit = null) {
+    constructor(name = "Unnamed", color = '#ccc', radius = 0, x = 0, y = 0, orbit = null) {
         super(name, color, radius, x, y, orbit);
     }
 }
 
 // Planet class extends SpaceObject
 class Planet extends OrbitingObject {
-    constructor(name = "Unnamed", color = 'white', radius = 0, x = 0, y = 0, orbit = null, settlement = new Settlement(), culture = new Culture()) {
+    constructor(name = "Unnamed", color = '#ccc', radius = 0, x = 0, y = 0, orbit = null, settlement = new Settlement(), culture = new Culture()) {
         super(name, color, radius, x, y, orbit);
         this.settlement = settlement
         this.culture = culture

@@ -163,8 +163,8 @@ function showShipyardSellMenu(planet) {
             `<h4>Your ships</h4>`,
             createSellShipMenu(fleet.ships, shipyard, (ship)=>onSelectPlayerShip(ship)),
             `Your # ships: ${fleet.ships.length}/${fleet.officers.length}` + fleet.ships.length < 2 ? colorSpan(` (You can't sell your last ship!)`, 'Yellow') : '',
-            colorSpan(`Your credits: ${captain.credits}`, captain.credits == 0 ? 'red' : ''),
-            colorSpan(`Shipyard credits: ${shipyard.credits}`, shipyard.credits == 0 ? 'red' : ''),
+            colorSpan(`Your credits: ${captain.credits}`, captain.credits == 0 ? '#f00' : ''),
+            colorSpan(`Shipyard credits: ${shipyard.credits}`, shipyard.credits == 0 ? '#f00' : ''),
             `Sell Penalty: ${round(100/shipyard.rake, 2)}%`,
         ]}),
         [

@@ -54,7 +54,7 @@ function showTradeInfoSellMenu(cargoType = CARGO_TYPES_ALL[0]) {
     }
     options.push(
         ["Buy Info", () => showTradeInfoBuyMenu(cargoType)],
-        ["Back", () => showStarMap()],
+        ["Close", () => closeModal()],
     )
 
     showModal(
@@ -80,7 +80,7 @@ function showTradeInfoBuyMenu(cargoType = CARGO_TYPES_ALL[0]) {
     }
     options.push(
         ["Sell Info", () => showTradeInfoSellMenu(cargoType)],
-        ["Back", () => showStarMap()],
+        ["Close", () => closeModal()],
     )
 
     showModal(

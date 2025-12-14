@@ -12,7 +12,6 @@ const COMBAT_STRATEGIES = Object.freeze({
 })
 
 const SHAPES = Object.freeze({
-    Dot: 'Dot', //always rendered as 1px by 1px
     FilledCircle: 'FilledCircle',
     EmptyCircle: 'EmptyCircle',
     Triangle: 'Triangle', //these tend to be rotated. starts pointing right, in line with radian chart

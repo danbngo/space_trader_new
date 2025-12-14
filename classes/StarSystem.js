@@ -1,5 +1,5 @@
 class StarSystem extends SpaceObject {
-    constructor(name = "Unnamed", color = 'white', radius = 0, x = 0, y = 0, barycenter = null, stars = [], planets = [], fleets = [], backgroundStars = []) {
+    constructor(name = "Unnamed", color = '#ccc', radius = 0, x = 0, y = 0, barycenter = null, stars = [], planets = [], fleets = [], backgroundStars = []) {
         super(name, color, radius, x, y)
         this.barycenter = barycenter
         this.stars = stars

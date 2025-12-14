@@ -89,21 +89,30 @@ class EncounterMap {
         const ships = [...playerShips, ...enemyShips];
         const mod = 2000 //hacky way to position stars intended for starmap onto the encounter map
 
-        cvs.clearObjects()
+        cvs.clear()
 
         cvs.addEmptyCircle('maplimits', 0, 0, this.encounter.mapDimensions, 24, 'cyan')
 
         starSystem.backgroundStars.forEach( (bgStar, index) => {
-            cvs.addDot(`orbit${index}`, bgStar.x * mod, bgStar.y * mod, bgStar.color)
+            cvs.addPixel(`bgstar${index}`, bgStar.x * mod, bgStar.y * mod, bgStar.calcColor())
         });
 
         ships.forEach((ship,index) => {
-            cvs.addTriangle(`ship${index}`, ship.x, ship.y, ship.radius, 12, ship.color, ship.angle, ()=>this.selectObject(ship))
+            const shipObj = cvs.addTriangle(`ship${index}`, ship.x, ship.y, ship.radius, 12, ship.color, ship.angle, ()=>this.selectObject(ship))
             cvs.addEmptyCircle(`shipshield${index}`, ship.x, ship.y, ship.radius*1.1, 10, 'cyan')
-            cvs.addText(`shiplabel${index}`, ship.x, ship.y, 0, -32, ship.name, ship.color, DEFAULT_FONT_SIZE)
+            const labelObj = cvs.addText(`shiplabel${index}`, ship.x, ship.y, 0, -32, ship.name, ship.color, DEFAULT_FONT_SIZE)
             cvs.addTriangle(`shipthruster${index}`, ship.x, ship.y, ship.radius/EARTH_RADII_PER_AU*0.5, 6, 'orange', ship.angle - Math.PI)
             cvs.addTriangle(`shipbrakeleft${index}`, ship.x, ship.y, ship.radius/EARTH_RADII_PER_AU*0.5, 6, 'orange', ship.angle - Math.PI*1/2)
             cvs.addTriangle(`shipbrakeright${index}`, ship.x, ship.y, ship.radius/EARTH_RADII_PER_AU*0.5, 6, 'orange', ship.angle - Math.PI*3/2)
+            const objs = [shipObj, labelObj]
+            for (const obj of objs) {
+                obj.onHover = ()=>{
+                    for (const obj2 of objs) obj2.filters.set('brightness',1.5)
+                }
+                obj.onHoverEnd = ()=>{
+                    for (const obj3 of objs) obj3.filters.delete('brightness')
+                }
+            }
         })
 
         cvs.recalculateDrawOrder()
@@ -138,18 +147,20 @@ class EncounterMap {
             const invisible = ship.escaped
 
             //if (obj.location) return //dont display docked fleets
-            const id = `ship${index}`
-            const shieldId = `shipshield${index}`
-            const labelId = `shiplabel${index}`
-
-            const cvsShipObject = cvs.getObject(id)
-            const cvsShieldObject = cvs.getObject(shieldId)
-            const cvsLabelObject = cvs.getObject(labelId)
+            const cvsShipObject = cvs.getObject(`ship${index}`)
+            const cvsShieldObject = cvs.getObject(`shipshield${index}`)
+            const cvsLabelObject = cvs.getObject(`shiplabel${index}`)
+            const cvsThrusterObject = cvs.getObject(`shipthruster${index}`)
+            const cvsBrakeLeftObject = cvs.getObject(`shipbrakeleft${index}`)
+            const cvsBrakeRightObject = cvs.getObject(`shipbrakeright${index}`)
 
             if (invisible) {
                 cvsLabelObject.visible = false
                 cvsShieldObject.visible = false
                 cvsLabelObject.visible = false
+                cvsThrusterObject.visible = false
+                cvsBrakeLeftObject.visible = false
+                cvsBrakeRightObject.visible = false
                 return
             }
 
@@ -157,11 +168,10 @@ class EncounterMap {
             const shield255 = Math.round(255*shieldsRatio)
             const hullRatio = 0.25 + (0.75*ship.hull[0]/ship.hull[1])
 
-            //TODO: add dimming for hull damage, doesnt work as easily in canvas
             cvsShipObject.x = ship.x
             cvsShipObject.y = ship.y
             cvsShipObject.rotation = ship.angle
-            cvsShipObject.filter = `brightness(${hullRatio})`
+            cvsShipObject.filters.set('opacity', hullRatio)
             
             cvsShieldObject.x = ship.x
             cvsShieldObject.y = ship.y
@@ -171,41 +181,37 @@ class EncounterMap {
             cvsLabelObject.y = ship.y
 
             //animate thrusters
-            let cvsObject = cvs.getObject(`shipthruster${index}`)
-            if (!ship.accelerating) cvsObject.visible = false
+            if (!ship.accelerating) cvsThrusterObject.visible = false
             else {
                 const [screenOffsetX, screenOffsetY] = rotatePoint(4, 0, 0, 0, ship.angle-Math.PI)
                 const [oX, oY] = rotatePoint(ship.radius, 0, 0, 0, ship.angle-Math.PI)
-                cvsObject.visible = true
-                cvsObject.x = ship.x + oX
-                cvsObject.y = ship.y + oY
-                cvsObject.screenOffsetX = screenOffsetX
-                cvsObject.screenOffsetY = screenOffsetY
+                cvsThrusterObject.visible = true
+                cvsThrusterObject.x = ship.x + oX
+                cvsThrusterObject.y = ship.y + oY
+                cvsThrusterObject.screenOffsetX = screenOffsetX
+                cvsThrusterObject.screenOffsetY = screenOffsetY
             }
 
             //TODO: brake triangles seem pointed in the wrong directions
-            cvsObject = cvs.getObject(`shipbrakeleft${index}`)
-            if (!ship.braking && !ship.turningLeft) cvsObject.visible = false
+            if (!ship.braking && !ship.turningLeft) cvsBrakeLeftObject.visible = false
             else {
                 const [screenOffsetX, screenOffsetY] = rotatePoint(4, 0, 0, 0, ship.angle-Math.PI/2)
                 const [oX, oY] = rotatePoint(ship.radius, 0, 0, 0, ship.angle-Math.PI/2)
-                cvsObject.visible = true
-                cvsObject.x = ship.x + oX
-                cvsObject.y = ship.y + oY
-                cvsObject.screenOffsetX = screenOffsetX
-                cvsObject.screenOffsetY = screenOffsetY
+                cvsBrakeLeftObject.visible = true
+                cvsBrakeLeftObject.x = ship.x + oX
+                cvsBrakeLeftObject.y = ship.y + oY
+                cvsBrakeLeftObject.screenOffsetX = screenOffsetX
+                cvsBrakeLeftObject.screenOffsetY = screenOffsetY
             }
-
-            cvsObject = cvs.getObject(`shipbrakeright${index}`)
-            if (!ship.braking && !ship.turningRight) cvsObject.visible = false
+            if (!ship.braking && !ship.turningRight) cvsBrakeRightObject.visible = false
             else {
                 const [screenOffsetX, screenOffsetY] = rotatePoint(4, 0, 0, 0, ship.angle-Math.PI*3/2)
                 const [oX, oY] = rotatePoint(ship.radius, 0, 0, 0, ship.angle-Math.PI*3/2)
-                cvsObject.visible = true
-                cvsObject.x = ship.x + oX
-                cvsObject.y = ship.y + oY
-                cvsObject.screenOffsetX = screenOffsetX
-                cvsObject.screenOffsetY = screenOffsetY
+                cvsBrakeRightObject.visible = true
+                cvsBrakeRightObject.x = ship.x + oX
+                cvsBrakeRightObject.y = ship.y + oY
+                cvsBrakeRightObject.screenOffsetX = screenOffsetX
+                cvsBrakeRightObject.screenOffsetY = screenOffsetY
             }
         })
 
@@ -322,7 +328,7 @@ function startEncounter() {
         const [speedX, speedY] = rotatePoint(-rng(spawnDistance/10, spawnDistance/20, false), 0, 0, 0, rng(Math.PI/2, -Math.PI/2, false))
         const randomTarget = rndMember(playerShips)
         const angle = new Path(ship.x, ship.y, randomTarget.x, randomTarget.y).angle
-        Object.assign(ship, {x, y, speedX, speedY, color: 'red', angle})
+        Object.assign(ship, {x, y, speedX, speedY, color: '#d33', angle})
     }
 
     showModal(encounter.encounterType.name, encounter.encounterType.description, [['Ok', ()=>{
@@ -346,13 +352,13 @@ function endEncounter() {
 function handlePlayerStranded() {
     const [nearestPlanet, nearestDistance] = gameState.system.calcNearestPlanet(gameState.fleet)
     const creditCost = rng(20*nearestDistance, 10*nearestDistance)
-    const dayCost = rng(1.5*nearestDistance, 0.75*nearestDistance)
+    const dayCost = rng(1.5*nearestDistance, 0.75*nearestDistance, false)
     console.log('player is stranded:',nearestPlanet,nearestDistance,creditCost,dayCost)
     gameState.fleet.dock(nearestPlanet)
 
     let msg = `You have no working ships remaining, so you have to call a tow ship.<br/>`
     msg += `It tows your ships to the nearest planet for ${creditCost}CR.<br/>`
-    msg += `You also lose ${dayCost} days while waiting.<br/>`
+    msg += `You also lose ${round(dayCost,1)} days while waiting.<br/>`
 
     showModal(`Stranded`, msg, [['Continue', ()=>showPlanetMenu(nearestPlanet)]])
 }

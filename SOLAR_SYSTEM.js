@@ -12,4 +12,4 @@ const PLANETS = [MERCURY, VENUS, EARTH, MARS, JUPITER, SATURN, URANUS, NEPTUNE]
 
 SOL.addChildren(PLANETS)
 
-const SOLAR_SYSTEM = new StarSystem('Sol System', '#ffffff', 1, 0, 0, SOL, [SOL], PLANETS, [], [])
+const SOLAR_SYSTEM = new StarSystem('Sol System', '#ffff44', 1, 0, 0, SOL, [SOL], PLANETS, [], [])

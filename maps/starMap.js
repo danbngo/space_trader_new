@@ -18,6 +18,8 @@ class StarMap {
         this.infoBar = createElement({parent: this.root, style:{position:'absolute', bottom: 0, left: 0}})
         this.objectPane = createElement({parent: this.root, style: {position: 'absolute', top: 0, right: 0, height: '100%'}})
 
+        for (const bgStar of starSystem.backgroundStars) bgStar.reset()
+
         this.refresh()
 
         window.addEventListener("resize", ()=>this.cvs.autoResize());
@@ -32,6 +34,7 @@ class StarMap {
         this.refreshInfoBar();
         this.refreshObjectPane();
         this.refreshCanvas();
+        this.refreshAnimations(gameState.year)
     }
 
     refreshControls() {
@@ -51,7 +54,9 @@ class StarMap {
     openAssistant() {
         this.togglePause(true)
         showModal(`Assistant`, 'How can I help you captain?', [
-            ['Trade Info', ()=>this.onTradeInfo()],
+            ['Trade Info', ()=>showTradeInfoSellMenu()],
+            ['Ships Manifest', ()=>showShipsMenu()],
+            ['Cargo Manifest', ()=>showCargoMenu()],
             ['Cancel', ()=>closeModal()],
         ])
     }
@@ -94,10 +99,10 @@ class StarMap {
         //const routes = [gameState.fleet.route]
         const orbitingBodies = [...stars, ...planets].filter(b=>(b.orbit))
 
-        cvs.clearObjects()
+        cvs.clear()
 
         backgroundStars.forEach( (bgStar, index) => {
-            cvs.addDot(`orbit${index}`, bgStar.x, bgStar.y, bgStar.color)
+            cvs.addPixel(bgStar.x, bgStar.y, bgStar.r, bgStar.g, bgStar.b, bgStar.a, bgStar.size)
         });
 
         orbitingBodies.forEach( (orbitingBody, index) => {
@@ -111,28 +116,36 @@ class StarMap {
         })
 
         planets.forEach((body,index)=>{
-            cvs.addFilledCircle(`planet${index}`, body.x, body.y, body.radius/EARTH_RADII_PER_AU * 150, 4, body.color, ()=>this.selectObject(body))
-            cvs.addText(`planetlabel${index}`, body.x, body.y, 0, -32, body.name, body.color, DEFAULT_FONT_SIZE, ()=>this.selectObject(body))
+            const planetObj = cvs.addFilledCircle(`planet${index}`, body.x, body.y, body.radius/EARTH_RADII_PER_AU * 150, 4, body.color, ()=>this.selectObject(body))
+            const labelObj = cvs.addText(`planetlabel${index}`, body.x, body.y, 0, -32, body.name, body.color, DEFAULT_FONT_SIZE, ()=>this.selectObject(body))
+            const objs = [planetObj, labelObj]
+            for (const obj of objs) {
+                obj.onHover = ()=>{
+                    for (const obj2 of objs) obj2.filters.set('brightness',1.5)
+                }
+                obj.onHoverEnd = ()=>{
+                    for (const obj3 of objs) obj3.filters.delete('brightness')
+                }
+            }
         })
 
         fleets.forEach((fleet, index)=>{
             const fleetAngle = fleet.route ? fleet.route.path.angle : -Math.PI/2
-            cvs.addTriangle(`fleet${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU, 12, fleet.color, fleetAngle, ()=>this.selectObject(fleet))
+            const fleetObj = cvs.addTriangle(`fleet${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU, 12, fleet.color, fleetAngle, ()=>this.selectObject(fleet))
             cvs.addLine(`fleetpath${index}`, 0, 0, 0, 0, fleet.color, 1)
             cvs.addTriangle(`fleetthruster${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU*0.5, 6, 'orange', fleetAngle - Math.PI)
             //cvs.addTriangle(`fleetbrakeleft${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU*0.5, 6, 'orange', fleetAngle - Math.PI*1/2)
             //cvs.addTriangle(`fleetbrakeright${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU*0.5, 6, 'orange', fleetAngle - Math.PI*3/2)
-            cvs.addText(`fleetlabel${index}`, fleet.x, fleet.y, 0, -32, fleet.name, fleet.color, DEFAULT_FONT_SIZE,
-                ()=>this.selectObject(fleet),
-                /*()=>{
-                    cvs.getObject(`fleetlabel${index}`).color = 'red'
-                    cvs.redraw()
-                },
-                ()=>{
-                    cvs.getObject(`fleetlabel${index}`).color = fleet.color
-                    cvs.redraw()
-                },*/
-            )
+            const labelObj = cvs.addText(`fleetlabel${index}`, fleet.x, fleet.y, 0, -32, fleet.name, fleet.color, DEFAULT_FONT_SIZE, ()=>this.selectObject(fleet),)
+            const objs = [fleetObj, labelObj]
+            for (const obj of objs) {
+                obj.onHover = ()=>{
+                    for (const obj2 of objs) obj2.filters.set('brightness',1.5)
+                }
+                obj.onHoverEnd = ()=>{
+                    for (const obj3 of objs) obj3.filters.delete('brightness')
+                }
+            }
         })
 
         cvs.recalculateDrawOrder()
@@ -175,8 +188,14 @@ class StarMap {
             cvsObject.y = fleet.y
 
             cvsObject = cvs.getObject(`fleetlabel${index}`)
-            cvsObject.x = fleet.x
-            cvsObject.y = fleet.y
+            if (fleet.location || !fleet.route) {
+                cvsObject.visible = false
+            }
+            else {
+                cvsObject.visible = true
+                cvsObject.x = fleet.x
+                cvsObject.y = fleet.y
+            }
 
             cvsObject = cvs.getObject(`fleetpath${index}`)
             if (!fleet.route) cvsObject.visible = false
@@ -194,16 +213,29 @@ class StarMap {
                 cvsObject.visible = false
             }
             else {
+                console.log('fleet state:',fleet)
                 const [screenOffsetX, screenOffsetY] = rotatePoint(10, 0, 0, 0, fleetAngle-Math.PI)
+                cvsObject.visible = true
                 cvsObject.x = fleet.x
                 cvsObject.y = fleet.y
-                cvsObject.visible = true
                 cvsObject.screenOffsetX = screenOffsetX
                 cvsObject.screenOffsetY = screenOffsetY
             }
         })
 
         cvs.redraw()
+    }
+
+    refreshAnimations(year = 0) {
+        const {starSystem, cvs} = this
+        const {backgroundStars} = starSystem
+        backgroundStars.forEach( (bgStar, index) => {
+            bgStar.twinkle(year)
+            cvs.pixels[index].a = bgStar.a
+            if (index == 0) console.log('alpha:',bgStar.a,'pixel:',cvs.pixels[index])
+            //cvsObject.filters.set('brightness', bgStar.twinkleProgress)
+            //cvsObject.filters.set('opacity', opacity)
+        });
     }
 
     refreshObjectPane() {
@@ -238,10 +270,6 @@ class StarMap {
         showPlanetMenu(planet)
     }
 
-    onTradeInfo() {
-        showTradeInfoSellMenu()
-    }
-
     setDestination(obj = new SpaceObject(), unpause = false) {
         if (obj instanceof Planet) gameState.fleet.route = new Route(gameState.fleet, obj)
         if (unpause) this.togglePause(false)
@@ -270,6 +298,7 @@ class StarMap {
         gameState.year += elapsedYears
         gameState.system.refreshPositions()
 
+        this.refreshAnimations(gameState.year)
         this.refreshCanvas()
         this.refreshInfoBar()
 
