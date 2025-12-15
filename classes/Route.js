@@ -1,6 +1,6 @@
 
 class Route {
-    constructor(fleet = new Fleet(), destination = new Planet(), startYear = gameState.year) {
+    constructor(fleet = new Fleet(), destination = new Planet(), startYear = gs.year) {
         //run simu
         const naiveDistance = calcDistance(fleet.x, fleet.y, destination.x, destination.y)
         const naiveTravelTime = naiveDistance/fleet.calcSpeed()

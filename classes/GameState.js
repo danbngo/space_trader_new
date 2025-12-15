@@ -56,8 +56,16 @@ class GameState {
     get credits() {
         return this.captain.credits;
     }
-    set credits(amount = 0) {
-        this.captain.credits = amount
+    set credits(amt = 0) {
+        this.captain.credits = amt
+    }
+
+    get loans() {
+        return this.captain.loans
+    }
+
+    get location() {
+        return this.fleet.location
     }
 
     /** Save to localStorage */

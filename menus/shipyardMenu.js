@@ -40,8 +40,8 @@ function createSellShipMenu(ships = [new Ship()], shipyard = new Shipyard(), onS
 
 function leaveShipyard(shipyard = new Shipyard()) {
     const {planet} = shipyard
-    if (gameState.fleet.ships.length == 0) {
-        console.log('leaving shipyard without ships:',planet,gameState)
+    if (gs.fleet.ships.length == 0) {
+        console.log('leaving shipyard without ships:',planet,gs)
         showModal(
             `${coloredName(planet)} - Shipyard`,
             `You start to leave the shipyard but realize you have no ships! Without a ship you'd no longer be a space captain!<br/><br/>
@@ -53,21 +53,21 @@ function leaveShipyard(shipyard = new Shipyard()) {
         )
     }
     else {
-        console.log('leaving shipyard:',planet,gameState)
+        console.log('leaving shipyard:',planet,gs)
         showPlanetMenu(planet)
     }
 }
 
 function showShipyardBuyMenu(shipyard = new Shipyard()) {
     const {planet} = shipyard
-    const {fleet, captain} = gameState
+    const {fleet} = gs
     const isDocked = fleet.location == planet
     const rebuildMenu = ()=>showShipyardBuyMenu(shipyard)
     const leave = ()=>leaveShipyard(shipyard, planet)
 
     function buyShip(ship = new Ship()) {
         const buyPrice = shipyard.calcBuyPrice(ship)
-        gameState.credits -= buyPrice;
+        gs.credits -= buyPrice;
         shipyard.credits += buyPrice;
         safeAdd(fleet.ships, ship)
         safeRemove(shipyard.ships, ship)
@@ -80,17 +80,16 @@ function showShipyardBuyMenu(shipyard = new Shipyard()) {
             `Buy ${ship.name}?`,
             `Are you sure you want to buy the ${ship.name} for ${buyPrice} credits?`,
             [
-                ['Buy', () => buyShip(ship)],
+                ['Buy', () => buyShip(ship), !isDocked],
                 ['Cancel', () => rebuildMenu()],
             ],
         )
     }
     
     function onSelectShipyardShip(ship = new Ship()) {
-        if (!isDocked) return
         const buyPrice = shipyard.calcBuyPrice(ship)
         const buttons = [
-            [`Buy`, ()=>showBuyShipModal(ship), (captain.credits < buyPrice || fleet.ships.length >= fleet.numPilots)],
+            [`Buy`, ()=>showBuyShipModal(ship), (gs.credits < buyPrice || fleet.ships.length >= fleet.numPilots)],
             ["Sell Ships", ()=>showShipyardSellMenu(shipyard)],
             ["Back", () => leave()],
         ]
@@ -100,11 +99,11 @@ function showShipyardBuyMenu(shipyard = new Shipyard()) {
     showModal(
         `${coloredName(planet)} - Shipyard`,
         createElement({children:[
-            `<h4>Shipyard ships</h4>`,
+            `<b>Shipyard ships</b>`,
             createBuyShipMenu(shipyard.ships, shipyard, (ship)=>onSelectShipyardShip(ship)),
-            `Your # ships: ${fleet.ships.length}/${fleet.numPilots} | Your credits: ${captain.credits}`,
+            `Your # ships: ${fleet.ships.length}/${fleet.numPilots} | Your credits: ${gs.credits}`,
             //`Shipyard credits: ${shipyard.credits}`,
-            `Buy Penalty: ${round(100*shipyard.rake, 2)}% | Local Ship Quality: ${round(100*shipyard.planet.culture.shipQuality, 2)}%`,
+            `Buy Penalty: ${roundToPlaces(100*shipyard.rake, 2)}% | Local Ship Quality: ${roundToPlaces(100*shipyard.planet.culture.shipQuality, 2)}%`,
         ]}),
         [
             ["Sell Ships", ()=>showShipyardSellMenu(shipyard)],
@@ -116,15 +115,15 @@ function showShipyardBuyMenu(shipyard = new Shipyard()) {
 
 function showShipyardSellMenu(shipyard = new Shipyard()) {
     const {planet} = shipyard
-    const {fleet, captain} = gameState
+    const {fleet} = gs
     const isDocked = fleet.location == planet
     const rebuildMenu = ()=>showShipyardSellMenu(shipyard)
     const leave = ()=>leaveShipyard(shipyard)
 
     function sellShip(ship = new Ship(), salePrice = 0) {
         Shipyard.recordState(shipyard)
-        const officersShare = gameState.fleet.calcTotalCRShare(salePrice, true)
-        gameState.credits += salePrice - officersShare;
+        const officersShare = gs.fleet.calcTotalCRShare(salePrice, true)
+        gs.credits += salePrice - officersShare;
         shipyard.credits -= salePrice;
         safeAdd(shipyard.ships, ship)
         safeRemove(fleet.ships, ship)
@@ -132,9 +131,8 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
     }
 
     function onSelectPlayerShip(ship = new Ship()) {
-        if (!isDocked) return
         refreshPanelButtons('shipyard_sell_panel', [
-            [`Sell`, ()=>showSellShipModal(ship), (shipyard.credits <= 0)],
+            [`Sell`, ()=>showSellShipModal(ship), !isDocked || (shipyard.credits <= 0)],
             ["Buy Ships", ()=>showShipyardBuyMenu(shipyard)],
             ["Back", () => leave()],
         ])
@@ -143,7 +141,7 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
     function showSellShipModal(ship = new Ship()) {
         const salePrice = shipyard.calcSellPrice(ship)
         const shipyardCanAfford = shipyard.credits >= salePrice
-        const officersShare = gameState.fleet.calcTotalCRShare(salePrice, true)
+        const officersShare = gs.fleet.calcTotalCRShare(salePrice, true)
         const finalSale = salePrice - officersShare
 
         showModal(
@@ -152,7 +150,7 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
                 !shipyardCanAfford ? `${colorSpan(WARNING, 'yellow', true)}: Your ${ship.name} is worth ${salePrice}CR but the shipyard only has ${shipyard.credits} credits!` : ``,
                 `Are you sure you want to sell your ${ship.name} for ${Math.min(salePrice, shipyard.credits)} credits?`,
                 `Sale Price: ${finalSale}CR ${officersShare ? `(-${officersShare}CR for officers)` : ''}`,
-                `CR After Sale: ${gameState.credits+finalSale}CR`,
+                `CR After Sale: ${gs.credits+finalSale}CR`,
             ]}),
             [
                 ['Sell', () => sellShip(ship, salePrice)],
@@ -164,12 +162,12 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
     showModal(
         `${coloredName(planet)} - Shipyard`,
         createElement({children:[
-            `<h4>Your ships</h4>`,
+            `<b>Your ships</b>`,
             createSellShipMenu(fleet.ships, shipyard, (ship)=>onSelectPlayerShip(ship)),
             `Your # ships: ${fleet.ships.length}/${fleet.numPilots}` + fleet.ships.length < 2 ? colorSpan(` (You can't sell your last ship!)`, 'Yellow') : '',
-            colorSpan(`Your credits: ${captain.credits}`, captain.credits == 0 ? '#f00' : ''),
+            colorSpan(`Your credits: ${gs.credits}`, gs.credits == 0 ? '#f00' : ''),
             colorSpan(`Shipyard credits: ${shipyard.credits}`, shipyard.credits == 0 ? '#f00' : ''),
-            `Sell Penalty: ${round(100/shipyard.rake, 2)}%`,
+            `Sell Penalty: ${roundToPlaces(100/shipyard.rake, 2)}%`,
         ]}),
         [
             ["Buy Ships", ()=>showShipyardBuyMenu(shipyard)],

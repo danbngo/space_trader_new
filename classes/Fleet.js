@@ -24,7 +24,7 @@ class Fleet extends SpaceObject {
         const shareRatio = this.officers.reduce((total, officer) => total + officer.crShare, 0)
         console.log('share ratio:',shareRatio,this.officers)
         const share = Math.min(1, shareRatio) * ofCR
-        return rounded ? round(share) : share
+        return rounded ? Math.round(share) : share
     }
 
     calcTotalCargoSpace() {

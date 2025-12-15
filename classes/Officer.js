@@ -51,7 +51,7 @@ class Officer {
         return 1 + Math.floor(this.level / CAPTAIN_LEVELS_PER_OFFICER)
     }
 
-    get totalLoans() {
-        return this.loans.reduce()
+    get totalDebts() {
+        return this.loans.reduce((total, loan) => total + loan.totalRepayable, 0)
     }
 }

@@ -12,11 +12,11 @@ function createCargoTable(cargo = new CountsMap(), onSelectCargoType = (ct = CAR
 }
 
 
-function showCargoMenu(cargo = gameState.fleet.cargo) {
+function showCargoMenu(cargo = gs.fleet.cargo) {
     const reloadMenu = ()=>showCargoMenu(cargo)
 
-    function dumpCargo(ct = CARGO_TYPES_ALL[0], amount = 0) {
-        cargo.increment(ct, -amount)
+    function dumpCargo(ct = CARGO_TYPES_ALL[0], amt = 0) {
+        cargo.increment(ct, -amt)
         reloadMenu()
     }
 
@@ -25,7 +25,7 @@ function showCargoMenu(cargo = gameState.fleet.cargo) {
             1, dumpableAmount, `Buy ${ct.name}`, 
             `How many ${ct.name} would you like to dump?`,
             null,
-            'Dump', 'Cancel', (amount = 0)=>dumpCargo(ct, amount), ()=>reloadMenu(),
+            'Dump', 'Cancel', (amt = 0)=>dumpCargo(ct, amt), ()=>reloadMenu(),
         )
     }
 
@@ -43,7 +43,7 @@ function showCargoMenu(cargo = gameState.fleet.cargo) {
         `Cargo Manifest`,
         createElement({children:[
             createCargoTable(cargo, onSelectCargoType),
-            `Your Cargo Space: ${gameState.fleet.cargo.total}/${gameState.fleet.calcTotalCargoSpace()}`,
+            `Your Cargo Space: ${gs.fleet.cargo.total}/${gs.fleet.calcTotalCargoSpace()}`,
         ]}),
         [
             ["Close", () => closeModal()],

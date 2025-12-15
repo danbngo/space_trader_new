@@ -4,19 +4,19 @@ This file contains the most important, discoverable details an AI coding agent n
 
 ## Quick Architecture
 - Single-page vanilla JS game (no bundler). Scripts are loaded via [index.html](../../index.html) in a fixed order: utilities → enums → types → classes → generators → UI → menus → `main.js`.
-- Central state: `gameState` (see [globals.js](../../globals.js)) is the authoritative runtime state and is serialized to `localStorage` under key `spaceGameState` by [GameState.js](../../classes/GameState.js).
+- Central state: `gs` (see [globals.js](../../globals.js)) is the authoritative runtime state and is serialized to `localStorage` under key `spaceGameState` by [GameState.js](../../classes/GameState.js).
 - UI: modal/panel system in [ui.js](../../ui.js) — use `createElement()`, `createPanel()` / `showPanel()` or `showModal()` and `showElement()` to replace `#game-container`.
 - Rendering: `CanvasWrapper` ([menus/CanvasWrapper.js](../../menus/CanvasWrapper.js)) provides an imperative canvas API (addFilledCircle, addText, addLine, etc.) used by star map and encounters.
 
 ## Core Patterns & Conventions
-- Global-first: code relies on globals (e.g., `gameState`, `EARTH`, `PLANETS`), not ES modules. Keep script order and don't convert files to modules without updating `index.html`.
+- Global-first: code relies on globals (e.g., `gs`, `EARTH`, `PLANETS`), not ES modules. Keep script order and don't convert files to modules without updating `index.html`.
 - Factories: use `generators.js` (`generateShip`, `generateFleet`, `generateEncounter`) to create domain objects rather than mutating templates inline.
 - Types: `types/` defines type classes (e.g., `ShipType` in `types/SHIP_TYPES.js`). To add a new ship, update that file and use `generateShip()` where appropriate.
 - UI panels: build content with `createElement({children:[...]})` and pass to `showModal(title, contentEl, buttons)` or `showPanel()`; use `refreshPanelButtons(panel, buttons)` to update buttons.
 
 ## Debug / Run Notes
 - No npm scripts — open `index.html` in a browser or serve folder via a lightweight server: e.g. `python -m http.server 8000` and browse to `http://localhost:8000`.
-- Debugging: use browser DevTools. Helpful globals to inspect: `gameState`, `gameState.fleet`, `gameState.system`.
+- Debugging: use browser DevTools. Helpful globals to inspect: `gs`, `gs.fleet`, `gs.system`.
 - Console logging: many places already use `console.log()`; add `debugger` or breakpoints in the browser for real-time inspection (encounter tick runs from `menus/encounterMap.js`).
 
 ## Important Implementation Details & Gotchas

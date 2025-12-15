@@ -10,12 +10,12 @@ class CountsMap {
         return this.counts.get(key) || 0
     }
 
-    increment(key = 'key', amount = 0) {
-        this.counts.set(key, this.getAmount(key) + amount)
+    increment(key = 'key', amt = 0) {
+        this.counts.set(key, this.getAmount(key) + amt)
     }
 
-    setAmount(key = 'key', amount = 0) {
-        this.counts.set(key, amount)
+    setAmount(key = 'key', amt = 0) {
+        this.counts.set(key, amt)
     }
 
     get total() {
@@ -32,10 +32,10 @@ class CountsMap {
     }
 
     //probably not mathematically correct but oh well
-    randomSubset(amount = 0) {
+    randomSubset(amt = 0) {
         const subset = new CountsMap()
-        amount = Math.min(this.total, amount)
-        while (amount > 0) {
+        amt = Math.min(this.total, amt)
+        while (amt > 0) {
             const ct = this.randomItem()
             if (subset.getAmount(ct) > this.getAmount(ct)) continue
             subset.increment(ct, 1)
@@ -44,14 +44,14 @@ class CountsMap {
     }
 
     add(added = new CountsMap()) {
-        for (const [key, amount] of added.counts) {
-            this.increment(key, amount)
+        for (const [key, amt] of added.counts) {
+            this.increment(key, amt)
         }
     }
 
     subtract(subtracted = new CountsMap()) {
-        for (const [key, amount] of subtracted.counts) {
-            this.increment(key, -amount)
+        for (const [key, amt] of subtracted.counts) {
+            this.increment(key, -amt)
         }
     }
 }

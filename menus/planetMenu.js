@@ -1,5 +1,5 @@
 function showPlanetMenu(planet = new Planet()) {
-    const isDocked = gameState.fleet.location == planet
+    const isDocked = gs.location == planet
     const {settlement} = planet
 
     let msg = isDocked ?
@@ -8,8 +8,8 @@ function showPlanetMenu(planet = new Planet()) {
 
     if (isDocked) {
         console.log('1')
-        const damagedShips = gameState.fleet.ships.filter(s=>s.isDamaged())
-        console.log('2:',damagedShips,gameState.fleet.ships)
+        const damagedShips = gs.fleet.ships.filter(s=>s.isDamaged())
+        console.log('2:',damagedShips,gs.fleet.ships)
         if (damagedShips.length > 0) msg += colorSpan(`Your ships receive complementary repairs courtesy of the dock's nanite swarm.<br/>`, 'lightgreen', true)
         for (const s of damagedShips) s.repairHull()
         msg += `What would you like to do?<br/>`
@@ -27,6 +27,9 @@ function showPlanetMenu(planet = new Planet()) {
     }
     if (settlement.guild) {
         options.push(["Guild", () => showGuildMenu(settlement.guild)]);
+    }
+    if (settlement.bank) {
+        options.push(["Bank", () => showBankMenu(settlement.bank)]);
     }
     options.push([isDocked ? "Depart" : "Stop Scanning", () => departPlanet(planet)]);
 

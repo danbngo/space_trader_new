@@ -1,11 +1,11 @@
 DONE: fix the shields never diminishing bug - use opacity
 DONE: make shield regen actually work - make shiled more expensive than hull
-
-next up:
-
-banks, so players dont lose all their credits to pirates and the like
+DONE: banks, so players dont lose all their credits to pirates and the like
 -charges you a deposit fee, NO INTEREST.
--can take out loans, but if you don't pay on time you get a bounty equivalent to the loan
+-can take out loans, but if you don't pay on time you... we'll deal with this later
+
+NEXT UP:
+
 more encounter types
  -miners - you can attack and loot them
  -merchants - same as above but will offer to trade with you
@@ -88,7 +88,7 @@ this will get more strategic in the future because:
 -asteroids, cannot shoot through them, they can be purposely shot and broken to create debris
 -debris hurts you to move through, and slows thrusters if you're in it
 -rockets that follow enemies, but can be shot down with lasers or other rockets
--aoe attacks like bombs/mines that go off after a certain amount of time or when near an enemy
+-aoe attacks like bombs/mines that go off after a certain amt of time or when near an enemy
 -stealth mode, ships that cant be seen unless they leave stealth (to attack) or you're close to them
 -tractor beams, nuff said
 -etc, etc.

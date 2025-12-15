@@ -14,11 +14,11 @@ function createOfficersTable(officers = [new Officer()], onSelectOfficer = (offi
     return createTable(rows, (rowIndex = 0)=>onSelectOfficer(officers[rowIndex]))
 }
 
-function showOfficersMenu(officers = gameState.fleet.officers) {
+function showOfficersMenu(officers = gs.fleet.officers) {
     const reloadMenu = ()=>showOfficersMenu(officers)
 
     function fireOfficer(officer = new Officer()) {
-        safeRemove(gameState.fleet.officers, officer)
+        safeRemove(gs.fleet.officers, officer)
         showOfficersMenu(officers) //DONT use reloadMenu here, wont reflect changes to ship list
     }
 
@@ -34,7 +34,7 @@ function showOfficersMenu(officers = gameState.fleet.officers) {
 
     function onSelectOfficer(officer = new Officer()) {
         const buttons = [
-            ['Fire', ()=>showFireOfficerModal(officer), gameState.fleet.numPilots <= gameState.fleet.ships.length],
+            ['Fire', ()=>showFireOfficerModal(officer), gs.fleet.numPilots <= gs.fleet.ships.length],
             ["Close", () => closeModal()],
         ]
         refreshPanelButtons('officers_panel', buttons)

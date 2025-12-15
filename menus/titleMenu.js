@@ -12,18 +12,18 @@ function showTitleScreen() {
 }
 
 function startNewGame() {
-    gameState = new GameState(SOLAR_SYSTEM)
+    gs = new GameState(SOLAR_SYSTEM)
     console.log("New game started.");
     createCharacter()
 }
 
 function createCharacter() {
-    showCaptainCreationMenu(gameState.captain, ()=>showStarMap())
+    showCaptainCreationMenu(gs.captain, ()=>showStarMap())
 }
 
 function continueGame() {
-    gameState.load()
-    console.log("Game continued:", gameState);
+    gs.load()
+    console.log("Game continued:", gs);
     displayStarMap()
 }
 

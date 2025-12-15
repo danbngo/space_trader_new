@@ -4,9 +4,9 @@ ticket speed: 1 hour per real life second
 default zoom distances: 1200px = half the size of the solar system
 */
 class StarMap {
-    constructor(starSystem = new StarSystem(), autoSelectObject = gameState.fleet) {
+    constructor(starSystem = new StarSystem(), autoSelectObject = gs.fleet) {
         this.starSystem = starSystem
-        this.selectedObject = autoSelectObject || gameState.fleet;
+        this.selectedObject = autoSelectObject || gs.fleet;
 
         this.paused = true
         this.lastTickMs = Date.now()
@@ -36,7 +36,7 @@ class StarMap {
         this.refreshControls();
         this.refreshInfoBar();
         this.refreshObjectPane();
-        this.refreshAnimations(gameState.year)
+        this.refreshAnimations(gs.year)
         this.refreshCanvas(true);
     }
 
@@ -67,10 +67,10 @@ class StarMap {
     }
 
     refreshInfoBar() {
-        const {fleet, year} = gameState
+        const {fleet, year} = gs
         const {location, route} = fleet
         const destination = route?.destination
-        const distance = round(route?.distance, 2)
+        const distance = roundToPlaces(route?.distance, 2)
         const endYear = route?.endYear
         const yearsRemaining = describeTimespan(endYear-year)
 
@@ -101,7 +101,7 @@ class StarMap {
     rebuildCanvas() {
         const {starSystem, cvs} = this
         const {stars, planets, fleets, backgroundStars} = starSystem
-        //const routes = [gameState.fleet.route]
+        //const routes = [gs.fleet.route]
         const orbitingBodies = [...stars, ...planets].filter(b=>(b.orbit))
 
         cvs.clear()
@@ -245,12 +245,12 @@ class StarMap {
             this.objectPane.textContent = '(Select an object on the map.)';
             return;
         }
-        const isDockedHere = this.selectedObject == gameState.fleet.location
-        const cantTravelHere = (this.selectedObject == gameState.fleet.location) || gameState.fleet.isStranded()
+        const isDockedHere = this.selectedObject == gs.location
+        const cantTravelHere = (this.selectedObject == gs.location) || gs.fleet.isStranded()
         const container = createElement({parent:this.objectPane, classNames:['starmap-object-panel']})
         createElement({parent:container, tag:'h3', innerHTML: coloredName(this.selectedObject)})
-        if (this.selectedObject == gameState.fleet) {
-            if (gameState.fleet.location) createElement({parent:container, tag:'button', innerHTML:`Dock (${coloredName(gameState.fleet.location)})`, onClick:()=>this.explore(gameState.fleet.location)})
+        if (this.selectedObject == gs.fleet) {
+            if (gs.location) createElement({parent:container, tag:'button', innerHTML:`Dock (${coloredName(gs.location)})`, onClick:()=>this.explore(gs.location)})
         }
 
         // Planet-specific actions
@@ -267,12 +267,12 @@ class StarMap {
         this.refresh();
     }
 
-    explore(planet = gameState.fleet.location) {
+    explore(planet = gs.location) {
         showPlanetMenu(planet)
     }
 
     setDestination(obj = new SpaceObject(), unpause = false) {
-        if (obj instanceof Planet) gameState.fleet.route = new Route(gameState.fleet, obj)
+        if (obj instanceof Planet) gs.fleet.route = new Route(gs.fleet, obj)
         if (unpause) this.togglePause(false)
         else this.refresh()
     }
@@ -289,24 +289,24 @@ class StarMap {
 
     tick() {
         if (this.paused) return
-        const playerWasDocked = (gameState.fleet.location !== undefined)
+        const playerWasDocked = (gs.location !== undefined)
 
         const currentTime = Date.now()
         const elapsedMs = Math.min(this.maxMsPerTick, currentTime - this.lastTickMs)
         this.lastTickMs = currentTime
         const elapsedYears = elapsedMs * this.gameYearsPerMs;
 
-        gameState.year += elapsedYears
-        gameState.system.refreshPositions()
+        gs.year += elapsedYears
+        gs.system.refreshPositions()
 
-        this.refreshAnimations(gameState.year)
+        this.refreshAnimations(gs.year)
         this.refreshInfoBar()
         this.refreshCanvas()
 
         //pause if player reached his destination
-        if (!playerWasDocked && gameState.fleet.location) {
+        if (!playerWasDocked && gs.location) {
             console.log('pausing since player reached destination')
-            showPlanetMenu(gameState.fleet.location)
+            showPlanetMenu(gs.location)
             return
         }
 
@@ -325,8 +325,8 @@ class StarMap {
 }
 
 
-function showStarMap(autoSelectObject = gameState.fleet) {
-    const starMap = new StarMap(gameState.system, autoSelectObject)
+function showStarMap(autoSelectObject = gs.fleet) {
+    const starMap = new StarMap(gs.system, autoSelectObject)
     showMap(starMap)
 }
 

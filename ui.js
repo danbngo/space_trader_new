@@ -53,8 +53,8 @@ function showSliderModal(min = 0, max = 10, title = '', description = '', footer
     slider.max = max;
     slider.value = min;
     slider.oninput = (e) => {
-        const footerText = footerGenerator ? footerGenerator(currentValue) : ''
         currentValue = parseInt(e.target.value);
+        const footerText = footerGenerator ? footerGenerator(currentValue) : ''
         document.getElementById('slider-value').textContent = `${currentValue} / ${max}`;
         document.getElementById('slider-footer').innerHTML = footerText;
     };

@@ -17,7 +17,7 @@ function createShipsListMenu(ships = [new Ship()], onSelectShip = (s = new Ship(
 }
 
 
-function showShipsMenu(ships = [...gameState.fleet.ships]) {
+function showShipsMenu(ships = [...gs.fleet.ships]) {
     const reloadMenu = ()=>showShipsMenu(ships)
 
     function dumpShip(ship = new Ship()) {
@@ -37,7 +37,7 @@ function showShipsMenu(ships = [...gameState.fleet.ships]) {
 
     function onSelectShip(ship = new Ship()) {
         const buttons = [
-            ['Dump', ()=>showDumpShipModal(ship), gameState.fleet.ships.length < 2],
+            ['Dump', ()=>showDumpShipModal(ship), gs.fleet.ships.length < 2],
             ["Close", () => closeModal()],
         ]
         refreshPanelButtons('ships_panel', buttons)

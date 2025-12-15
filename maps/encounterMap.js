@@ -5,10 +5,10 @@ default zoom distances: 1200px = 1000 miles
 combat map size = 5000 miles
 */
 class EncounterMap {
-    constructor(encounter = new Encounter(), autoSelectObject = gameState.fleet) {
-        this.starSystem = gameState.system
+    constructor(encounter = new Encounter(), autoSelectObject = gs.fleet) {
+        this.starSystem = gs.system
         this.encounter = encounter
-        this.selectedObject = autoSelectObject || gameState.fleet;
+        this.selectedObject = autoSelectObject || gs.fleet;
 
         this.paused = true
         this.lastTickMs = Date.now()
@@ -60,7 +60,7 @@ class EncounterMap {
             parent:this.controls,
             classNames: ['starmap-buttons'],
             children: [
-                createElement({tag:'button', innerHTML:this.paused ? '▶' : '⏸', onClick: () => this.togglePause(), disabled: !gameState.encounter.combatEnabled}),
+                createElement({tag:'button', innerHTML:this.paused ? '▶' : '⏸', onClick: () => this.togglePause(), disabled: !gs.encounter.combatEnabled}),
                 createElement({tag:'button', innerHTML:'+', onClick: () => this.cvs.adjustZoom(1.33)}),
                 createElement({tag:'button', innerHTML:'-', onClick: () => this.cvs.adjustZoom(0.66)}),
                 //ship info button?
@@ -70,7 +70,7 @@ class EncounterMap {
     }
 
     refreshInfoBar() {
-        const {encounter} = gameState
+        const {encounter} = gs
 
         this.infoBar.innerHTML = ""
         createElement({
@@ -84,7 +84,7 @@ class EncounterMap {
 
     rebuildCanvas() {
         const {encounter, cvs, starSystem} = this
-        const playerFleet = gameState.fleet
+        const playerFleet = gs.fleet
         const playerShips = playerFleet.ships
         const enemyFleet = encounter.fleet
         const enemyShips = enemyFleet.ships
@@ -122,7 +122,7 @@ class EncounterMap {
 
     refreshCanvas(forceRedraw = false) {
         const {encounter, cvs} = this
-        const playerFleet = gameState.fleet
+        const playerFleet = gs.fleet
         const playerShips = playerFleet.ships
         const enemyFleet = encounter.fleet
         const enemyShips = enemyFleet.ships
@@ -237,7 +237,7 @@ class EncounterMap {
     }
 
     refreshObjectPane() {
-        //const playerShips = gameState.fleet.ships
+        //const playerShips = gs.fleet.ships
         const obj = this.selectedObject
         this.objectPane.innerHTML = '';
         if (!this.selectedObject) {
@@ -274,15 +274,15 @@ class EncounterMap {
     }
 
     tick() {
-        if (this.paused || gameState.encounter.result || !gameState.encounter.combatEnabled) return
+        if (this.paused || gs.encounter.result || !gs.encounter.combatEnabled) return
 
         const currentTime = Date.now()
         const elapsedMs = Math.min(this.maxMsPerTick, currentTime - this.lastTickMs)
         this.lastTickMs = currentTime
         const elapsedSeconds = elapsedMs * this.gameSecondsPerMs;
-        gameState.encounter.tick(elapsedSeconds)
+        gs.encounter.tick(elapsedSeconds)
 
-        if (gameState.encounter.result) {
+        if (gs.encounter.result) {
             endCombat()
             return
         }
@@ -295,23 +295,23 @@ class EncounterMap {
     }
 
     onHail() {
-        if (gameState.encounter.combatEnabled) {
+        if (gs.encounter.combatEnabled) {
             this.togglePause(true)
-            showModal(`Surrender?`, `Surrender to the ${gameState.encounter.encounterType.name}?`, [
-                ['Surrender', ()=>gameState.encounter.encounterType.onSurrender()],
+            showModal(`Surrender?`, `Surrender to the ${gs.encounter.encounterType.name}?`, [
+                ['Surrender', ()=>gs.encounter.encounterType.onSurrender()],
                 ['Cancel', ()=>closeModal()]
             ])
         }
-        else gameState.encounter.encounterType.onStart()
+        else gs.encounter.encounterType.onStart()
     }
 }
 
 function startEncounter() {
     const encounter = generateEncounter()
-    gameState.encounter = encounter
+    gs.encounter = encounter
 
     //randomize ship locations
-    const playerFleet = gameState.fleet
+    const playerFleet = gs.fleet
     const playerShips = playerFleet.ships
     const enemyFleet = encounter.fleet
     const enemyShips = enemyFleet.ships
@@ -351,45 +351,52 @@ function startEncounter() {
 }
 
 function endEncounter() {
-    gameState.encounter = undefined
+    gs.encounter = undefined
     showStarMap()
     //restore all shields
-    for (const s of gameState.fleet.ships) s.restoreShields()
+    for (const s of gs.fleet.ships) s.restoreShields()
     //pause and show modal if player has no working ships, cant move
-    if (gameState.fleet.isStranded()) {
+    if (gs.fleet.isStranded()) {
         handlePlayerStranded()
         return
     }
 }
 
 function handlePlayerStranded() {
-    const [nearestPlanet, nearestDistance] = gameState.system.calcNearestPlanet(gameState.fleet)
+    const [nearestPlanet, nearestDistance] = gs.system.calcNearestPlanet(gs.fleet)
     const creditCost = 10 + rng(200*nearestDistance, 100*nearestDistance)
+    const canAfford = gs.credits >= creditCost
+    const noCredits = gs.credits <= 0
     const dayCost = 0.25 + rng(1.5*nearestDistance, 0.75*nearestDistance, false)
+    gs.credits = Math.max(0, gs.credits - creditCost)
+    gs.days += dayCost
+
     console.log('player is stranded:',nearestPlanet,nearestDistance,creditCost,dayCost)
-    gameState.fleet.dock(nearestPlanet)
+    gs.fleet.dock(nearestPlanet)
 
     let msg = `You have no working ships remaining, so you have to call a tow ship.<br/>`
-    msg += `It tows your ships to the nearest planet for ${creditCost}CR.<br/>`
-    msg += `You also lose ${round(dayCost,1)} days while waiting.<br/>`
+    if (canAfford) msg += `The operator charges you a fee of ${creditCost}CR.<br/>`
+    else if (noCredits) msg += `The operator complains bitterly after realizing you have no credits, but tows you anyway.<br/>`
+    else msg += `The fee is ${creditCost}CR, but you only have ${gs.credits}CR.<br/>Grumbling, the operator confiscates your few remaining credits and tows you anyway.<br/>`
+    msg += `You spend ${describeTimespan(dayCost/365)} being dragged through space.<br/>`
     currentMap.refresh()
 
     showModal(`Stranded`, msg, [['Continue', ()=>showPlanetMenu(nearestPlanet)]])
 }
 
 function showEncounterMap() {
-    const encounterMap = new EncounterMap(gameState.encounter, gameState.fleet.ships[0])
+    const encounterMap = new EncounterMap(gs.encounter, gs.fleet.ships[0])
     showMap(encounterMap)
 }
 
 function startCombat() {
-    gameState.encounter.combatEnabled = true;
+    gs.encounter.combatEnabled = true;
     closeModal()
     currentMap.togglePause(false)
 }
 
 function endCombat() {
-    const {encounter} = gameState
+    const {encounter} = gs
     const {result} = encounter
     if (result == ENCOUNTER_RESULTS.Defeat) {
         showModal(`Defeat`, `All your ships have been disabled!`, [['Continue', ()=>encounter.encounterType.onDefeat()]])

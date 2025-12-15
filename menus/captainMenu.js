@@ -1,5 +1,5 @@
 
-function showCaptainMenu(captain = gameState.captain) {
+function showCaptainMenu(captain = gs.captain) {
 
     const {name, level, expPoints, expToNextLevel, skills, skillPoints} = captain
 
@@ -28,7 +28,7 @@ function showCaptainMenu(captain = gameState.captain) {
 }
 
 
-function showCaptainCreationMenu(captain = gameState.captain, onClose = ()=>{}) {
+function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}) {
 
     const {name, skills, skillPoints} = captain
 

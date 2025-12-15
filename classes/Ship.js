@@ -47,12 +47,12 @@ class Ship {
         return this.hull[0] < this.hull[1]
     }
 
-    repairHull(amount = this.hull[1]) {
-        this.hull[0] = Math.min(this.hull[0]+amount, this.hull[1])
+    repairHull(amt = this.hull[1]) {
+        this.hull[0] = Math.min(this.hull[0]+amt, this.hull[1])
     }
     
-    restoreShields(amount = this.shields[1]) {
-        this.shields[0] = Math.min(this.shields[0]+amount, this.shields[1])
+    restoreShields(amt = this.shields[1]) {
+        this.shields[0] = Math.min(this.shields[0]+amt, this.shields[1])
     }
 
     resetCombatVars() {

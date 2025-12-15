@@ -1,6 +1,6 @@
 function createTradeInfoBuyTable(ct = CARGO_TYPES_ALL[0], onSelectPlanet = (p = new Planet())=>{}) {
     const {illegal} = ct
-    const {system, fleet} = gameState
+    const {system, fleet} = gs
     const {planets} = system
     const rows = [
         ['Planet', 'Buy Price', 'Market Amt.', 'Distance', 'ETA']
@@ -25,7 +25,7 @@ function createTradeInfoBuyTable(ct = CARGO_TYPES_ALL[0], onSelectPlanet = (p = 
 
 function createTradeInfoSellTable(ct = CARGO_TYPES_ALL[0], onSelectPlanet = (p = PLANETS[0])=>{}) {
     const {illegal} = ct
-    const {system, fleet} = gameState
+    const {system, fleet} = gs
     const {planets} = system
     const rows = [
         ['Planet', 'Sell Price', 'Market CR', 'Distance', 'ETA']
@@ -48,7 +48,7 @@ function createTradeInfoSellTable(ct = CARGO_TYPES_ALL[0], onSelectPlanet = (p =
 }
 
 function showTradeInfoSellMenu(ct = CARGO_TYPES_ALL[0]) {
-    const {fleet} = gameState
+    const {fleet} = gs
 
     function onSelectPlanet(planet = new Planet()) {
         showStarMap(planet)
@@ -68,14 +68,14 @@ function showTradeInfoSellMenu(ct = CARGO_TYPES_ALL[0]) {
         `Trade Info - Sell ${ct.name}`,
         createElement({children:[
             createTradeInfoSellTable(ct, onSelectPlanet),
-            `Your ${ct.name} amount: ${fleet.cargo.getAmount(ct)}`,
+            `Your ${ct.name} amt: ${fleet.cargo.getAmount(ct)}`,
         ]}),
         options
     );
 }
 
 function showTradeInfoBuyMenu(ct = CARGO_TYPES_ALL[0]) {
-    const {fleet, captain} = gameState
+    const {fleet} = gs
 
     function onSelectPlanet(planet = new Planet()) {
         showStarMap(planet)
@@ -94,7 +94,7 @@ function showTradeInfoBuyMenu(ct = CARGO_TYPES_ALL[0]) {
         `Trade Info - Buy ${ct.name}`,
         createElement({children:[
             createTradeInfoBuyTable(ct, onSelectPlanet),
-            `Your ${ct.name} amount: ${fleet.cargo.getAmount(ct)} | Your Cargo Space: ${fleet.cargo.total}/${fleet.calcTotalCargoSpace()} | Your credits: ${captain.credits}`,
+            `Your ${ct.name} amt: ${fleet.cargo.getAmount(ct)} | Your Cargo Space: ${fleet.cargo.total}/${fleet.calcTotalCargoSpace()} | Your credits: ${gs.credits}`,
         ]}),
         options
     );

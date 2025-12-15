@@ -1,13 +1,13 @@
 
 
 class Encounter {
-    constructor(gameState = new GameState(), encounterType = ENCOUNTER_TYPES_ALL[0], planet = new Planet(), fleet = new Fleet()) {
+    constructor(gs = new GameState(), encounterType = ENCOUNTER_TYPES_ALL[0], planet = new Planet(), fleet = new Fleet()) {
         this.encounterType = encounterType;
         this.planet = planet;
         this.fleet = fleet;
         this.combatEnabled = false;
         this.mapDimensions = ENCOUNTER_MAP_RADIUS_MILES;
-        this.playerFleet = gameState.fleet
+        this.playerFleet = gs.fleet
         this.playerShips = this.playerFleet.ships
         this.playerFlagship = this.playerFleet.flagship
         this.enemyFleet = this.fleet

@@ -2,11 +2,11 @@ function generateShip(planet = new Planet(), shipType = rndMember(SHIP_TYPES_ALL
     const {culture} = planet
     const {shipQuality} = culture
 
-    let maxHull =    round(AVERAGE_SHIP_HULL*rng(2, 0.5, false)*shipType.hull*shipQuality) 
-    let maxShields = round(AVERAGE_SHIP_SHIELDS*rng(2, 0.5, false)*shipType.shields*shipQuality)
-    let lasers =     round(rng(2, 0.5, false)*shipType.lasers*shipQuality)
-    let thrusters =  round(rng(2, 0.5, false)*shipType.thrusters*shipQuality)
-    let cargoSpace = round(rng(2, 0.5, false)*shipType.cargoSpace*shipQuality)
+    let maxHull =    Math.round(AVERAGE_SHIP_HULL*rng(2, 0.5, false)*shipType.hull*shipQuality) 
+    let maxShields = Math.round(AVERAGE_SHIP_SHIELDS*rng(2, 0.5, false)*shipType.shields*shipQuality)
+    let lasers =     Math.round(rng(2, 0.5, false)*shipType.lasers*shipQuality)
+    let thrusters =  Math.round(rng(2, 0.5, false)*shipType.thrusters*shipQuality)
+    let cargoSpace = Math.round(rng(2, 0.5, false)*shipType.cargoSpace*shipQuality)
 
     const shields = [maxShields, maxShields]
     const hull = [maxHull, maxHull]
@@ -49,7 +49,7 @@ function generateShipyard(planet = new Planet()) {
     for(let i=0;i<count;i++) {
         ships.push(generateShip(planet));
     }
-    const rake = rng(2, 1, false)
+    const rake = rng(2, 0.5, false)
     const credits = rng(200*1000, 10*1000);
     return new Shipyard(planet, ships, credits, rake);
 }
@@ -60,7 +60,7 @@ function generateMarket(planet = new Planet(), blackMarket = false) {
         marketCargo.setAmount(ct, Math.random() > .2 ? rng(MARKET_MAX_CARGO_PER_TYPE) : 0)
     }
     const credits = rng(MARKET_MAX_CREDITS, MARKET_MAX_CREDITS/10);
-    const rake = rng(2, 1, false);
+    const rake = rng(2, 0.5, false);
     return new Market(planet, blackMarket, marketCargo, credits, rake);
 }
 
@@ -70,8 +70,14 @@ function generateGuild(planet = new Planet()) {
     for(let i=0;i<count;i++) {
         officers.push(generateOfficer(planet));
     }
-    const rake = rng(2, 1, false);
+    const rake = rng(2, 0.5, false);
     return new Guild(planet, officers, rake);
+}
+
+function generateBank(planet = new Planet()) {
+    const rake = rng(2, 0.5, false);
+    const credits = rng(1000*1000, 50*1000);
+    return new Bank(planet, credits, rake)    
 }
 
 function generateCulture(planet = new Planet()) {
@@ -87,11 +93,12 @@ function generateCulture(planet = new Planet()) {
 }
 
 function generateSettlement(planet = new Planet()) {
-    const shipyard = generateShipyard(planet);
-    const market = generateMarket(planet, false);
-    const blackMarket = generateMarket(planet, true);
-    const guild = generateGuild(planet);
-    return new Settlement(shipyard, market, blackMarket, guild)
+    const shipyard = Math.random() > .2 ? generateShipyard(planet) : null;
+    const market =  Math.random() > .2 ? generateMarket(planet, false) : null
+    const blackMarket =  Math.random() > .2 ? generateMarket(planet, true) : null
+    const guild =  Math.random() > .2 ? generateGuild(planet) : null
+    const bank =  Math.random() > .2 ? generateBank(planet) : null
+    return new Settlement(shipyard, market, blackMarket, guild, bank)
 }
 
 function generateFleet(planet = new Planet(), fleetType = rndMember(FLEET_TYPES_ALL)) {
@@ -119,7 +126,7 @@ function generateFleet(planet = new Planet(), fleetType = rndMember(FLEET_TYPES_
 function generateEncounter(planet = rndMember(PLANETS), encounterType = rndMember(ENCOUNTER_TYPES_ALL)) {
     const {fleetType} = encounterType
     const fleet = generateFleet(planet, fleetType)
-    return new Encounter(gameState, encounterType, planet, fleet)
+    return new Encounter(gs, encounterType, planet, fleet)
 }
 
 function generateBackgroundStars(radius = 1, numStars = 1) {

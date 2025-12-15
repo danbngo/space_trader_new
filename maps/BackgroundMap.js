@@ -26,7 +26,7 @@ class BackgroundMap {
 
     refresh() {
         this.rebuildCanvas();
-        this.refreshAnimations(gameState.year)
+        this.refreshAnimations(gs.year)
         this.refreshCanvas(true);
     }
 

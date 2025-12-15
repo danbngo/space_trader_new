@@ -104,7 +104,7 @@ class CanvasWrapper {
 
         this.pixelRatio = CanvasWrapper.getPixelRatio(this.ctx);
 
-        this.maxFrameRate = 30; //do not refresh more than 30 times per second
+        this.maxFrameRate = 60; //do not refresh more than 30 times per second
         this.lastRedrawAt = 0;
 
         this.autoResize()

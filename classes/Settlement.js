@@ -18,12 +18,12 @@ class Shipyard {
     static state = new ShipyardState();
 
     static recordState(shipyard = new Shipyard()) {
-        if (gameState.fleet.ships.length == 0) return //dont record if player has no ships left, to allow him to restore
-        this.state = new ShipyardState([...gameState.fleet.ships], gameState.credits, [...shipyard.ships], shipyard.credits)
+        if (gs.fleet.ships.length == 0) return //dont record if player has no ships left, to allow him to restore
+        this.state = new ShipyardState([...gs.fleet.ships], gs.credits, [...shipyard.ships], shipyard.credits)
     }
     static restoreState() {
-        gameState.fleet.ships = [...this.state.playerShips]
-        gameState.credits = this.state.playerCredits
+        gs.fleet.ships = [...this.state.playerShips]
+        gs.credits = this.state.playerCredits
         this.ships = [...this.state.shipyardShips]
         this.credits = this.state.shipyardCredits
     }
@@ -77,18 +77,33 @@ class Market {
 }
 
 class Bank {
+    static playerBalance = 0 //might need to improve this later if like..multiplayer becomes a thing
+
     constructor(planet = new Planet(), credits = 0, rake = 0) {
         this.planet = planet;
         this.credits = credits;
+        this.rake = rake;
+    }
+    calcDepositPenalty(depositAmount = 0) {
+        return Math.ceil( depositAmount * Math.pow(0.01, 1/(1+this.rake)) )
+    }
+    calcWithdrawalPenalty(withdrawalAmount = 0) {
+        return Math.ceil( withdrawalAmount * Math.pow(0.01, 1/(1+this.rake)) )
+    }
+    calcLoanInterest(loanAmount = 1, loanDuration = 1) {
+        console.log('calculating loan interest:', loanAmount, loanDuration)
+        return Math.ceil( loanAmount * Math.pow(0.01*loanDuration, 1/(1+this.rake)) )
+    }
+    calcLoanMaxAmount(officer = new Officer()) {
+        let maxLoanAmount = Math.pow(officer.level, 1.5) * 5000
+        maxLoanAmount += officer.fame*10 - officer.infamy*10
+        maxLoanAmount += Bank.playerBalance
+        maxLoanAmount -= officer.bounty
+        maxLoanAmount -= officer.totalDebts
+        return Math.floor(maxLoanAmount)
     }
 }
 
-class BankLoan {
-    constructor(amount = 0, dueYear = 0) {
-        this.amount = amount
-        this.dueYear = dueYear
-    }
-}
 
 class Settlement {
     constructor(shipyard = null, market = null, blackMarket = null, guild = null, bank = null) {

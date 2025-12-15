@@ -23,13 +23,13 @@ function createHireOfficerMenu(officers = [new Officer()], guild = new Guild(), 
 
 function showGuildMenu(guild = new Guild()) {
     const {planet} = guild
-    const {fleet, captain} = gameState
+    const {fleet, captain} = gs
     const isDocked = fleet.location == planet
     const rebuildMenu = ()=>showGuildMenu(guild)
 
     function hireOfficer(officer = new Officer()) {
         const hirePrice = guild.calcHirePrice(officer)
-        gameState.credits -= hirePrice;
+        gs.credits -= hirePrice;
         //guild.credits += hirePrice;
         safeAdd(fleet.officers, officer)
         safeRemove(guild.officers, officer)
@@ -50,25 +50,22 @@ function showGuildMenu(guild = new Guild()) {
     
     function onSelectGuildOfficer(officer = new Officer()) {
         console.log('selected guild officer:',officer)
-        if (!isDocked) return
         const hirePrice = guild.calcHirePrice(officer)
         const buttons = [
-            [`Hire`, ()=>showHireOfficerModal(officer), (captain.credits < hirePrice || fleet.officers.length >= captain.maxSubordinates)],
+            [`Hire`, ()=>showHireOfficerModal(officer), (!isDocked || gs.credits < hirePrice || fleet.officers.length >= captain.maxSubordinates)],
             ["Back", () => showPlanetMenu(planet)],
         ]
         refreshPanelButtons('guild_hire_panel', buttons)
     }
-
-    console.log('1')
 
     showModal(
         `${coloredName(planet)} - Guild`,
         createElement({children:[
             `Guild officers`,
             createHireOfficerMenu(guild.officers, guild, (officer)=>onSelectGuildOfficer(officer)),
-            `Your # officers: ${fleet.officers.length}/${captain.maxSubordinates} | Your credits: ${captain.credits}`,
+            `Your # officers: ${fleet.officers.length}/${captain.maxSubordinates} | Your credits: ${gs.credits}`,
             //`Guild credits: ${guild.credits}`,
-            `Hire Penalty: ${round(100*guild.rake, 2)}% | Local Officer Level: ${round(100*guild.planet.culture.officerQuality, 2)}%`,
+            `Hire Penalty: ${roundToPlaces(100*guild.rake, 2)}% | Local Officer Level: ${roundToPlaces(100*guild.planet.culture.officerQuality, 2)}%`,
         ]}),
         [
             ["Back", () => showPlanetMenu(planet)],
