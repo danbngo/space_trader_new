@@ -5,9 +5,16 @@ class BankLoan {
         this.term = term
         this.startYear = startYear
         this.dueYear = startYear + term
+        this.outstandingBalance = this.totalRepayable;
+    }
+    repay(amount = 0) {
+        this.outstandingBalance = Math.max(0, this.outstandingBalance - amount)
+    }
+    get paidOff() {
+        return this.outstandingBalance <= 0
     }
     get overdue() {
-        return gs.year > this.dueYear
+        return this.outstandingBalance > 0 && gs.year > this.dueYear
     }
     get totalRepayable() {
         return this.principal + this.interest

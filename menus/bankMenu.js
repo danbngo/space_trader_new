@@ -1,12 +1,13 @@
 function createBankLoansTable(loans = [new BankLoan()], onSelectLoan = (loan = new BankLoan())=>{}) {
     if (loans.length == 0) return `(None)`
     const rows = [
-        ['Due Date', 'Term', 'Total Repayable', 'Principal', 'Interest']
+        ['Due Date', 'Term', 'Outstanding Balance', 'Total Repayable', 'Principal', 'Interest']
     ]
     for (const loan of loans) {
         rows.push([
-            describeDate(loan.dueYear),
+            colorSpan(describeDate(loan.dueYear), gs.year >= loan.dueYear ? 'red' : ''),
             describeTimespan(loan.term),
+            statColorSpan(loan.outstandingBalance, loan.outstandingBalance/loan.totalRepayable),
             loan.totalRepayable,
             loan.principal,
             loan.interest
@@ -46,10 +47,11 @@ function showBankMenu(bank = new Bank()) {
         reloadMenu()
     }
 
-    function repay(loan = new Loan()) {
-        gs.credits -= loan.totalRepayable
-        bank.credits += loan.totalRepayable
-        safeRemove(gs.loans, loan)
+    function repay(loan = new BankLoan(), amount = 0) {
+        gs.credits -= amount
+        bank.credits += amount
+        loan.repay(amount)
+        if (loan.outstandingBalance <= 0) safeRemove(gs.loans, loan)
         reloadMenu()
     }
 
@@ -116,14 +118,17 @@ function showBankMenu(bank = new Bank()) {
         )
     }
 
-    function showRepayLoanModal(loan = new Loan()) {
-        showModal(
-            `Repay Loan?`,
-            `Are you sure you want to repay your ${loan.overdue ? 'overdue' : ''} loan due on ${describeDate(loan.dueYear)} for ${loan.totalRepayable}?`,
-            [
-                ['Repay', () => repay(loan)],
-                ['Cancel', () => rebuildMenu()],
-            ],
+    function showRepaySlider(loan = new BankLoan()) {
+        showSliderModal(
+            1, loan.outstandingBalance, `Repay Loan`,
+            `How much would you like to repay on your ${loan.overdue ? 'overdue' : ''} loan due on ${describeDate(loan.dueYear)}?`,
+            (amt)=>{
+                return `
+                    Balance After Repayment: ${loan.outstandingBalance-amt}<br/>
+                    Current Balance: ${loan.outstandingBalance}<br/>
+                `
+            },
+            'Repay', 'Cancel', (amt = 0)=>repay(loan, amt), ()=>reloadMenu(),
         )
     }
 
@@ -138,10 +143,10 @@ function showBankMenu(bank = new Bank()) {
     ]
 
     function onSelectLoan(loan = new Loan()) {
-        const canRepay = gs.credits >= loan.totalRepayable
+        const canRepay = gs.credits > 0
         const buttons = [
             ...baseButtons,
-            ['Repay', ()=>showRepayLoanModal(loan), !canRepay],
+            ['Repay', ()=>showRepaySlider(loan), !canRepay],
             ['Back', ()=>showPlanetMenu(planet)],
         ]
         refreshPanelButtons('bank_panel', buttons)

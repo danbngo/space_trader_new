@@ -69,17 +69,21 @@ class OrbitingObject extends SpaceObject {
 
 // Star class extends SpaceObject
 class Star extends OrbitingObject {
-    constructor(name = "Unnamed", color = '#ccc', radius = 0, x = 0, y = 0, orbit = null) {
+    constructor(name = "Unnamed", color = '#ccc', radius = 0, x = 0, y = 0, orbit = null, shaders = []) {
         super(name, color, radius, x, y, orbit);
+        this.shaders = shaders
     }
 }
 
 // Planet class extends SpaceObject
 class Planet extends OrbitingObject {
-    constructor(name = "Unnamed", color = '#ccc', radius = 0, x = 0, y = 0, orbit = null, settlement = new Settlement(), culture = new Culture()) {
+    constructor(name = "Unnamed", color = '#ccc', radius = 0, x = 0, y = 0, orbit = null, planetType = PLANET_TYPES_ALL[0], settlement = new Settlement(), culture = new Culture(), shaders = [], filters = new Map()) {
         super(name, color, radius, x, y, orbit);
+        this.planetType = planetType
         this.settlement = settlement
         this.culture = culture
+        this.shaders = shaders
+        this.filters = filters
     }
 }
 

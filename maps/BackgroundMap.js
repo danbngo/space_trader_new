@@ -10,7 +10,9 @@ class BackgroundMap {
 
         this.bgStars = generateBackgroundStars(this.outerRadius, 5000)
 
-        for (const bgStar of this.bgStars) bgStar.reset()
+        for (const bgStar of this.bgStars) {
+            bgStar.reset()
+        }
 
         this.refresh()
 
@@ -53,8 +55,10 @@ class BackgroundMap {
             bgStar.y *= 1.01
 
             if (calcDistance(0, 0, bgStar.x, bgStar.y) >= this.outerRadius) {
-                bgStar.x = rng(this.innerRadius, 0, false) * (Math.random() > .5 ? 1 : - 1)
-                bgStar.y = rng(this.innerRadius, 0, false) * (Math.random() > .5 ? 1 : - 1)
+                const distance = rng(this.innerRadius, 0, false)
+                const [x,y] = rotatePoint(distance, 0, 0, 0, Math.PI*4*Math.random())
+                bgStar.x = x
+                bgStar.y = y
             }
 
             const pixel = cvs.pixels[index]

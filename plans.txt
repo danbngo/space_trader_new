@@ -2,7 +2,7 @@ DONE: fix the shields never diminishing bug - use opacity
 DONE: make shield regen actually work - make shiled more expensive than hull
 DONE: banks, so players dont lose all their credits to pirates and the like
 -charges you a deposit fee, NO INTEREST.
--can take out loans, but if you don't pay on time you... we'll deal with this later
+-can take out loans, 
 
 NEXT UP:
 
@@ -13,6 +13,9 @@ more encounter types
  -bounty hunters - will just straight attack you if you OR your officers have a bounty
  -asteroid encounters so you can mine raw resources
  -dead/stranded ships - you can loot them but may be ambushed while doing so
+
+if you don't pay loans on time bounty hunters will attack you to recoup them
+
 allow player to retire after 50 years and get an ending
 taverns, hire more interesting characters via the tavern
 missions - via the guild, etc.

@@ -249,10 +249,10 @@ class EncounterMap {
         })
         if (obj instanceof Ship) {
             const {hull, shields} = obj
-            createElement({parent:this.objectPane, innerHTML: `Hull: ${statColorSpan(round(100 * hull[0]/hull[1]), hull[0]/hull[1], true)}%`})
-            createElement({parent:this.objectPane, innerHTML: `Shields: ${statColorSpan(round(100 * obj.shields[0]/obj.shields[1]), shields[0]/shields[1], true)}%`})
-            createElement({parent:this.objectPane, innerHTML: `Laser Recharge: ${statColorSpan(round(100 * obj.laserRechargeProgress), obj.laserRechargeProgress, true)}%`})
-            createElement({parent:this.objectPane, innerHTML: `Shield Recharge: ${statColorSpan(round(100 * obj.shieldRechargeProgress), obj.shieldRechargeProgress, true)}%`})
+            createElement({parent:this.objectPane, innerHTML: `Hull: ${statColorSpan(Math.round(100 * hull[0]/hull[1]), hull[0]/hull[1], true)}%`})
+            createElement({parent:this.objectPane, innerHTML: `Shields: ${statColorSpan(Math.round(100 * obj.shields[0]/obj.shields[1]), shields[0]/shields[1], true)}%`})
+            createElement({parent:this.objectPane, innerHTML: `Laser Recharge: ${statColorSpan(Math.round(100 * obj.laserRechargeProgress), obj.laserRechargeProgress, true)}%`})
+            createElement({parent:this.objectPane, innerHTML: `Shield Recharge: ${statColorSpan(Math.round(100 * obj.shieldRechargeProgress), obj.shieldRechargeProgress, true)}%`})
             createElement({parent:this.objectPane, innerHTML: obj.isDisabled() ? `(Disabled)` : obj.escaped ? '(Escaped)' : ''})
         }
     }

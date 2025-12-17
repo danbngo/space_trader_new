@@ -49,7 +49,118 @@ class CanvasObject {
         this.visible = visible
 
         this.filters = filters
+        this.shaders = []
+        this.cacheTexture = false
+        //this.textureMap = new Map()
+        this.imageMap = new Map()
     }
+
+    static sizeBreakpoints = [1, 2, 4, 8, 16, 32, 64, 128];
+
+    static getNearestSizeBreakpoint(size = 1) {
+        //returns the nearest number in CanvasObject.sizeBreakpoints that is >= size
+        for (const bp of CanvasObject.sizeBreakpoints) {
+            if (bp >= size) return bp;
+        }
+        return 1
+    }
+
+    draw(ctx, size = 1, sx = 0, sy = 0, x2Offset = 0, y2Offset = 0, allowFilters = true, allowCache = this.cacheTexture) {
+        //let tex;
+        let img;
+        let bucket = size;
+
+        if (allowCache) {
+            bucket = CanvasObject.getNearestSizeBreakpoint(size);
+            if (!this.imageMap.has(bucket)) this.imageMap.set(bucket, this.asImage(bucket, false, false));
+            img = this.imageMap.get(bucket)
+            //console.log('retrieved img for bucket:',bucket,'given size:',size)
+        }
+
+        ctx.save();
+        ctx.translate(sx, sy);
+
+        ctx.fillStyle = this.fillColor;
+        ctx.strokeStyle = this.strokeColor;
+        const filterKeys = [...this.filters.keys()]
+        if (filterKeys.length > 0) {
+            const fk = allowFilters ? filterKeys : filterKeys.filter(k=>(k !== 'brightness' && k !== 'drop-shadow'))
+            ctx.filter = fk.map(k=>`${k}(${this.filters.get(k)})`).join(' ');
+        }
+        ctx.lineWidth = this.lineWidth;
+        if (this.rotation) ctx.rotate(this.rotation + Math.PI/2);
+
+        switch (this.shape) {
+            case SHAPES.FilledCircle:
+                if (img) {
+                    ctx.drawImage(img, 0-bucket, 0-bucket)//, size*2, size*2);                    
+                }
+                else {
+                    /*const grd = ctx.createRadialGradient(0, 0, 0, 0, 0, size*1.5);
+                    grd.addColorStop(0, this.fillColor);
+                    grd.addColorStop(1, 'black');
+                    ctx.fillStyle = grd;*/
+                    ctx.beginPath();
+                    ctx.arc(0, 0, size, 0, Math.PI * 2);
+                    ctx.fill();
+                    if (this.strokeColor) ctx.stroke()
+                }
+                break;
+
+            case SHAPES.EmptyCircle:
+                ctx.beginPath();
+                ctx.arc(0, 0, size, 0, Math.PI * 2);
+                ctx.stroke();
+                break;
+
+            case SHAPES.Triangle:
+                const r = size;
+                const h = (Math.sqrt(3) / 2) * r;
+                ctx.beginPath();
+                ctx.moveTo(0, -h / 2);
+                ctx.lineTo(-r / 2, h / 2);
+                ctx.lineTo(r / 2, h / 2);
+                ctx.closePath();
+                ctx.fill();
+                if (this.strokeColor) ctx.stroke()
+                break;
+
+            case SHAPES.Text:
+                ctx.font = `${this.size}px "Google Sans Code"`;
+                ctx.strokeStyle = this.strokeColor || "black";
+                ctx.strokeText(this.textContent, 0, 0);
+                ctx.fillText(this.textContent, 0, 0);
+                break;
+
+            case SHAPES.Line:
+                ctx.beginPath();
+                ctx.moveTo(0, 0); // start point
+                ctx.lineTo(x2Offset, y2Offset); // end point
+                ctx.stroke();       // actually draw it
+        }
+
+        if (!img && this.shaders.length > 0) {
+            //console.log('calling shader function for:', this, 'tex:', tex, 'size:', size, 'allowCache:', allowCache, 'allowFilters:', allowFilters)
+            ctx.clip();
+            for (const shader of this.shaders) {
+                shader(ctx, size);
+            }
+        }
+        ctx.restore();
+    }
+
+    asImage(size = 0, allowCache = true, allowFilters = true) {
+        console.log('drawing canvasobj as image:',size,allowCache,allowFilters,this)
+        const diameter = size*2
+        const c = document.createElement("canvas");
+        c.width = c.height = diameter;
+        const ctx = c.getContext("2d");
+
+        this.draw(ctx, size, size, size, 0, 0, allowCache, allowFilters)
+
+        return c;
+    }
+
 }
 
 class CanvasPixel {
@@ -77,9 +188,10 @@ class CanvasWrapper {
         this.canvas = createElement({parent:this.root, tag:'canvas'})
 
         this.ctx = this.canvas.getContext('2d');
-        this.ctx.globalAlpha = 1;
-        this.ctx.globalCompositeOperation = "source-over";
-        
+        //this.ctx.globalAlpha = 1;
+        //this.ctx.globalCompositeOperation = "source-over";
+        this.ctx.imageSmoothingEnabled = false;
+
         // Camera + zoom
         this.cameraX = 0;
         this.cameraY = 0;
@@ -166,8 +278,8 @@ class CanvasWrapper {
         return this.addObject(obj)
     }
 
-    addEmptyCircle(id = "", x = 0, y = 0, size = 0, minScreenSize = 0, strokeColor = '#ccc', onClick = null) {
-        const obj = new CanvasObject({ id, shape: SHAPES.EmptyCircle, x, y, size, minScreenSize, strokeColor, onClick });
+    addEmptyCircle(id = "", x = 0, y = 0, size = 0, minScreenSize = 0, strokeColor = '#ccc', lineWidth = 1, onClick = null) {
+        const obj = new CanvasObject({ id, shape: SHAPES.EmptyCircle, x, y, size, minScreenSize, strokeColor, onClick, lineWidth });
         return this.addObject(obj)
     }
 
@@ -323,7 +435,7 @@ class CanvasWrapper {
 
         const {ctx, canvas, pixels, zoom, pixelRatio} = this
         const {width, height} = canvas
-        ctx.clearRect(0, 0, width, height);
+        //ctx.clearRect(0, 0, width, height);
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
 
@@ -361,6 +473,14 @@ class CanvasWrapper {
         for (const obj of drawOrder) {
             if (!obj.visible) continue
             let { sx, sy } = this.worldToScreen(obj.x, obj.y);
+            sx += obj.screenOffsetX;
+            sy += obj.screenOffsetY;
+            const size = Math.max(obj.minScreenSize, obj.size * zoom / pixelRatio)
+
+            //dont render objects off screen
+            if (sx + size < 0 || sx - size >= width || sy + size < 0 || sy - size >= height) continue;
+            sx = Math.round(sx)
+            sy = Math.round(sy)
 
             let x2Offset = 0;
             let y2Offset = 0;
@@ -370,66 +490,7 @@ class CanvasWrapper {
                 y2Offset = sy2 - sy
             }
 
-            sx += obj.screenOffsetX;
-            sy += obj.screenOffsetY;
-
-            sx = Math.round(sx)
-            sy = Math.round(sy)
-
-            ctx.save();
-            ctx.translate(sx, sy);
-
-            ctx.fillStyle = obj.fillColor;
-            ctx.strokeStyle = obj.strokeColor;
-            const filterKeys = [...obj.filters.keys()]
-            if (filterKeys.length > 0) {
-                ctx.filter = filterKeys.map(k=>`${k}(${obj.filters.get(k)})`).join(' ');
-            }
-            ctx.lineWidth = obj.lineWidth;
-            const size = Math.max(obj.minScreenSize, obj.size * zoom / pixelRatio)
-            if (obj.rotation) ctx.rotate(obj.rotation + Math.PI/2);
-
-            switch (obj.shape) {
-                case SHAPES.FilledCircle:
-                    ctx.beginPath();
-                    ctx.arc(0, 0, size, 0, Math.PI * 2);
-                    ctx.fill();
-                    if (obj.strokeColor) ctx.stroke()
-                    break;
-
-                case SHAPES.EmptyCircle:
-                    ctx.beginPath();
-                    ctx.arc(0, 0, size, 0, Math.PI * 2);
-                    ctx.stroke();
-                    break;
-
-                case SHAPES.Triangle:
-                    const r = size;
-                    const h = (Math.sqrt(3) / 2) * r;
-                    ctx.beginPath();
-                    ctx.moveTo(0, -h / 2);
-                    ctx.lineTo(-r / 2, h / 2);
-                    ctx.lineTo(r / 2, h / 2);
-                    ctx.closePath();
-                    ctx.fill();
-                    if (obj.strokeColor) ctx.stroke()
-                    break;
-
-                case SHAPES.Text:
-                    ctx.font = `${obj.size}px "Google Sans Code"`;
-                    ctx.strokeStyle = obj.strokeColor || "black";
-                    ctx.strokeText(obj.textContent, 0, 0);
-                    ctx.fillText(obj.textContent, 0, 0);
-                    break;
-
-                case SHAPES.Line:
-                    ctx.beginPath();
-                    ctx.moveTo(0, 0); // start point
-                    ctx.lineTo(x2Offset, y2Offset); // end point
-                    ctx.stroke();       // actually draw it
-            }
-
-            ctx.restore();
+            obj.draw(ctx, size, sx, sy, x2Offset, y2Offset)
         }
     }
 }

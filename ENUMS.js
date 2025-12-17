@@ -29,3 +29,14 @@ const SKILLS = Object.freeze({
 })
 
 const SKILLS_ALL = Object.values(SKILLS)
+
+const PLANET_TYPES = Object.freeze({
+  EARTHLIKE: "Earthlike",
+  TERRESTRIAL: "Terrestrial",
+  GAS_GIANT: "Gas Giant",
+  GAS_DWARF: "Gas Dwarf",
+  ICE_GIANT: "Ice Giant",
+  ICE_DWARF: "Ice Dwarf",
+});
+
+const PLANET_TYPES_ALL = Object.values(PLANET_TYPES)
