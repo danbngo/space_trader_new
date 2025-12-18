@@ -12,6 +12,7 @@ class Officer {
         this.skillPoints = STARTING_SKILL_POINTS;
         this.expPoints = 0;
         this.loans = []
+        this.fleet = null;
     }
 
     levelUp(autoImproveSkills = false) {

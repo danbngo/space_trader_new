@@ -19,7 +19,7 @@ class Route {
         const duration = this.endYear - this.startYear
         const elapsedTime = year - this.startYear
         const progressRatio = elapsedTime/duration
-        const normalProgress = applyNormalCurve(progressRatio)
+        const normalProgress = normalCurve(progressRatio)
         return [this.path.startX + this.path.dx*normalProgress, this.path.startY + this.path.dy*normalProgress]
     }
 

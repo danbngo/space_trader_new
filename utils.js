@@ -23,18 +23,44 @@ function roundToPlaces(num = 0, places = 0) {
 }
 
 // Smooth S-curve (slow → fast → slow)
-function applyNormalCurve(ratio = 0) {
+function normalCurve(ratio = Math.random()) {
     if (ratio <= 0) return 0;
     if (ratio >= 1) return 1;
+    if (ratio == 0.5) return 0.5;
 
     // Smoothstep (3x² – 2x³)
     return ratio * ratio * (3 - 2 * ratio);
+}
+
+//fast -> slow -> fast
+function inverseNormalCurve(ratio = Math.random()) {
+    if (ratio <= 0) return 0;
+    if (ratio >= 1) return 1;
+    if (ratio == 0.5) return 0.5;
+
+    const smooth = normalCurve(ratio);
+    return ratio*ratio/smooth;
 }
 
 function rndMember(arr = []) {
     if (!Array.isArray(arr) || arr.length === 0) return undefined;
     const idx = Math.floor(Math.random() * arr.length);
     return arr[idx];
+}
+
+function rndMembers(arr = [], numMembers = 1, nonRepeating = true) {
+    if (!Array.isArray(arr) || arr.length === 0) return [];
+    if (numMembers <= 0) return [];
+    if (numMembers >= arr.length && nonRepeating) return arr.slice();
+    const result = [];
+    const available = nonRepeating ? arr.slice() : arr;
+    for (let i = 0; i < numMembers; i++) {
+        if (available.length === 0) break;
+        const idx = Math.floor(Math.random() * available.length);
+        result.push(available[idx]);
+        if (nonRepeating) available.splice(idx, 1);
+    }
+    return result;
 }
 
 function rotatePoint(x = 0, y = 0, originX = 0, originY = 0, angleRadians = 2*Math.PI) {
@@ -59,11 +85,16 @@ function rotatePoint(x = 0, y = 0, originX = 0, originY = 0, angleRadians = 2*Ma
 function rndIndexWeighted(weights = [1]) {
     if (!weights || weights.length === 0) return -1;
 
+    console.log('rnd index weighted called w weights:',weights);
+
     const totalWeight = weights.reduce((sum, w) => sum + w, 0);
     if (totalWeight <= 0) return -1;
 
+    console.log('total weight:',totalWeight);
+
     let r = Math.random() * totalWeight;
     for (let i = 0; i < weights.length; i++) {
+        console.log('i,r selected:',i,r,'weights[i]:',weights[i]);
         if (r < weights[i]) return i;
         r -= weights[i];
     }
@@ -108,4 +139,21 @@ function safeAdd(arr = [], item) {
     if (arr.includes(item)) return false;
     arr.push(item);
     return true;
+}
+
+function colorArrToRgbaString(color = COLORS.White) {
+    const [r,g,b,a] = color
+    return `rgba(${r},${g},${b},${a})`
+}
+
+function hexToRgba(hex = '#ffffff') {
+    // Remove # if present
+    hex = hex.replace(/^#/, '');
+    
+    // Parse hex values
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    
+    return [r, g, b, 1];
 }

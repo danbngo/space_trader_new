@@ -6,6 +6,11 @@ DONE: banks, so players dont lose all their credits to pirates and the like
 
 NEXT UP:
 
+improve combat fleeing:
+ -ships in escape mode auto-escape when outside the map range, all other ships stay put
+ -flagship (player) can only flee when all his other ships have fled OR are disabled
+ -maybe make enemy flagship work the same way
+
 more encounter types
  -miners - you can attack and loot them
  -merchants - same as above but will offer to trade with you

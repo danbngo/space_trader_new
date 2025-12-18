@@ -69,7 +69,7 @@ function showShipyardBuyMenu(shipyard = new Shipyard()) {
         const buyPrice = shipyard.calcBuyPrice(ship)
         gs.credits -= buyPrice;
         shipyard.credits += buyPrice;
-        safeAdd(fleet.ships, ship)
+        fleet.addShip(ship)
         safeRemove(shipyard.ships, ship)
         rebuildMenu()
     }

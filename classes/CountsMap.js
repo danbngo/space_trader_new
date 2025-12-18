@@ -22,12 +22,15 @@ class CountsMap {
         return calcMapValuesTotal(this.counts)
     }
     
-    randomItem() {
+    randomItem(weighted = true) {
         const ctWeights = []
-        const keys = this.counts.keys()
-        for (const ct of keys) weights.push(this.getAmount(ct))
+        const keys = Array.from(this.counts.keys())
+        for (const ct of keys) ctWeights.push(weighted ? this.getAmount(ct) : (this.getAmount(ct) > 0 ? 1 : 0))
+        console.log('ct weights:',ctWeights)
+        console.log('keys:',keys)
         const ctIndex = rndIndexWeighted(ctWeights)
         const ct = keys[ctIndex]
+        console.log('random ct index:',ctIndex,'ct selected:',ct,'from keys:',keys)
         return ct
     }
 
@@ -37,8 +40,12 @@ class CountsMap {
         amt = Math.min(this.total, amt)
         while (amt > 0) {
             const ct = this.randomItem()
+            console.log('amt left to pick:',amt,'ct selected:',ct,'source amt:',this.getAmount(ct),'subset amt:',subset.getAmount(ct))
+            if (!ct) break
             if (subset.getAmount(ct) > this.getAmount(ct)) continue
             subset.increment(ct, 1)
+            amt--
+            console.log('added:',ct,'amt remaining:',amt)
         }
         return subset
     }

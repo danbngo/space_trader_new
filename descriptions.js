@@ -1,14 +1,3 @@
-function describeShip(ship = new Ship()) {
-    return `${ship.name} | Hull ${ship.hull[0]}/${ship.hull[1]} | ` +
-    `Shields ${ship.shields[0]}/${ship.shields[1]} | ` +
-    `Lasers ${ship.lasers} | Thrusters ${ship.thrusters} | `;
-}
-
-
-function describeShips(ships = [new Ship()]) {
-    if (ships.length == 0) return "(None)"
-    return ships.map(s=>`<li>${describeShip(s)}</li>`).join('')
-}
 
 function describeTimespan(years = 0) {
     if (years <= 0) return "0 hours";
@@ -32,9 +21,9 @@ function describeTimespan(years = 0) {
 
 function coloredName(obj = new SpaceObject()) {
     let name = obj.name
-    if (obj instanceof Ship) name = name.substring(name.lastIndexOf(" ") + 1);
+    if (obj instanceof Ship) name = obj.shipType.name
 
-    return `${colorSpan(name, obj.color)}`
+    return `${colorSpan(name, colorArrToRgbaString(obj.color))}`
 }
 
 function describeDate(year = 0, minutesEnabled = false) {

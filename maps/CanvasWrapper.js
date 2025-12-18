@@ -6,7 +6,7 @@ class CanvasObject {
         y = 0,
         size = 1,        // for triangle
         rotation = 0,    // radians for triangle
-        fillColor = '#ccc',
+        fillColor = COLORS.White,
         strokeColor = null,
         textContent = null,
         onClick = null,
@@ -15,12 +15,11 @@ class CanvasObject {
         //for lines
         x2 = 0,
         y2 = 0,
-        lineWidth = 1,
+        lineWidth = 0.5,
         screenOffsetX = 0,
         screenOffsetY = 0,
         minScreenSize = 1,
         visible = true,
-        filters = new Map()
     } = {}) {
         this.id = id;
         this.shape = shape;
@@ -31,8 +30,8 @@ class CanvasObject {
         this.size = size;
         this.rotation = rotation;
 
-        this.fillColor = fillColor;
-        this.strokeColor = strokeColor;
+        this.fillColor = fillColor ? [...fillColor] : null;
+        this.strokeColor = strokeColor ? [...strokeColor] : null;
 
         this.textContent = textContent;
         this.onClick = onClick;
@@ -47,64 +46,24 @@ class CanvasObject {
         this.screenOffsetY = screenOffsetY;
         this.minScreenSize = minScreenSize;
         this.visible = visible
-
-        this.filters = filters
-        this.shaders = []
-        this.cacheTexture = false
-        //this.textureMap = new Map()
-        this.imageMap = new Map()
     }
 
-    static sizeBreakpoints = [1, 2, 4, 8, 16, 32, 64, 128];
-
-    static getNearestSizeBreakpoint(size = 1) {
-        //returns the nearest number in CanvasObject.sizeBreakpoints that is >= size
-        for (const bp of CanvasObject.sizeBreakpoints) {
-            if (bp >= size) return bp;
-        }
-        return 1
-    }
-
-    draw(ctx, size = 1, sx = 0, sy = 0, x2Offset = 0, y2Offset = 0, allowFilters = true, allowCache = this.cacheTexture) {
-        //let tex;
-        let img;
-        let bucket = size;
-
-        if (allowCache) {
-            bucket = CanvasObject.getNearestSizeBreakpoint(size);
-            if (!this.imageMap.has(bucket)) this.imageMap.set(bucket, this.asImage(bucket, false, false));
-            img = this.imageMap.get(bucket)
-            //console.log('retrieved img for bucket:',bucket,'given size:',size)
-        }
-
+    draw(ctx, size = 1, sx = 0, sy = 0, x2Offset = 0, y2Offset = 0, overrideStrokeColor = undefined) {
         ctx.save();
         ctx.translate(sx, sy);
 
-        ctx.fillStyle = this.fillColor;
-        ctx.strokeStyle = this.strokeColor;
-        const filterKeys = [...this.filters.keys()]
-        if (filterKeys.length > 0) {
-            const fk = allowFilters ? filterKeys : filterKeys.filter(k=>(k !== 'brightness' && k !== 'drop-shadow'))
-            ctx.filter = fk.map(k=>`${k}(${this.filters.get(k)})`).join(' ');
-        }
+        ctx.fillStyle = colorArrToRgbaString(this.fillColor);
+        const effectiveStrokeColor = overrideStrokeColor !== undefined ? overrideStrokeColor : this.strokeColor
+        ctx.strokeStyle = effectiveStrokeColor ? colorArrToRgbaString(effectiveStrokeColor) : null;
         ctx.lineWidth = this.lineWidth;
         if (this.rotation) ctx.rotate(this.rotation + Math.PI/2);
 
         switch (this.shape) {
             case SHAPES.FilledCircle:
-                if (img) {
-                    ctx.drawImage(img, 0-bucket, 0-bucket)//, size*2, size*2);                    
-                }
-                else {
-                    /*const grd = ctx.createRadialGradient(0, 0, 0, 0, 0, size*1.5);
-                    grd.addColorStop(0, this.fillColor);
-                    grd.addColorStop(1, 'black');
-                    ctx.fillStyle = grd;*/
-                    ctx.beginPath();
-                    ctx.arc(0, 0, size, 0, Math.PI * 2);
-                    ctx.fill();
-                    if (this.strokeColor) ctx.stroke()
-                }
+                ctx.beginPath();
+                ctx.arc(0, 0, size, 0, Math.PI * 2);
+                ctx.fill();
+                if (this.strokeColor) ctx.stroke()
                 break;
 
             case SHAPES.EmptyCircle:
@@ -114,6 +73,11 @@ class CanvasObject {
                 break;
 
             case SHAPES.Triangle:
+                const gradient = ctx.createLinearGradient(0, 0, 0, size)
+                gradient.addColorStop(1, '#000000');
+                gradient.addColorStop(0, ctx.fillStyle); 
+                ctx.fillStyle = gradient;
+
                 const r = size;
                 const h = (Math.sqrt(3) / 2) * r;
                 ctx.beginPath();
@@ -127,7 +91,7 @@ class CanvasObject {
 
             case SHAPES.Text:
                 ctx.font = `${this.size}px "Google Sans Code"`;
-                ctx.strokeStyle = this.strokeColor || "black";
+                ctx.strokeStyle = ctx.strokeStyle || "black";
                 ctx.strokeText(this.textContent, 0, 0);
                 ctx.fillText(this.textContent, 0, 0);
                 break;
@@ -139,24 +103,17 @@ class CanvasObject {
                 ctx.stroke();       // actually draw it
         }
 
-        if (!img && this.shaders.length > 0) {
-            //console.log('calling shader function for:', this, 'tex:', tex, 'size:', size, 'allowCache:', allowCache, 'allowFilters:', allowFilters)
-            ctx.clip();
-            for (const shader of this.shaders) {
-                shader(ctx, size);
-            }
-        }
         ctx.restore();
     }
 
-    asImage(size = 0, allowCache = true, allowFilters = true) {
-        console.log('drawing canvasobj as image:',size,allowCache,allowFilters,this)
+    asImage(size = 0, strokeColor = undefined) {
+        console.log('drawing canvasobj as image:',size,strokeColor,this)
         const diameter = size*2
         const c = document.createElement("canvas");
         c.width = c.height = diameter;
         const ctx = c.getContext("2d");
 
-        this.draw(ctx, size, size, size, 0, 0, allowCache, allowFilters)
+        this.draw(ctx, size, size, size, 0, 0, strokeColor)
 
         return c;
     }
@@ -188,8 +145,8 @@ class CanvasWrapper {
         this.canvas = createElement({parent:this.root, tag:'canvas'})
 
         this.ctx = this.canvas.getContext('2d');
-        //this.ctx.globalAlpha = 1;
-        //this.ctx.globalCompositeOperation = "source-over";
+        this.ctx.globalAlpha = 1;
+        this.ctx.globalCompositeOperation = "source-over";
         this.ctx.imageSmoothingEnabled = false;
 
         // Camera + zoom
@@ -273,17 +230,17 @@ class CanvasWrapper {
     // Object Creation Helpers
     // ----------------------
 
-    addFilledCircle(id = "", x = 0, y = 0, size = 0, minScreenSize = 0, fillColor = '#ccc', onClick = null) {
+    addFilledCircle(id = "", x = 0, y = 0, size = 0, minScreenSize = 0, fillColor = COLORS.LightGray, onClick = null) {
         const obj = new CanvasObject({ id, shape: SHAPES.FilledCircle, x, y, size, minScreenSize, fillColor, onClick });
         return this.addObject(obj)
     }
 
-    addEmptyCircle(id = "", x = 0, y = 0, size = 0, minScreenSize = 0, strokeColor = '#ccc', lineWidth = 1, onClick = null) {
+    addEmptyCircle(id = "", x = 0, y = 0, size = 0, minScreenSize = 0, strokeColor = COLORS.LightGray, lineWidth = 1, onClick = null) {
         const obj = new CanvasObject({ id, shape: SHAPES.EmptyCircle, x, y, size, minScreenSize, strokeColor, onClick, lineWidth });
         return this.addObject(obj)
     }
 
-    addTriangle(id = "", x = 0, y = 0, size = 0, minScreenSize = 0, fillColor = '#ccc', rotation = 0, onClick = null) {
+    addTriangle(id = "", x = 0, y = 0, size = 0, minScreenSize = 0, fillColor = COLORS.LightGray, rotation = 0, onClick = null) {
         const obj = new CanvasObject({ id, shape: SHAPES.Triangle, x, y, size, minScreenSize, fillColor, rotation, onClick });
         return this.addObject(obj)
     }
@@ -294,12 +251,12 @@ class CanvasWrapper {
         return pixel
     }
 
-    addText(id = "", x = 0, y = 0, screenOffsetX = 0, screenOffsetY = 0, textContent = "", fillColor = '#ccc', size = 0, onClick = null, onHover = null, onHoverEnd = null) {
+    addText(id = "", x = 0, y = 0, screenOffsetX = 0, screenOffsetY = 0, textContent = "", fillColor = COLORS.LightGray, size = 0, onClick = null, onHover = null, onHoverEnd = null) {
         const obj = new CanvasObject({ id, shape: SHAPES.Text, size, x, y, screenOffsetX, screenOffsetY, textContent, fillColor, onClick, onHover, onHoverEnd });
         return this.addObject(obj)
     }
 
-    addLine(id = "", x = 0, y = 0, x2 = 0, y2 = 0, strokeColor = '#ccc', lineWidth = 0) {
+    addLine(id = "", x = 0, y = 0, x2 = 0, y2 = 0, strokeColor = COLORS.LightGray, lineWidth = 0) {
         const obj = new CanvasObject({
             id,
             shape: SHAPES.Line,
@@ -477,7 +434,6 @@ class CanvasWrapper {
             sy += obj.screenOffsetY;
             const size = Math.max(obj.minScreenSize, obj.size * zoom / pixelRatio)
 
-            //dont render objects off screen
             if (sx + size < 0 || sx - size >= width || sy + size < 0 || sy - size >= height) continue;
             sx = Math.round(sx)
             sy = Math.round(sy)

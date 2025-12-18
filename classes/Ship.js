@@ -1,8 +1,9 @@
 
 // Ship class
 class Ship {
-    constructor(name = "Unnamed", color = '#ccc', hull = [0, 0], shields = [0, 0], lasers = 0, thrusters = 0, cargoSpace = 0) {
+    constructor(name = "Unnamed", shipType = SHIP_TYPES[0], color = COLORS.White, hull = [0, 0], shields = [0, 0], lasers = 0, thrusters = 0, cargoSpace = 0) {
         this.name = name;
+        this.shipType = shipType;
         this.color = color;
         this.hull = hull;
         this.shields = shields;
@@ -29,18 +30,40 @@ class Ship {
         this.turningRight = false;
         this.beingHit = false;
         this.escaped = false;
+        this.fleet = null;
+    }
+
+    get isFlagship() {
+        if (!this.fleet) return false
+        return this.fleet.flagship == this
     }
 
     get radius() {
-        return BASE_SPACE_SHIP_RADIUS_IN_MILES * Math.pow(1+this.hull[1]/AVERAGE_SHIP_HULL, 0.5)
+        //use formula based on mass and radius of a sphere
+        return BASE_SPACE_SHIP_RADIUS_IN_MILES * (1+Math.cbrt(this.mass))
     }
 
     get mass() {
-        return this.hull[1]/AVERAGE_SHIP_HULL + this.shields[1]/AVERAGE_SHIP_SHIELDS + this.lasers + this.thrusters + this.cargoSpace
+        return this.hull[1]/AVERAGE_SHIP_HULL
+        + this.shields[1]/AVERAGE_SHIP_SHIELDS 
+        + this.lasers/AVERAGE_SHIP_LASERS
+        + this.cargoSpace/AVERAGE_SHIP_CARGO_SPACE
+        + this.thrusters/AVERAGE_SHIP_THRUSTERS
     }
 
     get value() {
         return Math.pow(this.mass, 2)*10
+    }
+
+    get combatRating() {
+        if (this.isDisabled()) return 0
+        if (this.escaped) return 0
+        const hpRating = 
+            this.hull[0] / AVERAGE_SHIP_HULL
+            + this.shields[0] / (AVERAGE_SHIP_SHIELDS*2)
+            + this.shields[1] / (AVERAGE_SHIP_SHIELDS*2)
+        const atkRating = this.lasers / AVERAGE_SHIP_LASERS
+        return hpRating * atkRating
     }
 
     isDamaged() {
@@ -69,6 +92,7 @@ class Ship {
         this.shieldRechargeProgress = 0;
         this.laserRechargeProgress = 0;
         this.escaped = false;
+        this.color[3] = 1
         this.resetCombatVarsTurn()
     }
 
@@ -99,7 +123,8 @@ class Ship {
         if (this.isDisabled()) return 0
         const mod = 1549263
         let thrusters = this.thrusters * mod * ENCOUNTER_THRUSTER_PENALTY
-        return thrusters / this.mass
+        //dont include thrusters in mass
+        return thrusters / (this.mass-this.thrusters/AVERAGE_SHIP_THRUSTERS)
     }
 
     calcAngleDeg() {
@@ -122,8 +147,11 @@ class Ship {
         if (counterClockwise) this.turningLeft = true
         else this.turningRight = true
         const speed = this.calcSpeed()
-        const force = speed*elapsedSeconds/TIME_TO_TURN_SHIP_WITH_ONE_THRUSTER_IN_SECONDS
+        //turn ratio cant be more than 1 rotation per second
+        let force = speed*elapsedSeconds/TIME_TO_TURN_SHIP_WITH_ONE_THRUSTER_IN_SECONDS
+        force = Math.min(force, elapsedSeconds)
         const turnRatio = force * (counterClockwise ? 1 : -1)
+
         this.angle += turnRatio*Math.PI*2
     }
 

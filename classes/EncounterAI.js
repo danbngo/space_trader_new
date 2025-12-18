@@ -4,6 +4,11 @@ class EncounterAI {
         this.encounter = encounter
     }
 
+    getOpposingFleet(ship = new Ship()) {
+        if (ship.fleet == gs.fleet) return this.fleet
+        else return gs.fleet
+    }
+
     calcNearestTarget(ship = new Ship(), targetShips = [new Ship()]) {
         let closestDistance = Infinity
         let closest = targetShips[0]
@@ -88,15 +93,28 @@ class EncounterAI {
         ]
     }
 
+    chooseCombatStrategy(ship = new Ship()) {
+        if (!ship.autoCombat) return
+        const {fleet} = ship
+        const opposingFleet = this.getOpposingFleet(ship)
+        const fleetCombatBalance = fleet.calcCombatRating() / opposingFleet.calcCombatRating()
+        const shipCombatBalance = ship.combatRating / opposingFleet.calcCombatRating()
+
+        if (fleetCombatBalance + shipCombatBalance < 0.5) {
+            return COMBAT_STRATEGIES.Escape
+        }
+
+        return COMBAT_STRATEGIES.AttackNearest
+    }
+
     makeShipsPlan() {
-        const {ships, playerShips, enemyFleet, playerFleet} = this.encounter
+        const {ships} = this.encounter
         for (const ship of ships) {
             if (ship.isDisabled()) continue
-            const opposingFleet = playerShips.includes(ship) ? enemyFleet : playerFleet
+            const {fleet} = ship
+            const opposingFleet = this.getOpposingFleet(ship)
             //assign a combat strategy for ships in auto
-            if (ship.autoCombat) {
-                ship.combatStrategy = COMBAT_STRATEGIES.AttackNearest
-            }
+            ship.combatStrategy = this.chooseCombatStrategy(ship)
             //choose a target
             if (ship.combatStrategy == COMBAT_STRATEGIES.AttackNearest) {
                 const target = this.calcNearestTarget(ship, opposingFleet.ships)
@@ -110,15 +128,22 @@ class EncounterAI {
                 ship.destinationY = fy//target.y
                 //console.log('set target for ship:',target)
             }
+            else if (ship.combatStrategy == COMBAT_STRATEGIES.Escape) {
+                //set destination to edge of map
+                const angleAwayFromCenter = new Path(0, 0, ship.x, ship.y).angle
+                const escapeDistance = this.encounter.mapDimensions*1.1 //just go off the map
+                ship.destinationX = ship.x + Math.cos(angleAwayFromCenter)*escapeDistance
+                ship.destinationY = ship.y + Math.sin(angleAwayFromCenter)*escapeDistance
+            }
         }   
     }
 
     makeShipsFire(onShipFire = (s = new Ship())=>{}) {
-        const {ships, playerFleet, enemyFleet, playerShips} = this.encounter
+        const {ships} = this.encounter
         for (const ship of ships) {
             if (ship.isDisabled()) continue
             if (!ship.autoCombat) continue
-            const opposingFleet = playerShips.includes(ship) ? enemyFleet : playerFleet
+            const opposingFleet = this.getOpposingFleet(ship)
             //console.log('1')
             if (!ship.canFire()) continue
             if (!this.calcIsFacingAnyTarget(ship, opposingFleet.ships)) continue //dont shoot if we wont hit anything
@@ -136,7 +161,7 @@ class EncounterAI {
             if (destinationX == undefined || destinationY == undefined) continue
             //thrust towards target
             const angleToDestination = new Path(x, y, destinationX, destinationY).angle
-            const distanceToDestination = calcDistance(x, y, destinationX, destinationY)
+            //const distanceToDestination = calcDistance(x, y, destinationX, destinationY)
 
             //how much is our current angle different from the angle we need to be facing in?
             let dAngle = angleToDestination - angle;

@@ -31,7 +31,7 @@ function showGuildMenu(guild = new Guild()) {
         const hirePrice = guild.calcHirePrice(officer)
         gs.credits -= hirePrice;
         //guild.credits += hirePrice;
-        safeAdd(fleet.officers, officer)
+        fleet.addOfficer(officer)
         safeRemove(guild.officers, officer)
         rebuildMenu()
     }

@@ -7,7 +7,7 @@ class StarMap {
     constructor(starSystem = new StarSystem(), autoSelectObject = gs.fleet) {
         console.log('CREATING STAR MAP FOR SYSTEM:',starSystem)
         this.starSystem = starSystem
-        this.selectedObject = autoSelectObject || gs.fleet;
+        this.selectedObject = null
 
         this.paused = true
         this.lastTickMs = Date.now()
@@ -30,6 +30,7 @@ class StarMap {
         requestAnimationFrame(()=> requestAnimationFrame(()=>{
             this.cvs.autoResize();
             this.refresh();
+            this.selectObject(autoSelectObject || gs.fleet)
         }));
     }
 
@@ -77,7 +78,7 @@ class StarMap {
         const yearsRemaining = describeTimespan(endYear-year)
 
         const planetLink = (planet = new Planet())=> {
-            return createElement({innerHTML: coloredName(planet), onClick: ()=>this.selectObject(planet), style: {color: planet.color}, classNames:['clickable-text']})
+            return createElement({innerHTML: coloredName(planet), onClick: ()=>this.selectObject(planet), style: {color: colorArrToRgbaString(planet.color)}, classNames:['clickable-text']})
         }
 
         this.infoBar.innerHTML = ""
@@ -121,25 +122,20 @@ class StarMap {
         stars.forEach((body,index)=>{
             //for fun, make bodies a bit bigger so they're visually different sizes instead of all being min size
             const starObj = cvs.addFilledCircle(`star${index}`, body.x, body.y, body.radius/EARTH_RADII_PER_AU * 25, 12, body.color, ()=>this.selectObject(body))
-            //starObj.shaders = body.shaders
-            //starObj.cacheTexture = true
-            //starObj.filters.set('drop-shadow','0 0 6px '+body.color)
         })
 
         planets.forEach((body,index)=>{
             const planetObj = cvs.addFilledCircle(`planet${index}`, body.x, body.y, body.radius/EARTH_RADII_PER_AU * 150, 8, body.color, ()=>this.selectObject(body))
-            //planetObj.shaders = body.shaders
-            //planetObj.filters = new Map(body.filters)
-            //planetObj.cacheTexture = true
             const labelObj = cvs.addText(`planetlabel${index}`, body.x, body.y, 0, -32, body.name, body.color, DEFAULT_FONT_SIZE, ()=>this.selectObject(body))
             const objs = [planetObj, labelObj]
             for (const obj of objs) {
                 obj.onHover = ()=>{
-                    for (const obj2 of objs) obj2.filters.set('brightness',1.5)
+                    for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
                 }
                 obj.onHoverEnd = ()=>{
-                    for (const obj3 of objs) obj3.filters.delete('brightness')
+                    for (const obj3 of objs) obj3.strokeColor = COLORS.Black
                 }
+                obj.onHoverEnd()
             }
         })
 
@@ -147,18 +143,19 @@ class StarMap {
             const fleetAngle = fleet.route ? fleet.route.path.angle : -Math.PI/2
             const fleetObj = cvs.addTriangle(`fleet${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU, 12, fleet.color, fleetAngle, ()=>this.selectObject(fleet))
             cvs.addLine(`fleetpath${index}`, 0, 0, 0, 0, fleet.color, 1)
-            cvs.addTriangle(`fleetthruster${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU*0.5, 6, 'orange')
+            cvs.addTriangle(`fleetthruster${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU*0.5, 6, COLORS.Orange)
             //cvs.addTriangle(`fleetbrakeleft${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU*0.5, 6, 'orange', fleetAngle - Math.PI*1/2)
             //cvs.addTriangle(`fleetbrakeright${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU*0.5, 6, 'orange', fleetAngle - Math.PI*3/2)
             const labelObj = cvs.addText(`fleetlabel${index}`, fleet.x, fleet.y, 0, -32, fleet.name, fleet.color, DEFAULT_FONT_SIZE, ()=>this.selectObject(fleet),)
             const objs = [fleetObj, labelObj]
             for (const obj of objs) {
                 obj.onHover = ()=>{
-                    for (const obj2 of objs) obj2.filters.set('brightness',1.5)
+                    for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
                 }
                 obj.onHoverEnd = ()=>{
-                    for (const obj3 of objs) obj3.filters.delete('brightness')
+                    for (const obj3 of objs) obj3.strokeColor = COLORS.Black
                 }
+                obj.onHoverEnd()
             }
         })
 
@@ -267,15 +264,15 @@ class StarMap {
         if (this.selectedObject instanceof Star) {
             const index = this.starSystem.stars.indexOf(this.selectedObject)
             createElement({parent:container, children:[
-                this.cvs.getObject(`star${index}`)?.asImage(50, true, false) || null
+                this.cvs.getObject(`star${index}`)?.asImage(25, null) || null
             ]})
         }
 
         // Planet-specific actions
         if (this.selectedObject instanceof Planet) {
             const index = this.starSystem.planets.indexOf(this.selectedObject)
-            createElement({parent:container, children:[
-                this.cvs.getObject(`planet${index}`)?.asImage(50, true, false) || null
+            createElement({parent:container, style: {margin: 'auto'}, children:[
+                this.cvs.getObject(`planet${index}`)?.asImage(25, null) || null
             ]})
             createElement({parent:container, tag:'button', innerHTML:isDockedHere ? 'Dock' : 'Scan', onClick:()=>this.explore(this.selectedObject)})
             createElement({parent:container, tag:'button', innerHTML:'Travel', onClick:()=>this.setDestination(this.selectedObject, true), disabled: cantTravelHere})

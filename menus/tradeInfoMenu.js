@@ -16,7 +16,7 @@ function createTradeInfoBuyTable(ct = CARGO_TYPES_ALL[0], onSelectPlanet = (p = 
             coloredName(planet),
             !market ? 'N/A' : statColorSpan(buyPrice, ct.value/buyPrice),
             !market ? 'N/A' : statColorSpan(market.cargo.getAmount(ct), market.cargo.getAmount(ct)/MARKET_MAX_CARGO_PER_TYPE),
-            statColorSpan(round(distance, 2), distScore),
+            statColorSpan(Math.round(distance, 2), distScore),
             statColorSpan(describeTimespan(route.travelTime), distScore),
         ])
     }
@@ -40,7 +40,7 @@ function createTradeInfoSellTable(ct = CARGO_TYPES_ALL[0], onSelectPlanet = (p =
             coloredName(planet),
             !market ? 'N/A' : statColorSpan(sellPrice, sellPrice/ct.value),
             !market ? 'N/A' : statColorSpan(market.credits, 2*market.credits/MARKET_MAX_CREDITS),
-            statColorSpan(round(distance, 2), distScore),
+            statColorSpan(Math.round(distance, 2), distScore),
             statColorSpan(describeTimespan(route.travelTime), distScore),
         ])
     }

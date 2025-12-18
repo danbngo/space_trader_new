@@ -34,6 +34,11 @@ html, body {
     overflow: hidden;
 }
 
+h3 {
+    text-align: center;
+    margin: 0;
+}
+
 li {
     margin-left: 24px;
 }

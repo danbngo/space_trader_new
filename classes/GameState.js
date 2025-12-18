@@ -5,30 +5,24 @@ class GameState {
 
         // Create captain
         const captain = new Officer("Captain", STARTING_CREDITS);
-        const playerShip = new Ship("Starting Ship", '#ccc', [20,20], [10,10], 5, 5, 5)
+        const playerShip = new Ship("Starting Shuttle", SHIP_TYPES.SHUTTLE, COLORS.LightGray, [100,100], [10,10], 50, 500, 50)
 
         // Create fleet
         this.fleet = new Fleet(
             "Player Fleet",
-            '#ccc',
+            COLORS.LightGray,
             0, 0,
-            playerShip,
-            [playerShip],
-            new CountsMap(),
-            captain,
-            [],
-            EARTH,
         )
 
-        this.fleet.captain = this.captain;
-        this.fleet.officers = [];
+        this.fleet.addShip(playerShip)
+        this.fleet.addOfficer(captain)
 
         // Add player's fleet to system
         this.system.fleets = [this.fleet];
 
         // Initial planet setup
         this._initializePlanets();
-        this.fleet.dock(EARTH);
+        this.fleet.dock(rndMember(PLANETS));
 
         this.encounter = null//new Encounter() //dont need to serialize this, cant save during encounters
         const bgStars = generateBackgroundStars(SOLAR_SYSTEM_RADIUS_IN_AU, 5000)
@@ -120,7 +114,7 @@ class GameState {
 
         // Restore fleet
         this.fleet = Object.assign(
-            new Fleet("Player Fleet", '#ccc', 0, 0, [], [], 0, null, EARTH, 0),
+            new Fleet("Player Fleet", COLORS.LightGray, 0, 0, [], [], 0, null, EARTH, 0),
             data.fleet
         );
 

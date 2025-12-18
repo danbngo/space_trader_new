@@ -1,13 +1,13 @@
 // Fleet class extends SpaceObject
 class Fleet extends SpaceObject {
-    constructor(name = "Unnamed", color = '#ccc', x = 0, y = 0, flagship = new Ship(), ships = [new Ship()], cargo = new CountsMap(), captain = new Officer(), officers = [new Officer()], location = null) {
+    constructor(name = "Unnamed", color = COLORS.White, x = 0, y = 0) {
         super(name, color, 0, x, y);
-        this.flagship = flagship;
-        this.ships = ships; // Ship[]
-        this.cargo = cargo;
-        this.captain = captain
-        this.officers = officers; // Officer[]
-        this.location = location; // SpaceObject
+        this.flagship = null;
+        this.ships = []
+        this.cargo = new CountsMap();
+        this.captain = null;
+        this.officers = []
+        this.location = null;
         this.route = null //could be Route class
     }
 
@@ -50,6 +50,10 @@ class Fleet extends SpaceObject {
         weight += this.cargo.total
         return 60 * 24 * 365 * totalThrusters / weight
     }
+
+    calcCombatRating() {
+        return this.ships.reduce((total, ship) => total + ship.combatRating, 0);
+    }
     
     isStranded() {
         return this.ships.filter(s=>(!s.isDisabled())).length <= 0
@@ -57,5 +61,20 @@ class Fleet extends SpaceObject {
 
     get numPilots() {
         return this.officers.length + this.captain ? 1 : 0
+    }
+
+    addShip(ship = new Ship()) {
+        if (!this.flagship) this.flagship = ship
+        this.ships.push(ship)
+        ship.fleet = this
+    }
+    addOfficer(officer = new Officer()) {
+        if (!this.captain) this.captain = officer
+        this.officers.push(officer)
+        officer.fleet = this
+    }
+
+    get activeShips() {
+        return this.ships.filter(s=>!s.isDisabled() && !s.escaped)
     }
 }

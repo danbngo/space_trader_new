@@ -1,6 +1,6 @@
 // SpaceObject class
 class SpaceObject {
-    constructor(name = "Unnamed", color = '#ccc', radius = 0, x = 0, y = 0) {
+    constructor(name = "Unnamed", color = COLORS.White, radius = 0, x = 0, y = 0) {
         this.name = name;
         this.color = color
         this.radius = radius;
@@ -51,7 +51,7 @@ class BackgroundStar extends SpaceObject {
 
 
 class OrbitingObject extends SpaceObject {
-    constructor(name = "Unnamed", color = '#ccc', radius = 0, x = 0, y = 0, orbit = null) {
+    constructor(name = "Unnamed", color = COLORS.White, radius = 0, x = 0, y = 0, orbit = null) {
         super(name, color, radius, x, y);
         this.orbit = orbit;
     }
@@ -69,21 +69,18 @@ class OrbitingObject extends SpaceObject {
 
 // Star class extends SpaceObject
 class Star extends OrbitingObject {
-    constructor(name = "Unnamed", color = '#ccc', radius = 0, x = 0, y = 0, orbit = null, shaders = []) {
+    constructor(name = "Unnamed", color = COLORS.White, radius = 0, x = 0, y = 0, orbit = null) {
         super(name, color, radius, x, y, orbit);
-        this.shaders = shaders
     }
 }
 
 // Planet class extends SpaceObject
 class Planet extends OrbitingObject {
-    constructor(name = "Unnamed", color = '#ccc', radius = 0, x = 0, y = 0, orbit = null, planetType = PLANET_TYPES_ALL[0], settlement = new Settlement(), culture = new Culture(), shaders = [], filters = new Map()) {
+    constructor(name = "Unnamed", color = COLORS.White, radius = 0, x = 0, y = 0, orbit = null, planetType = PLANET_TYPES_ALL[0], settlement = new Settlement(), culture = new Culture()) {
         super(name, color, radius, x, y, orbit);
         this.planetType = planetType
         this.settlement = settlement
         this.culture = culture
-        this.shaders = shaders
-        this.filters = filters
     }
 }
 

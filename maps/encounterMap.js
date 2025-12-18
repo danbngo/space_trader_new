@@ -15,19 +15,6 @@ class EncounterMap {
         this.gameSecondsPerMs = 1/1000
         this.maxMsPerTick = 100
 
-        /*this.root = createElement({classNames: ['starmap-root']})
-        this.infoBar = createElement({parent: this.root, classNames:['starmap-info-bar']})
-        this.controls = createElement({parent: this.root})
-        this.main = createElement({parent: this.root, classNames:['starmap-main']})
-
-        const baseZoom = 1200*50*1000/MILES_PER_AU
-        this.cvs = new CanvasWrapper(1200, 600, 'black', baseZoom, baseZoom/10, baseZoom*10, encounter.mapDimensions)
-        this.leftSection = createElement({parent:this.root, classNames:['starmap-left'], children:[this.cvs.root]})
-
-        this.rightSection = createElement({parent:this.root, classNames:['starmap-right']})
-
-        this.main.appendChild(this.leftSection);
-        this.main.appendChild(this.rightSection);*/
         this.projectileGfxMap = new Map()
 
         const baseZoom = 1200*50*1000/MILES_PER_AU
@@ -37,7 +24,9 @@ class EncounterMap {
         this.infoBar = createElement({parent: this.root, style:{position:'absolute', bottom: 0, left: 0}})
         this.objectPane = createElement({parent: this.root, style: {position: 'absolute', top: 0, right: 0, height: '100%', pointerEvents: 'none'}})
 
+        this.rebuildCanvas();
         this.refresh()
+
         window.addEventListener("resize", ()=>this.cvs.autoResize());
         
         requestAnimationFrame(()=> requestAnimationFrame(()=>{
@@ -47,7 +36,6 @@ class EncounterMap {
     }
 
     refresh() {
-        this.rebuildCanvas();
         this.refreshControls();
         this.refreshInfoBar();
         this.refreshObjectPane();
@@ -93,7 +81,7 @@ class EncounterMap {
 
         cvs.clear()
 
-        cvs.addEmptyCircle('maplimits', 0, 0, this.encounter.mapDimensions, 24, 'cyan')
+        cvs.addEmptyCircle('maplimits', 0, 0, this.encounter.mapDimensions, 24, COLORS.Cyan)
 
         starSystem.backgroundStars.forEach( (bgStar, index) => {
             cvs.addPixel(bgStar.x*BG_STAR_DISTANCE_MOD, bgStar.y*BG_STAR_DISTANCE_MOD, bgStar.r, bgStar.g, bgStar.b, bgStar.a, bgStar.size)
@@ -101,19 +89,20 @@ class EncounterMap {
 
         ships.forEach((ship,index) => {
             const shipObj = cvs.addTriangle(`ship${index}`, ship.x, ship.y, ship.radius, 12, ship.color, ship.angle, ()=>this.selectObject(ship))
-            cvs.addEmptyCircle(`shipshield${index}`, ship.x, ship.y, ship.radius*1.1, 10, 'cyan')
-            const labelObj = cvs.addText(`shiplabel${index}`, ship.x, ship.y, 0, -32, ship.name, ship.color, DEFAULT_FONT_SIZE)
-            cvs.addTriangle(`shipthruster${index}`, ship.x, ship.y, ship.radius/EARTH_RADII_PER_AU*0.5, 6, 'orange', ship.angle - Math.PI)
-            cvs.addTriangle(`shipbrakeleft${index}`, ship.x, ship.y, ship.radius/EARTH_RADII_PER_AU*0.5, 6, 'orange', ship.angle - Math.PI*1/2)
-            cvs.addTriangle(`shipbrakeright${index}`, ship.x, ship.y, ship.radius/EARTH_RADII_PER_AU*0.5, 6, 'orange', ship.angle - Math.PI*3/2)
+            cvs.addEmptyCircle(`shipshield${index}`, ship.x, ship.y, ship.radius*1.1, 10, COLORS.Blue, 1)
+            const labelObj = cvs.addText(`shiplabel${index}`, ship.x, ship.y, 0, -32, ship.shipType.name, ship.color, DEFAULT_FONT_SIZE)
+            cvs.addTriangle(`shipthruster${index}`, ship.x, ship.y, ship.radius*0.5, 6, COLORS.Orange)
+            cvs.addTriangle(`shipbrakeleft${index}`, ship.x, ship.y, ship.radius*0.5, 6, COLORS.Orange)
+            cvs.addTriangle(`shipbrakeright${index}`, ship.x, ship.y, ship.radius*0.5, 6, COLORS.Orange)
             const objs = [shipObj, labelObj]
             for (const obj of objs) {
                 obj.onHover = ()=>{
-                    for (const obj2 of objs) obj2.filters.set('brightness',1.5)
+                    for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
                 }
                 obj.onHoverEnd = ()=>{
-                    for (const obj3 of objs) obj3.filters.delete('brightness')
+                    for (const obj3 of objs) obj3.strokeColor = COLORS.Black
                 }
+                obj.onHoverEnd()
             }
         })
 
@@ -166,17 +155,20 @@ class EncounterMap {
                 return
             }
 
-            const shieldsRatio = ship.shields[0]/ship.shields[1]
+            const shieldsRatio = ship.shields[0] <= 0 ? 0 : 0.25+(0.75*ship.shields[0]/ship.shields[1])
             const hullRatio = 0.25 + (0.75*ship.hull[0]/ship.hull[1])
+            //const hull255 = Math.round(255*hullRatio)
+            //const shields255 = Math.round(255*shieldsRatio)
 
             cvsShipObject.x = ship.x
             cvsShipObject.y = ship.y
             cvsShipObject.rotation = ship.angle
-            cvsShipObject.filters.set('opacity', hullRatio)
+            cvsShipObject.fillColor[3] = hullRatio
             
             cvsShieldObject.x = ship.x
             cvsShieldObject.y = ship.y
-            cvsShieldObject.filters.set('opacity', shieldsRatio)
+            cvsShieldObject.strokeColor[3] = shieldsRatio
+            cvsShieldObject.fillColor[3] = shieldsRatio
 
             cvsLabelObject.x = ship.x
             cvsLabelObject.y = ship.y
@@ -184,35 +176,28 @@ class EncounterMap {
             //animate thrusters
             if (!ship.accelerating) cvsThrusterObject.visible = false
             else {
-                const [screenOffsetX, screenOffsetY] = rotatePoint(4, 0, 0, 0, ship.angle-Math.PI)
-                const [oX, oY] = rotatePoint(ship.radius, 0, 0, 0, ship.angle-Math.PI)
+                const [oX, oY] = rotatePoint(ship.radius*1.25, 0, 0, 0, ship.angle-Math.PI)
                 cvsThrusterObject.visible = true
                 cvsThrusterObject.x = ship.x + oX
                 cvsThrusterObject.y = ship.y + oY
-                cvsThrusterObject.screenOffsetX = screenOffsetX
-                cvsThrusterObject.screenOffsetY = screenOffsetY
+                cvsThrusterObject.rotation = ship.angle - Math.PI
             }
 
-            //TODO: brake triangles seem pointed in the wrong directions
             if (!ship.braking && !ship.turningLeft) cvsBrakeLeftObject.visible = false
             else {
-                const [screenOffsetX, screenOffsetY] = rotatePoint(4, 0, 0, 0, ship.angle-Math.PI/2)
-                const [oX, oY] = rotatePoint(ship.radius, 0, 0, 0, ship.angle-Math.PI/2)
+                const [oX, oY] = rotatePoint(ship.radius*1.25, 0, 0, 0, ship.angle-Math.PI*3/4)
                 cvsBrakeLeftObject.visible = true
                 cvsBrakeLeftObject.x = ship.x + oX
                 cvsBrakeLeftObject.y = ship.y + oY
-                cvsBrakeLeftObject.screenOffsetX = screenOffsetX
-                cvsBrakeLeftObject.screenOffsetY = screenOffsetY
+                cvsBrakeLeftObject.rotation = ship.angle - Math.PI*3/4
             }
             if (!ship.braking && !ship.turningRight) cvsBrakeRightObject.visible = false
             else {
-                const [screenOffsetX, screenOffsetY] = rotatePoint(4, 0, 0, 0, ship.angle-Math.PI*3/2)
-                const [oX, oY] = rotatePoint(ship.radius, 0, 0, 0, ship.angle-Math.PI*3/2)
+                const [oX, oY] = rotatePoint(ship.radius*1.25, 0, 0, 0, ship.angle-Math.PI*5/4)
                 cvsBrakeRightObject.visible = true
                 cvsBrakeRightObject.x = ship.x + oX
                 cvsBrakeRightObject.y = ship.y + oY
-                cvsBrakeRightObject.screenOffsetX = screenOffsetX
-                cvsBrakeRightObject.screenOffsetY = screenOffsetY
+                cvsBrakeRightObject.rotation = ship.angle - Math.PI*5/4
             }
         })
 
@@ -320,14 +305,14 @@ function startEncounter() {
     //ships never have backward momentum
     for (const ship of [...enemyShips, ...playerShips]) {
         ship.resetCombatVars()
-        const [speedX, speedY] = rotatePoint(rng(spawnDistance/10, spawnDistance/10, false), 0, 0, 0, rng(0, Math.PI*4, false))
+        const [speedX, speedY] = rotatePoint(rng(spawnDistance/10, spawnDistance/100, false), 0, 0, 0, rng(0, Math.PI*4, false))
         Object.assign(ship, {speedX,speedY})
     }
 
 
     for (const ship of playerShips) {
         const [x,y] = rotatePoint(-rng(spawnDistance, spawnDistance/2, false), 0, 0, 0, rng(Math.PI/2, -Math.PI/2, false))
-        const [speedX, speedY] = rotatePoint(rng(spawnDistance/10, spawnDistance/20, false), 0, 0, 0, rng(Math.PI/2, -Math.PI/2, false))
+        const [speedX, speedY] = rotatePoint(rng(spawnDistance/10, spawnDistance/100, false), 0, 0, 0, rng(Math.PI/2, -Math.PI/2, false))
         const randomTarget = rndMember(enemyShips)
         Object.assign(ship, {x, y, speedX, speedY, angle: new Path(ship.x, ship.y, randomTarget.x, randomTarget.y).angle})
         //make first player ship controllable. TODO: make this more configurable later
@@ -341,7 +326,7 @@ function startEncounter() {
         const [speedX, speedY] = rotatePoint(-rng(spawnDistance/10, spawnDistance/20, false), 0, 0, 0, rng(Math.PI/2, -Math.PI/2, false))
         const randomTarget = rndMember(playerShips)
         const angle = new Path(ship.x, ship.y, randomTarget.x, randomTarget.y).angle
-        Object.assign(ship, {x, y, speedX, speedY, color: '#d33', angle})
+        Object.assign(ship, {x, y, speedX, speedY, color: hexToRgba('#dd4400'), angle})
     }
 
     showModal(encounter.encounterType.name, encounter.encounterType.description, [['Ok', ()=>{
@@ -352,7 +337,7 @@ function startEncounter() {
 
 function endEncounter() {
     gs.encounter = undefined
-    showStarMap()
+    showStarMap(gs.fleet)
     //restore all shields
     for (const s of gs.fleet.ships) s.restoreShields()
     //pause and show modal if player has no working ships, cant move
@@ -402,7 +387,7 @@ function endCombat() {
         showModal(`Defeat`, `All your ships have been disabled!`, [['Continue', ()=>encounter.encounterType.onDefeat()]])
     }
     else if (result == ENCOUNTER_RESULTS.Victory) {
-        showModal(`Victory`, `All enemy ships have been disabled! You win!`, [['Continue', ()=>encounter.encounterType.onVictory()]])
+        showModal(`Victory`, `All enemy ships have fled or been disabled! You win!`, [['Continue', ()=>encounter.encounterType.onVictory()]])
     }
     else if (result == ENCOUNTER_RESULTS.Escaped) {
         showModal(`Escape`, `You fled from the battlefield!`, [['Continue', ()=>encounter.encounterType.onEscape()]])

@@ -87,20 +87,13 @@ class Encounter {
         console.log('adding projectile from ship!',firedBy)
         //const {playerShips} = this
         //const isAllied = playerShips.includes(firedBy)
-        const color = firedBy.color //isAllied ? 'blue' : 'red'
+        const color = firedBy.color
         const [speedX, speedY] = rotatePoint(PROJECTILE_SPEED_IN_MILES_PER_SECOND, 0, 0, 0, firedBy.angle)//this.calcProjectileSpeed(firedBy)
         //more lasers = bigger projectile
-        const radius = BASE_PROJECTILE_RADIUS_IN_MILES * (1+firedBy.lasers)/25
+        const radius = BASE_PROJECTILE_RADIUS_IN_MILES * (1+Math.pow(firedBy.lasers, 1/2))
         const proj = new Projectile(color, radius, firedBy.x, firedBy.y, speedX, speedY, firedBy.angle, firedBy)
         this.projectiles.push(proj)
     }
-
-    /*calcProjectileSpeed(firedBy = new Ship()) {
-        const inertia = Math.max(0, calcSpeedAlongAngle(firedBy.speedX, firedBy.speedY, firedBy.angle))
-        const [sx,sy] = rotatePoint(PROJECTILE_SPEED_IN_MILES_PER_SECOND + inertia, 0, 0, 0, firedBy.angle)
-        const speed = calcDistance(sx, sy, 0, 0)
-        return [sx, sy, speed]
-    }*/
 
     handleProjectileCollisions() {
         //not allowing friendly fire for now
@@ -135,8 +128,11 @@ class Encounter {
         this.projectiles = this.projectiles.filter(p=>(!projectilesToRemove.includes(p)))
         for (const ship of activeShips) {
             const distFromCenter = calcDistance(ship.x, ship.y, 0, 0)
-            //projectiles can travel a bit further than the map edge for cooler visuals
             if (distFromCenter > this.mapDimensions) {
+                //ships actively trying to fight can choose not to escape
+                if (ship.autoCombat && ship.combatStrategy != COMBAT_STRATEGIES.Escape) continue
+                //flagship must be last non-disabled ship to escape!
+                if (ship.isFlagship && ship.fleet.activeShips.length > 1) continue
                 ship.escaped = true
                 ship.x = Infinity
                 ship.y = Infinity
@@ -152,7 +148,7 @@ class Encounter {
         //const collided = []
         lsLoop: for (const ls of liveShips) {
             //if (collided.includes(ls)) continue
-            const alliedShips = playerShips.includes(ls) ? playerShips : enemyShips
+            const alliedShips = ls.fleet.ships
             for (const s of ships) {
                 if (ls == s) continue
                 const colliding = calcCirclesIntersecting(ls.x, ls.y, ls.radius, s.x, s.y, s.radius)
@@ -233,10 +229,10 @@ class Encounter {
 
         /* damage ships */
         if (!noDamage) {
-            const impact = Math.round(Math.abs(dpNormA - dpNormB) / 500);
-            shipA.takeDamage(impact)
-            shipB.takeDamage(impact)
-            console.log('apply ship to ship collision!',{shipA,shipB,dx,dy,distance,nx,ny,tx,ty,dpTanA,dpTanB,m1,m2,newNormA,newNormB,overlap})
+            const impactDamage = Math.round(Math.abs(dpNormA - dpNormB) / 1000);
+            shipA.takeDamage(impactDamage)
+            shipB.takeDamage(impactDamage)
+            console.log('apply ship to ship collision!',{shipA,shipB,dx,dy,distance,nx,ny,tx,ty,dpTanA,dpTanB,m1,m2,newNormA,newNormB,overlap,impactDamage})
         }
     }
 }

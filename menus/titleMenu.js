@@ -18,7 +18,7 @@ function startNewGame() {
 }
 
 function createCharacter() {
-    showCaptainCreationMenu(gs.captain, ()=>showStarMap())
+    showCaptainCreationMenu(gs.captain, ()=>showStarMap(gs.fleet))
 }
 
 function continueGame() {

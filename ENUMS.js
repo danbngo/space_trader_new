@@ -6,9 +6,9 @@ const ENCOUNTER_RESULTS = Object.freeze({
     Escaped: 'Escaped'
 })
 
-
 const COMBAT_STRATEGIES = Object.freeze({
     AttackNearest: 'Attack Nearest',
+    Escape: 'Escape',
 })
 
 const SHAPES = Object.freeze({
@@ -40,3 +40,19 @@ const PLANET_TYPES = Object.freeze({
 });
 
 const PLANET_TYPES_ALL = Object.values(PLANET_TYPES)
+
+const COLORS = Object.freeze({
+    White: [255,255,255,1],
+    Black: [0,0,0,1],
+    Red: [255,0,0,1],
+    Cyan: [0,255,255,1],
+    Blue: [0,0,255,1],
+    Yellow: [255,255,0,1],
+    Green: [0,255,0,1],
+    Orange: [255,165,0,1],
+    Purple: [128,0,128,1],
+    Gray: [128,128,128,1],
+    LightGray: [192,192,192,1],
+    LightGreen: [144,238,144,1],
+    LightBlue: [173,216,230,1],
+})

@@ -11,14 +11,15 @@ class ShipType {
 }
 
 const SHIP_TYPES = {
-    TRANSPORT: new ShipType('Transport', 0.25, 0.25, 0.25, 2, 0.5),
-    CRUISE_SHIP: new ShipType('Cruise Ship', 2, 0.5, 0.25, 1, 2),
-    CARGO_SHIP: new ShipType('Cargo Ship', 1, 0.25, 0.25, 2, 4),
+    SHUTTLE: new ShipType('Shuttle', 0.1, 0.1, 0.1, 1, 1),
+    PASSENGER_SHIP: new ShipType('Passenger Ship', 2, 0.5, 0.1, 1, 2),
+    FREIGHTER: new ShipType('Freighter', 1, 0.25, 0.1, 2, 4),
+    BLOCKADE_RUNNER: new ShipType('Blockade Runner', 1.5, 1, 0.5, 3, 3),
     SCOUT: new ShipType('Scout', 0.5, 0.5, 0.5, 3, 0.5),
     DESTROYER: new ShipType('Destroyer', 2, 2, 4, 1, 0.5),
     BATTLESHIP: new ShipType('Battleship', 4, 4, 3, 0.5, 1),
-    MINING_SHIP: new ShipType('Mining Ship', 2, 1, 1, 0.5, 2),
-    FIGHTER: new ShipType('Fighter', 1, 2, 2, 1, 0.25),
-}
+    FIGHTER: new ShipType('Fighter', 1, 2, 2, 1, 0.1),
+    MINING_SHIP: new ShipType('Mining Ship', 2, 0.5, 1, 0.5, 2),
+    GUARD_SHIP: new ShipType('Guard Ship', 1.5, 1.5, 1.5, 0.5, 0.25),}
 
 const SHIP_TYPES_ALL = Object.values(SHIP_TYPES)
