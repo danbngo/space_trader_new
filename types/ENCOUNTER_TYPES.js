@@ -27,8 +27,6 @@ const ENCOUNTER_TYPES = {
         ()=>showPlayerEscapedFromFleetModal(),
         ()=>gs.encounter.encounterType.onDefeat()
     ),
-
-
     MERCHANTS: new EncounterType('Merchants', 'You encountered: merchants.', FLEET_TYPES.MERCHANTS,
         ()=>{
             showModal('Merchants', 'The merchants greet you warmly and offer to trade goods.', [
@@ -43,25 +41,35 @@ const ENCOUNTER_TYPES = {
         ()=>showPlayerEscapedFromFleetModal(),
         ()=>gs.encounter.encounterType.onDefeat()
     ),
-
     PIRATES: new EncounterType('Pirates', 'You encountered: pirates.', FLEET_TYPES.PIRATES,
         ()=>{
             showModal('The pirates fire warning shots at your ship!<br/>They demand you surrender and prepare to be boarded!', [
-                ['View', ()=>{
-                    closeModal()
-                }],
-                ['Submit', ()=>{
-                    gs.encounter.encounterType.onSurrender()
-                }],
-                ['Resist', ()=>showPlayerRefuseSurrenderModal(1, 0)
-                ],
+                ['View', ()=>closeModal()],
+                ['Submit', ()=>gs.encounter.encounterType.onSurrender()],
+                ['Resist', ()=>showPlayerRefuseSurrenderModal(1, 0)],
             ])
         },
         ()=>showPlayerDefeatedFleetModal(1),
         ()=>showPlayerDefeatedByPiratesModal(),
         ()=>showPlayerEscapedFromFleetModal(),
         ()=>showPlayerDidSurrenderModal(1)
+    ),
+    POLICE: new EncounterType('Police', 'You encountered: police.', FLEET_TYPES.PATROL,
+        ()=>{
+            showModal('The police ships pull alongside your fleet and order you to submit to a routine inspection.', [
+                ['View', ()=>closeModal()],
+                ['Accept', ()=>showPlayerPoliceInspectionModal()],
+                ['Resist', ()=>showPlayerRefuseSurrenderModal(-1, 1)],
+            ])
+        },
+        ()=>showPlayerDefeatedFleetModal(-1),
+        ()=>showPlayerDefeatedByPoliceModal(),
+        ()=>showPlayerEscapedFromFleetModal(),
+        ()=>showPlayerDidSurrenderModal(-1)
     )
+
+
+
 }
 
 const ENCOUNTER_TYPES_ALL = Object.values(ENCOUNTER_TYPES)

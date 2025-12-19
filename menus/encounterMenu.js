@@ -35,7 +35,7 @@ function showPlayerDidSurrenderModal( fameLossMultiplier = 1) {
     if (fameLoss) msg += `Submitting meekly to the ravages of the ${fleetName} causes you to lose ${famePenalty} fame.<br/>`
     if (infamyLoss) msg += `Throwing yourself upon the mercy of the ${fleetName} causes you to lose ${famePenalty} infamy.<br/>`
 
-    showModal(gs.encounter.encounterType.name, msg, [['Continue', ()=>endEncounter()]])
+    showModal(gs.encounter.encounterType.name, msg, [['Continue', ()=>gs.encounter.encounterType.onDefeat()]])
 }
 
 
@@ -249,3 +249,40 @@ function showPlayerEscapedFromFleetModal() {
     showModal(gs.encounter.encounterType.name, msg, [['Continue', ()=>endEncounter()]])
 }
 
+function showPlayerPoliceInspectionModal() {
+    let msg = ''
+    const fleetName = gs.encounter.encounterType.name
+    const illegalCargo = gs.fleet.cargo.items().filter( ct => ct.isIllegal )
+    if (illegalCargo.length === 0) {
+        msg += `The police inspect your cargo and find nothing illegal. They thank you for your cooperation and wish you a safe journey.<br/>`
+    }
+    else {
+        let fine = 0
+        for (const [ct, amt] of gs.fleet.cargo.counts) {
+            if (illegalCargo.includes(ct)) {
+                const finePerUnit = ct.value*2
+                fine += finePerUnit * amt
+            }
+            gs.fleet.cargo.setAmount(ct, 0) //confiscate all illegal cargo
+        }
+        const jailTime = fine/1000 //1 unit of jail time per 1000CR of fine
+        msg += `The police inspect your cargo and discover ${illegalCargo.length} units of contraband!<br/>`
+        msg += `All of your contraband is confiscated.<br/>`
+        msg += `You are given the option to pay a fine of ${fine}CR or serve ${jailTime} days in jail.<br/>`
+        showModal(fleetName, msg, [
+            ['Pay Fine', ()=>{
+                gs.credits -= fine
+                msg += `You pay the fine of ${fine}CR.<br/>`
+                showModal(fleetName, msg, [['Continue', ()=>endEncounter()]])
+            }, gs.credits >= fine],
+            ['Serve Jail Time', ()=>{
+                const nearestPlanet = gs.starSystem.calcNearestPlanet(gs.fleet)
+                gs.fleet.dock(nearestPlanet)
+                gs.year += jailTime / 365.0
+                msg += `The police take you to the nearest planet, ${nearestPlanet.name}.<br/>`
+                msg += `You serve ${jailTime} days in jail.<br/>`
+                showModal(fleetName, msg, [['Continue', ()=>endEncounter()]])
+            }]
+        ])
+    }
+}
