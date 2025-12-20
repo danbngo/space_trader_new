@@ -45,7 +45,7 @@ function showShipsMenu(ships = [...gs.fleet.ships]) {
 
     showModal(
         `Ships Manifest`,
-        createElement({children:[
+        ce({children:[
             createShipsListMenu(ships, onSelectShip),
         ]}),
         [

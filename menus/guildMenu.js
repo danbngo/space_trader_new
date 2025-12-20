@@ -60,7 +60,7 @@ function showGuildMenu(guild = new Guild()) {
 
     showModal(
         `${coloredName(planet)} - Guild`,
-        createElement({children:[
+        ce({children:[
             `Guild officers`,
             createHireOfficerMenu(guild.officers, guild, (officer)=>onSelectGuildOfficer(officer)),
             `Your # officers: ${fleet.officers.length}/${captain.maxSubordinates} | Your credits: ${gs.credits}`,

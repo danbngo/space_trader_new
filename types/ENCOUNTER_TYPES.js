@@ -59,7 +59,7 @@ const ENCOUNTER_TYPES = {
             showModal('The police ships pull alongside your fleet and order you to submit to a routine inspection.', [
                 ['View', ()=>closeModal()],
                 ['Accept', ()=>showPlayerPoliceInspectionModal()],
-                ['Resist', ()=>showPlayerRefuseSurrenderModal(-1, 1)],
+                ['Attack', ()=>showPlayerAttackFleetModal(-2, 2)],
             ])
         },
         ()=>showPlayerDefeatedFleetModal(-1),

@@ -91,7 +91,7 @@ function showMarketMenu(market = new Market()) {
         refreshPanelButtons('market_panel', buttons)
     }
 
-    let infoContainer = createElement({
+    let infoContainer = ce({
         children: [
             createMarketCargoTable(blackMarket, fleet.cargo, market.cargo, buyPrices, sellPrices, onSelectCargoType),
             `Your Cargo Space: ${fleet.cargo.total}/${fleet.calcTotalCargoSpace()} | Your Credits: ${gs.credits}`,

@@ -41,7 +41,7 @@ function showCargoMenu(cargo = gs.fleet.cargo) {
 
     showModal(
         `Cargo Manifest`,
-        createElement({children:[
+        ce({children:[
             createCargoTable(cargo, onSelectCargoType),
             `Your Cargo Space: ${gs.fleet.cargo.total}/${gs.fleet.calcTotalCargoSpace()}`,
         ]}),

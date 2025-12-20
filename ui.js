@@ -5,7 +5,7 @@
 const UI_CONTAINER = document.getElementById("game-container");
 
 
-function removeChildren(parent = createElement()) {
+function removeChildren(parent = ce()) {
     while (parent.firstChild) parent.removeChild(parent.firstChild)
 }
 
@@ -25,13 +25,13 @@ function refreshPanelButtons (panelId = '', buttons = []) {
 }
 
 function createPanel(title = '', text = '', buttons = [['Continue', ()=>{}, false]], id = '') {
-    const panel = createElement({
+    const panel = ce({
         id,
         classNames: ['panel'],
         children: [
-            createElement({classNames:['panel-title'], innerHTML: title}),
+            ce({classNames:['panel-title'], innerHTML: title}),
             text,
-            createElement({classNames:['panel-buttons']})
+            ce({classNames:['panel-buttons']})
         ]
     })
     refreshPanelButtons(panel, buttons)
@@ -47,7 +47,7 @@ function showPanel(title = '', text = '', buttons = ['Continue', ()=>{}], id = '
 function showSliderModal(min = 0, max = 10, title = '', description = '', footerGenerator = (value = 0)=>'', acceptLabel = 'Accept', cancelLabel = 'Cancel', onAccept = () => {}, onCancel = () => ()=>closeModal()) {
     let currentValue = min;
     
-    const slider = createElement({tag: 'input', style: {width: '100%'}});
+    const slider = ce({tag: 'input', style: {width: '100%'}});
     slider.type = 'range';
     slider.min = min;
     slider.max = max;
@@ -73,12 +73,12 @@ function showSliderModal(min = 0, max = 10, title = '', description = '', footer
 
     const panel = showModal(
         title,
-        createElement({children:[
+        ce({children:[
             description,
-            createElement({id: 'slider-value', style: {textAlign: 'center', marginTop: '16px'}}),
+            ce({id: 'slider-value', style: {textAlign: 'center', marginTop: '16px'}}),
             slider,
-            createElement({id: 'slider-footer'}),
-            createElement({classNames:['panel-buttons']})
+            ce({id: 'slider-footer'}),
+            ce({classNames:['panel-buttons']})
         ]}),
         buttons,
     );
@@ -88,7 +88,7 @@ function showSliderModal(min = 0, max = 10, title = '', description = '', footer
     return panel;
 }
 
-function showElement(element = createElement()) {
+function showElement(element = ce()) {
     UI_CONTAINER.innerHTML = "";
     UI_CONTAINER.appendChild(element);
 }
@@ -147,7 +147,7 @@ function colorSpan(text = '', color = '', asHtmlText = true) {
     return span;
 }
 
-function createElement({tag = 'div', id = '', innerHTML = '', children = [], parent = undefined, classNames = [], onClick, style = {}, disabled = false} = {}) {
+function ce({tag = 'div', id = '', innerHTML = '', children = [], parent = undefined, classNames = [], onClick, style = {}, disabled = false} = {}) {
     id = id || ''
     tag = tag || 'div'
     children = children || []
@@ -159,7 +159,7 @@ function createElement({tag = 'div', id = '', innerHTML = '', children = [], par
     const el = document.createElement(tag)
     if (innerHTML !== undefined) el.innerHTML = ''+innerHTML
     if (id && id.length > 0) el.id = ''+id
-    if (children && children.length > 0) for (const child of children) if (child !== undefined && child !== null) el.appendChild(child instanceof HTMLElement ? child : createElement({innerHTML: child}))
+    if (children && children.length > 0) for (const child of children) if (child !== undefined && child !== null) el.appendChild(child instanceof HTMLElement ? child : ce({innerHTML: child}))
     if (parent) parent.appendChild(el)
     if (classNames && classNames.length > 0) for (const className of classNames) el.classList.add(className)
     if (onClick) el.onclick = onClick
@@ -175,7 +175,7 @@ function applyStyle(element, style = {}) {
 }
 
 // utils.js or tableUtil.js
-function createTable(rows = [createElement()], onSelectRow = (index = 0)=>{}) {
+function createTable(rows = [ce()], onSelectRow = (index = 0)=>{}) {
     const table = document.createElement("table");
     table.className = "ui-table";
 
@@ -193,7 +193,7 @@ function createTable(rows = [createElement()], onSelectRow = (index = 0)=>{}) {
             onSelectRow(index-1); //-1 for header
         }
 
-        const tr = createElement({
+        const tr = ce({
             parent: table,
             tag:'tr',
             classNames: [index == 0 ? 'ui-table-first-row' : 'ui-table-row'],
@@ -201,7 +201,7 @@ function createTable(rows = [createElement()], onSelectRow = (index = 0)=>{}) {
         })
 
         for (let i = 0; i < colCount; i++) {
-            createElement({
+            ce({
                 parent: tr,
                 tag:index == 0 ? 'th' : 'td',
                 classNames:['ui-table-cell'],
@@ -214,14 +214,14 @@ function createTable(rows = [createElement()], onSelectRow = (index = 0)=>{}) {
     return table;
 }
 
-let currentModal = createElement()
+let currentModal = ce()
 
 function showModal(title = '', text = '', buttons = [['Continue', ()=>{}, false]], id = '') {
     if (currentMap) currentMap.refresh()
     // Close existing modal if open
     if (currentModal) closeModal();
     // Create overlay
-    currentModal = createElement({parent:UI_CONTAINER, classNames:['modal-overlay'], children:[
+    currentModal = ce({parent:UI_CONTAINER, classNames:['modal-overlay'], children:[
         createPanel(title, text, buttons, id)
     ]})
     return currentModal
@@ -235,7 +235,7 @@ function closeModal() {
     if (currentMap) currentMap.refresh()
 }
 
-function attachDragHandler(element = createElement(), callback = (dx=0,dy=0)=>{}) {
+function attachDragHandler(element = ce(), callback = (dx=0,dy=0)=>{}) {
     let isDown = false;
     let lastX = 0;
     let lastY = 0;
@@ -272,7 +272,7 @@ function attachDragHandler(element = createElement(), callback = (dx=0,dy=0)=>{}
 }
 
 
-function attachMouseWheelHandler(element = createElement(), callback = (direction = 1)=>{}) {
+function attachMouseWheelHandler(element = ce(), callback = (direction = 1)=>{}) {
     if (!element || typeof callback !== "function") return;
 
     const handler = (event) => {

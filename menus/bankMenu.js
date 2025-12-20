@@ -152,7 +152,7 @@ function showBankMenu(bank = new Bank()) {
         refreshPanelButtons('bank_panel', buttons)
     }
 
-    let infoContainer = createElement({
+    let infoContainer = ce({
         children: [
             `<u>Your loans</u>`,
             createBankLoansTable(gs.loans, onSelectLoan),

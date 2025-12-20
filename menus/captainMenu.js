@@ -11,10 +11,10 @@ function showCaptainMenu(captain = gs.captain) {
 
     showModal(
         `Captain Overview`,
-        createElement({children:[
+        ce({children:[
             `Name: ${name}`,
             `Level: ${level} | Exp.: ${expPoints} | To Next Lvl: ${expToNextLevel}`,
-            ...SKILLS_ALL.map(sk=>createElement({children:[
+            ...SKILLS_ALL.map(sk=>ce({children:[
                 `${sk}: ${statColorSpan(skills.getAmount(sk), skills.getAmount(sk)*SKILLS_ALL.length/5/SKILL_POINTS_PER_LEVEL, true)}`
             ]})),
             `Skill Points: ${colorSpan(skillPoints, skillPoints > 0 ? 'green' : '', true)}`,
@@ -45,9 +45,9 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}) {
 
     showModal(
         `Create Captain`,
-        createElement({children:[
+        ce({children:[
             `Name: ${name}`,
-            ...SKILLS_ALL.map(sk=>createElement({children:[
+            ...SKILLS_ALL.map(sk=>ce({children:[
                 `${sk}: ${statColorSpan(skills.getAmount(sk), skills.getAmount(sk)*SKILLS_ALL.length/5/SKILL_POINTS_PER_LEVEL, true)}`
             ]})),
             `Skill Points: ${statColorSpan(skillPoints, skillPoints > 0 ? 4 : 1, true)}`,

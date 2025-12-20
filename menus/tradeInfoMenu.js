@@ -66,7 +66,7 @@ function showTradeInfoSellMenu(ct = CARGO_TYPES_ALL[0]) {
 
     showModal(
         `Trade Info - Sell ${ct.name}`,
-        createElement({children:[
+        ce({children:[
             createTradeInfoSellTable(ct, onSelectPlanet),
             `Your ${ct.name} amt: ${fleet.cargo.getAmount(ct)}`,
         ]}),
@@ -92,7 +92,7 @@ function showTradeInfoBuyMenu(ct = CARGO_TYPES_ALL[0]) {
 
     showModal(
         `Trade Info - Buy ${ct.name}`,
-        createElement({children:[
+        ce({children:[
             createTradeInfoBuyTable(ct, onSelectPlanet),
             `Your ${ct.name} amt: ${fleet.cargo.getAmount(ct)} | Your Cargo Space: ${fleet.cargo.total}/${fleet.calcTotalCargoSpace()} | Your credits: ${gs.credits}`,
         ]}),

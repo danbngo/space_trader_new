@@ -98,7 +98,7 @@ function showShipyardBuyMenu(shipyard = new Shipyard()) {
 
     showModal(
         `${coloredName(planet)} - Shipyard`,
-        createElement({children:[
+        ce({children:[
             `<b>Shipyard ships</b>`,
             createBuyShipMenu(shipyard.ships, shipyard, (ship)=>onSelectShipyardShip(ship)),
             `Your # ships: ${fleet.ships.length}/${fleet.numPilots} | Your credits: ${gs.credits}`,
@@ -146,7 +146,7 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
 
         showModal(
             `Sell ${ship.name}?`,
-            createElement({children:[
+            ce({children:[
                 !shipyardCanAfford ? `${colorSpan(WARNING, 'yellow', true)}: Your ${ship.name} is worth ${salePrice}CR but the shipyard only has ${shipyard.credits} credits!` : ``,
                 `Are you sure you want to sell your ${ship.name} for ${Math.min(salePrice, shipyard.credits)} credits?`,
                 `Sale Price: ${finalSale}CR ${officersShare ? `(-${officersShare}CR for officers)` : ''}`,
@@ -161,7 +161,7 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
 
     showModal(
         `${coloredName(planet)} - Shipyard`,
-        createElement({children:[
+        ce({children:[
             `<b>Your ships</b>`,
             createSellShipMenu(fleet.ships, shipyard, (ship)=>onSelectPlayerShip(ship)),
             `Your # ships: ${fleet.ships.length}/${fleet.numPilots}` + fleet.ships.length < 2 ? colorSpan(` (You can't sell your last ship!)`, 'Yellow') : '',

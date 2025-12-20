@@ -45,7 +45,7 @@ class Fleet extends SpaceObject {
         const totalThrusters = this.calcTotalThrusters()
         let weight = 0
         for (const ship of this.ships) {
-            weight += ship.value
+            weight += ship.mass
         }
         weight += this.cargo.total
         return 60 * 24 * 365 * totalThrusters / weight

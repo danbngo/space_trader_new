@@ -1,9 +1,3 @@
-/*
-EncounterMap
-tick speed: 1 second per real life second (*60*60 speed compared to the starmap)
-default zoom distances: 1200px = 1000 miles
-combat map size = 5000 miles
-*/
 class EncounterMap {
     constructor(encounter = new Encounter(), autoSelectObject = gs.fleet) {
         this.starSystem = gs.system
@@ -12,17 +6,18 @@ class EncounterMap {
 
         this.paused = true
         this.lastTickMs = Date.now()
-        this.gameSecondsPerMs = 1/1000
         this.maxMsPerTick = 100
 
-        this.projectileGfxMap = new Map()
-
-        const baseZoom = 1200*50*1000/MILES_PER_AU
+        const baseZoom = ENCOUNTER_MAP_RADIUS_MILES / 10
         this.cvs = new CanvasWrapper(baseZoom, baseZoom/10, baseZoom*10, encounter.mapDimensions)
-        this.root = createElement({classNames: ['starmap-root'], children: [this.cvs.root]})
-        this.controls = createElement({parent: this.root, style: {position: 'absolute', top: 0, left: 0}})
-        this.infoBar = createElement({parent: this.root, style:{position:'absolute', bottom: 0, left: 0}})
-        this.objectPane = createElement({parent: this.root, style: {position: 'absolute', top: 0, right: 0, height: '100%', pointerEvents: 'none'}})
+        this.root = ce({classNames: ['starmap-root'], children: [this.cvs.root]})
+        this.controls = ce({parent: this.root, style: {position: 'absolute', top: 0, left: 0}})
+        this.infoBar = ce({parent: this.root, style:{position:'absolute', bottom: 0, left: 0}})
+        this.objectPane = ce({parent: this.root, style: {position: 'absolute', top: 0, right: 0, height: '100%', pointerEvents: 'none'}})
+
+        this.uiMode = UI_MODE.Default;
+        this.targetingAreas = [];
+        this.validTargets = [];
 
         this.rebuildCanvas();
         this.refresh()
@@ -33,6 +28,7 @@ class EncounterMap {
             this.cvs.autoResize();
             this.refresh();
         }));
+
     }
 
     refresh() {
@@ -44,15 +40,15 @@ class EncounterMap {
 
     refreshControls() {
         this.controls.innerHTML = ""
-        createElement({
+        ce({
             parent:this.controls,
             classNames: ['starmap-buttons'],
             children: [
-                createElement({tag:'button', innerHTML:this.paused ? '▶' : '⏸', onClick: () => this.togglePause(), disabled: !gs.encounter.combatEnabled}),
-                createElement({tag:'button', innerHTML:'+', onClick: () => this.cvs.adjustZoom(1.33)}),
-                createElement({tag:'button', innerHTML:'-', onClick: () => this.cvs.adjustZoom(0.66)}),
+                ce({tag:'button', innerHTML:this.paused ? '▶' : '⏸', onClick: () => this.togglePause(), disabled: !gs.encounter.combatEnabled}),
+                ce({tag:'button', innerHTML:'+', onClick: () => this.cvs.adjustZoom(1.33)}),
+                ce({tag:'button', innerHTML:'-', onClick: () => this.cvs.adjustZoom(0.66)}),
                 //ship info button?
-                createElement({tag:'button', innerHTML: '🗨', onClick: ()=> this.onHail()})
+                ce({tag:'button', innerHTML: '🗨', onClick: ()=> this.onHail()})
             ]
         })
     }
@@ -61,7 +57,7 @@ class EncounterMap {
         const {encounter} = gs
 
         this.infoBar.innerHTML = ""
-        createElement({
+        ce({
             parent:this.infoBar,
             classNames: ['starmap-info-bar'],
             children: [
@@ -72,12 +68,8 @@ class EncounterMap {
 
     rebuildCanvas() {
         const {encounter, cvs, starSystem} = this
-        const playerFleet = gs.fleet
-        const playerShips = playerFleet.ships
-        const enemyFleet = encounter.fleet
-        const enemyShips = enemyFleet.ships
-        const ships = [...playerShips, ...enemyShips];
-        const BG_STAR_DISTANCE_MOD = 20000 //hacky way to position stars intended for starmap onto the encounter map
+        const {ships} = encounter
+        const BG_STAR_DISTANCE_MOD = 1 //hacky way to position stars intended for starmap onto the encounter map
 
         cvs.clear()
 
@@ -88,19 +80,18 @@ class EncounterMap {
         });
 
         ships.forEach((ship,index) => {
-            const shipObj = cvs.addTriangle(`ship${index}`, ship.x, ship.y, ship.radius, 12, ship.color, ship.angle, ()=>this.selectObject(ship))
+            const shipObj = cvs.addTriangle(`ship${index}`, ship.x, ship.y, ship.radius, 12, ship.color, ship.angle, ()=>this.selectObject(ship), true)
+            if (ship == this.selectedObject) shipObj.strokeColor = COLORS.Green
             cvs.addEmptyCircle(`shipshield${index}`, ship.x, ship.y, ship.radius*1.1, 10, COLORS.Blue, 1)
-            const labelObj = cvs.addText(`shiplabel${index}`, ship.x, ship.y, 0, -32, ship.shipType.name, ship.color, DEFAULT_FONT_SIZE)
+            const labelObj = cvs.addText(`shiplabel${index}`, ship.x, ship.y, 0, -32, ship.shipType.name, ship.color, DEFAULT_FONT_SIZE, 2, ()=>this.selectObject(ship))
             cvs.addTriangle(`shipthruster${index}`, ship.x, ship.y, ship.radius*0.5, 6, COLORS.Orange)
-            cvs.addTriangle(`shipbrakeleft${index}`, ship.x, ship.y, ship.radius*0.5, 6, COLORS.Orange)
-            cvs.addTriangle(`shipbrakeright${index}`, ship.x, ship.y, ship.radius*0.5, 6, COLORS.Orange)
             const objs = [shipObj, labelObj]
             for (const obj of objs) {
                 obj.onHover = ()=>{
                     for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
                 }
                 obj.onHoverEnd = ()=>{
-                    for (const obj3 of objs) obj3.strokeColor = COLORS.Black
+                    for (const obj3 of objs) obj3.strokeColor = this.calcStrokeColorForShip(ship)
                 }
                 obj.onHoverEnd()
             }
@@ -111,27 +102,7 @@ class EncounterMap {
 
     refreshCanvas(forceRedraw = false) {
         const {encounter, cvs} = this
-        const playerFleet = gs.fleet
-        const playerShips = playerFleet.ships
-        const enemyFleet = encounter.fleet
-        const enemyShips = enemyFleet.ships
-        const ships = [...playerShips, ...enemyShips];
-        const {projectiles} = encounter
-
-        const liveProjectileUuids = []
-
-        projectiles.forEach( (proj)=> {
-            const {uuid, color, radius} = proj
-            liveProjectileUuids.push(uuid)
-            const id = 'proj'+uuid
-            let gfx = cvs.getObject(id)
-            if (!gfx) {
-                gfx = cvs.addFilledCircle(id, 0, 0, radius, 2, color)
-                this.projectileGfxMap.set(uuid, gfx)
-            }
-            gfx.x = proj.x
-            gfx.y = proj.y
-        })
+        const {ships, activeTurnFleet} = encounter
 
         //draw objects
         ships.forEach( (ship, index) => {
@@ -142,16 +113,12 @@ class EncounterMap {
             const cvsShieldObject = cvs.getObject(`shipshield${index}`)
             const cvsLabelObject = cvs.getObject(`shiplabel${index}`)
             const cvsThrusterObject = cvs.getObject(`shipthruster${index}`)
-            const cvsBrakeLeftObject = cvs.getObject(`shipbrakeleft${index}`)
-            const cvsBrakeRightObject = cvs.getObject(`shipbrakeright${index}`)
 
             if (invisible) {
                 cvsShipObject.visible = false
                 cvsShieldObject.visible = false
                 cvsLabelObject.visible = false
                 cvsThrusterObject.visible = false
-                cvsBrakeLeftObject.visible = false
-                cvsBrakeRightObject.visible = false
                 return
             }
 
@@ -173,6 +140,14 @@ class EncounterMap {
             cvsLabelObject.x = ship.x
             cvsLabelObject.y = ship.y
 
+            let label = ship.shipType.name
+            if (ship.isDisabled()) label += '☠'
+            else if (ship.fleet != activeTurnFleet) label += ''
+            else if (ship.numActionsRemaining == 0) label += '⧖'
+            else if (ship.numActionsRemaining == 1) label += '¹'
+            else if (ship.numActionsRemaining >= 2) label += '²'
+            cvsLabelObject.textContent = label
+
             //animate thrusters
             if (!ship.accelerating) cvsThrusterObject.visible = false
             else {
@@ -182,32 +157,7 @@ class EncounterMap {
                 cvsThrusterObject.y = ship.y + oY
                 cvsThrusterObject.rotation = ship.angle - Math.PI
             }
-
-            if (!ship.braking && !ship.turningLeft) cvsBrakeLeftObject.visible = false
-            else {
-                const [oX, oY] = rotatePoint(ship.radius*1.25, 0, 0, 0, ship.angle-Math.PI*3/4)
-                cvsBrakeLeftObject.visible = true
-                cvsBrakeLeftObject.x = ship.x + oX
-                cvsBrakeLeftObject.y = ship.y + oY
-                cvsBrakeLeftObject.rotation = ship.angle - Math.PI*3/4
-            }
-            if (!ship.braking && !ship.turningRight) cvsBrakeRightObject.visible = false
-            else {
-                const [oX, oY] = rotatePoint(ship.radius*1.25, 0, 0, 0, ship.angle-Math.PI*5/4)
-                cvsBrakeRightObject.visible = true
-                cvsBrakeRightObject.x = ship.x + oX
-                cvsBrakeRightObject.y = ship.y + oY
-                cvsBrakeRightObject.rotation = ship.angle - Math.PI*5/4
-            }
         })
-
-        //clean up unused projectile gfx
-        const deadProjectileUuids = this.projectileGfxMap.keys().filter(k=>(!liveProjectileUuids.includes(k)))
-        for (const uuid of deadProjectileUuids) {
-            const id = 'proj'+uuid
-            cvs.deleteObject(id)
-            this.projectileGfxMap.delete(uuid)
-        }
 
         cvs.redraw(forceRedraw)
     }
@@ -223,27 +173,69 @@ class EncounterMap {
 
     refreshObjectPane() {
         //const playerShips = gs.fleet.ships
-        const obj = this.selectedObject
+        const {selectedObject, encounter} = this
+        const {playerFleet, combatEnabled} = encounter
+
+        const obj = selectedObject
         this.objectPane.innerHTML = '';
+
+        const container = ce({parent:this.objectPane, classNames:['starmap-object-panel']})
+
+        if (this.uiMode == UI_MODE.TargetingAttack) {
+            ce({parent:container, innerHTML: `${obj.shipType.name}: Attack`})
+            ce({parent:container, innerHTML: '(Select target)'})
+            ce({parent:container, tag:'button', innerHTML:'Cancel', onClick: ()=>{
+                this.stopTargeting()
+            }})
+            return;
+        }
+
+        if (this.uiMode == UI_MODE.TargetingMove) {
+            ce({parent:container, innerHTML: `${obj.shipType.name}: Move`})
+            ce({parent:container, innerHTML: '(Select destination)'})
+            ce({parent:container, tag:'button', innerHTML:'Cancel', onClick: ()=>{
+                this.stopTargeting()
+            }})
+            return;
+        }
+
         if (!this.selectedObject) {
             return;
         }
-        createElement({
-            parent:this.objectPane, tag:'h2', innerHTML: coloredName(obj), classNames: ['clickable-text'],
+        ce({
+            parent:container, tag:'h3', innerHTML: coloredName(obj), classNames: ['clickable-text'],
+            style: {filter: `drop-shadow(1px 0 0 ${colorArrToRgbaString(COLORS.Green)}) drop-shadow(0 1px 0 ${colorArrToRgbaString(COLORS.Green)})  drop-shadow(0 -0.5px 0 ${colorArrToRgbaString(COLORS.Green)})  drop-shadow(-0.5px 0 0 ${colorArrToRgbaString(COLORS.Green)})`},
             onClick: ()=>this.selectObject(obj)
         })
         if (obj instanceof Ship) {
+            const index = this.encounter.ships.indexOf(obj)
             const {hull, shields} = obj
-            createElement({parent:this.objectPane, innerHTML: `Hull: ${statColorSpan(Math.round(100 * hull[0]/hull[1]), hull[0]/hull[1], true)}%`})
-            createElement({parent:this.objectPane, innerHTML: `Shields: ${statColorSpan(Math.round(100 * obj.shields[0]/obj.shields[1]), shields[0]/shields[1], true)}%`})
-            createElement({parent:this.objectPane, innerHTML: `Laser Recharge: ${statColorSpan(Math.round(100 * obj.laserRechargeProgress), obj.laserRechargeProgress, true)}%`})
-            createElement({parent:this.objectPane, innerHTML: `Shield Recharge: ${statColorSpan(Math.round(100 * obj.shieldRechargeProgress), obj.shieldRechargeProgress, true)}%`})
-            createElement({parent:this.objectPane, innerHTML: obj.isDisabled() ? `(Disabled)` : obj.escaped ? '(Escaped)' : ''})
+            const showActions = combatEnabled && obj.fleet == playerFleet && !obj.escaped && !obj.isDisabled()
+            const canAct = obj.numActionsRemaining > 0
+            ce({parent:container, style: {margin: 'auto'}, children:[
+                this.cvs.getObject(`ship${index}`)?.asImage(25, COLORS.LightGreen) || null
+            ]})
+            ce({parent:container, innerHTML: `Hull: ${statColorSpan(Math.round(100 * hull[0]/hull[1]), hull[0]/hull[1], true)}%`})
+            ce({parent:container, innerHTML: `Shields: ${statColorSpan(Math.round(100 * obj.shields[0]/obj.shields[1]), shields[0]/shields[1], true)}%`})
+            ce({parent:container, innerHTML: obj.isDisabled() ? `(Disabled)` : obj.escaped ? '(Escaped)' : ''})
+            if (showActions) {
+                ce({parent:container, tag:'button', innerHTML:'Attack', disabled: !canAct, onClick: ()=>this.startTargetingAttack(obj)})
+                ce({parent:container, tag:'button', innerHTML:'Move', disabled: !canAct, onClick: ()=>this.startTargetingMove(obj)})
+            }
         }
     }
 
-    selectObject(obj) {
+    selectObject(obj = new Ship()) {
         console.log('selected:',obj)
+        if (this.uiMode == UI_MODE.TargetingMove) return
+        if (this.uiMode == UI_MODE.TargetingAttack) {
+            //fill this in later
+        }
+        for (const obj of this.cvs.drawOrder) {
+            if (obj.strokeColor == COLORS.Green) {
+                obj.strokeColor = this.calcStrokeColorForShip(obj)
+            }
+        }
         this.selectedObject = obj;
         this.cvs.moveCameraTo(obj.x, obj.y)
         this.refresh();
@@ -258,14 +250,97 @@ class EncounterMap {
         this.refresh() //always do first refresh, as fleets launch during pause/unpause
     }
 
+    calcStrokeColorForShip(ship = new Ship()) {
+        if (ship == this.selectedObject) return COLORS.Green
+        if (this.validTargets.includes(ship)) return COLORS.Yellow
+        return COLORS.Black
+    }
+
+    calcCanBeControlled(ship = new Ship()) {
+        const {activeTurnFleet, playerFleet} = this.encounter
+        if (ship.fleet != activeTurnFleet) return false
+        if (ship.numActionsRemaining <= 0) return false
+        if (ship.fleet != playerFleet) return false
+        return true
+    }
+
+    startTargetingAttack(attacker = new Ship()) {
+        if (!this.calcCanBeControlled(attacker)) return
+        this.uiMode = UI_MODE.TargetingAttack
+        this.targetingAreas = []
+        const {encounter, cvs} = this
+        const {playerFleet, ships} = encounter
+        //show targeting areas
+        const targetingAngle = attacker.angle+Math.PI
+        const attackRange = attacker.maxSensorDistance
+        const [ax,ay] = rotatePoint(attacker.x + attackRange*0.66, attacker.y, attacker.x, attacker.y, attacker.angle) //use centroid
+        const [tx,ty] = rotatePoint(attacker.x + attackRange/2, attacker.y, attacker.x, attacker.y, attacker.angle)
+        const targetingTriangle = createEquilateralTrianglePoints(ax, ay, attackRange, targetingAngle+Math.PI/2, 'aroundCenter')
+        const targetingCvsObject = cvs.addTriangle('targetingarea', tx, ty, attackRange, 4, [0,255,0,0.1], targetingAngle)
+        const targetingCvsLine = cvs.addLine('targetingline', attacker.x, attacker.y, tx, ty, 2, COLORS.LightGreen)
+        console.log('added targeting area:',targetingTriangle,attackRange,targetingCvsObject)
+        for (const target of ships) {
+            if (target.fleet == playerFleet || target.isDisabled() || target.escaped) continue
+            if (!isPointWithinTriangle(target.x, target.y, targetingTriangle)) continue
+            this.validTargets.push(target)
+            //const targetIndex = ships.indexOf(target)
+            //const targetCvsObj = cvs.getObject(`ship${targetIndex}`)
+            //targetCvsObj.strokeColor = COLORS.Yellow
+        }
+        this.targetingAreas.push(targetingCvsObject)
+        this.refresh()
+        this.refreshCanvas(true)
+    }
+
+    startTargetingMove(mover = new Ship()) {
+        if (!this.calcCanBeControlled(mover)) return
+        this.uiMode = UI_MODE.TargetingMove
+        this.targetingAreas = []
+        const {cvs} = this
+        //show targeting areas
+        const targetingAngle = mover.angle
+        const moveRange = mover.maxMoveDistance
+        const [tx,ty] = rotatePoint(mover.x + moveRange/2, mover.y, mover.x, mover.y, targetingAngle)
+        const ellipse = new Ellipse(mover.x, mover.y, moveRange/2, moveRange/4, targetingAngle+Math.PI/2)
+        const targetingCvsObject = cvs.addFilledOval('targetingarea', ellipse.x, ellipse.y, ellipse.majorAxis, ellipse.minorAxis, 4, [0,255,0,0.1], ellipse.angle)
+        const targetingCvsCircle = cvs.addEmptyCircle('targetingcircle', mover.x, mover.y, mover.radius, 4, COLORS.LightGreen, 2)
+        this.targetingAreas.push(targetingCvsObject, targetingCvsCircle)
+        this.cvs.onClickWorldXY = (toX, toY)=>this.finishTargetingMove(toX, toY, ellipse)
+        this.cvs.onMouseMoveWorldXY = (x, y)=>this.targetMove(x, y, ellipse)
+        this.refresh()
+        this.refreshCanvas(true)
+    }
+
+    targetMove(x = 0, y = 0, ellipse = new Ellipse()) {
+        if (!isPointInEllipse(x, y, ellipse)) {
+            return;
+        }
+        const targetingCvsCircle = this.cvs.getObject('targetingcircle')
+        targetingCvsCircle.x = x
+        targetingCvsCircle.y = y
+        this.refreshCanvas(true)
+    }
+
+    finishTargetingMove(toX = 0, toY = 0, ellipse = new Ellipse()) {
+        this.stopTargeting()
+    }
+
+    stopTargeting() {
+        this.cvs.onClickWorldXY = null;
+        this.uiMode = UI_MODE.Default
+        this.validTargets = []
+        this.targetingAreas = []
+        this.cvs.deleteObject('targetingarea')
+        this.cvs.deleteObject('targetingline')
+        this.refresh()
+        this.refreshCanvas(true)
+    }
+
     tick() {
         if (this.paused || gs.encounter.result || !gs.encounter.combatEnabled) return
 
         const currentTime = Date.now()
-        const elapsedMs = Math.min(this.maxMsPerTick, currentTime - this.lastTickMs)
         this.lastTickMs = currentTime
-        const elapsedSeconds = elapsedMs * this.gameSecondsPerMs;
-        gs.encounter.tick(elapsedSeconds)
 
         if (gs.encounter.result) {
             endCombat()
@@ -274,7 +349,7 @@ class EncounterMap {
 
         this.refreshAnimations(currentTime/200000) //hack to make stars twinkle at a reasonable speed
         this.refreshCanvas()
-        this.refreshObjectPane();
+        //this.refreshObjectPane();
 
         requestAnimationFrame(()=>this.tick())
     }
@@ -291,106 +366,10 @@ class EncounterMap {
     }
 }
 
-function startEncounter() {
-    const encounter = generateEncounter()
-    gs.encounter = encounter
 
-    //randomize ship locations
-    const playerFleet = gs.fleet
-    const playerShips = playerFleet.ships
-    const enemyFleet = encounter.fleet
-    const enemyShips = enemyFleet.ships
-    const spawnDistance = encounter.mapDimensions*ENCOUNTER_SHIP_MAX_SPAWN_DISTANCE_RATIO
-
-    //ships never have backward momentum
-    for (const ship of [...enemyShips, ...playerShips]) {
-        ship.resetCombatVars()
-        const [speedX, speedY] = rotatePoint(rng(spawnDistance/10, spawnDistance/100, false), 0, 0, 0, rng(0, Math.PI*4, false))
-        Object.assign(ship, {speedX,speedY})
-    }
-
-
-    for (const ship of playerShips) {
-        const [x,y] = rotatePoint(-rng(spawnDistance, spawnDistance/2, false), 0, 0, 0, rng(Math.PI/2, -Math.PI/2, false))
-        const [speedX, speedY] = rotatePoint(rng(spawnDistance/10, spawnDistance/100, false), 0, 0, 0, rng(Math.PI/2, -Math.PI/2, false))
-        const randomTarget = rndMember(enemyShips)
-        Object.assign(ship, {x, y, speedX, speedY, angle: new Path(ship.x, ship.y, randomTarget.x, randomTarget.y).angle})
-        //make first player ship controllable. TODO: make this more configurable later
-        if (ship == playerShips[0]) {
-            ship.autoCombat = false;
-            ship.manualCombat = true;
-        }
-    }
-    for (const ship of enemyShips) {
-        const [x,y] = rotatePoint(rng(spawnDistance, spawnDistance/2, false), 0, 0, 0, rng(Math.PI/2, -Math.PI/2, false))
-        const [speedX, speedY] = rotatePoint(-rng(spawnDistance/10, spawnDistance/20, false), 0, 0, 0, rng(Math.PI/2, -Math.PI/2, false))
-        const randomTarget = rndMember(playerShips)
-        const angle = new Path(ship.x, ship.y, randomTarget.x, randomTarget.y).angle
-        Object.assign(ship, {x, y, speedX, speedY, color: hexToRgba('#dd4400'), angle})
-    }
-
-    showModal(encounter.encounterType.name, encounter.encounterType.description, [['Ok', ()=>{
-        showEncounterMap()
-        encounter.encounterType.onStart()
-    }]])
-}
-
-function endEncounter() {
-    gs.encounter = undefined
-    showStarMap(gs.fleet)
-    //restore all shields
-    for (const s of gs.fleet.ships) s.restoreShields()
-    //pause and show modal if player has no working ships, cant move
-    if (gs.fleet.isStranded()) {
-        handlePlayerStranded()
-        return
-    }
-}
-
-function handlePlayerStranded() {
-    const [nearestPlanet, nearestDistance] = gs.system.calcNearestPlanet(gs.fleet)
-    const creditCost = 10 + rng(200*nearestDistance, 100*nearestDistance)
-    const canAfford = gs.credits >= creditCost
-    const noCredits = gs.credits <= 0
-    const dayCost = 0.25 + rng(1.5*nearestDistance, 0.75*nearestDistance, false)
-    gs.credits = Math.max(0, gs.credits - creditCost)
-    gs.days += dayCost
-
-    console.log('player is stranded:',nearestPlanet,nearestDistance,creditCost,dayCost)
-    gs.fleet.dock(nearestPlanet)
-
-    let msg = `You have no working ships remaining, so you have to call a tow ship.<br/>`
-    if (canAfford) msg += `The operator charges you a fee of ${creditCost}CR.<br/>`
-    else if (noCredits) msg += `The operator complains bitterly after realizing you have no credits, but tows you anyway.<br/>`
-    else msg += `The fee is ${creditCost}CR, but you only have ${gs.credits}CR.<br/>Grumbling, the operator confiscates your few remaining credits and tows you anyway.<br/>`
-    msg += `You spend ${describeTimespan(dayCost/365)} being dragged through space.<br/>`
-    currentMap.refresh()
-
-    showModal(`Stranded`, msg, [['Continue', ()=>showPlanetMenu(nearestPlanet)]])
-}
 
 function showEncounterMap() {
     const encounterMap = new EncounterMap(gs.encounter, gs.fleet.ships[0])
     showMap(encounterMap)
 }
 
-function startCombat() {
-    gs.encounter.combatEnabled = true;
-    closeModal()
-    currentMap.togglePause(false)
-}
-
-function endCombat() {
-    const {encounter} = gs
-    const {result} = encounter
-    if (result == ENCOUNTER_RESULTS.Defeat) {
-        showModal(`Defeat`, `All your ships have been disabled!`, [['Continue', ()=>encounter.encounterType.onDefeat()]])
-    }
-    else if (result == ENCOUNTER_RESULTS.Victory) {
-        showModal(`Victory`, `All enemy ships have fled or been disabled! You win!`, [['Continue', ()=>encounter.encounterType.onVictory()]])
-    }
-    else if (result == ENCOUNTER_RESULTS.Escaped) {
-        showModal(`Escape`, `You fled from the battlefield!`, [['Continue', ()=>encounter.encounterType.onEscape()]])
-    }
-    //else if (result == ENCOUNTER_RESULTS.Surrendered) encounter.encounterType.onSurrender() //handled elsewhere
-}

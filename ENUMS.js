@@ -16,7 +16,8 @@ const SHAPES = Object.freeze({
     EmptyCircle: 'EmptyCircle',
     Triangle: 'Triangle', //these tend to be rotated. starts pointing right, in line with radian chart
     Text: 'Text', //renders some text in monospace
-    Line: 'Line'
+    Line: 'Line',
+    FilledOval: 'FilledOval',
 })
 
 const SKILLS = Object.freeze({
@@ -56,3 +57,15 @@ const COLORS = Object.freeze({
     LightGreen: [144,238,144,1],
     LightBlue: [173,216,230,1],
 })
+
+const UI_MODE = Object.freeze({
+    Default: 'Default',
+    TargetingAttack: 'TargetingAttack',
+    TargetingMove: 'TargetingMove',
+})
+
+const ACTION_TYPES = Object.freeze({
+    MoveTo: 'MoveTo',
+    Attack: 'Attack',
+})
+const ACTION_TYPES_ALL = Object.values(ACTION_TYPES)

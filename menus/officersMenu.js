@@ -42,7 +42,7 @@ function showOfficersMenu(officers = gs.fleet.officers) {
 
     showModal(
         `Officer Roster`,
-        createElement({children:[
+        ce({children:[
             createOfficersTable(officers, onSelectOfficer),
         ]}),
         [

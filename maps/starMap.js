@@ -15,10 +15,10 @@ class StarMap {
         this.maxMsPerTick = 100
 
         this.cvs = new CanvasWrapper(100, 10, 5000, NEPTUNE.orbit.radius*2)
-        this.root = createElement({classNames: ['starmap-root'], children: [this.cvs.root]})
-        this.controls = createElement({parent: this.root, style: {position: 'absolute', top: 0, left: 0}})
-        this.infoBar = createElement({parent: this.root, style:{position:'absolute', bottom: 0, left: 0}})
-        this.objectPane = createElement({parent: this.root, style: {position: 'absolute', top: 0, right: 0, height: '100%', pointerEvents: 'none'}})
+        this.root = ce({classNames: ['starmap-root'], children: [this.cvs.root]})
+        this.controls = ce({parent: this.root, style: {position: 'absolute', top: 0, left: 0}})
+        this.infoBar = ce({parent: this.root, style:{position:'absolute', bottom: 0, left: 0}})
+        this.objectPane = ce({parent: this.root, style: {position: 'absolute', top: 0, right: 0, height: '100%', pointerEvents: 'none'}})
 
         for (const bgStar of starSystem.backgroundStars) bgStar.reset()
 
@@ -45,14 +45,14 @@ class StarMap {
 
     refreshControls() {
         this.controls.innerHTML = ""
-        createElement({
+        ce({
             parent:this.controls,
             classNames: ['starmap-buttons'],
             children: [
-                createElement({tag:'button', innerHTML:this.paused ? '▶' : '⏸', onClick: () => this.togglePause()}),
-                createElement({tag:'button', innerHTML:'+', onClick: () => this.cvs.adjustZoom(1.33)}),
-                createElement({tag:'button', innerHTML:'-', onClick: () => this.cvs.adjustZoom(0.66)}),
-                createElement({tag:'button', innerHTML:'?', onClick: () => this.openAssistant()}),
+                ce({tag:'button', innerHTML:this.paused ? '▶' : '⏸', onClick: () => this.togglePause()}),
+                ce({tag:'button', innerHTML:'+', onClick: () => this.cvs.adjustZoom(1.33)}),
+                ce({tag:'button', innerHTML:'-', onClick: () => this.cvs.adjustZoom(0.66)}),
+                ce({tag:'button', innerHTML:'?', onClick: () => this.openAssistant()}),
             ]
         })
     }
@@ -78,16 +78,16 @@ class StarMap {
         const yearsRemaining = describeTimespan(endYear-year)
 
         const planetLink = (planet = new Planet())=> {
-            return createElement({innerHTML: coloredName(planet), onClick: ()=>this.selectObject(planet), style: {color: colorArrToRgbaString(planet.color)}, classNames:['clickable-text']})
+            return ce({innerHTML: coloredName(planet), onClick: ()=>this.selectObject(planet), style: {color: colorArrToRgbaString(planet.color)}, classNames:['clickable-text']})
         }
 
         this.infoBar.innerHTML = ""
-        createElement({
+        ce({
             parent:this.infoBar,
             classNames: ['starmap-info-bar'],
             children: [
                 `${describeDate(year)} | `,
-                destination ? createElement({
+                destination ? ce({
                     style: {display:'flex', gap:'6px', paddingBottom:'8px'},
                     children: [
                         `→`,
@@ -126,14 +126,14 @@ class StarMap {
 
         planets.forEach((body,index)=>{
             const planetObj = cvs.addFilledCircle(`planet${index}`, body.x, body.y, body.radius/EARTH_RADII_PER_AU * 150, 8, body.color, ()=>this.selectObject(body))
-            const labelObj = cvs.addText(`planetlabel${index}`, body.x, body.y, 0, -32, body.name, body.color, DEFAULT_FONT_SIZE, ()=>this.selectObject(body))
+            const labelObj = cvs.addText(`planetlabel${index}`, body.x, body.y, 0, -32, body.name, body.color, DEFAULT_FONT_SIZE, 2, ()=>this.selectObject(body))
             const objs = [planetObj, labelObj]
             for (const obj of objs) {
                 obj.onHover = ()=>{
                     for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
                 }
                 obj.onHoverEnd = ()=>{
-                    for (const obj3 of objs) obj3.strokeColor = COLORS.Black
+                    for (const obj3 of objs) obj3.strokeColor = (body == this.selectedObject) ? COLORS.Green : COLORS.Black
                 }
                 obj.onHoverEnd()
             }
@@ -141,19 +141,17 @@ class StarMap {
 
         fleets.forEach((fleet, index)=>{
             const fleetAngle = fleet.route ? fleet.route.path.angle : -Math.PI/2
-            const fleetObj = cvs.addTriangle(`fleet${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU, 12, fleet.color, fleetAngle, ()=>this.selectObject(fleet))
+            const fleetObj = cvs.addTriangle(`fleet${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU, 12, fleet.color, fleetAngle, ()=>this.selectObject(fleet), true)
             cvs.addLine(`fleetpath${index}`, 0, 0, 0, 0, fleet.color, 1)
             cvs.addTriangle(`fleetthruster${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU*0.5, 6, COLORS.Orange)
-            //cvs.addTriangle(`fleetbrakeleft${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU*0.5, 6, 'orange', fleetAngle - Math.PI*1/2)
-            //cvs.addTriangle(`fleetbrakeright${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU*0.5, 6, 'orange', fleetAngle - Math.PI*3/2)
-            const labelObj = cvs.addText(`fleetlabel${index}`, fleet.x, fleet.y, 0, -32, fleet.name, fleet.color, DEFAULT_FONT_SIZE, ()=>this.selectObject(fleet),)
+            const labelObj = cvs.addText(`fleetlabel${index}`, fleet.x, fleet.y, 0, -32, fleet.name, fleet.color, DEFAULT_FONT_SIZE, 2, ()=>this.selectObject(fleet),)
             const objs = [fleetObj, labelObj]
             for (const obj of objs) {
                 obj.onHover = ()=>{
                     for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
                 }
                 obj.onHoverEnd = ()=>{
-                    for (const obj3 of objs) obj3.strokeColor = COLORS.Black
+                    for (const obj3 of objs) obj3.strokeColor = (fleet == this.selectedObject) ? COLORS.Green : COLORS.Black
                 }
                 obj.onHoverEnd()
             }
@@ -175,6 +173,7 @@ class StarMap {
 
         stars.forEach((body,index)=>{
             const cvsObject = cvs.getObject(`star${index}`)
+            if (body == this.selectedObject) cvsObject.strokeColor = COLORS.Green
             cvsObject.x = body.x
             cvsObject.y = body.y
         })
@@ -187,6 +186,7 @@ class StarMap {
             Object.assign(cvsObject, {x: body.x, y:body.y})
 
             cvsObject = cvs.getObject(`planetlabel${index}`)
+            if (body == this.selectedObject) cvsObject.strokeColor = COLORS.Green
             cvsObject.x = body.x
             cvsObject.y = body.y
         })
@@ -195,6 +195,7 @@ class StarMap {
             const fleetAngle = fleet.route ? fleet.route.path.angle : -Math.PI/2
 
             let cvsObject = cvs.getObject(`fleet${index}`)
+            if (fleet == this.selectedObject) cvsObject.strokeColor = COLORS.Green
             cvsObject.x = fleet.x
             cvsObject.y = fleet.y
             cvsObject.rotation = fleetAngle
@@ -255,31 +256,33 @@ class StarMap {
         }
         const isDockedHere = this.selectedObject == gs.location
         const cantTravelHere = (this.selectedObject == gs.location) || gs.fleet.isStranded()
-        const container = createElement({parent:this.objectPane, classNames:['starmap-object-panel']})
-        createElement({parent:container, tag:'h3', innerHTML: coloredName(this.selectedObject)})
+        const container = ce({parent:this.objectPane, classNames:['starmap-object-panel']})
+        ce({parent:container, tag:'h3', innerHTML: coloredName(this.selectedObject),
+            style: {filter: `drop-shadow(1px 0 0 ${colorArrToRgbaString(COLORS.Green)}) drop-shadow(0 1px 0 ${colorArrToRgbaString(COLORS.Green)})  drop-shadow(0 -0.5px 0 ${colorArrToRgbaString(COLORS.Green)})  drop-shadow(-0.5px 0 0 ${colorArrToRgbaString(COLORS.Green)})`}
+        })
         if (this.selectedObject == gs.fleet) {
-            if (gs.location) createElement({parent:container, tag:'button', innerHTML:`Dock (${coloredName(gs.location)})`, onClick:()=>this.explore(gs.location)})
-        }
-
-        if (this.selectedObject instanceof Star) {
-            const index = this.starSystem.stars.indexOf(this.selectedObject)
-            createElement({parent:container, children:[
-                this.cvs.getObject(`star${index}`)?.asImage(25, null) || null
-            ]})
+            if (gs.location) ce({parent:container, tag:'button', innerHTML:`Dock (${coloredName(gs.location)})`, onClick:()=>this.explore(gs.location)})
         }
 
         // Planet-specific actions
-        if (this.selectedObject instanceof Planet) {
+        if (this.selectedObject instanceof Planet || this.selectedObject instanceof Star) {
             const index = this.starSystem.planets.indexOf(this.selectedObject)
-            createElement({parent:container, style: {margin: 'auto'}, children:[
-                this.cvs.getObject(`planet${index}`)?.asImage(25, null) || null
+            ce({parent:container, style: {margin: 'auto'}, children:[
+                this.cvs.getObject(`planet${index}`)?.asImage(25, COLORS.LightGreen) || null
             ]})
-            createElement({parent:container, tag:'button', innerHTML:isDockedHere ? 'Dock' : 'Scan', onClick:()=>this.explore(this.selectedObject)})
-            createElement({parent:container, tag:'button', innerHTML:'Travel', onClick:()=>this.setDestination(this.selectedObject, true), disabled: cantTravelHere})
+            if (this.selectedObject instanceof Planet) {
+                ce({parent:container, tag:'button', innerHTML:isDockedHere ? 'Dock' : 'Scan', onClick:()=>this.explore(this.selectedObject)})
+                ce({parent:container, tag:'button', innerHTML:'Travel', onClick:()=>this.setDestination(this.selectedObject, true), disabled: cantTravelHere})
+            }
         }
     }
 
     selectObject(obj) {
+        for (const obj of this.cvs.drawOrder) {
+            if (obj.strokeColor == COLORS.Green) {
+                obj.strokeColor = COLORS.Black
+            }
+        }
         console.log('selected:',obj)
         this.selectedObject = obj;
         this.cvs.moveCameraTo(obj.x, obj.y)

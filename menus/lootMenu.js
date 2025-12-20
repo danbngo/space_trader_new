@@ -67,7 +67,7 @@ function showLootMenu(loot = new CountsMap()) {
         refreshPanelButtons('loot_panel', buttons)
     }
 
-    let infoContainer = createElement({
+    let infoContainer = ce({
         children: [
             createLootCargoTable(fleet.cargo, loot, onSelectCargoType),
             `Your Cargo Space: ${fleet.cargo.total}/${fleet.calcTotalCargoSpace()}`,

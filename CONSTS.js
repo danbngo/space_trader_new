@@ -10,24 +10,14 @@ const EARTH_RADII_PER_AU = 23454.8
 const MILES_PER_AU = 432288*EARTH_RADII_PER_AU
 
 //TODO: try to make some of these vars more dynamic in future - different sizes for ships, projectiles etc.
-const BASE_SPACE_SHIP_RADIUS_IN_MILES = 1000
-const BASE_PROJECTILE_RADIUS_IN_MILES = 200
 const FLEET_RADIUS_IN_EARTH_RADII = 1/1000
 
 const ENCOUNTER_CHANCE_PER_DAY = 0.2;
 
 //combat distances = miles, time = seconds
-const ENCOUNTER_SHIP_MAX_SPAWN_DISTANCE_RATIO = 0.1
-const ENCOUNTER_MAP_RADIUS_MILES = 500*1000
-const TIME_TO_SHOOT_LASER_IN_SECONDS = 0.5
-const TIME_TO_RECHARGE_LASER_IN_SECONDS = 2
-const TIME_TO_RECHARGE_SHIELDS_IN_SECONDS = 2
-const TIME_TO_TURN_SHIP_WITH_ONE_THRUSTER_IN_SECONDS = 2000
-const ENCOUNTER_THRUSTER_PENALTY = 1/(1*10000) //ships are already going fast, cant move much due to inertia
-const PROJECTILE_SPEED_IN_MILES_PER_SECOND = 25*1000
-const PROJECTILE_SPEED_INCREASE_FACTOR_PER_SECOND = 1//1.33
-
-const DECELERATION_SPEED_RATIO = 0.8 //decelerating is slower than acceleration (make sure you face the right direction!)
+const ENCOUNTER_SHIP_MAX_SPAWN_DISTANCE_RATIO = 0.5
+const ENCOUNTER_MAP_RADIUS_MILES = 100
+const BASE_SPACE_SHIP_RADIUS_IN_MILES = 1/100
 
 const STARTING_SKILL_POINTS = 5;
 const SKILL_POINTS_PER_LEVEL = 5;
@@ -43,7 +33,11 @@ const AVERAGE_SHIP_SHIELDS = 10
 const AVERAGE_SHIP_LASERS = 5
 const AVERAGE_SHIP_THRUSTERS = 5
 const AVERAGE_SHIP_CARGO_SPACE = 5
+const AVERAGE_SHIP_RADARS = 5
 
 
 const BANK_MAX_LOAN_YEARS = 5
 const BANK_MIN_LOAN_AMOUNT = 100
+
+const SHIP_MAX_FIRING_ANGLE = Math.PI/4 //target can be no more than 45 degrees away from where ship is pointing
+const SHIP_NUM_ACTIONS_PER_TURN = 2

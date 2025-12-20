@@ -1,3 +1,98 @@
+function startEncounter() {
+    const encounter = generateEncounter()
+    gs.encounter = encounter
+
+    const {playerShips, enemyShips, ships} = encounter
+    //randomize ship locations
+    const maxSpawnDistance = encounter.mapDimensions*ENCOUNTER_SHIP_MAX_SPAWN_DISTANCE_RATIO
+    const minSpawnDistance = maxSpawnDistance/5
+
+    for (const ship of ships) {
+        ship.resetCombatVars()
+    }
+
+    for (const ship of playerShips) {
+        const [x,y] = rotatePoint(-rng(maxSpawnDistance, minSpawnDistance/2, false), 0, 0, 0, rng(Math.PI/2, -Math.PI/2, false))
+        Object.assign(ship, {x, y})
+    }
+    for (const ship of enemyShips) {
+        const [x,y] = rotatePoint(rng(maxSpawnDistance, minSpawnDistance, false), 0, 0, 0, rng(Math.PI/2, -Math.PI/2, false))
+        Object.assign(ship, {x, y})
+    }
+    for (const ship of playerShips) {
+        const randomTarget = rndMember(enemyShips)
+        const angle = new Path(ship.x, ship.y, randomTarget.x, randomTarget.y).angle
+        console.log('angle:',angle)
+        Object.assign(ship, {angle})
+    }
+    for (const ship of enemyShips) {
+        const randomTarget = rndMember(playerShips)
+        const angle = new Path(ship.x, ship.y, randomTarget.x, randomTarget.y).angle
+        console.log('angle:',angle)
+        Object.assign(ship, {color: hexToRgba('#dd4400'), angle})
+    }
+
+    showModal(encounter.fleetName, encounter.encounterType.description, [['Ok', ()=>{
+        showEncounterMap()
+        encounter.encounterType.onStart()
+    }]])
+}
+
+function endEncounter() {
+    gs.encounter = undefined
+    showStarMap(gs.fleet)
+    //restore all shields
+    for (const s of gs.fleet.ships) s.restoreShields()
+    //pause and show modal if player has no working ships, cant move
+    if (gs.fleet.isStranded()) {
+        handlePlayerStranded()
+        return
+    }
+}
+
+function startCombat(playerHasInitiative = false) {
+    gs.encounter.combatEnabled = true;
+    gs.encounter.activeTurnFleet = playerHasInitiative ? gs.fleet : gs.encounter.enemyFleet
+    closeModal()
+    currentMap.togglePause(false)
+}
+
+function endCombat() {
+    const {encounter} = gs
+    const {result} = encounter
+    if (result == ENCOUNTER_RESULTS.Defeat) {
+        showModal(`Defeat`, `All your ships have been disabled!`, [['Continue', ()=>encounter.encounterType.onDefeat()]])
+    }
+    else if (result == ENCOUNTER_RESULTS.Victory) {
+        showModal(`Victory`, `All enemy ships have fled or been disabled! You win!`, [['Continue', ()=>encounter.encounterType.onVictory()]])
+    }
+    else if (result == ENCOUNTER_RESULTS.Escaped) {
+        showModal(`Escape`, `You fled from the battlefield!`, [['Continue', ()=>encounter.encounterType.onEscape()]])
+    }
+}
+
+function handlePlayerStranded() {
+    const [nearestPlanet, nearestDistance] = gs.system.calcNearestPlanet(gs.fleet)
+    const creditCost = 10 + rng(200*nearestDistance, 100*nearestDistance)
+    const canAfford = gs.credits >= creditCost
+    const noCredits = gs.credits <= 0
+    const dayCost = 0.25 + rng(1.5*nearestDistance, 0.75*nearestDistance, false)
+    gs.credits = Math.max(0, gs.credits - creditCost)
+    gs.days += dayCost
+
+    console.log('player is stranded:',nearestPlanet,nearestDistance,creditCost,dayCost)
+    gs.fleet.dock(nearestPlanet)
+
+    let msg = `You have no working ships remaining, so you have to call a tow ship.<br/>`
+    if (canAfford) msg += `The operator charges you a fee of ${creditCost}CR.<br/>`
+    else if (noCredits) msg += `The operator complains bitterly after realizing you have no credits, but tows you anyway.<br/>`
+    else msg += `The fee is ${creditCost}CR, but you only have ${gs.credits}CR.<br/>Grumbling, the operator confiscates your few remaining credits and tows you anyway.<br/>`
+    msg += `You spend ${describeTimespan(dayCost/365)} being dragged through space.<br/>`
+    currentMap.refresh()
+
+    showModal(`Stranded`, msg, [['Continue', ()=>showPlanetMenu(nearestPlanet)]])
+}
+
 function loseCargoFromDisabledShips(disabledShips = []) {
     const disabledShipsCargoCapacity = disabledShips.reduce( (total, ship) => {
         return total + ship.cargoSpace
@@ -12,7 +107,7 @@ function loseCargoFromDisabledShips(disabledShips = []) {
 }
 
 function showPlayerRefuseSurrenderModal(fameMultiplier = 0, bountyMultiplier = 0) {
-    const fleetName = gs.encounter.encounterType.name
+    const fleetName = gs.encounter.fleetName
     const bounty = 100 * bountyMultiplier
     const fame = fameMultiplier > 0 ? 1 * fameMultiplier : 0
     const infamy = fameMultiplier < 0 ? 1 * Math.abs(fameMultiplier) : 0
@@ -20,11 +115,11 @@ function showPlayerRefuseSurrenderModal(fameMultiplier = 0, bountyMultiplier = 0
     if (infamy > 0) msg += `Your defiance of the authorities causes you to gain ${infamy} infamy.<br/>`
     if (fame > 0) msg += `Your fearlessness causes you to gain ${fame} fame.<br/>`
     if (bounty > 0) msg += `You bounty has risen by ${bounty}CR.<br/>`
-    showModal(gs.encounter.encounterType.name, msg, [['Continue', ()=>startCombat()]])
+    showModal(gs.encounter.fleetName, msg, [['Continue', ()=>startCombat(false)]])
 }
 
 function showPlayerDidSurrenderModal( fameLossMultiplier = 1) {
-    const fleetName = gs.encounter.encounterType.name
+    const fleetName = gs.encounter.fleetName
     const fameLoss = fameLossMultiplier < 0 ? 5 * fameLossMultiplier : 0
     const infamyLoss = fameLossMultiplier < 0 ? 5 * fameLossMultiplier : 0
 
@@ -35,12 +130,12 @@ function showPlayerDidSurrenderModal( fameLossMultiplier = 1) {
     if (fameLoss) msg += `Submitting meekly to the ravages of the ${fleetName} causes you to lose ${famePenalty} fame.<br/>`
     if (infamyLoss) msg += `Throwing yourself upon the mercy of the ${fleetName} causes you to lose ${famePenalty} infamy.<br/>`
 
-    showModal(gs.encounter.encounterType.name, msg, [['Continue', ()=>gs.encounter.encounterType.onDefeat()]])
+    showModal(fleetName, msg, [['Continue', ()=>gs.encounter.encounterType.onDefeat()]])
 }
 
 
 function showPlayerAttackFleetModal(fameMultiplier = 0, bountyMultiplier = 0) {
-    const fleetName = gs.encounter.encounterType.name
+    const fleetName = gs.encounter.fleetName
     const fame = fameMultiplier > 0 ? 1 * fameMultiplier : 0
     const infamy = fameMultiplier < 0 ? 1 * Math.abs(fameMultiplier) : 0
     const bounty = 1000 * bountyMultiplier
@@ -51,7 +146,7 @@ function showPlayerAttackFleetModal(fameMultiplier = 0, bountyMultiplier = 0) {
     if (infamy > 0) msg += `This dastardly act causes you to gain ${infamy} infamy.<br/>`
     if (fame > 0) msg += `This brave act causes you to gain ${fame} fame.<br/>`
     if (bounty > 0) msg += `You bounty has risen by ${bounty}CR.<br/>`
-    showModal(fleetName, msg, [['Continue', ()=>startCombat()]])
+    showModal(fleetName, msg, [['Continue', ()=>startCombat(true)]])
 }
 
 function showTradeOfferModal() {
@@ -61,7 +156,7 @@ function showTradeOfferModal() {
 
 function showTradeOfferPlayerSellModal() {
     let msg = ''
-    const fleetName = gs.encounter.encounterType.name
+    const fleetName = gs.encounter.fleetName
     const ct = gs.fleet.cargo.randomItem(false)
     let onSell = null;
 
@@ -99,7 +194,7 @@ function showTradeOfferPlayerSellModal() {
 
 function showTradeOfferPlayerBuyModal() {
     let msg = ''
-    const fleetName = gs.encounter.encounterType.name
+    const fleetName = gs.encounter.fleetName
     const ct = gs.encounter.fleet.cargo.randomItem(false)
     const availableCargoSpace = gs.fleet.calcAvailableCargoSpace()
     let onBuy = null;
@@ -137,19 +232,17 @@ function showTradeOfferPlayerBuyModal() {
 }
 
 
-function showPlayerDefeatedFleetModal(fameMultiplier = 0) {
-    const enemyFleet = gs.encounter.fleet
-    const fleetName = gs.encounter.encounterType.name
+function showPlayerDefeatedEnemyModal(fameMultiplier = 0) {
+    const {enemyFleet, fleetName, disabledEnemyShips} = gs.encounter
     const fame = fameMultiplier > 0 ? 5 * fameMultiplier : 0
     const infamy = fameMultiplier < 0 ? 5 * Math.abs(fameMultiplier) : 0
-    const disabledEnemyShips = enemyFleet.ships.filter(s=>s.isDisabled())
     const abandonedCargoCapacity = disabledEnemyShips.reduce( (total, ship) => {
         return total + ship.cargoSpace
     }, 0)
     const cargoRatio = abandonedCargoCapacity / enemyFleet.calcTotalCargoSpace()
     const lootAmt = Math.floor(enemyFleet.cargo.total * cargoRatio)
     const loot = enemyFleet.cargo.randomSubset(lootAmt)
-    const disabledPlayerShips = gs.fleet.ships.filter(s=>s.isDisabled())
+    const disabledPlayerShips = gs.encounter.playerShips.filter(s=>s.isDisabled())
 
     gs.captain.infamy += infamy
     gs.captain.fame += fame
@@ -173,8 +266,7 @@ function showPlayerDefeatedFleetModal(fameMultiplier = 0) {
 }
 
 function showPlayerDefeatedByNeutralsModal( infamyLossMultiplier = 1) {
-    const fleetName = gs.encounter.encounterType.name
-    const disabledPlayerShips = gs.fleet.ships.filter(s=>s.isDisabled())
+    const {fleetName, disabledPlayerShips} = gs.encounter
     
     const infamyLoss = 5 * infamyLossMultiplier
     gs.captain.infamy -= infamyLoss
@@ -193,8 +285,7 @@ function showPlayerDefeatedByNeutralsModal( infamyLossMultiplier = 1) {
 }
 
 function showPlayerDefeatedByPiratesModal() {
-    const fleetName = gs.encounter.encounterType.name
-    const {fleet, encounter} = gs
+    const {fleetName, fleet, encounter, disabledPlayerShips} = gs.encounter
     let msg = `Unfortunately, you were no match for the ${fleetName}.<br/>`
 
     if (disabledPlayerShips.length > 0) {
@@ -233,13 +324,9 @@ function showPlayerDefeatedByPiratesModal() {
     showModal(gs.encounter.encounterType.name, msg, [['Continue', ()=>endEncounter()]])
 }
 
-function showPlayerEscapedFromFleetModal() {
-    const fleetName = gs.encounter.encounterType.name
-    const playerShips = gs.fleet.ships
-    const disabledPlayerShips = playerShips.filter(s=>s.isDisabled())
-    const escapedPlayerShips = playerShips.filter(s=>s.escaped)
-
-    let msg = `You escaped from the ${fleetName}.<br/>`
+function showPlayerEscapedFromEnemyModal() {
+    const {fleetName, disabledPlayerShips, escapedPlayerShips} = gs.encounter
+        let msg = `You escaped from the ${fleetName}.<br/>`
     if (escapedPlayerShips.length > 0) msg += `${escapedPlayerShips.length} of your ships exited the battlefield intact.<br/>`
     if (disabledPlayerShips.length > 0) {
         msg += `However, ${disabledPlayerShips.length} were disabled in the fighting.<br/>`
@@ -251,7 +338,7 @@ function showPlayerEscapedFromFleetModal() {
 
 function showPlayerPoliceInspectionModal() {
     let msg = ''
-    const fleetName = gs.encounter.encounterType.name
+    const {fleetName} = gs.encounter
     const illegalCargo = gs.fleet.cargo.items().filter( ct => ct.isIllegal )
     if (illegalCargo.length === 0) {
         msg += `The police inspect your cargo and find nothing illegal. They thank you for your cooperation and wish you a safe journey.<br/>`
@@ -265,7 +352,7 @@ function showPlayerPoliceInspectionModal() {
             }
             gs.fleet.cargo.setAmount(ct, 0) //confiscate all illegal cargo
         }
-        const jailTime = fine/1000 //1 unit of jail time per 1000CR of fine
+        const jailTime = 1+fine/1000 //1 unit of jail time per 1000CR of fine
         msg += `The police inspect your cargo and discover ${illegalCargo.length} units of contraband!<br/>`
         msg += `All of your contraband is confiscated.<br/>`
         msg += `You are given the option to pay a fine of ${fine}CR or serve ${jailTime} days in jail.<br/>`
@@ -282,7 +369,8 @@ function showPlayerPoliceInspectionModal() {
                 msg += `The police take you to the nearest planet, ${nearestPlanet.name}.<br/>`
                 msg += `You serve ${jailTime} days in jail.<br/>`
                 showModal(fleetName, msg, [['Continue', ()=>endEncounter()]])
-            }]
+            }],
+            ['Resist', ()=>showPlayerRefuseSurrenderModal(-1, 1)],
         ])
     }
 }

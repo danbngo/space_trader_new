@@ -5,7 +5,7 @@ class GameState {
 
         // Create captain
         const captain = new Officer("Captain", STARTING_CREDITS);
-        const playerShip = new Ship("Starting Shuttle", SHIP_TYPES.SHUTTLE, COLORS.LightGray, [100,100], [10,10], 50, 500, 50)
+        const playerShip = new Ship("Starting Shuttle", SHIP_TYPES.SHUTTLE, COLORS.LightGray, [100,100], [10,10], 10, 10, 10, 10)
 
         // Create fleet
         this.fleet = new Fleet(

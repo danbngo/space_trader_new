@@ -5,6 +5,7 @@ class CanvasObject {
         x = 0,
         y = 0,
         size = 1,        // for triangle
+        minorSize = 1,   // for oval
         rotation = 0,    // radians for triangle
         fillColor = COLORS.White,
         strokeColor = null,
@@ -15,19 +16,22 @@ class CanvasObject {
         //for lines
         x2 = 0,
         y2 = 0,
-        lineWidth = 0.5,
+        lineWidth = 1,
         screenOffsetX = 0,
         screenOffsetY = 0,
         minScreenSize = 1,
         visible = true,
+        gradient = false
     } = {}) {
         this.id = id;
         this.shape = shape;
+        this.gradient = gradient;
 
         this.x = x;
         this.y = y;
         this.size = size;
         this.size = size;
+        this.minorSize = minorSize;
         this.rotation = rotation;
 
         this.fillColor = fillColor ? [...fillColor] : null;
@@ -66,6 +70,14 @@ class CanvasObject {
                 if (this.strokeColor) ctx.stroke()
                 break;
 
+            case SHAPES.FilledOval:
+                const minorSize = size * (this.minorSize / this.size);
+                ctx.beginPath();
+                ctx.ellipse(0, 0, size, minorSize, 0, 0, Math.PI * 2);
+                ctx.fill();
+                if (this.strokeColor) ctx.stroke()
+                break;
+
             case SHAPES.EmptyCircle:
                 ctx.beginPath();
                 ctx.arc(0, 0, size, 0, Math.PI * 2);
@@ -73,11 +85,12 @@ class CanvasObject {
                 break;
 
             case SHAPES.Triangle:
-                const gradient = ctx.createLinearGradient(0, 0, 0, size)
-                gradient.addColorStop(1, '#000000');
-                gradient.addColorStop(0, ctx.fillStyle); 
-                ctx.fillStyle = gradient;
-
+                if (this.gradient) {
+                    const gradient = ctx.createLinearGradient(0, 0, 0, size)
+                    gradient.addColorStop(1, '#000000');
+                    gradient.addColorStop(0, ctx.fillStyle); 
+                    ctx.fillStyle = gradient;
+                }
                 const r = size;
                 const h = (Math.sqrt(3) / 2) * r;
                 ctx.beginPath();
@@ -141,8 +154,8 @@ class CanvasWrapper {
         cameraPanLimit = 500,
     ) {
         // Root element for the user to attach anywhere
-        this.root = createElement({classNames:['canvas-root']})
-        this.canvas = createElement({parent:this.root, tag:'canvas'})
+        this.root = ce({classNames:['canvas-root']})
+        this.canvas = ce({parent:this.root, tag:'canvas'})
 
         this.ctx = this.canvas.getContext('2d');
         this.ctx.globalAlpha = 1;
@@ -162,6 +175,9 @@ class CanvasWrapper {
         this.drawOrder = [];         // ordered list of objects
         this.hoveredObjects = [];
         this.pixels = []
+
+        this.onClickWorldXY = null;
+        this.onMouseMoveWorldXY = null;
 
         // Setup click detection
         this.canvas.addEventListener('click', (e) => this.handleClick(e));
@@ -235,13 +251,18 @@ class CanvasWrapper {
         return this.addObject(obj)
     }
 
+    addFilledOval(id = "", x = 0, y = 0, majorAxis = 0, minorAxis = 0, minScreenSize = 0, fillColor = COLORS.LightGray, rotation = 0, onClick = null) {
+        const obj = new CanvasObject({ id, shape: SHAPES.FilledOval, x, y, size: majorAxis, minorSize: minorAxis, minScreenSize, rotation, fillColor, onClick });
+        return this.addObject(obj)
+    }
+
     addEmptyCircle(id = "", x = 0, y = 0, size = 0, minScreenSize = 0, strokeColor = COLORS.LightGray, lineWidth = 1, onClick = null) {
         const obj = new CanvasObject({ id, shape: SHAPES.EmptyCircle, x, y, size, minScreenSize, strokeColor, onClick, lineWidth });
         return this.addObject(obj)
     }
 
-    addTriangle(id = "", x = 0, y = 0, size = 0, minScreenSize = 0, fillColor = COLORS.LightGray, rotation = 0, onClick = null) {
-        const obj = new CanvasObject({ id, shape: SHAPES.Triangle, x, y, size, minScreenSize, fillColor, rotation, onClick });
+    addTriangle(id = "", x = 0, y = 0, size = 0, minScreenSize = 0, fillColor = COLORS.LightGray, rotation = 0, onClick = null, gradient = false) {
+        const obj = new CanvasObject({ id, shape: SHAPES.Triangle, x, y, size, minScreenSize, fillColor, rotation, onClick, gradient });
         return this.addObject(obj)
     }
 
@@ -251,8 +272,8 @@ class CanvasWrapper {
         return pixel
     }
 
-    addText(id = "", x = 0, y = 0, screenOffsetX = 0, screenOffsetY = 0, textContent = "", fillColor = COLORS.LightGray, size = 0, onClick = null, onHover = null, onHoverEnd = null) {
-        const obj = new CanvasObject({ id, shape: SHAPES.Text, size, x, y, screenOffsetX, screenOffsetY, textContent, fillColor, onClick, onHover, onHoverEnd });
+    addText(id = "", x = 0, y = 0, screenOffsetX = 0, screenOffsetY = 0, textContent = "", fillColor = COLORS.LightGray, size = 0, lineWidth = 2, onClick = null, onHover = null, onHoverEnd = null) {
+        const obj = new CanvasObject({ id, shape: SHAPES.Text, size, lineWidth, x, y, screenOffsetX, screenOffsetY, textContent, fillColor, onClick, onHover, onHoverEnd });
         return this.addObject(obj)
     }
 
@@ -291,14 +312,21 @@ class CanvasWrapper {
     }
 
     worldToScreen(x = 0, y = 0) {
-        return {
-            sx: ((x - this.cameraX) * this.zoom + (this.canvas.width / 2)) / this.pixelRatio,
-            sy: ((y - this.cameraY) * this.zoom + (this.canvas.height / 2)) / this.pixelRatio
-        };
+        return [
+            ((x - this.cameraX) * this.zoom + (this.canvas.width / 2)) / this.pixelRatio,
+            ((y - this.cameraY) * this.zoom + (this.canvas.height / 2)) / this.pixelRatio
+        ];
+    }
+
+    screenToWorld(sx = 0, sy = 0) {
+        return [
+            ((sx * this.pixelRatio) - (this.canvas.width / 2)) / this.zoom + this.cameraX,
+            ((sy * this.pixelRatio) - (this.canvas.height / 2)) / this.zoom + this.cameraY
+        ];
     }
 
     isMouseOverObject(obj, mouseX = 0, mouseY = 0) {
-        let { sx: ox, sy: oy } = this.worldToScreen(obj.x, obj.y);
+        let [ox, oy] = this.worldToScreen(obj.x, obj.y);
         ox += obj.screenOffsetX;
         oy += obj.screenOffsetY;
         if (obj.shape == SHAPES.Text) {
@@ -320,6 +348,10 @@ class CanvasWrapper {
         const rect = this.canvas.getBoundingClientRect();
         const mouseX = event.clientX - rect.left;
         const mouseY = event.clientY - rect.top;
+
+        if (this.onMouseMoveWorldXY) {
+            this.onMouseMoveWorldXY(this.screenToWorld(mouseX, mouseY));
+        }
 
         const currentlyHovered = [];
         let shouldRedraw = false;
@@ -361,6 +393,11 @@ class CanvasWrapper {
         const mouseX = event.clientX - rect.left;
         const mouseY = event.clientY - rect.top;
 
+        if (this.onClickWorldXY) {
+            this.onClickWorldXY(this.screenToWorld(mouseX, mouseY));
+            return
+        }
+
         // Check objects in reverse draw order (top-most first)
         for (let i = this.drawOrder.length - 1; i >= 0; i--) {
             const obj = this.drawOrder[i];
@@ -376,7 +413,7 @@ class CanvasWrapper {
     recalculateDrawOrder() {
         // Sort so dots at bottom, text at top
         const sorted = [...this.drawOrder].sort((a, b) => {
-            const order = { dot: 0, filledCircle: 1, emptyCircle: 1, triangle: 2, text: 3 };
+            const order = { Line: 0, EmptyCircle: 1, FilledCircle: 2, FilledOval: 3, Triangle: 4, Text: 5 };
             return order[a.shape] - order[b.shape];
         });
         this.drawOrder = sorted
@@ -408,7 +445,7 @@ class CanvasWrapper {
         }
 
         for (const pixel of pixels) {
-            let { sx, sy } = this.worldToScreen(pixel.x, pixel.y);
+            let [sx, sy] = this.worldToScreen(pixel.x, pixel.y);
             sx = Math.round(sx*pixelRatio)
             sy = Math.round(sy*pixelRatio) 
             if (sx < 0 || sx >= width || sy < 0 || sy >= height) continue;
@@ -429,7 +466,7 @@ class CanvasWrapper {
         const drawOrder = this.drawOrder
         for (const obj of drawOrder) {
             if (!obj.visible) continue
-            let { sx, sy } = this.worldToScreen(obj.x, obj.y);
+            let [sx, sy] = this.worldToScreen(obj.x, obj.y);
             sx += obj.screenOffsetX;
             sy += obj.screenOffsetY;
             const size = Math.max(obj.minScreenSize, obj.size * zoom / pixelRatio)
@@ -441,7 +478,7 @@ class CanvasWrapper {
             let x2Offset = 0;
             let y2Offset = 0;
             if (obj.x2 !== undefined && obj.y2 !== undefined) {
-                const { sx: sx2, sy: sy2 } = this.worldToScreen(obj.x2, obj.y2)
+                const [sx2, sy2] = this.worldToScreen(obj.x2, obj.y2);
                 x2Offset = sx2 - sx
                 y2Offset = sy2 - sy
             }
