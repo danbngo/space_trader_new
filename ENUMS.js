@@ -56,16 +56,17 @@ const COLORS = Object.freeze({
     LightGray: [192,192,192,1],
     LightGreen: [144,238,144,1],
     LightBlue: [173,216,230,1],
+    LightRed: [255,102,102,1], // #dd4400 ?
 })
 
 const UI_MODE = Object.freeze({
     Default: 'Default',
-    TargetingAttack: 'TargetingAttack',
-    TargetingMove: 'TargetingMove',
+    Animating: 'Animating',
+    Targeting: 'Targeting',
 })
 
-const ACTION_TYPES = Object.freeze({
-    MoveTo: 'MoveTo',
+const MOVE_TYPES = Object.freeze({
+    Move: 'Move',
     Attack: 'Attack',
 })
-const ACTION_TYPES_ALL = Object.values(ACTION_TYPES)
+const MOVE_TYPES_ALL = Object.values(MOVE_TYPES)

@@ -10,6 +10,7 @@ class CanvasObject {
         fillColor = COLORS.White,
         strokeColor = null,
         textContent = null,
+        fontModifier = null,
         onClick = null,
         onHover = null,
         onHoverEnd = null,
@@ -41,6 +42,7 @@ class CanvasObject {
         this.onClick = onClick;
         this.onHover = onHover;
         this.onHoverEnd = onHoverEnd;
+        this.fontModifier = fontModifier;
 
         this.x2 = x2;
         this.y2 = y2;
@@ -60,7 +62,7 @@ class CanvasObject {
         const effectiveStrokeColor = overrideStrokeColor !== undefined ? overrideStrokeColor : this.strokeColor
         ctx.strokeStyle = effectiveStrokeColor ? colorArrToRgbaString(effectiveStrokeColor) : null;
         ctx.lineWidth = this.lineWidth;
-        if (this.rotation) ctx.rotate(this.rotation + Math.PI/2);
+        let minorSize = this.size ? size*(this.minorSize / this.size) : size;
 
         switch (this.shape) {
             case SHAPES.FilledCircle:
@@ -71,11 +73,13 @@ class CanvasObject {
                 break;
 
             case SHAPES.FilledOval:
-                const minorSize = size * (this.minorSize / this.size);
+                //minorSize is the y radius, size is the x radius
                 ctx.beginPath();
-                ctx.ellipse(0, 0, size, minorSize, 0, 0, Math.PI * 2);
+                console.log('drawing ellipse w rotation:',this.rotation)
+                ctx.ellipse(0, 0, size, minorSize, this.rotation, 0, Math.PI * 2);
                 ctx.fill();
                 if (this.strokeColor) ctx.stroke()
+                //if (this.rotation) ctx.rotate(this.rotation);
                 break;
 
             case SHAPES.EmptyCircle:
@@ -85,18 +89,20 @@ class CanvasObject {
                 break;
 
             case SHAPES.Triangle:
-                if (this.gradient) {
+                if (this.rotation) ctx.rotate(this.rotation);
+                /*if (this.gradient) {
                     const gradient = ctx.createLinearGradient(0, 0, 0, size)
                     gradient.addColorStop(1, '#000000');
                     gradient.addColorStop(0, ctx.fillStyle); 
                     ctx.fillStyle = gradient;
-                }
-                const r = size;
-                const h = (Math.sqrt(3) / 2) * r;
+                }*/
                 ctx.beginPath();
-                ctx.moveTo(0, -h / 2);
-                ctx.lineTo(-r / 2, h / 2);
-                ctx.lineTo(r / 2, h / 2);
+                // tip (pointing right)
+                ctx.moveTo(minorSize / 2, 0);
+                // base top
+                ctx.lineTo(-minorSize / 2, -size / 2);
+                // base bottom
+                ctx.lineTo(-minorSize / 2, size / 2);
                 ctx.closePath();
                 ctx.fill();
                 if (this.strokeColor) ctx.stroke()
@@ -104,6 +110,10 @@ class CanvasObject {
 
             case SHAPES.Text:
                 ctx.font = `${this.size}px "Google Sans Code"`;
+                if (this.fontModifier) {
+                    ctx.font = `${this.fontModifier} ${this.size}px "Google Sans Code"`;
+                }
+
                 ctx.strokeStyle = ctx.strokeStyle || "black";
                 ctx.strokeText(this.textContent, 0, 0);
                 ctx.fillText(this.textContent, 0, 0);
@@ -251,8 +261,8 @@ class CanvasWrapper {
         return this.addObject(obj)
     }
 
-    addFilledOval(id = "", x = 0, y = 0, majorAxis = 0, minorAxis = 0, minScreenSize = 0, fillColor = COLORS.LightGray, rotation = 0, onClick = null) {
-        const obj = new CanvasObject({ id, shape: SHAPES.FilledOval, x, y, size: majorAxis, minorSize: minorAxis, minScreenSize, rotation, fillColor, onClick });
+    addFilledOval(id = "", x = 0, y = 0, radiusX = 0, radiusY = 0, minScreenSize = 0, fillColor = COLORS.LightGray, rotation = 0, onClick = null) {
+        const obj = new CanvasObject({ id, shape: SHAPES.FilledOval, x, y, size: radiusX, minorSize: radiusY, minScreenSize, rotation, fillColor, onClick });
         return this.addObject(obj)
     }
 
@@ -261,8 +271,9 @@ class CanvasWrapper {
         return this.addObject(obj)
     }
 
-    addTriangle(id = "", x = 0, y = 0, size = 0, minScreenSize = 0, fillColor = COLORS.LightGray, rotation = 0, onClick = null, gradient = false) {
-        const obj = new CanvasObject({ id, shape: SHAPES.Triangle, x, y, size, minScreenSize, fillColor, rotation, onClick, gradient });
+    addTriangle(id = "", x = 0, y = 0, size = 0, minorSize = 0, minScreenSize = 0, fillColor = COLORS.LightGray, rotation = 0, onClick = null, gradient = false) {
+        console.log('adding cvs triangle with size, minorSize:',size,minorSize)
+        const obj = new CanvasObject({ id, shape: SHAPES.Triangle, x, y, size, minorSize, minScreenSize, fillColor, rotation, onClick, gradient });
         return this.addObject(obj)
     }
 
@@ -302,6 +313,7 @@ class CanvasWrapper {
     }
 
     getObject(id = "") {
+        if (id instanceof CanvasObject) return id
         return this.objectMap.get(id) || null;
     }
 
@@ -350,7 +362,7 @@ class CanvasWrapper {
         const mouseY = event.clientY - rect.top;
 
         if (this.onMouseMoveWorldXY) {
-            this.onMouseMoveWorldXY(this.screenToWorld(mouseX, mouseY));
+            this.onMouseMoveWorldXY(...this.screenToWorld(mouseX, mouseY));
         }
 
         const currentlyHovered = [];
@@ -394,7 +406,7 @@ class CanvasWrapper {
         const mouseY = event.clientY - rect.top;
 
         if (this.onClickWorldXY) {
-            this.onClickWorldXY(this.screenToWorld(mouseX, mouseY));
+            this.onClickWorldXY(...this.screenToWorld(mouseX, mouseY));
             return
         }
 

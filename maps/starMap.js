@@ -39,7 +39,7 @@ class StarMap {
         this.refreshControls();
         this.refreshInfoBar();
         this.refreshObjectPane();
-        this.refreshAnimations(gs.year)
+        this.refreshBackground(gs.year)
         this.refreshCanvas(true);
     }
 
@@ -141,9 +141,9 @@ class StarMap {
 
         fleets.forEach((fleet, index)=>{
             const fleetAngle = fleet.route ? fleet.route.path.angle : -Math.PI/2
-            const fleetObj = cvs.addTriangle(`fleet${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU, 12, fleet.color, fleetAngle, ()=>this.selectObject(fleet), true)
+            const fleetObj = cvs.addTriangle(`fleet${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU, fleet.radius/EARTH_RADII_PER_AU, 12, fleet.color, fleetAngle, ()=>this.selectObject(fleet), true)
             cvs.addLine(`fleetpath${index}`, 0, 0, 0, 0, fleet.color, 1)
-            cvs.addTriangle(`fleetthruster${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU*0.5, 6, COLORS.Orange)
+            cvs.addTriangle(`fleetengine${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU*0.5, fleet.radius/EARTH_RADII_PER_AU*0.5, 6, COLORS.Orange)
             const labelObj = cvs.addText(`fleetlabel${index}`, fleet.x, fleet.y, 0, -32, fleet.name, fleet.color, DEFAULT_FONT_SIZE, 2, ()=>this.selectObject(fleet),)
             const objs = [fleetObj, labelObj]
             for (const obj of objs) {
@@ -221,7 +221,7 @@ class StarMap {
                 cvsObject.y2 = endY
             }
 
-            cvsObject = cvs.getObject(`fleetthruster${index}`)
+            cvsObject = cvs.getObject(`fleetengine${index}`)
             if (fleet.location || !fleet.route) {
                 cvsObject.visible = false
             }
@@ -239,7 +239,7 @@ class StarMap {
         cvs.redraw(forceRedraw)
     }
 
-    refreshAnimations(year = 0) {
+    refreshBackground(year = 0) {
         const {starSystem, cvs} = this
         const {backgroundStars} = starSystem
         backgroundStars.forEach( (bgStar, index) => {
@@ -250,30 +250,30 @@ class StarMap {
 
     refreshObjectPane() {
         this.objectPane.innerHTML = '';
-        if (!this.selectedObject) {
+        const obj = this.selectedObject
+        if (!obj) {
             this.objectPane.textContent = '(Select an object on the map.)';
             return;
         }
-        const isDockedHere = this.selectedObject == gs.location
-        const cantTravelHere = (this.selectedObject == gs.location) || gs.fleet.isStranded()
+        const isDockedHere = obj == gs.location
+        const cantTravelHere = (obj == gs.location) || gs.fleet.isStranded()
         const container = ce({parent:this.objectPane, classNames:['starmap-object-panel']})
-        ce({parent:container, tag:'h3', innerHTML: coloredName(this.selectedObject),
+        ce({parent:container, tag:'h3', innerHTML: coloredName(obj), onClick: ()=>this.selectObject(obj),
             style: {filter: `drop-shadow(1px 0 0 ${colorArrToRgbaString(COLORS.Green)}) drop-shadow(0 1px 0 ${colorArrToRgbaString(COLORS.Green)})  drop-shadow(0 -0.5px 0 ${colorArrToRgbaString(COLORS.Green)})  drop-shadow(-0.5px 0 0 ${colorArrToRgbaString(COLORS.Green)})`}
         })
-        if (this.selectedObject == gs.fleet) {
+        const cvsId = obj instanceof Planet ? `planet${this.starSystem.planets.indexOf(obj)}`
+            : obj instanceof Star ? `star${this.starSystem.stars.indexOf(obj)}` 
+            : obj instanceof Fleet ? `fleet${this.starSystem.fleets.indexOf(obj)}`
+            : ''
+        ce({parent:container, style: {margin: 'auto'}, onClick: ()=>this.selectObject(obj), children:[
+            this.cvs.getObject(cvsId)?.asImage(25, COLORS.LightGreen) || null
+        ]})
+        if (obj == gs.fleet) {
             if (gs.location) ce({parent:container, tag:'button', innerHTML:`Dock (${coloredName(gs.location)})`, onClick:()=>this.explore(gs.location)})
         }
-
-        // Planet-specific actions
-        if (this.selectedObject instanceof Planet || this.selectedObject instanceof Star) {
-            const index = this.starSystem.planets.indexOf(this.selectedObject)
-            ce({parent:container, style: {margin: 'auto'}, children:[
-                this.cvs.getObject(`planet${index}`)?.asImage(25, COLORS.LightGreen) || null
-            ]})
-            if (this.selectedObject instanceof Planet) {
-                ce({parent:container, tag:'button', innerHTML:isDockedHere ? 'Dock' : 'Scan', onClick:()=>this.explore(this.selectedObject)})
-                ce({parent:container, tag:'button', innerHTML:'Travel', onClick:()=>this.setDestination(this.selectedObject, true), disabled: cantTravelHere})
-            }
+    if (obj instanceof Planet) {
+            ce({parent:container, tag:'button', innerHTML:isDockedHere ? 'Dock' : 'Scan', onClick:()=>this.explore(obj)})
+            ce({parent:container, tag:'button', innerHTML:'Travel', onClick:()=>this.setDestination(obj, true), disabled: cantTravelHere})
         }
     }
 
@@ -321,7 +321,7 @@ class StarMap {
         gs.year += elapsedYears
         gs.system.refreshPositions()
 
-        this.refreshAnimations(gs.year)
+        this.refreshBackground(gs.year)
         this.refreshInfoBar()
         this.refreshCanvas()
 

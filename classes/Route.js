@@ -14,13 +14,10 @@ class Route {
     }
 
     positionAtYear(year = 0) {
-        if (year < this.startYear) return [this.path.startX, this.path.startY]
-        if (year > this.endYear) return [this.path.endX, this.path.endY]
         const duration = this.endYear - this.startYear
         const elapsedTime = year - this.startYear
         const progressRatio = elapsedTime/duration
-        const normalProgress = normalCurve(progressRatio)
-        return [this.path.startX + this.path.dx*normalProgress, this.path.startY + this.path.dy*normalProgress]
+        return this.path.positionAtProgress(progressRatio)
     }
 
     static estimateTravelTimeToOrbitingBody(

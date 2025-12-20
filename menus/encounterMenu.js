@@ -29,7 +29,7 @@ function startEncounter() {
         const randomTarget = rndMember(playerShips)
         const angle = new Path(ship.x, ship.y, randomTarget.x, randomTarget.y).angle
         console.log('angle:',angle)
-        Object.assign(ship, {color: hexToRgba('#dd4400'), angle})
+        Object.assign(ship, {color: COLORS.LightRed, angle})
     }
 
     showModal(encounter.fleetName, encounter.encounterType.description, [['Ok', ()=>{
@@ -54,7 +54,6 @@ function startCombat(playerHasInitiative = false) {
     gs.encounter.combatEnabled = true;
     gs.encounter.activeTurnFleet = playerHasInitiative ? gs.fleet : gs.encounter.enemyFleet
     closeModal()
-    currentMap.togglePause(false)
 }
 
 function endCombat() {

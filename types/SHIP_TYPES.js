@@ -1,11 +1,11 @@
 
 class ShipType {
-    constructor(name = '', hull = 1, shields = 1, lasers = 1, thrusters = 1, cargoSpace = 1, radars = 1) {
+    constructor(name = '', hull = 1, shields = 1, lasers = 1, engine = 1, cargoSpace = 1, radars = 1) {
         this.name = name
         this.hull = hull
         this.shields = shields
         this.lasers = lasers
-        this.thrusters = thrusters
+        this.engine = engine
         this.cargoSpace = cargoSpace
         this.radars = radars
     }

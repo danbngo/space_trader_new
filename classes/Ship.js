@@ -1,7 +1,7 @@
 
 // Ship class
 class Ship {
-    constructor(name = "Unnamed", shipType = SHIP_TYPES[0], color = COLORS.White, hull = [0, 0], shields = [0, 0], lasers = 0, thrusters = 0, cargoSpace = 0, radars = 0) {
+    constructor(name = "Unnamed", shipType = SHIP_TYPES[0], color = COLORS.White, hull = [0, 0], shields = [0, 0], lasers = 0, engine = 0, cargoSpace = 0, radars = 0) {
         this.name = name;
         this.shipType = shipType;
         this.color = color;
@@ -9,7 +9,7 @@ class Ship {
         this.shields = shields;
         this.lasers = lasers;
         this.radars = radars;
-        this.thrusters = thrusters;
+        this.engine = engine;
         this.cargoSpace = cargoSpace;
         this.fleet = null;
 
@@ -18,7 +18,7 @@ class Ship {
         this.y = 0;
         this.angle = Math.PI*2; //direction ship is facing in. it can only accelerate/decelerate and shoot in that direction
         this.escaped = false;
-        this.numActionsRemaining = SHIP_NUM_ACTIONS_PER_TURN; //for encounter turn processing
+        this.numMovesRemaining = SHIP_NUM_MOVES_PER_TURN; //for encounter turn processing
     }
 
     get isFlagship() {
@@ -36,7 +36,7 @@ class Ship {
         + this.shields[1]/AVERAGE_SHIP_SHIELDS 
         + this.lasers/AVERAGE_SHIP_LASERS
         + this.cargoSpace/AVERAGE_SHIP_CARGO_SPACE
-        + this.thrusters/AVERAGE_SHIP_THRUSTERS
+        + this.engine/AVERAGE_SHIP_ENGINE
         + this.radars/AVERAGE_SHIP_RADARS
     }
 
@@ -56,7 +56,7 @@ class Ship {
     }
 
     get maxMoveDistance() {
-        return this.thrusters * 2;
+        return this.engine * 2;
     }
 
     get maxSensorDistance() {
@@ -85,7 +85,7 @@ class Ship {
         this.shieldRechargeProgress = 0;
         this.laserRechargeProgress = 0;
         this.escaped = false;
-        this.numActionsRemaining = SHIP_NUM_ACTIONS_PER_TURN
+        this.numMovesRemaining = SHIP_NUM_MOVES_PER_TURN
     }
 
     setDisabled() {
@@ -104,11 +104,40 @@ class Ship {
         if (this.isDisabled()) return
         this.beingHit = true
         if (this.shields[0] > 0) {
-            this.shields[0] = Math.max(0, this.shields[0] - dmg)
-            return
+            const shieldDmg = Math.min(dmg, this.shields[0])
+            this.shields[0] -= shieldDmg
+            dmg -= shieldDmg
+            if (dmg <= 0) return
         }
         this.hull[0] = Math.max(0, this.hull[0] - dmg)
         if (this.hull[0] <= 0) this.setDisabled()
+    }
+
+    rechargeShields() {
+        const rechargeAmt = rng(1, this.engine)
+        this.restoreShields(rechargeAmt)
+    }
+
+    calcAttackAreas(overrideX = this.x, overrideY = this.y) {
+        const attackRange = this.maxSensorDistance
+        const targetingAngle = this.angle+Math.PI/2
+        const targetingAngle2 = this.angle-Math.PI/2
+        const [tx,ty] = rotatePoint(overrideX + attackRange/2, overrideY, overrideX, overrideY, targetingAngle)
+        const [tx2,ty2] = rotatePoint(overrideX + attackRange/2, overrideY, overrideX, overrideY, targetingAngle2)
+        //turn the triangles an additional radian so they are pointing outwards
+        const targetingTriangle1 = new Triangle(tx, ty, attackRange, Triangle.calcEquilateralTriangleHeight(attackRange), targetingAngle+Math.PI)
+        const targetingTriangle2 = new Triangle(tx2, ty2, attackRange, Triangle.calcEquilateralTriangleHeight(attackRange), targetingAngle2-Math.PI)
+        return [targetingTriangle1, targetingTriangle2]
+    }
+
+    calcMoveArea(overrideX = this.x, overrideY = this.y) {
+        const targetingAngle = this.angle
+        const moveRange = this.maxMoveDistance
+        //use 0.55, want ship to be forced to move slightly
+        const [tx,ty] = rotatePoint(overrideX + moveRange*0.55, overrideY, overrideX, overrideY, targetingAngle)
+        //if ship was at 0 rotation, it would be facing right. we would want the ellipse to be wider horizontally than vertically
+        const ellipse = new Ellipse(tx, ty, moveRange/2, moveRange/4, targetingAngle)
+        return ellipse
     }
 
 }

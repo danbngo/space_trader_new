@@ -158,25 +158,8 @@ function hexToRgba(hex = '#ffffff') {
     return [r, g, b, 1];
 }
 
-function createEquilateralTrianglePoints(centerX = 0, centerY = 0, sideLength = 10, rotationRadians = 0, rotationMode = 'aroundTopVertex') {
-    const height = (Math.sqrt(3) / 2) * sideLength;
-    const points = [
-        { x: centerX, y: centerY - (2 / 3) * height }, // Top vertex
-        { x: centerX - (sideLength / 2), y: centerY + (1 / 3) * height }, // Bottom left vertex
-        { x: centerX + (sideLength / 2), y: centerY + (1 / 3) * height }  // Bottom right vertex
-    ];
-    if (rotationRadians !== 0) {
-        for (let point of points) {
-            const [rx, ry] = rotationMode === 'aroundTopVertex' ? [points[0].x, points[0].y] : [centerX, centerY];
-            [point.x, point.y] = rotatePoint(point.x, point.y, rx, ry, rotationRadians);
-        }
-    }
-    const result = points.map(p => [p.x, p.y])
-    console.log('created triangle points:',{result, points, centerX, centerY, sideLength, rotationRadians, rotationMode})
-    return result
-}
 
-function isPointInsideOfTriangle(px = 0, py = 0, trianglePoints = [[0,0],[1,0],[0,1]]) {
+function isPointInTriangle(px = 0, py = 0, trianglePoints = [[0,0],[1,0],[0,1]]) {
     console.log('checking if point within triangle:',{px,py,trianglePoints});
 
     // Apply barycentric coordinates method
@@ -208,23 +191,6 @@ function isPointInsideOfTriangle(px = 0, py = 0, trianglePoints = [[0,0],[1,0],[
     return isInside;
 }
 
-function isPointInsideOfEllipse(px = 0, py = 0, cx = 0, cy = 0, majorAxis = 10, minorAxis = 5, theta = 0) {
-    // Translate point to ellipse's coordinate system
-    const dx = px - cx;
-    const dy = py - cy;
-    
-    // Rotate point by -theta to align with ellipse's axes
-    const cosT = Math.cos(-theta);
-    const sinT = Math.sin(-theta);
-    const rotX = dx * cosT - dy * sinT;
-    const rotY = dx * sinT + dy * cosT;
-    
-    // Apply ellipse equation: (x²/a²) + (y²/b²) <= 1
-    const normalized = (rotX * rotX) / (majorAxis * majorAxis) + 
-                      (rotY * rotY) / (minorAxis * minorAxis);
-    
-    return normalized <= 1;
-}
 
 function calcLineThroughPoints(cx = 0, cy = 0, dx = 1, dy = 0, length = 10) {
     const halfLength = length / 2;

@@ -1,7 +1,7 @@
 function createShipsListMenu(ships = [new Ship()], onSelectShip = (s = new Ship())=>{}) {
     if (ships.length == 0) return `(None)`
     const rows = [
-        ['Ship Name', 'Hull', 'Shields', 'Lasers', 'Thrusters', 'Cargo Space']
+        ['Ship Name', 'Hull', 'Shields', 'Lasers', 'Engine', 'Cargo Space']
     ]
     for (const ship of ships) {
         rows.push([
@@ -9,7 +9,7 @@ function createShipsListMenu(ships = [new Ship()], onSelectShip = (s = new Ship(
             statColorSpan(`${ship.hull[0]}/${ship.hull[1]}`, ship.hull[0]/ship.hull[1]),
             statColorSpan(`${ship.shields[0]}/${ship.shields[1]}`, ship.shields[0]/ship.shields[1]),
             ship.lasers,
-            ship.thrusters,
+            ship.engine,
             ship.cargoSpace,
         ])
     }

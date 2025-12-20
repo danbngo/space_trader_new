@@ -1,14 +1,14 @@
 class EncounterMap {
-    constructor(encounter = new Encounter(), autoSelectObject = gs.fleet) {
+    constructor(encounter = new Encounter(), autoSelectObject = encounter.playerShips[0]) {
         this.starSystem = gs.system
         this.encounter = encounter
-        this.selectedObject = autoSelectObject || gs.fleet;
+        this.selectedObject = autoSelectObject || encounter.playerShips[0];
 
-        this.paused = true
         this.lastTickMs = Date.now()
         this.maxMsPerTick = 100
+        this.paused = false
 
-        const baseZoom = ENCOUNTER_MAP_RADIUS_MILES / 10
+        const baseZoom = ENCOUNTER_MAP_RADIUS_MILES/2
         this.cvs = new CanvasWrapper(baseZoom, baseZoom/10, baseZoom*10, encounter.mapDimensions)
         this.root = ce({classNames: ['starmap-root'], children: [this.cvs.root]})
         this.controls = ce({parent: this.root, style: {position: 'absolute', top: 0, left: 0}})
@@ -16,26 +16,40 @@ class EncounterMap {
         this.objectPane = ce({parent: this.root, style: {position: 'absolute', top: 0, right: 0, height: '100%', pointerEvents: 'none'}})
 
         this.uiMode = UI_MODE.Default;
+        this.targetingLabel = '';
         this.targetingAreas = [];
         this.validTargets = [];
+        this.animations = [];
+        this.onSelectObject = null;
+        this.onHoverObject = null;
 
         this.rebuildCanvas();
-        this.refresh()
-
+        this.refresh(true)
         window.addEventListener("resize", ()=>this.cvs.autoResize());
         
         requestAnimationFrame(()=> requestAnimationFrame(()=>{
             this.cvs.autoResize();
-            this.refresh();
+            this.selectObject(autoSelectObject || encounter.playerShips[0])
+            this.refresh(true);
         }));
-
     }
 
     refresh() {
+        this.checkTurnOver();
         this.refreshControls();
         this.refreshInfoBar();
         this.refreshObjectPane();
         this.refreshCanvas(true);
+    }
+
+    togglePause(newPausedState = !this.paused) {
+        console.log('setting paused to:',newPausedState)
+        this.paused = newPausedState
+        if (!this.paused) {
+            this.lastTickMs = Date.now()
+            this.tick()
+        }
+        this.refresh() //always do first refresh, as fleets launch during pause/unpause
     }
 
     refreshControls() {
@@ -44,24 +58,28 @@ class EncounterMap {
             parent:this.controls,
             classNames: ['starmap-buttons'],
             children: [
-                ce({tag:'button', innerHTML:this.paused ? '▶' : '⏸', onClick: () => this.togglePause(), disabled: !gs.encounter.combatEnabled}),
+                ce({tag:'button', innerHTML:this.paused ? '▶' : '⏸', onClick: () => this.togglePause()}),
                 ce({tag:'button', innerHTML:'+', onClick: () => this.cvs.adjustZoom(1.33)}),
                 ce({tag:'button', innerHTML:'-', onClick: () => this.cvs.adjustZoom(0.66)}),
                 //ship info button?
-                ce({tag:'button', innerHTML: '🗨', onClick: ()=> this.onHail()})
+                ce({tag:'button', innerHTML: '🗨', onClick: ()=> this.onHail(), disabled: (this.uiMode == UI_MODE.Animating)})
             ]
         })
     }
 
     refreshInfoBar() {
-        const {encounter} = gs
-
+        const {encounter} = this
         this.infoBar.innerHTML = ""
+        let msg = encounter.encounterType.name
+        if (encounter.combatEnabled) {
+            msg += ` - Turn: ${encounter.activeTurnFleet === encounter.playerFleet ?
+                colorSpan('Player', colorArrToRgbaString(COLORS.LightGray)) : colorSpan('Enemy', colorArrToRgbaString(COLORS.LightRed))}`
+        }
         ce({
             parent:this.infoBar,
             classNames: ['starmap-info-bar'],
             children: [
-                encounter.encounterType.name
+                msg
             ]
         })
     }
@@ -80,11 +98,12 @@ class EncounterMap {
         });
 
         ships.forEach((ship,index) => {
-            const shipObj = cvs.addTriangle(`ship${index}`, ship.x, ship.y, ship.radius, 12, ship.color, ship.angle, ()=>this.selectObject(ship), true)
+            const shipObj = cvs.addTriangle(`ship${index}`, ship.x, ship.y, ship.radius, ship.radius, 12, ship.color, ship.angle, ()=>this.selectObject(ship), true)
+            shipObj.onHover = ()=>this.hoverObject(ship)
             if (ship == this.selectedObject) shipObj.strokeColor = COLORS.Green
             cvs.addEmptyCircle(`shipshield${index}`, ship.x, ship.y, ship.radius*1.1, 10, COLORS.Blue, 1)
             const labelObj = cvs.addText(`shiplabel${index}`, ship.x, ship.y, 0, -32, ship.shipType.name, ship.color, DEFAULT_FONT_SIZE, 2, ()=>this.selectObject(ship))
-            cvs.addTriangle(`shipthruster${index}`, ship.x, ship.y, ship.radius*0.5, 6, COLORS.Orange)
+            labelObj.onHover = ()=>this.hoverObject(ship)
             const objs = [shipObj, labelObj]
             for (const obj of objs) {
                 obj.onHover = ()=>{
@@ -112,13 +131,11 @@ class EncounterMap {
             const cvsShipObject = cvs.getObject(`ship${index}`)
             const cvsShieldObject = cvs.getObject(`shipshield${index}`)
             const cvsLabelObject = cvs.getObject(`shiplabel${index}`)
-            const cvsThrusterObject = cvs.getObject(`shipthruster${index}`)
 
             if (invisible) {
                 cvsShipObject.visible = false
                 cvsShieldObject.visible = false
                 cvsLabelObject.visible = false
-                cvsThrusterObject.visible = false
                 return
             }
 
@@ -140,29 +157,22 @@ class EncounterMap {
             cvsLabelObject.x = ship.x
             cvsLabelObject.y = ship.y
 
-            let label = ship.shipType.name
-            if (ship.isDisabled()) label += '☠'
-            else if (ship.fleet != activeTurnFleet) label += ''
-            else if (ship.numActionsRemaining == 0) label += '⧖'
-            else if (ship.numActionsRemaining == 1) label += '¹'
-            else if (ship.numActionsRemaining >= 2) label += '²'
-            cvsLabelObject.textContent = label
-
-            //animate thrusters
-            if (!ship.accelerating) cvsThrusterObject.visible = false
+            const label = ship.shipType.name
+            let fontModifier = null
+            if (ship.isDisabled()) fontModifier = 'italic'
+            else if (ship.fleet != activeTurnFleet) fontModifier = 'italic'
             else {
-                const [oX, oY] = rotatePoint(ship.radius*1.25, 0, 0, 0, ship.angle-Math.PI)
-                cvsThrusterObject.visible = true
-                cvsThrusterObject.x = ship.x + oX
-                cvsThrusterObject.y = ship.y + oY
-                cvsThrusterObject.rotation = ship.angle - Math.PI
+                if (ship.numMovesRemaining == 0) fontModifier = null
+                else fontModifier = 'bold'
             }
+            cvsLabelObject.textContent = label
+            cvsLabelObject.fontModifier = fontModifier
         })
 
         cvs.redraw(forceRedraw)
     }
 
-    refreshAnimations(year = 0) {
+    refreshBackground(year = 0) {
         const {starSystem, cvs} = this
         const {backgroundStars} = starSystem
         backgroundStars.forEach( (bgStar, index) => {
@@ -174,25 +184,16 @@ class EncounterMap {
     refreshObjectPane() {
         //const playerShips = gs.fleet.ships
         const {selectedObject, encounter} = this
-        const {playerFleet, combatEnabled} = encounter
+        const {playerFleet, combatEnabled, activeTurnFleet, ships} = encounter
 
         const obj = selectedObject
         this.objectPane.innerHTML = '';
 
         const container = ce({parent:this.objectPane, classNames:['starmap-object-panel']})
 
-        if (this.uiMode == UI_MODE.TargetingAttack) {
-            ce({parent:container, innerHTML: `${obj.shipType.name}: Attack`})
+        if (this.uiMode == UI_MODE.Targeting) {
+            ce({parent:container, innerHTML: `${obj.shipType.name}: Targeting ${this.targetingLabel}`})
             ce({parent:container, innerHTML: '(Select target)'})
-            ce({parent:container, tag:'button', innerHTML:'Cancel', onClick: ()=>{
-                this.stopTargeting()
-            }})
-            return;
-        }
-
-        if (this.uiMode == UI_MODE.TargetingMove) {
-            ce({parent:container, innerHTML: `${obj.shipType.name}: Move`})
-            ce({parent:container, innerHTML: '(Select destination)'})
             ce({parent:container, tag:'button', innerHTML:'Cancel', onClick: ()=>{
                 this.stopTargeting()
             }})
@@ -208,17 +209,18 @@ class EncounterMap {
             onClick: ()=>this.selectObject(obj)
         })
         if (obj instanceof Ship) {
-            const index = this.encounter.ships.indexOf(obj)
+            const index = ships.indexOf(obj)
             const {hull, shields} = obj
-            const showActions = combatEnabled && obj.fleet == playerFleet && !obj.escaped && !obj.isDisabled()
-            const canAct = obj.numActionsRemaining > 0
-            ce({parent:container, style: {margin: 'auto'}, children:[
+            const showMoves = combatEnabled && obj.fleet == playerFleet && !obj.escaped && !obj.isDisabled() && activeTurnFleet == playerFleet
+            const canAct = obj.numMovesRemaining > 0
+            ce({parent:container, style: {margin: 'auto'}, onClick: ()=>this.selectObject(obj), children:[
                 this.cvs.getObject(`ship${index}`)?.asImage(25, COLORS.LightGreen) || null
             ]})
             ce({parent:container, innerHTML: `Hull: ${statColorSpan(Math.round(100 * hull[0]/hull[1]), hull[0]/hull[1], true)}%`})
             ce({parent:container, innerHTML: `Shields: ${statColorSpan(Math.round(100 * obj.shields[0]/obj.shields[1]), shields[0]/shields[1], true)}%`})
+            ce({parent:container, innerHTML: `Moves: ${statColorSpan(obj.numMovesRemaining, obj.numMovesRemaining/2, true)}`})
             ce({parent:container, innerHTML: obj.isDisabled() ? `(Disabled)` : obj.escaped ? '(Escaped)' : ''})
-            if (showActions) {
+            if (showMoves) {
                 ce({parent:container, tag:'button', innerHTML:'Attack', disabled: !canAct, onClick: ()=>this.startTargetingAttack(obj)})
                 ce({parent:container, tag:'button', innerHTML:'Move', disabled: !canAct, onClick: ()=>this.startTargetingMove(obj)})
             }
@@ -227,10 +229,8 @@ class EncounterMap {
 
     selectObject(obj = new Ship()) {
         console.log('selected:',obj)
-        if (this.uiMode == UI_MODE.TargetingMove) return
-        if (this.uiMode == UI_MODE.TargetingAttack) {
-            //fill this in later
-        }
+        if (this.onSelectObject) this.onSelectObject(obj);
+        //if (this.uiMode !== UI_MODE.Default) return
         for (const obj of this.cvs.drawOrder) {
             if (obj.strokeColor == COLORS.Green) {
                 obj.strokeColor = this.calcStrokeColorForShip(obj)
@@ -241,13 +241,8 @@ class EncounterMap {
         this.refresh();
     }
 
-    togglePause(newPausedState) {
-        this.paused = (newPausedState !== undefined ? newPausedState : !this.paused)
-        if (!this.paused) {
-            this.lastTickMs = Date.now()
-            this.tick()
-        }
-        this.refresh() //always do first refresh, as fleets launch during pause/unpause
+    hoverObject(obj = new Ship()) {
+        if (this.onHoverObject) this.onHoverObject(obj);
     }
 
     calcStrokeColorForShip(ship = new Ship()) {
@@ -259,104 +254,195 @@ class EncounterMap {
     calcCanBeControlled(ship = new Ship()) {
         const {activeTurnFleet, playerFleet} = this.encounter
         if (ship.fleet != activeTurnFleet) return false
-        if (ship.numActionsRemaining <= 0) return false
+        if (ship.numMovesRemaining <= 0) return false
         if (ship.fleet != playerFleet) return false
         return true
     }
 
     startTargetingAttack(attacker = new Ship()) {
         if (!this.calcCanBeControlled(attacker)) return
+        const {cvs} = this
+
         this.uiMode = UI_MODE.TargetingAttack
         this.targetingAreas = []
-        const {encounter, cvs} = this
-        const {playerFleet, ships} = encounter
-        //show targeting areas
-        const targetingAngle = attacker.angle+Math.PI
-        const attackRange = attacker.maxSensorDistance
-        const [ax,ay] = rotatePoint(attacker.x + attackRange*0.66, attacker.y, attacker.x, attacker.y, attacker.angle) //use centroid
-        const [tx,ty] = rotatePoint(attacker.x + attackRange/2, attacker.y, attacker.x, attacker.y, attacker.angle)
-        const targetingTriangle = createEquilateralTrianglePoints(ax, ay, attackRange, targetingAngle+Math.PI/2, 'aroundCenter')
-        const targetingCvsObject = cvs.addTriangle('targetingarea', tx, ty, attackRange, 4, [0,255,0,0.1], targetingAngle)
-        const targetingCvsLine = cvs.addLine('targetingline', attacker.x, attacker.y, tx, ty, 2, COLORS.LightGreen)
-        console.log('added targeting area:',targetingTriangle,attackRange,targetingCvsObject)
-        for (const target of ships) {
-            if (target.fleet == playerFleet || target.isDisabled() || target.escaped) continue
-            if (!isPointWithinTriangle(target.x, target.y, targetingTriangle)) continue
-            this.validTargets.push(target)
-            //const targetIndex = ships.indexOf(target)
-            //const targetCvsObj = cvs.getObject(`ship${targetIndex}`)
-            //targetCvsObj.strokeColor = COLORS.Yellow
+        const [t1, t2] = attacker.calcAttackAreas()
+        const targetingCvsObject1 = cvs.addTriangle('targetingarea', t1.x, t1.y, t1.base, t1.height, 4, [0,255,0,0.1], t1.angle)
+        const targetingCvsObject2 = cvs.addTriangle('targetingarea2', t2.x, t2.y, t2.base, t2.height, 4, [0,255,0,0.1], t2.angle)
+        const targetingCvsCircle = cvs.addEmptyCircle('targetingcircle', 0, 0, 0, 12, COLORS.LightGreen, 2)
+        targetingCvsCircle.visible = false
+
+        this.validTargets = this.encounter.calcAttackAreas(attacker)
+        if (this.validTargets.length > 0) this.targetAttack(this.validTargets[0])
+        this.onHoverObject = (hoveredObj)=>this.targetAttack(hoveredObj)
+        this.onSelectObject = (selectedObj)=>this.attemptAttack(attacker, selectedObj)
+        this.startTargeting('Attack', [targetingCvsObject1, targetingCvsObject2, targetingCvsCircle], this.validTargets)
+    }
+
+    targetAttack(target = new Ship()) {
+        if (!this.validTargets.includes(target)) return
+        const targetingCvsCircle = this.cvs.getObject('targetingcircle')
+        Object.assign(targetingCvsCircle, {visible: true, x: target.x, y: target.y, radius: target.radius})
+        this.refreshCanvas()
+    }
+
+    attemptAttack(attacker = new Ship(), target = new Ship()) {
+        console.log('finishing attack on:',attacker,target)
+        if (!this.validTargets.includes(target)) {
+            return
         }
-        this.targetingAreas.push(targetingCvsObject)
-        this.refresh()
-        this.refreshCanvas(true)
+        this.exectuteAttack(attacker, target)
+    }
+
+    executeAttack(attacker = new Ship(), target = new Ship()) {
+        const {cvs, animations} = this
+        const move = new ShipMove(MOVE_TYPES.Attack, attacker, target)
+        const path = move.path
+        const animLine = cvs.addLine('laserline', 0, 0, 0, 0, COLORS.Red, 2)
+        const laserDuration = (500 + 30*calcDistance(attacker.x, attacker.y, target.x, target.y))/2
+        animations.push(new Loop(laserDuration, (progressRatio)=>{
+            const [x2, y2] = path.positionAtProgress(Math.min(progressRatio * 1.25))
+            const [x, y] = path.positionAtProgress(Math.max(0, progressRatio*1.25 - 0.25))
+            Object.assign(animLine, {x, y, x2, y2})
+        }, ()=>{
+            move.execute()
+            cvs.deleteObject(animLine)
+            this.refresh()
+        }))
+        this.startAnimating()
     }
 
     startTargetingMove(mover = new Ship()) {
         if (!this.calcCanBeControlled(mover)) return
-        this.uiMode = UI_MODE.TargetingMove
-        this.targetingAreas = []
         const {cvs} = this
-        //show targeting areas
-        const targetingAngle = mover.angle
-        const moveRange = mover.maxMoveDistance
-        const [tx,ty] = rotatePoint(mover.x + moveRange/2, mover.y, mover.x, mover.y, targetingAngle)
-        const ellipse = new Ellipse(mover.x, mover.y, moveRange/2, moveRange/4, targetingAngle+Math.PI/2)
-        const targetingCvsObject = cvs.addFilledOval('targetingarea', ellipse.x, ellipse.y, ellipse.majorAxis, ellipse.minorAxis, 4, [0,255,0,0.1], ellipse.angle)
-        const targetingCvsCircle = cvs.addEmptyCircle('targetingcircle', mover.x, mover.y, mover.radius, 4, COLORS.LightGreen, 2)
-        this.targetingAreas.push(targetingCvsObject, targetingCvsCircle)
-        this.cvs.onClickWorldXY = (toX, toY)=>this.finishTargetingMove(toX, toY, ellipse)
+        const ellipse = mover.calcMoveArea()
+        const targetingCvsObject = cvs.addFilledOval('targetingarea', ellipse.x, ellipse.y, ellipse.radiusX, ellipse.radiusY, 4, [0,255,0,0.1], ellipse.angle)
+        console.log('created targeting cvs object:',targetingCvsObject, ellipse)
+        const targetingCvsCircle = cvs.addEmptyCircle('targetingcircle', ellipse.x, ellipse.y, mover.radius, 4, COLORS.LightGreen, 2)
+        this.cvs.onClickWorldXY = (x, y)=>this.attemptMove(x, y, ellipse, mover)
         this.cvs.onMouseMoveWorldXY = (x, y)=>this.targetMove(x, y, ellipse)
-        this.refresh()
-        this.refreshCanvas(true)
+        this.startTargeting('Move', [targetingCvsObject, targetingCvsCircle])
     }
 
     targetMove(x = 0, y = 0, ellipse = new Ellipse()) {
-        if (!isPointInEllipse(x, y, ellipse)) {
+        if (!ellipse.containsPoint(x, y)) {
             return;
         }
         const targetingCvsCircle = this.cvs.getObject('targetingcircle')
-        targetingCvsCircle.x = x
-        targetingCvsCircle.y = y
-        this.refreshCanvas(true)
+        Object.assign(targetingCvsCircle, {visible: true, x, y})
+        this.refreshCanvas()
     }
 
-    finishTargetingMove(toX = 0, toY = 0, ellipse = new Ellipse()) {
+    attemptMove(x = 0, y = 0, ellipse = new Ellipse(), mover = new Ship()) {
+        console.log('finishing move to:',x,y,ellipse,mover)
+        if (!ellipse.containsPoint(x, y)) {
+            return
+        }
+        this.exectuteMove(new ShipMove(MOVE_TYPES.Move, mover, null, x, y))
+    }
+
+    exectuteMove(move = new ShipMove()) {
+        const {cvs, animations} = this
+        const mover = move.actor
+        mover.angle = move.path.angle
+        
+        const animLine = cvs.addLine('moveline', move.path.startX, move.path.startY, move.path.endX, move.path.endY, mover.color, 1)
+        const animThruster = cvs.addTriangle(`moveengine`, mover.x, mover.y, mover.radius*0.5, mover.radius*0.5, 6, COLORS.Orange, mover.angle - Math.PI)
+
+        animations.push(new Loop(2000, (progressRatio)=>{
+            const [newX, newY] = move.path.positionAtProgress(progressRatio)
+            const [engineXOffset, engineYOffset] = rotatePoint(10, 0, 0, 0, mover.angle-Math.PI)
+            Object.assign(mover, {x: newX, y: newY, angle:move.path.angle})
+            Object.assign(animThruster, {x: newX, screenOffsetX: engineXOffset, y: newY, screenOffsetY: engineYOffset, angle: move.path.angle-Math.PI})
+        }, ()=>{
+            move.execute()
+            cvs.deleteObject(animLine)
+            cvs.deleteObject(animThruster)
+            this.refresh()
+        }))
+        this.startAnimating()
+    }
+
+    startAnimating() {
         this.stopTargeting()
-    }
-
-    stopTargeting() {
-        this.cvs.onClickWorldXY = null;
-        this.uiMode = UI_MODE.Default
-        this.validTargets = []
-        this.targetingAreas = []
-        this.cvs.deleteObject('targetingarea')
-        this.cvs.deleteObject('targetingline')
+        this.togglePause(false)
+        this.uiMode = UI_MODE.Animating
         this.refresh()
         this.refreshCanvas(true)
     }
 
+    startTargeting(label = '', targetingAreas = [], validTargets = []) {
+        this.uiMode = UI_MODE.Targeting
+        this.targetingLabel = label
+        this.targetingAreas = targetingAreas
+        this.validTargets = validTargets
+        this.refresh()
+        this.refreshCanvas(true)
+    }
+
+    stopTargeting() {
+        this.uiMode = UI_MODE.Default
+        for (const cvsObj of this.targetingAreas) this.cvs.deleteObject(cvsObj)
+        this.cvs.onClickWorldXY = null;
+        this.cvs.onMouseMoveWorldXY = null;
+        this.validTargets = []
+        this.targetingAreas = []
+        this.refresh()
+        this.refreshCanvas(true)
+    }
+
+    handleAnimations(currentMs = Date.now()) {
+        for (const animation of this.animations) {
+            animation.update(currentMs)
+        }
+        this.animations = this.animations.filter(a => !a.completed)
+        if (this.animations.length == 0 && this.uiMode == UI_MODE.Animating) {
+            this.uiMode = UI_MODE.Default
+            this.refresh()
+        }
+    }
+
     tick() {
-        if (this.paused || gs.encounter.result || !gs.encounter.combatEnabled) return
+        if (this.encounter.result) return
+        if (this.paused) return
 
         const currentTime = Date.now()
         this.lastTickMs = currentTime
 
-        if (gs.encounter.result) {
+        if (this.encounter.result) {
             endCombat()
             return
         }
 
-        this.refreshAnimations(currentTime/200000) //hack to make stars twinkle at a reasonable speed
+        this.refreshBackground(currentTime/200000) //hack to make stars twinkle at a reasonable speed
         this.refreshCanvas()
+        console.log('ui mode:',this.uiMode)
+        if (this.uiMode == UI_MODE.Animating) this.handleAnimations(currentTime)
+        else {
+            if (this.encounter.activeTurnFleet === this.encounter.enemyFleet) {
+                this.handleEnemyMoves()
+            }
+        }
         //this.refreshObjectPane();
 
         requestAnimationFrame(()=>this.tick())
     }
 
+    handleEnemyMoves() {
+        const {encounter} = this
+        const {ai} = encounter
+        const nextMove = ai.calcNextMove()
+    }
+
+    checkTurnOver() {
+        const {encounter} = this
+        if (encounter.isTurnOver()) {
+            encounter.handleTurnOver()
+            this.refresh()
+        }
+    }
+
     onHail() {
         if (gs.encounter.combatEnabled) {
-            this.togglePause(true)
             showModal(`Surrender?`, `Surrender to the ${gs.encounter.encounterType.name}?`, [
                 ['Surrender', ()=>gs.encounter.encounterType.onSurrender()],
                 ['Cancel', ()=>closeModal()]

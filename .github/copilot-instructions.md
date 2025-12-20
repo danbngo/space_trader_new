@@ -28,7 +28,7 @@ This file contains the most important, discoverable details an AI coding agent n
 - Common bug pattern: some handlers use the implicit `event` variable; prefer function parameters (e.g., `handleClick(e)` uses `event` inside — watch for this when editing).
 
 ## Examples (Concrete)
-- Add a ship type: edit `types/SHIP_TYPES.js` (see `ShipType` class). Example: `SHIP_TYPES.MY_SHIP = new ShipType('MyShip', hull, shields, lasers, thrusters, cargoSpace)`.
+- Add a ship type: edit `types/SHIP_TYPES.js` (see `ShipType` class). Example: `SHIP_TYPES.MY_SHIP = new ShipType('MyShip', hull, shields, lasers, engine, cargoSpace)`.
 - Add a menu: create a function in `menus/*.js` that builds content with `ce()` and calls `showModal(title, content, buttons)`; follow `menus/titleMenu.js` and `menus/planetMenu.js` for examples.
 - Add a canvas object: use `const map = new CanvasWrapper()` then `map.addFilledCircle('id', x, y, size, minSize, '#fff', onClick)`.
 - Persisted fields: if adding persistent fields to `GameState`, update `_serialize()` and `_deserialize()` together.

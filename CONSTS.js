@@ -10,7 +10,7 @@ const EARTH_RADII_PER_AU = 23454.8
 const MILES_PER_AU = 432288*EARTH_RADII_PER_AU
 
 //TODO: try to make some of these vars more dynamic in future - different sizes for ships, projectiles etc.
-const FLEET_RADIUS_IN_EARTH_RADII = 1/1000
+const FLEET_RADIUS = 1/1000 * 1/EARTH_RADII_PER_AU
 
 const ENCOUNTER_CHANCE_PER_DAY = 0.2;
 
@@ -31,7 +31,7 @@ const STARTING_CREDITS = 5*1000
 const AVERAGE_SHIP_HULL = 15
 const AVERAGE_SHIP_SHIELDS = 10
 const AVERAGE_SHIP_LASERS = 5
-const AVERAGE_SHIP_THRUSTERS = 5
+const AVERAGE_SHIP_ENGINE = 5
 const AVERAGE_SHIP_CARGO_SPACE = 5
 const AVERAGE_SHIP_RADARS = 5
 
@@ -40,4 +40,4 @@ const BANK_MAX_LOAN_YEARS = 5
 const BANK_MIN_LOAN_AMOUNT = 100
 
 const SHIP_MAX_FIRING_ANGLE = Math.PI/4 //target can be no more than 45 degrees away from where ship is pointing
-const SHIP_NUM_ACTIONS_PER_TURN = 2
+const SHIP_NUM_MOVES_PER_TURN = 2

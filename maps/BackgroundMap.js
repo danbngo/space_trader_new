@@ -28,7 +28,7 @@ class BackgroundMap {
 
     refresh() {
         this.rebuildCanvas();
-        this.refreshAnimations(gs.year)
+        this.refreshBackground(gs.year)
         this.refreshCanvas(true);
     }
 
@@ -46,7 +46,7 @@ class BackgroundMap {
         cvs.redraw(forceRedraw)
     }
 
-    refreshAnimations(year = 0) {
+    refreshBackground(year = 0) {
         const {bgStars, cvs} = this
         bgStars.forEach( (bgStar, index) => {
             bgStar.twinkle(year)
@@ -70,7 +70,7 @@ class BackgroundMap {
 
     tick() {
         const currentTime = Date.now()
-        this.refreshAnimations(currentTime/200000) //hack to make stars twinkle at a reasonable speed
+        this.refreshBackground(currentTime/200000) //hack to make stars twinkle at a reasonable speed
         this.refreshCanvas()
 
         requestAnimationFrame(()=>this.tick())

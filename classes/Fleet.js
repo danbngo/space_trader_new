@@ -1,7 +1,7 @@
 // Fleet class extends SpaceObject
 class Fleet extends SpaceObject {
     constructor(name = "Unnamed", color = COLORS.White, x = 0, y = 0) {
-        super(name, color, 0, x, y);
+        super(name, color, FLEET_RADIUS, x, y);
         this.flagship = null;
         this.ships = []
         this.cargo = new CountsMap();
@@ -35,20 +35,20 @@ class Fleet extends SpaceObject {
         return this.calcTotalCargoSpace() - this.cargo.total
     }
 
-    calcTotalThrusters() {
-        return this.ships.reduce((total, ship) => total + ship.thrusters, 0);
+    calcTotalEngine() {
+        return this.ships.reduce((total, ship) => total + ship.engine, 0);
     }
 
     //in AU per years
     calcSpeed() {
-        //each thruster makes your fleet go 1 AU per MINUTE if there was no weight
-        const totalThrusters = this.calcTotalThrusters()
+        //each engine makes your fleet go 1 AU per MINUTE if there was no weight
+        const totalEngine = this.calcTotalEngine()
         let weight = 0
         for (const ship of this.ships) {
             weight += ship.mass
         }
         weight += this.cargo.total
-        return 60 * 24 * 365 * totalThrusters / weight
+        return 60 * 24 * 365 * totalEngine / weight
     }
 
     calcCombatRating() {

@@ -1,4 +1,4 @@
-export class Animation {
+class Loop {
     constructor(durationMs = 1000, onUpdate = (progressRatio = 0)=>{}, onComplete = ()=>{}) {
         this.durationMs = durationMs;
         this.onUpdate = onUpdate;
@@ -7,9 +7,9 @@ export class Animation {
         this.requestId = null;
         this.startMs = null;
         this.completed = false;
-        this.tick()
+        this.update()
     }
-    tick(currentMs = Date.now()) {
+    update(currentMs = Date.now()) {
         if (this.completed) return;
         if (this.startTime === null) {
             this.startTime = currentMs;

@@ -57,13 +57,13 @@ i think what makes sense for this game is somewhere between ships flying around 
 i want something like this:
 each ship gets a turn based on its initiative ???
 
-ships can move within a circle based on their thruster AMOUNT
+ships can move within a circle based on their engine AMOUNT
 moving directly into a ship in range lets you ram it - hurts their hull a lot and yours a bit, ignores shields
 when 2 ships are right next to each other neither can shoot, and ramming is somewhat ineffective.
 ships can shoot lasers at other ships. higher chance to miss if further away.
 
-shooting or moving uses ALL accumulated laser/thrusters
-lasers, shields and thrusters regen by UP TO 50% the missing amt each turn
+shooting or moving uses ALL accumulated laser/engine
+lasers, shields and engine regen by UP TO 50% the missing amt each turn
 
 ships can also try to escape near the edge of the screen.
 fleeing has higher % chance near the edge, and you auto flee if you reach the very edge
@@ -72,7 +72,7 @@ ships start near-ish the center so it's hard to flee right away
 at any time, you can surrender. surrendering means all your remaining ships get looted or whatever the enemy has in store.
 not surrendering means the ships still on the battlefield may be damaged further.
 when a ship has 0 hull it becomes disabled (NOT destroyed)
-disabled ships cant be fixed until you pull into port and they cant be used for thrusters, carrying cargo, combat etc.
+disabled ships cant be fixed until you pull into port and they cant be used for engine, carrying cargo, combat etc.
 if ALL your ships are disabled, you're automatically towed to the nearest planet at high expense.
 if you can't afford to fix any ships, the galactic bank automatically gives you an exorbitant loan.
 
@@ -94,7 +94,7 @@ this will get more strategic in the future because:
 -being able to laser through multiple enemies if you line them up
 -gas clouds, less chance to hit or be hit in them
 -asteroids, cannot shoot through them, they can be purposely shot and broken to create debris
--debris hurts you to move through, and slows thrusters if you're in it
+-debris hurts you to move through, and slows engine if you're in it
 -rockets that follow enemies, but can be shot down with lasers or other rockets
 -aoe attacks like bombs/mines that go off after a certain amt of time or when near an enemy
 -stealth mode, ships that cant be seen unless they leave stealth (to attack) or you're close to them

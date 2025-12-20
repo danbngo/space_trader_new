@@ -1,7 +1,7 @@
 function createBuyShipMenu(ships = [new Ship()], shipyard = new Shipyard(), onSelectShip = (ship = new Ship())=>{}) {
     if (ships.length == 0) return `(None)`
     const rows = [
-        ['Ship Name', 'Hull', 'Shields', 'Lasers', 'Thrusters', 'Cargo Space', 'Buy Price']
+        ['Ship Name', 'Hull', 'Shields', 'Lasers', 'Engine', 'Cargo Space', 'Buy Price']
     ]
     for (const ship of ships) {
         const buyPrice = shipyard.calcBuyPrice(ship)
@@ -10,7 +10,7 @@ function createBuyShipMenu(ships = [new Ship()], shipyard = new Shipyard(), onSe
             statColorSpan(ship.hull[1], ship.hull[1]/10),
             statColorSpan(ship.shields[1], ship.shields[1]/10),
             statColorSpan(ship.lasers, ship.lasers/10),
-            statColorSpan(ship.thrusters, ship.thrusters/10),
+            statColorSpan(ship.engine, ship.engine/10),
             statColorSpan(ship.cargoSpace, ship.cargoSpace/10),
             statColorSpan(buyPrice, ship.value/buyPrice)
         ])
@@ -21,7 +21,7 @@ function createBuyShipMenu(ships = [new Ship()], shipyard = new Shipyard(), onSe
 function createSellShipMenu(ships = [new Ship()], shipyard = new Shipyard(), onSelectShip = (ship = new Ship())=>{}) {
     if (ships.length == 0) return `(None)`
     const rows = [
-        ['Ship Name', 'Hull', 'Shields', 'Lasers', 'Thrusters', 'Cargo Space', 'Sell Price']
+        ['Ship Name', 'Hull', 'Shields', 'Lasers', 'Engine', 'Cargo Space', 'Sell Price']
     ]
     for (const ship of ships) {
         const sellPrice = shipyard.calcSellPrice(ship)
@@ -30,7 +30,7 @@ function createSellShipMenu(ships = [new Ship()], shipyard = new Shipyard(), onS
             statColorSpan(ship.hull[1], ship.hull[1]/10),
             statColorSpan(ship.shields[1], ship.shields[1]/10),
             statColorSpan(ship.lasers, ship.lasers/10),
-            statColorSpan(ship.thrusters, ship.thrusters/10),
+            statColorSpan(ship.engine, ship.engine/10),
             statColorSpan(ship.cargoSpace, ship.cargoSpace/10),
             statColorSpan(sellPrice, sellPrice/ship.value)
         ])
