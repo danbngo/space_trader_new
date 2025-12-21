@@ -9,7 +9,7 @@ class EncounterMap {
         this.paused = false
 
         const baseZoom = ENCOUNTER_MAP_RADIUS_MILES/2
-        this.cvs = new CanvasWrapper(baseZoom, baseZoom/10, baseZoom*10, encounter.mapRadius)
+        this.cvs = new CanvasWrapper(baseZoom/2, baseZoom/10, baseZoom*10, encounter.mapRadius)
         this.root = ce({classNames: ['starmap-root'], children: [this.cvs.root]})
         this.controls = ce({parent: this.root, style: {position: 'absolute', top: 0, left: 0}})
         this.infoBar = ce({parent: this.root, style:{position:'absolute', bottom: 0, left: 0}})
@@ -255,13 +255,17 @@ class EncounterMap {
             const index = ships.indexOf(obj)
             const {hull, shields} = obj
             const showActions = combatEnabled && obj.fleet == playerFleet && !obj.escaped && !obj.isDisabled() && activeTurnFleet == playerFleet && (uiMode !== UI_MODE.Animating)
+            console.log('showing actions with props:', { combatEnabled, isPlayerShip: obj.fleet == playerFleet, isEscaped: obj.escaped, isDisabled: obj.isDisabled(), isPlayerTurn: activeTurnFleet == playerFleet, uiMode })
             const canAct = obj.numActionsRemaining > 0 && (uiMode !== UI_MODE.Animating)
             const canRecharge = obj.shields[0] < obj.shields[1]
             ce({parent:container, style: {margin: 'auto'}, onClick: ()=>this.selectObject(obj), children:[
                 this.cvs.getObject(`ship${index}`)?.asImage(25, COLORS.LightGreen) || null
             ]})
-            ce({parent:container, innerHTML: `Hull: ${statColorSpan(Math.round(100 * hull[0]/hull[1]), hull[0]/hull[1], true)}%`})
-            if (obj.shields[1] > 0) ce({parent:container, innerHTML: `Shields: ${statColorSpan(Math.round(100 * obj.shields[0]/obj.shields[1]), shields[0]/shields[1], true)}%`})
+            ce({parent:container, innerHTML: `Hull: ${statColorSpan(`${hull[0]}/${hull[1]}`, hull[0]/hull[1], true)}`})
+            if (obj.shields[1] > 0) ce({parent:container, innerHTML: `Shields: ${statColorSpan(`${shields[0]}/${shields[1]}`, shields[0]/shields[1], true)}`})
+            if (obj.lasers > 0) ce({parent:container, innerHTML: `Lasers: ${statColorSpan(obj.lasers, obj.lasers/AVERAGE_SHIP_LASERS, true)}`})
+            if (obj.engine) ce({parent:container,  innerHTML: `Engine: ${statColorSpan(obj.engine, obj.engine/AVERAGE_SHIP_ENGINE, true)}`})
+            if (obj.radars) ce({parent:container, innerHTML: `Radars: ${statColorSpan(obj.radars, obj.radars/AVERAGE_SHIP_RADARS, true)}`})
             ce({parent:container, innerHTML: `Actions: ${statColorSpan(obj.numActionsRemaining, obj.numActionsRemaining/2, true)}`})
             ce({parent:container, innerHTML: obj.isDisabled() ? `(Disabled)` : obj.escaped ? '(Escaped)' : ''})
             if (showActions) {

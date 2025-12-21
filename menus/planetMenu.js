@@ -6,6 +6,14 @@ function showPlanetMenu(planet = new Planet()) {
         `You have arrived at ${coloredName(planet)}.<br/>`
         : `You are scanning ${coloredName(planet)}.<br/>`
 
+    msg += `Population: ${roundToPlaces(planet.culture.population * 1000,2)}M<br/>`
+    msg += `Territory: ~${roundToPlaces(planet.culture.territory,2)}AU<br/>`
+    msg += `Government Rating: ${roundToPlaces(planet.culture.governmentRating,2)}x<br/>`
+    msg += `Security Rating: ${roundToPlaces(planet.culture.securityRating,2)}x<br/>`
+    msg += `Commercial Rating: ${roundToPlaces(planet.culture.commercialRating,2)}x<br/>`
+    msg += `Industrial Rating: ${roundToPlaces(planet.culture.industrialRating,2)}x<br/>`
+    msg += `Crime Rating: ${roundToPlaces(planet.culture.crimeRating,2)}x<br/>`
+
     if (isDocked) {
         console.log('1')
         const damagedShips = gs.fleet.ships.filter(s=>s.isDamaged())

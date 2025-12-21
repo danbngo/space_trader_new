@@ -7,7 +7,7 @@ const ENCOUNTER_RESULTS = Object.freeze({
 })
 
 const COMBAT_STRATEGIES = Object.freeze({
-    AttackNearest: 'Attack Nearest',
+    Attack: 'Attack',
     Escape: 'Escape',
     Asteroid: 'Asteroid'
 })
@@ -22,11 +22,11 @@ const SHAPES = Object.freeze({
 })
 
 const SKILLS = Object.freeze({
-    Piloting: 'Piloting', //avoid hazards, fleet (not ships) goes faster
+    Pilot: 'Pilot', //avoid hazards, fleet (not ships) goes faster
     Stealth: 'Stealth', //avoid fleet encounters, sneak attacks
-    Bartering: 'Bartering', //lowers prices in markets, shipyards etc.
-    Engineering: 'Engineering', //gain some hull back after encounters, upgrade modules are more effective?
-    Salvaging: 'Salvaging', //gain more cargo after destroying asteroids, etc.
+    Barter: 'Barter', //lowers prices in markets, shipyards etc.
+    Engineer: 'Engineer', //gain some hull back after encounters, upgrade modules are more effective?
+    Salvage: 'Salvage', //gain more cargo after destroying asteroids, etc.
     //Science: 'Science', //hmmm
     //Doctor: 'Doctor', //your officers gain health during travel - add this later w/ more officer-specific content
     //Leadership: 'Leadership' //lets you have more officers - would like a better system for this
@@ -54,6 +54,7 @@ const COLORS = Object.freeze({
     Yellow: [255,255,0,1], // rgba(255,255,0,1)
     Green: [0,255,0,1], // rgba(0,255,0,1)
     Orange: [255,165,0,1], // rgba(255,165,0,1)
+    LightOrange: [255,200,100,1], // rgba(255,200,100,1)
     Purple: [128,0,128,1], // rgba(128,0,128,1)
     LightPurple: [200,162,200,1], // rgba(200,162,200,1)
     Gray: [128,128,128,1], // rgba(128,128,128,1)

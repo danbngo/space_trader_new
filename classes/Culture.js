@@ -1,7 +1,7 @@
 
 
 class Culture {
-    constructor(cargoPriceModifiers = new CountsMap(), shipQuality = 1.0, officerQuality = 1.0, territory = 1, population = 1, industrialRating = 1, commercialRating = 1, securityRating = 1, crimeRating = 1) {
+    constructor(cargoPriceModifiers = new CountsMap(), shipQuality = 1.0, officerQuality = 1.0, territory = 1, population = 1, governmentRating = 1, industrialRating = 1, commercialRating = 1, securityRating = 1, crimeRating = 1) {
         this.cargoPriceModifiers = cargoPriceModifiers
         this.shipQuality = shipQuality;
         this.officerQuality = officerQuality;

@@ -43,7 +43,7 @@ const BANK_MIN_LOAN_AMOUNT = 100
 
 const SHIP_NUM_MOVES_PER_TURN = 2
 
-const JAIL_DAYS_PER_1000CR_FINE = 1 //1 day of jail time per 1000CR of fine
+const JAIL_DAYS_PER_1000CR_FINE = 5 //5 days of jail time per 1000CR of fine
 
 
 const GAME_START_YEAR = 3000

@@ -14,8 +14,8 @@ class Building {
         this.credits = credits
     }
     get rake() {
-        console.log('Calculating rake for building on planet', this.planet.name,'with baseRake', this.baseRake,'and player barter skill', gs.fleet.totalSkills.getAmount(SKILLS.Bartering),'skills:',gs.fleet.totalSkills)
-        return this.baseRake/(1 + gs.fleet.totalSkills.getAmount(SKILLS.Bartering)/50)
+        console.log('Calculating rake for building on planet', this.planet.name,'with baseRake', this.baseRake,'and player barter skill', gs.fleet.totalSkills.getAmount(SKILLS.Barter),'skills:',gs.fleet.totalSkills)
+        return this.baseRake/(1 + gs.fleet.totalSkills.getAmount(SKILLS.Barter)/50)
     }
 
 }
@@ -110,13 +110,23 @@ class Bank extends Building {
     }
 }
 
+class Courthouse extends Building {
+    constructor(planet = new Planet(), baseRake = 1) {
+        super(planet, baseRake)
+    }
+    calcPayBountyPenalty(bountyAmount = 0) {
+        return Math.ceil( bountyAmount * Math.pow(0.01, 1/(1+this.rake)) )
+    }
+}
+
 
 class Settlement {
-    constructor(shipyard = null, market = null, blackMarket = null, guild = null, bank = null) {
+    constructor(shipyard = null, market = null, blackMarket = null, guild = null, bank = null, courthouse = null) {
         this.shipyard = shipyard;
         this.market = market;
         this.blackMarket = blackMarket;
         this.guild = guild;
         this.bank = bank;
+        this.courthouse = courthouse;
     }
 }

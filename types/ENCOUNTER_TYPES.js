@@ -34,7 +34,7 @@ const ENCOUNTER_TYPES = {
             else {
                 showModal(gs.encounter.fleetName, 'The miners transmit a surly, perfunctory greeting, but otherwise ignore you.', [
                     ['View', ()=>closeModal()],
-                    ['Continue', ()=>endEncounter()],
+                    ['Ignore', ()=>endEncounter()],
                     ['Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, true)],
                 ])
             }
@@ -44,7 +44,7 @@ const ENCOUNTER_TYPES = {
         ()=>showPlayerEscapedFromFleetModal(),
         ()=>gs.encounter.encounterType.onDefeat()
     ),
-    TOURISTS: new EncounterType('Tourists', COLORS.DarkGray, 'You encountered: tourists.', FLEET_TYPES.MINERS, AI_TYPES.Ship, FORMATION_TYPES.FaceOff,
+    TOURISTS: new EncounterType('Tourists', COLORS.LightOrange, 'You encountered: tourists.', FLEET_TYPES.TOURISTS, AI_TYPES.Ship, FORMATION_TYPES.FaceOff,
         ()=>{
             if (gs.encounter.luck[0] * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > gs.encounter.fleet.totalRadar) {
                 showModal(gs.encounter.fleetName, 'Your long range sensors detect a tourist fleet before they detect you.<br/>You manage to approach them stealthily.', [
@@ -60,7 +60,7 @@ const ENCOUNTER_TYPES = {
             else {
                 showModal(gs.encounter.fleetName, 'The tourist fleet broadcasts a corporate jingle, inviting you to join them for your next pleasure cruise.', [
                     ['View', ()=>closeModal()],
-                    ['Continue', ()=>endEncounter()],
+                    ['Ignore', ()=>endEncounter()],
                     ['Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, true)],
                 ])
             }
@@ -87,14 +87,14 @@ const ENCOUNTER_TYPES = {
                 showModal(gs.encounter.fleetName, 'The merchants eagerly invite you to trade. They claim to have the best prices in the sector!', [
                     ['View', ()=>closeModal()],
                     ['Trade', ()=>showTradeOfferModal()],
-                    ['Continue', ()=>endEncounter()],
+                    ['Ignore', ()=>endEncounter()],
                     ['Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, true)],
                 ])
             }
             else {
                 showModal(gs.encounter.fleetName, 'The merchant fleet ignores you nervously.', [
                     ['View', ()=>closeModal()],
-                    ['Continue', ()=>endEncounter()],
+                    ['Ignore', ()=>endEncounter()],
                     ['Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, true)],
                 ])
             }
@@ -121,14 +121,14 @@ const ENCOUNTER_TYPES = {
                 showModal(gs.encounter.fleetName, 'The smugglers broadcast a rather seedy invitation to peruse their illicit wares.', [
                     ['View', ()=>closeModal()],
                     ['Trade', ()=>showTradeOfferModal()],
-                    ['Continue', ()=>endEncounter()],
+                    ['Ignore', ()=>endEncounter()],
                     ['Attack', ()=>showPlayerAttackFleetModal(1, 0, false, true)],
                 ])
             }
             else {
                 showModal(gs.encounter.fleetName, 'The smuggler fleet takes no chances and starts moving quickly away from you.', [
                     ['View', ()=>closeModal()],
-                    ['Continue', ()=>endEncounter()],
+                    ['Ignore', ()=>endEncounter()],
                     ['Attack', ()=>showPlayerAttackFleetModal(1, 0, false, true)],
                 ])
             }
@@ -161,7 +161,7 @@ const ENCOUNTER_TYPES = {
             else {
                 showModal(gs.encounter.fleetName, 'The pirates broadcast insults and jeers at your fleet, but let you pass regardless.', [
                     ['View', ()=>closeModal()],
-                    ['Continue', ()=>endEncounter()],
+                    ['Ignore', ()=>endEncounter()],
                     ['Attack', ()=>showPlayerAttackFleetModal(1, 0, false, false)],
                 ])
             }
@@ -180,14 +180,14 @@ const ENCOUNTER_TYPES = {
                     ['Hail', ()=>{
                         gs.luck[0] = 0
                         gs.encounter.encounterType.onStart()
-                    }]
+                    }],
                     ['Sneak Attack', ()=>showPlayerAttackFleetModal(-2, 2, false, false)],
                 ])
             }
             else if (gs.encounter.luck[1]*gs.captain.fame/gs.captain.infamy > 1 && gs.captain.fame > 100) {
                 showModal(gs.encounter.fleetName, `The police greet you respectfully, having heard of your good deeds.<br/>They don't even trouble you with the routine inspection.`, [
                     ['View', ()=>closeModal()],
-                    ['Continue', ()=>endEncounter()],
+                    ['Ignore', ()=>endEncounter()],
                     ['Attack', ()=>showPlayerAttackFleetModal(-2, 2, false, false)],
                 ])
             }
@@ -208,7 +208,7 @@ const ENCOUNTER_TYPES = {
             else {
                 showModal(gs.encounter.fleetName, 'The police ships speed past your fleet, perhaps responding to some other incident.', [
                     ['View', ()=>closeModal()],
-                    ['Continue', ()=>endEncounter()],
+                    ['Ignore', ()=>endEncounter()],
                     ['Attack', ()=>showPlayerAttackFleetModal(-2, 2, false, false)],
                 ])
             }
@@ -231,6 +231,13 @@ const ENCOUNTER_TYPES = {
                     ['Sneak Attack', ()=>showPlayerAttackFleetModal(-2, 2, false, false)],
                 ])
             }
+            else if (gs.encounter.luck[1]*gs.captain.fame/gs.captain.infamy > 1 && gs.captain.fame > 100) {
+                showModal(gs.encounter.fleetName, `The soldiers salute you over comms, having heard of your good deeds.<br/>${gs.captain.inamy > 10 ? `In their view, the good you've done far outweighs the bad.` : ''}`, [
+                    ['View', ()=>closeModal()],
+                    ['Ignore', ()=>endEncounter()],
+                    ['Attack', ()=>showPlayerAttackFleetModal(-2, 2, false, false)],
+                ])
+            }
             if (gs.encounter.luck[2]*gs.captain.infamy > 250 && gs.captain.bounty > 0) {
                 showModal(gs.encounter.fleetName, 'The army ships power up their weapons the instant you pass by!<br/>You have grown so notorious that even the government considers you a threat!', [
                     ['View', ()=>closeModal()],
@@ -241,7 +248,7 @@ const ENCOUNTER_TYPES = {
             else {
                 showModal(gs.encounter.fleetName, `The army ships blares a platriotic jingle extolling the greatness of ${gs.encounter.planet.name}.`, [
                     ['View', ()=>closeModal()],
-                    ['Continue', ()=>endEncounter()],
+                    ['Ignore', ()=>endEncounter()],
                     ['Attack', ()=>showPlayerAttackFleetModal(-2, 2, false, false)],
                 ])
             }
@@ -274,7 +281,7 @@ const ENCOUNTER_TYPES = {
             else {
                 showModal(gs.encounter.fleetName, 'The bounty hunters glide past your fleet in eerie silence.', [
                     ['View', ()=>closeModal()],
-                    ['Continue', ()=>endEncounter()],
+                    ['Ignore', ()=>endEncounter()],
                     ['Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, false)],
                 ])
             }
@@ -286,7 +293,7 @@ const ENCOUNTER_TYPES = {
     ),
     ASTEROIDS: new EncounterType('Asteroids', COLORS.Gray, 'You encountered: asteroids.', FLEET_TYPES.ASTEROIDS, AI_TYPES.Asteroid, FORMATION_TYPES.Storm,
         ()=>{
-            if (gs.encounter.luck[0] * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Piloting)/50) > gs.encounter.fleet.totalRadar) {
+            if (gs.encounter.luck[0] * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Pilot)/50) > gs.encounter.fleet.totalRadar) {
                 showModal(gs.encounter.fleetName, `Your long range sensors detect an incoming cluster of asteroids.<br/>You skillfully steer out of harm's way.<br/>Although, you could choose to plunge back in and mine them if you wish.`, [
                     ['View', ()=>closeModal()],
                     ['Bypass', ()=>endEncounter()],
@@ -307,7 +314,7 @@ const ENCOUNTER_TYPES = {
     ),
     CRYOIDS: new EncounterType('Cryoids', COLORS.LightBlue, 'You encountered: cryoids.', FLEET_TYPES.CRYOIDS, AI_TYPES.Asteroid, FORMATION_TYPES.Storm,
         ()=>{
-            if (gs.encounter.luck[0] * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Piloting)/50) > gs.encounter.fleet.totalRadar) {
+            if (gs.encounter.luck[0] * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Pilot)/50) > gs.encounter.fleet.totalRadar) {
                 showModal(gs.encounter.fleetName, `Your long range sensors detect an incoming cluster of cryoids.<br/>You skillfully steer out of harm's way.<br/>Although, you could choose to plunge back in and mine them if you wish.`, [
                     ['View', ()=>closeModal()],
                     ['Bypass', ()=>endEncounter()],
@@ -328,7 +335,7 @@ const ENCOUNTER_TYPES = {
     ),
     PLASMOIDS: new EncounterType('Plasmoids', COLORS.Gray, 'You encountered: plasmoids.', FLEET_TYPES.PLASMOIDS, AI_TYPES.Asteroid, FORMATION_TYPES.Storm,
         ()=>{
-            if (gs.encounter.luck[0] * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Piloting)/50) > gs.encounter.fleet.totalRadar) {
+            if (gs.encounter.luck[0] * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Pilot)/50) > gs.encounter.fleet.totalRadar) {
                 showModal(gs.encounter.fleetName, `Your long range sensors detect an incoming cluster of plasmoids.<br/>You skillfully steer out of harm's way.<br/>Although, you could choose to plunge back in and mine them if you wish.`, [
                     ['View', ()=>closeModal()],
                     ['Bypass', ()=>endEncounter()],

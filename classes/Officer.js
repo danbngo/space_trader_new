@@ -41,7 +41,7 @@ class Officer {
     }
 
     get value() {
-        return Math.pow(1 + this.level, 2)*50
+        return Math.pow(1 + this.level, 2)*250
     }
 
     get crShare() {

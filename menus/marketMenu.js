@@ -98,8 +98,8 @@ function showMarketMenu(market = new Market()) {
             `Market Credits: ${market.credits}`
             +` | Buy Tax: ${statColorSpan(roundToPlaces(100*market.baseRake, 2), 2/(1+market.baseRake),true)}%`
             +` | Sell Tax: ${statColorSpan(roundToPlaces(100*market.baseRake/(market.baseRake+1), 2), 2/(market.baseRake+1),true)}%`,
-            `Taxes After Bartering | ${statColorSpan(roundToPlaces(100*(1+market.rake) - 100, 2), 2/(1+market.rake),true)}% Buy`
-            +` | ${statColorSpan(roundToPlaces(100*market.rake/(market.rake+1), 2), 2/(market.rake+1),true)}% Sell`,
+            (gs.fleet.totalSkills.getAmount(SKILLS.Barter) > 0) ? `Taxes After Barter | ${statColorSpan(roundToPlaces(100*(1+market.rake) - 100, 2), 2/(1+market.rake),true)}% Buy`
+            +` | ${statColorSpan(roundToPlaces(100*market.rake/(market.rake+1), 2), 2/(market.rake+1),true)}% Sell` : '',
         ]
     })
 

@@ -50,7 +50,7 @@ class EncounterAI {
                 strategy = COMBAT_STRATEGIES.Escape
             }
             else {
-                strategy =  COMBAT_STRATEGIES.AttackNearest
+                strategy =  COMBAT_STRATEGIES.Attack
             }
         }
         else if (aiType == AI_TYPES.Asteroid) {
@@ -146,12 +146,12 @@ class EncounterAI {
         const rammableTargets = encounter.calcRamTargets(ship, targets)
         const nearestTarget = this.calcNearestTarget(ship, targets)
 
-        console.log('deciding move for ship with strategy:', { strategy, attackableTargets, rammableTargets, nearestTarget, targets, opposingFleet });
+        console.log('deciding move for ship with strategy:', { strategy, attackableTargets, rammableTargets, targets, opposingFleet });
 
         if (strategy == COMBAT_STRATEGIES.Asteroid) {
             if (attackableTargets.length > 0 && ship.lasers > 0 && Math.random() > 0.5) {
                 //attack targets if any available
-                return new ShipAction(encounter, ship, MOVE_TYPES.Attack, nearestTarget)
+                return new ShipAction(encounter, ship, MOVE_TYPES.Attack, rndMember(attackableTargets))
             }
             const inTheWayTargets = rammableTargets.filter(t => {
                 const path = new Path(ship.x, ship.y, t.x, t.y)
@@ -171,16 +171,19 @@ class EncounterAI {
             const bestMove = this.calcBestMoveCoords(ship, toX, toY)
             if (bestMove) return new ShipAction(encounter, ship, MOVE_TYPES.Move, null, bestMove[0], bestMove[1])
         }
-        else if (strategy == COMBAT_STRATEGIES.AttackNearest) {
+        else if (strategy == COMBAT_STRATEGIES.Attack) {
             if (attackableTargets.length > 0 && ship.lasers > 0) {
                 //attack targets if any available
-                return new ShipAction(encounter, ship, MOVE_TYPES.Attack, nearestTarget)
+                return new ShipAction(encounter, ship, MOVE_TYPES.Attack, rndMember(attackableTargets))
             }
             else if (rammableTargets.length > 0 && ship.engine > 0) {
-                //ram targets if any available
-                return new ShipAction(encounter, ship, MOVE_TYPES.Ram, nearestTarget)
+                //ram targets if any available - but don't ram if they have more hull than us
+                const safeRammableTargets = rammableTargets.filter(t => t.hull[0] < ship.hull[0])
+                if (safeRammableTargets.length > 0) {
+                    return new ShipAction(encounter, ship, MOVE_TYPES.Ram, rndMember(safeRammableTargets))
+                }
             }
-            else if (nearestTarget && ship.engine > 0) {
+            else if (ship.engine > 0 && nearestTarget) {
                 //move into attack range if possible
                 const bestMove = this.calcBestAttackCoords(ship, targets)
                 if (bestMove) return new ShipAction(encounter, ship, MOVE_TYPES.Move, null, bestMove[0], bestMove[1])

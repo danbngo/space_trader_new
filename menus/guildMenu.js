@@ -66,8 +66,8 @@ function showGuildMenu(guild = new Guild()) {
             `Your # officers: ${fleet.officers.length}/${captain.maxSubordinates} | Your credits: ${gs.credits}`,
             //`Guild credits: ${guild.credits}`,
             `Local Officer Level: ${roundToPlaces(100*guild.planet.culture.officerQuality, 2)}%`,
-            `Hire Tax: ${statColorSpan(roundToPlaces(100*guild.baseRake, 2), 2/(1+guild.baseRake),true)}%`
-            `Taxes After Bartering | ${statColorSpan(roundToPlaces(100*(1+guild.rake) - 100, 2), 2/(1+guild.rake),true)}% Hire`
+            `Hire Tax: ${statColorSpan(roundToPlaces(100*guild.baseRake, 2), 2/(1+guild.baseRake),true)}%`,
+            (gs.fleet.totalSkills.getAmount(SKILLS.Barter) > 0) ? `Taxes After Barter | ${statColorSpan(roundToPlaces(100*(1+guild.rake) - 100, 2), 2/(1+guild.rake),true)}% Hire` : '',
         ]}),
         [
             ["Back", () => showPlanetMenu(planet)],

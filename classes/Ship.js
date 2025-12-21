@@ -43,7 +43,7 @@ class Ship {
     }
 
     get value() {
-        return Math.pow(this.mass, 2)*10
+        return Math.pow(this.mass, 2)*2500
     }
 
     get combatRating() {

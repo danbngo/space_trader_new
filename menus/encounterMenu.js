@@ -285,11 +285,11 @@ function showPlayerDefeatedEnemyModal(fameMultiplier = 0) {
     const abandonedCargoCapacity = disabledEnemyShips.reduce( (total, ship) => {
         return total + ship.cargoSpace
     }, 0)
-    const creditsAmt = Math.floor(enemyFleet.credits * (abandonedCargoCapacity / enemyFleet.totalCargoSpace))
+    const creditsAmt = Math.floor(Math.random() * enemyFleet.credits * (abandonedCargoCapacity / enemyFleet.totalCargoSpace))
     const cargoRatio = abandonedCargoCapacity / enemyFleet.totalCargoSpace
     const maxLootAmt = Math.floor(enemyFleet.cargo.total * cargoRatio)
     const baseLootAmt = Math.floor(Math.random() * maxLootAmt)
-    const lootAmt = weightedAvg([baseLootAmt, enemyFleet.cargo.total], [25, gs.fleet.totalSkills.getAmount(SKILLS.Salvaging)])
+    const lootAmt = weightedAvg([baseLootAmt, enemyFleet.cargo.total], [25, gs.fleet.totalSkills.getAmount(SKILLS.Salvage)])
     const loot = enemyFleet.cargo.randomSubset(lootAmt)
     const disabledPlayerShips = gs.encounter.playerShips.filter(s=>s.isDisabled())
 
@@ -352,7 +352,7 @@ function showPlayerDefeatedHazardsModal() {
 
 function showNeutralsBribePlayerModal(maxCredits = 1000) {
     const baseCredits = Math.ceil(maxCredits*Math.random()/2)
-    const credits = Math.round(weightedAvg([baseCredits, maxCredits], [25, gs.fleet.totalSkills.getAmount(SKILLS.Haggling)]))
+    const credits = Math.round(weightedAvg([baseCredits, maxCredits], [25, gs.fleet.totalSkills.getAmount(SKILLS.Barter)]))
     let msg = `The ${gs.encounter.fleetName} frantically offers you ${baseCredits}CR to let them go unharmed!<br/>`
     if (credits > baseCredits) msg += `You employ your haggling skills and make them an offer they can't refuse.<br/>Their offer increases to ${credits}CR.<br/>`
     showModal(gs.encounter.fleetName, msg, [
@@ -452,13 +452,13 @@ function showPlayerDefeatedByPiratesModal() {
 function showPlayerDefeatedByPoliceModal() {
     console.log('showPlayerDefeatedByPoliceModal');
     const {fleetName} = gs.encounter
-    let msg = `The ${fleetName} are taking you in!<br/>`
+    let fine = 5000
+    let msg = `The ${fleetName} are taking you in! You are fined ${fine} for resisting arrest!<br/>`
     msg += `Your ships are roughly searched for illegal goods.<br/>`
-    const fine = seizePlayerContraband()
-    msg += fine > 0 ? `They confiscate all your contraband, and add a fine of ${fine} to your existing bounty.<br/>`
-    : `They find no contraband aboard your ships, but there is still the matter of your other crimes.<br/>`
-
-    showModal(fleetName, msg, [['Continue', ()=> showFineOrJailModal()]])
+    const smugglingFine = seizePlayerContraband()
+    msg += smugglingFine > 0 ? `They confiscate all your contraband, and add a fine of ${fine} to your existing bounty.<br/>`
+    : `They find no contraband aboard your ships, but that hardly excuses your other crimes.<br/>`
+    showModal(fleetName, msg, [['Continue', ()=> showFineOrJailModal(fine)]])
 }
 
 function showPlayerEscapedFromEnemyModal() {
@@ -509,7 +509,7 @@ function conductRepairs() {
         return total + (ship.hull[1] - ship.hull[0])
     }, 0)
     if (hullDamage <= 0) return msg
-    const repairRatio = weightedAvg([0, 1], [25*Math.random(), gs.fleet.totalSkills.getAmount(SKILLS.Engineering)])
+    const repairRatio = weightedAvg([0, 1], [25*Math.random(), gs.fleet.totalSkills.getAmount(SKILLS.Engineer)])
     const repairableShips = gs.fleet.ships.filter(s=>!s.isDisabled)
     const nonRepairableShips = gs.fleet.ships.filter(s=>s.isDisabled)
     const repairableHullDamage = repairableShips.reduce( (total, ship) => {
@@ -538,7 +538,7 @@ function showPlayerPoliceInspectionModal() {
     console.log('showPlayerPoliceInspectionModal');
     let msg = ''
     const {fleetName} = gs.encounter
-    const illegalCargo = gs.fleet.cargo.items().filter( ct => ct.isIllegal )
+    const illegalCargo = Array.from(gs.fleet.cargo.counts.keys()).filter( ct => ct.isIllegal )
     if (illegalCargo.length === 0) {
         msg += `The ${fleetName} inspect your cargo and find nothing illegal. They thank you for your cooperation and wish you a safe journey.<br/>`
     }
@@ -550,15 +550,22 @@ function showPlayerPoliceInspectionModal() {
     }
 }
 
-function showFineOrJailModal(fine = gs.captain.bounty, jailTime = null) {
-    if (!jailTime) jailTime = Math.round(1+fine*JAIL_DAYS_PER_1000CR_FINE) //1 day of jail time per 1000CR of fine
+function showFineOrJailModal(fine = 0) {
     const {fleetName} = gs.encounter
+    const fineFromBounty = Math.min(Math.max(gs.captain.bounty*Math.random(),100), gs.captain.bounty)
+    const jailTime = Math.round((fine+fineFromBounty)*JAIL_DAYS_PER_1000CR_FINE) //1 day of jail time per 1000CR of fine
+    gs.bounty -= fineFromBounty
+
     let msg = ''
-    msg += `The ${fleetName} give you the option to pay a fine of ${fine}CR or serve ${jailTime} days in jail.<br/>`
+    if (fineFromBounty) msg += `The ${fleetName} are aware of some of the bounties on your head, to the tune of ${fineFromBounty}CR.<br/>`
+    if (fine) msg += `The ${fleetName} give you the option to pay a fine of ${fine}CR${fineFromBounty ? `, plus ${fineFromBounty} to clear your bounty` : ''} or serve ${jailTime} days in jail.<br/>`
+    else msg += `The ${fleetName} give you the option to pay off your bounty of ${fineFromBounty}CR or serve ${jailTime} days in jail.<br/>`
     showModal(fleetName, msg, [
         ['Pay Fine', ()=>{
-            gs.credits -= fine
-            msg += `You pay the fine of ${fine}CR.<br/>`
+            gs.credits -= (fine + fineFromBounty)
+            msg += `You pay the fine of ${fine+fineFromBounty}CR.<br/>`
+            msg += `Your remaining CR: ${gs.credits}<br/>`
+            if (fineFromBounty) msg += `Your bounty has been reduced to: ${gs.bounty}CR.<br/>`
             showModal(fleetName, msg, [['Continue', ()=>endEncounter()]])
         }, gs.credits >= fine],
         ['Serve Jail Time', ()=>{
@@ -567,8 +574,8 @@ function showFineOrJailModal(fine = gs.captain.bounty, jailTime = null) {
             gs.year += jailTime / 365.0
             msg += `The ${fleetName} take you to the nearest planet, ${nearestPlanet.name}.<br/>`
             msg += `You serve ${jailTime} days in jail.<br/>`
+            if (fineFromBounty) msg += `Your bounty has been reduced to: ${gs.bounty}CR.<br/>`
             showModal(fleetName, msg, [['Continue', ()=>endEncounter()]])
         }],
-        ['Resist', ()=>showPlayerRefuseSurrenderModal(-1, 1)],
     ])
 }

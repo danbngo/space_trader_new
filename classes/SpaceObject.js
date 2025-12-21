@@ -86,8 +86,8 @@ class Planet extends OrbitingObject {
         if (name.endsWith('iaian')) name = name.replace('iaian', 'ian')
         if (name.endsWith('oian')) name = name.replace('oian', 'oan')
         if (name.endsWith('uian')) name = name.replace('uian', 'uan')
-        if (name.endsWith('yian')) name = name.replace('yian', 'yan')
         if (name.endsWith('sian')) name = name.replace('sian', 'tian')
+        if (name.endsWith('yian')) name = name.replace('yian', 'ian')
         return name
     }
 }

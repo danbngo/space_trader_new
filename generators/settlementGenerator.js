@@ -4,7 +4,8 @@ function generateSettlement(planet = new Planet()) {
     const blackMarket =  Math.random() > .2 ? generateMarket(planet, true) : null
     const guild =  Math.random() > .2 ? generateGuild(planet) : null
     const bank =  Math.random() > .2 ? generateBank(planet) : null
-    return new Settlement(shipyard, market, blackMarket, guild, bank)
+    const courthouse = Math.random() > .2 ? generateCourthouse(planet) : null;
+    return new Settlement(shipyard, market, blackMarket, guild, bank, courthouse)
 }
 
 
@@ -43,4 +44,9 @@ function generateBank(planet = new Planet()) {
     const rake = rng(2, 0.5, false);
     const credits = rng(1000*1000, 50*1000);
     return new Bank(planet, credits, rake)    
+}
+
+function generateCourthouse(planet = new Planet()) {
+    const rake = rng(2, 0.5, false);
+    return new Courthouse(planet, rake)    
 }

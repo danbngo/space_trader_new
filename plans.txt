@@ -6,10 +6,13 @@ DONE:
  -bounty hunters - will just straight attack you if you OR your officers have a bounty
  -have the banks put bounty on your head every month you're overdue on a loan
  -allow game to end
+ -make skills actually do things
 
 NEXT UP:
 
--make skills actually do things
+-apply officer rake to other cr sources - salvaging, bribes
+-allow arbitrary movement on starmap
+
 some encounters need to be more common near certain planets, asteroid belt, etc.
 
 taverns, hire more interesting characters via the tavern

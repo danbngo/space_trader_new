@@ -104,8 +104,8 @@ function showShipyardBuyMenu(shipyard = new Shipyard()) {
             `Your # ships: ${fleet.ships.length}/${fleet.numPilots} | Your credits: ${gs.credits}`,
             //`Shipyard credits: ${shipyard.credits}`,
             `Local Ship Quality: ${roundToPlaces(100*shipyard.planet.culture.shipQuality, 2)}%`,
-            `Buy Tax: ${statColorSpan(roundToPlaces(100*shipyard.baseRake, 2), 2/(1+shipyard.baseRake),true)}%`
-            `Taxes After Bartering | ${statColorSpan(roundToPlaces(100*(1+shipyard.rake) - 100, 2), 2/(1+shipyard.rake),true)}% Buy`
+            `Buy Tax: ${statColorSpan(roundToPlaces(100*shipyard.baseRake, 2), 2/(1+shipyard.baseRake),true)}%`,
+            (gs.fleet.totalSkills.getAmount(SKILLS.Barter) > 0) ? `Taxes After Barter | ${statColorSpan(roundToPlaces(100*(1+shipyard.rake) - 100, 2), 2/(1+shipyard.rake),true)}% Buy` : '',
         ]}),
         [
             ["Sell Ships", ()=>showShipyardSellMenu(shipyard)],
@@ -169,8 +169,8 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
             `Your # ships: ${fleet.ships.length}/${fleet.numPilots}` + fleet.ships.length < 2 ? colorSpan(` (You can't sell your last ship!)`, 'Yellow') : '',
             colorSpan(`Your credits: ${gs.credits}`, gs.credits == 0 ? '#f00' : ''),
             colorSpan(`Shipyard credits: ${shipyard.credits}`, shipyard.credits == 0 ? '#f00' : ''),
-            `Sell Tax: ${statColorSpan(roundToPlaces(100*market.baseRake/(market.baseRake+1), 2), 2/(market.baseRake+1),true)}%`,
-            `Taxes After Bartering | ${statColorSpan(roundToPlaces(100*market.rake/(market.rake+1), 2), 2/(market.rake+1),true)}% Sell`,
+            `Sell Tax: ${statColorSpan(roundToPlaces(100*shipyard.baseRake/(shipyard.baseRake+1), 2), 2/(shipyard.baseRake+1),true)}%`,
+            (gs.fleet.totalSkills.getAmount(SKILLS.Barter) > 0) ? `Taxes After Barter | ${statColorSpan(roundToPlaces(100*shipyard.rake/(shipyard.rake+1), 2), 2/(shipyard.rake+1),true)}% Sell` : '',
         ]}),
         [
             ["Buy Ships", ()=>showShipyardBuyMenu(shipyard)],
