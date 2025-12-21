@@ -12,7 +12,6 @@ NEXT UP:
 -make skills actually do things
 some encounters need to be more common near certain planets, asteroid belt, etc.
 
-allow player to retire after 50 years and get an ending
 taverns, hire more interesting characters via the tavern
 missions - via the guild, etc.
 -infamy/fame should factor into what missions you can take on

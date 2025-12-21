@@ -22,9 +22,10 @@ const SHAPES = Object.freeze({
 })
 
 const SKILLS = Object.freeze({
-    Navigation: 'Navigation', //avoid bad encounters if desired
-    Diplomacy: 'Diplomacy', //lowers prices in markets, shipyards etc.
-    Engineering: 'Engineering', //your ships gain hull% during travel
+    Piloting: 'Piloting', //avoid hazards, fleet (not ships) goes faster
+    Smuggling: 'Smuggling', //avoid fleet encounters, lose less credits/cargo when boarded
+    Bartering: 'Bartering', //lowers prices in markets, shipyards etc.
+    Engineering: 'Engineering', //gain some hull back after encounters, upgrade modules are more effective?
     //Science: 'Science', //hmmm
     //Doctor: 'Doctor', //your officers gain health during travel - add this later w/ more officer-specific content
     //Leadership: 'Leadership' //lets you have more officers - would like a better system for this

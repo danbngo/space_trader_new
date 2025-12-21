@@ -39,16 +39,29 @@ class Fleet extends SpaceObject {
         return this.ships.reduce((total, ship) => total + ship.engine, 0);
     }
 
+    get totalSkills() {
+        const totalSkills = new CountsMap();
+        for (const skill of SKILLS_ALL) {
+            for (const officer of [this.captain, ...this.officers]) {
+                totalSkills.increment(skill, officer.skills.getAmount(skill))
+            }
+        }
+        return totalSkills
+    }
+
+    get totalMass() {
+        return this.ships.reduce((total, ship) => total + ship.mass, 0);
+    }
+
     //in AU per years
     calcSpeed() {
         //each engine makes your fleet go 1 AU per MINUTE if there was no weight
         const totalEngine = this.calcTotalEngine()
-        let weight = 0
-        for (const ship of this.ships) {
-            weight += ship.mass
-        }
-        weight += this.cargo.total
-        return 60 * 24 * 365 * totalEngine / weight
+        const weight = this.totalMass + this.cargo.total
+        const baseSpeed = 60 * 24 * 365 * totalEngine / weight
+        const totalPilotSkill = this.totalSkills.getAmount(SKILLS.Piloting)
+        const speed = baseSpeed * (1 + totalPilotSkill/50)
+        return speed
     }
 
     calcCombatRating() {
