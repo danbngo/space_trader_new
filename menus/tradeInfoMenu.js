@@ -94,7 +94,7 @@ function showTradeInfoBuyMenu(ct = CARGO_TYPES_ALL[0]) {
         `Trade Info - Buy ${ct.name}`,
         ce({children:[
             createTradeInfoBuyTable(ct, onSelectPlanet),
-            `Your ${ct.name} amt: ${fleet.cargo.getAmount(ct)} | Your Cargo Space: ${fleet.cargo.total}/${fleet.calcTotalCargoSpace()} | Your credits: ${gs.credits}`,
+            `Your ${ct.name} amt: ${fleet.cargo.getAmount(ct)} | Your Cargo Space: ${fleet.cargo.total}/${fleet.totalCargoSpace} | Your credits: ${gs.credits}`,
         ]}),
         options
     );

@@ -7,12 +7,23 @@ class ShipyardState {
     }
 }
 
-class Shipyard {
-    constructor(planet = new Planet(), ships = [], credits = 0, rake = 0) {
+class Building {
+    constructor(planet = new Planet(), baseRake = 1, credits = 0) {
         this.planet = planet
+        this.baseRake = baseRake
+        this.credits = credits
+    }
+    get rake() {
+        console.log('Calculating rake for building on planet', this.planet.name,'with baseRake', this.baseRake,'and player barter skill', gs.fleet.totalSkills.getAmount(SKILLS.Bartering),'skills:',gs.fleet.totalSkills)
+        return this.baseRake/(1 + gs.fleet.totalSkills.getAmount(SKILLS.Bartering)/50)
+    }
+
+}
+
+class Shipyard extends Building {
+    constructor(planet = new Planet(), ships = [], credits = 0, baseRake = 1) {
+        super(planet, baseRake, credits)
         this.ships = ships; // Ship[]
-        this.credits = credits;
-        this.rake = rake
     }
 
     static state = new ShipyardState();
@@ -37,24 +48,21 @@ class Shipyard {
 }
 
 // Guild class
-class Guild {
-    constructor(planet = new Planet(), officers = [], rake = 0) {
-        this.planet = planet
+class Guild extends Building {
+    constructor(planet = new Planet(), officers = [], baseRake = 1) {
+        super(planet, baseRake)
         this.officers = officers; // Officer[]
-        this.rake = rake
     }
     calcHirePrice(officer = new Officer()) {
         return Math.round(officer.value * (1+this.rake))
     }
 }
 
-class Market {
-    constructor(planet = new Planet(), blackMarket = false, cargo = [], credits = 0, rake = 0) {
-        this.planet = planet
+class Market extends Building {
+    constructor(planet = new Planet(), blackMarket = false, cargo = [], credits = 0, baseRake = 1) {
+        super(planet, baseRake, credits)
         this.blackMarket = blackMarket;
         this.cargo = cargo; // Cargo[]
-        this.credits = credits;
-        this.rake = rake
     }
 
     calcCargoBuyPrices() {
@@ -68,7 +76,7 @@ class Market {
 
     calcCargoSellPrices() {
         const prices = new CountsMap()
-        for (const cargoType of CARGO_TYPES_ALL) {
+            for (const cargoType of CARGO_TYPES_ALL) {
             const price = Math.round(cargoType.value * this.planet.culture.cargoPriceModifiers.getAmount(cargoType) / (1+this.rake))
             prices.setAmount(cargoType, price)
         }
@@ -76,13 +84,11 @@ class Market {
     }
 }
 
-class Bank {
+class Bank extends Building {
     static playerBalance = 0 //might need to improve this later if like..multiplayer becomes a thing
 
-    constructor(planet = new Planet(), credits = 0, rake = 0) {
-        this.planet = planet;
-        this.credits = credits;
-        this.rake = rake;
+    constructor(planet = new Planet(), credits = 0, baseRake = 1) {
+        super(planet, baseRake, credits)
     }
     calcDepositPenalty(depositAmount = 0) {
         return Math.ceil( depositAmount * Math.pow(0.01, 1/(1+this.rake)) )

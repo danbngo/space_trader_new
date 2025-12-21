@@ -62,16 +62,19 @@ function endEncounter() {
     //restore all shields
     for (const s of gs.fleet.ships) s.restoreShields()
     //pause and show modal if player has no working ships, cant move
-    if (gs.fleet.isStranded()) {
+    if (gs.fleet.stranded) {
         handlePlayerStranded()
         return
     }
 }
 
-function startCombat(playerHasInitiative = false) {
+function startCombat(playerHasInitiative = false, sneakAttack = false) {
     console.log('startCombat', { playerHasInitiative });
     gs.encounter.combatEnabled = true;
     gs.encounter.activeTurnFleet = playerHasInitiative ? gs.fleet : gs.encounter.enemyFleet
+    if (sneakAttack) {
+        for (const ship of gs.encounter.ships) ship.shields[0] = 0
+    }
     closeModal()
     if (currentMap && currentMap.togglePause) currentMap.togglePause(false)
 }
@@ -119,7 +122,7 @@ function loseCargoFromDisabledShips(disabledShips = []) {
     const disabledShipsCargoCapacity = disabledShips.reduce( (total, ship) => {
         return total + ship.cargoSpace
     }, 0)
-    const cargoRatio = disabledShipsCargoCapacity / gs.fleet.calcTotalCargoSpace()
+    const cargoRatio = disabledShipsCargoCapacity / gs.fleet.totalCargoSpace
     const lostCargoAmt = Math.floor(gs.fleet.cargo.total * cargoRatio)
     if (lostCargoAmt <= 0) return ''
     let totalLostCargo = gs.fleet.cargo.randomSubset(lostCargoAmt)
@@ -158,7 +161,7 @@ function showPlayerDidSurrenderModal( fameLossMultiplier = 1) {
 }
 
 
-function showPlayerAttackFleetModal(fameMultiplier = 0, bountyMultiplier = 0) {
+function showPlayerAttackFleetModal(fameMultiplier = 0, bountyMultiplier = 0, sneakAttack = false) {
     console.log('showPlayerAttackFleetModal', { fameMultiplier, bountyMultiplier });
     const fleetName = gs.encounter.fleetName
     const fame = fameMultiplier > 0 ? 1 * fameMultiplier : 0
@@ -167,11 +170,12 @@ function showPlayerAttackFleetModal(fameMultiplier = 0, bountyMultiplier = 0) {
     gs.captain.fame += fame
     gs.captain.infamy += infamy
     gs.captain.bounty += bounty
-    let msg = `You attack the ${fleetName}!<br/>`
+    let msg = `You ${sneakAttack ? 'sneakily ' : ''}attack the ${fleetName}!<br/>`
+    if (sneakAttack) msg += `The ${fleetName} are caught with their shields down!<br/>`
     if (infamy > 0) msg += `This dastardly act causes you to gain ${infamy} infamy.<br/>`
     if (fame > 0) msg += `This brave act causes you to gain ${fame} fame.<br/>`
     if (bounty > 0) msg += `You bounty has risen by ${bounty}CR.<br/>`
-    showModal(fleetName, msg, [['Continue', ()=>startCombat(true)]])
+    showModal(fleetName, msg, [['Continue', ()=>startCombat(true, true)]])
 }
 
 function showTradeOfferModal() {
@@ -224,7 +228,7 @@ function showTradeOfferPlayerBuyModal() {
     let msg = ''
     const fleetName = gs.encounter.fleetName
     const ct = gs.encounter.fleet.cargo.randomItem(false)
-    const availableCargoSpace = gs.fleet.calcAvailableCargoSpace()
+    const availableCargoSpace = gs.fleet.availableCargoSpace
     let onBuy = null;
 
     msg += `The merchants proudly display their wares.<br/>`
@@ -268,7 +272,7 @@ function showPlayerDefeatedEnemyModal(fameMultiplier = 0) {
     const abandonedCargoCapacity = disabledEnemyShips.reduce( (total, ship) => {
         return total + ship.cargoSpace
     }, 0)
-    const cargoRatio = abandonedCargoCapacity / enemyFleet.calcTotalCargoSpace()
+    const cargoRatio = abandonedCargoCapacity / enemyFleet.totalCargoSpace
     const lootAmt = Math.floor(enemyFleet.cargo.total * cargoRatio)
     const loot = enemyFleet.cargo.randomSubset(lootAmt)
     const disabledPlayerShips = gs.encounter.playerShips.filter(s=>s.isDisabled())
@@ -300,7 +304,7 @@ function showPlayerDefeatedHazardsModal() {
     const abandonedCargoCapacity = disabledEnemyShips.reduce( (total, ship) => {
         return total + ship.cargoSpace
     }, 0)
-    const cargoRatio = abandonedCargoCapacity / enemyFleet.calcTotalCargoSpace()
+    const cargoRatio = abandonedCargoCapacity / enemyFleet.totalCargoSpace
     const lootAmt = Math.floor(enemyFleet.cargo.total * cargoRatio)
     const loot = enemyFleet.cargo.randomSubset(lootAmt)
     const disabledPlayerShips = gs.encounter.playerShips.filter(s=>s.isDisabled())
@@ -371,7 +375,7 @@ function showPlayerDefeatedByPiratesModal() {
         msg += 'They are disgusted to find nothing worth looting!<br/>'
     }
     else {
-        const canLootAmount = encounter.fleet.calcAvailableCargoSpace()
+        const canLootAmount = encounter.fleet.availableCargoSpace
         if (canLootAmount <= 0) {
             //this should not happen, as generators always leave a little room for cargo
             msg += 'They are embarassed to find their cargo bays are too full to hold any more loot.<br/>'

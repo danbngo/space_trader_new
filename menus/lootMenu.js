@@ -34,7 +34,7 @@ function showLootMenu(loot = new CountsMap()) {
             (amt)=>{
                 return `
                     Your Amount After Taking: ${fleet.cargo.getAmount(ct)+amt}<br/>
-                    Total Cargo After Taking: ${fleet.cargo.total+amt}/${fleet.calcTotalCargoSpace()}<br/>
+                    Total Cargo After Taking: ${fleet.cargo.total+amt}/${fleet.totalCargoSpace}<br/>
                 `
             },
             'Take', 'Cancel', (amt = 0)=>takeCargo(ct, amt), ()=>reloadMenu(),
@@ -48,7 +48,7 @@ function showLootMenu(loot = new CountsMap()) {
             (amt)=>{
                 return `
                     Your Amount After Dumping: ${fleet.cargo.getAmount(ct)-amt}CR <br/>
-                    Total Cargo After Dumping: ${fleet.cargo.totalAmt}/${fleet.calcTotalCargoSpace()}<br/>
+                    Total Cargo After Dumping: ${fleet.cargo.totalAmt}/${fleet.totalCargoSpace}<br/>
                 `
             },
             'Dump', 'Cancel', (amt = 0)=>dumpCargo(ct, amt), ()=>reloadMenu(),
@@ -58,7 +58,7 @@ function showLootMenu(loot = new CountsMap()) {
     function onSelectCargoType(ct = CARGO_TYPES_ALL[0]) {
         const playerAmount = fleet.cargo.getAmount(ct)
         const lootAmount = loot.getAmount(ct)
-        const maxLootAmount = Math.min(lootAmount, fleet.calcAvailableCargoSpace())
+        const maxLootAmount = Math.min(lootAmount, fleet.availableCargoSpace)
         const buttons = [
             ['Take', ()=>showTakeCargoSlider(ct, maxLootAmount), maxLootAmount == 0],
             ['Dump', ()=>showDumpCargoSlider(ct, playerAmount), playerAmount == 0],
@@ -70,7 +70,7 @@ function showLootMenu(loot = new CountsMap()) {
     let infoContainer = ce({
         children: [
             createLootCargoTable(fleet.cargo, loot, onSelectCargoType),
-            `Your Cargo Space: ${fleet.cargo.total}/${fleet.calcTotalCargoSpace()}`,
+            `Your Cargo Space: ${fleet.cargo.total}/${fleet.totalCargoSpace}`,
         ]
     })
 

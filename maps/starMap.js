@@ -270,7 +270,7 @@ class StarMap {
             return;
         }
         const isDockedHere = obj == gs.location
-        const cantTravelHere = (obj == gs.location) || gs.fleet.isStranded()
+        const cantTravelHere = (obj == gs.location) || gs.fleet.stranded
         const container = ce({parent:this.objectPane, classNames:['starmap-object-panel']})
         ce({parent:container, tag:'h3', innerHTML: coloredName(obj), onClick: ()=>this.selectObject(obj),
             style: {filter: `drop-shadow(1px 0 0 ${colorArrToRgbaString(COLORS.Green)}) drop-shadow(0 1px 0 ${colorArrToRgbaString(COLORS.Green)})  drop-shadow(0 -0.5px 0 ${colorArrToRgbaString(COLORS.Green)})  drop-shadow(-0.5px 0 0 ${colorArrToRgbaString(COLORS.Green)})`}

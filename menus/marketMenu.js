@@ -73,7 +73,7 @@ function showMarketMenu(market = new Market()) {
     }
 
     function onSelectCargoType(ct = CARGO_TYPES_ALL[0]) {
-        const remainingCargoSpace = fleet.calcAvailableCargoSpace();
+        const remainingCargoSpace = fleet.availableCargoSpace;
         const playerAmount = fleet.cargo.getAmount(ct)
         const marketAmount = market.cargo.getAmount(ct)
         const buyPrice = buyPrices.getAmount(ct)
@@ -94,8 +94,12 @@ function showMarketMenu(market = new Market()) {
     let infoContainer = ce({
         children: [
             createMarketCargoTable(blackMarket, fleet.cargo, market.cargo, buyPrices, sellPrices, onSelectCargoType),
-            `Your Cargo Space: ${fleet.cargo.total}/${fleet.calcTotalCargoSpace()} | Your Credits: ${gs.credits}`,
-            `Market Credits: ${market.credits} | Buy Penalty: ${roundToPlaces(100*market.rake, 2)}% | Sell Penalty: ${roundToPlaces(100/market.rake, 2)}%`,
+            `Your Cargo Space: ${fleet.cargo.total}/${fleet.totalCargoSpace} | Your Credits: ${gs.credits}`,
+            `Market Credits: ${market.credits}`
+            +` | Buy Tax: ${statColorSpan(roundToPlaces(100*market.baseRake, 2), 2/(1+market.baseRake),true)}%`
+            +` | Sell Tax: ${statColorSpan(roundToPlaces(100*market.baseRake/(market.baseRake+1), 2), 2/(market.baseRake+1),true)}%`,
+            `Taxes After Bartering | ${statColorSpan(roundToPlaces(100*(1+market.rake) - 100, 2), 2/(1+market.rake),true)}% Buy`
+            +` | ${statColorSpan(roundToPlaces(100*market.rake/(market.rake+1), 2), 2/(market.rake+1),true)}% Sell`,
         ]
     })
 

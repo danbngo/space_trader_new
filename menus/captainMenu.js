@@ -56,6 +56,7 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}) {
             ...SKILLS_ALL.map(sk=>[`${sk}+`, ()=>improveSkill(sk), skillPoints <= 0]),
             ["Reset", ()=>resetCaptain()],
             ["Finish", () => {
+                console.log('finishing captain creation',captain)
                 closeModal()
                 console.log('going to run:',onClose)
                 onClose()

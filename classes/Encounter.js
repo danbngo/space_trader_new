@@ -19,7 +19,7 @@ class Encounter {
         this.ai = new EncounterAI(this)
         this.result = null //playerVictory, playerDefeat, playerSurrendered,
         this.activeTurnFleet = this.playerFleet
-        this.luck = [Math.random(),Math.random(),Math.random(),] //used for initial encounter decisions
+        this.luck = [Math.random(),Math.random(),Math.random(),Math.random(),Math.random()] //used for initial encounter decisions
     }
 
     get disabledPlayerShips () { return this.playerShips.filter(s=>(s.isDisabled())) }

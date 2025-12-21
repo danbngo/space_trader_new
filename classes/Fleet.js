@@ -27,25 +27,29 @@ class Fleet extends SpaceObject {
         return rounded ? Math.round(share) : share
     }
 
-    calcTotalCargoSpace() {
+    get totalCargoSpace() {
         return this.ships.reduce((total, ship) => total + ship.cargoSpace, 0);
     }
 
-    calcAvailableCargoSpace() {
-        return this.calcTotalCargoSpace() - this.cargo.total
+    get availableCargoSpace() {
+        return this.totalCargoSpace - this.cargo.total
     }
 
-    calcTotalEngine() {
+    get totalEngine() {
         return this.ships.reduce((total, ship) => total + ship.engine, 0);
     }
 
     get totalSkills() {
+        console.log('getting total skills',this)
         const totalSkills = new CountsMap();
         for (const skill of SKILLS_ALL) {
-            for (const officer of [this.captain, ...this.officers]) {
+            console.log('checking skill:',skill)
+            for (const officer of this.officers) {
                 totalSkills.increment(skill, officer.skills.getAmount(skill))
+                console.log('added officer skill:',officer.name,skill,officer.skills.getAmount(skill))
             }
         }
+        console.log('returning total skills:',totalSkills.counts)
         return totalSkills
     }
 
@@ -64,11 +68,15 @@ class Fleet extends SpaceObject {
         return speed
     }
 
-    calcCombatRating() {
+    get totalRadar() {
+        return this.ships.reduce((total, ship) => total + ship.radar, 0);
+    }
+
+    get combatRating() {
         return this.ships.reduce((total, ship) => total + ship.combatRating, 0);
     }
     
-    isStranded() {
+    get stranded() {
         return this.ships.filter(s=>(!s.isDisabled())).length <= 0
     }
 

@@ -1,6 +1,6 @@
 function generateFleetCargo(fleet = new Fleet(), fleetType = rndMember(FLEET_TYPES_ALL)) {
     const cargo = new CountsMap()
-    const maxCargo = fleet.calcTotalCargoSpace()
+    const maxCargo = fleet.totalCargoSpace
     const cargoTypes = rndMembers(fleetType.cargoTypes, rng(fleetType.cargoTypes.length, 1), true)
     const totalCargo = cargoTypes.length > 0 ? rng(1, maxCargo) : 0
     for (let i = 0; i < totalCargo; i++) {

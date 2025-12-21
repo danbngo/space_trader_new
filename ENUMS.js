@@ -23,9 +23,10 @@ const SHAPES = Object.freeze({
 
 const SKILLS = Object.freeze({
     Piloting: 'Piloting', //avoid hazards, fleet (not ships) goes faster
-    Smuggling: 'Smuggling', //avoid fleet encounters, lose less credits/cargo when boarded
+    Stealth: 'Stealth', //avoid fleet encounters, sneak attacks
     Bartering: 'Bartering', //lowers prices in markets, shipyards etc.
     Engineering: 'Engineering', //gain some hull back after encounters, upgrade modules are more effective?
+    Mining: 'Mining', //gain more cargo after destroying asteroids, etc.
     //Science: 'Science', //hmmm
     //Doctor: 'Doctor', //your officers gain health during travel - add this later w/ more officer-specific content
     //Leadership: 'Leadership' //lets you have more officers - would like a better system for this

@@ -5,12 +5,12 @@ class Ship {
         this.name = name;
         this.shipType = shipType;
         this.color = [...color];
-        this.hull = hull;
-        this.shields = shields;
-        this.lasers = lasers;
-        this.radars = radars;
-        this.engine = engine;
-        this.cargoSpace = cargoSpace;
+        this.hull = hull; //sustain more damage before being disabled
+        this.shields = shields; //take less damage from lasers
+        this.lasers = lasers; //do more damage in combat, and vs. asteroids
+        this.radars = radars; //shoot further, and detect enemies and asteroids at greater distances
+        this.engine = engine; //move further in combat, travel faster in systems, ram harder, regen shields faster
+        this.cargoSpace = cargoSpace; //hold more stuff in your ships
         this.fleet = null;
 
         //combat vars
