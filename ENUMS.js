@@ -92,3 +92,9 @@ const AI_TYPES = Object.freeze({
     Ship: 'Ship',
     Asteroid: 'Asteroid', //mostly move in same direction unless able to ram
 })
+
+const ASTEROID_BELT_TYPES = Object.freeze({
+    Rocky: 'Rocky',
+    Icy: 'Icy',
+    Plasma: 'Plasma',
+})

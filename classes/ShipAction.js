@@ -65,6 +65,9 @@ class ShipAction {
         target.x += kx
         target.y += ky
 
+        //seems buggy but let's try it out
+        action.encounter.checkShipEscaped(actor)
+
         actor.numActionsRemaining--
     }
 

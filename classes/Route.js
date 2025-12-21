@@ -3,7 +3,7 @@ class Route {
     constructor(fleet = new Fleet(), destination = new Planet(), startYear = gs.year) {
         //run simu
         const naiveDistance = calcDistance(fleet.x, fleet.y, destination.x, destination.y)
-        const naiveTravelTime = naiveDistance/fleet.calcSpeed()
+        const naiveTravelTime = naiveDistance/fleet.speed
         const {toX, toY, endYear} = Route.estimateTravelTimeToOrbitingBody(startYear, fleet, destination, 100, naiveTravelTime*2+1)
         this.fleet = fleet
         this.destination = destination
@@ -28,7 +28,7 @@ class Route {
         maxYears = 10
     ) {
         const results = [];
-        const speed = fleet.calcSpeed()
+        const speed = fleet.speed
         let bestYearOffset = Infinity;
         let endPosition;
 

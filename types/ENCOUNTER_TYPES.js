@@ -18,7 +18,7 @@ class EncounterType {
 }
 
 const ENCOUNTER_TYPES = {
-    MINERS: new EncounterType('Miners', COLORS.DarkGray, 'You encountered: miners.', FLEET_TYPES.MINERS, AI_TYPES.Ship, FORMATION_TYPES.FaceOff,
+    MINERS: new EncounterType('Miners', COLORS.Brown, 'You encountered: miners.', FLEET_TYPES.MINERS, AI_TYPES.Ship, FORMATION_TYPES.FaceOff,
         ()=>{
             if (gs.encounter.luck[0] * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > gs.encounter.fleet.totalRadar) {
                 showModal(gs.encounter.fleetName, 'Your long range sensors detect a mining fleet before they detect you.<br/>You manage to approach them stealthily.', [
@@ -41,7 +41,7 @@ const ENCOUNTER_TYPES = {
         },
         ()=>showPlayerDefeatedEnemyModal(-1),
         ()=>showPlayerDefeatedByNeutralsModal(1),
-        ()=>showPlayerEscapedFromFleetModal(),
+        ()=>showPlayerEscapedFromEnemyModal(),
         ()=>gs.encounter.encounterType.onDefeat()
     ),
     TOURISTS: new EncounterType('Tourists', COLORS.LightOrange, 'You encountered: tourists.', FLEET_TYPES.TOURISTS, AI_TYPES.Ship, FORMATION_TYPES.FaceOff,
@@ -67,7 +67,7 @@ const ENCOUNTER_TYPES = {
         },
         ()=>showPlayerDefeatedEnemyModal(-1),
         ()=>showPlayerDefeatedByNeutralsModal(1),
-        ()=>showPlayerEscapedFromFleetModal(),
+        ()=>showPlayerEscapedFromEnemyModal(),
         ()=>gs.encounter.encounterType.onDefeat()
     ),
     MERCHANTS: new EncounterType('Merchants', COLORS.Yellow, 'You encountered: merchants.', FLEET_TYPES.MERCHANTS, AI_TYPES.Ship, FORMATION_TYPES.FaceOff,    
@@ -101,7 +101,7 @@ const ENCOUNTER_TYPES = {
         },
         ()=>showPlayerDefeatedEnemyModal(-1),
         ()=>showPlayerDefeatedByNeutralsModal(1),
-        ()=>showPlayerEscapedFromFleetModal(),
+        ()=>showPlayerEscapedFromEnemyModal(),
         ()=>gs.encounter.encounterType.onDefeat()
     ),
     SMUGGLERS: new EncounterType('Smugglers', COLORS.Yellow, 'You encountered: smugglers.', FLEET_TYPES.SMUGGLERS, AI_TYPES.Ship, FORMATION_TYPES.FaceOff,    
@@ -120,7 +120,7 @@ const ENCOUNTER_TYPES = {
             else if (gs.encounter.luck[1] > .5) {
                 showModal(gs.encounter.fleetName, 'The smugglers broadcast a rather seedy invitation to peruse their illicit wares.', [
                     ['View', ()=>closeModal()],
-                    ['Trade', ()=>showTradeOfferModal()],
+                    ['Trade', ()=>showTradeOfferModal(false)],
                     ['Ignore', ()=>endEncounter()],
                     ['Attack', ()=>showPlayerAttackFleetModal(1, 0, false, true)],
                 ])
@@ -135,7 +135,7 @@ const ENCOUNTER_TYPES = {
         },
         ()=>showPlayerDefeatedEnemyModal(1),
         ()=>showPlayerDefeatedByNeutralsModal(1),
-        ()=>showPlayerEscapedFromFleetModal(),
+        ()=>showPlayerEscapedFromEnemyModal(),
         ()=>gs.encounter.encounterType.onDefeat()
     ),
     PIRATES: new EncounterType('Pirates', COLORS.LightRed, 'You encountered: pirates.', FLEET_TYPES.PIRATES, AI_TYPES.Ship, FORMATION_TYPES.FaceOff,
@@ -168,7 +168,7 @@ const ENCOUNTER_TYPES = {
         },
         ()=>showPlayerDefeatedEnemyModal(1),
         ()=>showPlayerDefeatedByPiratesModal(),
-        ()=>showPlayerEscapedFromFleetModal(),
+        ()=>showPlayerEscapedFromEnemyModal(),
         ()=>showPlayerDidSurrenderModal(1)
     ),
     POLICE: new EncounterType('Police', COLORS.LightBlue, 'You encountered: police.', FLEET_TYPES.POLICE, AI_TYPES.Ship, FORMATION_TYPES.FaceOff,
@@ -215,7 +215,7 @@ const ENCOUNTER_TYPES = {
         },
         ()=>showPlayerDefeatedEnemyModal(-2),
         ()=>showPlayerDefeatedByPoliceModal(),
-        ()=>showPlayerEscapedFromFleetModal(),
+        ()=>showPlayerEscapedFromEnemyModal(),
         ()=>showPlayerDidSurrenderModal(-1)
     ),
     SOLDIERS: new EncounterType('Soldiers', COLORS.LightGreen, 'You encountered: soldiers.', FLEET_TYPES.SOLDIERS, AI_TYPES.Ship, FORMATION_TYPES.FaceOff,
@@ -255,7 +255,7 @@ const ENCOUNTER_TYPES = {
         },
         ()=>showPlayerDefeatedEnemyModal(-4),
         ()=>showPlayerDefeatedByPoliceModal(),
-        ()=>showPlayerEscapedFromFleetModal(),
+        ()=>showPlayerEscapedFromEnemyModal(),
         ()=>showPlayerDidSurrenderModal(-1)
     ),
     BOUNTY_HUNTERS: new EncounterType('Bounty Hunters', COLORS.LightRed, 'You encountered: bounty hunters.', FLEET_TYPES.BOUNTY_HUNTERS, AI_TYPES.Ship, FORMATION_TYPES.FaceOff,
@@ -288,7 +288,7 @@ const ENCOUNTER_TYPES = {
         },
         ()=>showPlayerDefeatedEnemyModal(-1),
         ()=>showFineOrJailModal(),
-        ()=>showPlayerEscapedFromFleetModal(),
+        ()=>showPlayerEscapedFromEnemyModal(),
         ()=>showPlayerDidSurrenderModal(-1)
     ),
     ASTEROIDS: new EncounterType('Asteroids', COLORS.Gray, 'You encountered: asteroids.', FLEET_TYPES.ASTEROIDS, AI_TYPES.Asteroid, FORMATION_TYPES.Storm,
@@ -359,7 +359,7 @@ const ENCOUNTER_TYPES = {
 for (const et of [ENCOUNTER_TYPES.ASTEROIDS, ENCOUNTER_TYPES.CRYOIDS, ENCOUNTER_TYPES.PLASMOIDS]) et.onEndTurn = (encounter = new Encounter())=>{
     //make fooroids move faster each turn
     for (const ship of encounter.enemyShips) {
-        if (Math.random() > .5) ship.engine *= 1.1
+        if (Math.random() > .5) ship.engine = Math.ceil(ship.engine*1.1)
     }
 }
 

@@ -1,6 +1,5 @@
-function startEncounter() {
+function startEncounter(encounter = gs.encounter) {
     console.log('startEncounter');
-    const encounter = generateEncounter()
     gs.encounter = encounter
 
     const {playerShips, enemyShips, ships, encounterType} = encounter
@@ -191,10 +190,10 @@ function showPlayerAttackFleetModal(fameMultiplier = 0, bountyMultiplier = 0, sn
     }]])
 }
 
-function showTradeOfferModal() {
+function showTradeOfferModal(allowSell = true) {
     console.log('showTradeOfferModal');
-    if (Math.random() > .5) showTradeOfferPlayerBuyModal()
-    else showTradeOfferPlayerSellModal()
+    if (allowSell && Math.random() > .5) showTradeOfferPlayerSellModal() 
+    else showTradeOfferPlayerBuyModal()
 }
 
 function showTradeOfferPlayerSellModal() {
@@ -220,7 +219,7 @@ function showTradeOfferPlayerSellModal() {
             gs.credits += totalPrice
             showModal(fleetName, 
                 `You sold ${sellAmount} units of ${ct.name} for ${totalPrice}CR.<br/>
-                The merchants thank you and depart.<br/>`, [['Continue', ()=>endEncounter()]])
+                The merchants thank you and tell you to come again!<br/>`, [['Continue', ()=>endEncounter()]])
         }
 
         msg += `They offer to buy ${sellAmount} ${ct.name} for ${pricePerUnit}CR each (total: ${totalPrice}CR).<br/>`
@@ -262,7 +261,7 @@ function showTradeOfferPlayerBuyModal() {
             gs.credits -= totalPrice
             showModal(fleetName, 
                 `You bought ${buyAmount} units of ${ct.name} for ${totalPrice}CR.<br/>
-                The merchants thank you and depart.<br/>`, [['Continue', ()=>endEncounter()]])
+                The merchants thank you and tell you to come again!<br/>`, [['Continue', ()=>endEncounter()]])
         }
         msg += `They offer to sell you ${buyAmount} ${ct.name} for ${pricePerUnit}CR each (total: ${totalPrice}CR).<br/>`
         msg += `Price vs. Market: ${roundToPlaces(100*pricePerUnit/ct.value,2)}%<br/>`
@@ -326,7 +325,9 @@ function showPlayerDefeatedHazardsModal() {
         return total + ship.cargoSpace
     }, 0)
     const cargoRatio = abandonedCargoCapacity / enemyFleet.totalCargoSpace
-    const lootAmt = Math.floor(enemyFleet.cargo.total * cargoRatio)
+    const maxLootAmt = Math.floor(enemyFleet.cargo.total * cargoRatio)
+    const baseLootAmt = Math.floor(Math.random() * maxLootAmt)
+    const lootAmt = weightedAvg([baseLootAmt, enemyFleet.cargo.total], [25, gs.fleet.totalSkills.getAmount(SKILLS.Salvage)])
     const loot = enemyFleet.cargo.randomSubset(lootAmt)
     const disabledPlayerShips = gs.encounter.playerShips.filter(s=>s.isDisabled())
     let msg = ''
@@ -421,7 +422,7 @@ function showPlayerDefeatedByPiratesModal() {
         msg += 'They are disgusted to find nothing worth looting!<br/>'
     }
     else {
-        const canLootAmount = encounter.fleet.availableCargoSpace
+        const canLootAmount = fleet.availableCargoSpace
         if (canLootAmount <= 0) {
             //this should not happen, as generators always leave a little room for cargo
             msg += 'They are embarassed to find their cargo bays are too full to hold any more loot.<br/>'
@@ -442,7 +443,7 @@ function showPlayerDefeatedByPiratesModal() {
         const stolenCreditsAmount = rng(gs.credits*0.5, gs.credits*0.1)
         msg += `They help themselves to ${stolenCreditsAmount} of your credits.<br/>`
     }
-    msg += `The ${fleetName} thank you for your time and depart.<br/>`
+    msg += `The ${fleetName} sadronically thank you for your time and depart.<br/>`
 
     msg += conductRepairs()
 
@@ -455,10 +456,10 @@ function showPlayerDefeatedByPoliceModal() {
     let fine = 5000
     let msg = `The ${fleetName} are taking you in! You are fined ${fine} for resisting arrest!<br/>`
     msg += `Your ships are roughly searched for illegal goods.<br/>`
-    const smugglingFine = seizePlayerContraband()
-    msg += smugglingFine > 0 ? `They confiscate all your contraband, and add a fine of ${fine} to your existing bounty.<br/>`
+    const [smugglingFine, seized] = seizePlayerContraband()
+    msg += smugglingFine > 0 ? `They confiscate ${seized.total} units of contraband, and add a fine of ${smugglingFine} to your existing bounty.<br/>`
     : `They find no contraband aboard your ships, but that hardly excuses your other crimes.<br/>`
-    showModal(fleetName, msg, [['Continue', ()=> showFineOrJailModal(fine)]])
+    showModal(fleetName, msg, [['Continue', ()=> showFineOrJailModal(fine+smugglingFine)]])
 }
 
 function showPlayerEscapedFromEnemyModal() {
@@ -492,15 +493,18 @@ function showPlayerEscapedFromHazardsModal() {
 }
 
 function seizePlayerContraband() {
+    const illegalCargo = Array.from(gs.fleet.cargo.counts.keys()).filter( ct => ct.isIllegal )
+    const seized = new CountsMap()
     let fine = 0
     for (const [ct, amt] of gs.fleet.cargo.counts) {
         if (illegalCargo.includes(ct)) {
             const finePerUnit = ct.value*2
             fine += finePerUnit * amt
+            seized.increment(ct, amt)
         }
         gs.fleet.cargo.setAmount(ct, 0) //confiscate all illegal cargo
     }
-    return fine
+    return [fine, seized]
 }
 
 function conductRepairs() {
@@ -538,13 +542,13 @@ function showPlayerPoliceInspectionModal() {
     console.log('showPlayerPoliceInspectionModal');
     let msg = ''
     const {fleetName} = gs.encounter
-    const illegalCargo = Array.from(gs.fleet.cargo.counts.keys()).filter( ct => ct.isIllegal )
-    if (illegalCargo.length === 0) {
+    const [fine, seized] = seizePlayerContraband()
+    if (fine == 0) {
         msg += `The ${fleetName} inspect your cargo and find nothing illegal. They thank you for your cooperation and wish you a safe journey.<br/>`
+        showModal(fleetName, msg, [['Continue', ()=>endEncounter()]])
     }
     else {
-        const fine = seizePlayerContraband()
-        msg += `The ${fleetName} inspect your cargo and discover ${illegalCargo.length} units of contraband!<br/>`
+        msg += `The ${fleetName} inspect your cargo and discover ${seized.total} units of contraband!<br/>`
         msg += `All of your contraband is confiscated.<br/>`
         showModal(fleetName, msg, [['Continue', ()=> showFineOrJailModal(fine)]])
     }

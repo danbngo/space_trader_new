@@ -24,7 +24,7 @@ const SHIP_TYPES = {
     FIGHTER: new ShipType('Fighter', SHAPES.Triangle, 1, 2, 2, 1, 0.1, 1),
     MINING_SHIP: new ShipType('Mining Ship', SHAPES.Triangle, 2, 0.5, 1, 0.5, 2, 0.5),
     GUARD_SHIP: new ShipType('Guard Ship', SHAPES.Triangle, 1, 1.5, 1.5, 0.5, 0.25, 1.5),
-    PATROL_SHIP: new ShipType('Patrol Ship', SHAPES.Triangle, 1.5, 1.5, 1.5, 1, 0.25, 2),
+    PATROL_SHIP: new ShipType('Patrol Ship', SHAPES.Triangle, 1.5, 1.5, 1.5, 2, 0.25, 2),
 }
 
 const SHIP_TYPES_ALL = Object.values(SHIP_TYPES)

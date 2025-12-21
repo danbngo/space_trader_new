@@ -161,7 +161,7 @@ function ce({tag = 'div', id = '', innerHTML = '', children = [], parent = undef
     if (id && id.length > 0) el.id = ''+id
     if (children && children.length > 0) for (const child of children) if (child !== undefined && child !== null) el.appendChild(child instanceof HTMLElement ? child : ce({innerHTML: child}))
     if (parent) parent.appendChild(el)
-    if (classNames && classNames.length > 0) for (const className of classNames) el.classList.add(className)
+    if (classNames && classNames.length > 0) for (const className of classNames) if (className && className.length > 0) el.classList.add(className)
     if (onClick) el.onclick = onClick
     if (style) applyStyle(el, style)
     if (disabled) el.disabled = true

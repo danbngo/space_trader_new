@@ -58,10 +58,10 @@ class Fleet extends SpaceObject {
     }
 
     //in AU per years
-    calcSpeed() {
+    get speed() {
         //each engine makes your fleet go 1 AU per MINUTE if there was no weight
         const weight = this.totalMass + this.cargo.total
-        const baseSpeed = 60 * 24 * 365 * this.totalEngine / weight
+        const baseSpeed = AVERAGE_FLEET_SPEED * this.totalEngine/AVERAGE_SHIP_ENGINE / weight
         const totalPilotSkill = this.totalSkills.getAmount(SKILLS.Pilot)
         const speed = baseSpeed * (1 + totalPilotSkill/50)
         return speed

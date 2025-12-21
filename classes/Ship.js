@@ -30,11 +30,11 @@ class Ship {
 
     get radius() {
         //use formula based on mass and radius of a sphere
-        return BASE_SPACE_SHIP_RADIUS_IN_MILES * (1+Math.sqrt(this.mass))
+        return BASE_SHIP_RADIUS_IN_MILES * (1+Math.sqrt(this.mass))
     }
 
     get mass() {
-        return 1 + BASE_SPACE_SHIP_MASS * (this.hull[1]/AVERAGE_SHIP_HULL
+        return AVERAGE_SHIP_MASS * (this.hull[1]/AVERAGE_SHIP_HULL
         + this.shields[1]/AVERAGE_SHIP_SHIELDS 
         + this.lasers/AVERAGE_SHIP_LASERS
         + this.cargoSpace/AVERAGE_SHIP_CARGO_SPACE
@@ -70,7 +70,7 @@ class Ship {
     }
 
     get maxRamDamage() {
-        return 0.25 * this.maxMoveDistance * this.mass;
+        return this.maxMoveDistance * this.mass / 8;
     }
 
     isDamaged() {

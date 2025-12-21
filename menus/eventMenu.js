@@ -1,4 +1,5 @@
 function checkForEvents(elapsedYears = 1) {
+    //console.log('checkForEvents', { elapsedYears });
     const elapsedDays = elapsedYears*365
     if (checkGameOver()) return
     if (checkForEncounter(elapsedDays)) return
@@ -6,23 +7,186 @@ function checkForEvents(elapsedYears = 1) {
 }
 
 function checkForEncounter(elapsedDays = 1) {
+    //console.log('checkForEncounter', { elapsedDays, location: gs.location, encounter: gs.encounter });
     //dont have encounters while docked or already in an encounter
     if (gs.location || gs.encounter) return
-    const encounterChance = 1 - Math.pow(1-ENCOUNTER_CHANCE_PER_DAY, elapsedDays)
-    const didEncounter = Math.random() < encounterChance
-    if (!didEncounter) return
-    if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
-    startEncounter()
-    return true
+    if (!checkForPlanetEncounters(elapsedDays)) {
+        checkForAsteroidBeltEncounters(elapsedDays)
+    }
+}
+
+function checkForAsteroidBeltEncounters(elapsedDays = 1) {
+    //console.log('checkForAsteroidBeltEncounters', { elapsedDays });
+    //dont have encounters while docked or already in an encounter
+    if (gs.location || gs.encounter) return
+    
+    const asteroidBelts = gs.system.asteroidBelts
+    const fleet = gs.fleet
+    
+    for (const belt of asteroidBelts) {
+        // Get the belt's center distance from the sun
+        const beltCenterDistance = belt.orbit.radius
+        
+        // Get the belt's territory radius
+        const beltRadius = belt.radius
+        
+        // Calculate fleet's distance from the sun
+        const fleetDistanceFromSun = calcDistance(fleet.x, fleet.y, 0, 0)
+        
+        // Calculate distance from the belt's center ring
+        const distanceFromBeltCenter = Math.abs(fleetDistanceFromSun - beltCenterDistance)
+        
+        // Calculate proximity factor using 1/(1+d/r) formula
+        // In the middle of belt (d=0): factor = 1.0
+        // At edge (d=beltRadius): factor = 0.5
+        // Beyond edge: factor approaches 0 but never reaches it
+        const proximityFactor = 1 / (1 + distanceFromBeltCenter / beltRadius)
+        
+        // Base encounter chance
+        const baseChance = Math.pow(ASTEROIDS_ENCOUNTER_CHANCE_PER_DAY, 1/(elapsedDays * proximityFactor))
+        
+        /*console.log(`Checking ${belt.name}:`, {
+            beltCenterDistance,
+            beltRadius,
+            fleetDistanceFromSun,
+            distanceFromBeltCenter,
+            proximityFactor: proximityFactor.toFixed(3),
+            baseChance: baseChance.toFixed(4)
+        });*/
+        
+        // Check if encounter happens
+        if (Math.random() > baseChance) continue
+        
+        // Determine encounter type based on belt type
+        let encounterType
+        if (belt.beltType === ASTEROID_BELT_TYPES.Rocky) {
+            encounterType = ENCOUNTER_TYPES.ASTEROIDS
+        } else if (belt.beltType === ASTEROID_BELT_TYPES.Icy) {
+            encounterType = ENCOUNTER_TYPES.CRYOIDS
+        } else if (belt.beltType === ASTEROID_BELT_TYPES.Plasma) {
+            encounterType = ENCOUNTER_TYPES.PLASMOIDS
+        } else {
+            continue // Unknown belt type, skip
+        }
+        
+        console.log(`🚨 ASTEROID ENCOUNTER TRIGGERED: ${belt.name} (${encounterType.name})`);
+        
+        // Start the encounter
+        if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
+        const encounter = generateEncounter(encounterType, null)
+        startEncounter(encounter)
+        return true
+    }
+    
+    return false
+}
+
+function checkForPlanetEncounters(elapsedDays = 1) {
+    //console.log('checkForPlanetEncounters', { elapsedDays });
+    //dont have encounters while docked or already in an encounter
+    if (gs.location || gs.encounter) return
+    
+    const planets = [...gs.system.planets]
+    const fleet = gs.fleet
+
+    const sortedPlanetsByProximity = planets.sort((a, b) => {
+        const distA = calcDistance(fleet.x, fleet.y, a.x, a.y)
+        const distB = calcDistance(fleet.x, fleet.y, b.x, b.y)
+        return distA - distB
+    })
+    
+    for (const planet of sortedPlanetsByProximity) {
+        if (!planet.culture) continue
+        
+        const distance = calcDistance(fleet.x, fleet.y, planet.x, planet.y)
+        const territory = planet.culture.territory
+        
+        // Calculate proximity factor using 1/(1+d/t) formula
+        // At planet (d=0): factor = 1.0
+        // At edge (d=territory): factor = 0.5
+        // Beyond edge: factor approaches 0 but never reaches it
+        const proximityFactor = 1 / (1 + distance / territory)
+        
+        // Base encounter chance influenced by culture properties
+        const {governmentRating, securityRating, crimeRating, commercialRating, industrialRating} = planet.culture
+        
+        const baseChance = Math.pow(PLANET_ENCOUNTER_CHANCE_PER_DAY, 1/(elapsedDays * proximityFactor))
+        
+        // Build weighted encounter type array based on culture
+        const encounterWeights = []
+        
+        // Police (influenced by government and security)
+        encounterWeights.push({type: ENCOUNTER_TYPES.POLICE, weight: (governmentRating + securityRating) * 2})
+        
+        // Pirates (influenced by crime, reduced by security)
+        encounterWeights.push({type: ENCOUNTER_TYPES.PIRATES, weight: crimeRating * 3 / securityRating})
+        
+        // Smugglers (influenced by crime and commercial)
+        encounterWeights.push({type: ENCOUNTER_TYPES.SMUGGLERS, weight: ((crimeRating + commercialRating) * 1.5) / securityRating})
+        
+        // Merchants (influenced by commercial)
+        encounterWeights.push({type: ENCOUNTER_TYPES.MERCHANTS, weight: commercialRating * 3})
+        
+        // Miners (influenced by industrial)
+        encounterWeights.push({type: ENCOUNTER_TYPES.MINERS, weight: industrialRating * 2})
+        
+        // Tourists (influenced by commercial and government)
+        encounterWeights.push({type: ENCOUNTER_TYPES.TOURISTS, weight: (commercialRating + governmentRating)})
+        
+        // Calculate total weight
+        const totalWeight = encounterWeights.reduce((sum, e) => sum + e.weight, 0)
+        if (totalWeight <= 0) continue
+        
+        // Adjust base chance by culture activity level
+        const activityLevel = (governmentRating + securityRating + crimeRating + commercialRating + industrialRating) / 5
+        const encounterChance = baseChance * activityLevel
+        
+        /*console.log(`Checking ${planet.name}:`, {
+            distance: distance.toFixed(2),
+            territory: territory.toFixed(2),
+            proximityFactor: proximityFactor.toFixed(3),
+            activityLevel: activityLevel.toFixed(2),
+            encounterChance: encounterChance.toFixed(4),
+            totalWeight: totalWeight.toFixed(2)
+        });*/
+        
+        // Check if encounter happens
+        if (Math.random() > encounterChance) continue
+        
+        // Select encounter type using weighted random
+        const roll = Math.random() * totalWeight
+        let cumulative = 0
+        let selectedType = encounterWeights[0].type
+        
+        for (const {type, weight} of encounterWeights) {
+            cumulative += weight
+            if (roll <= cumulative) {
+                selectedType = type
+                break
+            }
+        }
+        
+        console.log(`🚨 PLANET ENCOUNTER TRIGGERED: ${planet.name} (${selectedType.name})`);
+        
+        // Start the encounter with the selected type
+        if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
+        const encounter = generateEncounter(selectedType, planet)
+        startEncounter(encounter)
+        return true
+    }
+    
+    return false
 }
 
 function checkDebtCollections(elapsedDays = 1) {
+    //console.log('checkDebtCollections', { elapsedDays });
     //check for bank bounty collection
     const outstandingDebts = gs.captain.calcTotalDebts(true)
     if (outstandingDebts <= 0) return
-    const bountyChance = 1 - Math.pow(1-BANK_BOUNTY_CHANCE_PER_DAY, elapsedDays)
-    const didCollectBounty = Math.random() < bountyChance
-    if (!didCollectBounty) return
+    const baseChance = Math.pow(BANK_BOUNTY_CHANCE_PER_DAY, 1/(elapsedDays))
+    if (Math.random() > baseChance) return
+
+    console.log('🚨 DEBT COLLECTION TRIGGERED', { outstandingDebts, bountyChance });
     const totalDebts = gs.captain.calcTotalDebts(true)
     const convertedAmt = Math.min(totalDebts, 100 + rng( Math.ceil(totalDebts/3), Math.ceil(totalDebts/6) ))
     const fees = Math.ceil(convertedAmt * 0.5)

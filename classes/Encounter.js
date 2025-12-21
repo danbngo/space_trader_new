@@ -19,7 +19,7 @@ class Encounter {
         this.result = null //playerVictory, playerDefeat, playerSurrendered,
         this.activeTurnFleet = this.playerFleet
         this.luck = [Math.random(),Math.random(),Math.random(),Math.random(),Math.random()] //used for initial encounter decisions
-        this.fleetName = `${this.planet.ianName} ${this.encounterType.name}`
+        this.fleetName = this.planet ? `${this.planet.ianName} ${this.encounterType.name}` : this.encounterType.name
     }
 
     get disabledPlayerShips () { return this.playerShips.filter(s=>(s.isDisabled())) }

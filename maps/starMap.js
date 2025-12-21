@@ -49,7 +49,7 @@ class StarMap {
             parent:this.controls,
             classNames: ['starmap-buttons'],
             children: [
-                ce({tag:'button', innerHTML:this.paused ? '▶' : '⏸', onClick: () => this.togglePause()}),
+                ce({tag:'button', classNames: [(this.paused && !gs.location) || (!this.paused && gs.location) ? 'highlighted' : null] , innerHTML:this.paused ? '▶' : '⏸', onClick: () => this.togglePause()}),
                 ce({tag:'button', innerHTML:'+', onClick: () => this.cvs.adjustZoom(1.33)}),
                 ce({tag:'button', innerHTML:'-', onClick: () => this.cvs.adjustZoom(0.66)}),
                 ce({tag:'button', innerHTML:'?', onClick: () => this.openAssistant()}),

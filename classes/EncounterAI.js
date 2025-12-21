@@ -42,11 +42,11 @@ class EncounterAI {
         const {fleet, aiType} = ship
         const opposingFleet = this.calcOpposingFleet(fleet)
         const fleetCombatBalance = fleet.combatRating / opposingFleet.combatRating
-        const shipCombatBalance = ship.combatRating / (opposingFleet.combatRating / (opposingFleet.activeShips.length || 1))
+        const shipState = (ship.hull[0] / ship.hull[1] + ship.shields[0] / ship.shields[1]) / 2
         let strategy;
         
         if (aiType == AI_TYPES.Ship) {
-            if (fleetCombatBalance + shipCombatBalance < 0.5) {
+            if (Math.max(fleetCombatBalance*shipState, shipState) < 0.5) {
                 strategy = COMBAT_STRATEGIES.Escape
             }
             else {
@@ -57,7 +57,7 @@ class EncounterAI {
             strategy = COMBAT_STRATEGIES.Asteroid
         }
 
-        console.log('combat balances:', { fleetCombatBalance, shipCombatBalance, strategy });
+        console.log('combat balances:', { fleetCombatBalance, shipState, strategy });
         return strategy
     }
 
@@ -89,23 +89,26 @@ class EncounterAI {
         console.log('EncounterAI.calcBestMoveCoords', { ship, destX, destY, simulations });
         const moveArea = ship.calcMoveArea()
         let bestMove = null
-        let bestMoveScore = 0
-        const angleToTarget = new Path(ship.x, ship.y, destX, destY).angle
+        let bestMoveScore = Infinity
+        const pathToTarget = new Path(ship.x, ship.y, destX, destY)
+        const angleToTarget = pathToTarget.angle
+        const distToTarget = pathToTarget.distance
         for (let i = 0; i < simulations; i++) {
             const [toX, toY] = [rng(moveArea.x+moveArea.radiusX, moveArea.x-moveArea.radiusX, false), rng(moveArea.y+moveArea.radiusY, moveArea.y-moveArea.radiusY, false)]
             if (!moveArea.containsPoint(toX, toY)) continue
-            const path = new Path(ship.x, ship.y, destX, destY)
+            const path = new Path(destX, destY, toX, toY)
             const {angle, distance} = path
             const dAngle = angleToTarget - angle
             const normalizedDAngle = Math.atan2(Math.sin(dAngle), Math.cos(dAngle)); 
             const angleScore = (Math.PI - Math.abs(normalizedDAngle)) / Math.PI
-            const distanceScore = 1 / (1 + distance)
-            const moveScore = angleScore * 0.7 + distanceScore * 0.3
-            if (moveScore > bestMoveScore) {
+            const distanceScore = (distance / distToTarget)
+            const moveScore = distanceScore * 0.5 + angleScore * 0.5
+            if (moveScore < bestMoveScore) {
                 bestMoveScore = moveScore
                 bestMove = [toX, toY]
             }
         }
+        console.log('found calcBestMoveCoords result:',bestMove,bestMoveScore)
         return bestMove
     }
 
@@ -158,7 +161,7 @@ class EncounterAI {
                 const angle = path.angle
                 const dAngle = angle - ship.angle
                 const normalizedDAngle = Math.atan2(Math.sin(dAngle), Math.cos(dAngle)); 
-                const mightHit = (Math.abs(normalizedDAngle) < Math.PI/8);
+                const mightHit = (Math.abs(normalizedDAngle) < Math.PI/6);
                 return mightHit
             })
             if (inTheWayTargets.length > 0 && ship.engine > 0 && Math.random() > .5) {
@@ -167,7 +170,7 @@ class EncounterAI {
                 return new ShipAction(encounter, ship, MOVE_TYPES.Ram, targetToRam)
             }
             //if no targets in the way, move semi randomly, mostly in the same dir we're already facing
-            const [toX, toY] = rotatePoint(0, encounter.mapRadius*2, 0, 0, ship.angle + rng(-Math.PI/8, Math.PI/8, false))
+            const [toX, toY] = rotatePoint(0, encounter.mapRadius*2, 0, 0, ship.angle + rng(-Math.PI/6, Math.PI/6, false))
             const bestMove = this.calcBestMoveCoords(ship, toX, toY)
             if (bestMove) return new ShipAction(encounter, ship, MOVE_TYPES.Move, null, bestMove[0], bestMove[1])
         }
@@ -178,7 +181,7 @@ class EncounterAI {
             }
             else if (rammableTargets.length > 0 && ship.engine > 0) {
                 //ram targets if any available - but don't ram if they have more hull than us
-                const safeRammableTargets = rammableTargets.filter(t => t.hull[0] < ship.hull[0])
+                const safeRammableTargets = rammableTargets.filter(t => t.hull[0] < ship.hull[0]*Math.random())
                 if (safeRammableTargets.length > 0) {
                     return new ShipAction(encounter, ship, MOVE_TYPES.Ram, rndMember(safeRammableTargets))
                 }

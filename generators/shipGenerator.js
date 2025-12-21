@@ -1,6 +1,5 @@
-function generateShip(planet = new Planet(), shipType = rndMember(SHIP_TYPES_ALL)) {
-    const {culture} = planet
-    const {shipQuality} = culture
+function generateShip(shipType = rndMember(SHIP_TYPES_ALL), planet = new Planet()) {
+    const shipQuality = planet ? planet.culture.shipQuality : 1
 
     let maxHull =    Math.ceil(AVERAGE_SHIP_HULL*rng(2, 0.5, false)*shipType.hull*shipQuality) 
     let maxShields = Math.ceil(AVERAGE_SHIP_SHIELDS*rng(2, 0.5, false)*shipType.shields*shipQuality)
@@ -12,7 +11,7 @@ function generateShip(planet = new Planet(), shipType = rndMember(SHIP_TYPES_ALL
     const hull = [maxHull, maxHull]
     const maxActionsPerTurn = shipType.maxActionsPerTurn || SHIP_NUM_MOVES_PER_TURN
 
-    const name = `${planet.name} ${shipType.name}`
+    const name = planet ? `${planet.name} ${shipType.name}` : shipType.name
 
     return new Ship(name, shipType, COLORS.LightGray, hull, shields, lasers, engine, cargoSpace, radars, maxActionsPerTurn);
 }

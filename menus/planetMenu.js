@@ -6,15 +6,7 @@ function showPlanetMenu(planet = new Planet()) {
         `You have arrived at ${coloredName(planet)}.<br/>`
         : `You are scanning ${coloredName(planet)}.<br/>`
 
-    msg += `Population: ${roundToPlaces(planet.culture.population * 1000,2)}M<br/>`
-    msg += `Territory: ~${roundToPlaces(planet.culture.territory,2)}AU<br/>`
-    msg += `Government Rating: ${roundToPlaces(planet.culture.governmentRating,2)}x<br/>`
-    msg += `Security Rating: ${roundToPlaces(planet.culture.securityRating,2)}x<br/>`
-    msg += `Commercial Rating: ${roundToPlaces(planet.culture.commercialRating,2)}x<br/>`
-    msg += `Industrial Rating: ${roundToPlaces(planet.culture.industrialRating,2)}x<br/>`
-    msg += `Crime Rating: ${roundToPlaces(planet.culture.crimeRating,2)}x<br/>`
-
-    if (isDocked) {
+        if (isDocked) {
         console.log('1')
         const damagedShips = gs.fleet.ships.filter(s=>s.isDamaged())
         console.log('2:',damagedShips,gs.fleet.ships)
@@ -23,7 +15,7 @@ function showPlanetMenu(planet = new Planet()) {
         msg += `What would you like to do?<br/>`
     }
 
-    const options = [];
+    const options = [[`Overview`, () => showPlanetOverviewMenu(planet)]];
     if (settlement.shipyard) {
         options.push(["Shipyard", () => showShipyardBuyMenu(settlement.shipyard)]);
     }
@@ -39,9 +31,26 @@ function showPlanetMenu(planet = new Planet()) {
     if (settlement.bank) {
         options.push(["Bank", () => showBankMenu(settlement.bank)]);
     }
+    if (settlement.courthouse) {
+        options.push(["Courthouse", () => showCourthouseMenu(settlement.courthouse)]);
+    }
     options.push([isDocked ? "Depart" : "Stop Scanning", () => departPlanet(planet)]);
 
     showModal(coloredName(planet), msg, options);
+}
+
+function showPlanetOverviewMenu(planet = new Planet()) {
+    const {culture} = planet
+    const {territory, population, governmentRating, securityRating, commercialRating, industrialRating, crimeRating} = culture
+    let msg = `<h3>${coloredName(planet)} Overview</h3>`    
+    msg += `Population: ${statColorSpan(describeLargeNumber(population * 1000), population, true)}M<br/>`
+    msg += `Territory: ~${statColorSpan(roundToPlaces(territory,2), territory, true)}AU<br/>`
+    msg += `Government Rating: ${statColorSpan(roundToPlaces(governmentRating,2), governmentRating, true)}x<br/>`
+    msg += `Security Rating: ${statColorSpan(roundToPlaces(securityRating,2), securityRating, true)}x<br/>`
+    msg += `Commercial Rating: ${statColorSpan(roundToPlaces(commercialRating,2), commercialRating, true)}x<br/>`
+    msg += `Industrial Rating: ${statColorSpan(roundToPlaces(industrialRating,2), industrialRating, true)}x<br/>`
+    msg += `Crime Rating: ${statColorSpan(roundToPlaces(crimeRating,2), crimeRating, true)}x<br/>`
+    showModal(coloredName(planet), msg, [["Back", () => showPlanetMenu(planet)]]);
 }
 
 

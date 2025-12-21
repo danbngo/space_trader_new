@@ -13,7 +13,7 @@ function generateShipyard(planet = new Planet()) {
     const count = rng(5, 1)
     const ships = [];
     for(let i=0;i<count;i++) {
-        ships.push(generateShip(planet));
+        ships.push(generateShip(rndMember(SHIP_TYPES_ALL), planet));
     }
     const rake = rng(2, 0.5, false)
     const credits = rng(200*1000, 10*1000);

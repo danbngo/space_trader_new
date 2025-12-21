@@ -10,7 +10,11 @@ DONE:
 
 NEXT UP:
 
+-make some buttons stand out a lot under certain conditions :
+  ex . hail button should be highlighted when player is in view mode
+  or unpause button when player's game is paused
 -apply officer rake to other cr sources - salvaging, bribes
+-ships should be able to miss, misfire engine (dont move), miss ramming, etc.
 -allow arbitrary movement on starmap
 
 some encounters need to be more common near certain planets, asteroid belt, etc.

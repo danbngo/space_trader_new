@@ -12,16 +12,16 @@ function generateFleetCargo(fleet = new Fleet(), fleetType = rndMember(FLEET_TYP
 }
 
 
-function generateFleet(planet = new Planet(), fleetType = rndMember(FLEET_TYPES_ALL)) {
-    console.log('Generating fleet of type:', fleetType.name, 'for planet:', planet.name)
+function generateFleet(fleetType = rndMember(FLEET_TYPES_ALL), planet = new Planet()) {
     const ships = []
-    const numShips = rng(fleetType.minShips, fleetType.maxShips)
+    const populationMod = planet ? planet.culture.population : 1
+    const numShips = rng(fleetType.minShips*populationMod, fleetType.maxShips*populationMod)
     for (let i = 0; i < numShips; i++) {
         const shipType = i == 0 ? fleetType.shipTypes[0] : rndMember(fleetType.shipTypes)
-        ships.push(generateShip(planet, shipType))
+        ships.push(generateShip(shipType, planet))
         console.log('generated ship:',ships[ships.length-1])
     }
-    const fleet = new Fleet(fleetType.name, planet.color, 0, 0)
+    const fleet = new Fleet(fleetType.name, planet ? planet.color : COLORS.DarkGray, 0, 0)
     ships.forEach(s=>fleet.addShip(s))
     
     fleet.cargo = generateFleetCargo(fleet, fleetType)

@@ -12,10 +12,12 @@ const PLANETS = [MERCURY, VENUS, EARTH, MARS, JUPITER, SATURN, URANUS, NEPTUNE]
 
 SOL.addChildren(PLANETS)
 
-const ASTEROID_BELT = new AsteroidBelt("Asteroid Belt", hexToRgba('#888888'), 0, 0, 0, new Orbit(2.8))
-const KUIPER_BELT = new AsteroidBelt("Kuiper Belt", hexToRgba('#888888'), 0, 0, 0, new Orbit(50))
+
+const CORONA = new AsteroidBelt("Corona", ASTEROID_BELT_TYPES.Plasma, hexToRgba('#ffff00'), 0, 0, 0, new Orbit(0.1))
+const ASTEROID_BELT = new AsteroidBelt("Asteroid Belt", ASTEROID_BELT_TYPES.Rocky, hexToRgba('#bb8844'), 0.2*2.8, 0, 0, new Orbit(2.8))
+const KUIPER_BELT = new AsteroidBelt("Kuiper Belt", ASTEROID_BELT_TYPES.Icy, hexToRgba('#bbbbdd'), 50*2/5, 0, 0, new Orbit(50))
 const ASTEROIDS = generateAsteroids(ASTEROID_BELT, COLORS.Brown, 500, 0.2)
-const KUIPER_ASTEROIDS = generateAsteroids(KUIPER_BELT, COLORS.LightBlue, 5000, 20/50)
+const KUIPER_ASTEROIDS = generateAsteroids(KUIPER_BELT, COLORS.LightBlue, 5000, 2/5)
 
 SOL.addChildren(ASTEROIDS)
 SOL.addChildren(KUIPER_ASTEROIDS)
@@ -28,7 +30,7 @@ const SOLAR_SYSTEM = new StarSystem(
     SOL, [SOL],
     PLANETS,
     [],
-    [ASTEROID_BELT, KUIPER_BELT], [...ASTEROIDS, ...KUIPER_ASTEROIDS],
+    [CORONA, ASTEROID_BELT, KUIPER_BELT], [...ASTEROIDS, ...KUIPER_ASTEROIDS],
     BACKGROUND_STARS
 );
 

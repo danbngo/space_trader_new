@@ -79,19 +79,29 @@ class Planet extends OrbitingObject {
     }
 
     get ianName() {
-        let name = this.name+'ian'
-        if (name == 'Earthian') return 'Terran'
-        if (name.endsWith('aaian')) name = name.replace('aaian', 'aan')
-        if (name.endsWith('eaian')) name = name.replace('eaian', 'ean')
-        if (name.endsWith('iaian')) name = name.replace('iaian', 'ian')
-        if (name.endsWith('oian')) name = name.replace('oian', 'oan')
-        if (name.endsWith('uian')) name = name.replace('uian', 'uan')
-        if (name.endsWith('sian')) name = name.replace('sian', 'tian')
-        if (name.endsWith('yian')) name = name.replace('yian', 'ian')
-        return name
+        let baseName = this.name+'ian'
+        if (baseName.endsWith('yian')) baseName = baseName.replace('yian', 'ian') //mercury
+        //venus already handled
+        if (baseName == 'Earthian') baseName = 'Terran' //earth
+        if (baseName.endsWith('sian')) baseName = baseName.replace('sian', 'tian') //mars
+        if (baseName.endsWith('upiterian')) baseName = baseName.replace('upiterian', 'ovian') //jupiter
+        //saturn already handled
+        if (baseName.endsWith('nusian')) baseName = baseName.replace('nusian', 'nian') //uranus
+        //neptune covered by vowel cases below
+        if (baseName.endsWith('aian')) baseName = baseName.replace('aian', 'ian')
+        if (baseName.endsWith('eian')) baseName = baseName.replace('eian', 'ian')
+        if (baseName.endsWith('iian')) baseName = baseName.replace('iian', 'ian')
+        if (baseName.endsWith('oian')) baseName = baseName.replace('oian', 'ian')
+        if (baseName.endsWith('uian')) baseName = baseName.replace('uian', 'ian')
+        return baseName
     }
 }
 
-class AsteroidBelt extends OrbitingObject {}
+class AsteroidBelt extends OrbitingObject {
+    constructor(name = "Unnamed", beltType = ASTEROID_BELT_TYPES.Rocky, color = COLORS.White, radius = 0, x = 0, y = 0, orbit = null) {
+        super(name, color, radius, x, y, orbit);
+        this.beltType = beltType
+    }
+}
 
 class Asteroid extends OrbitingObject {}

@@ -23,3 +23,28 @@ button:disabled {
     box-shadow: none;
     cursor: default;
 }
+
+/* Highlighted button - stands out for important actions */
+button.highlighted {
+    background: linear-gradient(135deg, rgba(255,215,0,0.3), rgba(255,165,0,0.3));
+    border: 2px solid #ffa500;
+    color: #ffd700;
+    box-shadow: 0 0 12px rgba(255,165,0,0.6);
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+button.highlighted:not(:disabled):hover {
+    background: linear-gradient(135deg, rgba(255,215,0,0.5), rgba(255,165,0,0.5));
+    border: 2px solid #ffd700;
+    box-shadow: 0 0 16px rgba(255,165,0,0.8);
+}
+
+/* Pulsing glow animation */
+@keyframes pulse-glow {
+    0%, 100% {
+        box-shadow: 0 0 12px rgba(255,165,0,0.6);
+    }
+    50% {
+        box-shadow: 0 0 20px rgba(255,165,0,0.9), 0 0 30px rgba(255,165,0,0.4);
+    }
+}
