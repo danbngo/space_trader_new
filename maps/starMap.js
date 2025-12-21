@@ -213,12 +213,12 @@ class StarMap {
             cvsObject = cvs.getObject(`fleetpath${index}`)
             if (!fleet.route) cvsObject.visible = false
             else {
-                let {startX, startY, endX, endY} = fleet.route.path
+                let {startX, startY, toX, toY} = fleet.route.path
                 cvsObject.visible = true
                 cvsObject.x = startX
                 cvsObject.y = startY
-                cvsObject.x2 = endX
-                cvsObject.y2 = endY
+                cvsObject.x2 = toX
+                cvsObject.y2 = toY
             }
 
             cvsObject = cvs.getObject(`fleetengine${index}`)

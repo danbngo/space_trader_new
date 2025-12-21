@@ -1,10 +1,11 @@
 function startEncounter() {
+    console.log('startEncounter');
     const encounter = generateEncounter()
     gs.encounter = encounter
 
     const {playerShips, enemyShips, ships} = encounter
     //randomize ship locations
-    const maxSpawnDistance = encounter.mapDimensions*ENCOUNTER_SHIP_MAX_SPAWN_DISTANCE_RATIO
+    const maxSpawnDistance = encounter.mapRadius*ENCOUNTER_SHIP_MAX_SPAWN_DISTANCE_RATIO
     const minSpawnDistance = maxSpawnDistance/5
 
     for (const ship of ships) {
@@ -39,6 +40,7 @@ function startEncounter() {
 }
 
 function endEncounter() {
+    console.log('endEncounter');
     gs.encounter = undefined
     showStarMap(gs.fleet)
     //restore all shields
@@ -51,12 +53,15 @@ function endEncounter() {
 }
 
 function startCombat(playerHasInitiative = false) {
+    console.log('startCombat', { playerHasInitiative });
     gs.encounter.combatEnabled = true;
     gs.encounter.activeTurnFleet = playerHasInitiative ? gs.fleet : gs.encounter.enemyFleet
     closeModal()
+    if (currentMap && currentMap.togglePause) currentMap.togglePause(false)
 }
 
 function endCombat() {
+    console.log('endCombat');
     const {encounter} = gs
     const {result} = encounter
     if (result == ENCOUNTER_RESULTS.Defeat) {
@@ -71,6 +76,7 @@ function endCombat() {
 }
 
 function handlePlayerStranded() {
+    console.log('handlePlayerStranded');
     const [nearestPlanet, nearestDistance] = gs.system.calcNearestPlanet(gs.fleet)
     const creditCost = 10 + rng(200*nearestDistance, 100*nearestDistance)
     const canAfford = gs.credits >= creditCost
@@ -93,6 +99,7 @@ function handlePlayerStranded() {
 }
 
 function loseCargoFromDisabledShips(disabledShips = []) {
+    console.log('loseCargoFromDisabledShips', { disabledShips });
     const disabledShipsCargoCapacity = disabledShips.reduce( (total, ship) => {
         return total + ship.cargoSpace
     }, 0)
@@ -106,6 +113,7 @@ function loseCargoFromDisabledShips(disabledShips = []) {
 }
 
 function showPlayerRefuseSurrenderModal(fameMultiplier = 0, bountyMultiplier = 0) {
+    console.log('showPlayerRefuseSurrenderModal', { fameMultiplier, bountyMultiplier });
     const fleetName = gs.encounter.fleetName
     const bounty = 100 * bountyMultiplier
     const fame = fameMultiplier > 0 ? 1 * fameMultiplier : 0
@@ -118,6 +126,7 @@ function showPlayerRefuseSurrenderModal(fameMultiplier = 0, bountyMultiplier = 0
 }
 
 function showPlayerDidSurrenderModal( fameLossMultiplier = 1) {
+    console.log('showPlayerDidSurrenderModal', { fameLossMultiplier });
     const fleetName = gs.encounter.fleetName
     const fameLoss = fameLossMultiplier < 0 ? 5 * fameLossMultiplier : 0
     const infamyLoss = fameLossMultiplier < 0 ? 5 * fameLossMultiplier : 0
@@ -134,6 +143,7 @@ function showPlayerDidSurrenderModal( fameLossMultiplier = 1) {
 
 
 function showPlayerAttackFleetModal(fameMultiplier = 0, bountyMultiplier = 0) {
+    console.log('showPlayerAttackFleetModal', { fameMultiplier, bountyMultiplier });
     const fleetName = gs.encounter.fleetName
     const fame = fameMultiplier > 0 ? 1 * fameMultiplier : 0
     const infamy = fameMultiplier < 0 ? 1 * Math.abs(fameMultiplier) : 0
@@ -149,11 +159,13 @@ function showPlayerAttackFleetModal(fameMultiplier = 0, bountyMultiplier = 0) {
 }
 
 function showTradeOfferModal() {
+    console.log('showTradeOfferModal');
     if (Math.random() > .5) showTradeOfferPlayerBuyModal()
     else showTradeOfferPlayerSellModal()
 }
 
 function showTradeOfferPlayerSellModal() {
+    console.log('showTradeOfferPlayerSellModal');
     let msg = ''
     const fleetName = gs.encounter.fleetName
     const ct = gs.fleet.cargo.randomItem(false)
@@ -192,6 +204,7 @@ function showTradeOfferPlayerSellModal() {
 }
 
 function showTradeOfferPlayerBuyModal() {
+    console.log('showTradeOfferPlayerBuyModal');
     let msg = ''
     const fleetName = gs.encounter.fleetName
     const ct = gs.encounter.fleet.cargo.randomItem(false)
@@ -232,6 +245,7 @@ function showTradeOfferPlayerBuyModal() {
 
 
 function showPlayerDefeatedEnemyModal(fameMultiplier = 0) {
+    console.log('showPlayerDefeatedEnemyModal', { fameMultiplier });
     const {enemyFleet, fleetName, disabledEnemyShips} = gs.encounter
     const fame = fameMultiplier > 0 ? 5 * fameMultiplier : 0
     const infamy = fameMultiplier < 0 ? 5 * Math.abs(fameMultiplier) : 0
@@ -257,7 +271,7 @@ function showPlayerDefeatedEnemyModal(fameMultiplier = 0) {
 
     if (disabledEnemyShips.length > 0) {
         msg += `The ${fleetName} left behind ${disabledEnemyShips.length} disabled ships!<br/>`
-        if (lootAmt > 0) msg += `Your scanners reveal ${lootAmt} units of cargo amid the wreckage.<br/>`
+        msg += `Your scanners reveal ${lootAmt} units of cargo amid the wreckage.<br/>`
     }
     showModal(gs.encounter.encounterType.name, msg, [
         lootAmt > 0 ? ['Loot', ()=>showLootMenu(loot)] : ['Continue', ()=>endEncounter()]
@@ -265,6 +279,7 @@ function showPlayerDefeatedEnemyModal(fameMultiplier = 0) {
 }
 
 function showPlayerDefeatedByNeutralsModal( infamyLossMultiplier = 1) {
+    console.log('showPlayerDefeatedByNeutralsModal', { infamyLossMultiplier });
     const {fleetName, disabledPlayerShips} = gs.encounter
     
     const infamyLoss = 5 * infamyLossMultiplier
@@ -284,6 +299,7 @@ function showPlayerDefeatedByNeutralsModal( infamyLossMultiplier = 1) {
 }
 
 function showPlayerDefeatedByPiratesModal() {
+    console.log('showPlayerDefeatedByPiratesModal');
     const {fleetName, fleet, encounter, disabledPlayerShips} = gs.encounter
     let msg = `Unfortunately, you were no match for the ${fleetName}.<br/>`
 
@@ -324,6 +340,7 @@ function showPlayerDefeatedByPiratesModal() {
 }
 
 function showPlayerEscapedFromEnemyModal() {
+    console.log('showPlayerEscapedFromEnemyModal');
     const {fleetName, disabledPlayerShips, escapedPlayerShips} = gs.encounter
         let msg = `You escaped from the ${fleetName}.<br/>`
     if (escapedPlayerShips.length > 0) msg += `${escapedPlayerShips.length} of your ships exited the battlefield intact.<br/>`
@@ -336,6 +353,7 @@ function showPlayerEscapedFromEnemyModal() {
 }
 
 function showPlayerPoliceInspectionModal() {
+    console.log('showPlayerPoliceInspectionModal');
     let msg = ''
     const {fleetName} = gs.encounter
     const illegalCargo = gs.fleet.cargo.items().filter( ct => ct.isIllegal )

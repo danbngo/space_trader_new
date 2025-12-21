@@ -68,5 +68,8 @@ const UI_MODE = Object.freeze({
 const MOVE_TYPES = Object.freeze({
     Move: 'Move',
     Attack: 'Attack',
+    Ram: 'Ram',
+    Recharge: 'Recharge',
+    Wait: 'Wait',
 })
 const MOVE_TYPES_ALL = Object.values(MOVE_TYPES)

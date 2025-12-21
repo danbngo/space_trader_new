@@ -22,7 +22,7 @@ const ENCOUNTER_TYPES = {
                 ['Attack', ()=>showPlayerAttackFleetModal(-1, 1)],
             ])
         },
-        ()=>showPlayerDefeatedFleetModal(-1),
+        ()=>showPlayerDefeatedEnemyModal(-1),
         ()=>showPlayerDefeatedByNeutralsModal(1),
         ()=>showPlayerEscapedFromFleetModal(),
         ()=>gs.encounter.encounterType.onDefeat()
@@ -36,7 +36,7 @@ const ENCOUNTER_TYPES = {
                 ['Attack', ()=>showPlayerAttackFleetModal(-1, 1)],
             ])
         },
-        ()=>showPlayerDefeatedFleetModal(-1),
+        ()=>showPlayerDefeatedEnemyModal(-1),
         ()=>showPlayerDefeatedByNeutralsModal(1),
         ()=>showPlayerEscapedFromFleetModal(),
         ()=>gs.encounter.encounterType.onDefeat()
@@ -49,7 +49,7 @@ const ENCOUNTER_TYPES = {
                 ['Resist', ()=>showPlayerRefuseSurrenderModal(1, 0)],
             ])
         },
-        ()=>showPlayerDefeatedFleetModal(1),
+        ()=>showPlayerDefeatedEnemyModal(1),
         ()=>showPlayerDefeatedByPiratesModal(),
         ()=>showPlayerEscapedFromFleetModal(),
         ()=>showPlayerDidSurrenderModal(1)
@@ -62,7 +62,7 @@ const ENCOUNTER_TYPES = {
                 ['Attack', ()=>showPlayerAttackFleetModal(-2, 2)],
             ])
         },
-        ()=>showPlayerDefeatedFleetModal(-1),
+        ()=>showPlayerDefeatedEnemyModal(-1),
         ()=>showPlayerDefeatedByPoliceModal(),
         ()=>showPlayerEscapedFromFleetModal(),
         ()=>showPlayerDidSurrenderModal(-1)

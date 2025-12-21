@@ -18,7 +18,7 @@ class Ship {
         this.y = 0;
         this.angle = Math.PI*2; //direction ship is facing in. it can only accelerate/decelerate and shoot in that direction
         this.escaped = false;
-        this.numMovesRemaining = SHIP_NUM_MOVES_PER_TURN; //for encounter turn processing
+        this.numActionsRemaining = SHIP_NUM_MOVES_PER_TURN; //for encounter turn processing
     }
 
     get isFlagship() {
@@ -32,12 +32,12 @@ class Ship {
     }
 
     get mass() {
-        return this.hull[1]/AVERAGE_SHIP_HULL
+        return BASE_SPACE_SHIP_MASS * (this.hull[1]/AVERAGE_SHIP_HULL
         + this.shields[1]/AVERAGE_SHIP_SHIELDS 
         + this.lasers/AVERAGE_SHIP_LASERS
         + this.cargoSpace/AVERAGE_SHIP_CARGO_SPACE
         + this.engine/AVERAGE_SHIP_ENGINE
-        + this.radars/AVERAGE_SHIP_RADARS
+        + this.radars/AVERAGE_SHIP_RADARS) / 6
     }
 
     get value() {
@@ -52,19 +52,23 @@ class Ship {
             + this.shields[0] / (AVERAGE_SHIP_SHIELDS*2)
             + this.shields[1] / (AVERAGE_SHIP_SHIELDS*2)
         const atkRating = this.lasers / AVERAGE_SHIP_LASERS * this.radars / AVERAGE_SHIP_RADARS
-        return hpRating * atkRating
+        return Math.pow(hpRating * atkRating, 0.5)
     }
 
     get maxMoveDistance() {
-        return this.engine * 2;
+        return 4 * this.engine / this.mass;
     }
 
-    get maxSensorDistance() {
-        return this.radars * 4;
+    get maxAttackDistance() {
+        return 4 * this.radars;
     }
 
     get maxLaserDamage() {
         return this.lasers;
+    }
+
+    get maxRamDamage() {
+        return this.engine;
     }
 
     isDamaged() {
@@ -82,10 +86,12 @@ class Ship {
     resetCombatVars() {
         //this.restoreShields() //looks weird visually
         this.angle = Math.PI*2;
-        this.shieldRechargeProgress = 0;
-        this.laserRechargeProgress = 0;
         this.escaped = false;
-        this.numMovesRemaining = SHIP_NUM_MOVES_PER_TURN
+        this.resetActions()
+    }
+
+    resetActions() {
+        this.numActionsRemaining = SHIP_NUM_MOVES_PER_TURN
     }
 
     setDisabled() {
@@ -99,11 +105,11 @@ class Ship {
         return this.hull[0] <= 0
     }
 
-    takeDamage(dmg = 0) {
-        console.log('applying dmg to ship:',this,dmg)
+    takeDamage(dmg = 0, bypassShields = false) {
+        console.log('applying dmg to ship:',this,dmg,bypassShields)
         if (this.isDisabled()) return
         this.beingHit = true
-        if (this.shields[0] > 0) {
+        if (this.shields[0] > 0 && !bypassShields) {
             const shieldDmg = Math.min(dmg, this.shields[0])
             this.shields[0] -= shieldDmg
             dmg -= shieldDmg
@@ -114,32 +120,29 @@ class Ship {
     }
 
     rechargeShields() {
-        const rechargeAmt = rng(1, this.engine)
+        const rechargeAmt = 1 + rng(this.engine/2)
         this.restoreShields(rechargeAmt)
     }
 
     calcAttackAreas(overrideX = this.x, overrideY = this.y) {
-        const attackRange = this.maxSensorDistance
+        const attackRange = 1+this.maxAttackDistance
         const targetingAngle = this.angle+Math.PI/2
         const targetingAngle2 = this.angle-Math.PI/2
         const [tx,ty] = rotatePoint(overrideX + attackRange/2, overrideY, overrideX, overrideY, targetingAngle)
         const [tx2,ty2] = rotatePoint(overrideX + attackRange/2, overrideY, overrideX, overrideY, targetingAngle2)
         //turn the triangles an additional radian so they are pointing outwards
-        const targetingTriangle1 = new Triangle(tx, ty, attackRange, Triangle.calcEquilateralTriangleHeight(attackRange), targetingAngle+Math.PI)
-        const targetingTriangle2 = new Triangle(tx2, ty2, attackRange, Triangle.calcEquilateralTriangleHeight(attackRange), targetingAngle2-Math.PI)
+        const targetingTriangle1 = new Triangle(tx, ty, attackRange*2, Triangle.calcEquilateralTriangleHeight(attackRange), targetingAngle+Math.PI)
+        const targetingTriangle2 = new Triangle(tx2, ty2, attackRange*2, Triangle.calcEquilateralTriangleHeight(attackRange), targetingAngle2-Math.PI)
         return [targetingTriangle1, targetingTriangle2]
     }
 
     calcMoveArea(overrideX = this.x, overrideY = this.y) {
         const targetingAngle = this.angle
-        const moveRange = this.maxMoveDistance
+        const moveRange = 1+this.maxMoveDistance
         //use 0.55, want ship to be forced to move slightly
-        const [tx,ty] = rotatePoint(overrideX + moveRange*0.55, overrideY, overrideX, overrideY, targetingAngle)
+        const [tx,ty] = rotatePoint(overrideX + moveRange*1.05, overrideY, overrideX, overrideY, targetingAngle)
         //if ship was at 0 rotation, it would be facing right. we would want the ellipse to be wider horizontally than vertically
-        const ellipse = new Ellipse(tx, ty, moveRange/2, moveRange/4, targetingAngle)
+        const ellipse = new Ellipse(tx, ty, moveRange, moveRange*.66, targetingAngle)
         return ellipse
     }
-
 }
-
-

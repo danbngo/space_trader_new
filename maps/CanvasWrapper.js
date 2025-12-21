@@ -75,7 +75,6 @@ class CanvasObject {
             case SHAPES.FilledOval:
                 //minorSize is the y radius, size is the x radius
                 ctx.beginPath();
-                console.log('drawing ellipse w rotation:',this.rotation)
                 ctx.ellipse(0, 0, size, minorSize, this.rotation, 0, Math.PI * 2);
                 ctx.fill();
                 if (this.strokeColor) ctx.stroke()

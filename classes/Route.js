@@ -4,13 +4,13 @@ class Route {
         //run simu
         const naiveDistance = calcDistance(fleet.x, fleet.y, destination.x, destination.y)
         const naiveTravelTime = naiveDistance/fleet.calcSpeed()
-        const {endX, endY, endYear} = Route.estimateTravelTimeToOrbitingBody(startYear, fleet, destination, 100, naiveTravelTime*2+1)
+        const {toX, toY, endYear} = Route.estimateTravelTimeToOrbitingBody(startYear, fleet, destination, 100, naiveTravelTime*2+1)
         this.fleet = fleet
         this.destination = destination
         this.startYear = startYear
         this.endYear = endYear
         this.travelTime = endYear-startYear
-        this.path = new Path(fleet.x, fleet.y, endX, endY)
+        this.path = new Path(fleet.x, fleet.y, toX, toY)
     }
 
     positionAtYear(year = 0) {
@@ -65,8 +65,8 @@ class Route {
         return {
             bestYearOffset,
             endPosition,
-            endX: endPosition[0],
-            endY: endPosition[1],
+            toX: endPosition[0],
+            toY: endPosition[1],
             endYear: startYear+bestYearOffset,
             debug: results
         };

@@ -82,6 +82,10 @@ function rotatePoint(x = 0, y = 0, originX = 0, originY = 0, angleRadians = 2*Ma
     ];
 }
 
+function calcAngleTowardsPoint(fromX = 0, fromY = 0, toX = 0, toY = 0) {
+    return Math.atan2(toY - fromY, toX - fromX);
+}
+
 function rndIndexWeighted(weights = [1]) {
     if (!weights || weights.length === 0) return -1;
 
@@ -159,44 +163,11 @@ function hexToRgba(hex = '#ffffff') {
 }
 
 
-function isPointInTriangle(px = 0, py = 0, trianglePoints = [[0,0],[1,0],[0,1]]) {
-    console.log('checking if point within triangle:',{px,py,trianglePoints});
-
-    // Apply barycentric coordinates method
-    const [A, B, C] = trianglePoints;
-    
-    // Compute vectors
-    const v0x = C[0] - A[0];
-    const v0y = C[1] - A[1];
-    const v1x = B[0] - A[0];
-    const v1y = B[1] - A[1];
-    const v2x = px - A[0];
-    const v2y = py - A[1];
-    
-    // Compute dot products
-    const dot00 = v0x * v0x + v0y * v0y;
-    const dot01 = v0x * v1x + v0y * v1y;
-    const dot02 = v0x * v2x + v0y * v2y;
-    const dot11 = v1x * v1x + v1y * v1y;
-    const dot12 = v1x * v2x + v1y * v2y;
-    
-    // Compute barycentric coordinates
-    const invDenom = 1 / (dot00 * dot11 - dot01 * dot01);
-    const u = (dot11 * dot02 - dot01 * dot12) * invDenom;
-    const v = (dot00 * dot12 - dot01 * dot02) * invDenom;
-    
-    // Check if point is in triangle (including edges)
-    const isInside = (u >= 0) && (v >= 0) && (u + v <= 1);
-    
-    return isInside;
-}
-
-
 function calcLineThroughPoints(cx = 0, cy = 0, dx = 1, dy = 0, length = 10) {
     const halfLength = length / 2;
     const startX = cx - (dx * halfLength);
     const startY = cy - (dy * halfLength);
-    const endX = cx + (dx * halfLength);
-    const endY = cy + (dy * halfLength);
-    return [[startX, startY], [endX, endY]];
+    const toX = cx + (dx * halfLength);
+    const toY = cy + (dy * halfLength);
+    return [[startX, startY], [toX, toY]];
 }
