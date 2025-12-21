@@ -170,7 +170,7 @@ class EncounterAI {
                 return new ShipAction(encounter, ship, MOVE_TYPES.Ram, targetToRam)
             }
             //if no targets in the way, move semi randomly, mostly in the same dir we're already facing
-            const [toX, toY] = rotatePoint(0, encounter.mapRadius*2, 0, 0, ship.angle + rng(-Math.PI/6, Math.PI/6, false))
+            const [toX, toY] = rotatePoint(encounter.mapRadius*2, 0, 0, 0, ship.angle + rng(-Math.PI/6, Math.PI/6, false))
             const bestMove = this.calcBestMoveCoords(ship, toX, toY)
             if (bestMove) return new ShipAction(encounter, ship, MOVE_TYPES.Move, null, bestMove[0], bestMove[1])
         }
@@ -200,7 +200,7 @@ class EncounterAI {
         else if (strategy == COMBAT_STRATEGIES.Escape && ship.engine > 0) {
             //move towards edge of map
             const angleFromCenter = calcAngleTowardsPoint(0, 0, ship.x, ship.y)
-            const [toX, toY] = rotatePoint(0, this.encounter.mapRadius*2, 0, 0, angleFromCenter)
+            const [toX, toY] = rotatePoint(this.encounter.mapRadius*2, 0, 0, 0, angleFromCenter)
             const bestMove = this.calcBestMoveCoords(ship, toX, toY)
             if (bestMove) return new ShipAction(this.encounter, ship, MOVE_TYPES.Move, null, bestMove[0], bestMove[1])
         }

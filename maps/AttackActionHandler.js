@@ -48,7 +48,7 @@ class AttackActionHandler extends ActionHandler {
         const animations = this.encounterMap.animations
         const path = action.path
         const animLine = this.cvs.addLine('laserline', 0, 0, 0, 0, COLORS.Red, 2)
-        const laserDuration = (500 + 30*calcDistance(action.actor.x, action.actor.y, action.target.x, action.target.y))/2
+        const laserDuration = 400 + 30*Math.pow(calcDistance(action.actor.x, action.actor.y, action.target.x, action.target.y), 0.5)
         
         animations.push(new Loop(laserDuration, (progressRatio)=>{
             const [x2, y2] = path.positionAtProgress(Math.min(progressRatio * 1.25))

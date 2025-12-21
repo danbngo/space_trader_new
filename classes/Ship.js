@@ -58,19 +58,19 @@ class Ship {
     }
 
     get maxMoveDistance() {
-        return 4 * this.engine / this.mass;
+        return 1 + AVERAGE_SHIP_MOVE_DISTANCE * Math.pow( (this.engine/AVERAGE_SHIP_ENGINE) / (this.mass/AVERAGE_SHIP_MASS), 0.5);
     }
 
     get maxAttackDistance() {
-        return 4 * this.radars;
+        return 1 + AVERAGE_SHIP_ATTACK_DISTANCE * Math.pow( (this.radars/AVERAGE_SHIP_RADARS) / (this.mass/AVERAGE_SHIP_MASS), 0.5);
     }
 
     get maxLaserDamage() {
-        return this.lasers;
+        return 1 + AVERAGE_SHIP_LASER_DMG * (this.lasers/AVERAGE_SHIP_LASERS);
     }
 
     get maxRamDamage() {
-        return this.maxMoveDistance * this.mass / 8;
+        return 1 + AVERAGE_SHIP_RAM_DMG * Math.pow(this.maxMoveDistance/AVERAGE_SHIP_MOVE_DISTANCE * this.mass/AVERAGE_SHIP_MASS, 0.5);
     }
 
     isDamaged() {

@@ -45,7 +45,7 @@ class MoveActionHandler extends ActionHandler {
         const animLine = this.cvs.addLine('moveline', action.path.startX, action.path.startY, action.path.toX, action.path.toY, mover.color, 1)
 
         //make asteroids move really fast so player doesn't get annoyed
-        const duration = mover.aiType == AI_TYPES.Ship ? 1000 : 200
+        const duration = mover.aiType == AI_TYPES.Ship ? 500 : 200
         animations.push(new Loop(duration, (progressRatio)=>{
             const [newX, newY] = action.path.positionAtProgress(progressRatio)
             Object.assign(mover, {x: newX, y: newY, angle:action.path.angle})

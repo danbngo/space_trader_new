@@ -33,14 +33,18 @@ function startEncounter(encounter = gs.encounter) {
     }
     for (const ship of playerShips) {
         const randomTarget = rndMember(enemyShips)
-        const angle = new Path(ship.x, ship.y, randomTarget.x, randomTarget.y).angle
-        Object.assign(ship, {angle})
+        if (randomTarget) {
+            const angle = new Path(ship.x, ship.y, randomTarget.x, randomTarget.y).angle
+            Object.assign(ship, {angle})
+        }
     }
     for (const ship of enemyShips) {
         if (formationType == FORMATION_TYPES.FaceOff) {
             const randomTarget = rndMember(playerShips)
-            const angle = new Path(ship.x, ship.y, randomTarget.x, randomTarget.y).angle
-            Object.assign(ship, {angle})
+            if (randomTarget) {
+                const angle = new Path(ship.x, ship.y, randomTarget.x, randomTarget.y).angle
+                Object.assign(ship, {angle})
+            }
         }
         else if (formationType == FORMATION_TYPES.Storm) {
             //const angle = rng(stormAngle + Math.PI/8, stormAngle - Math.PI/8, false)
@@ -557,13 +561,13 @@ function showPlayerPoliceInspectionModal() {
 function showFineOrJailModal(fine = 0) {
     const {fleetName} = gs.encounter
     const fineFromBounty = Math.min(Math.max(gs.captain.bounty*Math.random(),100), gs.captain.bounty)
-    const jailTime = Math.round((fine+fineFromBounty)*JAIL_DAYS_PER_1000CR_FINE) //1 day of jail time per 1000CR of fine
+    const jailDays = Math.round((fine+fineFromBounty)/JAIL_DAYS_PER_1000CR_FINE) //1 day of jail time per 1000CR of fine
     gs.bounty -= fineFromBounty
 
     let msg = ''
     if (fineFromBounty) msg += `The ${fleetName} are aware of some of the bounties on your head, to the tune of ${fineFromBounty}CR.<br/>`
-    if (fine) msg += `The ${fleetName} give you the option to pay a fine of ${fine}CR${fineFromBounty ? `, plus ${fineFromBounty} to clear your bounty` : ''} or serve ${jailTime} days in jail.<br/>`
-    else msg += `The ${fleetName} give you the option to pay off your bounty of ${fineFromBounty}CR or serve ${jailTime} days in jail.<br/>`
+    if (fine) msg += `The ${fleetName} give you the option to pay a fine of ${fine}CR${fineFromBounty ? `, plus ${fineFromBounty} to clear your bounty` : ''} or serve ${describeTimespan(jailDays/365)} days in jail.<br/>`
+    else msg += `The ${fleetName} give you the option to pay off your bounty of ${fineFromBounty}CR or serve ${describeTimespan(jailDays/365)} days in jail.<br/>`
     showModal(fleetName, msg, [
         ['Pay Fine', ()=>{
             gs.credits -= (fine + fineFromBounty)
@@ -575,9 +579,9 @@ function showFineOrJailModal(fine = 0) {
         ['Serve Jail Time', ()=>{
             const nearestPlanet = gs.starSystem.calcNearestPlanet(gs.fleet)
             gs.fleet.dock(nearestPlanet)
-            gs.year += jailTime / 365.0
+            gs.year += jailDays / 365.0
             msg += `The ${fleetName} take you to the nearest planet, ${nearestPlanet.name}.<br/>`
-            msg += `You serve ${jailTime} days in jail.<br/>`
+            msg += `You serve ${describeTimespan(jailDays/365)} days in jail.<br/>`
             if (fineFromBounty) msg += `Your bounty has been reduced to: ${gs.bounty}CR.<br/>`
             showModal(fleetName, msg, [['Continue', ()=>endEncounter()]])
         }],

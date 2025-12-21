@@ -308,9 +308,12 @@ class StarMap {
     }
 
     setDestination(obj = new SpaceObject(), unpause = false) {
-        if (obj instanceof Planet) gs.fleet.route = new Route(gs.fleet, obj)
+        if (obj instanceof Planet) {
+            gs.fleet.route = new Route(gs.fleet, obj)
+            gs.fleet.location = undefined
+        }
         if (unpause) this.togglePause(false)
-        else this.refresh()
+        this.refresh()
     }
 
     togglePause(newPausedState = !this.paused) {

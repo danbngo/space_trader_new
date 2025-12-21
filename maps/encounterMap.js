@@ -74,11 +74,11 @@ class EncounterMap {
             parent:this.controls,
             classNames: ['starmap-buttons'],
             children: [
-                ce({tag:'button', innerHTML:this.paused ? '▶' : '⏸', onClick: () => this.togglePause()}),
+                (this.encounter.combatEnabled ? ce({tag:'button', innerHTML:this.paused ? '▶' : '⏸', classNames: [(this.paused) ? 'highlighted' : null], onClick: () => this.togglePause()}) : null),
                 ce({tag:'button', innerHTML:'+', onClick: () => this.cvs.adjustZoom(1.33)}),
                 ce({tag:'button', innerHTML:'-', onClick: () => this.cvs.adjustZoom(0.66)}),
                 //ship info button?
-                ce({tag:'button', innerHTML: '🗨', onClick: ()=> this.onHail(), disabled: (!this.encounter.encounterType.onSurrender || this.uiMode == UI_MODE.Animating)})
+                ce({tag:'button', innerHTML: '🗨', classNames: [(!this.encounter.combatEnabled ? 'highlighted' : null)], onClick: ()=> this.onHail(), disabled: (!this.encounter.encounterType.onSurrender || this.uiMode == UI_MODE.Animating)})
             ]
         })
     }

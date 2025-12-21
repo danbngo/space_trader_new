@@ -83,7 +83,6 @@ class Planet extends OrbitingObject {
         if (baseName.endsWith('yian')) baseName = baseName.replace('yian', 'ian') //mercury
         //venus already handled
         if (baseName == 'Earthian') baseName = 'Terran' //earth
-        if (baseName.endsWith('sian')) baseName = baseName.replace('sian', 'tian') //mars
         if (baseName.endsWith('upiterian')) baseName = baseName.replace('upiterian', 'ovian') //jupiter
         //saturn already handled
         if (baseName.endsWith('nusian')) baseName = baseName.replace('nusian', 'nian') //uranus
@@ -93,6 +92,7 @@ class Planet extends OrbitingObject {
         if (baseName.endsWith('iian')) baseName = baseName.replace('iian', 'ian')
         if (baseName.endsWith('oian')) baseName = baseName.replace('oian', 'ian')
         if (baseName.endsWith('uian')) baseName = baseName.replace('uian', 'ian')
+        if (baseName.endsWith('sian')) baseName = baseName.replace('sian', 'tian') //mars
         return baseName
     }
 }

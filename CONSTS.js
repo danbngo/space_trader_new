@@ -14,7 +14,7 @@ const FLEET_RADIUS = 1/1000 * 1/EARTH_RADII_PER_AU
 
 const PLANET_ENCOUNTER_CHANCE_PER_DAY = 0.1; //chance of random encounter per day when right next to an 'average' planet
 const ASTEROIDS_ENCOUNTER_CHANCE_PER_DAY = 0.1; //chance of fooroid storms when in the middle of an asteroid belt
-const BANK_BOUNTY_CHANCE_PER_DAY = 1/30;
+const BANK_BOUNTY_CHANCE_PER_DAY = 0.01;
 
 //combat distances = miles, time = seconds
 const ENCOUNTER_SHIP_MAX_SPAWN_DISTANCE_RATIO = 0.5
@@ -39,6 +39,10 @@ const AVERAGE_SHIP_ENGINE = 5
 const AVERAGE_SHIP_CARGO_SPACE = 5
 const AVERAGE_SHIP_RADARS = 5
 
+const AVERAGE_SHIP_MOVE_DISTANCE = 5
+const AVERAGE_SHIP_ATTACK_DISTANCE = 20
+const AVERAGE_SHIP_LASER_DMG = 5
+const AVERAGE_SHIP_RAM_DMG = 2.5
 
 const BANK_MAX_LOAN_YEARS = 5
 const BANK_MIN_LOAN_AMOUNT = 100

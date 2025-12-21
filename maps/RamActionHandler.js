@@ -49,7 +49,7 @@ class RamActionHandler extends ActionHandler {
         const attacker = action.actor
         
         const animLine = this.cvs.addLine('ramline', action.path.startX, action.path.startY, action.path.toX, action.path.toY, attacker.color, 2)
-        const ramDuration = 1000
+        const ramDuration = 500
 
         animations.push(new Loop(ramDuration, (progressRatio)=>{
             const [newX, newY] = path.positionAtProgress(progressRatio)

@@ -15,6 +15,12 @@ function checkForEncounter(elapsedDays = 1) {
     }
 }
 
+function rollChanceOverTimespan(baseChancePerDay = 0.01, elapsedDays = 1) {
+    const lambda = -Math.log(1 - baseChancePerDay);
+    const perTickChance = 1 - Math.exp(-lambda * elapsedDays);
+    return Math.random() < perTickChance
+}
+
 function checkForAsteroidBeltEncounters(elapsedDays = 1) {
     //console.log('checkForAsteroidBeltEncounters', { elapsedDays });
     //dont have encounters while docked or already in an encounter
@@ -43,7 +49,8 @@ function checkForAsteroidBeltEncounters(elapsedDays = 1) {
         const proximityFactor = 1 / (1 + distanceFromBeltCenter / beltRadius)
         
         // Base encounter chance
-        const baseChance = Math.pow(ASTEROIDS_ENCOUNTER_CHANCE_PER_DAY, 1/(elapsedDays * proximityFactor))
+        //const baseChance = Math.pow(ASTEROIDS_ENCOUNTER_CHANCE_PER_DAY, 1/(elapsedDays * proximityFactor))
+        const encounterChance = rollChanceOverTimespan(ASTEROIDS_ENCOUNTER_CHANCE_PER_DAY, elapsedDays*proximityFactor)
         
         /*console.log(`Checking ${belt.name}:`, {
             beltCenterDistance,
@@ -51,11 +58,11 @@ function checkForAsteroidBeltEncounters(elapsedDays = 1) {
             fleetDistanceFromSun,
             distanceFromBeltCenter,
             proximityFactor: proximityFactor.toFixed(3),
-            baseChance: baseChance.toFixed(4)
+            encounterChance: encounterChance.toFixed(4)
         });*/
         
         // Check if encounter happens
-        if (Math.random() > baseChance) continue
+        if (Math.random() > encounterChance) continue
         
         // Determine encounter type based on belt type
         let encounterType
@@ -110,8 +117,6 @@ function checkForPlanetEncounters(elapsedDays = 1) {
         // Base encounter chance influenced by culture properties
         const {governmentRating, securityRating, crimeRating, commercialRating, industrialRating} = planet.culture
         
-        const baseChance = Math.pow(PLANET_ENCOUNTER_CHANCE_PER_DAY, 1/(elapsedDays * proximityFactor))
-        
         // Build weighted encounter type array based on culture
         const encounterWeights = []
         
@@ -139,11 +144,10 @@ function checkForPlanetEncounters(elapsedDays = 1) {
         
         // Adjust base chance by culture activity level
         const activityLevel = (governmentRating + securityRating + crimeRating + commercialRating + industrialRating) / 5
-        const encounterChance = baseChance * activityLevel
+        const encounterChance = rollChanceOverTimespan(PLANET_ENCOUNTER_CHANCE_PER_DAY, elapsedDays * activityLevel * proximityFactor)
         
         /*console.log(`Checking ${planet.name}:`, {
             distance: distance.toFixed(2),
-            territory: territory.toFixed(2),
             proximityFactor: proximityFactor.toFixed(3),
             activityLevel: activityLevel.toFixed(2),
             encounterChance: encounterChance.toFixed(4),
@@ -151,6 +155,8 @@ function checkForPlanetEncounters(elapsedDays = 1) {
         });*/
         
         // Check if encounter happens
+        //console.log('enc chance:',{encounterChance,elapsedDays,activityLevel,proximityFactor})
+
         if (Math.random() > encounterChance) continue
         
         // Select encounter type using weighted random
