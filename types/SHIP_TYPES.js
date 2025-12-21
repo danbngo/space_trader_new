@@ -29,5 +29,5 @@ const SHIP_TYPES = {
 const SHIP_TYPES_ALL = Object.values(SHIP_TYPES)
 
 const PSEUDO_SHIP_TYPES = {
-    ASTEROID: new ShipType('Asteroid', SHAPES.FilledCircle, 0.00000000001, 0, 0, 1, 0.5, 0, 1),
+    ASTEROID: new ShipType('Asteroid', SHAPES.FilledCircle, 0.25, 0, 0, 4, 0.5, 4, 1),
 }

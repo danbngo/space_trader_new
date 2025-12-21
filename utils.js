@@ -68,7 +68,7 @@ function rotatePoint(x = 0, y = 0, originX = 0, originY = 0, angleRadians = 2*Ma
     const translatedX = x - originX;
     const translatedY = y - originY;
 
-    // apply rotation
+    // apply angle
     const cosA = Math.cos(angleRadians);
     const sinA = Math.sin(angleRadians);
 

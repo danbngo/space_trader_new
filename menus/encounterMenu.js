@@ -20,7 +20,7 @@ function startEncounter() {
         Object.assign(ship, {x, y})
     }
     for (const ship of enemyShips) {
-        Object.assign(ship, {color: COLORS.LightRed})
+        Object.assign(ship, {color: encounter.encounterType.enemyColor})
         if (formationType == FORMATION_TYPES.FaceOff) {
             const [x,y] = rotatePoint(rng(maxSpawnDistance, minSpawnDistance, false), 0, 0, 0, rng(Math.PI/2, -Math.PI/2, false))
             Object.assign(ship, {x, y})
@@ -28,7 +28,7 @@ function startEncounter() {
         else if (formationType == FORMATION_TYPES.Storm) {
             const stormAngle = rndMember(stormAngles)
             const angle = stormAngle + rng(Math.PI/2, -Math.PI/2, false)
-            const [x,y] = rotatePoint(rng(encounter.mapRadius, maxSpawnDistance, false), 0, 0, 0, angle + Math.PI)
+            const [x,y] = rotatePoint(rng(encounter.mapRadius, maxSpawnDistance, false), 0, 0, 0, angle + Math.PI*rng(1.25,0.75,false))
             Object.assign(ship, {x, y, angle})
         }
     }
@@ -396,6 +396,17 @@ function showPlayerDefeatedByPiratesModal() {
     showModal(gs.encounter.encounterType.name, msg, [['Continue', ()=>endEncounter()]])
 }
 
+function showPlayerDefeatedByPoliceModal() {
+    console.log('showPlayerDefeatedByPoliceModal');
+    const {fleetName} = gs.encounter
+    let msg = `The ${fleetName} are taking you in!<br/>`
+    msg += `Your ships are roughly searched for illegal goods.<br/>`
+    const fine = seizePlayerContraband()
+    msg += fine > 0 ? `They confiscate all your contraband, and add a fine of ${fine} to your existing bounty.<br/>`
+    : `They find no contraband aboard your ships, but there is still the matter of your other crimes.<br/>`
+    showModal(fleetName, msg, [['Continue', ()=> showFineOrJailModal()]])
+}
+
 function showPlayerEscapedFromEnemyModal() {
     console.log('showPlayerEscapedFromEnemyModal');
     const {fleetName, disabledPlayerShips, escapedPlayerShips} = gs.encounter
@@ -405,7 +416,6 @@ function showPlayerEscapedFromEnemyModal() {
         msg += `However, ${disabledPlayerShips.length} were disabled in the fighting.<br/>`
         msg += loseCargoFromDisabledShips(disabledPlayerShips)
     }
-
     showModal(gs.encounter.encounterType.name, msg, [['Continue', ()=>endEncounter()]])
 }
 
@@ -422,42 +432,53 @@ function showPlayerEscapedFromHazardsModal() {
     showModal(gs.encounter.encounterType.name, msg, [['Continue', ()=>endEncounter()]])
 }
 
+function seizePlayerContraband() {
+    let fine = 0
+    for (const [ct, amt] of gs.fleet.cargo.counts) {
+        if (illegalCargo.includes(ct)) {
+            const finePerUnit = ct.value*2
+            fine += finePerUnit * amt
+        }
+        gs.fleet.cargo.setAmount(ct, 0) //confiscate all illegal cargo
+    }
+    return fine
+}
+
 function showPlayerPoliceInspectionModal() {
     console.log('showPlayerPoliceInspectionModal');
     let msg = ''
     const {fleetName} = gs.encounter
     const illegalCargo = gs.fleet.cargo.items().filter( ct => ct.isIllegal )
     if (illegalCargo.length === 0) {
-        msg += `The police inspect your cargo and find nothing illegal. They thank you for your cooperation and wish you a safe journey.<br/>`
+        msg += `The ${fleetName} inspect your cargo and find nothing illegal. They thank you for your cooperation and wish you a safe journey.<br/>`
     }
     else {
-        let fine = 0
-        for (const [ct, amt] of gs.fleet.cargo.counts) {
-            if (illegalCargo.includes(ct)) {
-                const finePerUnit = ct.value*2
-                fine += finePerUnit * amt
-            }
-            gs.fleet.cargo.setAmount(ct, 0) //confiscate all illegal cargo
-        }
-        const jailTime = 1+fine/1000 //1 unit of jail time per 1000CR of fine
-        msg += `The police inspect your cargo and discover ${illegalCargo.length} units of contraband!<br/>`
+        const fine = seizePlayerContraband()
+        msg += `The ${fleetName} inspect your cargo and discover ${illegalCargo.length} units of contraband!<br/>`
         msg += `All of your contraband is confiscated.<br/>`
-        msg += `You are given the option to pay a fine of ${fine}CR or serve ${jailTime} days in jail.<br/>`
-        showModal(fleetName, msg, [
-            ['Pay Fine', ()=>{
-                gs.credits -= fine
-                msg += `You pay the fine of ${fine}CR.<br/>`
-                showModal(fleetName, msg, [['Continue', ()=>endEncounter()]])
-            }, gs.credits >= fine],
-            ['Serve Jail Time', ()=>{
-                const nearestPlanet = gs.starSystem.calcNearestPlanet(gs.fleet)
-                gs.fleet.dock(nearestPlanet)
-                gs.year += jailTime / 365.0
-                msg += `The police take you to the nearest planet, ${nearestPlanet.name}.<br/>`
-                msg += `You serve ${jailTime} days in jail.<br/>`
-                showModal(fleetName, msg, [['Continue', ()=>endEncounter()]])
-            }],
-            ['Resist', ()=>showPlayerRefuseSurrenderModal(-1, 1)],
-        ])
+        showModal(fleetName, msg, [['Continue', ()=> showFineOrJailModal(fine)]])
     }
+}
+
+function showFineOrJailModal(fine = gs.captain.bounty, jailTime = null) {
+    if (!jailTime) jailTime = Math.round(1+fine*JAIL_DAYS_PER_1000CR_FINE) //1 day of jail time per 1000CR of fine
+    const {fleetName} = gs.encounter
+    let msg = ''
+    msg += `The ${fleetName} give you the option to pay a fine of ${fine}CR or serve ${jailTime} days in jail.<br/>`
+    showModal(fleetName, msg, [
+        ['Pay Fine', ()=>{
+            gs.credits -= fine
+            msg += `You pay the fine of ${fine}CR.<br/>`
+            showModal(fleetName, msg, [['Continue', ()=>endEncounter()]])
+        }, gs.credits >= fine],
+        ['Serve Jail Time', ()=>{
+            const nearestPlanet = gs.starSystem.calcNearestPlanet(gs.fleet)
+            gs.fleet.dock(nearestPlanet)
+            gs.year += jailTime / 365.0
+            msg += `The ${fleetName} take you to the nearest planet, ${nearestPlanet.name}.<br/>`
+            msg += `You serve ${jailTime} days in jail.<br/>`
+            showModal(fleetName, msg, [['Continue', ()=>endEncounter()]])
+        }],
+        ['Resist', ()=>showPlayerRefuseSurrenderModal(-1, 1)],
+    ])
 }

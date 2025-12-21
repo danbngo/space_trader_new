@@ -114,9 +114,16 @@ class EncounterMap {
         });
 
         ships.forEach((ship,index) => {
-            const shipObj = cvs.addTriangle(`ship${index}`, ship.x, ship.y, ship.radius, ship.radius, 12, ship.color, ship.angle, ()=>this.selectObject(ship), true)
+            let shipObj;
+            if (ship.shipType.shape == SHAPES.Triangle) {
+                shipObj = cvs.addTriangle(`ship${index}`, ship.x, ship.y, ship.radius, ship.radius, 12, ship.color, ship.angle, ()=>this.selectObject(ship), true)
+            }
+            else {
+                shipObj = cvs.addFilledOval(`ship${index}`, ship.x, ship.y, ship.radius, (ship.radius*(Math.random()+0.5)), 0.5, ship.color, ship.angle, ()=>this.selectObject(ship), true)
+                console.log('ship obj:', shipObj)
+            }
             shipObj.onHover = ()=>this.hoverObject(ship)
-            if (ship == this.selectedObject) shipObj.strokeColor = COLORS.Green
+            //if (ship == this.selectedObject) shipObj.strokeColor = COLORS.Green
             cvs.addEmptyCircle(`shipshield${index}`, ship.x, ship.y, ship.radius*1.1, 10, COLORS.Blue, 1)
             const labelObj = cvs.addText(`shiplabel${index}`, ship.x, ship.y, 0, -32, ship.shipType.name, ship.color, DEFAULT_FONT_SIZE, 2, ()=>this.selectObject(ship))
             labelObj.onHover = ()=>this.hoverObject(ship)
@@ -128,10 +135,11 @@ class EncounterMap {
                 }
                 obj.onHoverEnd = ()=>{
                     labelObj.visible = false
-                    for (const obj3 of objs) obj3.strokeColor = this.calcStrokeColorForShip(ship)
+                    for (const obj3 of objs) obj3.strokeColor = this.calcStrokeColorForObj(ship)
                 }
                 obj.onHoverEnd()
             }
+            const animThruster = this.cvs.addTriangle(`shipthruster${index}`, ship.x, ship.y, ship.radius*0.5, ship.radius*0.5, 6, COLORS.Orange, ship.angle - Math.PI)
         })
 
         cvs.recalculateDrawOrder()
@@ -150,11 +158,13 @@ class EncounterMap {
             const cvsShipObject = cvs.getObject(`ship${index}`)
             const cvsShieldObject = cvs.getObject(`shipshield${index}`)
             const cvsLabelObject = cvs.getObject(`shiplabel${index}`)
+            const cvsThrusterObject = cvs.getObject(`shipthruster${index}`)
 
             if (invisible) {
                 cvsShipObject.visible = false
                 cvsShieldObject.visible = false
                 cvsLabelObject.visible = false
+                cvsThrusterObject.visible = false
                 return
             }
 
@@ -165,7 +175,7 @@ class EncounterMap {
 
             cvsShipObject.x = ship.x
             cvsShipObject.y = ship.y
-            cvsShipObject.rotation = ship.angle
+            cvsShipObject.angle = ship.angle
             cvsShipObject.fillColor[3] = hullRatio
             
             cvsShieldObject.x = ship.x
@@ -175,6 +185,15 @@ class EncounterMap {
 
             cvsLabelObject.x = ship.x
             cvsLabelObject.y = ship.y
+
+            const [xo, yo] = rotatePoint(ship.radius, 0, 0, 0, ship.angle-Math.PI)
+            cvsThrusterObject.x = ship.x+xo
+            cvsThrusterObject.y = ship.y+yo
+            const [sxo, syo] = rotatePoint(4, 0, 0, 0, ship.angle-Math.PI)
+            cvsThrusterObject.screenOffsetX = sxo
+            cvsThrusterObject.screenOffsetY = syo
+            cvsThrusterObject.angle = ship.angle - Math.PI
+            //Object.assign(animThruster, {x: newX, screenOffsetX: engineXOffset, y: newY, screenOffsetY: engineYOffset, angle: action.path.angle-Math.PI})
 
             let fontModifier = null
             if (ship.isDisabled()) {
@@ -260,15 +279,14 @@ class EncounterMap {
         //if (this.uiMode !== UI_MODE.Default) return
         this.selectedObject = obj;
         this.cvs.moveCameraTo(obj.x, obj.y)
-        this.resetOutlines()
+        this.refreshStrokeColors()
         this.refresh();
     }
 
-    resetOutlines() {
-        for (const obj of this.cvs.drawOrder) {
-            if (obj.strokeColor == COLORS.Green) {
-                obj.strokeColor = this.calcStrokeColorForShip(obj)
-            }
+    refreshStrokeColors() {
+        for (let i = 0; i < this.encounter.ships.length; i++) {
+            const obj = this.cvs.getObject(`ship${i}`)
+            obj.strokeColor = this.calcStrokeColorForObj(this.encounter.ships[i])
         }
     }
 
@@ -276,10 +294,10 @@ class EncounterMap {
         if (this.onHoverObject) this.onHoverObject(obj);
     }
 
-    calcStrokeColorForShip(ship = new Ship()) {
+    calcStrokeColorForObj(ship = new Ship()) {
         if (ship == this.selectedObject) return COLORS.Green
-        if (this.validTargets.includes(ship)) return COLORS.Yellow
-        return COLORS.Black
+        else if (this.validTargets.includes(ship)) return COLORS.Yellow
+        else return COLORS.Black
     }
 
     calcCanBeControlled(ship = new Ship()) {
@@ -315,6 +333,7 @@ class EncounterMap {
         this.targetingAreas = targetingAreas
         this.validTargets = validTargets
         this.refresh()
+        this.refreshStrokeColors()
         this.refreshCanvas(true)
     }
 
@@ -326,8 +345,8 @@ class EncounterMap {
         this.cvs.onMouseMoveWorldXY = null;
         this.validTargets = []
         this.targetingAreas = []
-        this.resetOutlines()
         this.refresh()
+        this.refreshStrokeColors()
         this.refreshCanvas(true)
     }
 

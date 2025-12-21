@@ -59,7 +59,7 @@ function showMarketMenu(market = new Market()) {
                     CR After Sale: ${credits+finalSale}CR <br/>
                 `
             },
-            'Sell', 'Cancel', (amt = 0)=>sellCargo(ct, amt, totalSalePrice), ()=>reloadMenu(),
+            'Sell', 'Cancel', (amt = 0)=>sellCargo(ct, amt, amt*sellPrice), ()=>reloadMenu(),
         )
     }
 
@@ -68,7 +68,7 @@ function showMarketMenu(market = new Market()) {
             1, buyableAmount, `Buy ${ct.name}`, 
             `How many ${ct.name} would you like to buy?`,
             (amt)=>`Price: ${amt*buyPrice}CR`,
-            'Buy', 'Cancel', (amt = 0)=>buyCargo(ct, amt), ()=>reloadMenu(),
+            'Buy', 'Cancel', (amt = 0)=>buyCargo(ct, amt, amt*buyPrice), ()=>reloadMenu(),
         )
     }
 

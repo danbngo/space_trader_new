@@ -149,7 +149,7 @@ class StarMap {
             const fleetAngle = fleet.route ? fleet.route.path.angle : -Math.PI/2
             const fleetObj = cvs.addTriangle(`fleet${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU, fleet.radius/EARTH_RADII_PER_AU, 12, fleet.color, fleetAngle, ()=>this.selectObject(fleet), true)
             cvs.addLine(`fleetpath${index}`, 0, 0, 0, 0, fleet.color, 1)
-            cvs.addTriangle(`fleetengine${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU*0.5, fleet.radius/EARTH_RADII_PER_AU*0.5, 6, COLORS.Orange)
+            cvs.addTriangle(`fleetthruster${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU*0.5, fleet.radius/EARTH_RADII_PER_AU*0.5, 6, COLORS.Orange)
             const labelObj = cvs.addText(`fleetlabel${index}`, fleet.x, fleet.y, 0, -32, fleet.name, fleet.color, DEFAULT_FONT_SIZE, 2, ()=>this.selectObject(fleet),)
             const objs = [fleetObj, labelObj]
             for (const obj of objs) {
@@ -206,7 +206,7 @@ class StarMap {
             if (fleet == this.selectedObject) cvsObject.strokeColor = COLORS.Green
             cvsObject.x = fleet.x
             cvsObject.y = fleet.y
-            cvsObject.rotation = fleetAngle
+            cvsObject.angle = fleetAngle
 
             cvsObject = cvs.getObject(`fleetlabel${index}`)
             if (fleet.location || !fleet.route) {
@@ -229,13 +229,13 @@ class StarMap {
                 cvsObject.y2 = toY
             }
 
-            cvsObject = cvs.getObject(`fleetengine${index}`)
+            cvsObject = cvs.getObject(`fleetthruster${index}`)
             if (fleet.location || !fleet.route) {
                 cvsObject.visible = false
             }
             else {
                 const [screenOffsetX, screenOffsetY] = rotatePoint(10, 0, 0, 0, fleetAngle-Math.PI)
-                cvsObject.rotation = fleetAngle - Math.PI
+                cvsObject.angle = fleetAngle - Math.PI
                 cvsObject.visible = true
                 cvsObject.x = fleet.x
                 cvsObject.y = fleet.y
@@ -346,16 +346,8 @@ class StarMap {
             return
         }
 
-        if (!playerWasDocked) { //dont have encounters while docked or tick after launch
-            const elapsedDays = elapsedYears*365
-            const encounterChance = 1 - Math.pow(1-ENCOUNTER_CHANCE_PER_DAY, elapsedDays)
-            const didEncounter = Math.random() < encounterChance
-            if (didEncounter) {
-                this.togglePause(true)
-                startEncounter()
-                return
-            }
-        }
+        checkForEvents(elapsedYears)
+
         requestAnimationFrame(()=>this.tick())
     }
 }

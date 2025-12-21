@@ -6,7 +6,7 @@ class CanvasObject {
         y = 0,
         size = 1,        // for triangle
         minorSize = 1,   // for oval
-        rotation = 0,    // radians for triangle
+        angle = 0,    // radians for triangle
         fillColor = COLORS.White,
         strokeColor = null,
         textContent = null,
@@ -33,7 +33,7 @@ class CanvasObject {
         this.size = size;
         this.size = size;
         this.minorSize = minorSize;
-        this.rotation = rotation;
+        this.angle = angle;
 
         this.fillColor = fillColor ? [...fillColor] : null;
         this.strokeColor = strokeColor ? [...strokeColor] : null;
@@ -75,10 +75,10 @@ class CanvasObject {
             case SHAPES.FilledOval:
                 //minorSize is the y radius, size is the x radius
                 ctx.beginPath();
-                ctx.ellipse(0, 0, size, minorSize, this.rotation, 0, Math.PI * 2);
+                ctx.ellipse(0, 0, size, minorSize, this.angle, 0, Math.PI * 2);
                 ctx.fill();
                 if (this.strokeColor) ctx.stroke()
-                //if (this.rotation) ctx.rotate(this.rotation);
+                //if (this.angle) ctx.rotate(this.angle);
                 break;
 
             case SHAPES.EmptyCircle:
@@ -88,7 +88,7 @@ class CanvasObject {
                 break;
 
             case SHAPES.Triangle:
-                if (this.rotation) ctx.rotate(this.rotation);
+                if (this.angle) ctx.rotate(this.angle);
                 /*if (this.gradient) {
                     const gradient = ctx.createLinearGradient(0, 0, 0, size)
                     gradient.addColorStop(1, '#000000');
@@ -257,8 +257,8 @@ class CanvasWrapper {
         return this.addObject(obj)
     }
 
-    addFilledOval(id = "", x = 0, y = 0, radiusX = 0, radiusY = 0, minScreenSize = 0, fillColor = COLORS.LightGray, rotation = 0, onClick = null) {
-        const obj = new CanvasObject({ id, shape: SHAPES.FilledOval, x, y, size: radiusX, minorSize: radiusY, minScreenSize, rotation, fillColor, onClick });
+    addFilledOval(id = "", x = 0, y = 0, radiusX = 0, radiusY = 0, minScreenSize = 0, fillColor = COLORS.LightGray, angle = 0, onClick = null) {
+        const obj = new CanvasObject({ id, shape: SHAPES.FilledOval, x, y, size: radiusX, minorSize: radiusY, minScreenSize, angle, fillColor, onClick });
         return this.addObject(obj)
     }
 
@@ -267,9 +267,9 @@ class CanvasWrapper {
         return this.addObject(obj)
     }
 
-    addTriangle(id = "", x = 0, y = 0, size = 0, minorSize = 0, minScreenSize = 0, fillColor = COLORS.LightGray, rotation = 0, onClick = null, gradient = false) {
+    addTriangle(id = "", x = 0, y = 0, size = 0, minorSize = 0, minScreenSize = 0, fillColor = COLORS.LightGray, angle = 0, onClick = null, gradient = false) {
         console.log('adding cvs triangle with size, minorSize:',size,minorSize)
-        const obj = new CanvasObject({ id, shape: SHAPES.Triangle, x, y, size, minorSize, minScreenSize, fillColor, rotation, onClick, gradient });
+        const obj = new CanvasObject({ id, shape: SHAPES.Triangle, x, y, size, minorSize, minScreenSize, fillColor, angle, onClick, gradient });
         return this.addObject(obj)
     }
 

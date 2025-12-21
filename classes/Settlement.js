@@ -99,7 +99,7 @@ class Bank {
         maxLoanAmount += officer.fame*10 - officer.infamy*10
         maxLoanAmount += Bank.playerBalance
         maxLoanAmount -= officer.bounty
-        maxLoanAmount -= officer.totalDebts
+        maxLoanAmount -= officer.calcTotalDebts()
         return Math.floor(maxLoanAmount)
     }
 }

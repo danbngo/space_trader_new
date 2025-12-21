@@ -44,21 +44,22 @@ const PLANET_TYPES = Object.freeze({
 const PLANET_TYPES_ALL = Object.values(PLANET_TYPES)
 
 const COLORS = Object.freeze({
-    White: [255,255,255,1],
-    Black: [0,0,0,1],
-    Red: [255,0,0,1],
-    Cyan: [0,255,255,1],
-    Blue: [0,0,255,1],
-    Yellow: [255,255,0,1],
-    Green: [0,255,0,1],
-    Orange: [255,165,0,1],
-    Purple: [128,0,128,1],
-    Gray: [128,128,128,1],
-    LightGray: [192,192,192,1],
-    LightGreen: [144,238,144,1],
-    LightBlue: [173,216,230,1],
-    LightRed: [255,102,102,1], // #dd4400 ?
-    Brown: [124,92,64,1],
+    White: [255,255,255,1], // rgba(255,255,255,1)
+    Black: [0,0,0,1], // rgba(0,0,0,1)
+    Red: [255,0,0,1], // rgba(255,0,0,1)
+    Cyan: [0,255,255,1], // rgba(0,255,255,1)
+    Blue: [0,0,255,1], // rgba(0,0,255,1)
+    Yellow: [255,255,0,1], // rgba(255,255,0,1)
+    Green: [0,255,0,1], // rgba(0,255,0,1)
+    Orange: [255,165,0,1], // rgba(255,165,0,1)
+    Purple: [128,0,128,1], // rgba(128,0,128,1)
+    LightPurple: [200,162,200,1], // rgba(200,162,200,1)
+    Gray: [128,128,128,1], // rgba(128,128,128,1)
+    LightGray: [192,192,192,1], // rgba(192,192,192,1)
+    LightGreen: [144,238,144,1], // rgba(144,238,144,1)
+    LightBlue: [173,216,230,1], // rgba(173,216,230,1)
+    LightRed: [255,102,102,1], // rgba(255,102,102,1)
+    Brown: [124,92,64,1], // rgba(124,92,64,1)
 })
 
 const UI_MODE = Object.freeze({

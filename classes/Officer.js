@@ -52,7 +52,7 @@ class Officer {
         return 1 + Math.floor(this.level / CAPTAIN_LEVELS_PER_OFFICER)
     }
 
-    get totalDebts() {
-        return this.loans.reduce((total, loan) => total + loan.totalRepayable, 0)
+    calcTotalDebts(onlyOverdue = false) {
+        return this.loans.filter(l=>(!onlyOverdue || l.overdue)).reduce((total, loan) => total + loan.outstandingBalance, 0)
     }
 }

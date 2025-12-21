@@ -3,15 +3,13 @@ DONE:
  -merchants - same as above but will offer to trade with you
  -cops - will check you for contraband or arrest if you have a bounty
  -asteroid encounters so you can mine raw resources
+ -bounty hunters - will just straight attack you if you OR your officers have a bounty
+ -have the banks put bounty on your head every month you're overdue on a loan
+ -allow game to end
 
 NEXT UP:
 
-more encounter types
- -bounty hunters - will just straight attack you if you OR your officers have a bounty
- -dead/stranded ships - you can loot them but may be ambushed while doing so
-
-if you don't pay loans on time bounty hunters will attack you to recoup them
-
+-make skills actually do things
 some encounters need to be more common near certain planets, asteroid belt, etc.
 
 allow player to retire after 50 years and get an ending

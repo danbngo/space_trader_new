@@ -1,6 +1,6 @@
 class GameState {
     constructor(starSystem = new StarSystem()) {
-        this.year = 3000;
+        this.year = GAME_START_YEAR;
         this.system = starSystem
 
         // Create captain

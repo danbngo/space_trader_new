@@ -30,7 +30,7 @@ class Ship {
 
     get radius() {
         //use formula based on mass and radius of a sphere
-        return BASE_SPACE_SHIP_RADIUS_IN_MILES * (1+Math.cbrt(this.mass))
+        return BASE_SPACE_SHIP_RADIUS_IN_MILES * (1+Math.sqrt(this.mass))
     }
 
     get mass() {
@@ -70,7 +70,7 @@ class Ship {
     }
 
     get maxRamDamage() {
-        return 0.5 * this.maxMoveDistance * this.mass;
+        return 0.25 * this.maxMoveDistance * this.mass;
     }
 
     isDamaged() {
@@ -143,7 +143,7 @@ class Ship {
         const moveRange = 1+this.maxMoveDistance
         //use 0.55, want ship to be forced to move slightly
         const [tx,ty] = rotatePoint(overrideX + moveRange*1.05, overrideY, overrideX, overrideY, targetingAngle)
-        //if ship was at 0 rotation, it would be facing right. we would want the ellipse to be wider horizontally than vertically
+        //if ship was at 0 angle, it would be facing right. we would want the ellipse to be wider horizontally than vertically
         const ellipse = new Ellipse(tx, ty, moveRange, moveRange*.66, targetingAngle)
         return ellipse
     }
