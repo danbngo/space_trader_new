@@ -137,16 +137,16 @@ function showBankMenu(bank = new Bank()) {
     const canBorrow = bank.calcLoanMaxAmount(gs.captain) > 0
 
     const baseButtons = [
-        ['Withdraw', ()=>showWithdrawSlider(), !isDocked || !canWithdraw],
-        ['Deposit', ()=>showDepositSlider(), !isDocked || !canDeposit],
-        ['Borrow', ()=>showBorrowSlider(), !isDocked || !canBorrow],
+        ...(isDocked && canWithdraw ? [['Withdraw', ()=>showWithdrawSlider()]] : []),
+        ...(isDocked && canDeposit ? [['Deposit', ()=>showDepositSlider()]] : []),
+        ...(isDocked && canBorrow ? [['Borrow', ()=>showBorrowSlider()]] : []),
     ]
 
     function onSelectLoan(loan = new Loan()) {
         const canRepay = gs.credits > 0
         const buttons = [
             ...baseButtons,
-            ['Repay', ()=>showRepaySlider(loan), !canRepay],
+            ...(canRepay ? [['Repay', ()=>showRepaySlider(loan)]] : []),
             ['Back', ()=>showPlanetMenu(planet)],
         ]
         refreshPanelButtons('bank_panel', buttons)

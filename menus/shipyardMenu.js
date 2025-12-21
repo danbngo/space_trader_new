@@ -88,8 +88,9 @@ function showShipyardBuyMenu(shipyard = new Shipyard()) {
     
     function onSelectShipyardShip(ship = new Ship()) {
         const buyPrice = shipyard.calcBuyPrice(ship)
+        const canBuy = gs.credits >= buyPrice && fleet.ships.length < fleet.numPilots
         const buttons = [
-            [`Buy`, ()=>showBuyShipModal(ship), (gs.credits < buyPrice || fleet.ships.length >= fleet.numPilots)],
+            ...(canBuy ? [[`Buy`, ()=>showBuyShipModal(ship)]] : []),
             ["Sell Ships", ()=>showShipyardSellMenu(shipyard)],
             ["Back", () => leave()],
         ]
@@ -133,8 +134,9 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
     }
 
     function onSelectPlayerShip(ship = new Ship()) {
+        const canSell = isDocked && shipyard.credits > 0
         refreshPanelButtons('shipyard_sell_panel', [
-            [`Sell`, ()=>showSellShipModal(ship), !isDocked || (shipyard.credits <= 0)],
+            ...(canSell ? [[`Sell`, ()=>showSellShipModal(ship)]] : []),
             ["Buy Ships", ()=>showShipyardBuyMenu(shipyard)],
             ["Back", () => leave()],
         ])

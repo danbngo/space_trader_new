@@ -38,7 +38,7 @@ class Route {
             const t = (i / samples) * maxYears; // future year offset
 
             // planet's position in AU
-            const [px, py] = planet.calcAbsPositionAtYear(startYear + t);
+            const [px, py] = planet.calcAbsPositionAtYear ? planet.calcAbsPositionAtYear(startYear + t) : [planet.x, planet.y];
 
             const dx = px - fleet.x;
             const dy = py - fleet.y;

@@ -51,8 +51,9 @@ function showGuildMenu(guild = new Guild()) {
     function onSelectGuildOfficer(officer = new Officer()) {
         console.log('selected guild officer:',officer)
         const hirePrice = guild.calcHirePrice(officer)
+        const canHire = isDocked && gs.credits >= hirePrice && fleet.officers.length < captain.maxSubordinates
         const buttons = [
-            [`Hire`, ()=>showHireOfficerModal(officer), (!isDocked || gs.credits < hirePrice || fleet.officers.length >= captain.maxSubordinates)],
+            ...(canHire ? [[`Hire`, ()=>showHireOfficerModal(officer)]] : []),
             ["Back", () => showPlanetMenu(planet)],
         ]
         refreshPanelButtons('guild_hire_panel', buttons)

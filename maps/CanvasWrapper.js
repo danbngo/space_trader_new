@@ -184,6 +184,7 @@ class CanvasWrapper {
 
         this.onClickWorldXY = null;
         this.onMouseMoveWorldXY = null;
+        this.isDragging = false;
 
         // Setup click detection
         this.canvas.addEventListener('click', (e) => this.handleClick(e));
@@ -229,6 +230,7 @@ class CanvasWrapper {
     }
 
     onDragMap(x = 0, y = 0) {
+        this.isDragging = true;
         this.cameraX -= x/this.zoom
         this.cameraY -= y/this.zoom
         this.cameraX = Math.min(this.cameraPanLimit, Math.max(-this.cameraPanLimit, this.cameraX))
@@ -401,9 +403,10 @@ class CanvasWrapper {
         const mouseX = event.clientX - rect.left;
         const mouseY = event.clientY - rect.top;
 
-        if (this.onClickWorldXY) {
-            this.onClickWorldXY(...this.screenToWorld(mouseX, mouseY));
-            return
+        // Don't fire click events if the user just dragged
+        if (this.isDragging) {
+            this.isDragging = false;
+            return;
         }
 
         // Check objects in reverse draw order (top-most first)
@@ -416,6 +419,13 @@ class CanvasWrapper {
                 return
             }
         }
+
+        //only fire the default positional handler if no objects clicked
+        if (this.onClickWorldXY) {
+            this.onClickWorldXY(...this.screenToWorld(mouseX, mouseY));
+            return
+        }
+
     }
 
     recalculateDrawOrder() {

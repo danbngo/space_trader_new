@@ -22,6 +22,19 @@ class StarMap {
 
         for (const bgStar of starSystem.backgroundStars) bgStar.reset()
 
+        // Allow clicking empty space to select arbitrary coordinates
+        this.cvs.onClickWorldXY = (x, y) => {
+            // Create a temporary waypoint object for the clicked coordinates
+            const waypoint = {
+                name: `Coordinates (${roundToPlaces(x, 1)}, ${roundToPlaces(y, 1)})`,
+                x,
+                y,
+                color: COLORS.Cyan,
+                isWaypoint: true
+            }
+            this.selectObject(waypoint)
+        }
+
         this.rebuildCanvas();
         this.refresh()
 
@@ -285,9 +298,21 @@ class StarMap {
         if (obj == gs.fleet) {
             if (gs.location) ce({parent:container, tag:'button', innerHTML:`Dock (${coloredName(gs.location)})`, onClick:()=>this.explore(gs.location)})
         }
-    if (obj instanceof Planet) {
+        if (obj instanceof Planet) {
+            const distance = roundToPlaces(calcDistance(gs.fleet.x, gs.fleet.y, obj.x, obj.y), 2)
+            const travelTime = distance / gs.fleet.speed
+            ce({parent:container, innerHTML:`Distance: ${distance} AU`})
+            ce({parent:container, innerHTML:`ETA: ${describeTimespan(travelTime)}`})
             ce({parent:container, tag:'button', innerHTML:isDockedHere ? 'Dock' : 'Scan', onClick:()=>this.explore(obj)})
             ce({parent:container, tag:'button', innerHTML:'Travel', onClick:()=>this.setDestination(obj, true), disabled: cantTravelHere})
+        }
+        // Handle waypoint (arbitrary coordinates)
+        if (obj.isWaypoint) {
+            const distance = roundToPlaces(calcDistance(gs.fleet.x, gs.fleet.y, obj.x, obj.y), 2)
+            const travelTime = distance / gs.fleet.speed
+            ce({parent:container, innerHTML:`Distance: ${distance} AU`})
+            ce({parent:container, innerHTML:`ETA: ${describeTimespan(travelTime)}`})
+            ce({parent:container, tag:'button', innerHTML:'Travel', onClick:()=>this.setDestination(obj, true), disabled: gs.fleet.stranded})
         }
     }
 
@@ -304,11 +329,15 @@ class StarMap {
     }
 
     explore(planet = gs.location) {
-        showPlanetMenu(planet)
+        if (planet instanceof Planet) showPlanetMenu(planet)
     }
 
     setDestination(obj = new SpaceObject(), unpause = false) {
         if (obj instanceof Planet) {
+            gs.fleet.route = new Route(gs.fleet, obj)
+            gs.fleet.location = undefined
+        } else if (obj.isWaypoint) {
+            // Create a route to arbitrary coordinates
             gs.fleet.route = new Route(gs.fleet, obj)
             gs.fleet.location = undefined
         }

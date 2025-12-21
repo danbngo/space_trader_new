@@ -84,8 +84,8 @@ function showMarketMenu(market = new Market()) {
         const sellableAmount = Math.min(playerAmount, marketAffordableAmount)
         console.log({playerAmount,marketAmount,buyPrice,sellPrice,playerAffordableAmount,buyableAmount,marketAffordableAmount,sellableAmount})
         const buttons = [
-            ['Buy', ()=>showBuyCargoSlider(ct, buyableAmount, buyPrice), !isDocked || buyableAmount == 0],
-            ['Sell', ()=>showSellCargoSlider(ct, sellableAmount, sellPrice), !isDocked || sellableAmount == 0],
+            ...(isDocked && buyableAmount > 0 ? [['Buy', ()=>showBuyCargoSlider(ct, buyableAmount, buyPrice)]] : []),
+            ...(isDocked && sellableAmount > 0 ? [['Sell', ()=>showSellCargoSlider(ct, sellableAmount, sellPrice)]] : []),
             ['Back', ()=>showPlanetMenu(planet)],
         ]
         refreshPanelButtons('market_panel', buttons)

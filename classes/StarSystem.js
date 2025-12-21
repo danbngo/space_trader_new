@@ -45,8 +45,13 @@ class StarSystem extends SpaceObject {
             if (year <= fleet.route.startYear) continue
             //check if route completed, if so arrive at destination and dock
             if (year >= fleet.route.endYear) {
-                fleet.location = fleet.route.destination
-                fleet.route = undefined
+                if (fleet.route.destination instanceof Planet) fleet.dock(fleet.route.destination)
+                else {
+                    fleet.route = undefined
+                    fleet.location = undefined
+                    if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
+                    if (currentMap && currentMap.selectObject && fleet == gs.fleet) currentMap.selectObject(fleet)
+                }
                 continue
             }
             //otherwise, make progress along journey

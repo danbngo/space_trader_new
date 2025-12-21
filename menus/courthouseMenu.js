@@ -47,8 +47,8 @@ function showCourthouseMenu(courthouse = new Courthouse()) {
     const canPayBounty = gs.credits > 0 && gs.captain.bounty > 0
 
     const baseButtons = [
-        ['Pay Bounty', ()=>showPayBountySlider(), !isDocked || !canPayBounty],
-        ['Serve Jail Time', ()=>showServeJailTimeModal(Math.ceil(gs.captain.bounty*JAIL_DAYS_PER_1000CR_FINE/1000)), !isDocked || gs.captain.bounty <= 0],
+        ...(isDocked && canPayBounty ? [['Pay Bounty', ()=>showPayBountySlider()]] : []),
+        ...(isDocked && gs.captain.bounty > 0 ? [['Serve Jail Time', ()=>showServeJailTimeModal(Math.ceil(gs.captain.bounty*JAIL_DAYS_PER_1000CR_FINE/1000))]] : []),
     ]
 
     let infoContainer = ce({

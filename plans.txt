@@ -12,13 +12,14 @@ DONE:
   ex . hail button should be highlighted when player is in view mode
   or unpause button when player's game is paused
 some encounters need to be more common near certain planets, asteroid belt, etc.
+-allow arbitrary movement on starmap
 
 
 NEXT UP:
 
 -apply officer rake to other cr sources - salvaging, bribes
 -ships should be able to miss, misfire engine (dont move), miss ramming, etc.
--allow arbitrary movement on starmap
+
 
 - tutorial?
 
