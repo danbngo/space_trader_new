@@ -118,9 +118,12 @@ class EncounterMap {
             if (ship.shipType.shape == SHAPES.Triangle) {
                 shipObj = cvs.addTriangle(`ship${index}`, ship.x, ship.y, ship.radius, ship.radius, 12, ship.color, ship.angle, ()=>this.selectObject(ship), true)
             }
-            else {
-                shipObj = cvs.addFilledOval(`ship${index}`, ship.x, ship.y, ship.radius, (ship.radius*(Math.random()+0.5)), 0.5, ship.color, ship.angle, ()=>this.selectObject(ship), true)
+            else if (ship.shipType.shape == SHAPES.FilledOval) {
+                shipObj = cvs.addFilledOval(`ship${index}`, ship.x, ship.y, ship.radius, (ship.radius*(Math.random()+0.5)), 0.5, ship.color, ship.angle, ()=>this.selectObject(ship))
                 console.log('ship obj:', shipObj)
+            }
+            else if (ship.shipType.shape == SHAPES.FilledCircle) {
+                shipObj = cvs.addFilledCircle(`ship${index}`, ship.x, ship.y, ship.radius, 12, ship.color, ()=>this.selectObject(ship))
             }
             shipObj.onHover = ()=>this.hoverObject(ship)
             //if (ship == this.selectedObject) shipObj.strokeColor = COLORS.Green

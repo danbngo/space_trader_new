@@ -111,20 +111,6 @@ function radiansToDegrees(rads = 0) {
     return rads * (180 / Math.PI);
 }
 
-function calcCirclesIntersecting(x1 = 0, y1 = 0, r1 = 1, x2 = 0, y2 = 0, r2 = 1) {
-    const dx = x1 - x2;
-    const dy = y1 - y2;
-    const distSq = dx*dx + dy*dy;
-    const rad = r1 + r2;
-    return distSq <= rad * rad;
-}
-
-function calcSpeedAlongAngle(speedX = 0, speedY = 0, angle = Math.PI*2) {
-    const ux = Math.cos(angle);  // unit vector in that angle
-    const uy = Math.sin(angle);
-    return speedX * ux + speedY * uy;    // dot product = speed along angle
-}
-
 function isPointInRect(px, py, rx, ry, rw, rh) {
     return px >= rx && px <= rx + rw &&
            py >= ry && py <= ry + rh;
@@ -162,12 +148,15 @@ function hexToRgba(hex = '#ffffff') {
     return [r, g, b, 1];
 }
 
-
-function calcLineThroughPoints(cx = 0, cy = 0, dx = 1, dy = 0, length = 10) {
-    const halfLength = length / 2;
-    const startX = cx - (dx * halfLength);
-    const startY = cy - (dy * halfLength);
-    const toX = cx + (dx * halfLength);
-    const toY = cy + (dy * halfLength);
-    return [[startX, startY], [toX, toY]];
+function weightedAvg(values = [0], weights = [1]) {
+    if (values.length === 0 || weights.length === 0 || values.length !== weights.length) {
+        return 0;
+    }
+    let totalWeight = 0;
+    let weightedSum = 0;
+    for (let i = 0; i < values.length; i++) {
+        weightedSum += values[i] * weights[i];
+        totalWeight += weights[i];
+    }
+    return totalWeight === 0 ? 0 : weightedSum / totalWeight;
 }

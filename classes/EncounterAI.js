@@ -149,6 +149,10 @@ class EncounterAI {
         console.log('deciding move for ship with strategy:', { strategy, attackableTargets, rammableTargets, nearestTarget, targets, opposingFleet });
 
         if (strategy == COMBAT_STRATEGIES.Asteroid) {
+            if (attackableTargets.length > 0 && ship.lasers > 0 && Math.random() > 0.5) {
+                //attack targets if any available
+                return new ShipAction(encounter, ship, MOVE_TYPES.Attack, nearestTarget)
+            }
             const inTheWayTargets = rammableTargets.filter(t => {
                 const path = new Path(ship.x, ship.y, t.x, t.y)
                 const angle = path.angle

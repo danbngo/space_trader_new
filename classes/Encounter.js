@@ -4,7 +4,7 @@ class Encounter {
     constructor(gs = new GameState(), encounterType = ENCOUNTER_TYPES_ALL[0], planet = new Planet(), fleet = new Fleet()) {
         console.log('Encounter.constructor', { gs, encounterType, planet, fleet });
         this.encounterType = encounterType;
-        this.fleetName = this.encounterType.name
+        this.fleetName = `${this.planet.ianName} ${this.encounterType.name}`
         this.planet = planet;
         this.fleet = fleet;
         this.combatEnabled = false;

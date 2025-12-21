@@ -18,7 +18,7 @@ class EncounterType {
 }
 
 const ENCOUNTER_TYPES = {
-    MINERS: new EncounterType('Miners', COLORS.LightPurple, 'You encountered: miners.', FLEET_TYPES.MINERS, AI_TYPES.Ship, FORMATION_TYPES.FaceOff,
+    MINERS: new EncounterType('Miners', COLORS.DarkGray, 'You encountered: miners.', FLEET_TYPES.MINERS, AI_TYPES.Ship, FORMATION_TYPES.FaceOff,
         ()=>{
             if (gs.encounter.luck[0] * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > gs.encounter.fleet.totalRadar) {
                 showModal(gs.encounter.fleetName, 'Your long range sensors detect a mining fleet before they detect you.<br/>You manage to approach them stealthily.', [
@@ -28,14 +28,40 @@ const ENCOUNTER_TYPES = {
                         gs.luck[0] = 0
                         gs.encounter.encounterType.onStart()
                     }]
-                    ['Sneak Attack', ()=>showPlayerAttackFleetModal(-1, 1)],
+                    ['Sneak Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, true)],
                 ])
             }
             else {
                 showModal(gs.encounter.fleetName, 'The miners transmit a surly, perfunctory greeting, but otherwise ignore you.', [
                     ['View', ()=>closeModal()],
                     ['Continue', ()=>endEncounter()],
-                    ['Attack', ()=>showPlayerAttackFleetModal(-1, 1)],
+                    ['Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, true)],
+                ])
+            }
+        },
+        ()=>showPlayerDefeatedEnemyModal(-1),
+        ()=>showPlayerDefeatedByNeutralsModal(1),
+        ()=>showPlayerEscapedFromFleetModal(),
+        ()=>gs.encounter.encounterType.onDefeat()
+    ),
+    TOURISTS: new EncounterType('Tourists', COLORS.DarkGray, 'You encountered: tourists.', FLEET_TYPES.MINERS, AI_TYPES.Ship, FORMATION_TYPES.FaceOff,
+        ()=>{
+            if (gs.encounter.luck[0] * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > gs.encounter.fleet.totalRadar) {
+                showModal(gs.encounter.fleetName, 'Your long range sensors detect a tourist fleet before they detect you.<br/>You manage to approach them stealthily.', [
+                    ['View', ()=>closeModal()],
+                    ['Bypass', ()=>endEncounter()],
+                    ['Hail', ()=>{
+                        gs.luck[0] = 0
+                        gs.encounter.encounterType.onStart()
+                    }]
+                    ['Sneak Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, true)],
+                ])
+            }
+            else {
+                showModal(gs.encounter.fleetName, 'The tourist fleet broadcasts a corporate jingle, inviting you to join them for your next pleasure cruise.', [
+                    ['View', ()=>closeModal()],
+                    ['Continue', ()=>endEncounter()],
+                    ['Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, true)],
                 ])
             }
         },
@@ -54,26 +80,60 @@ const ENCOUNTER_TYPES = {
                         gs.luck[0] = 0
                         gs.encounter.encounterType.onStart()
                     }]
-                    ['Sneak Attack', ()=>showPlayerAttackFleetModal(-1, 1)],
+                    ['Sneak Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, true)],
                 ])
             }
             else if (gs.encounter.luck[1] > .5) {
-                showModal(gs.encounter.fleetName, 'The merchants greet you warmly and offer to trade goods.', [
+                showModal(gs.encounter.fleetName, 'The merchants eagerly invite you to trade. They claim to have the best prices in the sector!', [
                     ['View', ()=>closeModal()],
                     ['Trade', ()=>showTradeOfferModal()],
                     ['Continue', ()=>endEncounter()],
-                    ['Attack', ()=>showPlayerAttackFleetModal(-1, 1)],
+                    ['Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, true)],
                 ])
             }
             else {
                 showModal(gs.encounter.fleetName, 'The merchant fleet ignores you nervously.', [
                     ['View', ()=>closeModal()],
                     ['Continue', ()=>endEncounter()],
-                    ['Attack', ()=>showPlayerAttackFleetModal(-1, 1)],
+                    ['Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, true)],
                 ])
             }
         },
         ()=>showPlayerDefeatedEnemyModal(-1),
+        ()=>showPlayerDefeatedByNeutralsModal(1),
+        ()=>showPlayerEscapedFromFleetModal(),
+        ()=>gs.encounter.encounterType.onDefeat()
+    ),
+    SMUGGLERS: new EncounterType('Smugglers', COLORS.Yellow, 'You encountered: smugglers.', FLEET_TYPES.SMUGGLERS, AI_TYPES.Ship, FORMATION_TYPES.FaceOff,    
+        ()=>{
+            if (gs.encounter.luck[0] * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > gs.encounter.fleet.totalRadar) {
+                showModal(gs.encounter.fleetName, 'Your long range sensors detect a smuggler fleet before they detect you.<br/>You manage to approach them stealthily.', [
+                    ['View', ()=>closeModal()],
+                    ['Bypass', ()=>endEncounter()],
+                    ['Hail', ()=>{
+                        gs.luck[0] = 0
+                        gs.encounter.encounterType.onStart()
+                    }]
+                    ['Sneak Attack', ()=>showPlayerAttackFleetModal(1, 0, false, true)],
+                ])
+            }
+            else if (gs.encounter.luck[1] > .5) {
+                showModal(gs.encounter.fleetName, 'The smugglers broadcast a rather seedy invitation to peruse their illicit wares.', [
+                    ['View', ()=>closeModal()],
+                    ['Trade', ()=>showTradeOfferModal()],
+                    ['Continue', ()=>endEncounter()],
+                    ['Attack', ()=>showPlayerAttackFleetModal(1, 0, false, true)],
+                ])
+            }
+            else {
+                showModal(gs.encounter.fleetName, 'The smuggler fleet takes no chances and starts moving quickly away from you.', [
+                    ['View', ()=>closeModal()],
+                    ['Continue', ()=>endEncounter()],
+                    ['Attack', ()=>showPlayerAttackFleetModal(1, 0, false, true)],
+                ])
+            }
+        },
+        ()=>showPlayerDefeatedEnemyModal(1),
         ()=>showPlayerDefeatedByNeutralsModal(1),
         ()=>showPlayerEscapedFromFleetModal(),
         ()=>gs.encounter.encounterType.onDefeat()
@@ -88,7 +148,7 @@ const ENCOUNTER_TYPES = {
                         gs.luck[0] = 0
                         gs.encounter.encounterType.onStart()
                     }]
-                    ['Sneak Attack', ()=>showPlayerAttackFleetModal(1, 0)],
+                    ['Sneak Attack', ()=>showPlayerAttackFleetModal(1, 0, false, false)],
                 ])
             }
             else if (gs.encounter.luck[1] < 0.5) {
@@ -102,7 +162,7 @@ const ENCOUNTER_TYPES = {
                 showModal(gs.encounter.fleetName, 'The pirates broadcast insults and jeers at your fleet, but let you pass regardless.', [
                     ['View', ()=>closeModal()],
                     ['Continue', ()=>endEncounter()],
-                    ['Attack', ()=>showPlayerAttackFleetModal(1, 0)],
+                    ['Attack', ()=>showPlayerAttackFleetModal(1, 0, false, false)],
                 ])
             }
         },
@@ -111,7 +171,7 @@ const ENCOUNTER_TYPES = {
         ()=>showPlayerEscapedFromFleetModal(),
         ()=>showPlayerDidSurrenderModal(1)
     ),
-    POLICE: new EncounterType('Police', COLORS.LightBlue, 'You encountered: police.', FLEET_TYPES.PATROL, AI_TYPES.Ship, FORMATION_TYPES.FaceOff,
+    POLICE: new EncounterType('Police', COLORS.LightBlue, 'You encountered: police.', FLEET_TYPES.POLICE, AI_TYPES.Ship, FORMATION_TYPES.FaceOff,
         ()=>{
             if (gs.encounter.luck[0] * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > gs.encounter.fleet.totalRadar) {
                 showModal(gs.encounter.fleetName, 'Your long range sensors detect a police fleet before they detect you.<br/>You manage to approach them stealthily.', [
@@ -121,14 +181,14 @@ const ENCOUNTER_TYPES = {
                         gs.luck[0] = 0
                         gs.encounter.encounterType.onStart()
                     }]
-                    ['Sneak Attack', ()=>showPlayerAttackFleetModal(-2, 2)],
+                    ['Sneak Attack', ()=>showPlayerAttackFleetModal(-2, 2, false, false)],
                 ])
             }
             else if (gs.encounter.luck[1]*gs.captain.fame/gs.captain.infamy > 1 && gs.captain.fame > 100) {
                 showModal(gs.encounter.fleetName, `The police greet you respectfully, having heard of your good deeds.<br/>They don't even trouble you with the routine inspection.`, [
                     ['View', ()=>closeModal()],
                     ['Continue', ()=>endEncounter()],
-                    ['Attack', ()=>showPlayerAttackFleetModal(-2, 2)],
+                    ['Attack', ()=>showPlayerAttackFleetModal(-2, 2, false, false)],
                 ])
             }
             if (gs.encounter.luck[2]*gs.captain.infamy > 100 && gs.captain.bounty > 0) {
@@ -149,11 +209,44 @@ const ENCOUNTER_TYPES = {
                 showModal(gs.encounter.fleetName, 'The police ships speed past your fleet, perhaps responding to some other incident.', [
                     ['View', ()=>closeModal()],
                     ['Continue', ()=>endEncounter()],
-                    ['Attack', ()=>showPlayerAttackFleetModal(-2, 2)],
+                    ['Attack', ()=>showPlayerAttackFleetModal(-2, 2, false, false)],
                 ])
             }
         },
         ()=>showPlayerDefeatedEnemyModal(-2),
+        ()=>showPlayerDefeatedByPoliceModal(),
+        ()=>showPlayerEscapedFromFleetModal(),
+        ()=>showPlayerDidSurrenderModal(-1)
+    ),
+    SOLDIERS: new EncounterType('Soldiers', COLORS.LightGreen, 'You encountered: soldiers.', FLEET_TYPES.SOLDIERS, AI_TYPES.Ship, FORMATION_TYPES.FaceOff,
+        ()=>{
+            if (gs.encounter.luck[0] * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > gs.encounter.fleet.totalRadar) {
+                showModal(gs.encounter.fleetName, 'Your long range sensors detect an army fleet before they detect you.<br/>You manage to approach them stealthily.', [
+                    ['View', ()=>closeModal()],
+                    ['Bypass', ()=>endEncounter()],
+                    ['Hail', ()=>{
+                        gs.luck[0] = 0
+                        gs.encounter.encounterType.onStart()
+                    }]
+                    ['Sneak Attack', ()=>showPlayerAttackFleetModal(-2, 2, false, false)],
+                ])
+            }
+            if (gs.encounter.luck[2]*gs.captain.infamy > 250 && gs.captain.bounty > 0) {
+                showModal(gs.encounter.fleetName, 'The army ships power up their weapons the instant you pass by!<br/>You have grown so notorious that even the government considers you a threat!', [
+                    ['View', ()=>closeModal()],
+                    ['Surrender', ()=>gs.encounter.encounterType.onSurrender()],
+                    ['Resist', ()=>showPlayerRefuseSurrenderModal(-2, 2)],
+                ])
+            }
+            else {
+                showModal(gs.encounter.fleetName, `The army ships blares a platriotic jingle extolling the greatness of ${gs.encounter.planet.name}.`, [
+                    ['View', ()=>closeModal()],
+                    ['Continue', ()=>endEncounter()],
+                    ['Attack', ()=>showPlayerAttackFleetModal(-2, 2, false, false)],
+                ])
+            }
+        },
+        ()=>showPlayerDefeatedEnemyModal(-4),
         ()=>showPlayerDefeatedByPoliceModal(),
         ()=>showPlayerEscapedFromFleetModal(),
         ()=>showPlayerDidSurrenderModal(-1)
@@ -168,7 +261,7 @@ const ENCOUNTER_TYPES = {
                         gs.luck[0] = 0
                         gs.encounter.encounterType.onStart()
                     }]
-                    ['Sneak Attack', ()=>showPlayerAttackFleetModal(-1, 1)],
+                    ['Sneak Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, false)],
                 ])
             }
             else if (gs.encounter.luck[1] < 0.5 && gs.captain.bounty > gs.encounter.luck[2]*100) {
@@ -182,7 +275,7 @@ const ENCOUNTER_TYPES = {
                 showModal(gs.encounter.fleetName, 'The bounty hunters glide past your fleet in eerie silence.', [
                     ['View', ()=>closeModal()],
                     ['Continue', ()=>endEncounter()],
-                    ['Attack', ()=>showPlayerAttackFleetModal(-1, 1)],
+                    ['Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, false)],
                 ])
             }
         },
@@ -211,11 +304,53 @@ const ENCOUNTER_TYPES = {
         ()=>showPlayerDefeatedByHazardsModal(),
         ()=>showPlayerEscapedFromHazardsModal(),
         null
-    )
+    ),
+    CRYOIDS: new EncounterType('Cryoids', COLORS.LightBlue, 'You encountered: cryoids.', FLEET_TYPES.CRYOIDS, AI_TYPES.Asteroid, FORMATION_TYPES.Storm,
+        ()=>{
+            if (gs.encounter.luck[0] * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Piloting)/50) > gs.encounter.fleet.totalRadar) {
+                showModal(gs.encounter.fleetName, `Your long range sensors detect an incoming cluster of cryoids.<br/>You skillfully steer out of harm's way.<br/>Although, you could choose to plunge back in and mine them if you wish.`, [
+                    ['View', ()=>closeModal()],
+                    ['Bypass', ()=>endEncounter()],
+                    ['Mine', ()=>startCombat(true)],
+                ])
+            }
+            else {
+                showModal(gs.encounter.fleetName, 'You encounter a brutal cryoid storm! You must navigate carefully to avoid damage.', [
+                    ['View', ()=>closeModal()],
+                    ['Continue', ()=>startCombat(true)],
+                ])
+            }
+        },
+        ()=>showPlayerDefeatedHazardsModal(),
+        ()=>showPlayerDefeatedByHazardsModal(),
+        ()=>showPlayerEscapedFromHazardsModal(),
+        null
+    ),
+    PLASMOIDS: new EncounterType('Plasmoids', COLORS.Gray, 'You encountered: plasmoids.', FLEET_TYPES.PLASMOIDS, AI_TYPES.Asteroid, FORMATION_TYPES.Storm,
+        ()=>{
+            if (gs.encounter.luck[0] * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Piloting)/50) > gs.encounter.fleet.totalRadar) {
+                showModal(gs.encounter.fleetName, `Your long range sensors detect an incoming cluster of plasmoids.<br/>You skillfully steer out of harm's way.<br/>Although, you could choose to plunge back in and mine them if you wish.`, [
+                    ['View', ()=>closeModal()],
+                    ['Bypass', ()=>endEncounter()],
+                    ['Mine', ()=>startCombat(true)],
+                ])
+            }
+            else {
+                showModal(gs.encounter.fleetName, 'You encounter a brutal plasmoid storm! You must navigate carefully to avoid damage.', [
+                    ['View', ()=>closeModal()],
+                    ['Continue', ()=>startCombat(true)],
+                ])
+            }
+        },
+        ()=>showPlayerDefeatedHazardsModal(),
+        ()=>showPlayerDefeatedByHazardsModal(),
+        ()=>showPlayerEscapedFromHazardsModal(),
+        null
+    ),
 }
 
-ENCOUNTER_TYPES.ASTEROIDS.onEndTurn = (encounter = new Encounter())=>{
-    //make asteroids move faster each turn
+for (const et of [ENCOUNTER_TYPES.ASTEROIDS, ENCOUNTER_TYPES.CRYOIDS, ENCOUNTER_TYPES.PLASMOIDS]) et.onEndTurn = (encounter = new Encounter())=>{
+    //make fooroids move faster each turn
     for (const ship of encounter.enemyShips) {
         if (Math.random() > .5) ship.engine *= 1.1
     }

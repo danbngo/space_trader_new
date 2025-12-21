@@ -77,6 +77,19 @@ class Planet extends OrbitingObject {
         this.settlement = settlement
         this.culture = culture
     }
+
+    get ianName() {
+        let name = this.name+'ian'
+        if (name == 'Earthian') return 'Terran'
+        if (name.endsWith('aaian')) name = name.replace('aaian', 'aan')
+        if (name.endsWith('eaian')) name = name.replace('eaian', 'ean')
+        if (name.endsWith('iaian')) name = name.replace('iaian', 'ian')
+        if (name.endsWith('oian')) name = name.replace('oian', 'oan')
+        if (name.endsWith('uian')) name = name.replace('uian', 'uan')
+        if (name.endsWith('yian')) name = name.replace('yian', 'yan')
+        if (name.endsWith('sian')) name = name.replace('sian', 'tian')
+        return name
+    }
 }
 
 class AsteroidBelt extends OrbitingObject {}

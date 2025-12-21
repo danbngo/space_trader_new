@@ -68,13 +68,10 @@ function endEncounter() {
     }
 }
 
-function startCombat(playerHasInitiative = false, sneakAttack = false) {
+function startCombat(playerHasInitiative = false) {
     console.log('startCombat', { playerHasInitiative });
     gs.encounter.combatEnabled = true;
     gs.encounter.activeTurnFleet = playerHasInitiative ? gs.fleet : gs.encounter.enemyFleet
-    if (sneakAttack) {
-        for (const ship of gs.encounter.ships) ship.shields[0] = 0
-    }
     closeModal()
     if (currentMap && currentMap.togglePause) currentMap.togglePause(false)
 }
@@ -161,7 +158,7 @@ function showPlayerDidSurrenderModal( fameLossMultiplier = 1) {
 }
 
 
-function showPlayerAttackFleetModal(fameMultiplier = 0, bountyMultiplier = 0, sneakAttack = false) {
+function showPlayerAttackFleetModal(fameMultiplier = 0, bountyMultiplier = 0, sneakAttack = false, allowBribe = false) {
     console.log('showPlayerAttackFleetModal', { fameMultiplier, bountyMultiplier });
     const fleetName = gs.encounter.fleetName
     const fame = fameMultiplier > 0 ? 1 * fameMultiplier : 0
@@ -170,12 +167,28 @@ function showPlayerAttackFleetModal(fameMultiplier = 0, bountyMultiplier = 0, sn
     gs.captain.fame += fame
     gs.captain.infamy += infamy
     gs.captain.bounty += bounty
+
+    if (sneakAttack) {
+        for (const ship of gs.encounter.ships) ship.shields[0] = 0
+    }
+
     let msg = `You ${sneakAttack ? 'sneakily ' : ''}attack the ${fleetName}!<br/>`
     if (sneakAttack) msg += `The ${fleetName} are caught with their shields down!<br/>`
     if (infamy > 0) msg += `This dastardly act causes you to gain ${infamy} infamy.<br/>`
     if (fame > 0) msg += `This brave act causes you to gain ${fame} fame.<br/>`
     if (bounty > 0) msg += `You bounty has risen by ${bounty}CR.<br/>`
-    showModal(fleetName, msg, [['Continue', ()=>startCombat(true, true)]])
+
+
+    showModal(fleetName, msg, [['Continue', ()=>{
+        if (allowBribe) {
+            const combatAdvantage = gs.fleet.combatRating / gs.encounter.fleet.combatRating
+            if (combatAdvantage * Math.random() > 1.5) {
+                showNeutralsBribePlayerModal()
+                return
+            }
+        }
+        startCombat(true)
+    }]])
 }
 
 function showTradeOfferModal() {
@@ -272,11 +285,15 @@ function showPlayerDefeatedEnemyModal(fameMultiplier = 0) {
     const abandonedCargoCapacity = disabledEnemyShips.reduce( (total, ship) => {
         return total + ship.cargoSpace
     }, 0)
+    const creditsAmt = Math.floor(enemyFleet.credits * (abandonedCargoCapacity / enemyFleet.totalCargoSpace))
     const cargoRatio = abandonedCargoCapacity / enemyFleet.totalCargoSpace
-    const lootAmt = Math.floor(enemyFleet.cargo.total * cargoRatio)
+    const maxLootAmt = Math.floor(enemyFleet.cargo.total * cargoRatio)
+    const baseLootAmt = Math.floor(Math.random() * maxLootAmt)
+    const lootAmt = weightedAvg([baseLootAmt, enemyFleet.cargo.total], [25, gs.fleet.totalSkills.getAmount(SKILLS.Salvaging)])
     const loot = enemyFleet.cargo.randomSubset(lootAmt)
     const disabledPlayerShips = gs.encounter.playerShips.filter(s=>s.isDisabled())
 
+    gs.credits += creditsAmt
     gs.captain.infamy += infamy
     gs.captain.fame += fame
 
@@ -289,9 +306,13 @@ function showPlayerDefeatedEnemyModal(fameMultiplier = 0) {
         msg += loseCargoFromDisabledShips(disabledPlayerShips)
     }
 
+    msg += conductRepairs()
+
     if (disabledEnemyShips.length > 0) {
         msg += `The ${fleetName} left behind ${disabledEnemyShips.length} disabled ships!<br/>`
-        msg += `Your scanners reveal ${lootAmt} units of cargo amid the wreckage.<br/>`
+        msg += `Your scanners reveal ${baseLootAmt} units of cargo amid the wreckage.<br/>`
+        if (lootAmt > baseLootAmt) msg += `Your salvaging skills allow you to recover an additional ${lootAmt - baseLootAmt} units of cargo.<br/>`
+        if (creditsAmt > 0) msg += `You also salvage ${creditsAmt}CR from the wreckage.<br/>`
     }
     showModal(gs.encounter.encounterType.name, msg, [
         lootAmt > 0 ? ['Loot', ()=>showLootMenu(loot)] : ['Continue', ()=>endEncounter()]
@@ -315,12 +336,33 @@ function showPlayerDefeatedHazardsModal() {
         msg += `${disabledPlayerShips.length} of your ships were disabled.<br/>`
         msg += loseCargoFromDisabledShips(disabledPlayerShips)
     }
+
+    msg += conductRepairs()
+
+
     if (disabledEnemyShips.length > 0) {
         msg += `You destroyed ${disabledEnemyShips.length} ${fleetName}!<br/>`
-        msg += `Your scanners reveal ${lootAmt} units of usable material amid the wreckage.<br/>`
+        msg += `Your scanners reveal ${baseLootAmt} units of usable material amid the wreckage.<br/>`
+        if (lootAmt > baseLootAmt) msg += `Your salvaging skills allow you to recover an additional ${lootAmt - baseLootAmt} units of usable material.<br/>`
     }
     showModal(gs.encounter.encounterType.name, msg, [
         lootAmt > 0 ? ['Loot', ()=>showLootMenu(loot)] : ['Continue', ()=>endEncounter()]
+    ])
+}
+
+function showNeutralsBribePlayerModal(maxCredits = 1000) {
+    const baseCredits = Math.ceil(maxCredits*Math.random()/2)
+    const credits = Math.round(weightedAvg([baseCredits, maxCredits], [25, gs.fleet.totalSkills.getAmount(SKILLS.Haggling)]))
+    let msg = `The ${gs.encounter.fleetName} frantically offers you ${baseCredits}CR to let them go unharmed!<br/>`
+    if (credits > baseCredits) msg += `You employ your haggling skills and make them an offer they can't refuse.<br/>Their offer increases to ${credits}CR.<br/>`
+    showModal(gs.encounter.fleetName, msg, [
+        ['Accept Bribe', ()=>{
+            gs.credits += credits
+            showModal(gs.encounter.fleetName, `You accept the tribute of ${credits}CR.<br/>The ${gs.encounter.fleetName} anxiously departs before you can change your mind.<br/>`, [['Continue', ()=>endEncounter()]])
+        }],
+        ['Refuse', ()=>{
+            showModal(gs.encounter.fleetName, `You scornfully refuse the tribute!<br/>The ${gs.encounter.fleetName} readies for combat!<br/>`, [['Continue', ()=>startCombat(false)]])
+        }]
     ])
 }
 
@@ -341,6 +383,8 @@ function showPlayerDefeatedByNeutralsModal( infamyLossMultiplier = 1) {
         msg += loseCargoFromDisabledShips(disabledPlayerShips)
     }
 
+    msg += conductRepairs()
+
     showModal(gs.encounter.encounterType.name, msg, [['Continue', ()=>endEncounter()]])
 }
 
@@ -355,6 +399,8 @@ function showPlayerDefeatedByHazardsModal() {
         msg += `${disabledPlayerShips.length} of your ships were disabled in the fighting.<br/>`
         msg += loseCargoFromDisabledShips(disabledPlayerShips)
     }
+
+    msg += conductRepairs()
 
     showModal(gs.encounter.encounterType.name, msg, [['Continue', ()=>endEncounter()]])
 }
@@ -397,6 +443,9 @@ function showPlayerDefeatedByPiratesModal() {
         msg += `They help themselves to ${stolenCreditsAmount} of your credits.<br/>`
     }
     msg += `The ${fleetName} thank you for your time and depart.<br/>`
+
+    msg += conductRepairs()
+
     showModal(gs.encounter.encounterType.name, msg, [['Continue', ()=>endEncounter()]])
 }
 
@@ -408,6 +457,7 @@ function showPlayerDefeatedByPoliceModal() {
     const fine = seizePlayerContraband()
     msg += fine > 0 ? `They confiscate all your contraband, and add a fine of ${fine} to your existing bounty.<br/>`
     : `They find no contraband aboard your ships, but there is still the matter of your other crimes.<br/>`
+
     showModal(fleetName, msg, [['Continue', ()=> showFineOrJailModal()]])
 }
 
@@ -420,6 +470,9 @@ function showPlayerEscapedFromEnemyModal() {
         msg += `However, ${disabledPlayerShips.length} were disabled in the fighting.<br/>`
         msg += loseCargoFromDisabledShips(disabledPlayerShips)
     }
+
+    msg += conductRepairs()
+
     showModal(gs.encounter.encounterType.name, msg, [['Continue', ()=>endEncounter()]])
 }
 
@@ -432,6 +485,8 @@ function showPlayerEscapedFromHazardsModal() {
         msg += `However, ${disabledPlayerShips.length} were disabled.<br/>`
         msg += loseCargoFromDisabledShips(disabledPlayerShips)
     }
+
+    msg += conductRepairs()
 
     showModal(gs.encounter.encounterType.name, msg, [['Continue', ()=>endEncounter()]])
 }
@@ -446,6 +501,37 @@ function seizePlayerContraband() {
         gs.fleet.cargo.setAmount(ct, 0) //confiscate all illegal cargo
     }
     return fine
+}
+
+function conductRepairs() {
+    let msg = ''
+    const hullDamage = gs.fleet.ships.reduce( (total, ship) => {
+        return total + (ship.hull[1] - ship.hull[0])
+    }, 0)
+    if (hullDamage <= 0) return msg
+    const repairRatio = weightedAvg([0, 1], [25*Math.random(), gs.fleet.totalSkills.getAmount(SKILLS.Engineering)])
+    const repairableShips = gs.fleet.ships.filter(s=>!s.isDisabled)
+    const nonRepairableShips = gs.fleet.ships.filter(s=>s.isDisabled)
+    const repairableHullDamage = repairableShips.reduce( (total, ship) => {
+        return total + (ship.hull[1] - ship.hull[0])
+    }, 0)
+    const repairedAmt = Math.floor(repairRatio * repairableHullDamage)
+    msg += `Your ships suffered ${hullDamage} total hull damage.<br/>`
+    if (repairedAmt <= 0) return msg
+    if (nonRepairableShips.length > 0) msg += `Because ${nonRepairableShips.length} ships were disabled, only ${repairableHullDamage} is repairable.<br/>`
+    msg += `Your engineering skill lets you repair ${repairedAmt} points of hull damage across your fleet.<br/>`
+    repairRandomly(repairableShips, repairedAmt)
+    return msg
+}
+
+function repairRandomly(ships = [], repairedAmt = 0) {
+    if (ships.length <= 0 || repairedAmt <= 0) return
+    for (let i=0; i<repairedAmt; i++) {
+        const damagedShips = ships.filter(s=>s.hull[0] < s.hull[1])
+        if (damagedShips.length <= 0) break
+        const ship = rndMember(damagedShips)
+        ship.repairHull(1)
+    }
 }
 
 function showPlayerPoliceInspectionModal() {

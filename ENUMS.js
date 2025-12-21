@@ -26,7 +26,7 @@ const SKILLS = Object.freeze({
     Stealth: 'Stealth', //avoid fleet encounters, sneak attacks
     Bartering: 'Bartering', //lowers prices in markets, shipyards etc.
     Engineering: 'Engineering', //gain some hull back after encounters, upgrade modules are more effective?
-    Mining: 'Mining', //gain more cargo after destroying asteroids, etc.
+    Salvaging: 'Salvaging', //gain more cargo after destroying asteroids, etc.
     //Science: 'Science', //hmmm
     //Doctor: 'Doctor', //your officers gain health during travel - add this later w/ more officer-specific content
     //Leadership: 'Leadership' //lets you have more officers - would like a better system for this
@@ -58,6 +58,7 @@ const COLORS = Object.freeze({
     LightPurple: [200,162,200,1], // rgba(200,162,200,1)
     Gray: [128,128,128,1], // rgba(128,128,128,1)
     LightGray: [192,192,192,1], // rgba(192,192,192,1)
+    DarkGray: [64,64,64,1], // rgba(64,64,64,1)
     LightGreen: [144,238,144,1], // rgba(144,238,144,1)
     LightBlue: [173,216,230,1], // rgba(173,216,230,1)
     LightRed: [255,102,102,1], // rgba(255,102,102,1)
