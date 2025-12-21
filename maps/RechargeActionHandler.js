@@ -21,6 +21,7 @@ class RechargeActionHandler extends ActionHandler {
 
     execute(action =  new ShipAction()) {
         console.log('RechargeActionHandler.execute', { action });
+        this.encounterMap.animatingAction = action
         const animations = this.encounterMap.animations
         const ship = action.actor
         const animCircle = this.cvs.addFilledCircle('rechargecircle', ship.x, ship.y, ship.radius*1.5, 16, COLORS.LightBlue, 0)
@@ -35,7 +36,7 @@ class RechargeActionHandler extends ActionHandler {
         }, ()=>{
             action.execute()
             this.cvs.deleteObject(animCircle)
-            this.encounterMap.refresh()
+            this.encounterMap.stopAnimating()
         }))
         
         this.startAnimating()

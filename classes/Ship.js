@@ -1,10 +1,10 @@
 
 // Ship class
 class Ship {
-    constructor(name = "Unnamed", shipType = SHIP_TYPES[0], color = COLORS.White, hull = [0, 0], shields = [0, 0], lasers = 0, engine = 0, cargoSpace = 0, radars = 0) {
+    constructor(name = "Unnamed", shipType = SHIP_TYPES[0], color = COLORS.White, hull = [0, 0], shields = [0, 0], lasers = 0, engine = 0, cargoSpace = 0, radars = 0, maxActionsPerTurn = SHIP_NUM_MOVES_PER_TURN) {
         this.name = name;
         this.shipType = shipType;
-        this.color = color;
+        this.color = [...color];
         this.hull = hull;
         this.shields = shields;
         this.lasers = lasers;
@@ -18,7 +18,9 @@ class Ship {
         this.y = 0;
         this.angle = Math.PI*2; //direction ship is facing in. it can only accelerate/decelerate and shoot in that direction
         this.escaped = false;
-        this.numActionsRemaining = SHIP_NUM_MOVES_PER_TURN; //for encounter turn processing
+        this.maxActionsPerTurn = maxActionsPerTurn;
+        this.numActionsRemaining = this.maxActionsPerTurn; //for encounter turn processing
+        this.aiType = AI_TYPES.Ship
     }
 
     get isFlagship() {
@@ -32,7 +34,7 @@ class Ship {
     }
 
     get mass() {
-        return BASE_SPACE_SHIP_MASS * (this.hull[1]/AVERAGE_SHIP_HULL
+        return 1 + BASE_SPACE_SHIP_MASS * (this.hull[1]/AVERAGE_SHIP_HULL
         + this.shields[1]/AVERAGE_SHIP_SHIELDS 
         + this.lasers/AVERAGE_SHIP_LASERS
         + this.cargoSpace/AVERAGE_SHIP_CARGO_SPACE
@@ -51,7 +53,7 @@ class Ship {
             this.hull[0] / AVERAGE_SHIP_HULL
             + this.shields[0] / (AVERAGE_SHIP_SHIELDS*2)
             + this.shields[1] / (AVERAGE_SHIP_SHIELDS*2)
-        const atkRating = this.lasers / AVERAGE_SHIP_LASERS * this.radars / AVERAGE_SHIP_RADARS
+        const atkRating = this.lasers / AVERAGE_SHIP_LASERS * this.radars / AVERAGE_SHIP_RADARS + this.engine / AVERAGE_SHIP_ENGINE
         return Math.pow(hpRating * atkRating, 0.5)
     }
 
@@ -68,7 +70,7 @@ class Ship {
     }
 
     get maxRamDamage() {
-        return this.engine;
+        return 0.5 * this.maxMoveDistance * this.mass;
     }
 
     isDamaged() {
@@ -91,7 +93,7 @@ class Ship {
     }
 
     resetActions() {
-        this.numActionsRemaining = SHIP_NUM_MOVES_PER_TURN
+        this.numActionsRemaining = this.maxActionsPerTurn;
     }
 
     setDisabled() {

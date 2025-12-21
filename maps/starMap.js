@@ -14,7 +14,7 @@ class StarMap {
         this.gameYearsPerMs = 1/365/24/60 * 2
         this.maxMsPerTick = 100
 
-        this.cvs = new CanvasWrapper(100, 10, 5000, NEPTUNE.orbit.radius*2)
+        this.cvs = new CanvasWrapper(200, 20, 2000, NEPTUNE.orbit.radius)
         this.root = ce({classNames: ['starmap-root'], children: [this.cvs.root]})
         this.controls = ce({parent: this.root, style: {position: 'absolute', top: 0, left: 0}})
         this.infoBar = ce({parent: this.root, style:{position:'absolute', bottom: 0, left: 0}})
@@ -104,14 +104,18 @@ class StarMap {
     rebuildCanvas() {
         console.log('REBUILDING STAR MAP CANVAS')
         const {starSystem, cvs} = this
-        const {stars, planets, fleets, backgroundStars} = starSystem
+        const {stars, planets, fleets, backgroundStars, asteroids} = starSystem
         //const routes = [gs.fleet.route]
         const orbitingBodies = [...stars, ...planets].filter(b=>(b.orbit))
 
         cvs.clear()
 
         backgroundStars.forEach( (bgStar, index) => {
-            cvs.addPixel(bgStar.x, bgStar.y, bgStar.r, bgStar.g, bgStar.b, bgStar.a, bgStar.size)
+            cvs.addPixel(bgStar.x, bgStar.y, bgStar.color, bgStar.radius)
+        });
+
+        asteroids.forEach( (asteroid, index) => {
+            cvs.addPixel(asteroid.x, asteroid.y, asteroid.color, asteroid.radius)
         });
 
         orbitingBodies.forEach( (orbitingBody, index) => {
@@ -130,9 +134,11 @@ class StarMap {
             const objs = [planetObj, labelObj]
             for (const obj of objs) {
                 obj.onHover = ()=>{
+                    labelObj.visible = true
                     for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
                 }
                 obj.onHoverEnd = ()=>{
+                    labelObj.visible = false
                     for (const obj3 of objs) obj3.strokeColor = (body == this.selectedObject) ? COLORS.Green : COLORS.Black
                 }
                 obj.onHoverEnd()
@@ -148,9 +154,11 @@ class StarMap {
             const objs = [fleetObj, labelObj]
             for (const obj of objs) {
                 obj.onHover = ()=>{
+                    labelObj.visible = true
                     for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
                 }
                 obj.onHoverEnd = ()=>{
+                    labelObj.visible = false
                     for (const obj3 of objs) obj3.strokeColor = (fleet == this.selectedObject) ? COLORS.Green : COLORS.Black
                 }
                 obj.onHoverEnd()
@@ -162,7 +170,7 @@ class StarMap {
 
     refreshCanvas(forceRedraw = true) {
         const {cvs, starSystem} = this
-        const {stars, planets, fleets} = starSystem
+        const {stars, planets, fleets, asteroids} = starSystem
         const orbitingBodies = [...stars, ...planets].filter(b=>(b.orbit))
 
         orbitingBodies.forEach( (orbitingBody, index) => {
@@ -241,10 +249,16 @@ class StarMap {
 
     refreshBackground(year = 0) {
         const {starSystem, cvs} = this
-        const {backgroundStars} = starSystem
+        const {backgroundStars, asteroids} = starSystem
         backgroundStars.forEach( (bgStar, index) => {
             bgStar.twinkle(year)
             cvs.pixels[index].a = bgStar.a
+        });
+        const numBackgroundStars = backgroundStars.length
+        asteroids.forEach( (asteroid, index) => {
+            const pixel = cvs.pixels[numBackgroundStars + index]
+            pixel.x = asteroid.x
+            pixel.y = asteroid.y
         });
     }
 

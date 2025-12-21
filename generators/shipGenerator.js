@@ -10,8 +10,9 @@ function generateShip(planet = new Planet(), shipType = rndMember(SHIP_TYPES_ALL
     let cargoSpace = Math.ceil(AVERAGE_SHIP_CARGO_SPACE*rng(2, 0.5, false)*shipType.cargoSpace*shipQuality)
     const shields = [maxShields, maxShields]
     const hull = [maxHull, maxHull]
+    const maxActionsPerTurn = shipType.maxActionsPerTurn || SHIP_NUM_MOVES_PER_TURN
 
     const name = `${planet.name} ${shipType.name}`
 
-    return new Ship(name, shipType, COLORS.LightGray, hull, shields, lasers, engine, cargoSpace, radars);
+    return new Ship(name, shipType, COLORS.LightGray, hull, shields, lasers, engine, cargoSpace, radars, maxActionsPerTurn);
 }

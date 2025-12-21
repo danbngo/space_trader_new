@@ -48,22 +48,24 @@ class ShipAction {
     }
 
     static ram(action =  new ShipAction()) {
-        console.log('ShipAction.ram', { attacker: action.actor, target: action.target });
-        Object.assign(action.actor, {x: action.toX, y: action.toY, angle: action.angle})
+        console.log('ShipAction.ram', { action});
+        const {actor, target} = action
 
-        const dmgModifier = action.path.distance/action.actor.maxMoveDistance
+        Object.assign(actor, {x: action.toX, y: action.toY, angle: action.angle})
 
-        const dmg = 1+rng(action.actor.maxRamDamage * dmgModifier)
-        const selfDmg = 1+rng(action.actor.maxRamDamage/2 * dmgModifier)
-        action.target.takeDamage(dmg, true)
-        action.actor.takeDamage(selfDmg, true)
+        const dmgModifier = action.path.distance/actor.maxMoveDistance
 
-        const knockback = dmg/5 + action.target.radius + action.actor.radius
+        const dmg = 1+rng(actor.maxRamDamage * dmgModifier)
+        const selfDmg = 1+rng(actor.maxRamDamage/2 * dmgModifier)
+        target.takeDamage(dmg, true)
+        actor.takeDamage(selfDmg, true)
+
+        const knockback = 1 + (10*dmgModifier*(actor.mass/target.mass)) + target.radius + actor.radius
         const [kx,ky] = rotatePoint(knockback, 0, 0, 0, action.angle)
-        action.target.x += kx
-        action.target.y += ky
+        target.x += kx
+        target.y += ky
 
-        action.actor.numActionsRemaining--
+        actor.numActionsRemaining--
     }
 
     static attack(action =  new ShipAction()) {

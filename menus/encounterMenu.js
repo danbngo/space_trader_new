@@ -3,34 +3,50 @@ function startEncounter() {
     const encounter = generateEncounter()
     gs.encounter = encounter
 
-    const {playerShips, enemyShips, ships} = encounter
+    const {playerShips, enemyShips, ships, encounterType} = encounter
+    const {formationType} = encounterType
     //randomize ship locations
     const maxSpawnDistance = encounter.mapRadius*ENCOUNTER_SHIP_MAX_SPAWN_DISTANCE_RATIO
     const minSpawnDistance = maxSpawnDistance/5
+
+    let stormAngles = [rng(Math.PI/2, -Math.PI/2, false), rng(Math.PI + Math.PI/2, Math.PI - Math.PI/2, false)]
 
     for (const ship of ships) {
         ship.resetCombatVars()
     }
 
     for (const ship of playerShips) {
-        const [x,y] = rotatePoint(-rng(maxSpawnDistance, minSpawnDistance/2, false), 0, 0, 0, rng(Math.PI/2, -Math.PI/2, false))
+        const [x,y] = rotatePoint(rng(maxSpawnDistance, minSpawnDistance/2, false), 0, 0, 0, rng(Math.PI + Math.PI/2, Math.PI -Math.PI/2, false))
         Object.assign(ship, {x, y})
     }
     for (const ship of enemyShips) {
-        const [x,y] = rotatePoint(rng(maxSpawnDistance, minSpawnDistance, false), 0, 0, 0, rng(Math.PI/2, -Math.PI/2, false))
-        Object.assign(ship, {x, y})
+        Object.assign(ship, {color: COLORS.LightRed})
+        if (formationType == FORMATION_TYPES.FaceOff) {
+            const [x,y] = rotatePoint(rng(maxSpawnDistance, minSpawnDistance, false), 0, 0, 0, rng(Math.PI/2, -Math.PI/2, false))
+            Object.assign(ship, {x, y})
+        }
+        else if (formationType == FORMATION_TYPES.Storm) {
+            const stormAngle = rndMember(stormAngles)
+            const angle = stormAngle + rng(Math.PI/2, -Math.PI/2, false)
+            const [x,y] = rotatePoint(rng(encounter.mapRadius, maxSpawnDistance, false), 0, 0, 0, angle + Math.PI)
+            Object.assign(ship, {x, y, angle})
+        }
     }
     for (const ship of playerShips) {
         const randomTarget = rndMember(enemyShips)
         const angle = new Path(ship.x, ship.y, randomTarget.x, randomTarget.y).angle
-        console.log('angle:',angle)
         Object.assign(ship, {angle})
     }
     for (const ship of enemyShips) {
-        const randomTarget = rndMember(playerShips)
-        const angle = new Path(ship.x, ship.y, randomTarget.x, randomTarget.y).angle
-        console.log('angle:',angle)
-        Object.assign(ship, {color: COLORS.LightRed, angle})
+        if (formationType == FORMATION_TYPES.FaceOff) {
+            const randomTarget = rndMember(playerShips)
+            const angle = new Path(ship.x, ship.y, randomTarget.x, randomTarget.y).angle
+            Object.assign(ship, {angle})
+        }
+        else if (formationType == FORMATION_TYPES.Storm) {
+            //const angle = rng(stormAngle + Math.PI/8, stormAngle - Math.PI/8, false)
+            //Object.assign(ship, {angle})
+        }
     }
 
     showModal(encounter.fleetName, encounter.encounterType.description, [['Ok', ()=>{
@@ -278,6 +294,32 @@ function showPlayerDefeatedEnemyModal(fameMultiplier = 0) {
     ])
 }
 
+function showPlayerDefeatedHazardsModal() {
+    console.log('showPlayerDefeatedHazardsModal');
+    const {enemyFleet, fleetName, disabledEnemyShips} = gs.encounter
+    const abandonedCargoCapacity = disabledEnemyShips.reduce( (total, ship) => {
+        return total + ship.cargoSpace
+    }, 0)
+    const cargoRatio = abandonedCargoCapacity / enemyFleet.calcTotalCargoSpace()
+    const lootAmt = Math.floor(enemyFleet.cargo.total * cargoRatio)
+    const loot = enemyFleet.cargo.randomSubset(lootAmt)
+    const disabledPlayerShips = gs.encounter.playerShips.filter(s=>s.isDisabled())
+    let msg = ''
+    msg += `You survived the ${fleetName}!<br/>`
+
+    if (disabledPlayerShips.length > 0) {
+        msg += `${disabledPlayerShips.length} of your ships were disabled.<br/>`
+        msg += loseCargoFromDisabledShips(disabledPlayerShips)
+    }
+    if (disabledEnemyShips.length > 0) {
+        msg += `You destroyed ${disabledEnemyShips.length} ${fleetName}!<br/>`
+        msg += `Your scanners reveal ${lootAmt} units of usable material amid the wreckage.<br/>`
+    }
+    showModal(gs.encounter.encounterType.name, msg, [
+        lootAmt > 0 ? ['Loot', ()=>showLootMenu(loot)] : ['Continue', ()=>endEncounter()]
+    ])
+}
+
 function showPlayerDefeatedByNeutralsModal( infamyLossMultiplier = 1) {
     console.log('showPlayerDefeatedByNeutralsModal', { infamyLossMultiplier });
     const {fleetName, disabledPlayerShips} = gs.encounter
@@ -290,6 +332,21 @@ function showPlayerDefeatedByNeutralsModal( infamyLossMultiplier = 1) {
     msg += `They quickly depart the scene in case there are other attackers nearby.<br/>`
 
     if (infamyLoss) msg += `You lose ${infamyLoss} infamy from having suffered such an ignoble loss.<br/>`
+    if (disabledPlayerShips.length > 0) {
+        msg += `${disabledPlayerShips.length} of your ships were disabled in the fighting.<br/>`
+        msg += loseCargoFromDisabledShips(disabledPlayerShips)
+    }
+
+    showModal(gs.encounter.encounterType.name, msg, [['Continue', ()=>endEncounter()]])
+}
+
+function showPlayerDefeatedByHazardsModal() {
+    console.log('showPlayerDefeatedByHazardsModal');
+    const {fleetName, disabledPlayerShips} = gs.encounter
+    
+    let msg = ''
+    msg += `Your ships were scattered by the ${fleetName}.<br/>`
+
     if (disabledPlayerShips.length > 0) {
         msg += `${disabledPlayerShips.length} of your ships were disabled in the fighting.<br/>`
         msg += loseCargoFromDisabledShips(disabledPlayerShips)
@@ -346,6 +403,19 @@ function showPlayerEscapedFromEnemyModal() {
     if (escapedPlayerShips.length > 0) msg += `${escapedPlayerShips.length} of your ships exited the battlefield intact.<br/>`
     if (disabledPlayerShips.length > 0) {
         msg += `However, ${disabledPlayerShips.length} were disabled in the fighting.<br/>`
+        msg += loseCargoFromDisabledShips(disabledPlayerShips)
+    }
+
+    showModal(gs.encounter.encounterType.name, msg, [['Continue', ()=>endEncounter()]])
+}
+
+function showPlayerEscapedFromHazardsModal() {
+    console.log('showPlayerEscapedFromHazardsModal');
+    const {fleetName, disabledPlayerShips, escapedPlayerShips} = gs.encounter
+        let msg = `You escaped from the ${fleetName}.<br/>`
+    if (escapedPlayerShips.length > 0) msg += `${escapedPlayerShips.length} of your ships made it out intact.<br/>`
+    if (disabledPlayerShips.length > 0) {
+        msg += `However, ${disabledPlayerShips.length} were disabled.<br/>`
         msg += loseCargoFromDisabledShips(disabledPlayerShips)
     }
 

@@ -12,7 +12,7 @@ const MILES_PER_AU = 432288*EARTH_RADII_PER_AU
 //TODO: try to make some of these vars more dynamic in future - different sizes for ships, projectiles etc.
 const FLEET_RADIUS = 1/1000 * 1/EARTH_RADII_PER_AU
 
-const ENCOUNTER_CHANCE_PER_DAY = 0.2;
+const ENCOUNTER_CHANCE_PER_DAY = 0.5;
 
 //combat distances = miles, time = seconds
 const ENCOUNTER_SHIP_MAX_SPAWN_DISTANCE_RATIO = 0.5
@@ -40,5 +40,4 @@ const AVERAGE_SHIP_RADARS = 5
 const BANK_MAX_LOAN_YEARS = 5
 const BANK_MIN_LOAN_AMOUNT = 100
 
-const SHIP_MAX_FIRING_ANGLE = Math.PI/4 //target can be no more than 45 degrees away from where ship is pointing
 const SHIP_NUM_MOVES_PER_TURN = 2

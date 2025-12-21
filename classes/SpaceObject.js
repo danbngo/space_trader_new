@@ -2,7 +2,7 @@
 class SpaceObject {
     constructor(name = "Unnamed", color = COLORS.White, radius = 0, x = 0, y = 0) {
         this.name = name;
-        this.color = color
+        this.color = [...color]
         this.radius = radius;
         this.x = x;
         this.y = y;
@@ -27,22 +27,17 @@ class SpaceObject {
 }
 
 class BackgroundStar extends SpaceObject {
-    constructor(r = 0, g = 0, b = 0, x = 0, y = 0, size = 1, twinkleDurationYear = 1) {
-        super("Unnamed", 'rgba(255,0,0,0.5)', 0, x, y);
+    constructor(x = 0, y = 0, color = COLORS.LightGray, radius = 1, twinkleDurationYear = 1) {
+        super("Unnamed", color, radius, x, y);
         this.twinkleDurationYear = twinkleDurationYear;
         this.twinkleProgress = 0;
-        this.r = r;
-        this.g = g;
-        this.b = b;
-        this.a = 255;
-        this.size = size;
         this.twinkleProgressOffset = Math.random()
         this.reset()
     }
     twinkle(year = 0) {
         const inner = (year / this.twinkleDurationYear) % 1
         this.twinkleProgress = (inner + this.twinkleProgressOffset) % 1
-        this.a = Math.round(255*Math.abs(1-this.twinkleProgress*2))
+        this.color[3] = Math.round(255*Math.abs(1-this.twinkleProgress*2))
     }
     reset() {
         this.twinkleProgress = Math.random()
@@ -84,3 +79,6 @@ class Planet extends OrbitingObject {
     }
 }
 
+class AsteroidBelt extends OrbitingObject {}
+
+class Asteroid extends OrbitingObject {}

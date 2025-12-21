@@ -1,22 +1,25 @@
 
 
 class EncounterType {
-    constructor(name = '', description = '', fleetType = FLEET_TYPES_ALL[0], onStart = ()=>{}, onVictory = ()=>{}, onDefeat = ()=>{}, onEscape = ()=>{}, onSurrender = ()=>{}) {
+    constructor(name = '', description = '', fleetType = FLEET_TYPES_ALL[0], aiType = AI_TYPES.Ship, formationType = FORMATION_TYPES.FaceOff, onStart = ()=>{}, onVictory = ()=>{}, onDefeat = ()=>{}, onEscape = ()=>{}, onSurrender = ()=>{}) {
         this.name = name;
         this.description = description;
         this.fleetType = fleetType;
+        this.aiType = aiType
+        this.formationType = formationType;
         this.onStart = onStart;
         this.onVictory = onVictory;
         this.onDefeat = onDefeat;
         this.onEscape = onEscape;
         this.onSurrender = onSurrender;
+        this.onEndTurn = null;
     }
 }
 
 const ENCOUNTER_TYPES = {
-    MINERS: new EncounterType('Miners', 'You encountered: miners.', FLEET_TYPES.MINERS,
+    MINERS: new EncounterType('Miners', 'You encountered: miners.', FLEET_TYPES.MINERS, AI_TYPES.Ship, FORMATION_TYPES.FaceOff,
         ()=>{
-            showModal('The miners transmit a surly, perfunctory greeting, but otherwise ignore you.', [
+            showModal(gs.encounter.fleetName, 'The miners transmit a surly, perfunctory greeting, but otherwise ignore you.', [
                 ['View', ()=>closeModal()],
                 ['Ignore', ()=>endEncounter()],
                 ['Attack', ()=>showPlayerAttackFleetModal(-1, 1)],
@@ -27,9 +30,9 @@ const ENCOUNTER_TYPES = {
         ()=>showPlayerEscapedFromFleetModal(),
         ()=>gs.encounter.encounterType.onDefeat()
     ),
-    MERCHANTS: new EncounterType('Merchants', 'You encountered: merchants.', FLEET_TYPES.MERCHANTS,
+    MERCHANTS: new EncounterType('Merchants', 'You encountered: merchants.', FLEET_TYPES.MERCHANTS, AI_TYPES.Ship, FORMATION_TYPES.FaceOff,    
         ()=>{
-            showModal('Merchants', 'The merchants greet you warmly and offer to trade goods.', [
+            showModal(gs.encounter.fleetName, 'The merchants greet you warmly and offer to trade goods.', [
                 ['View', ()=>closeModal()],
                 ['Trade', ()=>showTradeOfferModal()],
                 ['Ignore', ()=>endEncounter()],
@@ -41,9 +44,9 @@ const ENCOUNTER_TYPES = {
         ()=>showPlayerEscapedFromFleetModal(),
         ()=>gs.encounter.encounterType.onDefeat()
     ),
-    PIRATES: new EncounterType('Pirates', 'You encountered: pirates.', FLEET_TYPES.PIRATES,
+    PIRATES: new EncounterType('Pirates', 'You encountered: pirates.', FLEET_TYPES.PIRATES, AI_TYPES.Ship, FORMATION_TYPES.FaceOff,
         ()=>{
-            showModal('The pirates fire warning shots at your ship!<br/>They demand you surrender and prepare to be boarded!', [
+            showModal(gs.encounter.fleetName, 'The pirates fire warning shots at your ship!<br/>They demand you surrender and prepare to be boarded!', [
                 ['View', ()=>closeModal()],
                 ['Submit', ()=>gs.encounter.encounterType.onSurrender()],
                 ['Resist', ()=>showPlayerRefuseSurrenderModal(1, 0)],
@@ -54,9 +57,9 @@ const ENCOUNTER_TYPES = {
         ()=>showPlayerEscapedFromFleetModal(),
         ()=>showPlayerDidSurrenderModal(1)
     ),
-    POLICE: new EncounterType('Police', 'You encountered: police.', FLEET_TYPES.PATROL,
+    POLICE: new EncounterType('Police', 'You encountered: police.', FLEET_TYPES.PATROL, AI_TYPES.Ship, FORMATION_TYPES.FaceOff,
         ()=>{
-            showModal('The police ships pull alongside your fleet and order you to submit to a routine inspection.', [
+            showModal(gs.encounter.fleetName, 'The police ships pull alongside your fleet and order you to submit to a routine inspection.', [
                 ['View', ()=>closeModal()],
                 ['Accept', ()=>showPlayerPoliceInspectionModal()],
                 ['Attack', ()=>showPlayerAttackFleetModal(-2, 2)],
@@ -66,10 +69,26 @@ const ENCOUNTER_TYPES = {
         ()=>showPlayerDefeatedByPoliceModal(),
         ()=>showPlayerEscapedFromFleetModal(),
         ()=>showPlayerDidSurrenderModal(-1)
+    ),
+    ASTEROIDS: new EncounterType('Asteroids', 'You encountered: asteroids.', FLEET_TYPES.ASTEROIDS, AI_TYPES.Asteroid, FORMATION_TYPES.Storm,
+        ()=>{
+            showModal(gs.encounter.fleetName, 'You encounter a brutal asteroid storm! You must navigate carefully to avoid damage.', [
+                ['View', ()=>closeModal()],
+                ['Continue', ()=>startCombat(true)],
+            ])
+        },
+        ()=>showPlayerDefeatedHazardsModal(),
+        ()=>showPlayerDefeatedByHazardsModal(),
+        ()=>showPlayerEscapedFromHazardsModal(),
+        null
     )
+}
 
-
-
+ENCOUNTER_TYPES.ASTEROIDS.onEndTurn = (encounter = new Encounter())=>{
+    //make asteroids move faster each turn
+    for (const ship of encounter.enemyShips) {
+        if (Math.random() > .5) ship.engine++
+    }
 }
 
 const ENCOUNTER_TYPES_ALL = Object.values(ENCOUNTER_TYPES)

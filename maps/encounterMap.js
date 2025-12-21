@@ -29,6 +29,7 @@ class EncounterMap {
         this.ramHandler = new RamActionHandler(this);
         this.rechargeHandler = new RechargeActionHandler(this);
         this.waitHandler = new WaitActionHandler(this);
+        this.animatingAction = null
 
         this.rebuildCanvas();
         this.refresh(true)
@@ -42,12 +43,18 @@ class EncounterMap {
     }
 
     refresh() {
-        console.log('refreshing encounterMap...')
-        this.checkTurnOver();
+        console.log('refreshing encounterMap w uiMode:',this.uiMode)
         this.refreshControls();
         this.refreshInfoBar();
         this.refreshObjectPane();
         this.refreshCanvas(true);
+    }
+
+    refreshLogic() {
+        console.log('EncounterMap.refreshLogic')
+        if (this.checkEncounterOver()) return;
+        this.checkTurnOver();
+        this.handleEnemyActions()
     }
 
     togglePause(newPausedState = !this.paused) {
@@ -58,6 +65,7 @@ class EncounterMap {
             this.tick()
         }
         this.refresh() //always do first refresh, as fleets launch during pause/unpause
+        this.refreshLogic()
     }
 
     refreshControls() {
@@ -70,7 +78,7 @@ class EncounterMap {
                 ce({tag:'button', innerHTML:'+', onClick: () => this.cvs.adjustZoom(1.33)}),
                 ce({tag:'button', innerHTML:'-', onClick: () => this.cvs.adjustZoom(0.66)}),
                 //ship info button?
-                ce({tag:'button', innerHTML: '🗨', onClick: ()=> this.onHail(), disabled: (this.uiMode == UI_MODE.Animating)})
+                ce({tag:'button', innerHTML: '🗨', onClick: ()=> this.onHail(), disabled: (!this.encounter.encounterType.onSurrender || this.uiMode == UI_MODE.Animating)})
             ]
         })
     }
@@ -102,7 +110,7 @@ class EncounterMap {
         cvs.addEmptyCircle('maplimits', 0, 0, this.encounter.mapRadius, 24, COLORS.Cyan)
 
         starSystem.backgroundStars.forEach( (bgStar, index) => {
-            cvs.addPixel(bgStar.x*BG_STAR_DISTANCE_MOD, bgStar.y*BG_STAR_DISTANCE_MOD, bgStar.r, bgStar.g, bgStar.b, bgStar.a, bgStar.size)
+            cvs.addPixel(bgStar.x*BG_STAR_DISTANCE_MOD, bgStar.y*BG_STAR_DISTANCE_MOD, bgStar.color, bgStar.size)
         });
 
         ships.forEach((ship,index) => {
@@ -115,9 +123,11 @@ class EncounterMap {
             const objs = [shipObj, labelObj]
             for (const obj of objs) {
                 obj.onHover = ()=>{
+                    labelObj.visible = true
                     for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
                 }
                 obj.onHoverEnd = ()=>{
+                    labelObj.visible = false
                     for (const obj3 of objs) obj3.strokeColor = this.calcStrokeColorForShip(ship)
                 }
                 obj.onHoverEnd()
@@ -133,7 +143,8 @@ class EncounterMap {
 
         //draw objects
         ships.forEach( (ship, index) => {
-            const invisible = ship.escaped
+            let invisible = ship.escaped
+            if (ship.aiType == AI_TYPES.Asteroid && ship.isDisabled()) invisible = true
 
             //if (obj.location) return //dont display docked fleets
             const cvsShipObject = cvs.getObject(`ship${index}`)
@@ -228,7 +239,7 @@ class EncounterMap {
                 this.cvs.getObject(`ship${index}`)?.asImage(25, COLORS.LightGreen) || null
             ]})
             ce({parent:container, innerHTML: `Hull: ${statColorSpan(Math.round(100 * hull[0]/hull[1]), hull[0]/hull[1], true)}%`})
-            ce({parent:container, innerHTML: `Shields: ${statColorSpan(Math.round(100 * obj.shields[0]/obj.shields[1]), shields[0]/shields[1], true)}%`})
+            if (obj.shields[1] > 0) ce({parent:container, innerHTML: `Shields: ${statColorSpan(Math.round(100 * obj.shields[0]/obj.shields[1]), shields[0]/shields[1], true)}%`})
             ce({parent:container, innerHTML: `Actions: ${statColorSpan(obj.numActionsRemaining, obj.numActionsRemaining/2, true)}`})
             ce({parent:container, innerHTML: obj.isDisabled() ? `(Disabled)` : obj.escaped ? '(Escaped)' : ''})
             if (showActions) {
@@ -288,6 +299,15 @@ class EncounterMap {
         this.refreshCanvas(true)
     }
 
+    stopAnimating() {
+        console.log('EncounterMap.stopAnimating')
+        this.animations = []
+        this.animatingAction = null
+        this.uiMode = UI_MODE.Default
+        this.refresh()
+        this.refreshLogic()
+    }
+
     startTargeting(label = '', targetingAreas = [], validTargets = []) {
         console.log('EncounterMap.startTargeting', { label, targetingAreas, validTargets });
         this.uiMode = UI_MODE.Targeting
@@ -312,6 +332,7 @@ class EncounterMap {
     }
 
     handleAnimations(currentMs = Date.now()) {
+        if (this.encounter.result) return
         for (const animation of this.animations) {
             animation.update(currentMs)
         }
@@ -332,20 +353,14 @@ class EncounterMap {
         this.refreshBackground(currentTime/200000) //hack to make stars twinkle at a reasonable speed
         this.refreshCanvas()
         if (this.uiMode == UI_MODE.Animating) this.handleAnimations(currentTime)
-        else {
-            this.checkTurnOver()
-            if (this.encounter.activeTurnFleet === this.encounter.enemyFleet) {
-                this.handleEnemyActions()
-                return
-            }
-        }
-        //this.refreshObjectPane();
 
         requestAnimationFrame(()=>this.tick())
     }
 
     handleEnemyActions() {
         const {encounter} = this
+        console.log('handle enemy actions called with uiMode:',this.uiMode,this.paused,this.encounter.combatEnabled,encounter.activeTurnFleet)
+        if (this.paused || this.uiMode != UI_MODE.Default || !encounter.combatEnabled || encounter.activeTurnFleet == gs.fleet || this.animatingAction || this.encounter.result) return
         const {ai} = encounter
         const nextMove = ai.calcNextMove()
         console.log('determined next AI move:',nextMove)
@@ -371,14 +386,20 @@ class EncounterMap {
 
     checkTurnOver() {
         //console.log('EncounterMap.checkTurnOver')
+        if (this.encounter.result) return
         const {encounter} = this
         if (encounter.isTurnOver()) {
             encounter.handleTurnOver()
-            if (encounter.result) {
-                endCombat()
-                return
-            }
-            this.refresh()
+            this.refreshLogic()
+            if (encounter.activeTurnFleet == gs.fleet) this.selectObject(encounter.playerShips[0] || null)
+        }
+    }
+
+    checkEncounterOver() {
+        if (this.encounter.result) {
+            endCombat()
+            return true
+            //this.refresh()
         }
     }
 

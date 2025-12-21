@@ -37,6 +37,7 @@ class MoveActionHandler extends ActionHandler {
 
     execute(action =  new ShipAction()) {
         console.log('MoveActionHandler.execute', { action });
+        this.encounterMap.animatingAction = action
         const animations = this.encounterMap.animations
         const mover = action.actor
         mover.angle = action.path.angle
@@ -44,7 +45,9 @@ class MoveActionHandler extends ActionHandler {
         const animLine = this.cvs.addLine('moveline', action.path.startX, action.path.startY, action.path.toX, action.path.toY, mover.color, 1)
         const animThruster = this.cvs.addTriangle(`moveengine`, mover.x, mover.y, mover.radius*0.5, mover.radius*0.5, 6, COLORS.Orange, mover.angle - Math.PI)
 
-        animations.push(new Loop(2000, (progressRatio)=>{
+        //make asteroids move really fast so player doesn't get annoyed
+        const duration = mover.aiType == AI_TYPES.Ship ? 1000 : 250
+        animations.push(new Loop(duration, (progressRatio)=>{
             const [newX, newY] = action.path.positionAtProgress(progressRatio)
             const [engineXOffset, engineYOffset] = rotatePoint(10, 0, 0, 0, mover.angle-Math.PI)
             Object.assign(mover, {x: newX, y: newY, angle:action.path.angle})
@@ -53,7 +56,7 @@ class MoveActionHandler extends ActionHandler {
             action.execute()
             this.cvs.deleteObject(animLine)
             this.cvs.deleteObject(animThruster)
-            this.encounterMap.refresh()
+            this.encounterMap.stopAnimating()
         }))
         
         this.startAnimating()

@@ -1,11 +1,14 @@
 class StarSystem extends SpaceObject {
-    constructor(name = "Unnamed", color = COLORS.White, radius = 0, x = 0, y = 0, barycenter = null, stars = [], planets = [], fleets = [], backgroundStars = []) {
+    constructor(name = "Unnamed", color = COLORS.White, radius = 0, x = 0, y = 0, barycenter = null, stars = [], planets = [], fleets = [], asteroidBelts = [], asteroids = [], backgroundStars = []) {
         super(name, color, radius, x, y)
         this.barycenter = barycenter
         this.stars = stars
         this.planets = planets
         this.fleets = fleets
+        this.asteroidBelts = asteroidBelts
+        this.asteroids = asteroids
         this.backgroundStars = backgroundStars
+        this.asteroids = asteroids
     }
 
     calcNearestPlanet(obj = SpaceObject(), planets = this.planets) {
@@ -22,7 +25,7 @@ class StarSystem extends SpaceObject {
     }
 
     refreshPositions(year = gs.year) {
-        const objects = [...this.stars, ...this.planets]
+        const objects = [...this.stars, ...this.planets, ...this.asteroids]
         for (const obj of objects) {
             const [x, y] = obj.calcAbsPositionAtYear(year)
             obj.x = x

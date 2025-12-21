@@ -9,6 +9,7 @@ const ENCOUNTER_RESULTS = Object.freeze({
 const COMBAT_STRATEGIES = Object.freeze({
     AttackNearest: 'Attack Nearest',
     Escape: 'Escape',
+    Asteroid: 'Asteroid'
 })
 
 const SHAPES = Object.freeze({
@@ -57,6 +58,7 @@ const COLORS = Object.freeze({
     LightGreen: [144,238,144,1],
     LightBlue: [173,216,230,1],
     LightRed: [255,102,102,1], // #dd4400 ?
+    Brown: [124,92,64,1],
 })
 
 const UI_MODE = Object.freeze({
@@ -73,3 +75,15 @@ const MOVE_TYPES = Object.freeze({
     Wait: 'Wait',
 })
 const MOVE_TYPES_ALL = Object.values(MOVE_TYPES)
+
+const FORMATION_TYPES = Object.freeze({
+    //Ambush: 'Ambush',
+    FaceOff: 'FaceOff', //ships all facing each other initially
+    Storm: 'Storm', //ships all moving in an arbitrary direction - could be used for asteroid encounters
+})
+const FORMATION_TYPES_ALL = Object.values(FORMATION_TYPES)
+
+const AI_TYPES = Object.freeze({
+    Ship: 'Ship',
+    Asteroid: 'Asteroid', //mostly move in same direction unless able to ram
+})

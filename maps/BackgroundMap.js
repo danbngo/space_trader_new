@@ -36,7 +36,7 @@ class BackgroundMap {
         const {bgStars, cvs} = this
         cvs.clear()
         bgStars.forEach( (bgStar, index) => {
-            cvs.addPixel(bgStar.x, bgStar.y, bgStar.r, bgStar.g, bgStar.b, bgStar.a, bgStar.size)
+            cvs.addPixel(bgStar.x, bgStar.y, bgStar.color, bgStar.size)
         });
         cvs.recalculateDrawOrder()
     }

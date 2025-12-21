@@ -25,8 +25,6 @@ class GameState {
         this.fleet.dock(rndMember(PLANETS));
 
         this.encounter = null//new Encounter() //dont need to serialize this, cant save during encounters
-        const bgStars = generateBackgroundStars(SOLAR_SYSTEM_RADIUS_IN_AU, 5000)
-        this.system.backgroundStars = bgStars
     }
 
     /** Internal helper to randomize guild/market/shipyard generation */

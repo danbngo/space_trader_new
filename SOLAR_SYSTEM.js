@@ -12,5 +12,23 @@ const PLANETS = [MERCURY, VENUS, EARTH, MARS, JUPITER, SATURN, URANUS, NEPTUNE]
 
 SOL.addChildren(PLANETS)
 
-const SOLAR_SYSTEM = new StarSystem('Sol System', hexToRgba('#ffff44'), 1, 0, 0, SOL, [SOL], PLANETS, [], [])
+const ASTEROID_BELT = new AsteroidBelt("Asteroid Belt", hexToRgba('#888888'), 0, 0, 0, new Orbit(2.8))
+const KUIPER_BELT = new AsteroidBelt("Kuiper Belt", hexToRgba('#888888'), 0, 0, 0, new Orbit(50))
+const ASTEROIDS = generateAsteroids(ASTEROID_BELT, COLORS.Brown, 500, 0.2)
+const KUIPER_ASTEROIDS = generateAsteroids(KUIPER_BELT, COLORS.LightBlue, 5000, 20/50)
+
+SOL.addChildren(ASTEROIDS)
+SOL.addChildren(KUIPER_ASTEROIDS)
+
+const BACKGROUND_STARS = generateBackgroundStars(SOLAR_SYSTEM_RADIUS_IN_AU, 5000)
+
+const SOLAR_SYSTEM = new StarSystem(
+    'Sol System',
+    hexToRgba('#ffff44'), 1, 0, 0,
+    SOL, [SOL],
+    PLANETS,
+    [],
+    [ASTEROID_BELT, KUIPER_BELT], [...ASTEROIDS, ...KUIPER_ASTEROIDS],
+    BACKGROUND_STARS
+);
 

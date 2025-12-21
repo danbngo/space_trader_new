@@ -1,8 +1,8 @@
 function generateFleetCargo(fleet = new Fleet(), fleetType = rndMember(FLEET_TYPES_ALL)) {
     const cargo = new CountsMap()
     const maxCargo = fleet.calcTotalCargoSpace()
-    const cargoTypes = fleetType.cargoTypes.filter(()=>(Math.random() > .5))
-    const totalCargo = cargoTypes.length > 0 ? rng(0, maxCargo*0.8) : 0
+    const cargoTypes = rndMembers(fleetType.cargoTypes, rng(fleetType.cargoTypes.length, 1), true)
+    const totalCargo = cargoTypes.length > 0 ? rng(1, maxCargo) : 0
     for (let i = 0; i < totalCargo; i++) {
         const ct = rndMember(cargoTypes)
         cargo.increment(ct, 1)

@@ -44,6 +44,7 @@ class Encounter {
     handleTurnOver() {
         console.log('Encounter.handleTurnOver', { activeTurnFleet: this.activeTurnFleet });
         if (!this.isTurnOver()) return
+        this.encounterType.onEndTurn?.(this)
         for (const ship of this.activeTurnFleet.ships) {
             ship.numActionsRemaining = 0
         }

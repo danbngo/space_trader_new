@@ -43,6 +43,7 @@ class RamActionHandler extends ActionHandler {
 
     execute(action =  new ShipAction()) {
         console.log('RamActionHandler.execute', { action });
+        this.encounterMap.animatingAction = action
         const animations = this.encounterMap.animations
         const path = action.path
         const attacker = action.actor
@@ -56,7 +57,7 @@ class RamActionHandler extends ActionHandler {
         }, ()=>{
             action.execute()
             this.cvs.deleteObject(animLine)
-            this.encounterMap.refresh()
+            this.encounterMap.stopAnimating()
         }))
         
         this.startAnimating()

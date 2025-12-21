@@ -19,9 +19,9 @@ class WaitActionHandler extends ActionHandler {
     }
 
     execute(action =  new ShipAction()) {
+        this.encounterMap.animatingAction = null
         console.log('WaitActionHandler.execute', { action });
         action.execute()
-        this.encounterMap.uiMode = UI_MODE.Default
-        this.encounterMap.refresh()
+        this.encounterMap.stopAnimating()
     }
 }

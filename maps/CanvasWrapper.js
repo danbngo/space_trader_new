@@ -143,13 +143,10 @@ class CanvasObject {
 }
 
 class CanvasPixel {
-    constructor({x = 0, y = 0, r = 255, g = 255, b = 255, a = 255, size = 1} = {}) {
+    constructor({x = 0, y = 0, color = COLORS.LightGray, size = 1} = {}) {
         this.x = x;
         this.y = y;
-        this.r = r;
-        this.g = g;
-        this.b = b;
-        this.a = a;
+        this.color = color;
         this.size = size;
     }
 }
@@ -276,8 +273,8 @@ class CanvasWrapper {
         return this.addObject(obj)
     }
 
-    addPixel(x = 0, y = 0, r = 255, g = 255, b = 255, a = 255, size = 1) {
-        const pixel = new CanvasPixel({x, y, r, g, b, a, size})
+    addPixel(x = 0, y = 0, color = COLORS.White, size = 1) {
+        const pixel = new CanvasPixel({x, y, color, size})
         this.pixels.push(pixel)
         return pixel
     }
@@ -466,7 +463,7 @@ class CanvasWrapper {
                 for (let offsetY = -intSize; offsetY <= intSize; offsetY++) {
                     if (sx + offsetX < 0 || sx + offsetX >= width || sy + offsetY < 0 || sy + offsetY >= height) continue;
                     if (calcDistance(0, 0, offsetX, offsetY) > size) continue;
-                    putPixelAt(sx + offsetX, sy + offsetY, pixel.r, pixel.g, pixel.b, pixel.a)
+                    putPixelAt(sx + offsetX, sy + offsetY, pixel.color[0], pixel.color[1], pixel.color[2], pixel.color[3])
                 }
             }
             //putPixelAt(sx, sy, pixel.r, pixel.g, pixel.b, pixel.a)

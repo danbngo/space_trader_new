@@ -43,6 +43,7 @@ class AttackActionHandler extends ActionHandler {
     }
 
     execute(action =  new ShipAction()) {
+        this.encounterMap.animatingAction = action
         console.log('AttackActionHandler.execute', { action });
         const animations = this.encounterMap.animations
         const path = action.path
@@ -56,7 +57,7 @@ class AttackActionHandler extends ActionHandler {
         }, ()=>{
             action.execute()
             this.cvs.deleteObject(animLine)
-            this.encounterMap.refresh()
+            this.encounterMap.stopAnimating()
         }))
         
         this.startAnimating()
