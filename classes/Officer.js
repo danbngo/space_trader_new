@@ -45,6 +45,7 @@ class Officer {
     }
 
     get crShare() {
+        if (this == gs.captain) return 0
         return Math.min(100, Math.round( Math.pow(1 + this.level, 1.5) )) / 100
     }
 

@@ -366,7 +366,7 @@ class EncounterMap {
     }
 
     showActionPopup(action = new ShipAction()) {
-        const {actor, target, actorHullDamage, actorShieldDamage, actorDisabled, actorEscaped, targetHullDamage, targetShieldDamage, targetDisabled, targetEscaped} = action
+        const {actor, target, actorBadMessage, targetBadMessage, actorHullDamage, actorShieldDamage, actorDisabled, actorEscaped, targetHullDamage, targetShieldDamage, targetDisabled, targetEscaped} = action
         const popupId = `action_${Date.now()}_${Math.random()}`
         let actorYOffset = -DEFAULT_FONT_SIZE
         let targetYOffset = -DEFAULT_FONT_SIZE
@@ -387,6 +387,10 @@ class EncounterMap {
             this.showPopup(`${popupId}_actor_escaped`, `Escaped!`, actor.x, actor.y, COLORS.Orange, actorYOffset)
             actorYOffset -= DEFAULT_FONT_SIZE
         }
+        else if (actorBadMessage) {
+            this.showPopup(`${popupId}_actor_bad_message`, actorBadMessage, actor.x, actor.y, COLORS.Red, actorYOffset)
+            actorYOffset -= DEFAULT_FONT_SIZE
+        }
 
         if (targetHullDamage > 0) {
             this.showPopup(`${popupId}_target_hull`, `${dnc(-targetHullDamage)}hp`, target.x, target.y, COLORS.LightGray)
@@ -402,6 +406,10 @@ class EncounterMap {
         }
         else if (targetEscaped) {
             this.showPopup(`${popupId}_target_escaped`, `Escaped!`, target.x, target.y, COLORS.Orange, targetYOffset)
+            targetYOffset -= DEFAULT_FONT_SIZE
+        }
+        else if (targetBadMessage) {
+            this.showPopup(`${popupId}_target_bad_message`, targetBadMessage, target.x, target.y, COLORS.Red, targetYOffset)
             targetYOffset -= DEFAULT_FONT_SIZE
         }
     }
@@ -507,6 +515,15 @@ class EncounterMap {
         const {encounter} = this
         if (encounter.isTurnComplete()) {
             encounter.handleTurnComplete()
+            for (let i = 0; i < encounter.activeTurnFleet.activeShips.length; i++) {
+                const ship = encounter.activeTurnFleet.activeShips[i]
+                if (ship.numActionsRemaining > ship.maxActionsPerTurn) {
+                    this.showPopup(`fast_${i}`, 'Fast!', ship.x, ship.y, COLORS.LightGreen, -DEFAULT_FONT_SIZE)
+                }
+                else if (ship.numActionsRemaining < ship.maxActionsPerTurn) {
+                    this.showPopup(`slow_${i}`, 'Slow!', ship.x, ship.y, COLORS.LightRed, -DEFAULT_FONT_SIZE)
+                }
+            }
             this.refreshLogic()
             if (encounter.activeTurnFleet == gs.fleet) this.selectObject(encounter.playerShips[0] || null)
         }

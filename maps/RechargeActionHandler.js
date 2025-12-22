@@ -36,6 +36,7 @@ class RechargeActionHandler extends ActionHandler {
         }, ()=>{
             action.execute()
             this.cvs.deleteObject(animCircle)
+            if (action.actor.fleet == gs.fleet) this.encounterMap.selectedObject = action.actor
             this.encounterMap.showActionPopup(action)
             this.encounterMap.stopAnimating()
         }))

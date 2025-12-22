@@ -51,8 +51,9 @@ class MoveActionHandler extends ActionHandler {
             Object.assign(mover, {x: newX, y: newY, angle:action.path.angle})
         }, ()=>{
             action.execute()
-            this.encounterMap.stopAnimating()
             this.cvs.deleteObject(animLine)
+            if (action.actor.fleet == gs.fleet) this.encounterMap.selectedObject = action.actor
+            this.encounterMap.stopAnimating()
             this.encounterMap.showActionPopup(action)
         }))
         

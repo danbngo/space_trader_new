@@ -56,7 +56,7 @@ class Encounter {
         else if (this.activeTurnFleet === this.enemyFleet) {
             this.activeTurnFleet = this.playerFleet
         }
-        for (const ship of this.activeTurnFleet.ships) {
+        for (const ship of this.activeTurnFleet.activeShips) {
             ship.resetActions()
         }
         this.updateEncounterResult()

@@ -20,7 +20,7 @@ class Fleet extends SpaceObject {
     }
 
     calcTotalCRShare(ofCR = 1, rounded = true) {
-        if (this.officers.length == 0) return 0
+        if (this.officers.length == 0 || isNaN(ofCR) || !ofCR || ofCR < 0) return 0
         const shareRatio = this.officers.reduce((total, officer) => total + officer.crShare, 0)
         console.log('share ratio:',shareRatio,this.officers)
         const share = Math.min(1, shareRatio) * ofCR

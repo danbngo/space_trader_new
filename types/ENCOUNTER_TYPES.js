@@ -333,7 +333,7 @@ const ENCOUNTER_TYPES = {
         ()=>showPlayerEscapedFromHazardsModal(),
         null
     ),
-    PLASMOIDS: new EncounterType('Plasmoids', COLORS.Gray, 'You encountered: plasmoids.', FLEET_TYPES.PLASMOIDS, AI_TYPES.Asteroid, FORMATION_TYPES.Storm,
+    PLASMOIDS: new EncounterType('Plasmoids', COLORS.LightYellow, 'You encountered: plasmoids.', FLEET_TYPES.PLASMOIDS, AI_TYPES.Asteroid, FORMATION_TYPES.Storm,
         ()=>{
             if (gs.encounter.luck[0] * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Pilot)/50) > gs.encounter.fleet.totalRadar) {
                 showModal(gs.encounter.fleetName, `Your long range sensors detect an incoming cluster of plasmoids.<br/>You skillfully steer out of harm's way.<br/>Although, you could choose to plunge back in and mine them if you wish.`, [

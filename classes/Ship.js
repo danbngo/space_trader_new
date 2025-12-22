@@ -97,6 +97,13 @@ class Ship {
 
     resetActions() {
         this.numActionsRemaining = this.maxActionsPerTurn;
+        //randomly gain or lose an action sometimes
+        if (Math.random() < 0.1) {
+            this.numActionsRemaining = this.numActionsRemaining + 1
+        }
+        if (Math.random() < 0.1) {
+            this.numActionsRemaining = Math.max(1, this.numActionsRemaining - 1)
+        }
     }
 
     setDisabled() {

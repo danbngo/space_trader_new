@@ -97,10 +97,10 @@ function endCombat() {
 function handlePlayerStranded() {
     console.log('handlePlayerStranded');
     const [nearestPlanet, nearestDistance] = gs.system.calcNearestPlanet(gs.fleet)
-    const creditCost = 10 + rng(200*nearestDistance, 100*nearestDistance)
+    const creditCost = 100 + rng(500*nearestDistance, 250*nearestDistance)
     const canAfford = gs.credits >= creditCost
     const noCredits = gs.credits <= 0
-    const dayCost = 0.25 + rng(1.5*nearestDistance, 0.75*nearestDistance, false)
+    const dayCost = 1 + rng(1.5*nearestDistance, 0.75*nearestDistance, false)
     gs.credits = Math.max(0, gs.credits - creditCost)
     gs.days += dayCost
 
@@ -292,8 +292,11 @@ function showPlayerDefeatedEnemyModal(fameMultiplier = 0) {
         return total + ship.cargoSpace
     }, 0)
     const creditsAmt = Math.floor(Math.random() * enemyFleet.credits * (abandonedCargoCapacity / enemyFleet.totalCargoSpace))
-    const officersShare = gs.fleet.calcTotalCRShare(creditsAmt, true)
-    const finalCredits = creditsAmt - officersShare
+    if (!isNaN(creditsAmt) && creditsAmt && creditsAmt > 0) {
+        const officersShare = gs.fleet.calcTotalCRShare(creditsAmt, true)
+        const finalCredits = creditsAmt - officersShare
+        gs.credits += finalCredits
+    }
     const cargoRatio = abandonedCargoCapacity / enemyFleet.totalCargoSpace
     const maxLootAmt = Math.floor(enemyFleet.cargo.total * cargoRatio)
     const baseLootAmt = Math.floor(Math.random() * maxLootAmt)
@@ -301,7 +304,6 @@ function showPlayerDefeatedEnemyModal(fameMultiplier = 0) {
     const loot = enemyFleet.cargo.randomSubset(lootAmt)
     const disabledPlayerShips = gs.encounter.playerShips.filter(s=>s.isDisabled())
 
-    gs.credits += finalCredits
     gs.captain.infamy += infamy
     gs.captain.fame += fame
 
@@ -320,7 +322,7 @@ function showPlayerDefeatedEnemyModal(fameMultiplier = 0) {
         msg += `The ${fleetName} left behind ${disabledEnemyShips.length} disabled ships!<br/>`
         msg += `Your scanners reveal ${baseLootAmt} units of cargo amid the wreckage.<br/>`
         if (lootAmt > baseLootAmt) msg += `Your salvaging skills allow you to recover an additional ${lootAmt - baseLootAmt} units of cargo.<br/>`
-        if (creditsAmt > 0) msg += `You also salvage ${finalCredits}CR from the wreckage${officersShare ? ` (-${officersShare}CR for officers)` : ''}.<br/>`
+        if (!isNaN(creditsAmt) && creditsAmt > 0) msg += `You also salvage ${finalCredits}CR from the wreckage${officersShare ? ` (-${officersShare}CR for officers)` : ''}.<br/>`
     }
     showModal(gs.encounter.encounterType.name, msg, [
         lootAmt > 0 ? ['Loot', ()=>showLootMenu(loot)] : ['Continue', ()=>endEncounter()]
@@ -568,7 +570,7 @@ function showPlayerPoliceInspectionModal() {
 function showFineOrJailModal(fine = 0) {
     const {fleetName} = gs.encounter
     const fineFromBounty = Math.ceil(Math.min(Math.max(gs.captain.bounty*Math.random(),100), gs.captain.bounty))
-    const jailDays = Math.round((fine+fineFromBounty)/JAIL_DAYS_PER_1000CR_FINE) //1 day of jail time per 1000CR of fine
+    const jailDays = Math.round(JAIL_DAYS_PER_1000CR_FINE*(fine+fineFromBounty)/1000) //1 day of jail time per 1000CR of fine
     gs.bounty -= fineFromBounty
 
     let msg = ''
@@ -582,7 +584,7 @@ function showFineOrJailModal(fine = 0) {
             msg += `Your remaining CR: ${gs.credits}<br/>`
             if (fineFromBounty) msg += `Your bounty has been reduced to: ${gs.bounty}CR.<br/>`
             showModal(fleetName, msg, [['Continue', ()=>endEncounter()]])
-        }, gs.credits >= fine],
+        }, gs.credits >= fine + fineFromBounty],
         ['Serve Jail Time', ()=>{
             const nearestPlanet = gs.starSystem.calcNearestPlanet(gs.fleet)
             gs.fleet.dock(nearestPlanet)

@@ -57,6 +57,7 @@ class RamActionHandler extends ActionHandler {
         }, ()=>{
             action.execute()
             this.cvs.deleteObject(animLine)
+            if (action.actor.fleet == gs.fleet) this.encounterMap.selectedObject = action.actor
             this.encounterMap.showActionPopup(action)
             this.encounterMap.stopAnimating()
         }))

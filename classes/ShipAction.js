@@ -22,6 +22,8 @@ class ShipAction {
         this.targetEscaped = null
         this.actorEscaped = null
         this.actorTurnComplete = null
+        this.actorBadMessage = null
+        this.targetBadMessage = null
     }
 
     execute() {
@@ -67,32 +69,47 @@ class ShipAction {
 
         Object.assign(actor, {x: action.toX, y: action.toY, angle: action.angle})
 
-        const dmgModifier = action.path.distance/actor.maxMoveDistance
+        //player has a 75% chance to miss at min range and 25% at max range
+        const didMiss = action.path.distance > 0 ? (Math.random() < (0.75 - (0.5 * (action.path.distance / actor.maxRamDistance)))) : false
+        if (didMiss) {
+            Object.assign(action, {targetBadMessage: 'Missed!'})
+        } 
+        else {
+            const dmgModifier = action.path.distance/actor.maxMoveDistance
 
-        const dmg = 1+rng(actor.maxRamDamage * dmgModifier)
-        const selfDmg = 1+rng(actor.maxRamDamage/2 * dmgModifier)
-        const [targetHullDamage, targetShieldDamage, targetDisabled] = target.takeDamage(dmg, true)
-        const [actorHullDamage, actorShieldDamage, actorDisabled] = actor.takeDamage(selfDmg, true)
+            const dmg = 1+rng(actor.maxRamDamage * dmgModifier)
+            const selfDmg = 1+rng(actor.maxRamDamage/2 * dmgModifier)
+            const [targetHullDamage, targetShieldDamage, targetDisabled] = target.takeDamage(dmg, true)
+            const [actorHullDamage, actorShieldDamage, actorDisabled] = actor.takeDamage(selfDmg, true)
 
-        const knockback = 1 + (10*dmgModifier*(actor.mass/target.mass)) + target.radius + actor.radius
-        const [kx,ky] = rotatePoint(knockback, 0, 0, 0, action.angle)
-        target.x += kx
-        target.y += ky
+            const knockback = 1 + (10*dmgModifier*(actor.mass/target.mass)) + target.radius + actor.radius
+            const [kx,ky] = rotatePoint(knockback, 0, 0, 0, action.angle)
+            target.x += kx
+            target.y += ky
+            const targetEscaped = action.encounter.checkShipEscaped(target)
+            Object.assign(action, {actorHullDamage, actorShieldDamage, actorDisabled, targetHullDamage, targetShieldDamage, targetDisabled, targetEscaped})
+        }
 
         //seems buggy but let's try it out
         const actorEscaped = action.encounter.checkShipEscaped(actor)
-        const targetEscaped = action.encounter.checkShipEscaped(target)
+        Object.assign(action, {actorEscaped})
 
         actor.numActionsRemaining--
-        Object.assign(action, {actorHullDamage, actorShieldDamage, actorDisabled, targetHullDamage, targetShieldDamage, targetDisabled, actorEscaped, targetEscaped})
     }
 
     static attack(action =  new ShipAction()) {
         console.log('ShipAction.attack', { attacker: action.actor, target: action.target });
-        const dmg = 1+rng(action.actor.maxLaserDamage)
+        //player has a 0% chance to miss at min range and 75% at max range
+        const didMiss = action.path.distance > 0 ? (Math.random() < (0.75 * (action.path.distance / action.actor.maxAttackDistance))) : false
+        if (didMiss) {
+            Object.assign(action, {targetBadMessage: 'Missed!'})
+        } 
+        else {
+            const dmg = 1+rng(action.actor.maxLaserDamage)
+            const [targetHullDamage, targetShieldDamage, targetDisabled] = action.target.takeDamage(dmg)
+            Object.assign(action, {targetHullDamage, targetShieldDamage, targetDisabled})
+        }
         action.actor.numActionsRemaining--
-        const [targetHullDamage, targetShieldDamage, targetDisabled] = action.target.takeDamage(dmg)
-        Object.assign(action, {targetHullDamage, targetShieldDamage, targetDisabled})
     }
 
     static wait(action =  new ShipAction()) {
