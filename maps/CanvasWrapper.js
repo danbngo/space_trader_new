@@ -151,7 +151,6 @@ class CanvasPixel {
     }
 }
 
-
 class CanvasWrapper {
     constructor(
         zoom = 100,
@@ -185,6 +184,7 @@ class CanvasWrapper {
         this.onClickWorldXY = null;
         this.onMouseMoveWorldXY = null;
         this.isDragging = false;
+        this.dragStartTime = 0;
 
         // Setup click detection
         this.canvas.addEventListener('click', (e) => this.handleClick(e));
@@ -230,6 +230,9 @@ class CanvasWrapper {
     }
 
     onDragMap(x = 0, y = 0) {
+        if (!this.isDragging) {
+            this.dragStartTime = Date.now();
+        }
         this.isDragging = true;
         this.cameraX -= x/this.zoom
         this.cameraY -= y/this.zoom
@@ -403,10 +406,13 @@ class CanvasWrapper {
         const mouseX = event.clientX - rect.left;
         const mouseY = event.clientY - rect.top;
 
-        // Don't fire click events if the user just dragged
+        // Don't fire click events if the user dragged for more than 200ms
         if (this.isDragging) {
+            const dragDuration = Date.now() - this.dragStartTime;
             this.isDragging = false;
-            return;
+            if (dragDuration > 50) {
+                return;
+            }
         }
 
         // Check objects in reverse draw order (top-most first)

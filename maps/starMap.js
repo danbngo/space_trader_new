@@ -178,6 +178,9 @@ class StarMap {
             }
         })
 
+        // Add waypoint marker (upside-down triangle for clicked coordinates)
+        cvs.addTriangle('waypointMarker', 0, 0, 0, 0, 12, [0,255,255,0.5], Math.PI/2)
+
         cvs.recalculateDrawOrder()
     }
 
@@ -256,6 +259,21 @@ class StarMap {
                 cvsObject.screenOffsetY = screenOffsetY
             }
         })
+
+        // Update waypoint marker
+        const waypointMarker = cvs.getObject('waypointMarker')
+        if (this.selectedObject && this.selectedObject.isWaypoint) {
+            waypointMarker.visible = true
+            waypointMarker.x = this.selectedObject.x
+            waypointMarker.y = this.selectedObject.y
+            
+            // Bobbing animation: full cycle every 2 seconds
+            //const bobCycle = (Date.now() % 2000) / 2000 // 0 to 1 over 2 seconds
+            //const bobOffset = Math.sin(bobCycle * Math.PI * 2) * 5 // -10 to +10 pixels
+            //waypointMarker.screenOffsetY = bobOffset
+        } else {
+            waypointMarker.visible = false
+        }
 
         cvs.redraw(forceRedraw)
     }

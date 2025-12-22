@@ -82,10 +82,11 @@ class ShipAction {
             const [targetHullDamage, targetShieldDamage, targetDisabled] = target.takeDamage(dmg, true)
             const [actorHullDamage, actorShieldDamage, actorDisabled] = actor.takeDamage(selfDmg, true)
 
-            const knockback = 1 + (10*dmgModifier*(actor.mass/target.mass)) + target.radius + actor.radius
+            const knockback = 1 + (AVERGE_RAMMING_KNOCKBACK_DISTANCE*dmgModifier*(actor.mass/target.mass)) + target.radius + actor.radius
             const [kx,ky] = rotatePoint(knockback, 0, 0, 0, action.angle)
             target.x += kx
             target.y += ky
+            target.angle = Math.random()*Math.PI*2
             const targetEscaped = action.encounter.checkShipEscaped(target)
             Object.assign(action, {actorHullDamage, actorShieldDamage, actorDisabled, targetHullDamage, targetShieldDamage, targetDisabled, targetEscaped})
         }

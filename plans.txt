@@ -1,29 +1,6 @@
-DONE:
- -miners - you can attack and loot them
- -merchants - same as above but will offer to trade with you
- -cops - will check you for contraband or arrest if you have a bounty
- -asteroid encounters so you can mine raw resources
- -bounty hunters - will just straight attack you if you OR your officers have a bounty
- -have the banks put bounty on your head every month you're overdue on a loan
- -allow game to end
- -make skills actually do things
-
--make some buttons stand out a lot under certain conditions :
-  ex . hail button should be highlighted when player is in view mode
-  or unpause button when player's game is paused
-some encounters need to be more common near certain planets, asteroid belt, etc.
--allow arbitrary movement on starmap
--apply officer rake to other cr sources - salvaging, bribes
--ships should be able to miss, misfire engine (dont move), miss ramming, etc.
--combat is a bit clunky, should auto select the ship that u last controlled after firing, moving etc.
-courthouses, so you can pay off your bounty or 
-maybe look into making ships look different visually - and less enormous ships, use sqrt of hull or something
-add asteroid belt? oort cloud?
--if asteroid belts, then add arbitrary travel destinations?
-add government buildings and make cultures more fleshed out
-
 
 NEXT UP:
+theres a weird bug where enemy ships keep waiting/recharging if close to me and fast small ships
 more strategic combat - tractor rays etc. maybe stuff like dust clouds that slow ships down.
 academy improvements - let players pay money for skills, some are cheaper than others
 -hard to click on objects because of the no click on drag thing, need to make that less strict
