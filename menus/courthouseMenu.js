@@ -35,7 +35,7 @@ function showCourthouseMenu(courthouse = new Courthouse()) {
 
     function showServeJailTimeModal(days = 0) {
         showModal(`Serve Jail Time`,
-            `Are you sure you want to serve <b>${describeTimespan(days*365)}</b> days in jail to clear your bounty of <b>${gs.captain.bounty}</b> CR?<br/>`,
+            `Are you sure you want to serve <b>${describeTimespan(days/365)}</b> days in jail to clear your bounty of <b>${gs.captain.bounty}</b> CR?<br/>`,
             [
                 ['Yes', ()=>{serveJailTime(days)}],
                 ['No', ()=>{reloadMenu()}],

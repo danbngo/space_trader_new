@@ -57,6 +57,7 @@ class AttackActionHandler extends ActionHandler {
         }, ()=>{
             action.execute()
             this.cvs.deleteObject(animLine)
+            this.encounterMap.showActionPopup(action)
             this.encounterMap.stopAnimating()
         }))
         

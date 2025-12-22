@@ -218,18 +218,21 @@ function showTradeOfferPlayerSellModal() {
         //no rake but value may vary
         const pricePerUnit = Math.ceil(ct.value * rng(2, 0.5, false))
         const totalPrice = pricePerUnit * sellAmount
+        const officersShare = gs.fleet.calcTotalCRShare(totalPrice, true)
+        const finalSale = totalPrice - officersShare
         onSell = () => {
             gs.fleet.cargo.increment(ct, -sellAmount)
-            gs.credits += totalPrice
+            gs.credits += finalSale
             showModal(fleetName, 
-                `You sold ${sellAmount} units of ${ct.name} for ${totalPrice}CR.<br/>
+                `You sold ${sellAmount} units of ${ct.name} for ${totalPrice}CR${officersShare ? ` (-${officersShare}CR for officers)` : ''}.<br/>
                 The merchants thank you and tell you to come again!<br/>`, [['Continue', ()=>endEncounter()]])
         }
 
         msg += `They offer to buy ${sellAmount} ${ct.name} for ${pricePerUnit}CR each (total: ${totalPrice}CR).<br/>`
         msg += `Price vs. Market: ${roundToPlaces(100*pricePerUnit/ct.value,2)}%<br/>`
         msg += `Your amount after sale: ${gs.fleet.cargo.getAmount(ct) - sellAmount}<br/>`
-        msg += `Your CR after sale: ${gs.credits + totalPrice}CR.<br/>`
+        msg += `Sale Price: ${finalSale}CR ${officersShare ? `(-${officersShare}CR for officers)` : ''}<br/>`
+        msg += `Your CR after sale: ${gs.credits + finalSale}CR.<br/>`
     }
 
     showModal(fleetName, msg, onSell ? [
@@ -289,6 +292,8 @@ function showPlayerDefeatedEnemyModal(fameMultiplier = 0) {
         return total + ship.cargoSpace
     }, 0)
     const creditsAmt = Math.floor(Math.random() * enemyFleet.credits * (abandonedCargoCapacity / enemyFleet.totalCargoSpace))
+    const officersShare = gs.fleet.calcTotalCRShare(creditsAmt, true)
+    const finalCredits = creditsAmt - officersShare
     const cargoRatio = abandonedCargoCapacity / enemyFleet.totalCargoSpace
     const maxLootAmt = Math.floor(enemyFleet.cargo.total * cargoRatio)
     const baseLootAmt = Math.floor(Math.random() * maxLootAmt)
@@ -296,7 +301,7 @@ function showPlayerDefeatedEnemyModal(fameMultiplier = 0) {
     const loot = enemyFleet.cargo.randomSubset(lootAmt)
     const disabledPlayerShips = gs.encounter.playerShips.filter(s=>s.isDisabled())
 
-    gs.credits += creditsAmt
+    gs.credits += finalCredits
     gs.captain.infamy += infamy
     gs.captain.fame += fame
 
@@ -315,7 +320,7 @@ function showPlayerDefeatedEnemyModal(fameMultiplier = 0) {
         msg += `The ${fleetName} left behind ${disabledEnemyShips.length} disabled ships!<br/>`
         msg += `Your scanners reveal ${baseLootAmt} units of cargo amid the wreckage.<br/>`
         if (lootAmt > baseLootAmt) msg += `Your salvaging skills allow you to recover an additional ${lootAmt - baseLootAmt} units of cargo.<br/>`
-        if (creditsAmt > 0) msg += `You also salvage ${creditsAmt}CR from the wreckage.<br/>`
+        if (creditsAmt > 0) msg += `You also salvage ${finalCredits}CR from the wreckage${officersShare ? ` (-${officersShare}CR for officers)` : ''}.<br/>`
     }
     showModal(gs.encounter.encounterType.name, msg, [
         lootAmt > 0 ? ['Loot', ()=>showLootMenu(loot)] : ['Continue', ()=>endEncounter()]
@@ -358,12 +363,14 @@ function showPlayerDefeatedHazardsModal() {
 function showNeutralsBribePlayerModal(maxCredits = 1000) {
     const baseCredits = Math.ceil(maxCredits*Math.random()/2)
     const credits = Math.round(weightedAvg([baseCredits, maxCredits], [25, gs.fleet.totalSkills.getAmount(SKILLS.Barter)]))
+    const officersShare = gs.fleet.calcTotalCRShare(credits, true)
+    const finalCredits = credits - officersShare
     let msg = `The ${gs.encounter.fleetName} frantically offers you ${baseCredits}CR to let them go unharmed!<br/>`
     if (credits > baseCredits) msg += `You employ your haggling skills and make them an offer they can't refuse.<br/>Their offer increases to ${credits}CR.<br/>`
     showModal(gs.encounter.fleetName, msg, [
         ['Accept Bribe', ()=>{
-            gs.credits += credits
-            showModal(gs.encounter.fleetName, `You accept the tribute of ${credits}CR.<br/>The ${gs.encounter.fleetName} anxiously departs before you can change your mind.<br/>`, [['Continue', ()=>endEncounter()]])
+            gs.credits += finalCredits
+            showModal(gs.encounter.fleetName, `You accept the tribute of ${finalCredits}CR${officersShare ? ` (-${officersShare}CR for officers)` : ''}.<br/>The ${gs.encounter.fleetName} anxiously departs before you can change your mind.<br/>`, [['Continue', ()=>endEncounter()]])
         }],
         ['Refuse', ()=>{
             showModal(gs.encounter.fleetName, `You scornfully refuse the tribute!<br/>The ${gs.encounter.fleetName} readies for combat!<br/>`, [['Continue', ()=>startCombat(false)]])
@@ -560,14 +567,14 @@ function showPlayerPoliceInspectionModal() {
 
 function showFineOrJailModal(fine = 0) {
     const {fleetName} = gs.encounter
-    const fineFromBounty = Math.min(Math.max(gs.captain.bounty*Math.random(),100), gs.captain.bounty)
+    const fineFromBounty = Math.ceil(Math.min(Math.max(gs.captain.bounty*Math.random(),100), gs.captain.bounty))
     const jailDays = Math.round((fine+fineFromBounty)/JAIL_DAYS_PER_1000CR_FINE) //1 day of jail time per 1000CR of fine
     gs.bounty -= fineFromBounty
 
     let msg = ''
     if (fineFromBounty) msg += `The ${fleetName} are aware of some of the bounties on your head, to the tune of ${fineFromBounty}CR.<br/>`
-    if (fine) msg += `The ${fleetName} give you the option to pay a fine of ${fine}CR${fineFromBounty ? `, plus ${fineFromBounty} to clear your bounty` : ''} or serve ${describeTimespan(jailDays/365)} days in jail.<br/>`
-    else msg += `The ${fleetName} give you the option to pay off your bounty of ${fineFromBounty}CR or serve ${describeTimespan(jailDays/365)} days in jail.<br/>`
+    if (fine) msg += `The ${fleetName} give you the option to pay a fine of ${fine}CR${fineFromBounty ? `, plus ${fineFromBounty} to clear your bounty` : ''} or serve ${describeTimespan(jailDays/365)} in jail.<br/>`
+    else msg += `The ${fleetName} give you the option to pay off your bounty of ${fineFromBounty}CR or serve ${describeTimespan(jailDays/365)} in jail.<br/>`
     showModal(fleetName, msg, [
         ['Pay Fine', ()=>{
             gs.credits -= (fine + fineFromBounty)
@@ -581,7 +588,7 @@ function showFineOrJailModal(fine = 0) {
             gs.fleet.dock(nearestPlanet)
             gs.year += jailDays / 365.0
             msg += `The ${fleetName} take you to the nearest planet, ${nearestPlanet.name}.<br/>`
-            msg += `You serve ${describeTimespan(jailDays/365)} days in jail.<br/>`
+            msg += `You serve ${describeTimespan(jailDays/365)} in jail.<br/>`
             if (fineFromBounty) msg += `Your bounty has been reduced to: ${gs.bounty}CR.<br/>`
             showModal(fleetName, msg, [['Continue', ()=>endEncounter()]])
         }],

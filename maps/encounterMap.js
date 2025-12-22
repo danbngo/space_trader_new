@@ -23,6 +23,9 @@ class EncounterMap {
         this.onSelectObject = null;
         this.onHoverObject = null;
 
+        // Combat popup text - Map of id -> {textContent, color, endMs, x, y}
+        this.popups = new Map();
+
         // Initialize action handlers
         this.attackHandler = new AttackActionHandler(this);
         this.moveHandler = new MoveActionHandler(this);
@@ -53,7 +56,7 @@ class EncounterMap {
     refreshLogic() {
         console.log('EncounterMap.refreshLogic')
         if (this.checkEncounterOver()) return;
-        this.checkTurnOver();
+        this.checkTurnComplete();
         this.handleEnemyActions()
     }
 
@@ -103,7 +106,7 @@ class EncounterMap {
     rebuildCanvas() {
         const {encounter, cvs, starSystem} = this
         const {ships} = encounter
-        const BG_STAR_DISTANCE_MOD = 1 //hacky way to position stars intended for starmap onto the encounter map
+        const BG_STAR_DISTANCE_MOD = 10 //hacky way to position stars intended for starmap onto the encounter map
 
         cvs.clear()
 
@@ -211,6 +214,32 @@ class EncounterMap {
             cvsLabelObject.fontModifier = fontModifier
         })
 
+        // Update combat popup texts
+        const currentMs = Date.now()
+        const popupIdsToRemove = []
+        for (const [id, popup] of this.popups.entries()) {
+            const popupObj = cvs.getObject(id)
+            if (popupObj) {
+                if (currentMs > popup.endMs) {
+                    popupIdsToRemove.push(id)
+                    continue
+                }
+                popupObj.visible = true
+                popupObj.x = popup.x
+                popupObj.y = popup.y
+                popupObj.text = popup.textContent
+                const progress = (currentMs - popup.startMs) / (popup.endMs - popup.startMs)
+                popupObj.screenOffsetY = popup.initialScreenOffsetY - DEFAULT_FONT_SIZE * progress
+                const alpha = 1 + (0.25 - 1) * progress
+                popupObj.fillColor = [...popup.color.slice(0, 3), alpha]
+            }
+        }
+
+        for (const id of popupIdsToRemove) {
+            this.cvs.deleteObject(id)
+            this.popups.delete(id)
+        }
+
         cvs.redraw(forceRedraw)
     }
 
@@ -315,6 +344,68 @@ class EncounterMap {
         return true
     }
 
+    showPopup(id = 'popup', text = '', x = 0, y = 0, color = COLORS.White, screenOffsetY = -DEFAULT_FONT_SIZE, durationMs = 2000) {
+        console.log('showPopup:', id, text, x, y, color, durationMs)
+        
+        const startMs = Date.now()
+        // Create canvas text object if it doesn't exist
+        if (!this.cvs.getObject(id)) {
+            this.cvs.addText(id, x, y, 0, screenOffsetY, text, color)
+        }
+        
+        // Update or create popup state
+        this.popups.set(id, {
+            textContent: text,
+            x: x,
+            y: y,
+            initialScreenOffsetY: screenOffsetY,
+            color: color,
+            startMs: startMs,
+            endMs: startMs + durationMs
+        })
+    }
+
+    showActionPopup(action = new ShipAction()) {
+        const {actor, target, actorHullDamage, actorShieldDamage, actorDisabled, actorEscaped, targetHullDamage, targetShieldDamage, targetDisabled, targetEscaped} = action
+        const popupId = `action_${Date.now()}_${Math.random()}`
+        let actorYOffset = -DEFAULT_FONT_SIZE
+        let targetYOffset = -DEFAULT_FONT_SIZE
+
+        if (actorHullDamage > 0) {
+            this.showPopup(`${popupId}_actor_hull`, `${dnc(-actorHullDamage)}hp`, actor.x, actor.y, COLORS.LightGray)
+            actorYOffset -= DEFAULT_FONT_SIZE
+        }
+        if (actorShieldDamage > 0) {
+            this.showPopup(`${popupId}_actor_shield`, `${dnc(-actorShieldDamage)}sp`, actor.x, actor.y, COLORS.Blue, actorYOffset)
+            actorYOffset -= DEFAULT_FONT_SIZE
+        }
+        if (actorDisabled) {
+            this.showPopup(`${popupId}_actor_disabled`, `Disabled!`, actor.x, actor.y, COLORS.LightGray, actorYOffset)
+            actorYOffset -= DEFAULT_FONT_SIZE
+        }
+        else if (actorEscaped) {
+            this.showPopup(`${popupId}_actor_escaped`, `Escaped!`, actor.x, actor.y, COLORS.Orange, actorYOffset)
+            actorYOffset -= DEFAULT_FONT_SIZE
+        }
+
+        if (targetHullDamage > 0) {
+            this.showPopup(`${popupId}_target_hull`, `${dnc(-targetHullDamage)}hp`, target.x, target.y, COLORS.LightGray)
+            targetYOffset -= DEFAULT_FONT_SIZE
+        }
+        if (targetShieldDamage > 0) {
+            this.showPopup(`${popupId}_target_shield`, `${dnc(-targetShieldDamage)}sp`, action.target.x, action.target.y, COLORS.Blue, targetYOffset)
+            targetYOffset -= DEFAULT_FONT_SIZE
+        }
+        if (targetDisabled) {
+            this.showPopup(`${popupId}_target_disabled`, `Disabled!`, target.x, target.y, COLORS.LightGray, targetYOffset)
+            targetYOffset -= DEFAULT_FONT_SIZE
+        }
+        else if (targetEscaped) {
+            this.showPopup(`${popupId}_target_escaped`, `Escaped!`, target.x, target.y, COLORS.Orange, targetYOffset)
+            targetYOffset -= DEFAULT_FONT_SIZE
+        }
+    }
+
     startAnimating() {
         console.log('EncounterMap.startAnimating')
         this.stopTargeting()
@@ -407,15 +498,15 @@ class EncounterMap {
                 this.waitHandler.execute(nextMove)
             }
         }
-        this.checkTurnOver()
+        this.checkTurnComplete()
     }
 
-    checkTurnOver() {
-        //console.log('EncounterMap.checkTurnOver')
+    checkTurnComplete() {
+        //console.log('EncounterMap.checkTurnComplete')
         if (this.encounter.result) return
         const {encounter} = this
-        if (encounter.isTurnOver()) {
-            encounter.handleTurnOver()
+        if (encounter.isTurnComplete()) {
+            encounter.handleTurnComplete()
             this.refreshLogic()
             if (encounter.activeTurnFleet == gs.fleet) this.selectObject(encounter.playerShips[0] || null)
         }

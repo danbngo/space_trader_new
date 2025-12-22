@@ -71,3 +71,10 @@ function describeLargeNumber(num = 0) {
     if (num >= 1e3) return (num / 1e3).toFixed(2).replace(/\.00$/, '') + ' K'
     return num.toString()
 }
+
+function describeNumChange(delta = 0) {
+    if (delta > 0) return `+${delta}`
+    if (delta < 0) return `-${Math.abs(delta)}`
+    return `+0`
+}
+const dnc = describeNumChange

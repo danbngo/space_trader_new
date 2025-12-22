@@ -20,8 +20,8 @@ class WaitActionHandler extends ActionHandler {
 
     execute(action =  new ShipAction()) {
         this.encounterMap.animatingAction = null
+        //this.encounterMap.stopAnimating() //this will cause a bug due to refresh loop
         console.log('WaitActionHandler.execute', { action });
         action.execute()
-        this.encounterMap.stopAnimating()
     }
 }

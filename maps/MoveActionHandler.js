@@ -51,8 +51,9 @@ class MoveActionHandler extends ActionHandler {
             Object.assign(mover, {x: newX, y: newY, angle:action.path.angle})
         }, ()=>{
             action.execute()
-            this.cvs.deleteObject(animLine)
             this.encounterMap.stopAnimating()
+            this.cvs.deleteObject(animLine)
+            this.encounterMap.showActionPopup(action)
         }))
         
         this.startAnimating()

@@ -12,39 +12,53 @@ class ShipAction {
         this.path = new Path(this.startX, this.startY, this.toX, this.toY)
         this.angle = this.path.angle
         this.completed = false
+
+        this.actorShieldDamage = null
+        this.actorHullDamage = null
+        this.actorDisabled = null
+        this.targetShieldDamage = null
+        this.targetHullDamage = null
+        this.targetDisabled = null
+        this.targetEscaped = null
+        this.actorEscaped = null
+        this.actorTurnComplete = null
     }
 
     execute() {
         console.log('ShipAction.execute', { encounter:this.encounter, actionType: this.actionType, actor: this.actor, target: this.target, toX: this.toX, toY: this.toY });
+        let result;
         if (this.actionType == MOVE_TYPES.Move) {
-            ShipAction.move(this)
+            result = ShipAction.move(this)
         }
         else if (this.actionType == MOVE_TYPES.Attack) {
-            ShipAction.attack(this)
+            result = ShipAction.attack(this)
         }
         else if (this.actionType == MOVE_TYPES.Ram) {
-            ShipAction.ram(this)
+            result = ShipAction.ram(this)
         }
         else if (this.actionType == MOVE_TYPES.Recharge) {
-            ShipAction.recharge(this)
+            result = ShipAction.recharge(this)
         }
         else if (this.actionType == MOVE_TYPES.Wait) {
-            ShipAction.wait(this)
+            result = ShipAction.wait(this)
         }
         else throw new Error(`Unknown move type: ${this.actionType}`)
         this.completed = true
+        return result
     }
 
     static recharge(action = new ShipAction()) {
         console.log('ShipAction.recharge', { action });
-        action.actor.rechargeShields()
         action.actor.numActionsRemaining--
+        const rechargedAmt = action.actor.rechargeShields()
+        Object.assign(action, {actorShieldDamage: -rechargedAmt})
     }
 
     static move(action =  new ShipAction()) {
         Object.assign(action.actor, {x: action.toX, y: action.toY, angle: action.angle})
         action.actor.numActionsRemaining--
-        if (action.encounter) action.encounter.checkShipEscaped(action.actor)
+        let actorEscaped = (action.encounter) ? action.encounter.checkShipEscaped(action.actor) : null
+        Object.assign(action, {actorEscaped})
     }
 
     static ram(action =  new ShipAction()) {
@@ -57,8 +71,8 @@ class ShipAction {
 
         const dmg = 1+rng(actor.maxRamDamage * dmgModifier)
         const selfDmg = 1+rng(actor.maxRamDamage/2 * dmgModifier)
-        target.takeDamage(dmg, true)
-        actor.takeDamage(selfDmg, true)
+        const [targetHullDamage, targetShieldDamage, targetDisabled] = target.takeDamage(dmg, true)
+        const [actorHullDamage, actorShieldDamage, actorDisabled] = actor.takeDamage(selfDmg, true)
 
         const knockback = 1 + (10*dmgModifier*(actor.mass/target.mass)) + target.radius + actor.radius
         const [kx,ky] = rotatePoint(knockback, 0, 0, 0, action.angle)
@@ -66,16 +80,19 @@ class ShipAction {
         target.y += ky
 
         //seems buggy but let's try it out
-        action.encounter.checkShipEscaped(actor)
+        const actorEscaped = action.encounter.checkShipEscaped(actor)
+        const targetEscaped = action.encounter.checkShipEscaped(target)
 
         actor.numActionsRemaining--
+        Object.assign(action, {actorHullDamage, actorShieldDamage, actorDisabled, targetHullDamage, targetShieldDamage, targetDisabled, actorEscaped, targetEscaped})
     }
 
     static attack(action =  new ShipAction()) {
         console.log('ShipAction.attack', { attacker: action.actor, target: action.target });
         const dmg = 1+rng(action.actor.maxLaserDamage)
-        action.target.takeDamage(dmg)
         action.actor.numActionsRemaining--
+        const [targetHullDamage, targetShieldDamage, targetDisabled] = action.target.takeDamage(dmg)
+        Object.assign(action, {targetHullDamage, targetShieldDamage, targetDisabled})
     }
 
     static wait(action =  new ShipAction()) {

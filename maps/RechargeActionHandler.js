@@ -36,6 +36,7 @@ class RechargeActionHandler extends ActionHandler {
         }, ()=>{
             action.execute()
             this.cvs.deleteObject(animCircle)
+            this.encounterMap.showActionPopup(action)
             this.encounterMap.stopAnimating()
         }))
         

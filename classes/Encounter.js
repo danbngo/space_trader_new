@@ -31,8 +31,8 @@ class Encounter {
     get activeShips () {return this.ships.filter(s=>(!s.isDisabled() && !s.escaped)) }
     //get ships() { return [...this.playerShips, ...this.enemyShips] } //dont use. static.
 
-    isTurnOver() {
-        //console.log('Encounter.isTurnOver', { activeTurnFleet: this.activeTurnFleet });
+    isTurnComplete() {
+        //console.log('Encounter.isTurnComplete', { activeTurnFleet: this.activeTurnFleet });
         const activeFleetShips = this.activeTurnFleet.ships.filter(s=>(!s.isDisabled() && !s.escaped))
         for (const ship of activeFleetShips) {
             if (ship.numActionsRemaining > 0) {
@@ -42,9 +42,9 @@ class Encounter {
         return true
     }
 
-    handleTurnOver() {
-        console.log('Encounter.handleTurnOver', { activeTurnFleet: this.activeTurnFleet });
-        if (!this.isTurnOver()) return
+    handleTurnComplete() {
+        console.log('Encounter.handleTurnComplete', { activeTurnFleet: this.activeTurnFleet });
+        if (!this.isTurnComplete()) return
         this.encounterType.onEndTurn?.(this)
         for (const ship of this.activeTurnFleet.ships) {
             ship.numActionsRemaining = 0
@@ -109,6 +109,8 @@ class Encounter {
         const distanceFromCenter = calcDistance(0, 0, ship.x, ship.y)
         if (distanceFromCenter > this.mapRadius) {
             ship.escaped = true
+            return true
         }
+        return false
     }
 }

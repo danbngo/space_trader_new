@@ -281,7 +281,7 @@ class CanvasWrapper {
         return pixel
     }
 
-    addText(id = "", x = 0, y = 0, screenOffsetX = 0, screenOffsetY = 0, textContent = "", fillColor = COLORS.LightGray, size = 0, lineWidth = 2, onClick = null, onHover = null, onHoverEnd = null) {
+    addText(id = "", x = 0, y = 0, screenOffsetX = 0, screenOffsetY = 0, textContent = "", fillColor = COLORS.LightGray, size = DEFAULT_FONT_SIZE, lineWidth = 2, onClick = null, onHover = null, onHoverEnd = null) {
         const obj = new CanvasObject({ id, shape: SHAPES.Text, size, lineWidth, x, y, screenOffsetX, screenOffsetY, textContent, fillColor, onClick, onHover, onHoverEnd });
         return this.addObject(obj)
     }

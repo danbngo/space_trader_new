@@ -197,7 +197,7 @@ function checkDebtCollections(elapsedDays = 1) {
     const convertedAmt = Math.min(totalDebts, 100 + rng( Math.ceil(totalDebts/3), Math.ceil(totalDebts/6) ))
     const fees = Math.ceil(convertedAmt * 0.5)
     payDebtsRandomly(gs.captain, convertedAmt)
-    gs.bounty += (convertedAmt + fees)
+    gs.bounty += Math.ceil(convertedAmt + fees)
     let msg = `The bank isn't happy that you haven't paid your overdue loans of ${totalDebts}CR.<br/>`
     msg += `They have passed a portion of your debt, plus fees on to some rather ruthless collection agencies.<br/>`
     msg += `Your new bounty: ${gs.captain.bounty}CR<br/>`

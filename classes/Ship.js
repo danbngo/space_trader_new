@@ -82,7 +82,10 @@ class Ship {
     }
     
     restoreShields(amt = this.shields[1]) {
+        const beforeShields = this.shields[0]
         this.shields[0] = Math.min(this.shields[0]+amt, this.shields[1])
+        const actualRecharge = this.shields[0] - beforeShields
+        return actualRecharge
     }
 
     resetCombatVars() {
@@ -109,21 +112,28 @@ class Ship {
 
     takeDamage(dmg = 0, bypassShields = false) {
         console.log('applying dmg to ship:',this,dmg,bypassShields)
-        if (this.isDisabled()) return
-        this.beingHit = true
+        if (this.isDisabled()) return [0, 0]
+        let disabled = false
+        let shieldDamage = 0
+        let hullDamage = 0
         if (this.shields[0] > 0 && !bypassShields) {
-            const shieldDmg = Math.min(dmg, this.shields[0])
-            this.shields[0] -= shieldDmg
-            dmg -= shieldDmg
-            if (dmg <= 0) return
+            shieldDamage = Math.min(dmg, this.shields[0])
+            this.shields[0] -= shieldDamage
+            dmg -= shieldDamage
+            if (dmg <= 0) return [hullDamage, shieldDamage]
         }
+        hullDamage = Math.min(dmg, this.hull[0])
         this.hull[0] = Math.max(0, this.hull[0] - dmg)
-        if (this.hull[0] <= 0) this.setDisabled()
+        if (this.hull[0] <= 0) {
+            disabled = true
+            this.setDisabled()
+        }
+        return [hullDamage, shieldDamage, disabled]
     }
 
     rechargeShields() {
         const rechargeAmt = 1 + rng(this.engine/2)
-        this.restoreShields(rechargeAmt)
+        return this.restoreShields(rechargeAmt)
     }
 
     calcAttackAreas(overrideX = this.x, overrideY = this.y) {
