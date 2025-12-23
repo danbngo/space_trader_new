@@ -37,7 +37,11 @@ class GravitonBeamActionHandler extends ActionHandler {
     attempt(attacker = new Ship(), target = new Ship()) {
         console.log('GravitonBeamActionHandler.attempt', { attacker, target });
         if (!this.encounterMap.validTargets.includes(target)) return
-        this.execute(new ShipAction(this.encounter, attacker, MOVE_TYPES.GravitonBeam, target))
+        const [attackerToX, attackerToY] = [attacker.x*0.75+target.x*0.25, attacker.y*0.75+target.y*0.25]
+        const [targetToX, targetToY] = [attacker.x*0.5+target.x*0.5, attacker.y*0.5+target.y*0.5]
+        const action = new ShipAction(this.encounter, attacker, MOVE_TYPES.GravitonBeam, target, attackerToX, attackerToY, targetToX, targetToY)
+        action.actorGoodMessage = 'Graviton Beam!'
+        this.execute(action)
     }
 
     execute(action = new ShipAction()) {
@@ -50,14 +54,17 @@ class GravitonBeamActionHandler extends ActionHandler {
         const beamLine = this.cvs.addLine('gravitonline', action.actor.x, action.actor.y, action.target.x, action.target.y, COLORS.Purple, 3)
         
         animations.push(new Loop(beamDuration, (progressRatio) => {
+            action.actor.x = action.startX + (action.toX - action.startX) * progressRatio
+            action.actor.y = action.startY + (action.toY - action.startY) * progressRatio
+            action.target.x = action.targetStartX + (action.targetToX - action.targetStartX) * progressRatio
+            action.target.y = action.targetStartY + (action.targetToY - action.targetStartY) * progressRatio
             beamLine.x = action.actor.x
             beamLine.y = action.actor.y
             beamLine.x2 = action.target.x
             beamLine.y2 = action.target.y
         }, () => {
-            action.execute()
             this.cvs.deleteObject(beamLine)
-            this.encounterMap.stopAnimating()
+            this.completeAction(action)
         }))
         
         this.startAnimating()

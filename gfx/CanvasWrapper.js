@@ -1,180 +1,4 @@
-class CanvasObject {
-    /**
-    * @param {Object} params
-    * @param {string} params.id
-    * @param {typeof SHAPES[keyof typeof SHAPES]} params.shape
-    * @param {number} params.x
-    * @param {number} params.y
-    * @param {number} params.size
-    * @param {number} [params.minorSize]
-    * @param {number} [params.angle]
-    * @param {string | null} [params.textContent]
-    * @param {function(CanvasObject):void | null} [params.onClick]
-    * @param {function(CanvasObject):void | null} [params.onHover]
-    * @param {function(CanvasObject):void | null} [params.onHoverEnd]
-    * @param {number} [params.x2]
-    * @param {number} [params.y2]
-    * @param {number} [params.lineWidth]
-    * @param {number} [params.screenOffsetX]
-    * @param {number} [params.screenOffsetY]
-    * @param {number} [params.minScreenSize]
-    * @param {boolean} [params.visible]
-    * @param {string | null} [params.fontModifier]
-    * @param {number[] | null} [params.fillColor]
-    * @param {number[] | null} [params.strokeColor]
-    */
-    constructor({
-        id = '',
-        shape = SHAPES.FilledCircle,
-        x = 0,
-        y = 0,
-        size = 1,        // for triangle
-        minorSize = 1,   // for oval
-        angle = 0,    // radians for triangle
-        fillColor = COLORS.White,
-        strokeColor = null,
-        textContent = null,
-        fontModifier = null,
-        onClick = null,
-        onHover = null,
-        onHoverEnd = null,
-        //for lines
-        x2 = 0,
-        y2 = 0,
-        lineWidth = 1,
-        screenOffsetX = 0,
-        screenOffsetY = 0,
-        minScreenSize = 1,
-        visible = true,
-    }) {
-        this.id = id;
-        this.shape = shape;
-        
-        this.x = x;
-        this.y = y;
-        this.size = size;
-        this.size = size;
-        this.minorSize = minorSize;
-        this.angle = angle;
-        
-        /** @type {number[] | null} */
-        this.fillColor = fillColor ? [...fillColor] : null;
-        /** @type {number[] | null} */
-        this.strokeColor = strokeColor ? [...strokeColor] : null;
-        
-        this.textContent = textContent;
-        this.onClick = onClick;
-        this.onHover = onHover;
-        this.onHoverEnd = onHoverEnd;
-        this.fontModifier = fontModifier;
-        
-        this.x2 = x2;
-        this.y2 = y2;
-        this.lineWidth = lineWidth;
-        
-        this.screenOffsetX = screenOffsetX;
-        this.screenOffsetY = screenOffsetY;
-        this.minScreenSize = minScreenSize;
-        this.visible = visible
-    }
-    
-    draw(ctx, size = 1, sx = 0, sy = 0, x2Offset = 0, y2Offset = 0, overrideStrokeColor = undefined) {
-        ctx.save();
-        ctx.translate(sx, sy);
-        
-        ctx.fillStyle = colorArrToRgbaString(this.fillColor);
-        const effectiveStrokeColor = overrideStrokeColor !== undefined ? overrideStrokeColor : this.strokeColor
-        ctx.strokeStyle = effectiveStrokeColor ? colorArrToRgbaString(effectiveStrokeColor) : null;
-        ctx.lineWidth = this.lineWidth;
-        let minorSize = this.size ? size*(this.minorSize / this.size) : size;
-        
-        switch (this.shape) {
-            case SHAPES.FilledCircle:
-            ctx.beginPath();
-            ctx.arc(0, 0, size, 0, Math.PI * 2);
-            ctx.fill();
-            if (this.strokeColor) ctx.stroke()
-                break;
-            
-            case SHAPES.FilledOval:
-            //minorSize is the y radius, size is the x radius
-            ctx.beginPath();
-            ctx.ellipse(0, 0, size, minorSize, this.angle, 0, Math.PI * 2);
-            ctx.fill();
-            if (this.strokeColor) ctx.stroke()
-                //if (this.angle) ctx.rotate(this.angle);
-            break;
-            
-            case SHAPES.EmptyCircle:
-            ctx.beginPath();
-            ctx.arc(0, 0, size, 0, Math.PI * 2);
-            ctx.stroke();
-            break;
-            
-            case SHAPES.Triangle:
-            if (this.angle) ctx.rotate(this.angle);
-            /*if (this.gradient) {
-            const gradient = ctx.createLinearGradient(0, 0, 0, size)
-            gradient.addColorStop(1, '#000000');
-            gradient.addColorStop(0, ctx.fillStyle); 
-            ctx.fillStyle = gradient;
-            }*/
-            ctx.beginPath();
-            // tip (pointing right)
-            ctx.moveTo(minorSize / 2, 0);
-            // base top
-            ctx.lineTo(-minorSize / 2, -size / 2);
-            // base bottom
-            ctx.lineTo(-minorSize / 2, size / 2);
-            ctx.closePath();
-            ctx.fill();
-            if (this.strokeColor) ctx.stroke()
-                break;
-            
-            case SHAPES.Text:
-            ctx.font = `${this.size}px "Google Sans Code"`;
-            if (this.fontModifier) {
-                ctx.font = `${this.fontModifier} ${this.size}px "Google Sans Code"`;
-            }
-            
-            ctx.strokeStyle = ctx.strokeStyle || "black";
-            ctx.strokeText(this.textContent, 0, 0);
-            ctx.fillText(this.textContent, 0, 0);
-            break;
-            
-            case SHAPES.Line:
-            ctx.lineWidth = this.size || ctx.lineWidth
-            ctx.beginPath();
-            ctx.moveTo(0, 0); // start point
-            ctx.lineTo(x2Offset, y2Offset); // end point
-            ctx.stroke();       // actually draw it
-        }
-        
-        ctx.restore();
-    }
-    
-    asImage(size = 0, strokeColor = undefined) {
-        console.log('drawing canvasobj as image:',size,strokeColor,this)
-        const diameter = size*2
-        const c = document.createElement("canvas");
-        c.width = c.height = diameter;
-        const ctx = c.getContext("2d");
-        
-        this.draw(ctx, size, size, size, 0, 0, strokeColor)
-        
-        return c;
-    }
-    
-}
 
-class CanvasPixel {
-    constructor({x = 0, y = 0, color = COLORS.LightGray, size = 1} = {}) {
-        this.x = x;
-        this.y = y;
-        this.color = color;
-        this.size = size;
-    }
-}
 
 class CanvasWrapper {
     constructor(
@@ -333,6 +157,10 @@ class CanvasWrapper {
         return obj;
     }
     
+    /**
+     * @param {string | CanvasObject} id 
+     * @returns 
+     */
     deleteObject(id = "") {
         const obj = this.getObject(id)
         if (!obj) return
@@ -340,8 +168,12 @@ class CanvasWrapper {
         this.drawOrder = this.drawOrder.filter(o=>(o !== obj))
     }
     
-    /** @param {string} id */
+    /**
+     * @param {string | CanvasObject} id 
+     * @returns 
+     */
     getObject(id = "") {
+        if (id instanceof CanvasObject) return id
         return this.objectMap.get(id) || null;
     }
     
@@ -469,8 +301,17 @@ class CanvasWrapper {
         });
         this.drawOrder = sorted
     }
+
+    removeExpiredObjects() {
+        const expiredIds = this.drawOrder.filter(o=>o.expired).map(o=>o.id)
+        for (const id of expiredIds) {
+            this.deleteObject(id)
+        }
+    }
     
     redraw(forceRedraw = false) {
+        this.removeExpiredObjects()
+
         const now = Date.now()
         const msSinceLastRedraw = now - this.lastRedrawAt
         if (msSinceLastRedraw < 1000/this.maxFrameRate && !forceRedraw) {
@@ -534,7 +375,7 @@ class CanvasWrapper {
                 y2Offset = sy2 - sy
             }
             
-            obj.draw(ctx, size, sx, sy, x2Offset, y2Offset)
+            obj.draw(now, ctx, size, sx, sy, x2Offset, y2Offset)
         }
     }
 }

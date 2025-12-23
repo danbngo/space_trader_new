@@ -10,9 +10,7 @@ function checkForEncounter(elapsedDays = 1) {
     //console.log('checkForEncounter', { elapsedDays, location: gs.location, encounter: gs.encounter });
     //dont have encounters while docked or already in an encounter
     if (gs.location || gs.encounter) return
-    if (!checkForPlanetEncounters(elapsedDays)) {
-        checkForAsteroidBeltEncounters(elapsedDays)
-    }
+    return checkForPlanetEncounters(elapsedDays) || checkForAsteroidBeltEncounters(elapsedDays)
 }
 
 function rollChanceOverTimespan(baseChancePerDay = 0.01, elapsedDays = 1) {
@@ -45,24 +43,13 @@ function checkForAsteroidBeltEncounters(elapsedDays = 1) {
         // Calculate proximity factor using 1/(1+d/r) formula
         // In the middle of belt (d=0): factor = 1.0
         // At edge (d=beltRadius): factor = 0.5
-        // Beyond edge: factor approaches 0 but never reaches it
-        const proximityFactor = 1 / (1 + distanceFromBeltCenter / beltRadius)
-        
+        // At 2x edge: factor = 0.5
+        const proximityFactor = 1 - (0.5 * distanceFromBeltCenter / beltRadius)
+        if (proximityFactor <= 0) continue
+
         // Base encounter chance
         //const baseChance = Math.pow(ASTEROIDS_ENCOUNTER_CHANCE_PER_DAY, 1/(elapsedDays * proximityFactor))
-        const encounterChance = rollChanceOverTimespan(ASTEROIDS_ENCOUNTER_CHANCE_PER_DAY, elapsedDays*proximityFactor)
-        
-        /*console.log(`Checking ${belt.name}:`, {
-            beltCenterDistance,
-            beltRadius,
-            fleetDistanceFromSun,
-            distanceFromBeltCenter,
-            proximityFactor: proximityFactor.toFixed(3),
-            encounterChance: encounterChance.toFixed(4)
-        });*/
-        
-        // Check if encounter happens
-        if (Math.random() > encounterChance) continue
+        if (!rollChanceOverTimespan(ASTEROIDS_ENCOUNTER_CHANCE_PER_DAY, elapsedDays*proximityFactor)) continue
         
         // Determine encounter type based on belt type
         let encounterType
@@ -144,20 +131,7 @@ function checkForPlanetEncounters(elapsedDays = 1) {
         
         // Adjust base chance by culture activity level
         const activityLevel = (governmentRating + securityRating + crimeRating + commercialRating + industrialRating) / 5
-        const encounterChance = rollChanceOverTimespan(PLANET_ENCOUNTER_CHANCE_PER_DAY, elapsedDays * activityLevel * proximityFactor)
-        
-        /*console.log(`Checking ${planet.name}:`, {
-            distance: distance.toFixed(2),
-            proximityFactor: proximityFactor.toFixed(3),
-            activityLevel: activityLevel.toFixed(2),
-            encounterChance: encounterChance.toFixed(4),
-            totalWeight: totalWeight.toFixed(2)
-        });*/
-        
-        // Check if encounter happens
-        //console.log('enc chance:',{encounterChance,elapsedDays,activityLevel,proximityFactor})
-
-        if (Math.random() > encounterChance) continue
+        if (!rollChanceOverTimespan(PLANET_ENCOUNTER_CHANCE_PER_DAY, elapsedDays * activityLevel * proximityFactor)) continue
         
         // Select encounter type using weighted random
         const roll = Math.random() * totalWeight
@@ -192,12 +166,12 @@ function checkDebtCollections(elapsedDays = 1) {
     const baseChance = Math.pow(BANK_BOUNTY_CHANCE_PER_DAY, 1/(elapsedDays))
     if (Math.random() > baseChance) return
 
-    console.log('🚨 DEBT COLLECTION TRIGGERED', { outstandingDebts, bountyChance });
+    console.log('🚨 DEBT COLLECTION TRIGGERED', { outstandingDebts, baseChance });
     const totalDebts = gs.captain.calcTotalDebts(true)
     const convertedAmt = Math.min(totalDebts, 100 + rng( Math.ceil(totalDebts/3), Math.ceil(totalDebts/6) ))
     const fees = Math.ceil(convertedAmt * 0.5)
     payDebtsRandomly(gs.captain, convertedAmt)
-    gs.bounty += Math.ceil(convertedAmt + fees)
+    gs.captain.bounty += Math.ceil(convertedAmt + fees)
     let msg = `The bank isn't happy that you haven't paid your overdue loans of ${totalDebts}CR.<br/>`
     msg += `They have passed a portion of your debt, plus fees on to some rather ruthless collection agencies.<br/>`
     msg += `Your new bounty: ${gs.captain.bounty}CR<br/>`

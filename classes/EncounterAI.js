@@ -116,7 +116,7 @@ class EncounterAI {
         for (let i = 0; i < simulations; i++) {
             const [toX, toY] = [rng(moveArea.x+moveArea.radiusX, moveArea.x-moveArea.radiusX, false), rng(moveArea.y+moveArea.radiusY, moveArea.y-moveArea.radiusY, false)]
             if (!moveArea.containsPoint(toX, toY)) continue
-            const [t1, t2] = attacker.calcAttackAreas(toX, toY)
+            const [t1, t2] = attacker.calcLaserAreas(toX, toY)
             let canAttack = false
             for (const target of targets) {
                 if (t1.containsPoint(target.x, target.y) || t2.containsPoint(target.x, target.y)) {
@@ -142,7 +142,7 @@ class EncounterAI {
         const targets = opposingFleet.activeShips
         const attackableTargets = encounter.calcAttackTargets(ship)
         const rammableTargets = encounter.calcRamTargets(ship)
-        const nearestTarget = this.calcNearestTarget(ship)
+        const nearestTarget = this.calcNearestTarget(ship, opposingFleet.activeShips)
 
         console.log('deciding move for ship with strategy:', { strategy, nearestTarget, attackableTargets, rammableTargets, targets, opposingFleet });
 

@@ -11,7 +11,10 @@ class StarSystem extends SpaceObject {
         this.asteroids = asteroids
     }
 
-    calcNearestPlanet(obj = SpaceObject(), planets = this.planets) {
+    /**
+     * @returns {[Planet, number]} The nearest planet and its distance from the given object.
+     */
+    calcNearestPlanet(obj = new SpaceObject(), planets = this.planets) {
         let nearestDistance = Infinity
         let nearestPlanet = planets[0]
         for (const planet of this.planets) {

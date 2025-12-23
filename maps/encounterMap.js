@@ -159,6 +159,8 @@ class EncounterMap extends BaseMap {
         const {encounter, cvs} = this
         const {ships, activeTurnFleet} = encounter
 
+        const now = Date.now()
+
         //draw objects
         ships.forEach( (ship, index) => {
             let invisible = ship.escaped
@@ -189,10 +191,7 @@ class EncounterMap extends BaseMap {
             
             // Display cloaked ships as white with low alpha
             if (ship.cloakedTurnsRemaining > 0) {
-                cvsShipObject.fillColor[0] = 255
-                cvsShipObject.fillColor[1] = 255
-                cvsShipObject.fillColor[2] = 255
-                cvsShipObject.fillColor[3] = 0.3
+                cvsShipObject.fillColor[3] = 0.1
             } else {
                 cvsShipObject.fillColor[3] = hullRatio
             }
@@ -212,6 +211,14 @@ class EncounterMap extends BaseMap {
             cvsThrusterObject.screenOffsetX = sxo
             cvsThrusterObject.screenOffsetY = syo
             cvsThrusterObject.angle = ship.angle - Math.PI
+            
+            // Oscillate thruster alpha based on engine speed
+            const currentMs = Date.now()
+            const engineSpeed = ship.engine / AVERAGE_SHIP_ENGINE // Normalize engine value
+            const oscillationFreq = 0.005 * (0.005 + engineSpeed) // Faster engines = faster oscillation
+            const alpha = 0.9 + 0.1 * Math.sin(currentMs * oscillationFreq)
+            cvsThrusterObject.fillColor[3] = alpha
+            
             //Object.assign(animThruster, {x: newX, screenOffsetX: engineXOffset, y: newY, screenOffsetY: engineYOffset, angle: action.path.angle-Math.PI})
 
             let fontModifier = null
@@ -227,31 +234,7 @@ class EncounterMap extends BaseMap {
             cvsLabelObject.fontModifier = fontModifier
         })
 
-        // Update combat popup texts
-        const currentMs = Date.now()
-        const popupIdsToRemove = []
-        for (const [id, popup] of this.popups.entries()) {
-            const popupObj = cvs.getObject(id)
-            if (popupObj) {
-                if (currentMs > popup.endMs) {
-                    popupIdsToRemove.push(id)
-                    continue
-                }
-                popupObj.visible = true
-                popupObj.x = popup.x
-                popupObj.y = popup.y
-                popupObj.text = popup.textContent
-                const progress = (currentMs - popup.startMs) / (popup.endMs - popup.startMs)
-                popupObj.screenOffsetY = popup.initialScreenOffsetY - DEFAULT_FONT_SIZE * progress
-                const alpha = 1 + (0.25 - 1) * progress
-                popupObj.fillColor = [...popup.color.slice(0, 3), alpha]
-            }
-        }
-
-        for (const id of popupIdsToRemove) {
-            this.cvs.deleteObject(id)
-            this.popups.delete(id)
-        }
+        this.handleAnimations(now)
 
         cvs.redraw(forceRedraw)
     }
@@ -321,44 +304,58 @@ class EncounterMap extends BaseMap {
                 
                 // Module buttons
                 if (obj.modules.includes(SHIP_MODULES.CLOAK)) {
-                    const onCooldown = obj.moduleCooldowns.getAmount(SHIP_MODULES.CLOAK) > 0
-                    ce({parent:container, tag:'button', innerHTML:'Cloak', disabled: !canAct || onCooldown, onClick: ()=>{
+                    const cooldown = obj.moduleCooldowns.getAmount(SHIP_MODULES.CLOAK)
+                    const onCooldown = cooldown > 0
+                    const label = cooldown > 0 ? `Cloak (${cooldown})` : 'Cloak'
+                    ce({parent:container, tag:'button', innerHTML:label, disabled: !canAct || onCooldown, onClick: ()=>{
                         this.cloakHandler.startTargeting(obj)
                     }})
                 }
                 if (obj.modules.includes(SHIP_MODULES.GRAVITON_BEAM)) {
-                    const onCooldown = obj.moduleCooldowns.getAmount(SHIP_MODULES.GRAVITON_BEAM) > 0
-                    ce({parent:container, tag:'button', innerHTML:'Graviton Beam', disabled: !canAct || onCooldown, onClick: ()=>{
+                    const cooldown = obj.moduleCooldowns.getAmount(SHIP_MODULES.GRAVITON_BEAM)
+                    const onCooldown = cooldown > 0
+                    const label = cooldown > 0 ? `Graviton Beam (${cooldown})` : 'Graviton Beam'
+                    ce({parent:container, tag:'button', innerHTML:label, disabled: !canAct || onCooldown, onClick: ()=>{
                         this.gravitonBeamHandler.startTargeting(obj)
                     }})
                 }
                 if (obj.modules.includes(SHIP_MODULES.WARHEAD)) {
-                    const onCooldown = obj.moduleCooldowns.getAmount(SHIP_MODULES.WARHEAD) > 0
-                    ce({parent:container, tag:'button', innerHTML:'Warhead', disabled: !canAct || onCooldown, onClick: ()=>{
+                    const cooldown = obj.moduleCooldowns.getAmount(SHIP_MODULES.WARHEAD)
+                    const onCooldown = cooldown > 0
+                    const label = cooldown > 0 ? `Warhead (${cooldown})` : 'Warhead'
+                    ce({parent:container, tag:'button', innerHTML:label, disabled: !canAct || onCooldown, onClick: ()=>{
                         this.warheadHandler.startTargeting(obj)
                     }})
                 }
                 if (obj.modules.includes(SHIP_MODULES.EMP_PULSE)) {
-                    const onCooldown = obj.moduleCooldowns.getAmount(SHIP_MODULES.EMP_PULSE) > 0
-                    ce({parent:container, tag:'button', innerHTML:'EMP Pulse', disabled: !canAct || onCooldown, onClick: ()=>{
+                    const cooldown = obj.moduleCooldowns.getAmount(SHIP_MODULES.EMP_PULSE)
+                    const onCooldown = cooldown > 0
+                    const label = cooldown > 0 ? `EMP Pulse (${cooldown})` : 'EMP Pulse'
+                    ce({parent:container, tag:'button', innerHTML:label, disabled: !canAct || onCooldown, onClick: ()=>{
                         this.empPulseHandler.startTargeting(obj)
                     }})
                 }
                 if (obj.modules.includes(SHIP_MODULES.BLINK)) {
-                    const onCooldown = obj.moduleCooldowns.getAmount(SHIP_MODULES.BLINK) > 0
-                    ce({parent:container, tag:'button', innerHTML:'Blink', disabled: !canAct || onCooldown, onClick: ()=>{
+                    const cooldown = obj.moduleCooldowns.getAmount(SHIP_MODULES.BLINK)
+                    const onCooldown = cooldown > 0
+                    const label = cooldown > 0 ? `Blink (${cooldown})` : 'Blink'
+                    ce({parent:container, tag:'button', innerHTML:label, disabled: !canAct || onCooldown, onClick: ()=>{
                         this.blinkHandler.startTargeting(obj)
                     }})
                 }
                 if (obj.modules.includes(SHIP_MODULES.BOOSTER)) {
-                    const onCooldown = obj.moduleCooldowns.getAmount(SHIP_MODULES.BOOSTER) > 0
-                    ce({parent:container, tag:'button', innerHTML:'Booster', disabled: !canAct || onCooldown, onClick: ()=>{
+                    const cooldown = obj.moduleCooldowns.getAmount(SHIP_MODULES.BOOSTER)
+                    const onCooldown = cooldown > 0
+                    const label = cooldown > 0 ? `Booster (${cooldown})` : 'Booster'
+                    ce({parent:container, tag:'button', innerHTML:label, disabled: !canAct || onCooldown, onClick: ()=>{
                         this.boosterHandler.startTargeting(obj)
                     }})
                 }
                 if (obj.modules.includes(SHIP_MODULES.SMOKE_BOMB)) {
-                    const onCooldown = obj.moduleCooldowns.getAmount(SHIP_MODULES.SMOKE_BOMB) > 0
-                    ce({parent:container, tag:'button', innerHTML:'Smoke Bomb', disabled: !canAct || onCooldown, onClick: ()=>{
+                    const cooldown = obj.moduleCooldowns.getAmount(SHIP_MODULES.SMOKE_BOMB)
+                    const onCooldown = cooldown > 0
+                    const label = cooldown > 0 ? `Smoke Bomb (${cooldown})` : 'Smoke Bomb'
+                    ce({parent:container, tag:'button', innerHTML:label, disabled: !canAct || onCooldown, onClick: ()=>{
                         this.smokeBombHandler.startTargeting(obj)
                     }})
                 }
@@ -399,76 +396,6 @@ class EncounterMap extends BaseMap {
         if (ship.numActionsRemaining <= 0) return false
         if (ship.fleet != playerFleet) return false
         return true
-    }
-
-    showPopup(id = 'popup', text = '', x = 0, y = 0, color = COLORS.White, screenOffsetY = -DEFAULT_FONT_SIZE, durationMs = 2000) {
-        console.log('showPopup:', id, text, x, y, color, durationMs)
-        
-        const startMs = Date.now()
-        // Create canvas text object if it doesn't exist
-        if (!this.cvs.getObject(id)) {
-            this.cvs.addText(id, x, y, 0, screenOffsetY, text, color)
-        }
-        
-        // Update or create popup state
-        this.popups.set(id, {
-            textContent: text,
-            x: x,
-            y: y,
-            initialScreenOffsetY: screenOffsetY,
-            color: color,
-            startMs: startMs,
-            endMs: startMs + durationMs
-        })
-    }
-
-    showActionPopup(action = new ShipAction()) {
-        const {actor, target, actorBadMessage, targetBadMessage, actorHullDamage, actorShieldDamage, actorDisabled, actorEscaped, targetHullDamage, targetShieldDamage, targetDisabled, targetEscaped} = action
-        const popupId = `action_${Date.now()}_${Math.random()}`
-        let actorYOffset = -DEFAULT_FONT_SIZE
-        let targetYOffset = -DEFAULT_FONT_SIZE
-
-        if (actorHullDamage > 0) {
-            this.showPopup(`${popupId}_actor_hull`, `${dnc(-actorHullDamage)}hp`, actor.x, actor.y, COLORS.LightGray)
-            actorYOffset -= DEFAULT_FONT_SIZE
-        }
-        if (actorShieldDamage > 0) {
-            this.showPopup(`${popupId}_actor_shield`, `${dnc(-actorShieldDamage)}sp`, actor.x, actor.y, COLORS.Blue, actorYOffset)
-            actorYOffset -= DEFAULT_FONT_SIZE
-        }
-        if (actorDisabled) {
-            this.showPopup(`${popupId}_actor_disabled`, `Disabled!`, actor.x, actor.y, COLORS.LightGray, actorYOffset)
-            actorYOffset -= DEFAULT_FONT_SIZE
-        }
-        else if (actorEscaped) {
-            this.showPopup(`${popupId}_actor_escaped`, `Escaped!`, actor.x, actor.y, COLORS.Orange, actorYOffset)
-            actorYOffset -= DEFAULT_FONT_SIZE
-        }
-        else if (actorBadMessage) {
-            this.showPopup(`${popupId}_actor_bad_message`, actorBadMessage, actor.x, actor.y, COLORS.Red, actorYOffset)
-            actorYOffset -= DEFAULT_FONT_SIZE
-        }
-
-        if (targetHullDamage > 0) {
-            this.showPopup(`${popupId}_target_hull`, `${dnc(-targetHullDamage)}hp`, target.x, target.y, COLORS.LightGray)
-            targetYOffset -= DEFAULT_FONT_SIZE
-        }
-        if (targetShieldDamage > 0) {
-            this.showPopup(`${popupId}_target_shield`, `${dnc(-targetShieldDamage)}sp`, action.target.x, action.target.y, COLORS.Blue, targetYOffset)
-            targetYOffset -= DEFAULT_FONT_SIZE
-        }
-        if (targetDisabled) {
-            this.showPopup(`${popupId}_target_disabled`, `Disabled!`, target.x, target.y, COLORS.LightGray, targetYOffset)
-            targetYOffset -= DEFAULT_FONT_SIZE
-        }
-        else if (targetEscaped) {
-            this.showPopup(`${popupId}_target_escaped`, `Escaped!`, target.x, target.y, COLORS.Orange, targetYOffset)
-            targetYOffset -= DEFAULT_FONT_SIZE
-        }
-        else if (targetBadMessage) {
-            this.showPopup(`${popupId}_target_bad_message`, targetBadMessage, target.x, target.y, COLORS.Red, targetYOffset)
-            targetYOffset -= DEFAULT_FONT_SIZE
-        }
     }
 
     startAnimating() {
@@ -534,7 +461,6 @@ class EncounterMap extends BaseMap {
 
         this.refreshBackground(currentTime/200000) //hack to make stars twinkle at a reasonable speed
         this.refreshCanvas()
-        if (this.uiMode == UI_MODE.Animating) this.handleAnimations(currentTime)
 
         requestAnimationFrame(()=>this.tick())
     }
@@ -575,10 +501,12 @@ class EncounterMap extends BaseMap {
             for (let i = 0; i < encounter.activeTurnFleet.activeShips.length; i++) {
                 const ship = encounter.activeTurnFleet.activeShips[i]
                 if (ship.numActionsRemaining > ship.maxActionsPerTurn) {
-                    this.showPopup(`fast_${i}`, 'Fast!', ship.x, ship.y, COLORS.LightGreen, -DEFAULT_FONT_SIZE)
+                    const txt = this.cvs.addText(`fast_${i}`, ship.x, ship.y, 0, -DEFAULT_FONT_SIZE, 'Fast!', COLORS.LightGreen)
+                    txt.setDurationMs(1000)
                 }
                 else if (ship.numActionsRemaining < ship.maxActionsPerTurn) {
-                    this.showPopup(`slow_${i}`, 'Slow!', ship.x, ship.y, COLORS.LightRed, -DEFAULT_FONT_SIZE)
+                    const txt = this.cvs.addText(`slow_${i}`, ship.x, ship.y, 0, -DEFAULT_FONT_SIZE, 'Slow!', COLORS.LightRed)
+                    txt.setDurationMs(1000) 
                 }
             }
             this.refreshLogic()
@@ -604,6 +532,9 @@ class EncounterMap extends BaseMap {
         else gs.encounter.encounterType.onStart()
     }
 }
+
+
+
 
 
 

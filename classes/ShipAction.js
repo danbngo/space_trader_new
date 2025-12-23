@@ -1,14 +1,18 @@
 class ShipAction {
-    constructor(encounter = new Encounter(), actor = new Ship(), actionType = MOVE_TYPES_ALL[0], target = null, toX = undefined, toY = undefined, startX = undefined, startY = undefined) {
-        console.log('ShipAction.constructor', { encounter, actor, actionType, target, toX, toY, startX, startY });
+    constructor(encounter = new Encounter(), actor = new Ship(), actionType = MOVE_TYPES_ALL[0], target = null, toX = undefined, toY = undefined, targetToX = undefined, targetToY = undefined) {
+        console.log('ShipAction.constructor', { encounter, actor, actionType, target, toX, toY });
         this.encounter = encounter
         this.actionType = actionType
         this.actor = actor
         this.target = target
         this.toX = toX !== undefined ? toX : target ? target.x : actor.x
         this.toY = toY !== undefined ? toY : target ? target.y : actor.y
-        this.startX = startX !== undefined ? startX : actor.x
-        this.startY = startY !== undefined ? startY : actor.y
+        this.targetToX = targetToX
+        this.targetToY = targetToY
+        this.startX = actor.x
+        this.startY = actor.y
+        this.targetStartX = target ? target.x : undefined
+        this.targetStartY = target ? target.y : undefined
         this.path = new Path(this.startX, this.startY, this.toX, this.toY)
         this.angle = this.path.angle
         this.completed = false
@@ -24,6 +28,8 @@ class ShipAction {
         this.actorTurnComplete = null
         this.actorBadMessage = null
         this.targetBadMessage = null
+        this.actorGoodMessage = null
+        this.targetGoodMessage = null
     }
 
     execute() {
@@ -139,20 +145,34 @@ class ShipAction {
     static booster(action = new ShipAction()) {
         console.log('ShipAction.booster', { action });
         const ship = action.actor
-        const boostDistance = 10
-        
-        // Move ship in the direction it's facing
-        const [dx, dy] = rotatePoint(boostDistance, 0, 0, 0, ship.angle)
-        const newX = ship.x + dx
-        const newY = ship.y + dy
+        const startX = ship.x
+        const startY = ship.y
+        const newX = action.toX
+        const newY = action.toY
         
         // Find enemy ships along the boost path and spin them
         const spinRadius = 10 * ship.radius
         const enemyShips = action.encounter.ships.filter(s => s.fleet !== ship.fleet && !s.isDisabled())
         
+        // Check multiple points along the path
+        const numChecks = 10
         for (const enemy of enemyShips) {
-            const distToEnemy = calcDistance(ship.x, ship.y, enemy.x, enemy.y)
-            if (distToEnemy <= spinRadius) {
+            let isInPath = false
+            
+            // Check distance from enemy to multiple points along the path
+            for (let i = 0; i <= numChecks; i++) {
+                const progress = i / numChecks
+                const checkX = startX + (newX - startX) * progress
+                const checkY = startY + (newY - startY) * progress
+                const distToEnemy = calcDistance(checkX, checkY, enemy.x, enemy.y)
+                
+                if (distToEnemy <= spinRadius) {
+                    isInPath = true
+                    break
+                }
+            }
+            
+            if (isInPath) {
                 // Spin the enemy ship to a random angle
                 enemy.angle = rng(Math.PI * 2, 0, false)
             }
@@ -173,7 +193,7 @@ class ShipAction {
     static blink(action = new ShipAction()) {
         console.log('ShipAction.blink', { action });
         const ship = action.actor
-        const blinkDistance = 5
+        const blinkDistance = 25
         
         // Teleport to random nearby position
         const randomAngle = rng(Math.PI * 2, 0, false)
@@ -211,7 +231,7 @@ class ShipAction {
         const attacker = action.actor
         const explosionX = action.toX
         const explosionY = action.toY
-        const explosionRadius = attacker.maxAttackDistance * 0.5
+        const explosionRadius = attacker.maxAttackDistance * 0.25
         
         // Find all ships within explosion radius
         const affectedShips = action.encounter.ships.filter(ship => {
@@ -225,12 +245,12 @@ class ShipAction {
             const dist = calcDistance(explosionX, explosionY, ship.x, ship.y)
             // Damage falls off with distance
             const damageRatio = 1 - (dist / explosionRadius)
-            const damage = attacker.maxLaserDamage * 2 * damageRatio
+            const damage = 20 * damageRatio //attacker.maxLaserDamage * 2 * damageRatio
             
             ship.takeDamage(damage)
             
             // Apply knockback
-            const knockbackDistance = explosionRadius * 0.5 * damageRatio
+            const knockbackDistance = 0.5 * damageRatio
             const angle = Math.atan2(ship.y - explosionY, ship.x - explosionX)
             const [kx, ky] = rotatePoint(knockbackDistance, 0, 0, 0, angle)
             ship.x += kx
@@ -307,4 +327,68 @@ class ShipAction {
         // Set cooldown
         attacker.moduleCooldowns.setAmount(SHIP_MODULES.GRAVITON_BEAM, SHIP_MODULES.GRAVITON_BEAM.cooldown)
     }
+
+    addPopups(cvs = new CanvasWrapper()) {
+        const {actor, target, actorBadMessage, targetBadMessage, targetGoodMessage, actorGoodMessage, actorHullDamage, actorShieldDamage, actorDisabled, actorEscaped, targetHullDamage, targetShieldDamage, targetDisabled, targetEscaped} = this
+        const popupId = `action_${Date.now()}_${Math.random()}`
+        let actorYOffset = -DEFAULT_FONT_SIZE
+        let targetYOffset = -DEFAULT_FONT_SIZE
+
+        const result = []
+
+        if (actorHullDamage > 0) {
+            result.push(cvs.addText(`${popupId}_actor_hull`, actor.x, actor.y, 0, actorYOffset, `${dnc(-actorHullDamage)}hp`, COLORS.LightGray))
+            actorYOffset -= DEFAULT_FONT_SIZE
+        }
+        if (actorShieldDamage > 0) {
+            result.push(cvs.addText(`${popupId}_actor_shield`, actor.x, actor.y, 0, actorYOffset, `${dnc(-actorShieldDamage)}sp`, COLORS.Blue))
+            actorYOffset -= DEFAULT_FONT_SIZE
+        }
+        if (actorDisabled) {
+            result.push(cvs.addText(`${popupId}_actor_disabled`, actor.x, actor.y, 0, actorYOffset, `Disabled!`, COLORS.LightGray))
+            actorYOffset -= DEFAULT_FONT_SIZE
+        }
+        else if (actorEscaped) {
+            result.push(cvs.addText(`${popupId}_actor_escaped`, actor.x, actor.y, 0, actorYOffset, `Escaped!`, COLORS.Orange))
+            actorYOffset -= DEFAULT_FONT_SIZE
+        }
+        else if (actorBadMessage) {
+            result.push(cvs.addText(`${popupId}_actor_bad_message`, actor.x, actor.y, 0, actorYOffset, actorBadMessage, COLORS.Red))
+            actorYOffset -= DEFAULT_FONT_SIZE
+        }
+        else if (actorGoodMessage) {
+            result.push(cvs.addText(`${popupId}_actor_good_message`, actor.x, actor.y, 0, actorYOffset, actorGoodMessage, COLORS.LightGreen))
+            actorYOffset -= DEFAULT_FONT_SIZE
+        }
+
+        if (targetHullDamage > 0) {
+            result.push(cvs.addText(`${popupId}_target_hull`, target.x, target.y, 0, targetYOffset, `${dnc(-targetHullDamage)}hp`, COLORS.LightGray))
+            targetYOffset -= DEFAULT_FONT_SIZE
+        }
+        if (targetShieldDamage > 0) {
+            result.push(cvs.addText(`${popupId}_target_shield`, target.x, target.y, 0, targetYOffset, `${dnc(-targetShieldDamage)}sp`, COLORS.Blue))
+            targetYOffset -= DEFAULT_FONT_SIZE
+        }
+        if (targetDisabled) {
+            result.push(cvs.addText(`${popupId}_target_disabled`, target.x, target.y, 0, targetYOffset, `Disabled!`, COLORS.LightGray))
+            targetYOffset -= DEFAULT_FONT_SIZE
+        }
+        else if (targetEscaped) {
+            result.push(cvs.addText(`${popupId}_target_escaped`, target.x, target.y, 0, targetYOffset, `Escaped!`, COLORS.Orange))
+            targetYOffset -= DEFAULT_FONT_SIZE
+        }
+        else if (targetBadMessage) {
+            result.push(cvs.addText(`${popupId}_target_bad_message`, target.x, target.y, 0, targetYOffset, targetBadMessage, COLORS.Red))
+            targetYOffset -= DEFAULT_FONT_SIZE
+        }
+        else if (targetGoodMessage) {
+            result.push(cvs.addText(`${popupId}_target_good_message`, target.x, target.y, 0, targetYOffset, targetGoodMessage, COLORS.LightGreen))
+            targetYOffset -= DEFAULT_FONT_SIZE
+        }
+
+        for (const r of result) r.setDurationMs(1000)
+
+        return result
+    }
+
 }

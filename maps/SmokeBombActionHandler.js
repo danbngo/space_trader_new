@@ -33,7 +33,9 @@ class SmokeBombActionHandler extends ActionHandler {
 
     attempt(attacker = new Ship(), target = null, x = 0, y = 0) {
         console.log('SmokeBombActionHandler.attempt', { attacker, x, y });
-        this.execute(new ShipAction(this.encounter, attacker, MOVE_TYPES.SmokeBomb, null, x, y))
+        const action = new ShipAction(this.encounter, attacker, MOVE_TYPES.SmokeBomb, null, x, y)
+        action.actorGoodMessage = 'Smoke Bomb!'
+        this.execute(action)
     }
 
     execute(action = new ShipAction()) {
@@ -50,9 +52,8 @@ class SmokeBombActionHandler extends ActionHandler {
             smokeCircle.size = maxRadius * progressRatio
             smokeCircle.fillColor[3] = 0.5 * (1 - progressRatio * 0.5)
         }, () => {
-            action.execute()
             this.cvs.deleteObject(smokeCircle)
-            this.encounterMap.stopAnimating()
+            this.completeAction(action)
         }))
         
         this.startAnimating()

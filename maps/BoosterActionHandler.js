@@ -17,18 +17,20 @@ class BoosterActionHandler extends ActionHandler {
 
     attempt(attacker = new Ship(), target = null, x = 0, y = 0) {
         console.log('BoosterActionHandler.attempt', { attacker });
-        const boostDistance = 10
+        const boostDistance = attacker.maxMoveDistance * 1.5
         const [dx, dy] = rotatePoint(boostDistance, 0, 0, 0, attacker.angle)
         const toX = attacker.x + dx
         const toY = attacker.y + dy
-        this.execute(new ShipAction(this.encounter, attacker, MOVE_TYPES.Booster, null, toX, toY))
+        const action = new ShipAction(this.encounter, attacker, MOVE_TYPES.Booster, null, toX, toY)
+        action.actorGoodMessage = 'Boost!'
+        this.execute(action)
     }
 
     execute(action = new ShipAction()) {
         console.log('BoosterActionHandler.execute', { action });
         this.encounterMap.animatingAction = action
         const animations = this.encounterMap.animations
-        const boostDuration = 600
+        const boostDuration = 1000
         const path = action.path
         const attacker = action.actor
         
@@ -40,9 +42,8 @@ class BoosterActionHandler extends ActionHandler {
             Object.assign(attacker, {x: newX, y: newY, angle: path.angle})
             trailLine.strokeColor[3] = 1 - progressRatio
         }, () => {
-            action.execute()
             this.cvs.deleteObject(trailLine)
-            this.encounterMap.stopAnimating()
+            this.completeAction(action)
         }))
         
         this.startAnimating()

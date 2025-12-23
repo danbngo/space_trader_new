@@ -162,7 +162,7 @@ class Ship {
         return this.restoreShields(rechargeAmt)
     }
 
-    calcAttackAreas(overrideX = this.x, overrideY = this.y) {
+    calcLaserAreas(overrideX = this.x, overrideY = this.y) {
         const attackRange = 1+this.maxAttackDistance
         const targetingAngle = this.angle+Math.PI/2
         const targetingAngle2 = this.angle-Math.PI/2
@@ -184,9 +184,9 @@ class Ship {
         return ellipse
     }
 
-    calcWarheadArea(overrideX = this.x, overrideY = this.y) {
+    calcBombArea(overrideX = this.x, overrideY = this.y) {
         const targetingAngle = this.angle
-        const attackRange = this.maxAttackDistance
+        const attackRange = this.maxAttackDistance/2
         // Position circle slightly in front of ship
         const [cx, cy] = rotatePoint(overrideX + attackRange * 1.2, overrideY, overrideX, overrideY, targetingAngle)
         return new Circle(cx, cy, attackRange)
@@ -196,8 +196,8 @@ class Ship {
         const attackRange = 1+this.maxAttackDistance
         const targetingAngle = this.angle
         // Position triangle in front of ship
-        const [tx, ty] = rotatePoint(overrideX + attackRange, overrideY, overrideX, overrideY, targetingAngle)
-        const targetingTriangle = new Triangle(tx, ty, attackRange*2, Triangle.calcEquilateralTriangleHeight(attackRange), targetingAngle)
+        const [tx, ty] = rotatePoint(overrideX + attackRange/2, overrideY, overrideX, overrideY, targetingAngle)
+        const targetingTriangle = new Triangle(tx, ty, attackRange*2, Triangle.calcEquilateralTriangleHeight(attackRange), targetingAngle+Math.PI)
         return targetingTriangle
     }
 }

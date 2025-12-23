@@ -11,13 +11,13 @@ class WarheadActionHandler extends ActionHandler {
         this.encounterMap.targetingAreas = []
         
         // Get targeting area (circle in front of ship)
-        const targetArea = attacker.calcWarheadArea()
+        const targetArea = attacker.calcBombArea()
         
         // Show the targeting area boundary
         const targetingAreaCircle = this.cvs.addEmptyCircle('targetingarea', targetArea.x, targetArea.y, targetArea.radius, 12, [0,255,0,0.3], 2)
         
         // Show the explosion preview (smaller circle that follows mouse)
-        const explosionRadius = attacker.maxAttackDistance * 0.5
+        const explosionRadius = attacker.maxAttackDistance * 0.25
         const targetingCvsCircle = this.cvs.addEmptyCircle('targetingcircle', targetArea.x, targetArea.y, explosionRadius, 12, COLORS.Orange, 2)
         
         this.cvs.onClickWorldXY = (x, y) => this.attempt(attacker, targetArea, x, y)
@@ -41,7 +41,9 @@ class WarheadActionHandler extends ActionHandler {
         if (!targetArea.containsPoint(x, y)) {
             return
         }
-        this.execute(new ShipAction(this.encounter, attacker, MOVE_TYPES.Warhead, null, x, y))
+        const action = new ShipAction(this.encounter, attacker, MOVE_TYPES.Warhead, null, x, y)
+        action.actorGoodMessage = 'Warhead!'
+        this.execute(action)
     }
 
     execute(action = new ShipAction()) {
@@ -52,15 +54,14 @@ class WarheadActionHandler extends ActionHandler {
         
         // Expanding explosion circle
         const explosionCircle = this.cvs.addFilledCircle('warheadexplosion', action.toX, action.toY, 0, 16, COLORS.Orange, 0)
-        const maxRadius = action.actor.maxAttackDistance * 0.5
+        const maxRadius = action.actor.maxAttackDistance * 0.25
         
         animations.push(new Loop(explosionDuration, (progressRatio) => {
             explosionCircle.size = maxRadius * progressRatio
             explosionCircle.fillColor[3] = 1 - progressRatio
         }, () => {
-            action.execute()
             this.cvs.deleteObject(explosionCircle)
-            this.encounterMap.stopAnimating()
+            this.completeAction(action)
         }))
         
         this.startAnimating()

@@ -1,7 +1,38 @@
-// @ts-check
+/**
+ * @fileoverview Defines various ship types used in the game.
+ * @module types/SHIP_TYPES
+ */
 
+/**
+ * @class ShipType
+ * @classdesc Represents a type of ship with specific attributes.
+ * @property {string} name - The name of the ship type.
+ * @property {string} shape - The shape of the ship (from SHAPES enum).
+ * @property {number} hull - The hull strength of the ship.
+ * @property {number} shields - The shield strength of the ship.
+ * @property {number} lasers - The laser power of the ship.
+ * @property {number} engine - The engine power of the ship.
+ * @property {number} cargoSpace - The cargo space of the ship.
+ * @property {number} radars - The radar capability of the ship.
+ * @property {Array} modules - The modules equipped on the ship.
+ * @property {number} maxNumModules - The maximum number of modules the ship can have.
+ * @property {number} maxActionsPerTurn - The maximum number of actions the ship can perform per turn.
+ * @constructor
+ * @param {string} name - The name of the ship type.
+ * @param {SHAPES} shape - The shape of the ship.
+ * @param {number} hull - The hull strength of the ship.
+ * @param {number} shields - The shield strength of the ship.
+ * @param {number} lasers - The laser power of the ship.
+ * @param {number} engine - The engine power of the ship.
+ * @param {number} cargoSpace - The cargo space of the ship.
+ * @param {number} radars - The radar capability of the ship.
+ * @param {Array} modules - The modules equipped on the ship.
+ * @param {number} maxNumModules - The maximum number of modules the ship can have.
+ * @param {number} maxActionsPerTurn - The maximum number of actions the ship can perform per turn.
+ * @returns {ShipType} The created ShipType instance.
+ */
 class ShipType {
-    constructor(name = '', shape = SHAPES.Triangle, hull = 1, shields = 1, lasers = 1, engine = 1, cargoSpace = 1, radars = 1, modules = [], maxNumModules = 0, maxActionsPerTurn = SHIP_NUM_MOVES_PER_TURN) {
+    constructor(name = '', shape, hull = 1, shields = 1, lasers = 1, engine = 1, cargoSpace = 1, radars = 1, modules = [], maxNumModules = 0, maxActionsPerTurn = SHIP_NUM_MOVES_PER_TURN) {
         this.name = name
         this.shape = shape;
         this.hull = hull

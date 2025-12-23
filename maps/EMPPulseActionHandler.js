@@ -14,7 +14,9 @@ class EMPPulseActionHandler extends ActionHandler {
 
     attempt(ship = new Ship()) {
         console.log('EMPPulseActionHandler.attempt', { ship });
-        this.execute(new ShipAction(this.encounter, ship, MOVE_TYPES.EMPPulse))
+        const action = new ShipAction(this.encounter, ship, MOVE_TYPES.EMPPulse)
+        action.actorGoodMessage = 'EMP Pulse!'
+        this.execute(action)
     }
 
     execute(action = new ShipAction()) {
@@ -32,9 +34,8 @@ class EMPPulseActionHandler extends ActionHandler {
             pulseRing.size = maxRadius * progressRatio
             pulseRing.strokeColor[3] = 1 - progressRatio
         }, () => {
-            action.execute()
             this.cvs.deleteObject(pulseRing)
-            this.encounterMap.stopAnimating()
+            this.completeAction(action)
         }))
         
         this.startAnimating()

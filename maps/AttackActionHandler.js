@@ -10,7 +10,7 @@ class AttackActionHandler extends ActionHandler {
         this.encounterMap.uiMode = UI_MODE.Targeting
         this.encounterMap.targetingAreas = []
         
-        const [t1, t2] = attacker.calcAttackAreas()
+        const [t1, t2] = attacker.calcLaserAreas()
         const targetingCvsObject1 = this.cvs.addTriangle('targetingarea', t1.x, t1.y, t1.base, t1.height, 4, [0,255,0,0.1], t1.angle)
         const targetingCvsObject2 = this.cvs.addTriangle('targetingarea2', t2.x, t2.y, t2.base, t2.height, 4, [0,255,0,0.1], t2.angle)
         const targetingCvsCircle = this.cvs.addEmptyCircle('targetingcircle', 0, 0, 0, 12, COLORS.LightGreen, 2)
@@ -55,11 +55,8 @@ class AttackActionHandler extends ActionHandler {
             const [x, y] = path.positionAtProgress(Math.max(0, progressRatio*1.25 - 0.25))
             Object.assign(animLine, {x, y, x2, y2})
         }, ()=>{
-            action.execute()
             this.cvs.deleteObject(animLine)
-            if (action.actor.fleet == gs.fleet) this.encounterMap.selectedObject = action.actor
-            this.encounterMap.showActionPopup(action)
-            this.encounterMap.stopAnimating()
+            this.completeAction(action)
         }))
         
         this.startAnimating()

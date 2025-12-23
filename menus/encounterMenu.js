@@ -576,7 +576,7 @@ function showFineOrJailModal(fine = 0) {
     const {fleetName} = gs.encounter
     const fineFromBounty = Math.ceil(Math.min(Math.max(gs.captain.bounty*Math.random(),100), gs.captain.bounty))
     const jailDays = Math.round(JAIL_DAYS_PER_1000CR_FINE*(fine+fineFromBounty)/1000) //1 day of jail time per 1000CR of fine
-    gs.bounty -= fineFromBounty
+    gs.captain.bounty -= fineFromBounty
 
     let msg = ''
     if (fineFromBounty) msg += `The ${fleetName} are aware of some of the bounties on your head, to the tune of ${fineFromBounty}CR.<br/>`
@@ -587,16 +587,16 @@ function showFineOrJailModal(fine = 0) {
             gs.credits -= (fine + fineFromBounty)
             msg += `You pay the fine of ${fine+fineFromBounty}CR.<br/>`
             msg += `Your remaining CR: ${gs.credits}<br/>`
-            if (fineFromBounty) msg += `Your bounty has been reduced to: ${gs.bounty}CR.<br/>`
+            if (fineFromBounty) msg += `Your bounty has been reduced to: ${gs.captain.bounty}CR.<br/>`
             showModal(fleetName, msg, [['Continue', ()=>endEncounter()]])
         }, gs.credits >= fine + fineFromBounty],
         ['Serve Jail Time', ()=>{
-            const nearestPlanet = gs.starSystem.calcNearestPlanet(gs.fleet)
+            const [nearestPlanet] = gs.system.calcNearestPlanet(gs.fleet)
             gs.fleet.dock(nearestPlanet)
             gs.year += jailDays / 365.0
             msg += `The ${fleetName} take you to the nearest planet, ${nearestPlanet.name}.<br/>`
             msg += `You serve ${describeTimespan(jailDays/365)} in jail.<br/>`
-            if (fineFromBounty) msg += `Your bounty has been reduced to: ${gs.bounty}CR.<br/>`
+            if (fineFromBounty) msg += `Your bounty has been reduced to: ${gs.captain.bounty}CR.<br/>`
             showModal(fleetName, msg, [['Continue', ()=>endEncounter()]])
         }],
     ])

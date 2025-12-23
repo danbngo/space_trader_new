@@ -19,9 +19,9 @@ class SpaceObject {
     }
     detachFromParent() {
         if (!this.parent) return
-        const newChildren = new Set(parent.children)
+        const newChildren = new Set(this.parent.children)
         newChildren.delete(this)
-        parent.children = Array.from(newChildren)
+        this.parent.children = Array.from(newChildren)
         this.parent = undefined
     }
 }
@@ -97,8 +97,15 @@ class Planet extends OrbitingObject {
     }
 }
 
+/**
+ * @extends {OrbitingObject}
+ * @param {ASTEROID_BELT_TYPES} beltType - The type of the asteroid belt.
+ * @param {number[]} color - The color of the asteroid belt.
+ * @param {number} radius - The radius of the asteroid belt.
+ * @property {Orbit} orbit - The orbit of the asteroid belt.
+ */
 class AsteroidBelt extends OrbitingObject {
-    constructor(name = "Unnamed", beltType = ASTEROID_BELT_TYPES.Rocky, color = COLORS.White, radius = 0, x = 0, y = 0, orbit = null) {
+    constructor(name = "Unnamed", beltType, color = COLORS.White, radius = 0, x = 0, y = 0, orbit = null) {
         super(name, color, radius, x, y, orbit);
         this.beltType = beltType
     }

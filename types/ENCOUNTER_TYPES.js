@@ -1,7 +1,40 @@
 
+/**
+ * @fileoverview Defines various encounter types for the game.
+ * @module types/ENCOUNTER_TYPES
+ */
 
+
+/**
+ * @class EncounterType
+ * @classdesc Represents a type of encounter in the game.
+ * @property {string} name - The name of the encounter type.
+ * @property {number[]} enemyColor - The color associated with the enemy fleet.
+ * @property {string} description - A brief description of the encounter type.
+ * @property {FLEET_TYPES} fleetType - The type of fleet associated with the encounter.
+ * @property {AI_TYPES} aiType - The AI type used for the encounter.
+ * @property {FORMATION_TYPES} formationType - The formation type of the encounter.
+ * @property {function} onStart - Function to execute when the encounter starts.
+ * @property {function} onVictory - Function to execute when the player wins the encounter.
+ * @property {function} onDefeat - Function to execute when the player loses the encounter.
+ * @property {function} onEscape - Function to execute when the player escapes the encounter.
+ * @property {function} onSurrender - Function to execute when the player surrenders in the encounter.
+ * @property {function} onEndTurn - Function to execute at the end of each turn in the encounter.
+ * @constructor
+ * @param {string} name - The name of the encounter type.
+ * @param {number[]} enemyColor - The color associated with the enemy fleet.
+ * @param {string} description - A brief description of the encounter type.
+ * @param {FLEET_TYPES} fleetType - The type of fleet associated with the encounter.
+ * @param {AI_TYPES} aiType - The AI type used for the encounter.
+ * @param {FORMATION_TYPES} formationType - The formation type of the encounter.
+ * @param {function} onStart - Function to execute when the encounter starts.
+ * @param {function} onVictory - Function to execute when the player wins the encounter.
+ * @param {function} onDefeat - Function to execute when the player loses the encounter.
+ * @param {function} onEscape - Function to execute when the player escapes the encounter.
+ * @param {function} onSurrender - Function to execute when the player surrenders in the encounter.
+ */
 class EncounterType {
-    constructor(name = '', enemyColor = COLORS.LightRed, description = '', fleetType = FLEET_TYPES_ALL[0], aiType = AI_TYPES.Ship, formationType = FORMATION_TYPES.FaceOff, onStart = ()=>{}, onVictory = ()=>{}, onDefeat = ()=>{}, onEscape = ()=>{}, onSurrender = ()=>{}) {
+    constructor(name = '', enemyColor = COLORS.LightRed, description = '', fleetType = FLEET_TYPES_ALL[0], aiType, formationType, onStart = ()=>{}, onVictory = ()=>{}, onDefeat = ()=>{}, onEscape = ()=>{}, onSurrender = ()=>{}) {
         this.name = name;
         this.enemyColor = enemyColor;
         this.description = description;
@@ -25,9 +58,9 @@ const ENCOUNTER_TYPES = {
                     ['View', ()=>closeModal()],
                     ['Bypass', ()=>endEncounter()],
                     ['Hail', ()=>{
-                        gs.luck[0] = 0
+                        gs.encounter.luck[0] = 0
                         gs.encounter.encounterType.onStart()
-                    }]
+                    }],
                     ['Sneak Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, true)],
                 ])
             }
@@ -51,9 +84,9 @@ const ENCOUNTER_TYPES = {
                     ['View', ()=>closeModal()],
                     ['Bypass', ()=>endEncounter()],
                     ['Hail', ()=>{
-                        gs.luck[0] = 0
+                        gs.encounter.luck[0] = 0
                         gs.encounter.encounterType.onStart()
-                    }]
+                    }],
                     ['Sneak Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, true)],
                 ])
             }
@@ -77,9 +110,9 @@ const ENCOUNTER_TYPES = {
                     ['View', ()=>closeModal()],
                     ['Bypass', ()=>endEncounter()],
                     ['Hail', ()=>{
-                        gs.luck[0] = 0
+                        gs.encounter.luck[0] = 0
                         gs.encounter.encounterType.onStart()
-                    }]
+                    }],
                     ['Sneak Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, true)],
                 ])
             }
@@ -111,9 +144,9 @@ const ENCOUNTER_TYPES = {
                     ['View', ()=>closeModal()],
                     ['Bypass', ()=>endEncounter()],
                     ['Hail', ()=>{
-                        gs.luck[0] = 0
+                        gs.encounter.luck[0] = 0
                         gs.encounter.encounterType.onStart()
-                    }]
+                    }],
                     ['Sneak Attack', ()=>showPlayerAttackFleetModal(1, 0, false, true)],
                 ])
             }
@@ -145,9 +178,9 @@ const ENCOUNTER_TYPES = {
                     ['View', ()=>closeModal()],
                     ['Bypass', ()=>endEncounter()],
                     ['Hail', ()=>{
-                        gs.luck[0] = 0
+                        gs.encounter.luck[0] = 0
                         gs.encounter.encounterType.onStart()
-                    }]
+                    }],
                     ['Sneak Attack', ()=>showPlayerAttackFleetModal(1, 0, false, false)],
                 ])
             }
@@ -178,7 +211,7 @@ const ENCOUNTER_TYPES = {
                     ['View', ()=>closeModal()],
                     ['Bypass', ()=>endEncounter()],
                     ['Hail', ()=>{
-                        gs.luck[0] = 0
+                        gs.encounter.luck[0] = 0
                         gs.encounter.encounterType.onStart()
                     }],
                     ['Sneak Attack', ()=>showPlayerAttackFleetModal(-2, 2, false, false)],
@@ -225,14 +258,14 @@ const ENCOUNTER_TYPES = {
                     ['View', ()=>closeModal()],
                     ['Bypass', ()=>endEncounter()],
                     ['Hail', ()=>{
-                        gs.luck[0] = 0
+                        gs.encounter.luck[0] = 0
                         gs.encounter.encounterType.onStart()
-                    }]
+                    }],
                     ['Sneak Attack', ()=>showPlayerAttackFleetModal(-2, 2, false, false)],
                 ])
             }
             else if (gs.encounter.luck[1]*gs.captain.fame/gs.captain.infamy > 1 && gs.captain.fame > 100) {
-                showModal(gs.encounter.fleetName, `The soldiers salute you over comms, having heard of your good deeds.<br/>${gs.captain.inamy > 10 ? `In their view, the good you've done far outweighs the bad.` : ''}`, [
+                showModal(gs.encounter.fleetName, `The soldiers salute you over comms, having heard of your good deeds.<br/>${gs.captain.infamy > 10 ? `In their view, the good you've done far outweighs the bad.` : ''}`, [
                     ['View', ()=>closeModal()],
                     ['Ignore', ()=>endEncounter()],
                     ['Attack', ()=>showPlayerAttackFleetModal(-2, 2, false, false)],
@@ -265,9 +298,9 @@ const ENCOUNTER_TYPES = {
                     ['View', ()=>closeModal()],
                     ['Bypass', ()=>endEncounter()],
                     ['Hail', ()=>{
-                        gs.luck[0] = 0
+                        gs.encounter.luck[0] = 0
                         gs.encounter.encounterType.onStart()
-                    }]
+                    }],
                     ['Sneak Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, false)],
                 ])
             }

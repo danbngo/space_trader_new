@@ -34,11 +34,8 @@ class RechargeActionHandler extends ActionHandler {
             animCircle.radiusX = ship.radius*1.5 * (progressRatio)
             animCircle.radiusY = ship.radius*1.5 * (progressRatio)
         }, ()=>{
-            action.execute()
             this.cvs.deleteObject(animCircle)
-            if (action.actor.fleet == gs.fleet) this.encounterMap.selectedObject = action.actor
-            this.encounterMap.showActionPopup(action)
-            this.encounterMap.stopAnimating()
+            this.completeAction(action)
         }))
         
         this.startAnimating()

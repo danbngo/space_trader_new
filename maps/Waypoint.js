@@ -9,7 +9,7 @@ class Waypoint {
     constructor(x = 0, y = 0) {
         this.x = x
         this.y = y
-        this.name = `Coordinates (${roundToPlaces(x, 1)}, ${roundToPlaces(y, 1)})`
+        this.name = `${roundToPlaces(x, 1)}, ${roundToPlaces(y, 1)}`
         /** @type {number[]} */
         this.color = COLORS.Cyan
         this.isWaypoint = true

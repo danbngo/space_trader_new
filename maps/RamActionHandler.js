@@ -55,11 +55,8 @@ class RamActionHandler extends ActionHandler {
             const [newX, newY] = path.positionAtProgress(progressRatio)
             Object.assign(attacker, {x: newX, y: newY, angle: path.angle})
         }, ()=>{
-            action.execute()
             this.cvs.deleteObject(animLine)
-            if (action.actor.fleet == gs.fleet) this.encounterMap.selectedObject = action.actor
-            this.encounterMap.showActionPopup(action)
-            this.encounterMap.stopAnimating()
+            this.completeAction(action)
         }))
         
         this.startAnimating()

@@ -83,7 +83,7 @@ function showShipyardBuyMenu(shipyard = new Shipyard()) {
     const {fleet} = gs
     const isDocked = fleet.location == planet
     const rebuildMenu = ()=>showShipyardBuyMenu(shipyard)
-    const leave = ()=>leaveShipyard(shipyard, planet)
+    const leave = ()=>leaveShipyard(shipyard)
 
     function buyShip(ship = new Ship()) {
         const buyPrice = shipyard.calcBuyPrice(ship)
@@ -174,7 +174,7 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
         showModal(
             `Sell ${ship.name}?`,
             ce({children:[
-                !shipyardCanAfford ? `${colorSpan(WARNING, 'yellow', true)}: Your ${ship.name} is worth ${salePrice}CR but the shipyard only has ${shipyard.credits} credits!` : ``,
+                !shipyardCanAfford ? `${colorSpan('Warning', 'yellow', true)}: Your ${ship.name} is worth ${salePrice}CR but the shipyard only has ${shipyard.credits} credits!` : ``,
                 `Are you sure you want to sell your ${ship.name} for ${Math.min(salePrice, shipyard.credits)} credits?`,
                 `Sale Price: ${finalSale}CR ${officersShare ? `(-${officersShare}CR for officers)` : ''}`,
                 `CR After Sale: ${gs.credits+finalSale}CR`,
@@ -191,7 +191,7 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
         ce({children:[
             `<b>Your ships</b>`,
             createSellShipMenu(fleet.ships, shipyard, (ship)=>onSelectPlayerShip(ship)),
-            `Your # ships: ${fleet.ships.length}/${fleet.numPilots}` + fleet.ships.length < 2 ? colorSpan(` (You can't sell your last ship!)`, 'Yellow') : '',
+            `Your # ships: ${fleet.ships.length}/${fleet.numPilots}` + (fleet.ships.length < 2 ? colorSpan(` (You can't sell your last ship!)`, 'Yellow') : ''),
             colorSpan(`Your credits: ${gs.credits}`, gs.credits == 0 ? '#f00' : ''),
             colorSpan(`Shipyard credits: ${shipyard.credits}`, shipyard.credits == 0 ? '#f00' : ''),
             `Sell Tax: ${statColorSpan(roundToPlaces(100*shipyard.baseRake/(shipyard.baseRake+1), 2), 2/(shipyard.baseRake+1),true)}%`,

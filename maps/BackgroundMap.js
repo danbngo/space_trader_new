@@ -1,5 +1,6 @@
-class BackgroundMap {
+class BackgroundMap extends BaseMap {
     constructor() {
+        super()
         this.lastTickMs = Date.now()
         this.gameYearsPerMs = 1/365/24/60 * 2
 
@@ -36,7 +37,7 @@ class BackgroundMap {
         const {bgStars, cvs} = this
         cvs.clear()
         bgStars.forEach( (bgStar, index) => {
-            cvs.addPixel(bgStar.x, bgStar.y, bgStar.color, bgStar.size)
+            cvs.addPixel(bgStar.x, bgStar.y, bgStar.color, bgStar.radius)
         });
         cvs.recalculateDrawOrder()
     }
@@ -64,7 +65,7 @@ class BackgroundMap {
             const pixel = cvs.pixels[index]
             pixel.x = bgStar.x
             pixel.y = bgStar.y
-            pixel.a = bgStar.a
+            pixel.a = bgStar.color[3]
         });
     }
 

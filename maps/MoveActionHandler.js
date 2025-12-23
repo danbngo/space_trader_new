@@ -50,11 +50,8 @@ class MoveActionHandler extends ActionHandler {
             const [newX, newY] = action.path.positionAtProgress(progressRatio)
             Object.assign(mover, {x: newX, y: newY, angle:action.path.angle})
         }, ()=>{
-            action.execute()
             this.cvs.deleteObject(animLine)
-            if (action.actor.fleet == gs.fleet) this.encounterMap.selectedObject = action.actor
-            this.encounterMap.stopAnimating()
-            this.encounterMap.showActionPopup(action)
+            this.completeAction(action)
         }))
         
         this.startAnimating()

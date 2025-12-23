@@ -40,4 +40,12 @@ class ActionHandler {
     stopTargeting() {
         this.encounterMap.stopTargeting()
     }
+
+    completeAction(action = new ShipAction()) {
+        console.log('ActionHandler.completeAction:',action)
+        action.execute()
+        if (action.actor.fleet == gs.fleet) this.encounterMap.selectedObject = action.actor
+        this.encounterMap.stopAnimating()
+        action.addPopups(this.encounterMap.cvs)
+    }
 }

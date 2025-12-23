@@ -93,7 +93,7 @@ class Encounter {
         console.log('Encounter.calcAttackTargets', { attacker });
         const validTargets = []
         const {ships} = this
-        const [t1, t2] = attacker.calcAttackAreas()
+        const [t1, t2] = attacker.calcLaserAreas()
         for (const target of ships) {
             if (target.fleet == attacker.fleet || target.isDisabled() || target.escaped || target.cloakedTurnsRemaining > 0) continue
             if (!t1.containsPoint(target.x, target.y) && !t2.containsPoint(target.x, target.y)) continue
