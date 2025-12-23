@@ -34,6 +34,9 @@ class ShipAction {
         this.targetInfoMessage = null
     }
 
+    /**
+     * @returns {ShipAction[]} An array of ShipAction instances representing the results of executing this action.
+     */
     execute() {
         console.log('ShipAction.execute - base class placeholder', { encounter:this.encounter, actionType: this.actionType, actor: this.actor, target: this.target, toX: this.toX, toY: this.toY });
         // Override this method in subclasses
@@ -41,7 +44,7 @@ class ShipAction {
     }
 
     addPopups(cvs = new CanvasWrapper()) {
-        const {actor, target, actorBadMessage, actorInfoMessage, targetInfoMessage, targetBadMessage, targetGoodMessage, actorGoodMessage, actorHullDamage, actorShieldDamage, actorDisabled, actorEscaped, targetHullDamage, targetShieldDamage, targetDisabled, targetEscaped} = this
+        const {actor, target, actorBadMessage, targetBadMessage, targetGoodMessage, actorGoodMessage, actorHullDamage, actorShieldDamage, actorDisabled, actorEscaped, targetHullDamage, targetShieldDamage, targetDisabled, targetEscaped} = this
         const popupId = `action_${Date.now()}_${Math.random()}`
         let actorYOffset = -DEFAULT_FONT_SIZE
         let targetYOffset = -DEFAULT_FONT_SIZE
@@ -103,4 +106,10 @@ class ShipAction {
         return result
     }
 
+    static getDamageAction(target = new Ship(), shieldDamage = 0, hullDamage = 0) {
+        const pseudoShipAction = new ShipAction(null, null, null, target)
+        pseudoShipAction.targetShieldDamage = shieldDamage
+        pseudoShipAction.targetHullDamage = hullDamage
+        return pseudoShipAction
+    }
 }

@@ -78,13 +78,6 @@ const COLORS = Object.freeze({
 })
 
 /** @enum {string} */
-const UI_MODE = Object.freeze({
-    Default: 'Default',
-    Animating: 'Animating',
-    Targeting: 'Targeting',
-})
-
-/** @enum {string} */
 const MOVE_TYPES = Object.freeze({
     Move: 'Move',
     Laser: 'Laser',

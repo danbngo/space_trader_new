@@ -7,7 +7,6 @@ class RamActionHandler extends ActionHandler {
         console.log('RamActionHandler.startTargeting', { attacker });
         if (!this.calcCanBeControlled(attacker)) return
         
-        this.encounterMap.uiMode = UI_MODE.Targeting
         this.encounterMap.targetingAreas = []
         
         const ellipse = attacker.calcMoveArea()
@@ -44,24 +43,21 @@ class RamActionHandler extends ActionHandler {
 
     execute(action =  new RamAction()) {
         console.log('RamActionHandler.execute', { action });
-        this.encounterMap.animatingAction = action
-        const animations = this.encounterMap.animations
         const path = action.path
         const attacker = action.actor
-        
         
         const popupId = `ram_${Date.now()}_${Math.random()}`
         const animLine = this.cvs.addLine(popupId, action.path.startX, action.path.startY, action.path.toX, action.path.toY, attacker.color, 2)
         const ramDuration = 500
 
-        animations.push(new Loop(ramDuration, (progressRatio)=>{
+        const animation = new Loop(ramDuration, (progressRatio)=>{
             const [newX, newY] = path.positionAtProgress(progressRatio)
             Object.assign(attacker, {x: newX, y: newY, angle: path.angle})
         }, ()=>{
             this.cvs.deleteObject(animLine)
             this.completeAction(action)
-        }))
+        })
         
-        this.startAnimating(action)
+        this.startAnimating(action, animation)
     }
 }

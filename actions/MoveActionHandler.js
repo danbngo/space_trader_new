@@ -37,8 +37,6 @@ class MoveActionHandler extends ActionHandler {
 
     execute(action =  new MoveAction()) {
         console.log('MoveActionHandler.execute', { action });
-        this.encounterMap.animatingAction = action
-        const animations = this.encounterMap.animations
         const mover = action.actor
         mover.angle = action.path.angle
         
@@ -47,14 +45,14 @@ class MoveActionHandler extends ActionHandler {
 
         //make asteroids move really fast so player doesn't get annoyed
         const duration = mover.aiType == AI_TYPES.Ship ? 500 : 200
-        animations.push(new Loop(duration, (progressRatio)=>{
+        const animation = new Loop(duration, (progressRatio)=>{
             const [newX, newY] = action.path.positionAtProgress(progressRatio)
             Object.assign(mover, {x: newX, y: newY, angle:action.path.angle})
         }, ()=>{
             this.cvs.deleteObject(animLine)
             this.completeAction(action)
-        }))
+        })
         
-        this.startAnimating(action)
+        this.startAnimating(action, animation)
     }
 }

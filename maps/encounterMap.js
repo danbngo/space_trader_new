@@ -48,7 +48,7 @@ class EncounterMap extends BaseMap {
     }
 
     refresh() {
-        console.log('refreshing encounterMap w uiMode:',this.uiMode)
+        console.log('refreshing encounterMap')
         this.refreshControls();
         this.refreshInfoBar();
         this.refreshObjectPane();
@@ -57,6 +57,8 @@ class EncounterMap extends BaseMap {
 
     refreshLogic() {
         console.log('EncounterMap.refreshLogic')
+        //dont do anything while animating
+        if (this.animations.length > 0) return;
         if (this.checkEncounterOver()) return;
         this.checkTurnComplete();
         this.handleEnemyActions()
@@ -248,7 +250,7 @@ class EncounterMap extends BaseMap {
 
     refreshObjectPane() {
         //const playerShips = gs.fleet.ships
-        const {selectedObject, encounter, uiMode} = this
+        const {selectedObject, encounter} = this
         const {playerFleet, combatEnabled, activeTurnFleet, ships} = encounter
 
         const obj = selectedObject
@@ -260,7 +262,7 @@ class EncounterMap extends BaseMap {
             return;
         }
 
-        if (this.targetingLabel.length > 0) {
+        if (this.targetingLabel && this.targetingLabel.length > 0) {
             ce({parent:container, innerHTML: `${obj.shipType.name}: Targeting ${this.targetingLabel}`})
             ce({parent:container, innerHTML: '(Select target)'})
             ce({parent:container, tag:'button', innerHTML:'Cancel', onClick: ()=>{
@@ -277,9 +279,9 @@ class EncounterMap extends BaseMap {
         if (obj instanceof Ship) {
             const index = ships.indexOf(obj)
             const {hull, shields} = obj
-            const showActions = combatEnabled && obj.fleet == playerFleet && !obj.escaped && !obj.disabled && activeTurnFleet == playerFleet && (uiMode !== UI_MODE.Animating)
-            console.log('showing actions with props:', { combatEnabled, isPlayerShip: obj.fleet == playerFleet, isEscaped: obj.escaped, isDisabled: obj.disabled, isPlayerTurn: activeTurnFleet == playerFleet, uiMode })
-            const canAct = obj.numActionsRemaining > 0 && (uiMode !== UI_MODE.Animating)
+            const showActions = combatEnabled && obj.fleet == playerFleet && !obj.escaped && !obj.disabled && activeTurnFleet == playerFleet
+            console.log('showing actions with props:', { combatEnabled, isPlayerShip: obj.fleet == playerFleet, isEscaped: obj.escaped, isDisabled: obj.disabled, isPlayerTurn: activeTurnFleet == playerFleet })
+            const canAct = (obj.numActionsRemaining > 0) && (this.animations.length <= 0)
             const canRecharge = obj.shields[0] < obj.shields[1]
             ce({parent:container, style: {margin: 'auto'}, onClick: ()=>this.selectObject(obj), children:[
                 this.cvs.getObject(`ship${index}`)?.asImage(25, COLORS.LightGreen) || null
@@ -396,23 +398,6 @@ class EncounterMap extends BaseMap {
         return true
     }
 
-    startAnimating() {
-        console.log('EncounterMap.startAnimating')
-        this.stopTargeting()
-        this.uiMode = UI_MODE.Animating
-        this.togglePause(false)
-        this.refresh()
-        this.refreshCanvas(true)
-    }
-
-    stopAnimating() {
-        console.log('EncounterMap.stopAnimating')
-        this.animations = []
-        this.animatingAction = null
-        this.refresh()
-        this.refreshLogic()
-    }
-
     startTargeting(label = '', targetingAreas = [], validTargets = []) {
         console.log('EncounterMap.startTargeting', { label, targetingAreas, validTargets });
         this.targetingLabel = label
@@ -430,6 +415,7 @@ class EncounterMap extends BaseMap {
         this.cvs.onMouseMoveWorldXY = null;
         this.validTargets = []
         this.targetingAreas = []
+        this.targetingLabel = null
         this.refresh()
         this.refreshStrokeColors()
         this.refreshCanvas(true)
@@ -440,10 +426,12 @@ class EncounterMap extends BaseMap {
         for (const animation of this.animations) {
             animation.update(currentMs)
         }
-        this.animations = this.animations.filter(a => !a.completed)
-        if (this.animations.length == 0 && this.uiMode == UI_MODE.Animating) {
-            this.uiMode = UI_MODE.Default
+        const completedAnimations = this.animations.filter(a => a.completed)
+        if (completedAnimations.length > 0) {
+            console.log('completed animations:',completedAnimations)
+            this.animations = this.animations.filter(a => !a.completed)
             this.refresh()
+            this.refreshLogic()
         }
     }
 
@@ -462,8 +450,8 @@ class EncounterMap extends BaseMap {
 
     handleEnemyActions() {
         const {encounter} = this
-        console.log('handle enemy actions called with uiMode:',this.uiMode,this.paused,this.encounter.combatEnabled,encounter.activeTurnFleet)
-        if (this.paused || this.uiMode != UI_MODE.Default || !encounter.combatEnabled || encounter.activeTurnFleet == gs.fleet || this.animatingAction || this.encounter.result) return
+        console.log('handle enemy actions called with uiMode:',this.paused,this.encounter.combatEnabled,encounter.activeTurnFleet)
+        if (this.paused || !encounter.combatEnabled || encounter.activeTurnFleet == gs.fleet || this.encounter.result) return
         const {ai} = encounter
         const nextMove = ai.calcNextMove()
         console.log('determined next AI move:',nextMove)
@@ -527,11 +515,6 @@ class EncounterMap extends BaseMap {
         else gs.encounter.encounterType.onStart()
     }
 }
-
-
-
-
-
 
 function showEncounterMap() {
     const encounterMap = new EncounterMap(gs.encounter, gs.fleet.ships[0])

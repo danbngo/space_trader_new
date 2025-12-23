@@ -1,7 +1,7 @@
 class RechargeAction extends ShipAction {
     constructor(encounter = new Encounter(), actor = new Ship()) {
         super(encounter, actor, MOVE_TYPES.Recharge)
-        this.actorInfoMessage = 'Recharging!'
+        //this.actorInfoMessage = 'Recharging!' //clutter-y
     }
 
     execute() {
@@ -10,5 +10,6 @@ class RechargeAction extends ShipAction {
         const rechargedAmt = this.actor.rechargeShields()
         Object.assign(this, {actorShieldDamage: -rechargedAmt})
         this.completed = true
+        return []
     }
 }

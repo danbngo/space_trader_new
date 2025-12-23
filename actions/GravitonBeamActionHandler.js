@@ -7,7 +7,6 @@ class GravitonBeamActionHandler extends ActionHandler {
         console.log('GravitonBeamActionHandler.startTargeting', { attacker });
         if (!this.calcCanBeControlled(attacker)) return
 
-        this.encounterMap.uiMode = UI_MODE.Targeting
         this.encounterMap.targetingAreas = []
         
         // Show targeting triangle in front of ship
@@ -43,15 +42,15 @@ class GravitonBeamActionHandler extends ActionHandler {
 
     execute(action = new GravitonBeamAction()) {
         console.log('GravitonBeamActionHandler.execute', { action });
-        this.encounterMap.animatingAction = action
-        const animations = this.encounterMap.animations
+        
+        
         const beamDuration = 1000
         
         // Wavy line between ships
         const popupId = `gravitonbeam_${Date.now()}_${Math.random()}`
         const beamLine = this.cvs.addLine(popupId, action.actor.x, action.actor.y, action.target.x, action.target.y, COLORS.Purple, 3)
         
-        animations.push(new Loop(beamDuration, (progressRatio) => {
+        const animation = new Loop(beamDuration, (progressRatio) => {
             action.actor.x = action.startX + (action.toX - action.startX) * progressRatio
             action.actor.y = action.startY + (action.toY - action.startY) * progressRatio
             action.target.x = action.targetStartX + (action.targetToX - action.targetStartX) * progressRatio
@@ -63,8 +62,8 @@ class GravitonBeamActionHandler extends ActionHandler {
         }, () => {
             this.cvs.deleteObject(beamLine)
             this.completeAction(action)
-        }))
+        })
         
-        this.startAnimating(action)
+        this.startAnimating(action, animation)
     }
 }

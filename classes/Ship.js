@@ -136,9 +136,9 @@ class Ship {
         return this.hull[0] <= 0
     }
 
-    takeDamage(dmg = 0, bypassShields = false) {
+    takeDamage(dmg = 0, bypassShields = false, dontHurtHull = false) {
         console.log('applying dmg to ship:',this,dmg,bypassShields)
-        if (this.disabled) return [0, 0]
+        if (this.disabled) return [0, 0, false]
         let disabled = false
         let shieldDamage = 0
         let hullDamage = 0
@@ -146,13 +146,15 @@ class Ship {
             shieldDamage = Math.min(dmg, this.shields[0])
             this.shields[0] -= shieldDamage
             dmg -= shieldDamage
-            if (dmg <= 0) return [hullDamage, shieldDamage]
+            if (dmg <= 0) return [hullDamage, shieldDamage, disabled]
         }
-        hullDamage = Math.min(dmg, this.hull[0])
-        this.hull[0] = Math.max(0, this.hull[0] - dmg)
-        if (this.hull[0] <= 0) {
-            disabled = true
-            this.setDisabled()
+        if (!dontHurtHull) {
+            hullDamage = Math.min(dmg, this.hull[0])
+            this.hull[0] = Math.max(0, this.hull[0] - dmg)
+            if (this.hull[0] <= 0) {
+                disabled = true
+                this.setDisabled()
+            }
         }
         return [hullDamage, shieldDamage, disabled]
     }

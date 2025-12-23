@@ -23,8 +23,8 @@ class BoosterActionHandler extends ActionHandler {
 
     execute(action = new BoosterAction()) {
         console.log('BoosterActionHandler.execute', { action });
-        this.encounterMap.animatingAction = action
-        const animations = this.encounterMap.animations
+        
+        
         const boostDuration = 1000
         const path = action.path
         const attacker = action.actor
@@ -33,15 +33,15 @@ class BoosterActionHandler extends ActionHandler {
         const popupId = `boosttrail_${Date.now()}_${Math.random()}`
         const trailLine = this.cvs.addLine(popupId, action.path.startX, action.path.startY, action.path.toX, action.path.toY, COLORS.Orange, 4)
         
-        animations.push(new Loop(boostDuration, (progressRatio) => {
+        const animation = new Loop(boostDuration, (progressRatio) => {
             const [newX, newY] = path.positionAtProgress(progressRatio)
             Object.assign(attacker, {x: newX, y: newY, angle: path.angle})
             trailLine.strokeColor[3] = 1 - progressRatio
         }, () => {
             this.cvs.deleteObject(trailLine)
             this.completeAction(action)
-        }))
+        })
         
-        this.startAnimating(action)
+        this.startAnimating(action, animation)
     }
 }

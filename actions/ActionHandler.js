@@ -39,15 +39,17 @@ class ActionHandler {
             const txt = this.cvs.addText(`${popupId}_actor_info_message`, action.actor.x, action.actor.y, 0, -DEFAULT_FONT_SIZE, action.actorInfoMessage, COLORS.White)
             txt.setDurationMs(1000)
         }
-        this.encounterMap.startAnimating()
         this.encounterMap.animations.push(animation)
+        this.encounterMap.stopTargeting()
+        //this.encounterMap.refresh()
     }
 
     completeAction(action = new ShipAction()) {
         console.log('ActionHandler.completeAction:',action)
-        action.execute()
+        const pseudoActions = action.execute()
         if (action.actor.fleet == gs.fleet) this.encounterMap.selectedObject = action.actor
-        this.encounterMap.stopAnimating()
         action.addPopups(this.encounterMap.cvs)
+        for (const a of pseudoActions) a.addPopups(this.encounterMap.cvs)
+        this.encounterMap.refresh()
     }
 }

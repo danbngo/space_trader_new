@@ -17,5 +17,6 @@ class LaserAction extends ShipAction {
         }
         this.actor.numActionsRemaining--
         this.completed = true
+        return []
     }
 }

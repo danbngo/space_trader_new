@@ -10,5 +10,6 @@ class MoveAction extends ShipAction {
         let actorEscaped = (this.encounter) ? this.encounter.checkShipEscaped(this.actor) : null
         Object.assign(this, {actorEscaped})
         this.completed = true
+        return []
     }
 }

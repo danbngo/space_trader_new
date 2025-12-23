@@ -7,14 +7,13 @@ class EMPPulseActionHandler extends ActionHandler {
         console.log('EMPPulseActionHandler.startTargeting', { ship });
         if (!this.calcCanBeControlled(ship)) return
 
-        this.encounterMap.uiMode = UI_MODE.Targeting
         this.encounterMap.targetingAreas = []
         
         // Get EMP pulse area (circle centered on ship)
         const pulseArea = ship.calcPulseArea()
         
         // Show the pulse radius that will be affected
-        const pulseCircle = this.cvs.addEmptyCircle('targetingarea', pulseArea.x, pulseArea.y, pulseArea.radius, 12, COLORS.TargetingConfirm, 3)
+        const pulseCircle = this.cvs.addFilledCircle('targetingarea', pulseArea.x, pulseArea.y, pulseArea.radius, 12, COLORS.Targeting)
         
         // Calculate which enemies will be hit
         const validTargets = this.encounter.enemyFleet.ships.filter(target => {
@@ -23,7 +22,8 @@ class EMPPulseActionHandler extends ActionHandler {
             return distance <= pulseArea.radius
         })
         
-        this.encounterMap.onSelectObject = (selectedObj) => this.attempt(ship)
+        //this.encounterMap.onSelectObject = (selectedObj) => this.attempt(ship)
+        this.encounterMap.cvs.onClickWorldXY = (x, y) => this.attempt(ship)
         
         this.encounterMap.startTargeting('EMP Pulse', [pulseCircle], validTargets)
     }
@@ -40,8 +40,8 @@ class EMPPulseActionHandler extends ActionHandler {
 
     execute(action = new EMPPulseAction()) {
         console.log('EMPPulseActionHandler.execute', { action });
-        this.encounterMap.animatingAction = action
-        const animations = this.encounterMap.animations
+        
+        const pseudoActions = []
         const ship = action.actor
         const pulseDuration = 1000
         
@@ -50,14 +50,14 @@ class EMPPulseActionHandler extends ActionHandler {
         const pulseRing = this.cvs.addEmptyCircle(popupId, ship.x, ship.y, 0, 12, COLORS.LightPurple, 3)
         const maxRadius = ship.calcPulseArea().radius
         
-        animations.push(new Loop(pulseDuration, (progressRatio) => {
+        const animation = new Loop(pulseDuration, (progressRatio) => {
             pulseRing.size = maxRadius * progressRatio
             pulseRing.strokeColor[3] = 1 - progressRatio
         }, () => {
             this.cvs.deleteObject(pulseRing)
             this.completeAction(action)
-        }))
+        })
         
-        this.startAnimating(action)
+        this.startAnimating(action, animation)
     }
 }

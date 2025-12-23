@@ -28,5 +28,6 @@ class GravitonBeamAction extends ShipAction {
         // Set cooldown
         actor.moduleCooldowns.setAmount(SHIP_MODULES.GRAVITON_BEAM, SHIP_MODULES.GRAVITON_BEAM.cooldown)
         this.completed = true
+        return []
     }
 }

@@ -7,7 +7,6 @@ class WarheadActionHandler extends ActionHandler {
         console.log('WarheadActionHandler.startTargeting', { attacker });
         if (!this.calcCanBeControlled(attacker)) return
 
-        this.encounterMap.uiMode = UI_MODE.Targeting
         this.encounterMap.targetingAreas = []
         
         // Get targeting area (circle in front of ship)
@@ -47,23 +46,20 @@ class WarheadActionHandler extends ActionHandler {
 
     execute(action = new WarheadAction()) {
         console.log('WarheadActionHandler.execute', { action });
-        this.encounterMap.animatingAction = action
-        const animations = this.encounterMap.animations
-        const explosionDuration = 800
+        const explosionDuration = 1000
         
         // Expanding explosion circle
         const popupId = `warhead_${Date.now()}_${Math.random()}`
         const explosionCircle = this.cvs.addFilledCircle(popupId, action.toX, action.toY, 0, 16, COLORS.Orange, 0)
         const maxRadius = action.actor.maxAttackDistance * 0.25
         
-        animations.push(new Loop(explosionDuration, (progressRatio) => {
+        const animation = new Loop(explosionDuration, (progressRatio) => {
             explosionCircle.size = maxRadius * progressRatio
             explosionCircle.fillColor[3] = 1 - progressRatio
         }, () => {
             this.cvs.deleteObject(explosionCircle)
             this.completeAction(action)
-        }))
-        
-        this.startAnimating(action)
+        })
+        this.startAnimating(action, animation)
     }
 }

@@ -13,5 +13,6 @@ class CloakAction extends ShipAction {
         // Set cooldown
         actor.moduleCooldowns.setAmount(SHIP_MODULES.CLOAK, SHIP_MODULES.CLOAK.cooldown)
         this.completed = true
+        return []
     }
 }

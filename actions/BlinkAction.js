@@ -29,5 +29,6 @@ class BlinkAction extends ShipAction {
         // Set cooldown
         ship.moduleCooldowns.setAmount(SHIP_MODULES.BLINK, SHIP_MODULES.BLINK.cooldown)
         this.completed = true
+        return []
     }
 }

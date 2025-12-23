@@ -55,5 +55,6 @@ class BoosterAction extends ShipAction {
         // Set cooldown
         ship.moduleCooldowns.setAmount(SHIP_MODULES.BOOSTER, SHIP_MODULES.BOOSTER.cooldown)
         this.completed = true
+        return []
     }
 }

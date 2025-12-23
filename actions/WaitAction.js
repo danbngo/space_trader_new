@@ -8,5 +8,6 @@ class WaitAction extends ShipAction {
         console.log('WaitAction.execute', { actor: this.actor });
         this.actor.numActionsRemaining = 0
         this.completed = true
+        return []
     }
 }

@@ -1,7 +1,7 @@
 class RamAction extends ShipAction {
     constructor(encounter = new Encounter(), actor = new Ship(), target = new Ship()) {
         super(encounter, actor, MOVE_TYPES.Ram, target)
-        this.actorInfoMessage = 'Ramming Speed!'
+        //this.actorInfoMessage = 'Ramming Speed!' //clutter-y
     }
 
     execute() {
@@ -38,5 +38,6 @@ class RamAction extends ShipAction {
 
         actor.numActionsRemaining--
         this.completed = true
+        return []
     }
 }

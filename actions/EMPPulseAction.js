@@ -6,8 +6,9 @@ class EMPPulseAction extends ShipAction {
 
     execute() {
         console.log('EMPPulseAction.execute', { actor: this.actor });
+        const pseudoActions = []
         const attacker = this.actor
-        const pulseRadius = attacker.maxAttackDistance * 2
+        const pulseRadius = attacker.calcPulseArea().radius
         
         // Find all ships within pulse radius
         const affectedShips = this.encounter.ships.filter(ship => {
@@ -18,8 +19,9 @@ class EMPPulseAction extends ShipAction {
         
         // Reset shields and increase cooldowns
         for (const ship of affectedShips) {
-            // Reset shields to 0
-            ship.shields[0] = 0
+            //hurt shields by a lot
+            const [hullDamage, shieldDamage] = ship.takeDamage(10+rng(30), false, true)
+            pseudoActions.push(ShipAction.getDamageAction(ship, shieldDamage, hullDamage))
             
             // Increase all module cooldowns by 1
             for (const moduleType of Object.values(SHIP_MODULES)) {
@@ -33,5 +35,6 @@ class EMPPulseAction extends ShipAction {
         // Set cooldown
         attacker.moduleCooldowns.setAmount(SHIP_MODULES.EMP_PULSE, SHIP_MODULES.EMP_PULSE.cooldown)
         this.completed = true
+        return pseudoActions
     }
 }

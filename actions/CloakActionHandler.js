@@ -21,8 +21,7 @@ class CloakActionHandler extends ActionHandler {
 
     execute(action = new CloakAction()) {
         console.log('CloakActionHandler.execute', { action });
-        this.encounterMap.animatingAction = action
-        const animations = this.encounterMap.animations
+        
         const ship = action.actor
         const animDuration = 500
         
@@ -31,14 +30,13 @@ class CloakActionHandler extends ActionHandler {
         const shipObj = this.cvs.getObject(`ship${shipIndex}`)
         const initialAlpha = shipObj.fillColor[3]
         
-        animations.push(new Loop(animDuration, (progressRatio) => {
+        const animation = new Loop(animDuration, (progressRatio) => {
             // Fade to 30% opacity
             shipObj.fillColor[3] = initialAlpha * (1 - progressRatio * 0.7)
         }, () => {
-            action.execute()
-            this.encounterMap.stopAnimating()
-        }))
+            this.completeAction(action)
+        })
         
-        this.startAnimating(action)
+        this.startAnimating(action, animation)
     }
 }

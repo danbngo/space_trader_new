@@ -7,7 +7,6 @@ class LaserActionHandler extends ActionHandler {
         console.log('LaserActionHandler.startTargeting', { attacker });
         if (!this.calcCanBeControlled(attacker)) return
 
-        this.encounterMap.uiMode = UI_MODE.Targeting
         this.encounterMap.targetingAreas = []
         
         const [t1, t2] = attacker.calcLaserAreas()
@@ -43,23 +42,23 @@ class LaserActionHandler extends ActionHandler {
     }
 
     execute(action =  new LaserAction()) {
-        this.encounterMap.animatingAction = action
+        
         console.log('LaserActionHandler.execute', { action });
-        const animations = this.encounterMap.animations
+        
         const path = action.path
         const popupId = `laser_${Date.now()}_${Math.random()}`
         const animLine = this.cvs.addLine(popupId, 0, 0, 0, 0, COLORS.Red, 2)
         const laserDuration = 400 + 30*Math.pow(calcDistance(action.actor.x, action.actor.y, action.target.x, action.target.y), 0.5)
         
-        animations.push(new Loop(laserDuration, (progressRatio)=>{
+        const animation = new Loop(laserDuration, (progressRatio)=>{
             const [x2, y2] = path.positionAtProgress(Math.min(progressRatio * 1.25))
             const [x, y] = path.positionAtProgress(Math.max(0, progressRatio*1.25 - 0.25))
             Object.assign(animLine, {x, y, x2, y2})
         }, ()=>{
             this.cvs.deleteObject(animLine)
             this.completeAction(action)
-        }))
+        })
         
-        this.startAnimating(action)
+        this.startAnimating(action, animation)
     }
 }

@@ -10,6 +10,7 @@ class WarheadAction extends ShipAction {
         const explosionX = this.toX
         const explosionY = this.toY
         const explosionRadius = attacker.maxAttackDistance * 0.25
+        const pseudoActions = []
         
         // Find all ships within explosion radius
         const affectedShips = this.encounter.ships.filter(ship => {
@@ -23,10 +24,10 @@ class WarheadAction extends ShipAction {
             const dist = calcDistance(explosionX, explosionY, ship.x, ship.y)
             // Damage falls off with distance
             const damageRatio = 1 - (dist / explosionRadius)
-            const damage = 20 * damageRatio //attacker.maxLaserDamage * 2 * damageRatio
+            const damage = 1+rng(20 * damageRatio) //attacker.maxLaserDamage * 2 * damageRatio
             
-            ship.takeDamage(damage)
-            
+            const [hullDamage, shieldDamage] = ship.takeDamage(damage)
+            pseudoActions.push(ShipAction.getDamageAction(ship, shieldDamage, hullDamage))
             // Apply knockback
             const knockbackDistance = 10 * damageRatio
             const angle = Math.atan2(ship.y - explosionY, ship.x - explosionX)
@@ -43,5 +44,6 @@ class WarheadAction extends ShipAction {
         // Set cooldown
         attacker.moduleCooldowns.setAmount(SHIP_MODULES.WARHEAD, SHIP_MODULES.WARHEAD.cooldown)
         this.completed = true
+        return pseudoActions
     }
 }
