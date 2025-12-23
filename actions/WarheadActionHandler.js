@@ -52,7 +52,8 @@ class WarheadActionHandler extends ActionHandler {
         const explosionDuration = 800
         
         // Expanding explosion circle
-        const explosionCircle = this.cvs.addFilledCircle('warheadexplosion', action.toX, action.toY, 0, 16, COLORS.Orange, 0)
+        const popupId = `warhead_${Date.now()}_${Math.random()}`
+        const explosionCircle = this.cvs.addFilledCircle(popupId, action.toX, action.toY, 0, 16, COLORS.Orange, 0)
         const maxRadius = action.actor.maxAttackDistance * 0.25
         
         animations.push(new Loop(explosionDuration, (progressRatio) => {
@@ -63,6 +64,6 @@ class WarheadActionHandler extends ActionHandler {
             this.completeAction(action)
         }))
         
-        this.startAnimating()
+        this.startAnimating(action)
     }
 }

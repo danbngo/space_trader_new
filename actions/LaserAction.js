@@ -1,10 +1,10 @@
-class AttackAction extends ShipAction {
+class LaserAction extends ShipAction {
     constructor(encounter = new Encounter(), actor = new Ship(), target = new Ship()) {
         super(encounter, actor, MOVE_TYPES.Laser, target)
     }
 
     execute() {
-        console.log('AttackAction.execute', { attacker: this.actor, target: this.target });
+        console.log('LaserAction.execute', { attacker: this.actor, target: this.target });
         //player has a 0% chance to miss at min range and 75% at max range
         const didMiss = this.path.distance > 0 ? (Math.random() < (0.75 * (this.path.distance / this.actor.maxAttackDistance))) : false
         if (didMiss) {

@@ -36,6 +36,6 @@ class BlinkActionHandler extends ActionHandler {
             this.completeAction(action)
         }))
         
-        this.startAnimating()
+        this.startAnimating(action)
     }
 }

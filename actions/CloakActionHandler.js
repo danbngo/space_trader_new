@@ -39,6 +39,6 @@ class CloakActionHandler extends ActionHandler {
             this.encounterMap.stopAnimating()
         }))
         
-        this.startAnimating()
+        this.startAnimating(action)
     }
 }

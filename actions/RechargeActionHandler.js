@@ -24,7 +24,8 @@ class RechargeActionHandler extends ActionHandler {
         this.encounterMap.animatingAction = action
         const animations = this.encounterMap.animations
         const ship = action.actor
-        const animCircle = this.cvs.addFilledCircle('rechargecircle', ship.x, ship.y, ship.radius*1.5, 16, COLORS.LightBlue, 0)
+        const popupId = `recharge_${Date.now()}_${Math.random()}`
+        const animCircle = this.cvs.addFilledCircle(popupId, ship.x, ship.y, ship.radius*1.5, 16, COLORS.LightBlue, 0)
         const rechargeDuration = 500
         
         animations.push(new Loop(rechargeDuration, (progressRatio)=>{
@@ -38,6 +39,6 @@ class RechargeActionHandler extends ActionHandler {
             this.completeAction(action)
         }))
         
-        this.startAnimating()
+        this.startAnimating(action)
     }
 }

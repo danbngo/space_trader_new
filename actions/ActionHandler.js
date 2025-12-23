@@ -33,12 +33,14 @@ class ActionHandler {
         return true
     }
 
-    startAnimating() {
+    startAnimating(action = new ShipAction(), animation = new Loop()) {
+        if (action && action.actorInfoMessage) {
+            const popupId = `action_${Date.now()}_${Math.random()}`
+            const txt = this.cvs.addText(`${popupId}_actor_info_message`, action.actor.x, action.actor.y, 0, -DEFAULT_FONT_SIZE, action.actorInfoMessage, COLORS.White)
+            txt.setDurationMs(1000)
+        }
         this.encounterMap.startAnimating()
-    }
-
-    stopTargeting() {
-        this.encounterMap.stopTargeting()
+        this.encounterMap.animations.push(animation)
     }
 
     completeAction(action = new ShipAction()) {

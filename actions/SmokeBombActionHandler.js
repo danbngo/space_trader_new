@@ -12,7 +12,7 @@ class SmokeBombActionHandler extends ActionHandler {
         
         // Targeting circle for smoke placement
         const smokeRadius = attacker.maxAttackDistance
-        const targetingCircle = this.cvs.addEmptyCircle('targetingcircle', 0, 0, smokeRadius, 12, COLORS.LightGreen, 2)
+        const targetingCircle = this.cvs.addEmptyCircle('targetingcircle', 0, 0, smokeRadius, 12, COLORS.TargetingConfirm, 2)
         
         this.cvs.onClickWorldXY = (x, y) => {
             this.attempt(attacker, null, x, y)
@@ -56,6 +56,6 @@ class SmokeBombActionHandler extends ActionHandler {
             this.completeAction(action)
         }))
         
-        this.startAnimating()
+        this.startAnimating(action)
     }
 }

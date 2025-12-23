@@ -12,8 +12,8 @@ class GravitonBeamActionHandler extends ActionHandler {
         
         // Show targeting triangle in front of ship
         const targetArea = attacker.calcGravitonBeamArea()
-        const targetingCvsTriangle = this.cvs.addTriangle('targetingarea', targetArea.x, targetArea.y, targetArea.base, targetArea.height, 4, [0,255,0,0.1], targetArea.angle)
-        const targetingCvsCircle = this.cvs.addEmptyCircle('targetingcircle', 0, 0, 0, 12, COLORS.Purple, 2)
+        const targetingCvsTriangle = this.cvs.addTriangle('targetingarea', targetArea.x, targetArea.y, targetArea.base, targetArea.height, 4, COLORS.Targeting, targetArea.angle)
+        const targetingCvsCircle = this.cvs.addEmptyCircle('targetingcircle', 0, 0, 0, 12, COLORS.TargetingConfirm, 2)
         targetingCvsCircle.visible = false
 
         const validTargets = this.encounter.calcGravitonBeamTargets(attacker)
@@ -48,7 +48,8 @@ class GravitonBeamActionHandler extends ActionHandler {
         const beamDuration = 1000
         
         // Wavy line between ships
-        const beamLine = this.cvs.addLine('gravitonline', action.actor.x, action.actor.y, action.target.x, action.target.y, COLORS.Purple, 3)
+        const popupId = `gravitonbeam_${Date.now()}_${Math.random()}`
+        const beamLine = this.cvs.addLine(popupId, action.actor.x, action.actor.y, action.target.x, action.target.y, COLORS.Purple, 3)
         
         animations.push(new Loop(beamDuration, (progressRatio) => {
             action.actor.x = action.startX + (action.toX - action.startX) * progressRatio
@@ -64,6 +65,6 @@ class GravitonBeamActionHandler extends ActionHandler {
             this.completeAction(action)
         }))
         
-        this.startAnimating()
+        this.startAnimating(action)
     }
 }

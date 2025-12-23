@@ -144,7 +144,7 @@ class EncounterAI {
         if (strategy == COMBAT_STRATEGIES.Asteroid) {
             if (attackableTargets.length > 0 && ship.lasers > 0 && Math.random() > 0.5) {
                 //attack targets if any available
-                return new ShipAction(encounter, ship, MOVE_TYPES.Laser, rndMember(attackableTargets))
+                return new LaserAction(encounter, ship, rndMember(attackableTargets))
             }
             const inTheWayTargets = rammableTargets.filter(t => {
                 const path = new Path(ship.x, ship.y, t.x, t.y)
@@ -157,33 +157,33 @@ class EncounterAI {
             if (inTheWayTargets.length > 0 && ship.engine > 0 && Math.random() > .5) {
                 //ram targets that are in the way
                 const targetToRam = rndMember(inTheWayTargets)
-                return new ShipAction(encounter, ship, MOVE_TYPES.Ram, targetToRam)
+                return new RamAction(encounter, ship, targetToRam)
             }
             //if no targets in the way, move semi randomly, mostly in the same dir we're already facing
             const [toX, toY] = rotatePoint(encounter.mapRadius*2, 0, 0, 0, ship.angle + rng(-Math.PI/4, Math.PI/4, false))
             const bestMove = this.calcBestMoveCoords(ship, toX, toY)
-            if (bestMove) return new ShipAction(encounter, ship, MOVE_TYPES.Move, null, bestMove[0], bestMove[1])
+            if (bestMove) return new MoveAction(encounter, ship, bestMove[0], bestMove[1])
         }
         else if (strategy == COMBAT_STRATEGIES.Attack) {
             if (attackableTargets.length > 0 && ship.lasers > 0) {
                 //attack targets if any available
-                return new ShipAction(encounter, ship, MOVE_TYPES.Laser, rndMember(attackableTargets))
+                return new LaserAction(encounter, ship, rndMember(attackableTargets))
             }
             else if (rammableTargets.length > 0 && ship.engine > 0) {
                 //ram targets if any available - but don't ram if they have more hull than us
                 const safeRammableTargets = rammableTargets.filter(t => t.hull[0]*Math.random() < ship.hull[0]*Math.random())
                 if (safeRammableTargets.length > 0) {
-                    return new ShipAction(encounter, ship, MOVE_TYPES.Ram, rndMember(safeRammableTargets))
+                    return new RamAction(encounter, ship, rndMember(safeRammableTargets))
                 }
             }
             else if (ship.engine > 0 && nearestTarget !== undefined) {
                 //move into attack range if possible
                 const bestMove = this.calcBestLaserCoords(ship, targets)
-                if (bestMove) return new ShipAction(encounter, ship, MOVE_TYPES.Move, null, bestMove[0], bestMove[1])
+                if (bestMove) return new MoveAction(encounter, ship, bestMove[0], bestMove[1])
                 else {
                     //move towards nearest target
                     const bestMove = this.calcBestMoveCoords(ship, nearestTarget.x, nearestTarget.y)
-                    if (bestMove) return new ShipAction(encounter, ship, MOVE_TYPES.Move, null, bestMove[0], bestMove[1])
+                    if (bestMove) return new MoveAction(encounter, ship, bestMove[0], bestMove[1])
                 }
             }
         }
@@ -192,14 +192,14 @@ class EncounterAI {
             const angleFromCenter = calcAngleTowardsPoint(0, 0, ship.x, ship.y)
             const [toX, toY] = rotatePoint(this.encounter.mapRadius*2, 0, 0, 0, angleFromCenter)
             const bestMove = this.calcBestMoveCoords(ship, toX, toY)
-            if (bestMove) return new ShipAction(this.encounter, ship, MOVE_TYPES.Move, null, bestMove[0], bestMove[1])
+            if (bestMove) return new MoveAction(this.encounter, ship, bestMove[0], bestMove[1])
         }
         
         //if all else fails, recharge
         if ((ship.shields[0] < ship.shields[1]) && ship.engine > 0) {
-            return new ShipAction(this.encounter, ship, MOVE_TYPES.Recharge)
+            return new RechargeAction(this.encounter, ship)
         }
-        else return new ShipAction(this.encounter, ship, MOVE_TYPES.Wait)
+        else return new WaitAction(this.encounter, ship)
     }
 }
 

@@ -73,6 +73,8 @@ const COLORS = Object.freeze({
     LightBlue: [173,216,230,1], // rgba(173,216,230,1)
     LightRed: [255,102,102,1], // rgba(255,102,102,1)
     Brown: [124,92,64,1], // rgba(124,92,64,1)
+    Targeting: [0,255,0,0.1], // rgba(0,255,0,0.1)
+    TargetingConfirm: [0,255,0,0.7], // rgba(0,255,0,0.7)
 })
 
 /** @enum {string} */

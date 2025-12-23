@@ -11,10 +11,10 @@ class EMPPulseActionHandler extends ActionHandler {
         this.encounterMap.targetingAreas = []
         
         // Get EMP pulse area (circle centered on ship)
-        const pulseArea = ship.calcEMPPulseArea()
+        const pulseArea = ship.calcPulseArea()
         
         // Show the pulse radius that will be affected
-        const pulseCircle = this.cvs.addEmptyCircle('targetingarea', pulseArea.x, pulseArea.y, pulseArea.radius, 12, [0,255,255,0.5], 3)
+        const pulseCircle = this.cvs.addEmptyCircle('targetingarea', pulseArea.x, pulseArea.y, pulseArea.radius, 12, COLORS.TargetingConfirm, 3)
         
         // Calculate which enemies will be hit
         const validTargets = this.encounter.enemyFleet.ships.filter(target => {
@@ -43,11 +43,12 @@ class EMPPulseActionHandler extends ActionHandler {
         this.encounterMap.animatingAction = action
         const animations = this.encounterMap.animations
         const ship = action.actor
-        const pulseDuration = 600
+        const pulseDuration = 1000
         
         // Expanding pulse ring
-        const pulseRing = this.cvs.addEmptyCircle('emppulse', ship.x, ship.y, 0, 12, COLORS.Cyan, 3)
-        const maxRadius = ship.maxAttackDistance * 2
+        const popupId = `emppulse_${Date.now()}_${Math.random()}`
+        const pulseRing = this.cvs.addEmptyCircle(popupId, ship.x, ship.y, 0, 12, COLORS.LightPurple, 3)
+        const maxRadius = ship.calcPulseArea().radius
         
         animations.push(new Loop(pulseDuration, (progressRatio) => {
             pulseRing.size = maxRadius * progressRatio
@@ -57,6 +58,6 @@ class EMPPulseActionHandler extends ActionHandler {
             this.completeAction(action)
         }))
         
-        this.startAnimating()
+        this.startAnimating(action)
     }
 }

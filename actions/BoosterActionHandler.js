@@ -30,7 +30,8 @@ class BoosterActionHandler extends ActionHandler {
         const attacker = action.actor
         
         // Trail effect
-        const trailLine = this.cvs.addLine('boosttrail', action.path.startX, action.path.startY, action.path.toX, action.path.toY, COLORS.Orange, 4)
+        const popupId = `boosttrail_${Date.now()}_${Math.random()}`
+        const trailLine = this.cvs.addLine(popupId, action.path.startX, action.path.startY, action.path.toX, action.path.toY, COLORS.Orange, 4)
         
         animations.push(new Loop(boostDuration, (progressRatio) => {
             const [newX, newY] = path.positionAtProgress(progressRatio)
@@ -41,6 +42,6 @@ class BoosterActionHandler extends ActionHandler {
             this.completeAction(action)
         }))
         
-        this.startAnimating()
+        this.startAnimating(action)
     }
 }

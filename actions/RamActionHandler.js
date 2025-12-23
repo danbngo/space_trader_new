@@ -11,8 +11,8 @@ class RamActionHandler extends ActionHandler {
         this.encounterMap.targetingAreas = []
         
         const ellipse = attacker.calcMoveArea()
-        const targetingCvsObject = this.cvs.addFilledOval('targetingarea', ellipse.x, ellipse.y, ellipse.radiusX, ellipse.radiusY, 4, [0,255,0,0.1], ellipse.angle)
-        const targetingCvsCircle = this.cvs.addEmptyCircle('targetingcircle', 0, 0, 0, 12, COLORS.LightGreen, 2)
+        const targetingCvsObject = this.cvs.addFilledOval('targetingarea', ellipse.x, ellipse.y, ellipse.radiusX, ellipse.radiusY, 4, COLORS.Targeting, ellipse.angle)
+        const targetingCvsCircle = this.cvs.addEmptyCircle('targetingcircle', 0, 0, 0, 12, COLORS.TargetingConfirm, 2)
         targetingCvsCircle.visible = false
 
         const validTargets = this.encounter.calcRamTargets(attacker)
@@ -49,7 +49,9 @@ class RamActionHandler extends ActionHandler {
         const path = action.path
         const attacker = action.actor
         
-        const animLine = this.cvs.addLine('ramline', action.path.startX, action.path.startY, action.path.toX, action.path.toY, attacker.color, 2)
+        
+        const popupId = `ram_${Date.now()}_${Math.random()}`
+        const animLine = this.cvs.addLine(popupId, action.path.startX, action.path.startY, action.path.toX, action.path.toY, attacker.color, 2)
         const ramDuration = 500
 
         animations.push(new Loop(ramDuration, (progressRatio)=>{
@@ -60,6 +62,6 @@ class RamActionHandler extends ActionHandler {
             this.completeAction(action)
         }))
         
-        this.startAnimating()
+        this.startAnimating(action)
     }
 }

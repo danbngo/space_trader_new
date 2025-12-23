@@ -201,9 +201,9 @@ class Ship {
         return targetingTriangle
     }
 
-    calcEMPPulseArea(overrideX = this.x, overrideY = this.y) {
+    calcPulseArea(overrideX = this.x, overrideY = this.y) {
         // EMP pulse is centered on the ship and has radius = maxAttackDistance * 2
-        const pulseRadius = this.maxAttackDistance
+        const pulseRadius = this.maxAttackDistance/2
         return new Circle(overrideX, overrideY, pulseRadius)
     }
 }

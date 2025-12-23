@@ -8,8 +8,8 @@ class MoveActionHandler extends ActionHandler {
         if (!this.calcCanBeControlled(mover)) return
         
         const ellipse = mover.calcMoveArea()
-        const targetingCvsObject = this.cvs.addFilledOval('targetingarea', ellipse.x, ellipse.y, ellipse.radiusX, ellipse.radiusY, 4, [0,255,0,0.1], ellipse.angle)
-        const targetingCvsCircle = this.cvs.addEmptyCircle('targetingcircle', ellipse.x, ellipse.y, mover.radius, 4, COLORS.LightGreen, 2)
+        const targetingCvsObject = this.cvs.addFilledOval('targetingarea', ellipse.x, ellipse.y, ellipse.radiusX, ellipse.radiusY, 4, COLORS.Targeting, ellipse.angle)
+        const targetingCvsCircle = this.cvs.addEmptyCircle('targetingcircle', ellipse.x, ellipse.y, mover.radius, 4, COLORS.TargetingConfirm, 2)
         
         this.cvs.onClickWorldXY = (x, y) => this.attempt(x, y, ellipse, mover)
         this.cvs.onMouseMoveWorldXY = (x, y) => this.target(x, y, ellipse)
@@ -32,7 +32,7 @@ class MoveActionHandler extends ActionHandler {
         if (!ellipse.containsPoint(x, y)) {
             return
         }
-        this.execute(new MoveAction(this.encounter, mover, null, x, y))
+        this.execute(new MoveAction(this.encounter, mover, x, y))
     }
 
     execute(action =  new MoveAction()) {
@@ -42,7 +42,8 @@ class MoveActionHandler extends ActionHandler {
         const mover = action.actor
         mover.angle = action.path.angle
         
-        const animLine = this.cvs.addLine('moveline', action.path.startX, action.path.startY, action.path.toX, action.path.toY, mover.color, 1)
+        const popupId = `move_${Date.now()}_${Math.random()}`
+        const animLine = this.cvs.addLine(popupId, action.path.startX, action.path.startY, action.path.toX, action.path.toY, mover.color, 1)
 
         //make asteroids move really fast so player doesn't get annoyed
         const duration = mover.aiType == AI_TYPES.Ship ? 500 : 200
@@ -54,6 +55,6 @@ class MoveActionHandler extends ActionHandler {
             this.completeAction(action)
         }))
         
-        this.startAnimating()
+        this.startAnimating(action)
     }
 }

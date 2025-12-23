@@ -22,8 +22,10 @@ class WaitActionHandler extends ActionHandler {
         this.encounterMap.animatingAction = null
         //this.encounterMap.stopAnimating() //this will cause a bug due to refresh loop
         console.log('WaitActionHandler.execute', { action });
-        action.execute()
-        this.encounterMap.refreshLogic()
+        //action.execute()
+        //this.encounterMap.refreshLogic()
         //if (action.actor.fleet == gs.fleet && this.encounterMap.selectedObject != action.actor) this.encounterMap.selectObject(action.actor)
+        this.startAnimating(action)
+        this.completeAction(action)
     }
 }

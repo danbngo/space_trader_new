@@ -5,8 +5,6 @@ class EncounterMap extends BaseMap {
         this.encounter = encounter
         this.paused = false // Override default paused state for encounters
 
-        /** @type {UI_MODE[keyof UI_MODE]} */
-        this.uiMode = UI_MODE.Default;
         this.targetingLabel = '';
         this.targetingAreas = [];
         this.validTargets = [];
@@ -21,7 +19,7 @@ class EncounterMap extends BaseMap {
         this.initializeDOM(baseZoom/2, baseZoom/10, baseZoom*10, encounter.mapRadius)
 
         // Initialize action handlers
-        this.attackHandler = new AttackActionHandler(this);
+        this.attackHandler = new LaserActionHandler(this);
         this.moveHandler = new MoveActionHandler(this);
         this.ramHandler = new RamActionHandler(this);
         this.rechargeHandler = new RechargeActionHandler(this);
@@ -85,7 +83,7 @@ class EncounterMap extends BaseMap {
                 ce({tag:'button', innerHTML:'+', onClick: () => this.cvs.adjustZoom(1.33)}),
                 ce({tag:'button', innerHTML:'-', onClick: () => this.cvs.adjustZoom(0.66)}),
                 //ship info button?
-                ce({tag:'button', innerHTML: '🗨', classNames: [(!this.encounter.combatEnabled ? 'highlighted' : null)], onClick: ()=> this.onHail(), disabled: (!this.encounter.encounterType.onSurrender || this.uiMode == UI_MODE.Animating)})
+                ce({tag:'button', innerHTML: '🗨', classNames: [(!this.encounter.combatEnabled ? 'highlighted' : null)], onClick: ()=> this.onHail(), disabled: (!this.encounter.encounterType.onSurrender)})
             ]
         })
     }
@@ -262,7 +260,7 @@ class EncounterMap extends BaseMap {
             return;
         }
 
-        if (uiMode == UI_MODE.Targeting) {
+        if (this.targetingLabel.length > 0) {
             ce({parent:container, innerHTML: `${obj.shipType.name}: Targeting ${this.targetingLabel}`})
             ce({parent:container, innerHTML: '(Select target)'})
             ce({parent:container, tag:'button', innerHTML:'Cancel', onClick: ()=>{
@@ -411,14 +409,12 @@ class EncounterMap extends BaseMap {
         console.log('EncounterMap.stopAnimating')
         this.animations = []
         this.animatingAction = null
-        this.uiMode = UI_MODE.Default
         this.refresh()
         this.refreshLogic()
     }
 
     startTargeting(label = '', targetingAreas = [], validTargets = []) {
         console.log('EncounterMap.startTargeting', { label, targetingAreas, validTargets });
-        this.uiMode = UI_MODE.Targeting
         this.targetingLabel = label
         this.targetingAreas = targetingAreas
         this.validTargets = validTargets
@@ -429,7 +425,6 @@ class EncounterMap extends BaseMap {
 
     stopTargeting() {
         console.log('EncounterMap.stopTargeting')
-        this.uiMode = UI_MODE.Default
         for (const cvsObj of this.targetingAreas) this.cvs.deleteObject(cvsObj)
         this.cvs.onClickWorldXY = null;
         this.cvs.onMouseMoveWorldXY = null;
@@ -502,11 +497,11 @@ class EncounterMap extends BaseMap {
                 const ship = encounter.activeTurnFleet.activeShips[i]
                 if (ship.numActionsRemaining > ship.maxActionsPerTurn) {
                     const txt = this.cvs.addText(`fast_${i}`, ship.x, ship.y, 0, -DEFAULT_FONT_SIZE, 'Fast!', COLORS.LightGreen)
-                    txt.setDurationMs(1000)
+                    txt.setDurationMs()
                 }
                 else if (ship.numActionsRemaining < ship.maxActionsPerTurn) {
                     const txt = this.cvs.addText(`slow_${i}`, ship.x, ship.y, 0, -DEFAULT_FONT_SIZE, 'Slow!', COLORS.LightRed)
-                    txt.setDurationMs(1000) 
+                    txt.setDurationMs() 
                 }
             }
             this.refreshLogic()
