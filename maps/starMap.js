@@ -3,48 +3,33 @@ StarMap
 ticket speed: 1 hour per real life second
 default zoom distances: 1200px = half the size of the solar system
 */
-class StarMap {
+class StarMap extends BaseMap {
     constructor(starSystem = new StarSystem(), autoSelectObject = gs.fleet) {
+        super()
         console.log('CREATING STAR MAP FOR SYSTEM:',starSystem)
         this.starSystem = starSystem
-        this.selectedObject = null
 
-        this.paused = true
-        this.lastTickMs = Date.now()
         this.gameYearsPerMs = 1/365/24/60 * 2
-        this.maxMsPerTick = 100
 
-        this.cvs = new CanvasWrapper(200, 20, 2000, NEPTUNE.orbit.radius)
-        this.root = ce({classNames: ['starmap-root'], children: [this.cvs.root]})
-        this.controls = ce({parent: this.root, style: {position: 'absolute', top: 0, left: 0}})
-        this.infoBar = ce({parent: this.root, style:{position:'absolute', bottom: 0, left: 0}})
-        this.objectPane = ce({parent: this.root, style: {position: 'absolute', top: 0, right: 0, height: '100%', pointerEvents: 'none'}})
+        this.initializeDOM(200, 20, 2000, NEPTUNE.orbit.radius)
 
         for (const bgStar of starSystem.backgroundStars) bgStar.reset()
 
         // Allow clicking empty space to select arbitrary coordinates
         this.cvs.onClickWorldXY = (x, y) => {
-            // Create a temporary waypoint object for the clicked coordinates
-            const waypoint = {
-                name: `Coordinates (${roundToPlaces(x, 1)}, ${roundToPlaces(y, 1)})`,
-                x,
-                y,
-                color: COLORS.Cyan,
-                isWaypoint: true
-            }
+            const waypoint = new Waypoint(x, y)
             this.selectObject(waypoint)
         }
 
-        this.rebuildCanvas();
+        this.rebuildCanvas()
         this.refresh()
-
-        window.addEventListener("resize", ()=>this.cvs.autoResize());
-
-        requestAnimationFrame(()=> requestAnimationFrame(()=>{
-            this.cvs.autoResize();
-            this.refresh();
-            this.selectObject(autoSelectObject || gs.fleet)
-        }));
+        this.selectObject(autoSelectObject || gs.fleet)
+    }
+    
+    onDeferredInit() {
+        this.cvs.autoResize()
+        this.refresh()
+        this.selectObject(gs.fleet)
     }
 
     refresh() {
@@ -160,7 +145,7 @@ class StarMap {
 
         fleets.forEach((fleet, index)=>{
             const fleetAngle = fleet.route ? fleet.route.path.angle : -Math.PI/2
-            const fleetObj = cvs.addTriangle(`fleet${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU, fleet.radius/EARTH_RADII_PER_AU, 12, fleet.color, fleetAngle, ()=>this.selectObject(fleet), true)
+            const fleetObj = cvs.addTriangle(`fleet${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU, fleet.radius/EARTH_RADII_PER_AU, 12, fleet.color, fleetAngle, ()=>this.selectObject(fleet))
             cvs.addLine(`fleetpath${index}`, 0, 0, 0, 0, fleet.color, 1)
             cvs.addTriangle(`fleetthruster${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU*0.5, fleet.radius/EARTH_RADII_PER_AU*0.5, 6, COLORS.Orange)
             const labelObj = cvs.addText(`fleetlabel${index}`, fleet.x, fleet.y, 0, -32, fleet.name, fleet.color, DEFAULT_FONT_SIZE, 2, ()=>this.selectObject(fleet),)
@@ -350,7 +335,8 @@ class StarMap {
         if (planet instanceof Planet) showPlanetMenu(planet)
     }
 
-    setDestination(obj = new SpaceObject(), unpause = false) {
+    /** @param {Planet | Waypoint} obj */
+    setDestination(obj, unpause = false) {
         if (obj instanceof Planet) {
             gs.fleet.route = new Route(gs.fleet, obj)
             gs.fleet.location = undefined

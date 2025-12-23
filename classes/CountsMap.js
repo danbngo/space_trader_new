@@ -2,19 +2,22 @@
 
 // Cargo class
 class CountsMap {
-    constructor(counts = new Map([['key',0]])) {
+    /**
+     * @param {Map<any,number>} counts 
+     */
+    constructor(counts = new Map([[{},0]])) {
         this.counts = counts
     }
 
-    getAmount(key = 'key') {
+    getAmount(key = {}) {
         return this.counts.get(key) || 0
     }
 
-    increment(key = 'key', amt = 0) {
+    increment(key = {}, amt = 0) {
         this.counts.set(key, this.getAmount(key) + amt)
     }
 
-    setAmount(key = 'key', amt = 0) {
+    setAmount(key = {}, amt = 0) {
         this.counts.set(key, amt)
     }
 

@@ -80,7 +80,7 @@ class Fleet extends SpaceObject {
     }
 
     get numPilots() {
-        return this.officers.length + this.captain ? 1 : 0
+        return this.officers.length + (this.captain !== undefined ? 1 : 0)
     }
 
     addShip(ship = new Ship()) {

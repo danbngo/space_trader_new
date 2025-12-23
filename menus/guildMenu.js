@@ -4,6 +4,7 @@
 function createHireOfficerMenu(officers = [new Officer()], guild = new Guild(), onSelectOfficer = (officer = new Officer())=>{}) {
     console.log('creating hire officer menu:',officers)
     if (officers.length == 0) return `(None)`
+    /** @type {any[]} */
     const rows = [
         ['Name', 'Level', 'CR Share', ...SKILLS_ALL, 'Hire Price']
     ]

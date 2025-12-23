@@ -21,6 +21,13 @@ class Ship {
         this.maxActionsPerTurn = maxActionsPerTurn;
         this.numActionsRemaining = this.maxActionsPerTurn; //for encounter turn processing
         this.aiType = AI_TYPES.Ship
+        this.localModules = []
+        this.cloakedTurnsRemaining = 0
+        this.moduleCooldowns = new CountsMap()
+    }
+
+    get modules() {
+        return [...this.shipType.modules, ...this.localModules]
     }
 
     get isFlagship() {
@@ -43,7 +50,14 @@ class Ship {
     }
 
     get value() {
-        return Math.pow(this.mass, 2)*2500
+        let baseValue = Math.pow(this.mass, 2)*2500
+        // Add value of installed modules
+        for (const module of this.localModules) {
+            if (module && module.moduleType) {
+                baseValue += module.moduleType.value * (module.quality || 1)
+            }
+        }
+        return baseValue
     }
 
     get combatRating() {
@@ -92,6 +106,11 @@ class Ship {
         //this.restoreShields() //looks weird visually
         this.angle = Math.PI*2;
         this.escaped = false;
+        this.cloakedTurnsRemaining = 0;
+        // Set all module cooldowns to max
+        for (const moduleType of Object.values(SHIP_MODULES)) {
+            this.moduleCooldowns.setAmount(moduleType, moduleType.cooldown)
+        }
         this.resetActions()
     }
 
@@ -163,5 +182,22 @@ class Ship {
         //if ship was at 0 angle, it would be facing right. we would want the ellipse to be wider horizontally than vertically
         const ellipse = new Ellipse(tx, ty, moveRange, moveRange*.66, targetingAngle)
         return ellipse
+    }
+
+    calcWarheadArea(overrideX = this.x, overrideY = this.y) {
+        const targetingAngle = this.angle
+        const attackRange = this.maxAttackDistance
+        // Position circle slightly in front of ship
+        const [cx, cy] = rotatePoint(overrideX + attackRange * 1.2, overrideY, overrideX, overrideY, targetingAngle)
+        return new Circle(cx, cy, attackRange)
+    }
+
+    calcGravitonBeamArea(overrideX = this.x, overrideY = this.y) {
+        const attackRange = 1+this.maxAttackDistance
+        const targetingAngle = this.angle
+        // Position triangle in front of ship
+        const [tx, ty] = rotatePoint(overrideX + attackRange, overrideY, overrideX, overrideY, targetingAngle)
+        const targetingTriangle = new Triangle(tx, ty, attackRange*2, Triangle.calcEquilateralTriangleHeight(attackRange), targetingAngle)
+        return targetingTriangle
     }
 }

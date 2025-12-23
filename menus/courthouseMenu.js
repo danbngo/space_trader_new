@@ -58,10 +58,14 @@ function showCourthouseMenu(courthouse = new Courthouse()) {
         ]
     })
 
-    panel = showModal(
+    showModal(
         `${coloredName(planet)} - Courthouse`,
-        `${gs.captain.bounty > 0 ? `The courthouse grants you temporary amnesty since you have come of own volition.` : ''}`,
-        infoContainer,
+        ce({
+            children:[
+                `${isDocked && gs.captain.bounty > 0 ? `The courthouse grants you temporary amnesty since you have come of own volition.` : ''}`,
+                infoContainer,
+            ]
+        }),
         [
             ...baseButtons,
             ['Back', ()=>showPlanetMenu(planet)]

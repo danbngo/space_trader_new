@@ -1,20 +1,11 @@
-class EncounterMap {
+class EncounterMap extends BaseMap {
     constructor(encounter = new Encounter(), autoSelectObject = encounter.playerShips[0]) {
+        super()
         this.starSystem = gs.system
         this.encounter = encounter
-        this.selectedObject = autoSelectObject || encounter.playerShips[0];
+        this.paused = false // Override default paused state for encounters
 
-        this.lastTickMs = Date.now()
-        this.maxMsPerTick = 100
-        this.paused = false
-
-        const baseZoom = ENCOUNTER_MAP_RADIUS_MILES/2
-        this.cvs = new CanvasWrapper(baseZoom/2, baseZoom/10, baseZoom*10, encounter.mapRadius)
-        this.root = ce({classNames: ['starmap-root'], children: [this.cvs.root]})
-        this.controls = ce({parent: this.root, style: {position: 'absolute', top: 0, left: 0}})
-        this.infoBar = ce({parent: this.root, style:{position:'absolute', bottom: 0, left: 0}})
-        this.objectPane = ce({parent: this.root, style: {position: 'absolute', top: 0, right: 0, height: '100%', pointerEvents: 'none'}})
-
+        /** @type {UI_MODE[keyof UI_MODE]} */
         this.uiMode = UI_MODE.Default;
         this.targetingLabel = '';
         this.targetingAreas = [];
@@ -26,23 +17,36 @@ class EncounterMap {
         // Combat popup text - Map of id -> {textContent, color, endMs, x, y}
         this.popups = new Map();
 
+        const baseZoom = ENCOUNTER_MAP_RADIUS_MILES/2
+        this.initializeDOM(baseZoom/2, baseZoom/10, baseZoom*10, encounter.mapRadius)
+
         // Initialize action handlers
         this.attackHandler = new AttackActionHandler(this);
         this.moveHandler = new MoveActionHandler(this);
         this.ramHandler = new RamActionHandler(this);
         this.rechargeHandler = new RechargeActionHandler(this);
         this.waitHandler = new WaitActionHandler(this);
+        
+        // Initialize module handlers
+        this.cloakHandler = new CloakActionHandler(this);
+        this.gravitonBeamHandler = new GravitonBeamActionHandler(this);
+        this.warheadHandler = new WarheadActionHandler(this);
+        this.empPulseHandler = new EMPPulseActionHandler(this);
+        this.blinkHandler = new BlinkActionHandler(this);
+        this.boosterHandler = new BoosterActionHandler(this);
+        this.smokeBombHandler = new SmokeBombActionHandler(this);
+        
         this.animatingAction = null
 
-        this.rebuildCanvas();
-        this.refresh(true)
-        window.addEventListener("resize", ()=>this.cvs.autoResize());
-        
-        requestAnimationFrame(()=> requestAnimationFrame(()=>{
-            this.cvs.autoResize();
-            this.selectObject(autoSelectObject || encounter.playerShips[0])
-            this.refresh(true);
-        }));
+        this.rebuildCanvas()
+        this.refresh()
+        this.selectObject(autoSelectObject || encounter.playerShips[0])
+    }
+    
+    onDeferredInit() {
+        this.cvs.autoResize()
+        this.selectObject(this.encounter.playerShips[0])
+        this.refresh()
     }
 
     refresh() {
@@ -119,7 +123,7 @@ class EncounterMap {
         ships.forEach((ship,index) => {
             let shipObj;
             if (ship.shipType.shape == SHAPES.Triangle) {
-                shipObj = cvs.addTriangle(`ship${index}`, ship.x, ship.y, ship.radius, ship.radius, 12, ship.color, ship.angle, ()=>this.selectObject(ship), true)
+                shipObj = cvs.addTriangle(`ship${index}`, ship.x, ship.y, ship.radius, ship.radius, 12, ship.color, ship.angle, ()=>this.selectObject(ship))
             }
             else if (ship.shipType.shape == SHAPES.FilledOval) {
                 shipObj = cvs.addFilledOval(`ship${index}`, ship.x, ship.y, ship.radius, (ship.radius*(Math.random()+0.5)), 0.5, ship.color, ship.angle, ()=>this.selectObject(ship))
@@ -182,7 +186,16 @@ class EncounterMap {
             cvsShipObject.x = ship.x
             cvsShipObject.y = ship.y
             cvsShipObject.angle = ship.angle
-            cvsShipObject.fillColor[3] = hullRatio
+            
+            // Display cloaked ships as white with low alpha
+            if (ship.cloakedTurnsRemaining > 0) {
+                cvsShipObject.fillColor[0] = 255
+                cvsShipObject.fillColor[1] = 255
+                cvsShipObject.fillColor[2] = 255
+                cvsShipObject.fillColor[3] = 0.3
+            } else {
+                cvsShipObject.fillColor[3] = hullRatio
+            }
             
             cvsShieldObject.x = ship.x
             cvsShieldObject.y = ship.y
@@ -305,6 +318,50 @@ class EncounterMap {
                     if (canRecharge) this.rechargeHandler.attempt(obj)
                     else this.waitHandler.attempt(obj)
                 }})
+                
+                // Module buttons
+                if (obj.modules.includes(SHIP_MODULES.CLOAK)) {
+                    const onCooldown = obj.moduleCooldowns.getAmount(SHIP_MODULES.CLOAK) > 0
+                    ce({parent:container, tag:'button', innerHTML:'Cloak', disabled: !canAct || onCooldown, onClick: ()=>{
+                        this.cloakHandler.startTargeting(obj)
+                    }})
+                }
+                if (obj.modules.includes(SHIP_MODULES.GRAVITON_BEAM)) {
+                    const onCooldown = obj.moduleCooldowns.getAmount(SHIP_MODULES.GRAVITON_BEAM) > 0
+                    ce({parent:container, tag:'button', innerHTML:'Graviton Beam', disabled: !canAct || onCooldown, onClick: ()=>{
+                        this.gravitonBeamHandler.startTargeting(obj)
+                    }})
+                }
+                if (obj.modules.includes(SHIP_MODULES.WARHEAD)) {
+                    const onCooldown = obj.moduleCooldowns.getAmount(SHIP_MODULES.WARHEAD) > 0
+                    ce({parent:container, tag:'button', innerHTML:'Warhead', disabled: !canAct || onCooldown, onClick: ()=>{
+                        this.warheadHandler.startTargeting(obj)
+                    }})
+                }
+                if (obj.modules.includes(SHIP_MODULES.EMP_PULSE)) {
+                    const onCooldown = obj.moduleCooldowns.getAmount(SHIP_MODULES.EMP_PULSE) > 0
+                    ce({parent:container, tag:'button', innerHTML:'EMP Pulse', disabled: !canAct || onCooldown, onClick: ()=>{
+                        this.empPulseHandler.startTargeting(obj)
+                    }})
+                }
+                if (obj.modules.includes(SHIP_MODULES.BLINK)) {
+                    const onCooldown = obj.moduleCooldowns.getAmount(SHIP_MODULES.BLINK) > 0
+                    ce({parent:container, tag:'button', innerHTML:'Blink', disabled: !canAct || onCooldown, onClick: ()=>{
+                        this.blinkHandler.startTargeting(obj)
+                    }})
+                }
+                if (obj.modules.includes(SHIP_MODULES.BOOSTER)) {
+                    const onCooldown = obj.moduleCooldowns.getAmount(SHIP_MODULES.BOOSTER) > 0
+                    ce({parent:container, tag:'button', innerHTML:'Booster', disabled: !canAct || onCooldown, onClick: ()=>{
+                        this.boosterHandler.startTargeting(obj)
+                    }})
+                }
+                if (obj.modules.includes(SHIP_MODULES.SMOKE_BOMB)) {
+                    const onCooldown = obj.moduleCooldowns.getAmount(SHIP_MODULES.SMOKE_BOMB) > 0
+                    ce({parent:container, tag:'button', innerHTML:'Smoke Bomb', disabled: !canAct || onCooldown, onClick: ()=>{
+                        this.smokeBombHandler.startTargeting(obj)
+                    }})
+                }
             }
         }
     }

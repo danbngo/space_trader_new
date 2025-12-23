@@ -1,5 +1,11 @@
 
+
 class Route {
+    /**
+     * @param {Fleet} fleet
+     * @param {Planet|Waypoint} destination
+     * @param {number} startYear
+     */
     constructor(fleet = new Fleet(), destination = new Planet(), startYear = gs.year) {
         //run simu
         const naiveDistance = calcDistance(fleet.x, fleet.y, destination.x, destination.y)
@@ -20,6 +26,16 @@ class Route {
         return this.path.positionAtProgress(progressRatio)
     }
 
+
+    /**
+     * 
+     * @param {number} startYear 
+     * @param {Fleet} fleet 
+     * @param {Planet|Waypoint} planet 
+     * @param {number} [samples] 
+     * @param {number} [maxYears] 
+     * @returns {{bestYearOffset: number, endPosition: [number, number], toX: number, toY: number, endYear: number, debug: Array}}  
+     */
     static estimateTravelTimeToOrbitingBody(
         startYear = 0,
         fleet = new Fleet(),
@@ -30,6 +46,7 @@ class Route {
         const results = [];
         const speed = fleet.speed
         let bestYearOffset = Infinity;
+        /** @type {[number, number] | undefined} */
         let endPosition;
 
         console.log('estimating travel time to an orbiting body:',startYear,fleet,planet,samples,maxYears)
@@ -38,7 +55,7 @@ class Route {
             const t = (i / samples) * maxYears; // future year offset
 
             // planet's position in AU
-            const [px, py] = planet.calcAbsPositionAtYear ? planet.calcAbsPositionAtYear(startYear + t) : [planet.x, planet.y];
+            const [px, py] = planet instanceof Planet ? planet.calcAbsPositionAtYear(startYear + t) : [planet.x, planet.y];
 
             const dx = px - fleet.x;
             const dy = py - fleet.y;

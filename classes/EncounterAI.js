@@ -140,9 +140,9 @@ class EncounterAI {
         const strategy = this.calcCombatStrategy(ship)
         const opposingFleet = this.calcOpposingFleet(ship.fleet)
         const targets = opposingFleet.activeShips
-        const attackableTargets = encounter.calcAttackTargets(ship, targets)
-        const rammableTargets = encounter.calcRamTargets(ship, targets)
-        const nearestTarget = this.calcNearestTarget(ship, targets)
+        const attackableTargets = encounter.calcAttackTargets(ship)
+        const rammableTargets = encounter.calcRamTargets(ship)
+        const nearestTarget = this.calcNearestTarget(ship)
 
         console.log('deciding move for ship with strategy:', { strategy, nearestTarget, attackableTargets, rammableTargets, targets, opposingFleet });
 

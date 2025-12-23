@@ -1,4 +1,5 @@
 function createMarketCargoTable(blackMarket = false, playerCargo = new CountsMap(), marketCargo = new CountsMap(), buyPrices = new CountsMap(), sellPrices = new CountsMap(), onSelectCargoType = (ct = CARGO_TYPES_ALL[0])=>{}) {
+    /** @type {any[]} */
     const rows = [
         ['Cargo Type', 'Market Amt.', 'Buy Price', 'Your Amt.', 'Sell Price']
     ]
@@ -68,7 +69,7 @@ function showMarketMenu(market = new Market()) {
             1, buyableAmount, `Buy ${ct.name}`, 
             `How many ${ct.name} would you like to buy?`,
             (amt)=>`Price: ${amt*buyPrice}CR`,
-            'Buy', 'Cancel', (amt = 0)=>buyCargo(ct, amt, amt*buyPrice), ()=>reloadMenu(),
+            'Buy', 'Cancel', (amt = 0)=>buyCargo(ct, amt), ()=>reloadMenu(),
         )
     }
 
@@ -103,7 +104,7 @@ function showMarketMenu(market = new Market()) {
         ]
     })
 
-    panel = showModal(
+    showModal(
         `${coloredName(planet)} - ${blackMarket ? 'Black Market' : 'Market'}`,
         infoContainer,
         [['Back', ()=>showPlanetMenu(planet)]],

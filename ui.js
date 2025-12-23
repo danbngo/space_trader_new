@@ -9,22 +9,36 @@ function removeChildren(parent = ce()) {
     while (parent.firstChild) parent.removeChild(parent.firstChild)
 }
 
-function refreshPanelButtons (panelId = '', buttons = []) {
-    const panel = panelId instanceof HTMLElement ? panelId : document.body.querySelector(`#${panelId}`)
+/**
+ * 
+ * @param {any} panelId 
+ * @param {any[]} buttons 
+ */
+function refreshPanelButtons (panelId = '', buttons) {
+    const panel = (panelId instanceof HTMLElement) ? panelId : document.body.querySelector(`#${panelId}`)
     const buttonsEl = panel.querySelector(".panel-buttons")
     removeChildren(buttonsEl)
-    buttons.forEach((btnData) => {
+    if (buttons) buttons.forEach((btnData) => {
         if (!btnData) return
         const [label, handler, disabled] = btnData
         const btn = document.createElement('button');
         btn.textContent = label;
+        // @ts-ignore
         btn.onclick = handler;
         buttonsEl.appendChild(btn);
         if (disabled) {console.log('gonna disable a btn:',btn); btn.disabled = true}
     });
 }
 
-function createPanel(title = '', text = '', buttons = [['Continue', ()=>{}, false]], id = '') {
+/**
+ * 
+ * @param {string} title 
+ * @param {any} text 
+ * @param {any[]} buttons 
+ * @param {string} id 
+ * @returns 
+ */
+function createPanel(title = '', text = '', buttons = [], id = '') {
     const panel = ce({
         id,
         classNames: ['panel'],
@@ -38,21 +52,23 @@ function createPanel(title = '', text = '', buttons = [['Continue', ()=>{}, fals
     return panel;
 }
 
-function showPanel(title = '', text = '', buttons = ['Continue', ()=>{}], id = '') {
+function showPanel(title = '', text = '', buttons = [], id = '') {
     const panel = createPanel(title, text, buttons, id);
     showElement(panel)
     return panel
 }
 
-function showSliderModal(min = 0, max = 10, title = '', description = '', footerGenerator = (value = 0)=>'', acceptLabel = 'Accept', cancelLabel = 'Cancel', onAccept = () => {}, onCancel = () => ()=>closeModal()) {
+function showSliderModal(min = 0, max = 10, title = '', description = '', footerGenerator = (value = 0)=>'', acceptLabel = 'Accept', cancelLabel = 'Cancel', onAccept = (value = 0) => {}, onCancel = () =>closeModal()) {
     let currentValue = min;
     
     const slider = ce({tag: 'input', style: {width: '100%'}});
+    if (!(slider instanceof HTMLInputElement)) return
     slider.type = 'range';
-    slider.min = min;
-    slider.max = max;
-    slider.value = min;
+    slider.min = ''+min;
+    slider.max = ''+max;
+    slider.value = ''+min;
     slider.oninput = (e) => {
+        // @ts-ignore
         currentValue = parseInt(e.target.value);
         const footerText = footerGenerator ? footerGenerator(currentValue) : ''
         document.getElementById('slider-value').textContent = `${currentValue} / ${max}`;
@@ -84,6 +100,7 @@ function showSliderModal(min = 0, max = 10, title = '', description = '', footer
     );
     
     refreshPanelButtons(panel, buttons);
+    // @ts-ignore
     slider.oninput({target:{value:slider.value}})
     return panel;
 }
@@ -95,11 +112,17 @@ function showElement(element = ce()) {
 
 let currentMap;
 
-function showMap(map = new StarMap()) {
+/** @param {BaseMap} map */
+function showMap(map) {
     currentMap = map
     showElement(map.root)
 }
 
+/**
+ * @param {any} text
+ * @param {number} ratio
+ * @param {boolean} asHtmlText
+ */
 function statColorSpan(text = '', ratio = 1.0, asHtmlText = false) {
     // clamp ratio so interpolation works cleanly
     const r = Math.max(0, Math.min(ratio, 4.0));
@@ -117,6 +140,7 @@ function statColorSpan(text = '', ratio = 1.0, asHtmlText = false) {
         return `rgb(${rr}, ${rg}, ${rb})`;
     }
     // segments (minRatio, maxRatio, colorA, colorB)
+    /** @type {Array<[number, number, string, string]>} */
     const segments = [
         [0.0, 0.5,   "#ff0000", "#ff8000"], // red → orange
         [0.5, 0.75,  "#ff8000", "#ffff00"], // orange → yellow
@@ -147,15 +171,19 @@ function colorSpan(text = '', color = '', asHtmlText = true) {
     return span;
 }
 
-function ce({tag = 'div', id = '', innerHTML = '', children = [], parent = undefined, classNames = [], onClick, style = {}, disabled = false} = {}) {
+
+function ce({tag = 'div', id = '', innerHTML = '', children = [], parent = undefined, classNames = [], onClick = undefined, style = {}, disabled = false} = {}) {
     id = id || ''
     tag = tag || 'div'
     children = children || []
     classNames = classNames || []
-    style = style || {}
-    if (onClick) style.cursor = 'pointer'
-    if (disabled) style.cursor = ''
 
+    /** @type {any} */
+    const effectiveStyle = style || {}
+    if (onClick) effectiveStyle.cursor = 'pointer'
+    if (disabled) effectiveStyle.cursor = ''
+
+    /** @type {any} */
     const el = document.createElement(tag)
     if (innerHTML !== undefined) el.innerHTML = ''+innerHTML
     if (id && id.length > 0) el.id = ''+id
@@ -163,8 +191,8 @@ function ce({tag = 'div', id = '', innerHTML = '', children = [], parent = undef
     if (parent) parent.appendChild(el)
     if (classNames && classNames.length > 0) for (const className of classNames) if (className && className.length > 0) el.classList.add(className)
     if (onClick) el.onclick = onClick
-    if (style) applyStyle(el, style)
-    if (disabled) el.disabled = true
+    if (style) applyStyle(el, effectiveStyle)
+    if (disabled && (el instanceof HTMLButtonElement || el instanceof HTMLInputElement)) el.disabled = true
     return el
 }
 
@@ -216,6 +244,12 @@ function createTable(rows = [ce()], onSelectRow = (index = 0)=>{}) {
 
 let currentModal = ce()
 
+/**
+ * @param {string} title
+ * @param {string | HTMLElement | Element} text
+ * @param {any[]} buttons
+ * @param {string} id
+*/
 function showModal(title = '', text = '', buttons = [['Continue', ()=>{}, false]], id = '') {
     if (currentMap) currentMap.refresh()
     // Close existing modal if open
@@ -284,7 +318,7 @@ function attachMouseWheelHandler(element = ce(), callback = (direction = 1)=>{})
         // Normalize to +1 / -1
         const direction = delta < 0 ? 1 : -1;
 
-        callback(direction, event);
+        callback(direction);
     };
 
     // Modern browsers

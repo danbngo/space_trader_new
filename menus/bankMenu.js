@@ -1,5 +1,6 @@
 function createBankLoansTable(loans = [new BankLoan()], onSelectLoan = (loan = new BankLoan())=>{}) {
     if (loans.length == 0) return `(None)`
+    /** @type {Array<Array<string|number|HTMLElement>>} */
     const rows = [
         ['Due Date', 'Term', 'Outstanding Balance', 'Total Repayable', 'Principal', 'Interest']
     ]
@@ -142,7 +143,7 @@ function showBankMenu(bank = new Bank()) {
         ...(isDocked && canBorrow ? [['Borrow', ()=>showBorrowSlider()]] : []),
     ]
 
-    function onSelectLoan(loan = new Loan()) {
+    function onSelectLoan(loan = new BankLoan()) {
         const canRepay = gs.credits > 0
         const buttons = [
             ...baseButtons,
@@ -162,7 +163,7 @@ function showBankMenu(bank = new Bank()) {
         ]
     })
 
-    panel = showModal(
+    showModal(
         `${coloredName(planet)} - Bank`,
         infoContainer,
         [

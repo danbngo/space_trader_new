@@ -15,9 +15,20 @@ function generateShipyard(planet = new Planet()) {
     for(let i=0;i<count;i++) {
         ships.push(generateShip(rndMember(SHIP_TYPES_ALL), planet));
     }
+    
+    // Generate modules
+    const moduleCount = rng(4, 1)
+    const modules = []
+    const allModuleTypes = Object.values(SHIP_MODULES)
+    for(let i=0;i<moduleCount;i++) {
+        const moduleType = rndMember(allModuleTypes)
+        const quality = rng(1.5, 0.5, false)
+        modules.push(new ShipModule(moduleType, quality))
+    }
+    
     const rake = rng(2, 0.5, false)
     const credits = rng(200*1000, 10*1000);
-    return new Shipyard(planet, ships, credits, rake);
+    return new Shipyard(planet, ships, modules, credits, rake);
 }
 
 function generateMarket(planet = new Planet(), blackMarket = false) {

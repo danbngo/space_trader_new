@@ -21,9 +21,10 @@ class Building {
 }
 
 class Shipyard extends Building {
-    constructor(planet = new Planet(), ships = [], credits = 0, baseRake = 1) {
+    constructor(planet = new Planet(), ships = [], modules = [], credits = 0, baseRake = 1) {
         super(planet, baseRake, credits)
         this.ships = ships; // Ship[]
+        this.modules = modules; // ShipModule[]
     }
 
     static state = new ShipyardState();
@@ -45,6 +46,9 @@ class Shipyard extends Building {
     calcSellPrice(ship = new Ship()) {
         return Math.round(ship.value / (1+this.rake))
     }
+    calcBuyModulePrice(module = new ShipModule()) {
+        return Math.round(module.moduleType.value * module.quality * (1+this.rake))
+    }
 }
 
 // Guild class
@@ -59,7 +63,7 @@ class Guild extends Building {
 }
 
 class Market extends Building {
-    constructor(planet = new Planet(), blackMarket = false, cargo = [], credits = 0, baseRake = 1) {
+    constructor(planet = new Planet(), blackMarket = false, cargo = new CountsMap(), credits = 0, baseRake = 1) {
         super(planet, baseRake, credits)
         this.blackMarket = blackMarket;
         this.cargo = cargo; // Cargo[]

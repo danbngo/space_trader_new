@@ -102,7 +102,7 @@ function handlePlayerStranded() {
     const noCredits = gs.credits <= 0
     const dayCost = 1 + rng(1.5*nearestDistance, 0.75*nearestDistance, false)
     gs.credits = Math.max(0, gs.credits - creditCost)
-    gs.days += dayCost
+    gs.year += dayCost/365
 
     console.log('player is stranded:',nearestPlanet,nearestDistance,creditCost,dayCost)
     gs.fleet.dock(nearestPlanet)
@@ -154,8 +154,8 @@ function showPlayerDidSurrenderModal( fameLossMultiplier = 1) {
     gs.captain.infamy -= infamyLoss
 
     let msg = `There's no other choice. You power your ships down and broadcast the universal signal for surrender.<br/>`
-    if (fameLoss) msg += `Submitting meekly to the ravages of the ${fleetName} causes you to lose ${famePenalty} fame.<br/>`
-    if (infamyLoss) msg += `Throwing yourself upon the mercy of the ${fleetName} causes you to lose ${famePenalty} infamy.<br/>`
+    if (fameLoss) msg += `Submitting meekly to the ravages of the ${fleetName} causes you to lose ${fameLoss} fame.<br/>`
+    if (infamyLoss) msg += `Throwing yourself upon the mercy of the ${fleetName} causes you to lose ${fameLoss} infamy.<br/>`
 
     showModal(fleetName, msg, [['Continue', ()=>gs.encounter.encounterType.onDefeat()]])
 }
@@ -205,6 +205,7 @@ function showTradeOfferPlayerSellModal() {
     let msg = ''
     const fleetName = gs.encounter.fleetName
     const ct = gs.fleet.cargo.randomItem(false)
+    if (!(ct instanceof CargoType)) throw new Error('wrong cargo type!')
     let onSell = null;
 
     msg += `The merchants look through your wares.<br/>`
@@ -291,12 +292,12 @@ function showPlayerDefeatedEnemyModal(fameMultiplier = 0) {
     const abandonedCargoCapacity = disabledEnemyShips.reduce( (total, ship) => {
         return total + ship.cargoSpace
     }, 0)
-    const creditsAmt = Math.floor(Math.random() * enemyFleet.credits * (abandonedCargoCapacity / enemyFleet.totalCargoSpace))
-    if (!isNaN(creditsAmt) && creditsAmt && creditsAmt > 0) {
-        const officersShare = gs.fleet.calcTotalCRShare(creditsAmt, true)
-        const finalCredits = creditsAmt - officersShare
-        gs.credits += finalCredits
-    }
+    let creditsAmt = Math.floor(Math.random() * enemyFleet.credits * (abandonedCargoCapacity / enemyFleet.totalCargoSpace))
+    if (!isNaN(creditsAmt)) throw new Error('creditsAmt was NaN!')
+    const officersShare = gs.fleet.calcTotalCRShare(creditsAmt, true)
+    const finalCredits = creditsAmt - officersShare
+    gs.credits += finalCredits
+    creditsAmt = finalCredits
     const cargoRatio = abandonedCargoCapacity / enemyFleet.totalCargoSpace
     const maxLootAmt = Math.floor(enemyFleet.cargo.total * cargoRatio)
     const baseLootAmt = Math.floor(Math.random() * maxLootAmt)
@@ -505,6 +506,10 @@ function showPlayerEscapedFromHazardsModal() {
     showModal(gs.encounter.encounterType.name, msg, [['Continue', ()=>endEncounter()]])
 }
 
+/**
+ * 
+ * @returns {[number, CountsMap]} - [fine amount, seized cargo]
+ */
 function seizePlayerContraband() {
     const illegalCargo = Array.from(gs.fleet.cargo.counts.keys()).filter( ct => ct.isIllegal )
     const seized = new CountsMap()

@@ -6,6 +6,17 @@ class GameState {
         // Create captain
         const captain = new Officer("Captain", STARTING_CREDITS);
         const playerShip = new Ship("Starting Ship", PSEUDO_SHIP_TYPES.STARTING_SHIP, COLORS.LightGray, [30,30], [20,20], 10, 10, 10, 10)
+        
+        // Give player all modules for testing
+        playerShip.localModules = [
+            SHIP_MODULES.CLOAK,
+            SHIP_MODULES.GRAVITON_BEAM,
+            SHIP_MODULES.WARHEAD,
+            SHIP_MODULES.EMP_PULSE,
+            SHIP_MODULES.BLINK,
+            SHIP_MODULES.BOOSTER,
+            SHIP_MODULES.SMOKE_BOMB
+        ]
 
         // Create fleet
         this.fleet = new Fleet(
@@ -41,14 +52,14 @@ class GameState {
         return this.fleet.captain;
     }
 
-    set captain(captain = new Officer()) {
+    set captain(captain) {
         this.fleet.captain = captain
     }
 
     get credits() {
         return this.captain.credits;
     }
-    set credits(amt = 0) {
+    set credits(amt) {
         this.captain.credits = amt
     }
 
@@ -112,7 +123,7 @@ class GameState {
 
         // Restore fleet
         this.fleet = Object.assign(
-            new Fleet("Player Fleet", COLORS.LightGray, 0, 0, [], [], 0, null, EARTH, 0),
+            new Fleet("Player Fleet", COLORS.LightGray, 0, 0),
             data.fleet
         );
 

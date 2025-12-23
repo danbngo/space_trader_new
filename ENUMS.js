@@ -45,6 +45,10 @@ const PLANET_TYPES = Object.freeze({
 
 const PLANET_TYPES_ALL = Object.values(PLANET_TYPES)
 
+/**
+ * Color values as RGBA tuples
+ * @type {{ [key: string]: number[] }}
+ */
 const COLORS = Object.freeze({
     White: [255,255,255,1], // rgba(255,255,255,1)
     Black: [0,0,0,1], // rgba(0,0,0,1)
@@ -79,6 +83,13 @@ const MOVE_TYPES = Object.freeze({
     Ram: 'Ram',
     Recharge: 'Recharge',
     Wait: 'Wait',
+    Blink: 'Blink',
+    Booster: 'Booster',
+    Cloak: 'Cloak',
+    Warhead: 'Warhead',
+    EMPPulse: 'EMPPulse',
+    GravitonBeam: 'GravitonBeam',
+    SmokeBomb: 'SmokeBomb'
 })
 const MOVE_TYPES_ALL = Object.values(MOVE_TYPES)
 

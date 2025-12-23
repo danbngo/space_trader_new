@@ -1,11 +1,11 @@
+DONE:
+-hard to click on objects because of the no click on drag thing, need to make that less strict
 
 NEXT UP:
 theres a weird bug where enemy ships keep waiting/recharging if close to me and fast small ships
 more strategic combat - tractor rays etc. maybe stuff like dust clouds that slow ships down.
 academy improvements - let players pay money for skills, some are cheaper than others
--hard to click on objects because of the no click on drag thing, need to make that less strict
 take on bounty missions ?? letter of marque??
-the way population works is kinda dumb??
 
 - tutorial?
 
@@ -17,6 +17,7 @@ missions - via the guild, etc.
 -have a grand narrative of some sort - political change, war, etc between planets
 add dwarf planets?
 give officers and ships perks - not just boring levelups
+the way population works is kinda dumb??
 
 EVENTUALLY TURN THIS INTO A ROGUELIKE LOL.
 
