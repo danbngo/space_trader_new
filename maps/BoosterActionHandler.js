@@ -17,16 +17,11 @@ class BoosterActionHandler extends ActionHandler {
 
     attempt(attacker = new Ship(), target = null, x = 0, y = 0) {
         console.log('BoosterActionHandler.attempt', { attacker });
-        const boostDistance = attacker.maxMoveDistance * 1.5
-        const [dx, dy] = rotatePoint(boostDistance, 0, 0, 0, attacker.angle)
-        const toX = attacker.x + dx
-        const toY = attacker.y + dy
-        const action = new ShipAction(this.encounter, attacker, MOVE_TYPES.Booster, null, toX, toY)
-        action.actorGoodMessage = 'Boost!'
+        const action = new BoosterAction(this.encounter, attacker)
         this.execute(action)
     }
 
-    execute(action = new ShipAction()) {
+    execute(action = new BoosterAction()) {
         console.log('BoosterActionHandler.execute', { action });
         this.encounterMap.animatingAction = action
         const animations = this.encounterMap.animations

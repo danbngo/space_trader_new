@@ -37,14 +37,11 @@ class GravitonBeamActionHandler extends ActionHandler {
     attempt(attacker = new Ship(), target = new Ship()) {
         console.log('GravitonBeamActionHandler.attempt', { attacker, target });
         if (!this.encounterMap.validTargets.includes(target)) return
-        const [attackerToX, attackerToY] = [attacker.x*0.75+target.x*0.25, attacker.y*0.75+target.y*0.25]
-        const [targetToX, targetToY] = [attacker.x*0.5+target.x*0.5, attacker.y*0.5+target.y*0.5]
-        const action = new ShipAction(this.encounter, attacker, MOVE_TYPES.GravitonBeam, target, attackerToX, attackerToY, targetToX, targetToY)
-        action.actorGoodMessage = 'Graviton Beam!'
+        const action = new GravitonBeamAction(this.encounter, attacker, target)
         this.execute(action)
     }
 
-    execute(action = new ShipAction()) {
+    execute(action = new GravitonBeamAction()) {
         console.log('GravitonBeamActionHandler.execute', { action });
         this.encounterMap.animatingAction = action
         const animations = this.encounterMap.animations

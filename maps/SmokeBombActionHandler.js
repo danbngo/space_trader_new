@@ -34,7 +34,7 @@ class SmokeBombActionHandler extends ActionHandler {
     attempt(attacker = new Ship(), target = null, x = 0, y = 0) {
         console.log('SmokeBombActionHandler.attempt', { attacker, x, y });
         const action = new ShipAction(this.encounter, attacker, MOVE_TYPES.SmokeBomb, null, x, y)
-        action.actorGoodMessage = 'Smoke Bomb!'
+        action.actorInfoMessage = 'Smoke Bomb!'
         this.execute(action)
     }
 

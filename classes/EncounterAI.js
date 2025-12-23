@@ -5,24 +5,19 @@ class EncounterAI {
         this.encounter = encounter
     }
 
-    calcOpposingFleet(fleet = new Fleet()) {
-        console.log('EncounterAI.calcOpposingFleet', { fleet });
-        if (fleet == gs.fleet) return this.encounter.fleet
-        else return gs.fleet
-    }
-
     calcShipsWithActions(fleet = new Fleet()) {
         console.log('EncounterAI.calcShipsWithActions', { fleet });
         return fleet.activeShips.filter(s => s.numActionsRemaining > 0)
     }
 
-    calcNearestTarget(ship = new Ship(), targetShips = [new Ship()]) {
+    calcNearestTarget(ship = new Ship()) {
+        const targetShips = this.encounter.calcHarmableTargets(ship)
         console.log('EncounterAI.calcNearestTarget', { ship, targetShips });
         let closestDistance = Infinity
         let closest = undefined
         const {x,y} = ship
         for (const target of targetShips) {
-            if (target.isDisabled() || target.escaped) continue
+            if (target.disabled || target.escaped) continue
             const distance = calcDistance(x, y, target.x, target.y)
             if (distance < closestDistance) {
                 closestDistance = distance
@@ -35,7 +30,7 @@ class EncounterAI {
     calcCombatStrategy(ship = new Ship()) {
         console.log('EncounterAI.calcCombatStrategy', { ship });
         const {fleet, aiType} = ship
-        const opposingFleet = this.calcOpposingFleet(fleet)
+        const opposingFleet = this.encounter.calcOpposingFleet(fleet)
         const fleetCombatBalance = fleet.combatRating / opposingFleet.combatRating
         const shipState = (ship.hull[0] / ship.hull[1] + ship.shields[0] / ship.shields[1]) / 2
         let strategy;
@@ -108,8 +103,8 @@ class EncounterAI {
     }
 
     //simulates 100 moves. a move is considered good if it allows you to attack
-    calcBestAttackCoords(attacker = new Ship(), targets = [new Ship()], simulations = 100) {
-        console.log('EncounterAI.calcBestAttackCoords', { attacker, targets, simulations });
+    calcBestLaserCoords(attacker = new Ship(), targets = [new Ship()], simulations = 100) {
+        console.log('EncounterAI.calcBestLaserCoords', { attacker, targets, simulations });
         const moveArea = attacker.calcMoveArea()
         let bestMove = null
         let bestMoveScore = 0.1 //only consider moves that allow attacking
@@ -138,18 +133,18 @@ class EncounterAI {
         console.log('EncounterAI.calcMoveForShip', { ship });
         const {encounter} = this
         const strategy = this.calcCombatStrategy(ship)
-        const opposingFleet = this.calcOpposingFleet(ship.fleet)
+        const opposingFleet = this.encounter.calcOpposingFleet(ship.fleet)
         const targets = opposingFleet.activeShips
-        const attackableTargets = encounter.calcAttackTargets(ship)
+        const attackableTargets = encounter.calcLaserTargets(ship)
         const rammableTargets = encounter.calcRamTargets(ship)
-        const nearestTarget = this.calcNearestTarget(ship, opposingFleet.activeShips)
+        const nearestTarget = this.calcNearestTarget(ship)
 
         console.log('deciding move for ship with strategy:', { strategy, nearestTarget, attackableTargets, rammableTargets, targets, opposingFleet });
 
         if (strategy == COMBAT_STRATEGIES.Asteroid) {
             if (attackableTargets.length > 0 && ship.lasers > 0 && Math.random() > 0.5) {
                 //attack targets if any available
-                return new ShipAction(encounter, ship, MOVE_TYPES.Attack, rndMember(attackableTargets))
+                return new ShipAction(encounter, ship, MOVE_TYPES.Laser, rndMember(attackableTargets))
             }
             const inTheWayTargets = rammableTargets.filter(t => {
                 const path = new Path(ship.x, ship.y, t.x, t.y)
@@ -172,7 +167,7 @@ class EncounterAI {
         else if (strategy == COMBAT_STRATEGIES.Attack) {
             if (attackableTargets.length > 0 && ship.lasers > 0) {
                 //attack targets if any available
-                return new ShipAction(encounter, ship, MOVE_TYPES.Attack, rndMember(attackableTargets))
+                return new ShipAction(encounter, ship, MOVE_TYPES.Laser, rndMember(attackableTargets))
             }
             else if (rammableTargets.length > 0 && ship.engine > 0) {
                 //ram targets if any available - but don't ram if they have more hull than us
@@ -183,7 +178,7 @@ class EncounterAI {
             }
             else if (ship.engine > 0 && nearestTarget !== undefined) {
                 //move into attack range if possible
-                const bestMove = this.calcBestAttackCoords(ship, targets)
+                const bestMove = this.calcBestLaserCoords(ship, targets)
                 if (bestMove) return new ShipAction(encounter, ship, MOVE_TYPES.Move, null, bestMove[0], bestMove[1])
                 else {
                     //move towards nearest target

@@ -76,7 +76,7 @@ class Fleet extends SpaceObject {
     }
     
     get stranded() {
-        return this.ships.filter(s=>(!s.isDisabled())).length <= 0
+        return this.ships.filter(s=>(!s.disabled)).length <= 0
     }
 
     get numPilots() {
@@ -95,6 +95,6 @@ class Fleet extends SpaceObject {
     }
 
     get activeShips() {
-        return this.ships.filter(s=>!s.isDisabled() && !s.escaped)
+        return this.ships.filter(s=>!s.disabled && !s.escaped)
     }
 }

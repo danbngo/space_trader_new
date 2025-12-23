@@ -303,7 +303,7 @@ function showPlayerDefeatedEnemyModal(fameMultiplier = 0) {
     const baseLootAmt = Math.floor(Math.random() * maxLootAmt)
     const lootAmt = weightedAvg([baseLootAmt, enemyFleet.cargo.total], [25, gs.fleet.totalSkills.getAmount(SKILLS.Salvage)])
     const loot = enemyFleet.cargo.randomSubset(lootAmt)
-    const disabledPlayerShips = gs.encounter.playerShips.filter(s=>s.isDisabled())
+    const disabledPlayerShips = gs.encounter.playerShips.filter(s=>s.disabled)
 
     gs.captain.infamy += infamy
     gs.captain.fame += fame
@@ -341,7 +341,7 @@ function showPlayerDefeatedHazardsModal() {
     const baseLootAmt = Math.floor(Math.random() * maxLootAmt)
     const lootAmt = weightedAvg([baseLootAmt, enemyFleet.cargo.total], [25, gs.fleet.totalSkills.getAmount(SKILLS.Salvage)])
     const loot = enemyFleet.cargo.randomSubset(lootAmt)
-    const disabledPlayerShips = gs.encounter.playerShips.filter(s=>s.isDisabled())
+    const disabledPlayerShips = gs.encounter.playerShips.filter(s=>s.disabled)
     let msg = ''
     msg += `You survived the ${fleetName}!<br/>`
 

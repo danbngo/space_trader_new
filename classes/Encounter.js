@@ -22,17 +22,17 @@ class Encounter {
         this.fleetName = this.planet ? `${this.planet.ianName} ${this.encounterType.name}` : this.encounterType.name
     }
 
-    get disabledPlayerShips () { return this.playerShips.filter(s=>(s.isDisabled())) }
+    get disabledPlayerShips () { return this.playerShips.filter(s=>(s.disabled)) }
     get escapedPlayerShips () {return this.playerShips.filter(s=>(s.escaped)) }
-    get disabledEnemyShips () {return this.enemyShips.filter(s=>(s.isDisabled())) }
-    get activePlayerShips () {return this.playerShips.filter(s=>(!s.isDisabled() && !s.escaped)) }
-    get activeEnemyShips () {return this.enemyShips.filter(s=>(!s.isDisabled() && !s.escaped)) }
-    get activeShips () {return this.ships.filter(s=>(!s.isDisabled() && !s.escaped)) }
+    get disabledEnemyShips () {return this.enemyShips.filter(s=>(s.disabled)) }
+    get activePlayerShips () {return this.playerShips.filter(s=>(!s.disabled && !s.escaped)) }
+    get activeEnemyShips () {return this.enemyShips.filter(s=>(!s.disabled && !s.escaped)) }
+    get activeShips () {return this.ships.filter(s=>(!s.disabled && !s.escaped)) }
     //get ships() { return [...this.playerShips, ...this.enemyShips] } //dont use. static.
 
     isTurnComplete() {
         //console.log('Encounter.isTurnComplete', { activeTurnFleet: this.activeTurnFleet });
-        const activeFleetShips = this.activeTurnFleet.ships.filter(s=>(!s.isDisabled() && !s.escaped))
+        const activeFleetShips = this.activeTurnFleet.ships.filter(s=>(!s.disabled && !s.escaped))
         for (const ship of activeFleetShips) {
             if (ship.numActionsRemaining > 0) {
                 return false
@@ -83,19 +83,32 @@ class Encounter {
             this.result = ENCOUNTER_RESULTS.Escaped
             return
         }
-        else if (playerFlagship.isDisabled()) {
+        else if (playerFlagship.disabled) {
             this.result = ENCOUNTER_RESULTS.Defeat
         }
         console.log('Encounter result:',this.result);
     }
 
-    calcAttackTargets(attacker = new Ship()) {
-        console.log('Encounter.calcAttackTargets', { attacker });
+    calcOpposingFleet(fleet = new Fleet()) {
+        console.log('EncounterAI.calcOpposingFleet', { fleet });
+        if (fleet == gs.fleet) return this.fleet
+        else return gs.fleet
+    }
+
+    calcHarmableTargets(attacker = new Ship()) {
+        console.log('Encounter.calcHarmableTargets', { attacker });
+        return this.calcOpposingFleet(attacker.fleet).ships.filter(target => {
+            if (target.disabled || target.escaped || target.cloakedTurnsRemaining > 0) return false
+            return true
+        })
+    }
+
+    calcLaserTargets(attacker = new Ship()) {
+        console.log('Encounter.calcLaserTargets', { attacker });
         const validTargets = []
         const {ships} = this
         const [t1, t2] = attacker.calcLaserAreas()
-        for (const target of ships) {
-            if (target.fleet == attacker.fleet || target.isDisabled() || target.escaped || target.cloakedTurnsRemaining > 0) continue
+        for (const target of this.calcHarmableTargets(attacker)) {
             if (!t1.containsPoint(target.x, target.y) && !t2.containsPoint(target.x, target.y)) continue
             validTargets.push(target)
         }
@@ -103,12 +116,10 @@ class Encounter {
     }
 
     calcRamTargets(attacker = new Ship()) {
-        console.log('Encounter.calcAttackTargets', { attacker });
+        console.log('Encounter.calcLaserTargets', { attacker });
         const validTargets = []
-        const {ships} = this
         const a1 = attacker.calcMoveArea()
-        for (const target of ships) {
-            if (target.fleet == attacker.fleet || target.isDisabled() || target.escaped || target.cloakedTurnsRemaining > 0) continue
+        for (const target of this.calcHarmableTargets(attacker)) {
             if (a1.containsPoint(target.x, target.y)) validTargets.push(target)
         }
         return validTargets
@@ -117,10 +128,8 @@ class Encounter {
     calcGravitonBeamTargets(attacker = new Ship()) {
         console.log('Encounter.calcGravitonBeamTargets', { attacker });
         const validTargets = []
-        const {ships} = this
         const targetingArea = attacker.calcGravitonBeamArea()
-        for (const target of ships) {
-            if (target.fleet == attacker.fleet || target.isDisabled() || target.escaped || target.cloakedTurnsRemaining > 0) continue
+        for (const target of this.calcHarmableTargets(attacker)) {
             if (targetingArea.containsPoint(target.x, target.y)) validTargets.push(target)
         }
         return validTargets

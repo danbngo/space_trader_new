@@ -15,12 +15,11 @@ class CloakActionHandler extends ActionHandler {
     attempt(ship = new Ship()) {
         console.log('CloakActionHandler.attempt', { ship });
         // TODO: Check if ship can cloak (not already cloaked, etc.)
-        const action = new ShipAction(this.encounter, ship, MOVE_TYPES.Cloak)
-        action.actorGoodMessage = 'Cloaked!'
+        const action = new CloakAction(this.encounter, ship)
         this.execute(action)
     }
 
-    execute(action = new ShipAction()) {
+    execute(action = new CloakAction()) {
         console.log('CloakActionHandler.execute', { action });
         this.encounterMap.animatingAction = action
         const animations = this.encounterMap.animations

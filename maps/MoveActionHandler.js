@@ -32,10 +32,10 @@ class MoveActionHandler extends ActionHandler {
         if (!ellipse.containsPoint(x, y)) {
             return
         }
-        this.execute(new ShipAction(this.encounter, mover, MOVE_TYPES.Move, null, x, y))
+        this.execute(new MoveAction(this.encounter, mover, null, x, y))
     }
 
-    execute(action =  new ShipAction()) {
+    execute(action =  new MoveAction()) {
         console.log('MoveActionHandler.execute', { action });
         this.encounterMap.animatingAction = action
         const animations = this.encounterMap.animations

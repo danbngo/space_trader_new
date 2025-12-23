@@ -38,10 +38,11 @@ class RamActionHandler extends ActionHandler {
         if (!this.encounterMap.validTargets.includes(target)) {
             return
         }
-        this.execute(new ShipAction(this.encounter, attacker, MOVE_TYPES.Ram, target))
+        const action = new RamAction(this.encounter, attacker, target)
+        this.execute(action)
     }
 
-    execute(action =  new ShipAction()) {
+    execute(action =  new RamAction()) {
         console.log('RamActionHandler.execute', { action });
         this.encounterMap.animatingAction = action
         const animations = this.encounterMap.animations

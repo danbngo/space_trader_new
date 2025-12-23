@@ -85,7 +85,7 @@ const UI_MODE = Object.freeze({
 /** @enum {string} */
 const MOVE_TYPES = Object.freeze({
     Move: 'Move',
-    Attack: 'Attack',
+    Laser: 'Laser',
     Ram: 'Ram',
     Recharge: 'Recharge',
     Wait: 'Wait',

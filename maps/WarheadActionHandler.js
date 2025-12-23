@@ -41,12 +41,11 @@ class WarheadActionHandler extends ActionHandler {
         if (!targetArea.containsPoint(x, y)) {
             return
         }
-        const action = new ShipAction(this.encounter, attacker, MOVE_TYPES.Warhead, null, x, y)
-        action.actorGoodMessage = 'Warhead!'
+        const action = new WarheadAction(this.encounter, attacker, null, x, y)
         this.execute(action)
     }
 
-    execute(action = new ShipAction()) {
+    execute(action = new WarheadAction()) {
         console.log('WarheadActionHandler.execute', { action });
         this.encounterMap.animatingAction = action
         const animations = this.encounterMap.animations

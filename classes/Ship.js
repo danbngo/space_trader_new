@@ -61,7 +61,7 @@ class Ship {
     }
 
     get combatRating() {
-        if (this.isDisabled()) return 0
+        if (this.disabled) return 0
         if (this.escaped) return 0
         const hpRating = 
             this.hull[0] / AVERAGE_SHIP_HULL
@@ -132,13 +132,13 @@ class Ship {
         this.angle = recordedAngle
     }
 
-    isDisabled() {
+    get disabled() {
         return this.hull[0] <= 0
     }
 
     takeDamage(dmg = 0, bypassShields = false) {
         console.log('applying dmg to ship:',this,dmg,bypassShields)
-        if (this.isDisabled()) return [0, 0]
+        if (this.disabled) return [0, 0]
         let disabled = false
         let shieldDamage = 0
         let hullDamage = 0
@@ -199,5 +199,11 @@ class Ship {
         const [tx, ty] = rotatePoint(overrideX + attackRange/2, overrideY, overrideX, overrideY, targetingAngle)
         const targetingTriangle = new Triangle(tx, ty, attackRange*2, Triangle.calcEquilateralTriangleHeight(attackRange), targetingAngle+Math.PI)
         return targetingTriangle
+    }
+
+    calcEMPPulseArea(overrideX = this.x, overrideY = this.y) {
+        // EMP pulse is centered on the ship and has radius = maxAttackDistance * 2
+        const pulseRadius = this.maxAttackDistance
+        return new Circle(overrideX, overrideY, pulseRadius)
     }
 }

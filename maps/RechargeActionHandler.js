@@ -16,10 +16,10 @@ class RechargeActionHandler extends ActionHandler {
     attempt(ship = new Ship()) {
         console.log('RechargeActionHandler.attempt', { ship });
         if (ship.shields[0] >= ship.shields[1]) return
-        this.execute(new ShipAction(this.encounter, ship, MOVE_TYPES.Recharge))
+        this.execute(new RechargeAction(this.encounter, ship))
     }
 
-    execute(action =  new ShipAction()) {
+    execute(action =  new RechargeAction()) {
         console.log('RechargeActionHandler.execute', { action });
         this.encounterMap.animatingAction = action
         const animations = this.encounterMap.animations

@@ -14,12 +14,11 @@ class BlinkActionHandler extends ActionHandler {
 
     attempt(ship = new Ship()) {
         console.log('BlinkActionHandler.attempt', { ship });
-        const action = new ShipAction(this.encounter, ship, MOVE_TYPES.Blink)
-        action.actorGoodMessage = 'Blink!'
+        const action = new BlinkAction(this.encounter, ship)
         this.execute(action)
     }
 
-    execute(action = new ShipAction()) {
+    execute(action = new BlinkAction()) {
         console.log('BlinkActionHandler.execute', { action });
         this.encounterMap.animatingAction = action
         const animations = this.encounterMap.animations
@@ -31,7 +30,7 @@ class BlinkActionHandler extends ActionHandler {
         
         animations.push(new Loop(blinkDuration, (progressRatio) => {
             // Fade out then fade in
-            shipObj.fillColor[3] = 1 - progressRatio * 2
+            shipObj.fillColor[3] = 1 - progressRatio
             //console.log('shipObj fillColor while blinking:',shipObj,shipObj.fillColor[3])
         }, () => {
             this.completeAction(action)

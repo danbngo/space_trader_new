@@ -164,7 +164,7 @@ class EncounterMap extends BaseMap {
         //draw objects
         ships.forEach( (ship, index) => {
             let invisible = ship.escaped
-            if (ship.aiType == AI_TYPES.Asteroid && ship.isDisabled()) invisible = true
+            if (ship.aiType == AI_TYPES.Asteroid && ship.disabled) invisible = true
 
             //if (obj.location) return //dont display docked fleets
             const cvsShipObject = cvs.getObject(`ship${index}`)
@@ -222,7 +222,7 @@ class EncounterMap extends BaseMap {
             //Object.assign(animThruster, {x: newX, screenOffsetX: engineXOffset, y: newY, screenOffsetY: engineYOffset, angle: action.path.angle-Math.PI})
 
             let fontModifier = null
-            if (ship.isDisabled()) {
+            if (ship.disabled) {
                 fontModifier = 'italic'
                 cvsLabelObject.fillColor[3] = 0.5
             }
@@ -279,8 +279,8 @@ class EncounterMap extends BaseMap {
         if (obj instanceof Ship) {
             const index = ships.indexOf(obj)
             const {hull, shields} = obj
-            const showActions = combatEnabled && obj.fleet == playerFleet && !obj.escaped && !obj.isDisabled() && activeTurnFleet == playerFleet && (uiMode !== UI_MODE.Animating)
-            console.log('showing actions with props:', { combatEnabled, isPlayerShip: obj.fleet == playerFleet, isEscaped: obj.escaped, isDisabled: obj.isDisabled(), isPlayerTurn: activeTurnFleet == playerFleet, uiMode })
+            const showActions = combatEnabled && obj.fleet == playerFleet && !obj.escaped && !obj.disabled && activeTurnFleet == playerFleet && (uiMode !== UI_MODE.Animating)
+            console.log('showing actions with props:', { combatEnabled, isPlayerShip: obj.fleet == playerFleet, isEscaped: obj.escaped, isDisabled: obj.disabled, isPlayerTurn: activeTurnFleet == playerFleet, uiMode })
             const canAct = obj.numActionsRemaining > 0 && (uiMode !== UI_MODE.Animating)
             const canRecharge = obj.shields[0] < obj.shields[1]
             ce({parent:container, style: {margin: 'auto'}, onClick: ()=>this.selectObject(obj), children:[
@@ -292,7 +292,7 @@ class EncounterMap extends BaseMap {
             if (obj.engine) ce({parent:container,  innerHTML: `Engine: ${statColorSpan(obj.engine, obj.engine/AVERAGE_SHIP_ENGINE, true)}`})
             if (obj.radars) ce({parent:container, innerHTML: `Radars: ${statColorSpan(obj.radars, obj.radars/AVERAGE_SHIP_RADARS, true)}`})
             ce({parent:container, innerHTML: `Actions: ${statColorSpan(obj.numActionsRemaining, obj.numActionsRemaining/2, true)}`})
-            ce({parent:container, innerHTML: obj.isDisabled() ? `(Disabled)` : obj.escaped ? '(Escaped)' : ''})
+            ce({parent:container, innerHTML: obj.disabled ? `(Disabled)` : obj.escaped ? '(Escaped)' : ''})
             if (showActions) {
                 ce({parent:container, tag:'button', innerHTML:'Attack', disabled: !canAct, onClick: ()=>this.attackHandler.startTargeting(obj)})
                 ce({parent:container, tag:'button', innerHTML:'Move', disabled: !canAct, onClick: ()=>this.moveHandler.startTargeting(obj)})
@@ -476,7 +476,7 @@ class EncounterMap extends BaseMap {
             if (nextMove.actionType == MOVE_TYPES.Move) {
                 this.moveHandler.execute(nextMove)
             }
-            else if (nextMove.actionType == MOVE_TYPES.Attack) {
+            else if (nextMove.actionType == MOVE_TYPES.Laser) {
                 this.attackHandler.execute(nextMove)
             }
             else if (nextMove.actionType == MOVE_TYPES.Recharge) {

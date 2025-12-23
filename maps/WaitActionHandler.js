@@ -15,10 +15,10 @@ class WaitActionHandler extends ActionHandler {
 
     attempt(ship = new Ship()) {
         console.log('WaitActionHandler.attempt', { ship });
-        this.execute(new ShipAction(this.encounter, ship, MOVE_TYPES.Wait))
+        this.execute(new WaitAction(this.encounter, ship))
     }
 
-    execute(action =  new ShipAction()) {
+    execute(action =  new WaitAction()) {
         this.encounterMap.animatingAction = null
         //this.encounterMap.stopAnimating() //this will cause a bug due to refresh loop
         console.log('WaitActionHandler.execute', { action });

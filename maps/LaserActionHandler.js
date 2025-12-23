@@ -16,7 +16,7 @@ class AttackActionHandler extends ActionHandler {
         const targetingCvsCircle = this.cvs.addEmptyCircle('targetingcircle', 0, 0, 0, 12, COLORS.LightGreen, 2)
         targetingCvsCircle.visible = false
 
-        const validTargets = this.encounter.calcAttackTargets(attacker)
+        const validTargets = this.encounter.calcLaserTargets(attacker)
         if (validTargets.length > 0) this.target(validTargets[0])
         
         this.encounterMap.onHoverObject = (hoveredObj) => this.target(hoveredObj)
@@ -39,10 +39,10 @@ class AttackActionHandler extends ActionHandler {
         if (!this.encounterMap.validTargets.includes(target)) {
             return
         }
-        this.execute(new ShipAction(this.encounter, attacker, MOVE_TYPES.Attack, target))
+        this.execute(new AttackAction(this.encounter, attacker, target))
     }
 
-    execute(action =  new ShipAction()) {
+    execute(action =  new AttackAction()) {
         this.encounterMap.animatingAction = action
         console.log('AttackActionHandler.execute', { action });
         const animations = this.encounterMap.animations
