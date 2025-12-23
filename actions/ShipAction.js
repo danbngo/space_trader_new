@@ -5,16 +5,16 @@ class ShipAction {
         this.actionType = actionType
         this.actor = actor
         this.target = target
-        this.toX = toX !== undefined ? toX : target ? target.x : actor.x
-        this.toY = toY !== undefined ? toY : target ? target.y : actor.y
+        this.toX = toX !== undefined ? toX : target ? target.x : actor ? actor.x : undefined
+        this.toY = toY !== undefined ? toY : target ? target.y : actor ? actor.y : undefined
         this.targetToX = targetToX
         this.targetToY = targetToY
-        this.startX = actor.x
-        this.startY = actor.y
+        this.startX = actor ? actor.x : undefined
+        this.startY = actor ? actor.y : undefined
         this.targetStartX = target ? target.x : undefined
         this.targetStartY = target ? target.y : undefined
-        this.path = new Path(this.startX, this.startY, this.toX, this.toY)
-        this.angle = this.path.angle
+        this.path = this.startX !== undefined && this.startY !== undefined && this.toX !== undefined && this.toY !== undefined ? new Path(this.startX, this.startY, this.toX, this.toY) : undefined
+        //this.angle = this.path ? this.path.angle : undefined
         this.completed = false
 
         this.actorShieldDamage = null
@@ -32,6 +32,9 @@ class ShipAction {
         this.targetGoodMessage = null
         this.targetBadMessage = null
         this.targetInfoMessage = null
+    }
+    get angle() {
+        return this.path.angle
     }
 
     /**

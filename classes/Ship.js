@@ -102,6 +102,16 @@ class Ship {
         return actualRecharge
     }
 
+    incrementAngle(delta = 0) {
+        this.angle += delta
+        // Normalize to 0 to 2π range
+        this.angle = this.angle % (Math.PI * 2)
+        if (this.angle < 0) {
+            this.angle += Math.PI * 2
+        }
+        return this.angle
+    }
+
     resetCombatVars() {
         //this.restoreShields() //looks weird visually
         this.angle = Math.PI*2;

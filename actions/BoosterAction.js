@@ -1,10 +1,11 @@
 class BoosterAction extends ShipAction {
     constructor(encounter = new Encounter(), actor = new Ship()) {
         super(encounter, actor, MOVE_TYPES.Booster)
-        const boostDistance = actor.maxMoveDistance * 1.5
+        const boostDistance = actor.maxMoveDistance * 4
         const [dx, dy] = rotatePoint(boostDistance, 0, 0, 0, actor.angle)
         this.toX = actor.x + dx
         this.toY = actor.y + dy
+        this.path = new Path(actor.x, actor.y, this.toX, this.toY)
         this.actorInfoMessage = 'Boost!'
     }
 
@@ -17,7 +18,7 @@ class BoosterAction extends ShipAction {
         const newY = this.toY
         
         // Find enemy ships along the boost path and spin them
-        const spinRadius = 10 * ship.radius
+        const spinRadius = 5 * ship.radius
         const enemyShips = this.encounter.ships.filter(s => s.fleet !== ship.fleet && !s.disabled)
         
         // Check multiple points along the path
@@ -40,7 +41,7 @@ class BoosterAction extends ShipAction {
             
             if (isInPath) {
                 // Spin the enemy ship to a random angle
-                enemy.angle = rng(Math.PI * 2, 0, false)
+                enemy.incrementAngle(rng(Math.PI/2, -Math.PI/2, false))
             }
         }
         

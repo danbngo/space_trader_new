@@ -56,7 +56,7 @@ class EncounterMap extends BaseMap {
     }
 
     refreshLogic() {
-        console.log('EncounterMap.refreshLogic')
+        console.log('EncounterMap.refreshLogic:',this.animations)
         //dont do anything while animating
         if (this.animations.length > 0) return;
         if (this.checkEncounterOver()) return;
@@ -109,7 +109,7 @@ class EncounterMap extends BaseMap {
 
     rebuildCanvas() {
         const {encounter, cvs, starSystem} = this
-        const {ships} = encounter
+        const {ships, effects} = encounter
         const BG_STAR_DISTANCE_MOD = 10 //hacky way to position stars intended for starmap onto the encounter map
 
         cvs.clear()
@@ -118,6 +118,17 @@ class EncounterMap extends BaseMap {
 
         starSystem.backgroundStars.forEach( (bgStar, index) => {
             cvs.addPixel(bgStar.x*BG_STAR_DISTANCE_MOD, bgStar.y*BG_STAR_DISTANCE_MOD, bgStar.color, bgStar.size)
+        });
+
+        // Add effects to canvas
+        effects.forEach((effect, index) => {
+            if (effect.effectType.shape == SHAPES.FilledOval) {
+                const minorAxis = effect.radius * 0.5
+                cvs.addFilledOval(`effect${index}`, effect.x, effect.y, effect.radius, minorAxis, 0.5, effect.effectType.color, effect.angle)
+            }
+            else if (effect.effectType.shape == SHAPES.Line) {
+                cvs.addLine(`effect${index}`, effect.x, effect.y, effect.toX, effect.toY, effect.effectType.color, effect.radius)
+            }
         });
 
         ships.forEach((ship,index) => {
@@ -172,6 +183,16 @@ class EncounterMap extends BaseMap {
             const cvsLabelObject = cvs.getObject(`shiplabel${index}`)
             const cvsThrusterObject = cvs.getObject(`shipthruster${index}`)
 
+            let cloaked = false
+
+            // Display cloaked ships as white with low alpha
+            if (ship.cloakedTurnsRemaining > 0) {
+                if (ship.fleet != encounter.playerFleet) {
+                    invisible = true //enemy ships will be invisible
+                }
+                else cloaked = true
+            }
+
             if (invisible) {
                 cvsShipObject.visible = false
                 cvsShieldObject.visible = false
@@ -190,7 +211,7 @@ class EncounterMap extends BaseMap {
             cvsShipObject.angle = ship.angle
             
             // Display cloaked ships as white with low alpha
-            if (ship.cloakedTurnsRemaining > 0) {
+            if (cloaked) {
                 cvsShipObject.fillColor[3] = 0.1
             } else {
                 cvsShipObject.fillColor[3] = hullRatio
@@ -451,7 +472,7 @@ class EncounterMap extends BaseMap {
     handleEnemyActions() {
         const {encounter} = this
         console.log('handle enemy actions called with uiMode:',this.paused,this.encounter.combatEnabled,encounter.activeTurnFleet)
-        if (this.paused || !encounter.combatEnabled || encounter.activeTurnFleet == gs.fleet || this.encounter.result) return
+        if (this.paused || !encounter.combatEnabled || encounter.activeTurnFleet == gs.fleet || this.encounter.result || this.animations.length > 0) return
         const {ai} = encounter
         const nextMove = ai.calcNextMove()
         console.log('determined next AI move:',nextMove)
@@ -498,6 +519,7 @@ class EncounterMap extends BaseMap {
     }
 
     checkEncounterOver() {
+        console.log('checking encounter over')
         if (this.encounter.result) {
             endCombat()
             return true

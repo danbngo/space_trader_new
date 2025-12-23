@@ -1,0 +1,31 @@
+/**
+ * @class EffectType
+ * @description Represents a type of effect that can be applied in the game.
+ * @property {string} name - The name of the effect type.
+ * @property {number[]} color - The color of the effect type as an RGBA tuple.
+ * @property {SHAPES} shape - The shape of the effect type (from SHAPES enum).
+ * @property {number} minSize - The minimum size of the effect.
+ * @property {number} maxSize - The maximum size of the effect.
+ * @property {number} minDuration - The minimum duration of the effect in turns.
+ * @property {number} maxDuration - The maximum duration of the effect in turns.
+ * @property {string} description - A brief description of the effect type.
+ */
+
+class EffectType {
+    constructor(name = '', color = COLORS.White, shape, minSize = 1, maxSize = 1, minDuration = 1, maxDuration = 1, description = '') {
+        this.name = name
+        this.color = color
+        this.shape = shape
+        this.minSize = minSize
+        this.maxSize = maxSize
+        this.minDuration = minDuration
+        this.maxDuration = maxDuration
+        this.description = description
+    }
+}
+
+const EFFECT_TYPES = Object.freeze({
+    DUST_CLOUD: new EffectType('Dust Cloud', [64,64,92,0.25], SHAPES.FilledOval, 25, 25, 2, 4, 'Slows ships and decreases accuracy when shooting into or out of it.'),
+    PLASMA_TRAIL: new EffectType('Plasma Trail', [255,165,0,0.25], SHAPES.Line, 8, 8, 2, 3, 'Does damage to ships that touch it.'),
+})
+const EFFECT_TYPES_ALL = Object.values(EFFECT_TYPES)

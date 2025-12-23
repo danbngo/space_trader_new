@@ -27,7 +27,8 @@ class RamAction extends ShipAction {
             const [kx,ky] = rotatePoint(knockback, 0, 0, 0, this.angle)
             target.x += kx
             target.y += ky
-            target.angle = Math.random()*Math.PI*2
+            target.incrementAngle(rng(Math.PI/2, -Math.PI/2, false))
+
             const targetEscaped = this.encounter.checkShipEscaped(target)
             Object.assign(this, {actorHullDamage, actorShieldDamage, actorDisabled, targetHullDamage, targetShieldDamage, targetDisabled, targetEscaped})
         }

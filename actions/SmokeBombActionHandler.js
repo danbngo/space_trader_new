@@ -4,42 +4,22 @@ class SmokeBombActionHandler extends ActionHandler {
     }
 
     startTargeting(attacker = new Ship()) {
-        console.log('SmokeBombActionHandler.startTargeting', { attacker });
-        if (!this.calcCanBeControlled(attacker)) return
-
-        this.encounterMap.targetingAreas = []
-        
-        // Targeting circle for smoke placement
-        const smokeRadius = attacker.maxAttackDistance
-        const targetingCircle = this.cvs.addEmptyCircle('targetingcircle', 0, 0, smokeRadius, 12, COLORS.TargetingConfirm, 2)
-        
-        this.cvs.onClickWorldXY = (x, y) => {
-            this.attempt(attacker, null, x, y)
-        }
-        
-        this.cvs.onMouseMoveWorldXY = (x, y) => {
-            targetingCircle.x = x
-            targetingCircle.y = y
-            this.encounterMap.refreshCanvas()
-        }
-        
-        this.encounterMap.startTargeting('Smoke Bomb', [targetingCircle], [])
+        // Smoke bomb is instant, no targeting needed
+        this.attempt(attacker)
     }
 
     target(...args) {
-        // Handled by mouse move
+        // No targeting needed
     }
 
-    attempt(attacker = new Ship(), target = null, x = 0, y = 0) {
-        console.log('SmokeBombActionHandler.attempt', { attacker, x, y });
-        const action = new ShipAction(this.encounter, attacker, MOVE_TYPES.SmokeBomb, null, x, y)
-        action.actorInfoMessage = 'Smoke Bomb!'
+    attempt(attacker = new Ship()) {
+        console.log('SmokeBombActionHandler.attempt', { attacker });
+        const action = new SmokeBombAction(this.encounter, attacker)
         this.execute(action)
     }
 
-    execute(action = new ShipAction()) {
+    execute(action = new SmokeBombAction()) {
         console.log('SmokeBombActionHandler.execute', { action });
-        
         
         const smokeDuration = 700
         

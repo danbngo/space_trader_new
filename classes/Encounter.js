@@ -20,6 +20,7 @@ class Encounter {
         this.activeTurnFleet = this.playerFleet
         this.luck = [Math.random(),Math.random(),Math.random(),Math.random(),Math.random()] //used for initial encounter decisions
         this.fleetName = this.planet ? `${this.planet.ianName} ${this.encounterType.name}` : this.encounterType.name
+        this.effects = []
     }
 
     get disabledPlayerShips () { return this.playerShips.filter(s=>(s.disabled)) }
@@ -59,6 +60,14 @@ class Encounter {
                 }
             }
         }
+        
+        // Handle effect expiration and decay
+        for (const effect of this.effects) {
+            effect.remainingTurns--
+            effect.radius *= 0.8 // Reduce radius by 20% each turn
+        }
+        // Remove expired effects
+        this.effects = this.effects.filter(effect => effect.remainingTurns > 0)
         
         if (this.activeTurnFleet === this.playerFleet) {
             this.activeTurnFleet = this.enemyFleet
