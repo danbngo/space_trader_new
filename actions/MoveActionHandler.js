@@ -8,7 +8,7 @@ class MoveActionHandler extends ActionHandler {
         if (!this.calcCanBeControlled(mover)) return
         
         const ellipse = mover.calcMoveArea()
-        const targetingCvsObject = this.cvs.addFilledOval('targetingarea', ellipse.x, ellipse.y, ellipse.radiusX, ellipse.radiusY, 4, COLORS.Targeting, ellipse.angle)
+        const targetingCvsObject = this.cvs.addEmptyOval('targetingarea', ellipse.x, ellipse.y, ellipse.radiusX, ellipse.radiusY, 4, COLORS.Targeting, ellipse.angle, 2)
         const targetingCvsCircle = this.cvs.addEmptyCircle('targetingcircle', ellipse.x, ellipse.y, mover.radius, 4, COLORS.TargetingConfirm, 2)
         
         this.cvs.onClickWorldXY = (x, y) => this.attempt(x, y, ellipse, mover)

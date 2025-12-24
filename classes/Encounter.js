@@ -48,10 +48,6 @@ class Encounter {
         this.encounterType.onEndTurn?.(this)
         for (const ship of this.activeTurnFleet.ships) {
             ship.numActionsRemaining = 0
-            // Decrement cloak duration
-            if (ship.cloakedTurnsRemaining > 0) {
-                ship.cloakedTurnsRemaining--
-            }
             // Decrement module cooldowns
             for (const moduleType of Object.values(SHIP_MODULES)) {
                 const currentCooldown = ship.moduleCooldowns.getAmount(moduleType)
@@ -83,7 +79,11 @@ class Encounter {
     handleShipActionComplete(ship = new Ship()) {
         ship.spendAction()
         // Apply effects that the ship is starting its turn inside
-        ship.statusEffects = new Set() //clear status effects and reapply based on current effects
+        for (const key of ship.statusEffects.keys) {
+            if (ship.statusEffects.has(key)) {
+                ship.statusEffects.increment(key, -1)
+            }
+        }
         for (const effect of this.effects) {
             if (effect.containsPoint(ship.x, ship.y)) {
                 effect.applyEffectOnStart(ship)

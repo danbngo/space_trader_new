@@ -4,12 +4,25 @@ class BlinkActionHandler extends ActionHandler {
     }
 
     startTargeting(ship = new Ship()) {
-        // Blink doesn't need targeting - random teleport
-        this.attempt(ship)
+        console.log('BlinkActionHandler.startTargeting', { ship });
+        if (!this.calcCanBeControlled(ship)) return
+
+        this.encounterMap.targetingAreas = []
+        
+        // Blink distance from BlinkAction.js
+        const blinkDistance = 25
+        
+        // Show the blink radius circle centered on ship to indicate where they might blink
+        const blinkCircle = this.cvs.addEmptyCircle('targetingarea', ship.x, ship.y, blinkDistance, 12, COLORS.Targeting)
+        
+        // Click anywhere to confirm blink
+        this.cvs.onClickWorldXY = (x, y) => this.attempt(ship)
+        
+        this.encounterMap.startTargeting('Blink', [blinkCircle], [])
     }
 
     target(...args) {
-        // No targeting needed
+        // No dynamic targeting needed - blink is random within radius
     }
 
     attempt(ship = new Ship()) {

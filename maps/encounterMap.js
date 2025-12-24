@@ -26,13 +26,23 @@ class EncounterMap extends BaseMap {
         this.waitHandler = new WaitActionHandler(this);
         
         // Initialize module handlers
-        this.cloakHandler = new CloakActionHandler(this);
+        /*this.cloakHandler = ;
         this.magnetizeHandler = new MagnetizeActionHandler(this);
         this.warheadHandler = new WarheadActionHandler(this);
         this.empPulseHandler = new EMPPulseActionHandler(this);
         this.blinkHandler = new BlinkActionHandler(this);
         this.boosterHandler = new BoosterActionHandler(this);
-        this.smokeBombHandler = new SmokeBombActionHandler(this);
+        this.smokeBombHandler = new SmokeBombActionHandler(this);*/
+
+        this.moduleHandlerMap = new Map([
+            [SHIP_MODULES.CLOAK, new CloakActionHandler(this)],
+            [SHIP_MODULES.MAGNETIZE, new MagnetizeActionHandler(this)],
+            [SHIP_MODULES.WARHEAD, new WarheadActionHandler(this)],
+            [SHIP_MODULES.EMP_PULSE, new EMPPulseActionHandler(this)],
+            [SHIP_MODULES.BLINK, new BlinkActionHandler(this)],
+            [SHIP_MODULES.BOOSTER, new BoosterActionHandler(this)],
+            [SHIP_MODULES.SMOKE_BOMB, new SmokeBombActionHandler(this)],
+        ])
         
         this.animatingAction = null
 
@@ -122,8 +132,8 @@ class EncounterMap extends BaseMap {
 
         ships.forEach((ship,index) => {
             let shipObj;
-            if (ship.shipType.shape == SHAPES.Triangle) {
-                shipObj = cvs.addTriangle(`ship${index}`, ship.x, ship.y, ship.radius, ship.radius, 12, ship.color, ship.angle, ()=>this.selectObject(ship))
+            if (ship.shipType.shape == SHAPES.FilledTriangle) {
+                shipObj = cvs.addFilledTriangle(`ship${index}`, ship.x, ship.y, ship.radius, ship.radius, 12, ship.color, ship.angle, ()=>this.selectObject(ship))
             }
             else if (ship.shipType.shape == SHAPES.FilledOval) {
                 shipObj = cvs.addFilledOval(`ship${index}`, ship.x, ship.y, ship.radius, (ship.radius*(Math.random()+0.5)), 0.5, ship.color, ship.angle, ()=>this.selectObject(ship))
@@ -149,7 +159,7 @@ class EncounterMap extends BaseMap {
                 }
                 obj.onHoverEnd()
             }
-            const animThruster = this.cvs.addTriangle(`shipthruster${index}`, ship.x, ship.y, ship.radius*0.5, ship.radius*0.5, 6, COLORS.Orange, ship.angle - Math.PI)
+            const animThruster = this.cvs.addFilledTriangle(`shipthruster${index}`, ship.x, ship.y, ship.radius*0.5, ship.radius*0.5, 6, COLORS.Orange, ship.angle - Math.PI)
         })
 
         cvs.recalculateDrawOrder()
@@ -186,7 +196,7 @@ class EncounterMap extends BaseMap {
             let cloaked = false
 
             // Display cloaked ships as white with low alpha
-            if (ship.cloakedTurnsRemaining > 0) {
+            if (ship.statusEffects.has(STATUS_EFFECTS.CLOAKED)) {
                 if (ship.fleet != encounter.playerFleet) {
                     invisible = true //enemy ships will be invisible
                 }
@@ -338,15 +348,8 @@ class EncounterMap extends BaseMap {
             ]})
              // Display status effects if any
             if (obj.statusEffects.size > 0) {
-                const statusEffectColors = {
-                    [STATUS_EFFECTS.DUSTY]: COLORS.Brown,
-                    [STATUS_EFFECTS.FROZEN]: COLORS.LightBlue,
-                    [STATUS_EFFECTS.IONIZED]: COLORS.Yellow,
-                    [STATUS_EFFECTS.OVERHEATED]: COLORS.Orange
-                }
-                const statusEffectSpans = Array.from(obj.statusEffects).map(effect => {
-                    const color = statusEffectColors[effect] || COLORS.White
-                    return colorSpan(effect, colorArrToRgbaString(color))
+                const statusEffectSpans = Array.from(obj.statusEffects.keys).map(effect => {
+                    return colorSpan(effect.name, colorArrToRgbaString(effect.color))
                 })
                 ce({parent:container, innerHTML: statusEffectSpans.join(' | ')})
             }
@@ -366,63 +369,18 @@ class EncounterMap extends BaseMap {
                     else this.waitHandler.attempt(obj)
                 }})
                 
-                // Module buttons
+                // Module buttons - iterate through all ship modules
                 const isIonized = obj.statusEffects.has(STATUS_EFFECTS.IONIZED)
-                if (obj.modules.includes(SHIP_MODULES.CLOAK)) {
-                    const cooldown = obj.moduleCooldowns.getAmount(SHIP_MODULES.CLOAK)
-                    const onCooldown = cooldown > 0
-                    const label = cooldown > 0 ? `Cloak (${cooldown})` : 'Cloak'
-                    ce({parent:container, tag:'button', innerHTML:label, disabled: !canAct || onCooldown || isIonized, onClick: ()=>{
-                        this.cloakHandler.startTargeting(obj)
-                    }})
-                }
-                if (obj.modules.includes(SHIP_MODULES.MAGNETIZE)) {
-                    const cooldown = obj.moduleCooldowns.getAmount(SHIP_MODULES.MAGNETIZE)
-                    const onCooldown = cooldown > 0
-                    const label = cooldown > 0 ? `Magnetize (${cooldown})` : 'Magnetize'
-                    ce({parent:container, tag:'button', innerHTML:label, disabled: !canAct || onCooldown || isIonized, onClick: ()=>{
-                        this.magnetizeHandler.startTargeting(obj)
-                    }})
-                }
-                if (obj.modules.includes(SHIP_MODULES.WARHEAD)) {
-                    const cooldown = obj.moduleCooldowns.getAmount(SHIP_MODULES.WARHEAD)
-                    const onCooldown = cooldown > 0
-                    const label = cooldown > 0 ? `Warhead (${cooldown})` : 'Warhead'
-                    ce({parent:container, tag:'button', innerHTML:label, disabled: !canAct || onCooldown || isIonized, onClick: ()=>{
-                        this.warheadHandler.startTargeting(obj)
-                    }})
-                }
-                if (obj.modules.includes(SHIP_MODULES.EMP_PULSE)) {
-                    const cooldown = obj.moduleCooldowns.getAmount(SHIP_MODULES.EMP_PULSE)
-                    const onCooldown = cooldown > 0
-                    const label = cooldown > 0 ? `EMP Pulse (${cooldown})` : 'EMP Pulse'
-                    ce({parent:container, tag:'button', innerHTML:label, disabled: !canAct || onCooldown || isIonized, onClick: ()=>{
-                        this.empPulseHandler.startTargeting(obj)
-                    }})
-                }
-                if (obj.modules.includes(SHIP_MODULES.BLINK)) {
-                    const cooldown = obj.moduleCooldowns.getAmount(SHIP_MODULES.BLINK)
-                    const onCooldown = cooldown > 0
-                    const label = cooldown > 0 ? `Blink (${cooldown})` : 'Blink'
-                    ce({parent:container, tag:'button', innerHTML:label, disabled: !canAct || onCooldown || isIonized, onClick: ()=>{
-                        this.blinkHandler.startTargeting(obj)
-                    }})
-                }
-                if (obj.modules.includes(SHIP_MODULES.BOOSTER)) {
-                    const cooldown = obj.moduleCooldowns.getAmount(SHIP_MODULES.BOOSTER)
-                    const onCooldown = cooldown > 0
-                    const label = cooldown > 0 ? `Booster (${cooldown})` : 'Booster'
-                    ce({parent:container, tag:'button', innerHTML:label, disabled: !canAct || onCooldown || isIonized, onClick: ()=>{
-                        this.boosterHandler.startTargeting(obj)
-                    }})
-                }
-                if (obj.modules.includes(SHIP_MODULES.SMOKE_BOMB)) {
-                    const cooldown = obj.moduleCooldowns.getAmount(SHIP_MODULES.SMOKE_BOMB)
-                    const onCooldown = cooldown > 0
-                    const label = cooldown > 0 ? `Smoke Bomb (${cooldown})` : 'Smoke Bomb'
-                    ce({parent:container, tag:'button', innerHTML:label, disabled: !canAct || onCooldown || isIonized, onClick: ()=>{
-                        this.smokeBombHandler.startTargeting(obj)
-                    }})
+
+                for (const [module, handler] of this.moduleHandlerMap) {
+                    if (obj.modules.includes(module)) {
+                        const cooldown = obj.moduleCooldowns.getAmount(module)
+                        const onCooldown = cooldown > 0
+                        const label = cooldown > 0 ? `${module.name} (${cooldown})` : module.name
+                        ce({parent:container, tag:'button', innerHTML:label, disabled: !canAct || onCooldown || isIonized, onClick: ()=>{
+                            handler.startTargeting(obj)
+                        }})
+                    }
                 }
             }
         }

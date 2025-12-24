@@ -10,8 +10,8 @@ class LaserActionHandler extends ActionHandler {
         this.encounterMap.targetingAreas = []
         
         const [t1, t2] = attacker.calcLaserAreas()
-        const targetingCvsObject1 = this.cvs.addTriangle('targetingarea', t1.x, t1.y, t1.base, t1.height, 4, COLORS.Targeting, t1.angle)
-        const targetingCvsObject2 = this.cvs.addTriangle('targetingarea2', t2.x, t2.y, t2.base, t2.height, 4, COLORS.Targeting, t2.angle)
+        const targetingCvsObject1 = this.cvs.addEmptyTriangle('targetingarea', t1.x, t1.y, t1.base, t1.height, 4, COLORS.Targeting, t1.angle)
+        const targetingCvsObject2 = this.cvs.addEmptyTriangle('targetingarea2', t2.x, t2.y, t2.base, t2.height, 4, COLORS.Targeting, t2.angle)
         const targetingCvsCircle = this.cvs.addEmptyCircle('targetingcircle', 0, 0, 0, 12, COLORS.TargetingConfirm, 2)
         targetingCvsCircle.visible = false
 

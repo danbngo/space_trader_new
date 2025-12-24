@@ -21,7 +21,7 @@ class SmokeBombActionHandler extends ActionHandler {
         const minorAxis = avgDebrisRadius * 0.5
         // Initial angle perpendicular to ship's forward direction
         const initialAngle = attacker.angle + Math.PI / 2
-        const targetingCvsEllipse = this.cvs.addEmptyOval('targetingcircle', targetArea.x, targetArea.y, majorAxis, minorAxis, 0.5,  COLORS.TargetingConfirm, initialAngle, 2)
+        const targetingCvsEllipse = this.cvs.addEmptyOval('targetingcircle', targetArea.x, targetArea.y, majorAxis, minorAxis, 2, COLORS.TargetingConfirm, initialAngle, 2)
         
         this.cvs.onClickWorldXY = (x, y) => this.attempt(attacker, targetArea, x, y)
         this.cvs.onMouseMoveWorldXY = (x, y) => this.target(attacker, x, y, targetArea)

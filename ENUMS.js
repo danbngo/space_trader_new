@@ -17,7 +17,8 @@ const COMBAT_STRATEGIES = Object.freeze({
 const SHAPES = Object.freeze({
     FilledCircle: 'FilledCircle',
     EmptyCircle: 'EmptyCircle',
-    Triangle: 'Triangle', //these tend to be rotated. starts pointing right, in line with radian chart
+    FilledTriangle: 'FilledTriangle', //these tend to be rotated. starts pointing right, in line with radian chart
+    EmptyTriangle: 'EmptyTriangle',
     Text: 'Text', //renders some text in monospace
     Line: 'Line',
     FilledOval: 'FilledOval',
@@ -74,7 +75,7 @@ const COLORS = Object.freeze({
     LightBlue: [173,216,230,1], // rgba(173,216,230,1)
     LightRed: [255,102,102,1], // rgba(255,102,102,1)
     Brown: [124,92,64,1], // rgba(124,92,64,1)
-    Targeting: [0,255,0,0.3], // rgba(0,255,0,0.1)
+    Targeting: [0,255,0,0.5], // rgba(0,255,0,0.1)
     TargetingConfirm: [0,255,0,0.7], // rgba(0,255,0,0.7)
 })
 
@@ -114,12 +115,4 @@ const ASTEROID_BELT_TYPES = Object.freeze({
     Rocky: 'Rocky',
     Icy: 'Icy',
     Plasma: 'Plasma',
-})
-
-
-const STATUS_EFFECTS = Object.freeze({
-    DUSTY: 'Dusty', //reduces chance to hit and also to be hit by lasers specifically, take some hull damage over time
-    FROZEN: 'Frozen', //reduces movement range and cannot ram
-    IONIZED: 'Ionized', //prevents use of ship modules and take some shield damage over time
-    OVERHEATED: 'Overheated', //take some damage over time (first shield then hull if no shields left) and cannot recharge shields
 })

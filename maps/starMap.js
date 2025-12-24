@@ -145,9 +145,9 @@ class StarMap extends BaseMap {
 
         fleets.forEach((fleet, index)=>{
             const fleetAngle = fleet.route ? fleet.route.path.angle : -Math.PI/2
-            const fleetObj = cvs.addTriangle(`fleet${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU, fleet.radius/EARTH_RADII_PER_AU, 12, fleet.color, fleetAngle, ()=>this.selectObject(fleet))
+            const fleetObj = cvs.addFilledTriangle(`fleet${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU, fleet.radius/EARTH_RADII_PER_AU, 12, fleet.color, fleetAngle, ()=>this.selectObject(fleet))
             cvs.addLine(`fleetpath${index}`, 0, 0, 0, 0, fleet.color, 1)
-            cvs.addTriangle(`fleetthruster${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU*0.5, fleet.radius/EARTH_RADII_PER_AU*0.5, 6, COLORS.Orange)
+            cvs.addFilledTriangle(`fleetthruster${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU*0.5, fleet.radius/EARTH_RADII_PER_AU*0.5, 6, COLORS.Orange)
             const labelObj = cvs.addText(`fleetlabel${index}`, fleet.x, fleet.y, 0, -32, fleet.name, fleet.color, DEFAULT_FONT_SIZE, 2, ()=>this.selectObject(fleet),)
             const objs = [fleetObj, labelObj]
             for (const obj of objs) {
@@ -164,7 +164,7 @@ class StarMap extends BaseMap {
         })
 
         // Add waypoint marker (upside-down triangle for clicked coordinates)
-        cvs.addTriangle('waypointMarker', 0, 0, 0, 0, 12, COLORS.Targeting, Math.PI/2)
+        cvs.addFilledTriangle('waypointMarker', 0, 0, 0, 0, 12, COLORS.Targeting, Math.PI/2)
 
         cvs.recalculateDrawOrder()
     }

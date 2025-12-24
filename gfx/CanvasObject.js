@@ -193,7 +193,7 @@ class CanvasObject {
             ctx.stroke();
             break;
             
-            case SHAPES.Triangle:
+            case SHAPES.FilledTriangle:
             if (this.angle) ctx.rotate(this.angle);
             /*if (this.gradient) {
             const gradient = ctx.createLinearGradient(0, 0, 0, size)
@@ -212,6 +212,19 @@ class CanvasObject {
             ctx.fill();
             if (this.strokeColor) ctx.stroke()
                 break;
+            
+            case SHAPES.EmptyTriangle:
+            if (this.angle) ctx.rotate(this.angle);
+            ctx.beginPath();
+            // tip (pointing right)
+            ctx.moveTo(minorSize / 2, 0);
+            // base top
+            ctx.lineTo(-minorSize / 2, -size / 2);
+            // base bottom
+            ctx.lineTo(-minorSize / 2, size / 2);
+            ctx.closePath();
+            ctx.stroke();
+            break;
             
             case SHAPES.Text:
             ctx.font = `${this.size}px "Google Sans Code"`;

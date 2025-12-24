@@ -22,9 +22,8 @@ class Ship {
         this.numActionsRemaining = this.maxActionsPerTurn; //for encounter turn processing
         this.aiType = AI_TYPES.Ship
         this.localModules = []
-        this.cloakedTurnsRemaining = 0
         this.moduleCooldowns = new CountsMap()
-        this.statusEffects = new Set()
+        this.statusEffects = new CountsMap()
     }
 
     get modules() {
@@ -122,12 +121,11 @@ class Ship {
         //this.restoreShields() //looks weird visually
         this.angle = Math.PI*2;
         this.escaped = false;
-        this.cloakedTurnsRemaining = 0;
         // Set all module cooldowns to max
         for (const moduleType of Object.values(SHIP_MODULES)) {
             this.moduleCooldowns.setAmount(moduleType, rng(moduleType.cooldown, 0, true))
         }
-        this.statusEffects = new Set()
+        this.statusEffects.clear()
         this.resetActions()
     }
 

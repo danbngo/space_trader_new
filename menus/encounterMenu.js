@@ -511,7 +511,7 @@ function showPlayerEscapedFromHazardsModal() {
  * @returns {[number, CountsMap]} - [fine amount, seized cargo]
  */
 function seizePlayerContraband() {
-    const illegalCargo = Array.from(gs.fleet.cargo.counts.keys()).filter( ct => ct.isIllegal )
+    const illegalCargo = gs.fleet.cargo.keys.filter( ct => ct.isIllegal )
     const seized = new CountsMap()
     let fine = 0
     for (const [ct, amt] of gs.fleet.cargo.counts) {

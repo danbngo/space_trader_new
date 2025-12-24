@@ -7,7 +7,7 @@ class CloakAction extends ShipAction {
     execute() {
         console.log('CloakAction.execute', { actor: this.actor });
         const {actor} = this
-        actor.cloakedTurnsRemaining = 2
+        actor.statusEffects.increment(STATUS_EFFECTS.CLOAKED, rng(5,3))
         this.encounter.handleShipActionComplete(actor)
         
         

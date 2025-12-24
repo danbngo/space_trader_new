@@ -13,7 +13,7 @@ class EMPPulseActionHandler extends ActionHandler {
         const pulseArea = ship.calcPulseArea()
         
         // Show the pulse radius that will be affected
-        const pulseCircle = this.cvs.addFilledCircle('targetingarea', pulseArea.x, pulseArea.y, pulseArea.radius, 12, COLORS.Targeting)
+        const pulseCircle = this.cvs.addEmptyCircle('targetingarea', pulseArea.x, pulseArea.y, pulseArea.radius, 12, COLORS.Targeting)
         
         // Calculate which enemies will be hit
         const validTargets = this.encounter.enemyFleet.ships.filter(target => {

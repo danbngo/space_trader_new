@@ -12,6 +12,6 @@ class DebrisCloudEffect extends Effect {
     applyEffectOnStart(ship = new Ship()) {
         // Apply dusty status effect to ships starting their turn in the dust cloud
         console.log('Applying dust cloud penalties to:', ship.name)
-        ship.statusEffects.add(STATUS_EFFECTS.DUSTY)
+        ship.statusEffects.increment(STATUS_EFFECTS.DUSTY)
     }
 }

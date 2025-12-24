@@ -11,7 +11,7 @@ class MagnetizeActionHandler extends ActionHandler {
         
         // Show targeting triangle in front of ship
         const targetArea = attacker.calcBeamArea()
-        const targetingCvsTriangle = this.cvs.addTriangle('targetingarea', targetArea.x, targetArea.y, targetArea.base, targetArea.height, 4, COLORS.Targeting, targetArea.angle)
+        const targetingCvsTriangle = this.cvs.addEmptyTriangle('targetingarea', targetArea.x, targetArea.y, targetArea.base, targetArea.height, 4, COLORS.Targeting, targetArea.angle)
         const targetingCvsCircle = this.cvs.addEmptyCircle('targetingcircle', 0, 0, 0, 12, COLORS.TargetingConfirm, 2)
         targetingCvsCircle.visible = false
 

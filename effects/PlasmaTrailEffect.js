@@ -6,16 +6,16 @@ class PlasmaTrailEffect extends Effect {
     applyEffectOnEnter(ship = new Ship()) {
         // Deal damage and apply overheated status when entering plasma trail
         console.log('Ship entered plasma trail:', ship.name)
-        ship.statusEffects.add(STATUS_EFFECTS.OVERHEATED)
+        ship.statusEffects.increment(STATUS_EFFECTS.OVERHEATED)
         const damage = rng(5,1)
-        ship.takeDamage(damage, true) // Bypass shields
+        ship.takeDamage(damage)
     }
 
     applyEffectOnStart(ship = new Ship()) {
         // Deal damage and apply overheated status to ships starting their turn in the plasma trail
         console.log('Applying plasma trail damage to:', ship.name)
-        ship.statusEffects.add(STATUS_EFFECTS.OVERHEATED)
+        ship.statusEffects.increment(STATUS_EFFECTS.OVERHEATED)
         const damage = rng(5,1)
-        ship.takeDamage(damage, true) // Bypass shields
+        ship.takeDamage(damage)
     }
 }
