@@ -26,6 +26,44 @@ class Officer {
         }
     }
 
+    grantExperience(amount = 0, autoLevelUp = (this !== gs.captain), autoImproveSkills = (this !== gs.captain)) {
+        let msg = ''
+        this.expPoints += amount;
+        if (this == gs.captain) {
+            msg += `You gained ${amount} experience points.\n`;
+        }
+        if (this.canLevelUp) {
+            if (this == gs.captain) msg += colorSpan(`You leveled up to level ${this.level + 1}!\n`, colorArrToRgbaString(COLORS.LightGreen), true);
+            while (autoLevelUp && this.canLevelUp) {
+                this.levelUp(autoImproveSkills);
+            }
+        }
+    }
+
+    grantInfamy(planet = new Planet(), amount = 1) {
+        this.infamy.increment(planet, amount);
+        if (this == gs.captain) {
+            return colorSpan(`You ${amount >= 0 ? 'gained' : 'lost'} ${Math.abs(amount)} infamy on ${planet.name}.<br/>`, colorArrToRgbaString(amount >= 0 ? COLORS.LightRed : COLORS.LightGreen));
+        }
+        return ''
+    }
+
+    grantFame(planet = new Planet(), amount = 1) {
+        this.fame.increment(planet, amount);
+        if (this == gs.captain) {
+            return colorSpan(`You ${amount >= 0 ? 'gained' : 'lost'} ${Math.abs(amount)} fame on ${planet.name}.<br/>`, colorArrToRgbaString(amount >= 0 ? COLORS.LightGreen : COLORS.LightRed));
+        }
+        return ''
+    }
+
+    grantBounty(planet = new Planet(), amount = 1) {
+        this.bounty.increment(planet, amount);
+        if (this == gs.captain) {
+            return colorSpan(`You ${amount >= 0 ? 'gained' : 'lost'} ${Math.abs(amount)} bounty on ${planet.name}.<br/>`, colorArrToRgbaString(amount >= 0 ? COLORS.LightRed : COLORS.LightGreen));
+        }
+        return ''
+    }
+
     autoImproveSkills() {
         while (this.skillPoints > 0) {
             const skill = rndMember(SKILLS_ALL)

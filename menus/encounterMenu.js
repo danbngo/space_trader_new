@@ -151,12 +151,9 @@ function showPlayerDidSurrenderModal( fameLossMultiplier = 1) {
     const fameLoss = fameLossMultiplier < 0 ? 5 * fameLossMultiplier : 0
     const infamyLoss = fameLossMultiplier < 0 ? 5 * fameLossMultiplier : 0
 
-    if (fameLoss && planet) gs.captain.fame.increment(planet, fameLoss)
-    if (infamyLoss && planet) gs.captain.infamy.increment(planet, infamyLoss)
-
     let msg = `There's no other choice. You power your ships down and broadcast the universal signal for surrender.<br/>`
-    if (fameLoss) msg += `Submitting meekly to the ravages of the ${fleetName} causes you to lose ${Math.abs(fameLoss)} fame.<br/>`
-    if (infamyLoss) msg += `Throwing yourself upon the mercy of the ${fleetName} causes you to lose ${Math.abs(infamyLoss)} infamy.<br/>`
+    if (fameLoss && planet) msg += gs.captain.grantFame(planet, fameLoss)
+    if (infamyLoss && planet) msg += gs.captain.grantInfamy(planet, infamyLoss)
 
     showModal(fleetName, msg, [['Continue', ()=>gs.encounter.encounterType.onDefeat()]])
 }
@@ -169,9 +166,6 @@ function showPlayerAttackFleetModal(fameMultiplier = 0, bountyMultiplier = 0, sn
     const fame = fameMultiplier > 0 ? 1 * fameMultiplier : 0
     const infamy = fameMultiplier < 0 ? 1 * Math.abs(fameMultiplier) : 0
     const bounty = 1000 * bountyMultiplier
-    if (fame && planet) gs.captain.fame.increment(planet, fame)
-    if (infamy && planet) gs.captain.infamy.increment(planet, infamy)
-    if (bounty && planet) gs.captain.bounty.increment(planet, bounty)
 
     if (sneakAttack) {
         for (const ship of gs.encounter.ships) ship.shields[0] = 0
@@ -179,16 +173,21 @@ function showPlayerAttackFleetModal(fameMultiplier = 0, bountyMultiplier = 0, sn
 
     let msg = `You ${sneakAttack ? 'sneakily ' : ''}attack the ${fleetName}!<br/>`
     if (sneakAttack) msg += `The ${fleetName} are caught with their shields down!<br/>`
-    if (infamy > 0) msg += `This dastardly act causes you to gain ${infamy} infamy.<br/>`
-    if (fame > 0) msg += `This brave act causes you to gain ${fame} fame.<br/>`
-    if (bounty > 0) msg += `You bounty has risen by ${bounty}CR.<br/>`
+    if (infamy && planet) msg += gs.captain.grantInfamy(planet, infamy)
+    if (fame && planet) msg += gs.captain.grantFame(planet, fame)
+    if (bounty && planet) msg += gs.captain.grantBounty(planet, bounty)
 
 
     showModal(fleetName, msg, [['Continue', ()=>{
         if (allowBribe) {
-            const combatAdvantage = gs.fleet.combatRating / gs.encounter.fleet.combatRating
+            let combatAdvantage = gs.fleet.combatRating / gs.encounter.fleet.combatRating
+            const planetInfamy = planet ? gs.captain.infamy.getAmount(planet) : 0
+            const totalInfamy = gs.captain.infamy.total
+            //combat advantage should vary from 0.5 its original amount to 2x based on the player's infamy
+            const relevantInfamy = Math.max(planetInfamy, totalInfamy / gs.system.planets.length) // Use higher of planet infamy or avg infamy
+            combatAdvantage *= 2 - (75/(50 + relevantInfamy)) //approaches 2x as infamy increases
             if (combatAdvantage * Math.random() > 1.5) {
-                showNeutralsBribePlayerModal()
+                showNeutralsBribePlayerModal(gs.encounter.fleet.captain.credits)
                 return
             }
         }
@@ -308,17 +307,13 @@ function showPlayerDefeatedEnemyModal(fameMultiplier = 0) {
     const loot = enemyFleet.cargo.randomSubset(lootAmt)
     const disabledPlayerShips = gs.encounter.playerShips.filter(s=>s.disabled)
 
-    if (infamy && planet) gs.captain.infamy.increment(planet, infamy)
-    if (fame && planet) gs.captain.fame.increment(planet, fame)
-
     // Award experience points based on enemy fleet strength
     const expGained = Math.round(AVERAGE_EXP_FROM_COMBAT * (enemyFleet.combatRating / 10))
-    gs.captain.expPoints += expGained
 
     let msg = `You defeated the ${fleetName}!<br/>`
-    if (infamy > 0) msg += `Your nefarious victory gains you ${infamy} infamy.<br/>`
-    if (fame > 0) msg += `Your glorious victory gains you ${fame} fame.<br/>`
-    msg += `You gained ${expGained} experience points.<br/>`
+    msg += gs.captain.grantExperience(expGained)
+    if (infamy && planet) msg += gs.captain.grantInfamy(planet, infamy)
+    if (fame && planet) msg += gs.captain.grantFame(planet, fame)
 
     if (disabledPlayerShips.length > 0) {
         msg += `${disabledPlayerShips.length} of your ships were disabled in the fighting.<br/>`
@@ -355,11 +350,10 @@ function showPlayerDefeatedHazardsModal() {
     
     // Award experience points based on mining success
     const expGained = playerKilledShips.length > 0 ? Math.round(AVERAGE_EXP_FROM_MINING * (playerKilledShips.length / disabledEnemyShips.length)) : 0
-    gs.captain.expPoints += expGained
     
     let msg = ''
     msg += `You survived the ${fleetName}!<br/>`
-    if (expGained > 0) msg += `You gained ${expGained} experience points from mining.<br/>`
+    msg += gs.captain.grantExperience(expGained)
 
     if (disabledPlayerShips.length > 0) {
         msg += `${disabledPlayerShips.length} of your ships were disabled.<br/>`
@@ -379,17 +373,28 @@ function showPlayerDefeatedHazardsModal() {
     ])
 }
 
-function showNeutralsBribePlayerModal(maxCredits = 1000) {
+function showNeutralsBribePlayerModal(maxCredits = 1000, infamyModifier = 0) {
     const baseCredits = Math.ceil(maxCredits*Math.random()/2)
     const credits = Math.round(weightedAvg([baseCredits, maxCredits], [25, gs.fleet.totalSkills.getAmount(SKILLS.Barter)]))
     const officersShare = gs.fleet.calcTotalCRShare(credits, true)
     const finalCredits = credits - officersShare
-    let msg = `The ${gs.encounter.fleetName} frantically offers you ${baseCredits}CR to let them go unharmed!<br/>`
+    const isInfamous = infamyModifier > Math.random()
+
+    let msg = ''
+    if (isInfamous) {
+        msg = `The ${gs.encounter.fleetName} recognize your notorious reputation and hastily offer you ${credits}CR, desperately hoping to avoid your wrath!<br/>`
+    } else {
+        msg = `The ${gs.encounter.fleetName} frantically offers you ${credits}CR to let them go unharmed!<br/>`
+    }
     if (credits > baseCredits) msg += `You employ your haggling skills and make them an offer they can't refuse.<br/>Their offer increases to ${credits}CR.<br/>`
+    
     showModal(gs.encounter.fleetName, msg, [
         ['Accept Bribe', ()=>{
             gs.credits += finalCredits
-            showModal(gs.encounter.fleetName, `You accept the tribute of ${finalCredits}CR${officersShare ? ` (-${officersShare}CR for officers)` : ''}.<br/>The ${gs.encounter.fleetName} anxiously departs before you can change your mind.<br/>`, [['Continue', ()=>endEncounter()]])
+            const acceptMsg = isInfamous
+                ? `You accept the tribute of ${finalCredits}CR${officersShare ? ` (-${officersShare}CR for officers)` : ''}.<br/>The ${gs.encounter.fleetName} flee in terror, grateful to have escaped with their lives.<br/>`
+                : `You accept the tribute of ${finalCredits}CR${officersShare ? ` (-${officersShare}CR for officers)` : ''}.<br/>The ${gs.encounter.fleetName} anxiously departs before you can change your mind.<br/>`
+            showModal(gs.encounter.fleetName, acceptMsg, [['Continue', ()=>endEncounter()]])
         }],
         ['Refuse', ()=>{
             showModal(gs.encounter.fleetName, `You scornfully refuse the tribute!<br/>The ${gs.encounter.fleetName} readies for combat!<br/>`, [['Continue', ()=>startCombat(false)]])
@@ -403,13 +408,12 @@ function showPlayerDefeatedByNeutralsModal( infamyLossMultiplier = 1) {
     const planet = gs.encounter.planet
     
     const infamyLoss = 5 * infamyLossMultiplier
-    if (infamyLoss && planet) gs.captain.infamy.increment(planet, -infamyLoss)
 
     let msg = ''
     msg += `The ${fleetName} seem shocked to have defeated you.<br/>`
     msg += `They quickly depart the scene in case there are other attackers nearby.<br/>`
 
-    if (infamyLoss) msg += `You lose ${infamyLoss} infamy from having suffered such an ignoble loss.<br/>`
+    if (infamyLoss && planet) msg += gs.captain.grantInfamy(planet, -infamyLoss)
     if (disabledPlayerShips.length > 0) {
         msg += `${disabledPlayerShips.length} of your ships were disabled in the fighting.<br/>`
         msg += loseCargoFromDisabledShips(disabledPlayerShips)
@@ -499,10 +503,9 @@ function showPlayerEscapedFromEnemyModal() {
     
     // Award experience points for successfully escaping
     const expGained = Math.round(AVERAGE_EXP_FROM_ESCAPING * (enemyFleet.combatRating / 10))
-    gs.captain.expPoints += expGained
     
     let msg = `You escaped from the ${fleetName}.<br/>`
-    msg += `You gained ${expGained} experience points for surviving the encounter.<br/>`
+    msg += gs.captain.grantExperience(expGained)
     if (escapedPlayerShips.length > 0) msg += `${escapedPlayerShips.length} of your ships exited the battlefield intact.<br/>`
     if (disabledPlayerShips.length > 0) {
         msg += `However, ${disabledPlayerShips.length} were disabled in the fighting.<br/>`
@@ -627,9 +630,9 @@ function showFineOrJailModal(fine = 0) {
     const currentBounty = planet ? gs.captain.bounty.getAmount(planet) : gs.captain.bounty.total
     const fineFromBounty = Math.ceil(Math.min(Math.max(currentBounty*Math.random(),100), currentBounty))
     const jailDays = Math.round(JAIL_DAYS_PER_1000CR_FINE*(fine+fineFromBounty)/1000) //1 day of jail time per 1000CR of fine
-    if (fineFromBounty && planet) gs.captain.bounty.increment(planet, -fineFromBounty)
 
     let msg = ''
+    if (fineFromBounty && planet) msg += gs.captain.grantBounty(planet, -fineFromBounty)
     if (fineFromBounty) msg += `The ${fleetName} are aware of some of the bounties on your head, to the tune of ${fineFromBounty}CR.<br/>`
     if (fine) msg += `The ${fleetName} give you the option to pay a fine of ${fine}CR${fineFromBounty ? `, plus ${fineFromBounty} to clear your bounty` : ''} or serve ${describeTimespan(jailDays/365)} in jail.<br/>`
     else msg += `The ${fleetName} give you the option to pay off your bounty of ${fineFromBounty}CR or serve ${describeTimespan(jailDays/365)} in jail.<br/>`

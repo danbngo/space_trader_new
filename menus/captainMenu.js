@@ -18,32 +18,34 @@ function showCaptainMenu(captain = gs.captain) {
 
     function showReputationTab() {
         // Get all planets with non-zero reputation
-        const planetsWithReputation = PLANETS.filter(p => 
-            captain.fame.getAmount(p) > 0 || 
-            captain.infamy.getAmount(p) > 0 || 
-            captain.bounty.getAmount(p) > 0
-        )
 
-        const reputationContent = planetsWithReputation.length > 0 ? [
-            ...planetsWithReputation.map(planet => ce({children:[
-                `<b>${coloredName(planet)}</b>`,
-                `  Fame: ${statColorSpan(captain.fame.getAmount(planet), captain.fame.getAmount(planet)/50, true)}`,
-                `  Infamy: ${statColorSpan(captain.infamy.getAmount(planet), captain.infamy.getAmount(planet)/50, true)}`,
-                `  Bounty: ${colorSpan(String(captain.bounty.getAmount(planet)), captain.bounty.getAmount(planet) > 0 ? 'red' : '', true)} CR`,
-            ]})),
-            `<br/><b>Total Across All Planets:</b>`,
-            `  Fame: ${statColorSpan(captain.fame.total, captain.fame.total/50, true)}`,
-            `  Infamy: ${statColorSpan(captain.infamy.total, captain.infamy.total/50, true)}`,
-            `  Bounty: ${colorSpan(String(captain.bounty.total), captain.bounty.total > 0 ? 'red' : '', true)} CR`,
-        ] : [
-            `You have no reputation on any planets yet.`,
-            `<br/>Gain fame by defeating enemies and helping others.`,
-            `Gain infamy by attacking innocents and breaking the law.`,
+        // Build table rows: header + planet rows + total row
+        const tableRows = [
+            // Header row
+            ['Planet', 'Bounty', 'Fame', 'Infamy'],
+            // Data rows for each planet
+            ...gs.system.planets.map(planet => [
+                coloredName(planet),
+                `${statColorSpan(captain.bounty.getAmount(planet), 1000/(1000+captain.bounty.getAmount(planet)), true)} CR`,
+                statColorSpan(captain.fame.getAmount(planet), 1 + captain.fame.getAmount(planet)/50, true),
+                statColorSpan(captain.infamy.getAmount(planet), 1 / (1 + captain.infamy.getAmount(planet)/50), true),
+            ]),
+            // Total row
+            [
+                '<b>Total</b>',
+                `${statColorSpan(captain.bounty.total, (1+gs.system.planets.length)*1000/(2000+captain.bounty.total), true)} CR`,
+                statColorSpan(captain.fame.total, 1 + captain.fame.total/50, true),
+                statColorSpan(captain.infamy.total, 1 / (1 + captain.infamy.total/50), true),
+            ]
         ]
+
+        const reputationTable = createTable(tableRows)
 
         showModal(
             `Captain Reputation`,
-            ce({children: reputationContent}),
+            ce({children: [
+                reputationTable,
+            ]}),
             [
                 ["Skills", () => showCaptainMenu(captain)],
                 ["Close", () => closeModal()],

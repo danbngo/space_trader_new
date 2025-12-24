@@ -5,7 +5,7 @@ function createCargoTable(cargo = new CountsMap(), onSelectCargoType = (ct = CAR
     for (const ct of CARGO_TYPES_ALL) {
         rows.push([
             ct.name,
-            cargo.getAmount(ct),
+            ''+cargo.getAmount(ct),
         ])
     }
     return createTable(rows, (rowIndex = 0)=>onSelectCargoType(CARGO_TYPES_ALL[rowIndex]))

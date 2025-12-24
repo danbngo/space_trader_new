@@ -26,7 +26,6 @@ missions - via the guild, etc.
 -escort missions? adds a temporary ship/officer? if they're disabled or die you lose rep?
 -have a grand narrative of some sort - political change, war, etc between planets
 give officers and ships perks - not just boring levelups
-the way population works is kinda dumb??
 
 EVENTUALLY TURN THIS INTO A ROGUELIKE LOL.
 
@@ -35,9 +34,7 @@ MAKE COMBAT MORE STRATEGIC:
 this will get more strategic in the future because:
 
 -being able to laser through multiple enemies if you line them up
--asteroids, cannot shoot through them, they can be purposely shot and broken to create debris
 -rockets that follow enemies, but can be shot down with lasers or other rockets
--aoe attacks like bombs/mines that go off after a certain amt of time or when near an enemy
 -etc, etc.
 
 
@@ -48,3 +45,6 @@ exploring ruins, artifacts with passive bonuses etc
 unique ships
 -what happens if player reaches the end of the map? we dont really need to do anything but might be cool.
 - tutorial?
+the way population works is kinda dumb??
+-asteroids, cannot shoot through them, they can be purposely shot and broken to create debris
+-aoe attacks like bombs/mines that go off after a certain amt of time or when near an enemy
