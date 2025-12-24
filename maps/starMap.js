@@ -164,7 +164,7 @@ class StarMap extends BaseMap {
         })
 
         // Add waypoint marker (upside-down triangle for clicked coordinates)
-        cvs.addTriangle('waypointMarker', 0, 0, 0, 0, 12, [0,255,255,0.5], Math.PI/2)
+        cvs.addTriangle('waypointMarker', 0, 0, 0, 0, 12, COLORS.Targeting, Math.PI/2)
 
         cvs.recalculateDrawOrder()
     }

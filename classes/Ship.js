@@ -24,6 +24,7 @@ class Ship {
         this.localModules = []
         this.cloakedTurnsRemaining = 0
         this.moduleCooldowns = new CountsMap()
+        this.statusEffects = new Set()
     }
 
     get modules() {
@@ -72,7 +73,12 @@ class Ship {
     }
 
     get maxMoveDistance() {
-        return 1 + AVERAGE_SHIP_MOVE_DISTANCE * Math.pow( (this.engine/AVERAGE_SHIP_ENGINE) / (this.mass/AVERAGE_SHIP_MASS), 0.5);
+        const baseDistance = (1 + AVERAGE_SHIP_MOVE_DISTANCE * Math.pow( (this.engine/AVERAGE_SHIP_ENGINE) / (this.mass/AVERAGE_SHIP_MASS), 0.5));
+        // Apply movement penalty if ship is frozen
+        if (this.statusEffects.has(STATUS_EFFECTS.FROZEN)) {
+            return baseDistance * 0.5;
+        }
+        return baseDistance;
     }
 
     get maxAttackDistance() {
@@ -119,8 +125,9 @@ class Ship {
         this.cloakedTurnsRemaining = 0;
         // Set all module cooldowns to max
         for (const moduleType of Object.values(SHIP_MODULES)) {
-            this.moduleCooldowns.setAmount(moduleType, moduleType.cooldown)
+            this.moduleCooldowns.setAmount(moduleType, rng(moduleType.cooldown, 0, true))
         }
+        this.statusEffects = new Set()
         this.resetActions()
     }
 
@@ -133,6 +140,10 @@ class Ship {
         if (Math.random() < 0.1) {
             this.numActionsRemaining = Math.max(1, this.numActionsRemaining - 1)
         }
+    }
+
+    spendAction() {
+        this.numActionsRemaining = Math.max(0, this.numActionsRemaining - 1)
     }
 
     setDisabled() {
@@ -204,7 +215,7 @@ class Ship {
         return new Circle(cx, cy, attackRange)
     }
 
-    calcGravitonBeamArea(overrideX = this.x, overrideY = this.y) {
+    calcBeamArea(overrideX = this.x, overrideY = this.y) {
         const attackRange = 1+this.maxAttackDistance
         const targetingAngle = this.angle
         // Position triangle in front of ship

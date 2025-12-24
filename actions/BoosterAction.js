@@ -17,43 +17,22 @@ class BoosterAction extends ShipAction {
         const newX = this.toX
         const newY = this.toY
         
-        // Find enemy ships along the boost path and spin them
-        const spinRadius = 5 * ship.radius
-        const enemyShips = this.encounter.ships.filter(s => s.fleet !== ship.fleet && !s.disabled)
-        
-        // Check multiple points along the path
-        const numChecks = 10
-        for (const enemy of enemyShips) {
-            let isInPath = false
-            
-            // Check distance from enemy to multiple points along the path
-            for (let i = 0; i <= numChecks; i++) {
-                const progress = i / numChecks
-                const checkX = startX + (newX - startX) * progress
-                const checkY = startY + (newY - startY) * progress
-                const distToEnemy = calcDistance(checkX, checkY, enemy.x, enemy.y)
-                
-                if (distToEnemy <= spinRadius) {
-                    isInPath = true
-                    break
-                }
-            }
-            
-            if (isInPath) {
-                // Spin the enemy ship to a random angle
-                enemy.incrementAngle(rng(Math.PI/2, -Math.PI/2, false))
-            }
-        }
+        // Create plasma trail from start to near end (90% of the way to avoid burning self)
+        const trailEndProgress = 0.9
+        const trailEndX = startX + (newX - startX) * trailEndProgress
+        const trailEndY = startY + (newY - startY) * trailEndProgress
+        const plasmaTrail = new PlasmaTrailEffect(startX, startY, trailEndX, trailEndY)
+        this.encounter.effects.push(plasmaTrail)
         
         // Update ship position
         Object.assign(ship, { x: newX, y: newY })
         
-        ship.numActionsRemaining--
+        this.encounter.handleShipActionComplete(ship)
         
         // Check if ship escaped the map
-        if (this.encounter) this.encounter.checkShipEscaped(ship)
+        if (this.encounter) this.encounter.checkShipMovementEffects(ship)
         
-        // Set cooldown
+        
         ship.moduleCooldowns.setAmount(SHIP_MODULES.BOOSTER, SHIP_MODULES.BOOSTER.cooldown)
         this.completed = true
         return []

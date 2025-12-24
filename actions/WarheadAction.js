@@ -36,12 +36,11 @@ class WarheadAction extends ShipAction {
             ship.y += ky
             
             // Check if knocked out of bounds
-            this.encounter.checkShipEscaped(ship)
+            this.encounter.checkShipMovementEffects(ship)
         }
+        this.encounter.handleShipActionComplete(this.actor)
         
-        attacker.numActionsRemaining--
         
-        // Set cooldown
         attacker.moduleCooldowns.setAmount(SHIP_MODULES.WARHEAD, SHIP_MODULES.WARHEAD.cooldown)
         this.completed = true
         return pseudoActions

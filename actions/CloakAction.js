@@ -8,9 +8,9 @@ class CloakAction extends ShipAction {
         console.log('CloakAction.execute', { actor: this.actor });
         const {actor} = this
         actor.cloakedTurnsRemaining = 2
-        actor.numActionsRemaining--
+        this.encounter.handleShipActionComplete(actor)
         
-        // Set cooldown
+        
         actor.moduleCooldowns.setAmount(SHIP_MODULES.CLOAK, SHIP_MODULES.CLOAK.cooldown)
         this.completed = true
         return []

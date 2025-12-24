@@ -187,6 +187,12 @@ class CanvasObject {
             ctx.stroke();
             break;
             
+            case SHAPES.EmptyOval:
+            ctx.beginPath();
+            ctx.ellipse(0, 0, size, minorSize, this.angle, 0, Math.PI * 2);
+            ctx.stroke();
+            break;
+            
             case SHAPES.Triangle:
             if (this.angle) ctx.rotate(this.angle);
             /*if (this.gradient) {

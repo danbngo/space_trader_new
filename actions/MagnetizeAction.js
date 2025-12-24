@@ -1,17 +1,17 @@
-class GravitonBeamAction extends ShipAction {
+class MagnetizeAction extends ShipAction {
     constructor(encounter = new Encounter(), actor = new Ship(), target = new Ship()) {
-        super(encounter, actor, MOVE_TYPES.GravitonBeam, target)
+        super(encounter, actor, MOVE_TYPES.Magnetize, target)
         const [attackerToX, attackerToY] = [actor.x*0.75+target.x*0.25, actor.y*0.75+target.y*0.25]
         const [targetToX, targetToY] = [actor.x*0.5+target.x*0.5, actor.y*0.5+target.y*0.5]
         this.toX = attackerToX
         this.toY = attackerToY
         this.targetToX = targetToX
         this.targetToY = targetToY
-        this.actorInfoMessage = 'Graviton Beam!'
+        this.actorInfoMessage = 'Magnetize!'
     }
 
     execute() {
-        console.log('GravitonBeamAction.execute', { actor: this.actor, target: this.target });
+        console.log('MagnetizeAction.execute', { actor: this.actor, target: this.target });
 
         const {actor, target} = this
         actor.x = this.toX
@@ -20,13 +20,12 @@ class GravitonBeamAction extends ShipAction {
         target.y = this.targetToY
         
         // Check if either ship escaped
-        this.encounter.checkShipEscaped(target)
-        this.encounter.checkShipEscaped(actor)
+        this.encounter.checkShipMovementEffects(target)
+        this.encounter.checkShipMovementEffects(actor)
+        this.encounter.handleShipActionComplete(actor)
         
-        actor.numActionsRemaining--
         
-        // Set cooldown
-        actor.moduleCooldowns.setAmount(SHIP_MODULES.GRAVITON_BEAM, SHIP_MODULES.GRAVITON_BEAM.cooldown)
+        actor.moduleCooldowns.setAmount(SHIP_MODULES.MAGNETIZE, SHIP_MODULES.MAGNETIZE.cooldown)
         this.completed = true
         return []
     }

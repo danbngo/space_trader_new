@@ -21,12 +21,12 @@ class BlinkAction extends ShipAction {
         // Update ship position
         Object.assign(ship, { x: newX, y: newY })
         
-        ship.numActionsRemaining--
+        this.encounter.handleShipActionComplete(this.actor)
         
         // Check if ship escaped the map
-        if (this.encounter) this.encounter.checkShipEscaped(ship)
+        if (this.encounter) this.encounter.checkShipMovementEffects(ship)
         
-        // Set cooldown
+        
         ship.moduleCooldowns.setAmount(SHIP_MODULES.BLINK, SHIP_MODULES.BLINK.cooldown)
         this.completed = true
         return []

@@ -10,7 +10,7 @@ class GameState {
         // Give player all modules for testing
         playerShip.localModules = [
             SHIP_MODULES.CLOAK,
-            SHIP_MODULES.GRAVITON_BEAM,
+            SHIP_MODULES.MAGNETIZE,
             SHIP_MODULES.WARHEAD,
             SHIP_MODULES.EMP_PULSE,
             SHIP_MODULES.BLINK,

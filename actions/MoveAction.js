@@ -6,8 +6,8 @@ class MoveAction extends ShipAction {
     execute() {
         console.log('MoveAction.execute', { actor: this.actor, toX: this.toX, toY: this.toY });
         Object.assign(this.actor, {x: this.toX, y: this.toY, angle: this.angle})
-        this.actor.numActionsRemaining--
-        let actorEscaped = (this.encounter) ? this.encounter.checkShipEscaped(this.actor) : null
+        this.encounter.handleShipActionComplete(this.actor)
+        let actorEscaped = (this.encounter) ? this.encounter.checkShipMovementEffects(this.actor) : null
         Object.assign(this, {actorEscaped})
         this.completed = true
         return []

@@ -13,11 +13,11 @@ class WarheadActionHandler extends ActionHandler {
         const targetArea = attacker.calcBombArea()
         
         // Show the targeting area boundary
-        const targetingAreaCircle = this.cvs.addEmptyCircle('targetingarea', targetArea.x, targetArea.y, targetArea.radius, 12, [0,255,0,0.3], 2)
+        const targetingAreaCircle = this.cvs.addEmptyCircle('targetingarea', targetArea.x, targetArea.y, targetArea.radius, 12, COLORS.Targeting, 2)
         
         // Show the explosion preview (smaller circle that follows mouse)
         const explosionRadius = attacker.maxAttackDistance * 0.25
-        const targetingCvsCircle = this.cvs.addEmptyCircle('targetingcircle', targetArea.x, targetArea.y, explosionRadius, 12, COLORS.Orange, 2)
+        const targetingCvsCircle = this.cvs.addEmptyCircle('targetingcircle', targetArea.x, targetArea.y, explosionRadius, 12, COLORS.TargetingConfirm, 2)
         
         this.cvs.onClickWorldXY = (x, y) => this.attempt(attacker, targetArea, x, y)
         this.cvs.onMouseMoveWorldXY = (x, y) => this.target(x, y, targetArea)

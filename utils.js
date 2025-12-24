@@ -160,3 +160,11 @@ function weightedAvg(values = [0], weights = [1]) {
     }
     return totalWeight === 0 ? 0 : weightedSum / totalWeight;
 }
+
+function generateUUID(prefix='') {
+    // Generate a short unique ID suitable for DOM usage
+    // Format: timestamp in base36 + random suffix
+    const timestamp = Date.now().toString(36);
+    const randomPart = Math.random().toString(36).substring(2, 7);
+    return `${prefix}${timestamp}${randomPart}`;
+}

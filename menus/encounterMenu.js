@@ -8,7 +8,7 @@ function startEncounter(encounter = gs.encounter) {
     const maxSpawnDistance = encounter.mapRadius*ENCOUNTER_SHIP_MAX_SPAWN_DISTANCE_RATIO
     const minSpawnDistance = maxSpawnDistance/5
 
-    let stormAngles = [rng(Math.PI/2, -Math.PI/2, false), rng(Math.PI + Math.PI/2, Math.PI - Math.PI/2, false)]
+    let stormAngles = [rng(Math.PI/2, -Math.PI/2, false)]//, rng(Math.PI + Math.PI/2, Math.PI - Math.PI/2, false)]
 
     for (const ship of ships) {
         ship.resetCombatVars()

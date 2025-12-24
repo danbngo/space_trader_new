@@ -123,6 +123,11 @@ class CanvasWrapper {
         return this.addObject(obj)
     }
     
+    addEmptyOval(id = "", x = 0, y = 0, radiusX = 0, radiusY = 0, minScreenSize = 0, strokeColor = COLORS.LightGray, angle = 0, lineWidth = 1, onClick = null) {
+        const obj = new CanvasObject({ id, shape: SHAPES.EmptyOval, x, y, size: radiusX, minorSize: radiusY, minScreenSize, angle, strokeColor, onClick, lineWidth });
+        return this.addObject(obj)
+    }
+    
     addTriangle(id = "", x = 0, y = 0, size = 0, minorSize = 0, minScreenSize = 0, fillColor = COLORS.LightGray, angle = 0, onClick = null) {
         console.log('adding cvs triangle with size, minorSize:',size,minorSize)
         const obj = new CanvasObject({ id, shape: SHAPES.Triangle, x, y, size, minorSize, minScreenSize, fillColor, angle, onClick });

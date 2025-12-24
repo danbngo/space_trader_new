@@ -63,8 +63,7 @@ class Encounter {
         
         // Handle effect expiration and decay
         for (const effect of this.effects) {
-            effect.remainingTurns--
-            effect.radius *= 0.8 // Reduce radius by 20% each turn
+            effect.onTurnEnd()
         }
         // Remove expired effects
         this.effects = this.effects.filter(effect => effect.remainingTurns > 0)
@@ -79,6 +78,17 @@ class Encounter {
             ship.resetActions()
         }
         this.updateEncounterResult()
+    }
+
+    handleShipActionComplete(ship = new Ship()) {
+        ship.spendAction()
+        // Apply effects that the ship is starting its turn inside
+        ship.statusEffects = new Set() //clear status effects and reapply based on current effects
+        for (const effect of this.effects) {
+            if (effect.containsPoint(ship.x, ship.y)) {
+                effect.applyEffectOnStart(ship)
+            }
+        }
     }
 
     updateEncounterResult() {
@@ -134,18 +144,27 @@ class Encounter {
         return validTargets
     }
 
-    calcGravitonBeamTargets(attacker = new Ship()) {
-        console.log('Encounter.calcGravitonBeamTargets', { attacker });
+    calcBeamTargets(attacker = new Ship()) {
+        console.log('Encounter.calcBeamTargets', { attacker });
         const validTargets = []
-        const targetingArea = attacker.calcGravitonBeamArea()
+        const targetingArea = attacker.calcBeamArea()
         for (const target of this.calcHarmableTargets(attacker)) {
             if (targetingArea.containsPoint(target.x, target.y)) validTargets.push(target)
         }
         return validTargets
     }
 
-    checkShipEscaped(ship = new Ship()) {
-        console.log('Encounter.checkShipEscaped', { ship });
+    checkShipMovementEffects(ship = new Ship()) {
+        console.log('Encounter.checkShipMovementEffects', { ship });
+        
+        // Check if ship entered any effects
+        for (const effect of this.effects) {
+            if (effect.containsPoint(ship.x, ship.y)) {
+                effect.applyEffectOnEnter(ship)
+            }
+        }
+        
+        // Check if ship escaped map
         const distanceFromCenter = calcDistance(0, 0, ship.x, ship.y)
         if (distanceFromCenter > this.mapRadius) {
             ship.escaped = true

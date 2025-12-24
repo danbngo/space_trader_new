@@ -6,9 +6,14 @@ class RechargeAction extends ShipAction {
 
     execute() {
         console.log('RechargeAction.execute', { actor: this.actor });
-        this.actor.numActionsRemaining--
-        const rechargedAmt = this.actor.rechargeShields()
-        Object.assign(this, {actorShieldDamage: -rechargedAmt})
+        this.encounter.handleShipActionComplete(this.actor)
+        // Check if ship is overheated - if so, can't recharge shields
+        if (this.actor.statusEffects.has(STATUS_EFFECTS.OVERHEATED)) {
+            Object.assign(this, {actorBadMessage: 'Overheated! Cannot recharge!'})
+        } else {
+            const rechargedAmt = this.actor.rechargeShields()
+            Object.assign(this, {actorShieldDamage: -rechargedAmt})
+        }
         this.completed = true
         return []
     }

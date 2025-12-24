@@ -17,7 +17,7 @@ class ShipModule {
 
 const SHIP_MODULES = {
     CLOAK: new BaseShipModule('Cloak', 'Makes your ship much harder to hit, but is dispelled if you attack or are hit.', 5000, 3),
-    GRAVITON_BEAM: new BaseShipModule('Graviton Beam', 'Pulls your ship and enemy ships towards each other', 6000, 2),
+    MAGNETIZE: new BaseShipModule('Magnetize', 'Pulls your ship and enemy ships towards each other', 6000, 2),
     WARHEAD: new BaseShipModule('Warhead', 'Deals damage and knockback in a large area', 8000, 4),
     EMP_PULSE: new BaseShipModule('EMP Pulse', 'Lowers the shields of nearby ships and increases the cooldown on their modules.', 7000, 3),
     BLINK: new BaseShipModule('Blink', 'Randomly teleports your ship a short distance', 4000, 2),

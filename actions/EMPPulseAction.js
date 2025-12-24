@@ -30,9 +30,9 @@ class EMPPulseAction extends ShipAction {
             }
         }
         
-        attacker.numActionsRemaining--
+        this.encounter.handleShipActionComplete(attacker)
         
-        // Set cooldown
+        
         attacker.moduleCooldowns.setAmount(SHIP_MODULES.EMP_PULSE, SHIP_MODULES.EMP_PULSE.cooldown)
         this.completed = true
         return pseudoActions
