@@ -92,4 +92,16 @@ class CountsMap {
     has(key = {}) {
         return this.getAmount(key) > 0
     }
+
+    toJSON() {
+        // Custom serialization for JSON.stringify
+        // Convert Map to object, handling Planet keys specially
+        const obj = {}
+        for (const [key, amount] of this.counts) {
+            // If key has a .name property (like Planet), use the name as the key
+            const jsonKey = key?.name || String(key)
+            obj[jsonKey] = amount
+        }
+        return { counts: obj }
+    }
 }

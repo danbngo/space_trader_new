@@ -147,15 +147,16 @@ function showPlayerRefuseSurrenderModal(fameMultiplier = 0, bountyMultiplier = 0
 function showPlayerDidSurrenderModal( fameLossMultiplier = 1) {
     console.log('showPlayerDidSurrenderModal', { fameLossMultiplier });
     const fleetName = gs.encounter.fleetName
+    const planet = gs.encounter.planet
     const fameLoss = fameLossMultiplier < 0 ? 5 * fameLossMultiplier : 0
     const infamyLoss = fameLossMultiplier < 0 ? 5 * fameLossMultiplier : 0
 
-    gs.captain.fame -= fameLoss
-    gs.captain.infamy -= infamyLoss
+    if (fameLoss && planet) gs.captain.fame.increment(planet, fameLoss)
+    if (infamyLoss && planet) gs.captain.infamy.increment(planet, infamyLoss)
 
     let msg = `There's no other choice. You power your ships down and broadcast the universal signal for surrender.<br/>`
-    if (fameLoss) msg += `Submitting meekly to the ravages of the ${fleetName} causes you to lose ${fameLoss} fame.<br/>`
-    if (infamyLoss) msg += `Throwing yourself upon the mercy of the ${fleetName} causes you to lose ${fameLoss} infamy.<br/>`
+    if (fameLoss) msg += `Submitting meekly to the ravages of the ${fleetName} causes you to lose ${Math.abs(fameLoss)} fame.<br/>`
+    if (infamyLoss) msg += `Throwing yourself upon the mercy of the ${fleetName} causes you to lose ${Math.abs(infamyLoss)} infamy.<br/>`
 
     showModal(fleetName, msg, [['Continue', ()=>gs.encounter.encounterType.onDefeat()]])
 }
@@ -164,12 +165,13 @@ function showPlayerDidSurrenderModal( fameLossMultiplier = 1) {
 function showPlayerAttackFleetModal(fameMultiplier = 0, bountyMultiplier = 0, sneakAttack = false, allowBribe = false) {
     console.log('showPlayerAttackFleetModal', { fameMultiplier, bountyMultiplier });
     const fleetName = gs.encounter.fleetName
+    const planet = gs.encounter.planet
     const fame = fameMultiplier > 0 ? 1 * fameMultiplier : 0
     const infamy = fameMultiplier < 0 ? 1 * Math.abs(fameMultiplier) : 0
     const bounty = 1000 * bountyMultiplier
-    gs.captain.fame += fame
-    gs.captain.infamy += infamy
-    gs.captain.bounty += bounty
+    if (fame && planet) gs.captain.fame.increment(planet, fame)
+    if (infamy && planet) gs.captain.infamy.increment(planet, infamy)
+    if (bounty && planet) gs.captain.bounty.increment(planet, bounty)
 
     if (sneakAttack) {
         for (const ship of gs.encounter.ships) ship.shields[0] = 0
@@ -287,6 +289,7 @@ function showTradeOfferPlayerBuyModal() {
 function showPlayerDefeatedEnemyModal(fameMultiplier = 0) {
     console.log('showPlayerDefeatedEnemyModal', { fameMultiplier });
     const {enemyFleet, fleetName, disabledEnemyShips} = gs.encounter
+    const planet = gs.encounter.planet
     const fame = fameMultiplier > 0 ? 5 * fameMultiplier : 0
     const infamy = fameMultiplier < 0 ? 5 * Math.abs(fameMultiplier) : 0
     const abandonedCargoCapacity = disabledEnemyShips.reduce( (total, ship) => {
@@ -305,8 +308,8 @@ function showPlayerDefeatedEnemyModal(fameMultiplier = 0) {
     const loot = enemyFleet.cargo.randomSubset(lootAmt)
     const disabledPlayerShips = gs.encounter.playerShips.filter(s=>s.disabled)
 
-    gs.captain.infamy += infamy
-    gs.captain.fame += fame
+    if (infamy && planet) gs.captain.infamy.increment(planet, infamy)
+    if (fame && planet) gs.captain.fame.increment(planet, fame)
 
     // Award experience points based on enemy fleet strength
     const expGained = Math.round(AVERAGE_EXP_FROM_COMBAT * (enemyFleet.combatRating / 10))
@@ -397,9 +400,10 @@ function showNeutralsBribePlayerModal(maxCredits = 1000) {
 function showPlayerDefeatedByNeutralsModal( infamyLossMultiplier = 1) {
     console.log('showPlayerDefeatedByNeutralsModal', { infamyLossMultiplier });
     const {fleetName, disabledPlayerShips} = gs.encounter
+    const planet = gs.encounter.planet
     
     const infamyLoss = 5 * infamyLossMultiplier
-    gs.captain.infamy -= infamyLoss
+    if (infamyLoss && planet) gs.captain.infamy.increment(planet, -infamyLoss)
 
     let msg = ''
     msg += `The ${fleetName} seem shocked to have defeated you.<br/>`
@@ -619,9 +623,11 @@ function showPlayerPoliceInspectionModal() {
 
 function showFineOrJailModal(fine = 0) {
     const {fleetName} = gs.encounter
-    const fineFromBounty = Math.ceil(Math.min(Math.max(gs.captain.bounty*Math.random(),100), gs.captain.bounty))
+    const planet = gs.encounter.planet
+    const currentBounty = planet ? gs.captain.bounty.getAmount(planet) : gs.captain.bounty.total
+    const fineFromBounty = Math.ceil(Math.min(Math.max(currentBounty*Math.random(),100), currentBounty))
     const jailDays = Math.round(JAIL_DAYS_PER_1000CR_FINE*(fine+fineFromBounty)/1000) //1 day of jail time per 1000CR of fine
-    gs.captain.bounty -= fineFromBounty
+    if (fineFromBounty && planet) gs.captain.bounty.increment(planet, -fineFromBounty)
 
     let msg = ''
     if (fineFromBounty) msg += `The ${fleetName} are aware of some of the bounties on your head, to the tune of ${fineFromBounty}CR.<br/>`
@@ -632,7 +638,7 @@ function showFineOrJailModal(fine = 0) {
             gs.credits -= (fine + fineFromBounty)
             msg += `You pay the fine of ${fine+fineFromBounty}CR.<br/>`
             msg += `Your remaining CR: ${gs.credits}<br/>`
-            if (fineFromBounty) msg += `Your bounty has been reduced to: ${gs.captain.bounty}CR.<br/>`
+            if (fineFromBounty) msg += `Your bounty has been reduced to: ${planet ? gs.captain.bounty.getAmount(planet) : gs.captain.bounty.total}CR.<br/>`
             showModal(fleetName, msg, [['Continue', ()=>endEncounter()]])
         }, gs.credits >= fine + fineFromBounty],
         ['Serve Jail Time', ()=>{
@@ -641,7 +647,7 @@ function showFineOrJailModal(fine = 0) {
             gs.year += jailDays / 365.0
             msg += `The ${fleetName} take you to the nearest planet, ${nearestPlanet.name}.<br/>`
             msg += `You serve ${describeTimespan(jailDays/365)} in jail.<br/>`
-            if (fineFromBounty) msg += `Your bounty has been reduced to: ${gs.captain.bounty}CR.<br/>`
+            if (fineFromBounty) msg += `Your bounty has been reduced to: ${planet ? gs.captain.bounty.getAmount(planet) : gs.captain.bounty.total}CR.<br/>`
             showModal(fleetName, msg, [['Continue', ()=>endEncounter()]])
         }],
     ])

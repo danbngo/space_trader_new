@@ -41,7 +41,7 @@ function showBankMenu(bank = new Bank()) {
 
     function borrow(principal = 0, term = 0) {
         const interest = bank.calcLoanInterest(principal, term)
-        const loan = new BankLoan(principal, interest, term)
+        const loan = new BankLoan(principal, interest, term, gs.year, planet)
         gs.loans.push(loan)
         gs.credits += loan.principal
         bank.credits -= loan.principal

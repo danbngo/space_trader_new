@@ -50,19 +50,20 @@ class StarMap extends BaseMap {
                 ce({tag:'button', classNames: [(this.paused && !gs.location) || (!this.paused && gs.location) ? 'highlighted' : null] , innerHTML:this.paused ? '▶' : '⏸', onClick: () => this.togglePause()}),
                 ce({tag:'button', innerHTML:'+', onClick: () => this.cvs.adjustZoom(1.33)}),
                 ce({tag:'button', innerHTML:'-', onClick: () => this.cvs.adjustZoom(0.66)}),
-                ce({tag:'button', innerHTML:'?', onClick: () => this.openAssistant()}),
+                ce({tag:'button', classNames: [gs.captain.skillPoints > 0 ? 'highlighted' : null], innerHTML:'?', onClick: () => this.openAssistant()}),
             ]
         })
     }
 
     openAssistant() {
         this.togglePause(true)
+        const hasSkillPoints = gs.captain.skillPoints > 0
         showModal(`Assistant`, 'How can I help you captain?', [
             ['Trade Info', ()=>showTradeInfoSellMenu()],
             ['Ships Manifest', ()=>showShipsMenu()],
             ['Cargo Manifest', ()=>showCargoMenu()],
             ['Officer Roster', ()=>showOfficersMenu()],
-            ['Captain Overview', ()=>showCaptainMenu()],
+            ['Captain Overview', ()=>showCaptainMenu(), false, hasSkillPoints ? 'highlighted' : null],
             ['Cancel', ()=>closeModal()],
         ])
     }

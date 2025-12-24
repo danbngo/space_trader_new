@@ -28,6 +28,7 @@ const SHIP_MODULE_TYPES = {
     BLINK: new ShipModuleType('Blink', MOVE_TYPES.Blink, 'Randomly teleports your ship a short distance', 4000, 2),
     BOOSTER: new ShipModuleType('Booster', MOVE_TYPES.Booster, 'Move very fast in a direction and spin ships as you pass.', 5500, 3),
     SMOKE_BOMB: new ShipModuleType('Smoke Bomb', MOVE_TYPES.SmokeBomb, 'Creates a dust cloud nearby, which slows ships and decreases hit chance.', 4500, 2),
+    SPEED_MODULE: new ShipModuleType('Speed Module', null, 'Grants +1 action per turn, allowing your ship to act faster in combat.', 6500, 0),
     //NANITE_SWARM: new ShipModuleType('Nanite Swarm', 'Repairs hull damage for your ship and nearby allies', 0),
     //DEFLECTOR: new ShipModuleType('Deflector', 'Reflects incoming enemy projectiles/ships', 0),
 }

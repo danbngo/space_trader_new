@@ -20,11 +20,18 @@ function refreshPanelButtons (panelId = '', buttons) {
     removeChildren(buttonsEl)
     if (buttons) buttons.forEach((btnData) => {
         if (!btnData) return
-        const [label, handler, disabled] = btnData
+        const [label, handler, disabled, classNames] = btnData
         const btn = document.createElement('button');
         btn.textContent = label;
         // @ts-ignore
         btn.onclick = handler;
+        if (classNames) {
+            if (Array.isArray(classNames)) {
+                classNames.forEach(cn => cn && btn.classList.add(cn))
+            } else {
+                btn.classList.add(classNames)
+            }
+        }
         buttonsEl.appendChild(btn);
         if (disabled) {console.log('gonna disable a btn:',btn); btn.disabled = true}
     });

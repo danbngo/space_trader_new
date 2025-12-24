@@ -180,11 +180,14 @@ function checkDebtCollections(elapsedDays = 1) {
     const totalDebts = gs.captain.calcTotalDebts(true)
     const convertedAmt = Math.min(totalDebts, 100 + rng( Math.ceil(totalDebts/3), Math.ceil(totalDebts/6) ))
     const fees = Math.ceil(convertedAmt * 0.5)
+    const overdueLoans = gs.captain.loans.filter(l=>l.overdue && l.outstandingBalance > 0)
+    const affectedLoan = overdueLoans.length > 0 ? rndMember(overdueLoans) : null
+    const bountyPlanet = affectedLoan?.planet || gs.location // Use loan's planet or current location
     payDebtsRandomly(gs.captain, convertedAmt)
-    gs.captain.bounty += Math.ceil(convertedAmt + fees)
+    if (bountyPlanet) gs.captain.bounty.increment(bountyPlanet, Math.ceil(convertedAmt + fees))
     let msg = `The bank isn't happy that you haven't paid your overdue loans of ${totalDebts}CR.<br/>`
     msg += `They have passed a portion of your debt, plus fees on to some rather ruthless collection agencies.<br/>`
-    msg += `Your new bounty: ${gs.captain.bounty}CR<br/>`
+    msg += `Your new bounty${bountyPlanet ? ` on ${bountyPlanet.name}` : ''}: ${bountyPlanet ? gs.captain.bounty.getAmount(bountyPlanet) : gs.captain.bounty.total}CR<br/>`
     msg += `Your new total overdue debt: ${outstandingDebts-convertedAmt}CR<br/>`
     if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
     showModal('Bank: Collections', msg, [['Continue', ()=> closeModal()]])
@@ -240,9 +243,9 @@ function calcPlayerScore() {
         cargoScore += (ct.value || 0) * (amt || 0);
     }
 
-    const fameScore = gs.captain.fame * 10;
-    const infamyScore = gs.captain.infamy * -10;
-    const bountyScore = gs.captain.bounty * -1;
+    const fameScore = gs.captain.fame.total * 10;
+    const infamyScore = gs.captain.infamy.total * -10;
+    const bountyScore = gs.captain.bounty.total * -1;
 
     const total = shipsScore + creditsScore + officerScore + fameScore + infamyScore + bountyScore + cargoScore;
     return { total, shipsScore, creditsScore, officerScore, fameScore, infamyScore, bountyScore, cargoScore };

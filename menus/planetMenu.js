@@ -34,6 +34,9 @@ function showPlanetMenu(planet = new Planet()) {
     if (settlement.courthouse) {
         options.push(["Courthouse", () => showCourthouseMenu(settlement.courthouse)]);
     }
+    if (settlement.academy) {
+        options.push(["Academy", () => showAcademyMenu(settlement.academy)]);
+    }
     options.push([isDocked ? "Depart" : "Stop Scanning", () => departPlanet(planet)]);
 
     showModal(coloredName(planet), msg, options);

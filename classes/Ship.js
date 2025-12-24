@@ -163,13 +163,17 @@ class Ship {
 
     resetActions() {
         this.numActionsRemaining = this.maxActionsPerTurn;
-        //randomly gain or lose an action sometimes
-        if (Math.random() < 0.1) {
+        
+        // Check for SpeedModule - grants +1 action per turn
+        const hasSpeedModule = this.modules.some(m => m.moduleType === SHIP_MODULE_TYPES.SPEED_MODULE)
+        if (hasSpeedModule) {
             this.numActionsRemaining = this.numActionsRemaining + 1
         }
-        if (Math.random() < 0.1) {
-            this.numActionsRemaining = Math.max(1, this.numActionsRemaining - 1)
-        }
+        
+        // Commented out random slow - kept for reference
+        // if (Math.random() < 0.1) {
+        //     this.numActionsRemaining = Math.max(1, this.numActionsRemaining - 1)
+        // }
     }
 
     spendAction() {

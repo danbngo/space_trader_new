@@ -15,7 +15,8 @@ class GameState {
             SHIP_MODULE_TYPES.EMP_PULSE,
             SHIP_MODULE_TYPES.BLINK,
             SHIP_MODULE_TYPES.BOOSTER,
-            SHIP_MODULE_TYPES.SMOKE_BOMB
+            SHIP_MODULE_TYPES.SMOKE_BOMB,
+            SHIP_MODULE_TYPES.SPEED_MODULE
         ]
 
         // Create fleet
@@ -120,6 +121,52 @@ class GameState {
             new Officer("Captain"),
             data.captain
         );
+
+        // Helper function to restore CountsMap with planet keys
+        const restoreCountsMapWithPlanetKeys = (serializedData) => {
+            const countsMap = new CountsMap()
+            if (!serializedData || !serializedData.counts) return countsMap
+            
+            // serializedData.counts is an object like {planetName: amount, ...}
+            for (const [planetName, amount] of Object.entries(serializedData.counts)) {
+                const planet = PLANETS.find(p => p.name === planetName)
+                if (planet && amount > 0) {
+                    countsMap.setAmount(planet, amount)
+                }
+            }
+            return countsMap
+        }
+
+        // Restore CountsMap instances for captain (with planet keys)
+        this.captain.bounty = restoreCountsMapWithPlanetKeys(data.captain.bounty)
+        this.captain.fame = restoreCountsMapWithPlanetKeys(data.captain.fame)
+        this.captain.infamy = restoreCountsMapWithPlanetKeys(data.captain.infamy)
+        
+        // Restore skills CountsMap (keys are skill constants, not planets)
+        if (data.captain.skills && data.captain.skills.counts) {
+            this.captain.skills = new CountsMap()
+            for (const [skillName, amount] of Object.entries(data.captain.skills.counts)) {
+                // Find the skill constant by name
+                const skill = Object.values(SKILLS).find(s => s.name === skillName)
+                if (skill && amount > 0) {
+                    this.captain.skills.setAmount(skill, amount)
+                }
+            }
+        }
+
+        // Restore loans with planet references
+        if (data.captain.loans && Array.isArray(data.captain.loans)) {
+            this.captain.loans = data.captain.loans.map(loanData => {
+                const loan = Object.assign(new BankLoan(), loanData)
+                // Restore planet reference
+                if (loanData.planet && typeof loanData.planet === 'string') {
+                    loan.planet = PLANETS.find(p => p.name === loanData.planet) || null
+                } else if (loanData.planet && loanData.planet.name) {
+                    loan.planet = PLANETS.find(p => p.name === loanData.planet.name) || null
+                }
+                return loan
+            })
+        }
 
         // Restore fleet
         this.fleet = Object.assign(

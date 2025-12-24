@@ -106,9 +106,9 @@ class Bank extends Building {
     }
     calcLoanMaxAmount(officer = new Officer()) {
         let maxLoanAmount = Math.pow(officer.level, 1.5) * 5000
-        maxLoanAmount += officer.fame*10 - officer.infamy*10
+        maxLoanAmount += officer.fame.total*10 - officer.infamy.total*10
         maxLoanAmount += Bank.playerBalance
-        maxLoanAmount -= officer.bounty
+        maxLoanAmount -= officer.bounty.total
         maxLoanAmount -= officer.calcTotalDebts()
         return Math.floor(maxLoanAmount)
     }
@@ -123,14 +123,31 @@ class Courthouse extends Building {
     }
 }
 
+class Academy extends Building {
+    constructor(planet = new Planet(), skillCosts = new CountsMap(), baseRake = 1) {
+        super(planet, baseRake)
+        this.skillCosts = skillCosts // CountsMap with skill cost modifiers (0.5-2 range)
+    }
+    
+    calcSkillUpgradeCost(skill = SKILLS_ALL[0], currentLevel = 0) {
+        // Base cost scales exponentially with current skill level
+        const baseCost = Math.ceil(100 * Math.pow(1.5, currentLevel))
+        // Apply skill-specific cost modifier from academy's specialization
+        const skillModifier = this.skillCosts.getAmount(skill) || 1
+        // Apply rake (overall cost modifier based on academy quality)
+        return Math.ceil(baseCost * skillModifier * (1 + this.rake))
+    }
+}
+
 
 class Settlement {
-    constructor(shipyard = null, market = null, blackMarket = null, guild = null, bank = null, courthouse = null) {
+    constructor(shipyard = null, market = null, blackMarket = null, guild = null, bank = null, courthouse = null, academy = null) {
         this.shipyard = shipyard;
         this.market = market;
         this.blackMarket = blackMarket;
         this.guild = guild;
         this.bank = bank;
         this.courthouse = courthouse;
+        this.academy = academy;
     }
 }

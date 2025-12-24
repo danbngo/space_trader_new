@@ -218,14 +218,14 @@ const ENCOUNTER_TYPES = {
                     ['Sneak Attack', ()=>showPlayerAttackFleetModal(-2, 2, false, false)],
                 ])
             }
-            else if (gs.encounter.luck[1]*gs.captain.fame/gs.captain.infamy > 1 && gs.captain.fame > 100) {
+            else if (gs.encounter.luck[1]*gs.captain.fame.total/gs.captain.infamy.total > 1 && gs.captain.fame.total > 100) {
                 showModal(gs.encounter.fleetName, `The police greet you respectfully, having heard of your good deeds.<br/>They don't even trouble you with the routine inspection.`, [
                     ['View', ()=>closeModal()],
                     ['Ignore', ()=>endEncounter()],
                     ['Attack', ()=>showPlayerAttackFleetModal(-2, 2, false, false)],
                 ])
             }
-            if (gs.encounter.luck[2]*gs.captain.infamy > 100 && gs.captain.bounty > 0) {
+            if (gs.encounter.luck[2]*gs.captain.infamy.total > 100 && gs.captain.bounty.total > 0) {
                 showModal(gs.encounter.fleetName, 'The police ships activate their sirens the instant you pass by!<br/>It seems your bad reputation has preceded you.', [
                     ['View', ()=>closeModal()],
                     ['Surrender', ()=>gs.encounter.encounterType.onSurrender()],
@@ -265,14 +265,14 @@ const ENCOUNTER_TYPES = {
                     ['Sneak Attack', ()=>showPlayerAttackFleetModal(-2, 2, false, false)],
                 ])
             }
-            else if (gs.encounter.luck[1]*gs.captain.fame/gs.captain.infamy > 1 && gs.captain.fame > 100) {
-                showModal(gs.encounter.fleetName, `The soldiers salute you over comms, having heard of your good deeds.<br/>${gs.captain.infamy > 10 ? `In their view, the good you've done far outweighs the bad.` : ''}`, [
+            else if (gs.encounter.luck[1]*gs.captain.fame.total/gs.captain.infamy.total > 1 && gs.captain.fame.total > 100) {
+                showModal(gs.encounter.fleetName, `The soldiers salute you over comms, having heard of your good deeds.<br/>${gs.captain.infamy.total > 10 ? `In their view, the good you've done far outweighs the bad.` : ''}`, [
                     ['View', ()=>closeModal()],
                     ['Ignore', ()=>endEncounter()],
                     ['Attack', ()=>showPlayerAttackFleetModal(-2, 2, false, false)],
                 ])
             }
-            if (gs.encounter.luck[2]*gs.captain.infamy > 250 && gs.captain.bounty > 0) {
+            if (gs.encounter.luck[2]*gs.captain.infamy.total > 250 && gs.captain.bounty.total > 0) {
                 showModal(gs.encounter.fleetName, 'The army ships power up their weapons the instant you pass by!<br/>You have grown so notorious that even the government considers you a threat!', [
                     ['View', ()=>closeModal()],
                     ['Surrender', ()=>gs.encounter.encounterType.onSurrender()],
@@ -305,7 +305,7 @@ const ENCOUNTER_TYPES = {
                     ['Sneak Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, false)],
                 ])
             }
-            else if (gs.encounter.luck[1] < 0.5 && gs.captain.bounty > gs.encounter.luck[2]*100) {
+            else if (gs.encounter.luck[1] < 0.5 && gs.captain.bounty.total > gs.encounter.luck[2]*100) {
                 showModal(gs.encounter.fleetName, `The bounty hunters have heard of you and the sizeable bounty on your head.<br/>They coldly inform you that they're here to collect one way or another.`, [
                     ['View', ()=>closeModal()],
                     ['Surrender', ()=>gs.encounter.encounterType.onSurrender()],

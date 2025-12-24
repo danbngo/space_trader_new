@@ -4,9 +4,11 @@ class Officer {
     constructor(name = "Unnamed", credits = 0, fame = 0, infamy = 0, bounty = 0) {
         this.name = name;
         this.credits = credits;
-        this.fame = fame;
-        this.infamy = infamy;
-        this.bounty = bounty;
+        // Convert old number values to CountsMap if needed (for backwards compatibility)
+        this.fame = (typeof fame === 'number') ? new CountsMap() : fame;
+        this.infamy = (typeof infamy === 'number') ? new CountsMap() : infamy;
+        this.bounty = (typeof bounty === 'number') ? new CountsMap() : bounty;
+        // If we received numbers, we can't assign them to a planet, so leave maps empty
         this.skills = new CountsMap();
         this.level = 1;
         this.skillPoints = STARTING_SKILL_POINTS;
@@ -41,7 +43,8 @@ class Officer {
     }
 
     get value() {
-        return Math.pow(1 + this.level, 2)*100
+        const totalSkillPoints = this.skills.total
+        return Math.pow(1 + totalSkillPoints, 2)*100
     }
 
     get crShare() {

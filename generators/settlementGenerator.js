@@ -5,7 +5,8 @@ function generateSettlement(planet = new Planet()) {
     const guild =  Math.random() > .2 ? generateGuild(planet) : null
     const bank =  Math.random() > .2 ? generateBank(planet) : null
     const courthouse = Math.random() > .2 ? generateCourthouse(planet) : null;
-    return new Settlement(shipyard, market, blackMarket, guild, bank, courthouse)
+    const academy = Math.random() > .2 ? generateAcademy(planet) : null;
+    return new Settlement(shipyard, market, blackMarket, guild, bank, courthouse, academy)
 }
 
 
@@ -60,4 +61,18 @@ function generateBank(planet = new Planet()) {
 function generateCourthouse(planet = new Planet()) {
     const rake = rng(2, 0.5, false);
     return new Courthouse(planet, rake)    
+}
+
+function generateAcademy(planet = new Planet()) {
+    const rake = rng(2, 0.5, false);
+    
+    // Generate skill cost modifiers (0.5-2.0 range)
+    // Some skills will be cheaper, some more expensive at each academy
+    const skillCosts = new CountsMap()
+    for (const skill of SKILLS_ALL) {
+        const costModifier = rng(2, 0.5, false)
+        skillCosts.setAmount(skill, costModifier)
+    }
+    
+    return new Academy(planet, skillCosts, rake)
 }
