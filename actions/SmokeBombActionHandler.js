@@ -58,7 +58,7 @@ class SmokeBombActionHandler extends ActionHandler {
         
         // Expanding smoke cloud
         const smokeCircle = this.cvs.addFilledCircle('smokebomb', action.toX, action.toY, 0, 16, [100,100,100,0.5], 0)
-        const maxRadius = (EFFECT_TYPES.DEBRIS_CLOUD.maxSize + EFFECT_TYPES.DEBRIS_CLOUD.minSize)/2
+        const maxRadius = (EFFECT_TYPES.DEBRIS_CLOUD.maxSize + EFFECT_TYPES.DEBRIS_CLOUD.minSize)/4
         
         const animation = new Loop(smokeDuration, (progressRatio) => {
             smokeCircle.size = maxRadius * progressRatio

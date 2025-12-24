@@ -4,14 +4,15 @@ class DebrisCloudEffect extends Effect {
         this.angle = angle;
     }
 
-    applyEffectOnEnter(ship = new Ship()) {
+    onShipEnter(ship = new Ship()) {
         // No immediate effect when entering
         console.log('Ship entered dust cloud:', ship.name)
+        ship.statusEffects.raiseTo(STATUS_EFFECTS.DUSTY)
     }
 
-    applyEffectOnStart(ship = new Ship()) {
+    onShipPresent(ship = new Ship()) {
         // Apply dusty status effect to ships starting their turn in the dust cloud
         console.log('Applying dust cloud penalties to:', ship.name)
-        ship.statusEffects.increment(STATUS_EFFECTS.DUSTY)
+        ship.statusEffects.raiseTo(STATUS_EFFECTS.DUSTY)
     }
 }

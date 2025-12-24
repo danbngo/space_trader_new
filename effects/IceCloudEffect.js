@@ -3,15 +3,15 @@ class IceCloudEffect extends Effect {
         super(EFFECT_TYPES.ICE_CLOUD, x, y, x, y)
     }
 
-    applyEffectOnEnter(ship = new Ship()) {
+    onShipEnter(ship = new Ship()) {
         // Apply frozen status when entering ice cloud
         console.log('Ship entered ice cloud:', ship.name)
-        ship.statusEffects.increment(STATUS_EFFECTS.FROZEN)
+        ship.statusEffects.raiseTo(STATUS_EFFECTS.FROZEN)
     }
 
-    applyEffectOnStart(ship = new Ship()) {
+    onShipPresent(ship = new Ship()) {
         // Apply frozen status to ships starting their turn in the ice cloud
         console.log('Applying ice cloud penalties to:', ship.name)
-        ship.statusEffects.increment(STATUS_EFFECTS.FROZEN)
+        ship.statusEffects.raiseTo(STATUS_EFFECTS.FROZEN)
     }
 }

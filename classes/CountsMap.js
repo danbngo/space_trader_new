@@ -26,6 +26,13 @@ class CountsMap {
         this.counts.set(key, newAmt)
     }
 
+    raiseTo(key = {}, amt = 1) {
+        const currentAmt = this.getAmount(key)
+        if (amt > currentAmt) {
+            this.counts.set(key, amt)
+        }
+    }
+
     setAmount(key = {}, amt = 0) {
         this.counts.set(key, amt)
     }

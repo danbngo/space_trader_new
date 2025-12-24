@@ -109,10 +109,12 @@ class ShipAction {
         return result
     }
 
-    static getDamageAction(target = new Ship(), shieldDamage = 0, hullDamage = 0) {
+    static getDamageAction(target = new Ship(), hullDamage = 0, shieldDamage = 0, disabled = false, escaped = false) {
         const pseudoShipAction = new ShipAction(null, null, null, target)
         pseudoShipAction.targetShieldDamage = shieldDamage
         pseudoShipAction.targetHullDamage = hullDamage
+        pseudoShipAction.targetDisabled = disabled
+        pseudoShipAction.targetEscaped = escaped
         return pseudoShipAction
     }
 }

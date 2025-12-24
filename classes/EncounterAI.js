@@ -142,7 +142,7 @@ class EncounterAI {
         console.log('deciding move for ship with strategy:', { strategy, nearestTarget, attackableTargets, rammableTargets, targets, opposingFleet });
 
         if (strategy == COMBAT_STRATEGIES.Asteroid) {
-            if (attackableTargets.length > 0 && ship.lasers > 0 && Math.random() > 0.5) {
+            if (attackableTargets.length > 0 && ship.canShoot && Math.random() > 0.5) {
                 //attack targets if any available
                 return new LaserAction(encounter, ship, rndMember(attackableTargets))
             }
@@ -154,7 +154,7 @@ class EncounterAI {
                 const mightHit = (Math.abs(normalizedDAngle) < Math.PI/4);
                 return mightHit
             })
-            if (inTheWayTargets.length > 0 && ship.engine > 0 && Math.random() > .5) {
+            if (inTheWayTargets.length > 0 && ship.canRam && Math.random() > .5) {
                 //ram targets that are in the way
                 const targetToRam = rndMember(inTheWayTargets)
                 return new RamAction(encounter, ship, targetToRam)
@@ -165,11 +165,11 @@ class EncounterAI {
             if (bestMove) return new MoveAction(encounter, ship, bestMove[0], bestMove[1])
         }
         else if (strategy == COMBAT_STRATEGIES.Attack) {
-            if (attackableTargets.length > 0 && ship.lasers > 0) {
+            if (attackableTargets.length > 0 && ship.canShoot) {
                 //attack targets if any available
                 return new LaserAction(encounter, ship, rndMember(attackableTargets))
             }
-            else if (rammableTargets.length > 0 && ship.engine > 0) {
+            else if (rammableTargets.length > 0 && ship.canRam) {
                 //ram targets if any available - but don't ram if they have more hull than us
                 const safeRammableTargets = rammableTargets.filter(t => t.hull[0]*Math.random() < ship.hull[0]*Math.random())
                 if (safeRammableTargets.length > 0) {
@@ -196,7 +196,7 @@ class EncounterAI {
         }
         
         //if all else fails, recharge
-        if ((ship.shields[0] < ship.shields[1]) && ship.engine > 0) {
+        if ((ship.shields[0] < ship.shields[1]) && ship.canRecharge) {
             return new RechargeAction(this.encounter, ship)
         }
         else return new WaitAction(this.encounter, ship)

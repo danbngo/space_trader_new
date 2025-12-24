@@ -141,7 +141,28 @@ class Ship {
     }
 
     spendAction() {
+        const pseudoActions = []
         this.numActionsRemaining = Math.max(0, this.numActionsRemaining - 1)
+        
+        // Apply damage over time from status effects
+        if (this.statusEffects.has(STATUS_EFFECTS.OVERHEATED)) {
+            // Overheated damages hull over time (thermal stress)
+            const [hullDamage, shieldDamage, disabled] = this.takeDamage(rng(4,1), false, false)
+            pseudoActions.push(ShipAction.getDamageAction(this, hullDamage, shieldDamage, disabled))
+        }
+        //a bit redundant since disabled clears status effects, but just in case
+        if (!this.disabled && this.statusEffects.has(STATUS_EFFECTS.DUSTY)) {
+            // Dusty damages hull over time (abrasive debris)
+            const [hullDamage, shieldDamage, disabled] = this.takeDamage(rng(3,1), true, false)
+            pseudoActions.push(ShipAction.getDamageAction(this, hullDamage, shieldDamage, disabled))
+        }
+        if (!this.disabled &&this.statusEffects.has(STATUS_EFFECTS.IONIZED)) {
+            // Ionized damages shields over time (electromagnetic interference)
+            const [hullDamage, shieldDamage, disabled] = this.takeDamage(rng(5,1), false, true)
+            pseudoActions.push(ShipAction.getDamageAction(this, hullDamage, shieldDamage, disabled))
+        }
+
+        return pseudoActions
     }
 
     setDisabled() {
@@ -155,6 +176,7 @@ class Ship {
         return this.hull[0] <= 0
     }
 
+    /** @returns {[number, number, boolean]} */
     takeDamage(dmg = 0, bypassShields = false, dontHurtHull = false) {
         console.log('applying dmg to ship:',this,dmg,bypassShields)
         if (this.disabled) return [0, 0, false]
@@ -226,5 +248,21 @@ class Ship {
         // EMP pulse is centered on the ship and has radius = maxAttackDistance * 2
         const pulseRadius = this.maxAttackDistance/2
         return new Circle(overrideX, overrideY, pulseRadius)
+    }
+
+    get canShoot() {
+        return this.lasers > 0 && !this.disabled && !this.escaped && !this.statusEffects.has(STATUS_EFFECTS.DUSTY)
+    }
+
+    get canUseModules() {
+        return !this.disabled && !this.escaped && !this.statusEffects.has(STATUS_EFFECTS.OVERHEATED)
+    }
+
+    get canRam() {
+        return this.engine > 0 && !this.disabled && !this.escaped && !this.statusEffects.has(STATUS_EFFECTS.FROZEN)
+    }
+
+    get canRecharge() {
+        return !this.disabled && !this.escaped && !this.statusEffects.has(STATUS_EFFECTS.IONIZED)
     }
 }

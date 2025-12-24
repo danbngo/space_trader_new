@@ -26,20 +26,20 @@ class WarheadAction extends ShipAction {
             const damageRatio = 1 - (dist / explosionRadius)
             const damage = 1+rng(20 * damageRatio) //attacker.maxLaserDamage * 2 * damageRatio
             
-            const [hullDamage, shieldDamage] = ship.takeDamage(damage)
-            pseudoActions.push(ShipAction.getDamageAction(ship, shieldDamage, hullDamage))
+            const [hullDamage, shieldDamage, disabled] = ship.takeDamage(damage)
             // Apply knockback
-            const knockbackDistance = 10 * damageRatio
+            const knockbackDistance = 15 * damageRatio
             const angle = Math.atan2(ship.y - explosionY, ship.x - explosionX)
             const [kx, ky] = rotatePoint(knockbackDistance, 0, 0, 0, angle)
             ship.x += kx
             ship.y += ky
             
             // Check if knocked out of bounds
-            this.encounter.checkShipMovementEffects(ship)
+            const escaped = this.encounter.checkShipMovementEffects(ship)
+            pseudoActions.push(ShipAction.getDamageAction(ship, hullDamage, shieldDamage, disabled, escaped))
         }
-        this.encounter.handleShipActionComplete(this.actor)
-        
+        const morePseudoActions = this.encounter.handleShipActionComplete(this.actor)
+        pseudoActions.push(...morePseudoActions)
         
         attacker.moduleCooldowns.setAmount(SHIP_MODULES.WARHEAD, SHIP_MODULES.WARHEAD.cooldown)
         this.completed = true

@@ -7,15 +7,28 @@ class BoosterActionHandler extends ActionHandler {
         console.log('BoosterActionHandler.startTargeting', { attacker });
         if (!this.calcCanBeControlled(attacker)) return
 
-        // Booster doesn't need targeting - just boost in the direction ship is facing
-        this.attempt(attacker)
+        this.encounterMap.targetingAreas = []
+        
+        // Calculate where the ship will boost to
+        const boostDistance = attacker.maxMoveDistance * 4
+        const [dx, dy] = rotatePoint(boostDistance, 0, 0, 0, attacker.angle)
+        const toX = attacker.x + dx
+        const toY = attacker.y + dy
+        
+        // Show a line indicating where the ship will boost
+        const boostLine = this.cvs.addLine('targetingline', attacker.x, attacker.y, toX, toY, COLORS.Targeting, 8)
+        
+        // Click anywhere to confirm boost
+        this.cvs.onClickWorldXY = (x, y) => this.attempt(attacker)
+        
+        this.encounterMap.startTargeting('Booster', [boostLine], [])
     }
 
     target(...args) {
-        // No targeting needed
+        // No dynamic targeting needed - boost is in the direction ship is facing
     }
 
-    attempt(attacker = new Ship(), target = null, x = 0, y = 0) {
+    attempt(attacker = new Ship()) {
         console.log('BoosterActionHandler.attempt', { attacker });
         const action = new BoosterAction(this.encounter, attacker)
         this.execute(action)

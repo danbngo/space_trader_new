@@ -34,6 +34,7 @@ class EncounterMap extends BaseMap {
         this.boosterHandler = new BoosterActionHandler(this);
         this.smokeBombHandler = new SmokeBombActionHandler(this);*/
 
+        // @ts-ignore
         this.moduleHandlerMap = new Map([
             [SHIP_MODULES.CLOAK, new CloakActionHandler(this)],
             [SHIP_MODULES.MAGNETIZE, new MagnetizeActionHandler(this)],
@@ -348,8 +349,9 @@ class EncounterMap extends BaseMap {
             ]})
              // Display status effects if any
             if (obj.statusEffects.size > 0) {
-                const statusEffectSpans = Array.from(obj.statusEffects.keys).map(effect => {
-                    return colorSpan(effect.name, colorArrToRgbaString(effect.color))
+                const statusEffectSpans = obj.statusEffects.keys.map(effect=>{
+                    const turnsRemaining = obj.statusEffects.getAmount(effect)
+                    return colorSpan(`${effect.name}${turnsRemaining > 0 ? ` (${turnsRemaining})` : ''}`, colorArrToRgbaString(effect.color))
                 })
                 ce({parent:container, innerHTML: statusEffectSpans.join(' | ')})
             }
@@ -361,23 +363,20 @@ class EncounterMap extends BaseMap {
             ce({parent:container, innerHTML: `Actions: ${statColorSpan(obj.numActionsRemaining, obj.numActionsRemaining/2, true)}`})
             ce({parent:container, innerHTML: obj.disabled ? `(Disabled)` : obj.escaped ? '(Escaped)' : ''})
             if (showActions) {
-                ce({parent:container, tag:'button', innerHTML:'Attack', disabled: !canAct, onClick: ()=>this.attackHandler.startTargeting(obj)})
+                ce({parent:container, tag:'button', innerHTML:'Shoot', disabled: !canAct || !obj.canShoot, onClick: ()=>this.attackHandler.startTargeting(obj)})
                 ce({parent:container, tag:'button', innerHTML:'Move', disabled: !canAct, onClick: ()=>this.moveHandler.startTargeting(obj)})
-                ce({parent:container, tag:'button', innerHTML:'Ram', disabled: !canAct, onClick: ()=>this.ramHandler.startTargeting(obj)})
+                ce({parent:container, tag:'button', innerHTML:'Ram', disabled: !canAct || !obj.canRam, onClick: ()=>this.ramHandler.startTargeting(obj)})
                 ce({parent:container, tag:'button', innerHTML:canRecharge ? 'Recharge' : 'Wait', disabled: !canAct, onClick: ()=>{
                     if (canRecharge) this.rechargeHandler.attempt(obj)
                     else this.waitHandler.attempt(obj)
                 }})
                 
-                // Module buttons - iterate through all ship modules
-                const isIonized = obj.statusEffects.has(STATUS_EFFECTS.IONIZED)
-
                 for (const [module, handler] of this.moduleHandlerMap) {
                     if (obj.modules.includes(module)) {
                         const cooldown = obj.moduleCooldowns.getAmount(module)
                         const onCooldown = cooldown > 0
                         const label = cooldown > 0 ? `${module.name} (${cooldown})` : module.name
-                        ce({parent:container, tag:'button', innerHTML:label, disabled: !canAct || onCooldown || isIonized, onClick: ()=>{
+                        ce({parent:container, tag:'button', innerHTML:label, disabled: !canAct || onCooldown || !obj.canUseModules, onClick: ()=>{
                             handler.startTargeting(obj)
                         }})
                     }

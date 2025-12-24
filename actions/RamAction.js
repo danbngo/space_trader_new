@@ -40,8 +40,8 @@ class RamAction extends ShipAction {
         //seems buggy but let's try it out
         const actorEscaped = this.encounter.checkShipMovementEffects(actor)
         Object.assign(this, {actorEscaped})
-        this.encounter.handleShipActionComplete(this.actor)
+        const pseudoActions = this.encounter.handleShipActionComplete(this.actor)
         this.completed = true
-        return []
+        return pseudoActions
     }
 }

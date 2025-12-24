@@ -77,7 +77,7 @@ class Encounter {
     }
 
     handleShipActionComplete(ship = new Ship()) {
-        ship.spendAction()
+        const pseudoActions = ship.spendAction()
         // Apply effects that the ship is starting its turn inside
         for (const key of ship.statusEffects.keys) {
             if (ship.statusEffects.has(key)) {
@@ -86,7 +86,19 @@ class Encounter {
         }
         for (const effect of this.effects) {
             if (effect.containsPoint(ship.x, ship.y)) {
-                effect.applyEffectOnStart(ship)
+                effect.onShipPresent(ship)
+            }
+        }
+        return pseudoActions
+    }
+
+    addEffect(effect = new Effect()) {
+        console.log('Encounter.addEffect', { effect });
+        this.effects.push(effect)
+        // Trigger onShipEnter for all ships currently within the effect's area
+        for (const ship of this.ships) {
+            if (effect.containsPoint(ship.x, ship.y)) {
+                effect.onShipEnter(ship)
             }
         }
     }
@@ -117,6 +129,7 @@ class Encounter {
     calcHarmableTargets(attacker = new Ship()) {
         console.log('Encounter.calcHarmableTargets', { attacker });
         return this.calcOpposingFleet(attacker.fleet).ships.filter(target => {
+            if (target.statusEffects.has(STATUS_EFFECTS.CLOAKED)) return false
             if (target.disabled || target.escaped || target.cloakedTurnsRemaining > 0) return false
             return true
         })
@@ -125,9 +138,9 @@ class Encounter {
     calcLaserTargets(attacker = new Ship()) {
         console.log('Encounter.calcLaserTargets', { attacker });
         const validTargets = []
-        const {ships} = this
         const [t1, t2] = attacker.calcLaserAreas()
         for (const target of this.calcHarmableTargets(attacker)) {
+            if (target.statusEffects.has(STATUS_EFFECTS.DUSTY)) continue
             if (!t1.containsPoint(target.x, target.y) && !t2.containsPoint(target.x, target.y)) continue
             validTargets.push(target)
         }
@@ -160,7 +173,7 @@ class Encounter {
         // Check if ship entered any effects
         for (const effect of this.effects) {
             if (effect.containsPoint(ship.x, ship.y)) {
-                effect.applyEffectOnEnter(ship)
+                effect.onShipEnter(ship)
             }
         }
         

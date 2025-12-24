@@ -27,7 +27,7 @@ class BoosterAction extends ShipAction {
         // Update ship position
         Object.assign(ship, { x: newX, y: newY })
         
-        this.encounter.handleShipActionComplete(ship)
+        const pseudoActions = this.encounter.handleShipActionComplete(ship)
         
         // Check if ship escaped the map
         if (this.encounter) this.encounter.checkShipMovementEffects(ship)
@@ -35,6 +35,6 @@ class BoosterAction extends ShipAction {
         
         ship.moduleCooldowns.setAmount(SHIP_MODULES.BOOSTER, SHIP_MODULES.BOOSTER.cooldown)
         this.completed = true
-        return []
+        return pseudoActions
     }
 }

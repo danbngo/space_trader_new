@@ -20,8 +20,8 @@ class EMPPulseAction extends ShipAction {
         // Reset shields and increase cooldowns
         for (const ship of affectedShips) {
             //hurt shields by a lot
-            const [hullDamage, shieldDamage] = ship.takeDamage(10+rng(30), false, true)
-            pseudoActions.push(ShipAction.getDamageAction(ship, shieldDamage, hullDamage))
+            const [hullDamage, shieldDamage, disabled] = ship.takeDamage(10+rng(30), false, true)
+            pseudoActions.push(ShipAction.getDamageAction(ship, hullDamage, shieldDamage, disabled))
             
             // Increase all module cooldowns by 1
             for (const moduleType of Object.values(SHIP_MODULES)) {
@@ -29,10 +29,8 @@ class EMPPulseAction extends ShipAction {
                 ship.moduleCooldowns.setAmount(moduleType, currentCooldown + 1)
             }
         }
-        
-        this.encounter.handleShipActionComplete(attacker)
-        
-        
+        const pseudoActionsFromAttacker = this.encounter.handleShipActionComplete(attacker)
+        pseudoActions.push(...pseudoActionsFromAttacker)
         attacker.moduleCooldowns.setAmount(SHIP_MODULES.EMP_PULSE, SHIP_MODULES.EMP_PULSE.cooldown)
         this.completed = true
         return pseudoActions

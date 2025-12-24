@@ -22,11 +22,10 @@ class MagnetizeAction extends ShipAction {
         // Check if either ship escaped
         this.encounter.checkShipMovementEffects(target)
         this.encounter.checkShipMovementEffects(actor)
-        this.encounter.handleShipActionComplete(actor)
-        
+        const pseudoActions = this.encounter.handleShipActionComplete(actor)
         
         actor.moduleCooldowns.setAmount(SHIP_MODULES.MAGNETIZE, SHIP_MODULES.MAGNETIZE.cooldown)
         this.completed = true
-        return []
+        return pseudoActions
     }
 }

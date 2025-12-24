@@ -32,11 +32,11 @@ class Effect {
         }
     }
 
-    applyEffectOnEnter(ship = new Ship()) {
+    onShipEnter(ship = new Ship()) {
         // Override in subclass
     }
 
-    applyEffectOnStart(ship = new Ship()) {
+    onShipPresent(ship = new Ship()) {
         // Override in subclass
     }
 

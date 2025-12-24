@@ -11,10 +11,10 @@ class SmokeBombAction extends ShipAction {
         // Use toX/toY if provided, otherwise create near the player with random offset
         const dustCloud = new DebrisCloudEffect(this.toX, this.toY, this.path ? this.path.angle + Math.PI/2 : rng(Math.PI * 2, 0, false))
         this.encounter.effects.push(dustCloud)
-        this.encounter.handleShipActionComplete(this.actor)
+        const pseudoActions = this.encounter.handleShipActionComplete(this.actor)
         
         attacker.moduleCooldowns.setAmount(SHIP_MODULES.SMOKE_BOMB, SHIP_MODULES.SMOKE_BOMB.cooldown)
         this.completed = true
-        return []
+        return pseudoActions
     }
 }
