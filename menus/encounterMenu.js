@@ -181,11 +181,8 @@ function showPlayerAttackFleetModal(fameMultiplier = 0, bountyMultiplier = 0, sn
     showModal(fleetName, msg, [['Continue', ()=>{
         if (allowBribe) {
             let combatAdvantage = gs.fleet.combatRating / gs.encounter.fleet.combatRating
-            const planetInfamy = planet ? gs.captain.infamy.getAmount(planet) : 0
-            const totalInfamy = gs.captain.infamy.total
             //combat advantage should vary from 0.5 its original amount to 2x based on the player's infamy
-            const relevantInfamy = Math.max(planetInfamy, totalInfamy / gs.system.planets.length) // Use higher of planet infamy or avg infamy
-            combatAdvantage *= 2 - (75/(50 + relevantInfamy)) //approaches 2x as infamy increases
+            combatAdvantage *= 2 - (75/(50 + gs.captain.calcInfamyForPlanet(gs.encounter.fleet.planet))) //approaches 2x as infamy increases
             if (combatAdvantage * Math.random() > 1.5) {
                 showNeutralsBribePlayerModal(gs.encounter.fleet.captain.credits)
                 return

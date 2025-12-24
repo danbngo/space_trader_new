@@ -56,6 +56,22 @@ class Officer {
         return ''
     }
 
+    calcInfamyForPlanet(planet = new Planet()) {
+        return Math.max(this.infamy.getAmount(planet), this.infamy.total / gs.system.planets.length)
+    }
+
+    calcFameForPlanet(planet = new Planet()) {
+        return Math.max(this.fame.getAmount(planet), this.fame.total / gs.system.planets.length)
+    }
+    
+    calcReputationForPlanet(planet = new Planet()) {
+        return this.calcFameForPlanet(planet) - this.calcInfamyForPlanet(planet)
+    }
+
+    calcBountyForPlanet(planet = new Planet()) {
+        return Math.max(this.bounty.getAmount(planet), this.bounty.total / gs.system.planets.length)
+    }
+
     grantBounty(planet = new Planet(), amount = 1) {
         this.bounty.increment(planet, amount);
         if (this == gs.captain) {

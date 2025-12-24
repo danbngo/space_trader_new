@@ -65,6 +65,13 @@ const ENCOUNTER_TYPES = {
                     ['Sneak Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, true)],
                 ])
             }
+            else if (gs.encounter.luck[1] * gs.captain.calcInfamyForPlanet(gs.encounter.planet) > 200) {
+                showModal(gs.encounter.fleetName, 'The miners have heard of your fearsome deeds and start fleeing immediately!', [
+                    ['View', ()=>closeModal()],
+                    ['Ignore', ()=>endEncounter()],
+                    ['Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, true)],
+                ])
+            }
             else {
                 showModal(gs.encounter.fleetName, 'The miners transmit a surly, perfunctory greeting, but otherwise ignore you.', [
                     ['View', ()=>closeModal()],
@@ -89,6 +96,13 @@ const ENCOUNTER_TYPES = {
                         gs.encounter.encounterType.onStart()
                     }],
                     ['Sneak Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, true)],
+                ])
+            }
+            else if (gs.encounter.luck[1] * gs.captain.calcInfamyForPlanet(gs.encounter.planet) > 200) {
+                showModal(gs.encounter.fleetName, 'The tourists have heard of your fearsome deeds and start fleeing immediately!', [
+                    ['View', ()=>closeModal()],
+                    ['Ignore', ()=>endEncounter()],
+                    ['Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, true)],
                 ])
             }
             else {
@@ -117,7 +131,14 @@ const ENCOUNTER_TYPES = {
                     ['Sneak Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, true)],
                 ])
             }
-            else if (gs.encounter.luck[1] > .5) {
+            else if (gs.encounter.luck[1] * gs.captain.calcInfamyForPlanet(gs.encounter.planet) > 100) {
+                showModal(gs.encounter.fleetName, 'The merchants have heard of your fearsome deeds and start fleeing immediately!', [
+                    ['View', ()=>closeModal()],
+                    ['Ignore', ()=>endEncounter()],
+                    ['Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, true)],
+                ])
+            }
+            else if (gs.encounter.luck[2] > .5) {
                 showModal(gs.encounter.fleetName, 'The merchants eagerly invite you to trade. They claim to have the best prices in the sector!', [
                     ['View', ()=>closeModal()],
                     ['Trade', ()=>showTradeOfferModal()],
@@ -151,7 +172,14 @@ const ENCOUNTER_TYPES = {
                     ['Sneak Attack', ()=>showPlayerAttackFleetModal(1, 0, false, true)],
                 ])
             }
-            else if (gs.encounter.luck[1] > .5) {
+            else if (gs.encounter.luck[1] * gs.captain.calcFameForPlanet(gs.encounter.planet) > 100) {
+                showModal(gs.encounter.fleetName, 'The smugglers have heard of your hostility towards the criminal community and quickly flee!', [
+                    ['View', ()=>closeModal()],
+                    ['Ignore', ()=>endEncounter()],
+                    ['Attack', ()=>showPlayerAttackFleetModal(1, 0, false, true)],
+                ])
+            }
+            else if (gs.encounter.luck[2] > .5) {
                 showModal(gs.encounter.fleetName, 'The smugglers broadcast a rather seedy invitation to peruse their illicit wares.', [
                     ['View', ()=>closeModal()],
                     ['Trade', ()=>showTradeOfferModal(false)],
@@ -185,7 +213,14 @@ const ENCOUNTER_TYPES = {
                     ['Sneak Attack', ()=>showPlayerAttackFleetModal(1, 0, false, false)],
                 ])
             }
-            else if (gs.encounter.luck[1] < 0.5) {
+            else if (gs.encounter.luck[1] * gs.captain.calcReputationForPlanet(gs.encounter.planet) > 200) {
+                showModal(gs.encounter.fleetName, 'The pirates are in awe of your fearsome exploits! They broadcast a merry jig and salute you while you pass.', [
+                    ['View', ()=>closeModal()],
+                    ['Ignore', ()=>endEncounter()],
+                    ['Attack', ()=>showPlayerAttackFleetModal(1, 0, false, true)],
+                ])
+            }
+            else if (gs.encounter.luck[2] < 0.5) {
                 showModal(gs.encounter.fleetName, 'The pirates fire warning shots at your ship!<br/>They demand you surrender and prepare to be boarded!', [
                     ['View', ()=>closeModal()],
                     ['Surrender', ()=>gs.encounter.encounterType.onSurrender()],
@@ -218,14 +253,14 @@ const ENCOUNTER_TYPES = {
                     ['Sneak Attack', ()=>showPlayerAttackFleetModal(-2, 2, false, false)],
                 ])
             }
-            else if (gs.encounter.luck[1]*gs.captain.fame.total/gs.captain.infamy.total > 1 && gs.captain.fame.total > 100) {
+            else if (gs.encounter.luck[1]*gs.captain.calcReputationForPlanet(gs.encounter.planet) > 200) {
                 showModal(gs.encounter.fleetName, `The police greet you respectfully, having heard of your good deeds.<br/>They don't even trouble you with the routine inspection.`, [
                     ['View', ()=>closeModal()],
                     ['Ignore', ()=>endEncounter()],
                     ['Attack', ()=>showPlayerAttackFleetModal(-2, 2, false, false)],
                 ])
             }
-            if (gs.encounter.luck[2]*gs.captain.infamy.total > 100 && gs.captain.bounty.total > 0) {
+            if (gs.encounter.luck[2]*gs.captain.calcInfamyForPlanet(gs.encounter.planet) > 50 && gs.captain.calcBountyForPlanet(gs.encounter.planet) > 0) {
                 showModal(gs.encounter.fleetName, 'The police ships activate their sirens the instant you pass by!<br/>It seems your bad reputation has preceded you.', [
                     ['View', ()=>closeModal()],
                     ['Surrender', ()=>gs.encounter.encounterType.onSurrender()],
@@ -265,14 +300,14 @@ const ENCOUNTER_TYPES = {
                     ['Sneak Attack', ()=>showPlayerAttackFleetModal(-2, 2, false, false)],
                 ])
             }
-            else if (gs.encounter.luck[1]*gs.captain.fame.total/gs.captain.infamy.total > 1 && gs.captain.fame.total > 100) {
-                showModal(gs.encounter.fleetName, `The soldiers salute you over comms, having heard of your good deeds.<br/>${gs.captain.infamy.total > 10 ? `In their view, the good you've done far outweighs the bad.` : ''}`, [
+            else if (gs.encounter.luck[1]*gs.captain.calcReputationForPlanet(gs.encounter.planet) > 300 && gs.captain.calcBountyForPlanet(gs.encounter.planet) > 0) {
+                showModal(gs.encounter.fleetName, `The soldiers salute you over comms, having heard of your good deeds.<br/>${gs.captain.calcInfamyForPlanet(gs.encounter.planet) > 25 ? `In their view, the good you've done far outweighs the bad.` : ''}`, [
                     ['View', ()=>closeModal()],
                     ['Ignore', ()=>endEncounter()],
                     ['Attack', ()=>showPlayerAttackFleetModal(-2, 2, false, false)],
                 ])
             }
-            if (gs.encounter.luck[2]*gs.captain.infamy.total > 250 && gs.captain.bounty.total > 0) {
+            if (gs.encounter.luck[2]*gs.captain.calcReputationForPlanet(gs.encounter.planet) < 300 && gs.captain.calcBountyForPlanet(gs.encounter.planet) > 0) {
                 showModal(gs.encounter.fleetName, 'The army ships power up their weapons the instant you pass by!<br/>You have grown so notorious that even the government considers you a threat!', [
                     ['View', ()=>closeModal()],
                     ['Surrender', ()=>gs.encounter.encounterType.onSurrender()],
@@ -305,8 +340,8 @@ const ENCOUNTER_TYPES = {
                     ['Sneak Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, false)],
                 ])
             }
-            else if (gs.encounter.luck[1] < 0.5 && gs.captain.bounty.total > gs.encounter.luck[2]*100) {
-                showModal(gs.encounter.fleetName, `The bounty hunters have heard of you and the sizeable bounty on your head.<br/>They coldly inform you that they're here to collect one way or another.`, [
+            else if (gs.encounter.luck[1] * gs.captain.calcBountyForPlanet(gs.encounter.planet) > 100) {
+                showModal(gs.encounter.fleetName, `The bounty hunters have heard of you and the active bounty on your head.<br/>They coldly inform you that they're here to collect one way or another.`, [
                     ['View', ()=>closeModal()],
                     ['Surrender', ()=>gs.encounter.encounterType.onSurrender()],
                     ['Resist', ()=>showPlayerRefuseSurrenderModal(-1, 1)],
