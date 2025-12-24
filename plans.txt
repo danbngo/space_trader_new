@@ -2,8 +2,6 @@ DONE:
 -hard to click on objects because of the no click on drag thing, need to make that less strict
 theres a weird bug where enemy ships keep waiting/recharging if close to me and fast small ships
 more strategic combat - tractor rays etc. maybe stuff like dust clouds that slow ships down.
-
-NEXT UP:
 -implement the new effects:
 -smoke bomb creates debris, or when asteroids destroyed
 -ice cloud when cryoids destroyed
@@ -14,14 +12,25 @@ NEXT UP:
  -ai should factor in clouds/hazards when deciding where to move 
 -make non permanent clouds shrink over time
 -make BOOSTER leave a plasma trail instead of spinning ships
--make spinning or being rammed animated - use new shipactions and/or anim handlers (not just pseudo)
-academy improvements - let players pay money for skills, some are cheaper than others
-take on bounty missions ?? letter of marque??
-
 -let enemy ships and fooroids use their abilities
 -asteroid should have graviton_beam (rename to: magnetize)
 -ice cloud should have smoke bomb
 -plasmoid should have booster
+
+
+NEXT UP:
+-damage text isnt showing on the very last action of a turn
+-plasmoids arent colored properly (new ones that spawned)
+-make the "fast!" status effect come from a module and remove the "slow!" one
+-in general, add some modules that do things other than grant new moves-regen, etc.
+-mining still feels off. too tedious, too much stuff happening on screen. maybe make few asteroids that are much more dangerous.
+ -good way to improve - only grant cargo for meteors you personally destroyed
+ -another way- make the actual play area for mining smaller= need less goons to be dangerous then
+-loot seems skewed after asteroid mining - seems rare stuff is dropping more than non-rare?? simulate this.
+-make spinning or being rammed animated - use new shipactions and/or anim handlers (not just pseudo)
+academy improvements - let players pay money for skills, some are cheaper than others
+take on bounty missions ?? letter of marque??
+
 
 
 -what happens if player reaches the end of the map? we dont really need to do anything but might be cool.

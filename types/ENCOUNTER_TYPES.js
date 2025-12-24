@@ -34,7 +34,7 @@
  * @param {function} onSurrender - Function to execute when the player surrenders in the encounter.
  */
 class EncounterType {
-    constructor(name = '', enemyColor = COLORS.LightRed, description = '', fleetType = FLEET_TYPES_ALL[0], aiType, formationType, onStart = ()=>{}, onVictory = ()=>{}, onDefeat = ()=>{}, onEscape = ()=>{}, onSurrender = ()=>{}) {
+    constructor(name = '', enemyColor = COLORS.LightRed, description = '', fleetType = FLEET_TYPES_ALL[0], aiType, formationType, onStart = ()=>{}, onVictory = ()=>{}, onDefeat = ()=>{}, onEscape = ()=>{}, onSurrender = ()=>{}, mapRadius = ENCOUNTER_MAP_RADIUS_MILES) {
         this.name = name;
         this.enemyColor = enemyColor;
         this.description = description;
@@ -47,6 +47,7 @@ class EncounterType {
         this.onEscape = onEscape;
         this.onSurrender = onSurrender;
         this.onEndTurn = null;
+        this.mapRadius = mapRadius;
     }
 }
 
@@ -393,6 +394,20 @@ for (const et of [ENCOUNTER_TYPES.ASTEROIDS, ENCOUNTER_TYPES.CRYOIDS, ENCOUNTER_
     //make fooroids move faster each turn
     for (const ship of encounter.enemyShips) {
         if (Math.random() > .5) ship.engine = Math.ceil(ship.engine*1.1)
+    }
+    //spawn more fooroids
+    const numToSpawn = Math.ceil(encounter.encounterType.fleetType.maxShips*Math.random()/5)
+    for (let i = 0; i < numToSpawn; i++) {
+        const mapRadius = encounter.mapRadius
+        const newShip = generateShip(rndMember(encounter.encounterType.fleetType.shipTypes), null)
+        encounter.enemyFleet.addShip(newShip)
+        encounter.ships.push(newShip)
+        const angle = Math.random()*Math.PI*2
+        const [x,y] = rotatePoint(0, mapRadius*1.01, 0, 0, angle)
+        newShip.angle = normalizeAngle(angle - Math.PI/2 + Math.random()*Math.PI/2 - Math.PI/4)
+        newShip.x = x
+        newShip.y = y
+        newShip.aiType = AI_TYPES.Asteroid
     }
 }
 

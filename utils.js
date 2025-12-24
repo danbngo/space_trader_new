@@ -86,6 +86,10 @@ function calcAngleTowardsPoint(fromX = 0, fromY = 0, toX = 0, toY = 0) {
     return Math.atan2(toY - fromY, toX - fromX);
 }
 
+function normalizeAngle(angle = Math.PI*4) {
+    return Math.atan2(Math.sin(angle), Math.cos(angle)); 
+}
+
 function rndIndexWeighted(weights = [1]) {
     if (!weights || weights.length === 0) return -1;
 

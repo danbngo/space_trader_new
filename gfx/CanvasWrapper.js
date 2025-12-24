@@ -134,7 +134,6 @@ class CanvasWrapper {
     }
     
     addFilledTriangle(id = "", x = 0, y = 0, size = 0, minorSize = 0, minScreenSize = 0, fillColor = COLORS.LightGray, angle = 0, onClick = null) {
-        console.log('adding cvs triangle with size, minorSize:',size,minorSize)
         const obj = new CanvasObject({ id, shape: SHAPES.FilledTriangle, x, y, size, minorSize, minScreenSize, fillColor, angle, onClick });
         return this.addObject(obj)
     }

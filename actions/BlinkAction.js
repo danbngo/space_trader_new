@@ -27,7 +27,7 @@ class BlinkAction extends ShipAction {
         pseudoActions.push(...this.encounter.checkShipMovementEffects(ship))
         
         
-        ship.moduleCooldowns.setAmount(SHIP_MODULES.BLINK, SHIP_MODULES.BLINK.cooldown)
+        ship.moduleCooldowns.setAmount(SHIP_MODULE_TYPES.BLINK, SHIP_MODULE_TYPES.BLINK.cooldown)
         this.completed = true
         return pseudoActions
     }

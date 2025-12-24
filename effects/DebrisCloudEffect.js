@@ -4,11 +4,11 @@ class DebrisCloudEffect extends Effect {
         this.angle = angle;
     }
 
-    hitShip(ship = new Ship()) {
+    hitShip(encounter = new Encounter(), ship = new Ship()) {
         // No immediate effect when entering
         console.log('Ship entered dust cloud:', ship.name)
         ship.statusEffects.raiseTo(STATUS_EFFECTS.DUSTY)
         const [hullDamage, shieldDamage, disabled] = ship.takeDamage(rng(3,1), true, false)
-        return [ShipAction.getDamageAction(ship, hullDamage, shieldDamage, disabled)]
+        return [ShipAction.getDamageAction(encounter, ship, hullDamage, shieldDamage, disabled)]
     }
 }

@@ -9,7 +9,7 @@ class CloakAction extends ShipAction {
         const {actor} = this
         actor.statusEffects.increment(STATUS_EFFECTS.CLOAKED, rng(5,3))
         const pseudoActions = this.encounter.handleShipActionComplete(actor)
-        actor.moduleCooldowns.setAmount(SHIP_MODULES.CLOAK, SHIP_MODULES.CLOAK.cooldown)
+        actor.moduleCooldowns.setAmount(SHIP_MODULE_TYPES.CLOAK, SHIP_MODULE_TYPES.CLOAK.cooldown)
         this.completed = true
         return pseudoActions
     }

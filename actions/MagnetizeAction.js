@@ -24,7 +24,7 @@ class MagnetizeAction extends ShipAction {
         pseudoActions.push(...this.encounter.checkShipMovementEffects(target))
         pseudoActions.push(...this.encounter.handleShipActionComplete(actor))
         
-        actor.moduleCooldowns.setAmount(SHIP_MODULES.MAGNETIZE, SHIP_MODULES.MAGNETIZE.cooldown)
+        actor.moduleCooldowns.setAmount(SHIP_MODULE_TYPES.MAGNETIZE, SHIP_MODULE_TYPES.MAGNETIZE.cooldown)
         this.completed = true
         return pseudoActions
     }

@@ -14,7 +14,7 @@ class BoosterAction extends ShipAction {
         const ship = this.actor
         
         // Create plasma trail from start to near end (90% of the way to avoid burning self)
-        const trailEndProgress = 1//0.85
+        const trailEndProgress = 1 //hehe, hurt the player a bit when he uses it
         const trailEndX = this.startX + (this.toX - this.startX) * trailEndProgress
         const trailEndY = this.startY + (this.toY - this.startY) * trailEndProgress
         console.log('BoosterAction.execute creating plasma trail to', trailEndX, trailEndY, 'from:', this.startX, this.startY,'progress:', trailEndProgress)
@@ -28,7 +28,7 @@ class BoosterAction extends ShipAction {
         // Check if ship escaped the map
         pseudoActions.push(...this.encounter.checkShipMovementEffects(ship))
         
-        ship.moduleCooldowns.setAmount(SHIP_MODULES.BOOSTER, SHIP_MODULES.BOOSTER.cooldown)
+        ship.moduleCooldowns.setAmount(SHIP_MODULE_TYPES.BOOSTER, SHIP_MODULE_TYPES.BOOSTER.cooldown)
         this.completed = true
         return pseudoActions
     }

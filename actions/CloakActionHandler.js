@@ -26,8 +26,7 @@ class CloakActionHandler extends ActionHandler {
         const animDuration = 500
         
         // Visual effect: ship fades out/becomes translucent
-        const shipIndex = this.encounter.ships.indexOf(ship)
-        const shipObj = this.cvs.getObject(`ship${shipIndex}`)
+        const shipObj = this.cvs.getObject(`ship${ship.uuid}`)
         const initialAlpha = shipObj.fillColor[3]
         
         const animation = new Loop(animDuration, (progressRatio) => {

@@ -37,8 +37,7 @@ class BlinkActionHandler extends ActionHandler {
         const ship = action.actor
         const blinkDuration = 1000
         
-        const shipIndex = this.encounter.ships.indexOf(ship)
-        const shipObj = this.cvs.getObject(`ship${shipIndex}`)
+        const shipObj = this.cvs.getObject(`ship${ship.uuid}`)
         
         const animation = new Loop(blinkDuration, (progressRatio) => {
             // Fade out then fade in

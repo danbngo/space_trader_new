@@ -1,13 +1,13 @@
 
 
 class Encounter {
-    constructor(gs = new GameState(), encounterType = ENCOUNTER_TYPES_ALL[0], planet = new Planet(), fleet = new Fleet()) {
+    constructor(gs = new GameState(), encounterType = ENCOUNTER_TYPES_ALL[0], planet = new Planet(), fleet = new Fleet(), effects = []) {
         console.log('Encounter.constructor', { gs, encounterType, planet, fleet });
         this.encounterType = encounterType;
         this.planet = planet;
         this.fleet = fleet;
         this.combatEnabled = false;
-        this.mapRadius = ENCOUNTER_MAP_RADIUS_MILES;
+        this.mapRadius = encounterType.mapRadius;
         this.playerFleet = gs.fleet
         this.playerShips = this.playerFleet.ships
         this.playerFlagship = this.playerFleet.flagship
@@ -20,7 +20,7 @@ class Encounter {
         this.activeTurnFleet = this.playerFleet
         this.luck = [Math.random(),Math.random(),Math.random(),Math.random(),Math.random()] //used for initial encounter decisions
         this.fleetName = this.planet ? `${this.planet.ianName} ${this.encounterType.name}` : this.encounterType.name
-        this.effects = []
+        this.effects = effects
     }
 
     get disabledPlayerShips () { return this.playerShips.filter(s=>(s.disabled)) }
@@ -49,7 +49,7 @@ class Encounter {
         for (const ship of this.activeTurnFleet.ships) {
             ship.numActionsRemaining = 0
             // Decrement module cooldowns
-            for (const moduleType of Object.values(SHIP_MODULES)) {
+            for (const moduleType of Object.values(SHIP_MODULE_TYPES)) {
                 const currentCooldown = ship.moduleCooldowns.getAmount(moduleType)
                 if (currentCooldown > 0) {
                     ship.moduleCooldowns.setAmount(moduleType, currentCooldown - 1)
@@ -62,7 +62,7 @@ class Encounter {
             effect.onTurnEnd()
         }
         // Remove expired effects
-        this.effects = this.effects.filter(effect => effect.remainingTurns > 0)
+        this.effects = this.effects.filter(effect => (effect.remainingTurns > 0 || effect.remainingTurns === null))
         
         if (this.activeTurnFleet === this.playerFleet) {
             this.activeTurnFleet = this.enemyFleet
@@ -86,7 +86,7 @@ class Encounter {
         }
         for (const effect of this.effects) {
             if (effect.containsPoint(ship.x, ship.y)) {
-                effect.hitShip(ship)
+                pseudoActions.push(...effect.hitShip(this, ship))
             }
         }
         return pseudoActions
@@ -99,7 +99,8 @@ class Encounter {
         // Trigger hitShip for all ships currently within the effect's area
         for (const ship of this.ships) {
             if (effect.containsPoint(ship.x, ship.y)) {
-                pseudoActions.concat(effect.hitShip(ship))
+                /** @ts-ignore */
+                pseudoActions.push(...effect.hitShip(this, ship))
             }
         }
         return pseudoActions
@@ -130,9 +131,13 @@ class Encounter {
 
     calcHarmableTargets(attacker = new Ship()) {
         console.log('Encounter.calcHarmableTargets', { attacker });
-        return this.calcOpposingFleet(attacker.fleet).ships.filter(target => {
+
+        //asteroids can target each other
+        const ships = (attacker.aiType == AI_TYPES.Asteroid) ? this.ships : this.calcOpposingFleet(attacker.fleet).ships;
+
+        return ships.filter(target => {
             if (target.statusEffects.has(STATUS_EFFECTS.CLOAKED)) return false
-            if (target.disabled || target.escaped || target.cloakedTurnsRemaining > 0) return false
+            if (target.disabled || target.escaped) return false
             return true
         })
     }
@@ -150,7 +155,7 @@ class Encounter {
     }
 
     calcRamTargets(attacker = new Ship()) {
-        console.log('Encounter.calcLaserTargets', { attacker });
+        console.log('Encounter.calcRamTargets', { attacker });
         const validTargets = []
         const a1 = attacker.calcMoveArea()
         for (const target of this.calcHarmableTargets(attacker)) {
@@ -169,20 +174,30 @@ class Encounter {
         return validTargets
     }
 
+    calcPulseTargets(attacker = new Ship()) {
+        console.log('Encounter.calcPulseTargets', { attacker });
+        const validTargets = []
+        const targetingArea = attacker.calcPulseArea()
+        for (const target of this.calcHarmableTargets(attacker)) {
+            if (targetingArea.containsPoint(target.x, target.y)) validTargets.push(target)
+        }
+        return validTargets
+    }
+
     checkShipMovementEffects(ship = new Ship()) {
         const pseudoActions = []
-        console.log('Encounter.checkShipMovementEffects', { ship });
+        console.log('Encounter.checkShipMovementEffects', { ship, effects:this.effects });
         // Check if ship entered any effects
         for (const effect of this.effects) {
             if (effect.containsPoint(ship.x, ship.y)) {
-                pseudoActions.push(...effect.hitShip(ship))
+                pseudoActions.push(...effect.hitShip(this, ship))
             }
         }
         
         // Check if ship escaped map
         const distanceFromCenter = calcDistance(0, 0, ship.x, ship.y)
         if (distanceFromCenter > this.mapRadius) {
-            pseudoActions.push(ShipAction.getDamageAction(ship, 0, 0, false, true))
+            pseudoActions.push(ShipAction.getDamageAction(this, ship, 0, 0, false, true))
             ship.escaped = true
         }
         return pseudoActions

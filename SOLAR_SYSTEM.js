@@ -13,9 +13,9 @@ const PLANETS = [MERCURY, VENUS, EARTH, MARS, JUPITER, SATURN, URANUS, NEPTUNE]
 SOL.addChildren(PLANETS)
 
 
-const CORONA = new AsteroidBelt("Corona", ASTEROID_BELT_TYPES.Plasma, hexToRgba('#ffff00'), 0.2, 0, 0, new Orbit(0.1))
-const ASTEROID_BELT = new AsteroidBelt("Asteroid Belt", ASTEROID_BELT_TYPES.Rocky, hexToRgba('#bb8844'), 0.2*2.8, 0, 0, new Orbit(2.8))
-const KUIPER_BELT = new AsteroidBelt("Kuiper Belt", ASTEROID_BELT_TYPES.Icy, hexToRgba('#bbbbdd'), 50*2/5, 0, 0, new Orbit(50))
+const CORONA = new AsteroidBelt("Corona", ASTEROID_BELT_TYPES.Plasma, hexToRgba('#ffff00'), 0.2, 0, 0, new Orbit(0.1), [ENCOUNTER_TYPES.PLASMOIDS], [EFFECT_TYPES.ION_CLOUD, EFFECT_TYPES.PLASMA_TRAIL])
+const ASTEROID_BELT = new AsteroidBelt("Asteroid Belt", ASTEROID_BELT_TYPES.Rocky, hexToRgba('#bb8844'), 0.2*2.8, 0, 0, new Orbit(2.8), [ENCOUNTER_TYPES.ASTEROIDS], [EFFECT_TYPES.DEBRIS_CLOUD])
+const KUIPER_BELT = new AsteroidBelt("Kuiper Belt", ASTEROID_BELT_TYPES.Icy, hexToRgba('#bbbbdd'), 50*2/5, 0, 0, new Orbit(50), [ENCOUNTER_TYPES.CRYOIDS], [EFFECT_TYPES.ICE_CLOUD])
 const ASTEROIDS = generateAsteroids(ASTEROID_BELT, COLORS.Brown, 500, 0.2)
 const KUIPER_ASTEROIDS = generateAsteroids(KUIPER_BELT, COLORS.LightBlue, 5000, 2/5)
 

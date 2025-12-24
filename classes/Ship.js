@@ -1,5 +1,34 @@
 
 // Ship class
+
+/**
+ * @class Ship
+ * @description Represents a spaceship with various attributes and methods for combat and movement.
+ * @property {string} name - The name of the ship.
+ * @property {Object} shipType - The type of the ship, containing its modules and other characteristics.
+ * @property {Array<number>} color - The RGB color of the ship.
+ * @property {Array<number>} hull - The current and maximum hull integrity of the ship.
+ * @property {Array<number>} shields - The current and maximum shield strength of the ship.
+ * @property {number} lasers - The laser power of the ship.
+ * @property {number} engine - The engine power of the ship.
+ * @property {number} cargoSpace - The cargo space available on the ship.
+ * @property {number} radars - The radar capability of the ship.
+ * @property {Fleet|null} fleet - The fleet to which the ship belongs.
+ * @property {number} x - The x-coordinate of the ship in combat.
+ * @property {number} y - The y-coordinate of the ship in combat.
+ * @property {number} angle - The direction the ship is facing in radians.
+ * @property {boolean} escaped - Indicates if the ship has escaped combat.
+ * @property {number} maxActionsPerTurn - The maximum number of actions the ship can take per turn.
+ * @property {number} numActionsRemaining - The number of actions remaining for the ship in the current turn.
+ * @property {any} aiType - The AI type of the ship (e.g., Ship, Asteroid).
+ * @property {Array<ShipModule>} localModules - The modules installed locally on the ship.
+ * @property {CountsMap} moduleCooldowns - A map tracking cooldowns for ship modules.
+ * @property {CountsMap} statusEffects - A map tracking status effects applied to the ship.
+ * @method get modules() - Returns all modules installed on the ship.
+ * @method get isFlagship() - Checks if the ship is the flagship of its fleet.
+ */
+
+
 class Ship {
     constructor(name = "Unnamed", shipType = SHIP_TYPES[0], color = COLORS.White, hull = [0, 0], shields = [0, 0], lasers = 0, engine = 0, cargoSpace = 0, radars = 0, maxActionsPerTurn = SHIP_NUM_MOVES_PER_TURN) {
         this.name = name;
@@ -20,10 +49,13 @@ class Ship {
         this.escaped = false;
         this.maxActionsPerTurn = maxActionsPerTurn;
         this.numActionsRemaining = this.maxActionsPerTurn; //for encounter turn processing
-        this.aiType = AI_TYPES.Ship
+        this.aiType = null
         this.localModules = []
         this.moduleCooldowns = new CountsMap()
         this.statusEffects = new CountsMap()
+        this.disabledByShip = null
+
+        this.uuid = generateUUID('ship_');
     }
 
     get modules() {
@@ -122,7 +154,7 @@ class Ship {
         this.angle = Math.PI*2;
         this.escaped = false;
         // Set all module cooldowns to max
-        for (const moduleType of Object.values(SHIP_MODULES)) {
+        for (const moduleType of Object.values(SHIP_MODULE_TYPES)) {
             this.moduleCooldowns.setAmount(moduleType, rng(moduleType.cooldown, 0, true))
         }
         this.statusEffects.clear()
@@ -161,7 +193,7 @@ class Ship {
     }
 
     /** @returns {[number, number, boolean]} */
-    takeDamage(dmg = 0, bypassShields = false, dontHurtHull = false) {
+    takeDamage(dmg = 0, bypassShields = false, dontHurtHull = false, sourceShip = null) {
         console.log('applying dmg to ship:',this,dmg,bypassShields)
         if (this.disabled) return [0, 0, false]
         let disabled = false
@@ -178,6 +210,7 @@ class Ship {
             this.hull[0] = Math.max(0, this.hull[0] - dmg)
             if (this.hull[0] <= 0) {
                 disabled = true
+                this.disabledByShip = sourceShip
                 this.setDisabled()
             }
         }

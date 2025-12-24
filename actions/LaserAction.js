@@ -16,7 +16,7 @@ class LaserAction extends ShipAction {
         } 
         else {
             const dmg = 1+rng(this.actor.maxLaserDamage)
-            const [targetHullDamage, targetShieldDamage, targetDisabled] = this.target.takeDamage(dmg)
+            const [targetHullDamage, targetShieldDamage, targetDisabled] = this.target.takeDamage(dmg, false, false, this.actor)
             Object.assign(this, {targetHullDamage, targetShieldDamage, targetDisabled})
         }
         const pseudoActions = this.encounter.handleShipActionComplete(this.actor)

@@ -63,11 +63,11 @@ class ShipAction {
             actorYOffset -= DEFAULT_FONT_SIZE
         }
         if (actorDisabled) {
-            result.push(cvs.addText(`${popupId}_actor_disabled`, actor.x, actor.y, 0, actorYOffset, actor instanceof Ship ? `Disabled!` : `Destroyed!`, COLORS.LightGray))
+            result.push(cvs.addText(`${popupId}_actor_disabled`, actor.x, actor.y, 0, actorYOffset, actor.shipType.aiType == AI_TYPES.Ship ? `Disabled!` : `Destroyed!`, COLORS.LightGray))
             actorYOffset -= DEFAULT_FONT_SIZE
         }
         else if (actorEscaped) {
-            result.push(cvs.addText(`${popupId}_actor_escaped`, actor.x, actor.y, 0, actorYOffset, actor instanceof Ship ? `Escaped!` : `Gone!`, COLORS.Orange))
+            result.push(cvs.addText(`${popupId}_actor_escaped`, actor.x, actor.y, 0, actorYOffset, actor.shipType.aiType == AI_TYPES.Ship ? `Escaped!` : `Gone!`, COLORS.Orange))
             actorYOffset -= DEFAULT_FONT_SIZE
         }
         else if (actorBadMessage) {
@@ -88,11 +88,11 @@ class ShipAction {
             targetYOffset -= DEFAULT_FONT_SIZE
         }
         if (targetDisabled) {
-            result.push(cvs.addText(`${popupId}_target_disabled`, target.x, target.y, 0, targetYOffset, target instanceof Ship ? `Disabled!` : `Destroyed!`, COLORS.LightGray))
+            result.push(cvs.addText(`${popupId}_target_disabled`, target.x, target.y, 0, targetYOffset, target.shipType.aiType == AI_TYPES.Ship ? `Disabled!` : `Destroyed!`, COLORS.LightGray))
             targetYOffset -= DEFAULT_FONT_SIZE
         }
         else if (targetEscaped) {
-            result.push(cvs.addText(`${popupId}_target_escaped`, target.x, target.y, 0, targetYOffset, target instanceof Ship ? `Escaped!` : `Gone!`, COLORS.Orange))
+            result.push(cvs.addText(`${popupId}_target_escaped`, target.x, target.y, 0, targetYOffset, target.shipType.aiType == AI_TYPES.Ship ? `Escaped!` : `Gone!`, COLORS.Orange))
             targetYOffset -= DEFAULT_FONT_SIZE
         }
         else if (targetBadMessage) {
@@ -109,8 +109,8 @@ class ShipAction {
         return result
     }
 
-    static getDamageAction(target = new Ship(), hullDamage = 0, shieldDamage = 0, disabled = false, escaped = false) {
-        const pseudoShipAction = new ShipAction(null, null, null, target)
+    static getDamageAction(encounter = new Encounter(), target = new Ship(), hullDamage = 0, shieldDamage = 0, disabled = false, escaped = false) {
+        const pseudoShipAction = new ShipAction(encounter, null, null, target)
         pseudoShipAction.targetShieldDamage = shieldDamage
         pseudoShipAction.targetHullDamage = hullDamage
         pseudoShipAction.targetDisabled = disabled

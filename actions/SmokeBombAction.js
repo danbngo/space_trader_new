@@ -1,5 +1,5 @@
 class SmokeBombAction extends ShipAction {
-    constructor(encounter = new Encounter(), actor = new Ship(), toX = 0, toY = 0) {
+    constructor(encounter = new Encounter(), actor = new Ship(), toX = undefined, toY = undefined) {
         super(encounter, actor, MOVE_TYPES.SmokeBomb, null, toX, toY)
         this.actorInfoMessage = 'Smoke Bomb!'
     }
@@ -13,7 +13,7 @@ class SmokeBombAction extends ShipAction {
         const pseudoActions = this.encounter.addEffect(dustCloud)
         pseudoActions.push(...this.encounter.handleShipActionComplete(this.actor))
         
-        attacker.moduleCooldowns.setAmount(SHIP_MODULES.SMOKE_BOMB, SHIP_MODULES.SMOKE_BOMB.cooldown)
+        attacker.moduleCooldowns.setAmount(SHIP_MODULE_TYPES.SMOKE_BOMB, SHIP_MODULE_TYPES.SMOKE_BOMB.cooldown)
         this.completed = true
         return pseudoActions
     }

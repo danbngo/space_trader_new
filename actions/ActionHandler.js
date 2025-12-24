@@ -49,7 +49,22 @@ class ActionHandler {
         const pseudoActions = action.execute()
         if (action.actor.fleet == gs.fleet) this.encounterMap.selectedObject = action.actor
         action.addPopups(this.encounterMap.cvs)
-        for (const a of pseudoActions) a.addPopups(this.encounterMap.cvs)
+        ActionHandler.checkOnDisabledEffects(action)
+        for (const a of pseudoActions) {
+            //if any ships killed, do some special logic here
+            ActionHandler.checkOnDisabledEffects(a)
+            a.addPopups(this.encounterMap.cvs)
+        }
+
         this.encounterMap.refresh()
+    }
+
+    static checkOnDisabledEffects(action = new ShipAction()) {
+        if (action.actorDisabled && action.actor.shipType.onDisabled) {
+            action.actor.shipType.onDisabled(action.actor, action.encounter)
+        }
+        if (action.targetDisabled && action.target.shipType.onDisabled) {
+            action.target.shipType.onDisabled(action.target, action.encounter)
+        }
     }
 }

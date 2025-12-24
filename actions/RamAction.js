@@ -24,8 +24,8 @@ class RamAction extends ShipAction {
 
             const dmg = 1+rng(actor.maxRamDamage * dmgModifier)
             const selfDmg = 1+rng(actor.maxRamDamage/2 * dmgModifier)
-            const [targetHullDamage, targetShieldDamage, targetDisabled] = target.takeDamage(dmg, true)
-            const [actorHullDamage, actorShieldDamage, actorDisabled] = actor.takeDamage(selfDmg, true)
+            const [targetHullDamage, targetShieldDamage, targetDisabled] = target.takeDamage(dmg, true, false, actor)
+            const [actorHullDamage, actorShieldDamage, actorDisabled] = actor.takeDamage(selfDmg, true, false, target)
 
             const knockback = 1 + (AVERGE_RAMMING_KNOCKBACK_DISTANCE*dmgModifier*(actor.mass/target.mass)) + target.radius + actor.radius
             const [kx,ky] = rotatePoint(knockback, 0, 0, 0, this.angle)

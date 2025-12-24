@@ -28,51 +28,46 @@ function checkForAsteroidBeltEncounters(elapsedDays = 1) {
     const fleet = gs.fleet
     
     for (const belt of asteroidBelts) {
-        // Get the belt's center distance from the sun
-        const beltCenterDistance = belt.orbit.radius
-        
-        // Get the belt's territory radius
-        const beltRadius = belt.radius
-        
-        // Calculate fleet's distance from the sun
-        const fleetDistanceFromSun = calcDistance(fleet.x, fleet.y, 0, 0)
-        
-        // Calculate distance from the belt's center ring
-        const distanceFromBeltCenter = Math.abs(fleetDistanceFromSun - beltCenterDistance)
-        
-        // Calculate proximity factor using 1/(1+d/r) formula
-        // In the middle of belt (d=0): factor = 1.0
-        // At edge (d=beltRadius): factor = 0.5
-        // At 2x edge: factor = 0.5
-        const proximityFactor = 1 - (0.5 * distanceFromBeltCenter / beltRadius)
+
+        const proximityFactor = calcBeltProximityFactor(fleet, belt)
         if (proximityFactor <= 0) continue
 
         // Base encounter chance
         //const baseChance = Math.pow(ASTEROIDS_ENCOUNTER_CHANCE_PER_DAY, 1/(elapsedDays * proximityFactor))
         if (!rollChanceOverTimespan(ASTEROIDS_ENCOUNTER_CHANCE_PER_DAY, elapsedDays*proximityFactor)) continue
-        
-        // Determine encounter type based on belt type
-        let encounterType
-        if (belt.beltType === ASTEROID_BELT_TYPES.Rocky) {
-            encounterType = ENCOUNTER_TYPES.ASTEROIDS
-        } else if (belt.beltType === ASTEROID_BELT_TYPES.Icy) {
-            encounterType = ENCOUNTER_TYPES.CRYOIDS
-        } else if (belt.beltType === ASTEROID_BELT_TYPES.Plasma) {
-            encounterType = ENCOUNTER_TYPES.PLASMOIDS
-        } else {
-            continue // Unknown belt type, skip
-        }
+        const encounterType = rndMember(belt.encounterTypes)
         
         console.log(`🚨 ASTEROID ENCOUNTER TRIGGERED: ${belt.name} (${encounterType.name})`);
         
         // Start the encounter
         if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
-        const encounter = generateEncounter(encounterType, null)
+        const encounter = generateEncounter(encounterType, null, belt.effectTypes)
         startEncounter(encounter)
         return true
     }
     
     return false
+}
+
+function calcBeltProximityFactor(fleet = new Fleet(), belt = new AsteroidBelt()) {
+    // Get the belt's center distance from the sun
+    const beltCenterDistance = belt.orbit.radius
+    
+    // Get the belt's territory radius
+    const beltRadius = belt.radius
+    
+    // Calculate fleet's distance from the sun
+    const fleetDistanceFromSun = calcDistance(fleet.x, fleet.y, 0, 0)
+    
+    // Calculate distance from the belt's center ring
+    const distanceFromBeltCenter = Math.abs(fleetDistanceFromSun - beltCenterDistance)
+    
+    // Calculate proximity factor using 1/(1+d/r) formula
+    // In the middle of belt (d=0): factor = 1.0
+    // At edge (d=beltRadius): factor = 0.5
+    // At 2x edge: factor = 0.5
+    const proximityFactor = 1 - (0.5 * distanceFromBeltCenter / beltRadius)
+    return Math.max(0, proximityFactor)
 }
 
 function checkForPlanetEncounters(elapsedDays = 1) {
@@ -150,12 +145,27 @@ function checkForPlanetEncounters(elapsedDays = 1) {
         
         // Start the encounter with the selected type
         if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
-        const encounter = generateEncounter(selectedType, planet)
+        const effectTypes = rollEncounterEffectTypes()
+        const encounter = generateEncounter(selectedType, planet, effectTypes)
         startEncounter(encounter)
         return true
     }
     
     return false
+}
+
+function rollEncounterEffectTypes() {
+    //check for proximity to different asteroid belts and give the player different effects based on that
+    const nearbyEffectTypes = new Set()
+    for (const belt of gs.system.asteroidBelts) {
+        const proximityFactor = calcBeltProximityFactor(gs.fleet, belt)
+        if (proximityFactor <= 0) continue
+        if (Math.random() > proximityFactor) continue
+        for (const et of belt.effectTypes) {
+            nearbyEffectTypes.add(et)
+        }
+    }
+    return Array.from(nearbyEffectTypes)
 }
 
 function checkDebtCollections(elapsedDays = 1) {

@@ -19,7 +19,7 @@ function generateShipyard(planet = new Planet()) {
     // Generate modules
     const moduleCount = rng(4, 1)
     const modules = []
-    const allModuleTypes = Object.values(SHIP_MODULES)
+    const allModuleTypes = Object.values(SHIP_MODULE_TYPES)
     for(let i=0;i<moduleCount;i++) {
         const moduleType = rndMember(allModuleTypes)
         const quality = rng(1.5, 0.5, false)

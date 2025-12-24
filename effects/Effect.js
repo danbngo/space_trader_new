@@ -9,6 +9,8 @@ class Effect {
         this.angle = this.path ? this.path.angle : rng(Math.PI * 2, 0, false);
         this.radius = rng(effectType.maxSize, effectType.minSize, true);
         this.remainingTurns = rng(effectType.maxDuration, effectType.minDuration, true);
+        this.duration = this.remainingTurns
+        this.initialRadius = this.radius
         this.uuid = generateUUID('effect_');
     }
 
@@ -32,12 +34,13 @@ class Effect {
         }
     }
 
-    hitShip(ship = new Ship()) {
+    hitShip(encounter = new Encounter(), ship = new Ship()) {
         // Override in subclass
     }
 
     onTurnEnd() {
+        if (this.remainingTurns == null || this.duration == null) return //some clouds can be permanent
         this.remainingTurns -= 1
-        this.radius = Math.max(0, this.radius*rng(0.9, 0.7, false))
+        this.radius = this.initialRadius * (0.1 + 0.9 * (this.remainingTurns / this.duration))
     }
 }

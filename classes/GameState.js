@@ -9,13 +9,13 @@ class GameState {
         
         // Give player all modules for testing
         playerShip.localModules = [
-            SHIP_MODULES.CLOAK,
-            SHIP_MODULES.MAGNETIZE,
-            SHIP_MODULES.WARHEAD,
-            SHIP_MODULES.EMP_PULSE,
-            SHIP_MODULES.BLINK,
-            SHIP_MODULES.BOOSTER,
-            SHIP_MODULES.SMOKE_BOMB
+            SHIP_MODULE_TYPES.CLOAK,
+            SHIP_MODULE_TYPES.MAGNETIZE,
+            SHIP_MODULE_TYPES.WARHEAD,
+            SHIP_MODULE_TYPES.EMP_PULSE,
+            SHIP_MODULE_TYPES.BLINK,
+            SHIP_MODULE_TYPES.BOOSTER,
+            SHIP_MODULE_TYPES.SMOKE_BOMB
         ]
 
         // Create fleet

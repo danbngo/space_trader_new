@@ -16,33 +16,22 @@ class EncounterMap extends BaseMap {
         this.popups = new Map();
 
         const baseZoom = ENCOUNTER_MAP_RADIUS_MILES/2
-        this.initializeDOM(baseZoom/2, baseZoom/10, baseZoom*10, encounter.mapRadius)
-
-        // Initialize action handlers
-        this.attackHandler = new LaserActionHandler(this);
-        this.moveHandler = new MoveActionHandler(this);
-        this.ramHandler = new RamActionHandler(this);
-        this.rechargeHandler = new RechargeActionHandler(this);
-        this.waitHandler = new WaitActionHandler(this);
-        
-        // Initialize module handlers
-        /*this.cloakHandler = ;
-        this.magnetizeHandler = new MagnetizeActionHandler(this);
-        this.warheadHandler = new WarheadActionHandler(this);
-        this.empPulseHandler = new EMPPulseActionHandler(this);
-        this.blinkHandler = new BlinkActionHandler(this);
-        this.boosterHandler = new BoosterActionHandler(this);
-        this.smokeBombHandler = new SmokeBombActionHandler(this);*/
+        this.initializeDOM(baseZoom/10, baseZoom/10, baseZoom*10, encounter.mapRadius)
 
         // @ts-ignore
-        this.moduleHandlerMap = new Map([
-            [SHIP_MODULES.CLOAK, new CloakActionHandler(this)],
-            [SHIP_MODULES.MAGNETIZE, new MagnetizeActionHandler(this)],
-            [SHIP_MODULES.WARHEAD, new WarheadActionHandler(this)],
-            [SHIP_MODULES.EMP_PULSE, new EMPPulseActionHandler(this)],
-            [SHIP_MODULES.BLINK, new BlinkActionHandler(this)],
-            [SHIP_MODULES.BOOSTER, new BoosterActionHandler(this)],
-            [SHIP_MODULES.SMOKE_BOMB, new SmokeBombActionHandler(this)],
+        this.moveHandlerMap = new Map([
+            [MOVE_TYPES.Laser, new LaserActionHandler(this)],
+            [MOVE_TYPES.Move, new MoveActionHandler(this)],
+            [MOVE_TYPES.Ram, new RamActionHandler(this)],
+            [MOVE_TYPES.Recharge, new RechargeActionHandler(this)],
+            [MOVE_TYPES.Wait, new WaitActionHandler(this)],
+            [MOVE_TYPES.Cloak, new CloakActionHandler(this)],
+            [MOVE_TYPES.Magnetize, new MagnetizeActionHandler(this)],
+            [MOVE_TYPES.Warhead, new WarheadActionHandler(this)],
+            [MOVE_TYPES.EMPPulse, new EMPPulseActionHandler(this)],
+            [MOVE_TYPES.Blink, new BlinkActionHandler(this)],
+            [MOVE_TYPES.Booster, new BoosterActionHandler(this)],
+            [MOVE_TYPES.SmokeBomb, new SmokeBombActionHandler(this)],
         ])
         
         this.animatingAction = null
@@ -71,7 +60,10 @@ class EncounterMap extends BaseMap {
         //dont do anything while animating
         if (this.animations.length > 0) return;
         if (this.checkEncounterOver()) return;
-        this.checkTurnComplete();
+        if (this.checkTurnComplete()) {
+            this.rebuildCanvas() //in case new ships were added
+            this.refreshCanvas(true)
+        }
         this.handleEnemyActions()
     }
 
@@ -96,7 +88,7 @@ class EncounterMap extends BaseMap {
                 ce({tag:'button', innerHTML:'+', onClick: () => this.cvs.adjustZoom(1.33)}),
                 ce({tag:'button', innerHTML:'-', onClick: () => this.cvs.adjustZoom(0.66)}),
                 //ship info button?
-                ce({tag:'button', innerHTML: '🗨', classNames: [(!this.encounter.combatEnabled ? 'highlighted' : null)], onClick: ()=> this.onHail(), disabled: (!this.encounter.encounterType.onSurrender)})
+                ce({tag:'button', innerHTML: '🗨', classNames: [(!this.encounter.combatEnabled ? 'highlighted' : null)], onClick: ()=> this.onHail(), disabled: (this.encounter.combatEnabled && !this.encounter.encounterType.onSurrender)})
             ]
         })
     }
@@ -120,33 +112,37 @@ class EncounterMap extends BaseMap {
 
     rebuildCanvas() {
         const {encounter, cvs, starSystem} = this
-        const {ships, effects} = encounter
+        const {ships} = encounter
         const BG_STAR_DISTANCE_MOD = 10 //hacky way to position stars intended for starmap onto the encounter map
 
         cvs.clear()
 
-        cvs.addEmptyCircle('maplimits', 0, 0, this.encounter.mapRadius, 24, COLORS.Cyan)
+        if (!cvs.getObject('maplimits')) cvs.addEmptyCircle('maplimits', 0, 0, this.encounter.mapRadius, 24, COLORS.Cyan)
 
-        starSystem.backgroundStars.forEach( (bgStar, index) => {
+        if (cvs.pixels.length <= 0) starSystem.backgroundStars.forEach( (bgStar, index) => {
             cvs.addPixel(bgStar.x*BG_STAR_DISTANCE_MOD, bgStar.y*BG_STAR_DISTANCE_MOD, bgStar.color, bgStar.size)
         });
 
         ships.forEach((ship,index) => {
-            let shipObj;
+            const shipId = `ship${ship.uuid}`
+            let shipObj = cvs.getObject(shipId)
+            if (shipObj) return
+            console.log('rebuilding ship:',shipId,shipObj,ship)
             if (ship.shipType.shape == SHAPES.FilledTriangle) {
-                shipObj = cvs.addFilledTriangle(`ship${index}`, ship.x, ship.y, ship.radius, ship.radius, 12, ship.color, ship.angle, ()=>this.selectObject(ship))
+                shipObj = cvs.addFilledTriangle(shipId, ship.x, ship.y, ship.radius, ship.radius, 12, ship.color, ship.angle, ()=>this.selectObject(ship))
             }
             else if (ship.shipType.shape == SHAPES.FilledOval) {
-                shipObj = cvs.addFilledOval(`ship${index}`, ship.x, ship.y, ship.radius, (ship.radius*(Math.random()+0.5)), 0.5, ship.color, ship.angle, ()=>this.selectObject(ship))
+                shipObj = cvs.addFilledOval(shipId, ship.x, ship.y, ship.radius, (ship.radius*(Math.random()+0.5)), 0.5, ship.color, ship.angle, ()=>this.selectObject(ship))
                 console.log('ship obj:', shipObj)
             }
             else if (ship.shipType.shape == SHAPES.FilledCircle) {
-                shipObj = cvs.addFilledCircle(`ship${index}`, ship.x, ship.y, ship.radius, 12, ship.color, ()=>this.selectObject(ship))
+                shipObj = cvs.addFilledCircle(shipId, ship.x, ship.y, ship.radius, 12, ship.color, ()=>this.selectObject(ship))
             }
+            else throw new Error('ship obj not created, must not have had a valid shape??')
             shipObj.onHover = ()=>this.hoverObject(ship)
             //if (ship == this.selectedObject) shipObj.strokeColor = COLORS.Green
-            cvs.addEmptyCircle(`shipshield${index}`, ship.x, ship.y, ship.radius*1.1, 10, COLORS.Blue, 1)
-            const labelObj = cvs.addText(`shiplabel${index}`, ship.x, ship.y, 0, -32, ship.shipType.name, ship.color, DEFAULT_FONT_SIZE, 2, ()=>this.selectObject(ship))
+            cvs.addEmptyCircle(shipId+'shield', ship.x, ship.y, ship.radius*1.1, 10, COLORS.Blue, 1)
+            const labelObj = cvs.addText(shipId+'label', ship.x, ship.y, 0, -32, ship.shipType.name, ship.color, DEFAULT_FONT_SIZE, 2, ()=>this.selectObject(ship))
             labelObj.onHover = ()=>this.hoverObject(ship)
             const objs = [shipObj, labelObj]
             for (const obj of objs) {
@@ -160,7 +156,8 @@ class EncounterMap extends BaseMap {
                 }
                 obj.onHoverEnd()
             }
-            const animThruster = this.cvs.addFilledTriangle(`shipthruster${index}`, ship.x, ship.y, ship.radius*0.5, ship.radius*0.5, 6, COLORS.Orange, ship.angle - Math.PI)
+            const thrusterColor = ship.aiType == AI_TYPES.Asteroid ? COLORS.Green : COLORS.Orange
+            const animThruster = this.cvs.addFilledTriangle(shipId+'thruster', ship.x, ship.y, ship.radius*0.5, ship.radius*0.5, 6, thrusterColor, ship.angle - Math.PI)
         })
 
         cvs.recalculateDrawOrder()
@@ -191,10 +188,15 @@ class EncounterMap extends BaseMap {
             if (ship.aiType == AI_TYPES.Asteroid && ship.disabled) invisible = true
 
             //if (obj.location) return //dont display docked fleets
-            const cvsShipObject = cvs.getObject(`ship${index}`)
-            const cvsShieldObject = cvs.getObject(`shipshield${index}`)
-            const cvsLabelObject = cvs.getObject(`shiplabel${index}`)
-            const cvsThrusterObject = cvs.getObject(`shipthruster${index}`)
+            const shipId = `ship${ship.uuid}`
+            const cvsShipObject = cvs.getObject(shipId)
+            if (!cvsShipObject) {
+                //console.log('WARNING: No ship object found!',index,ship)
+                return
+            }
+            const cvsShieldObject = cvs.getObject(shipId+'shield')
+            const cvsLabelObject = cvs.getObject(shipId+'label')
+            const cvsThrusterObject = cvs.getObject(shipId+'thruster')
 
             let cloaked = false
 
@@ -216,8 +218,6 @@ class EncounterMap extends BaseMap {
 
             const shieldsRatio = ship.shields[0] <= 0 ? 0 : 0.25+(0.75*ship.shields[0]/ship.shields[1])
             const hullRatio = 0.25 + (0.75*ship.hull[0]/ship.hull[1])
-            //const hull255 = Math.round(255*hullRatio)
-            //const shields255 = Math.round(255*shieldsRatio)
 
             cvsShipObject.x = ship.x
             cvsShipObject.y = ship.y
@@ -290,7 +290,7 @@ class EncounterMap extends BaseMap {
             const currentMs = Date.now()
             const radiusSpeed = effect.radius / 10 // Normalize radius value
             const oscillationFreq = 0.001 * (0.001 + radiusSpeed) // Larger radius = faster oscillation
-            const alpha = 0.2 + 0.05 * Math.sin(currentMs * oscillationFreq)
+            const alpha = 0.3 + (0.05 * Math.sin(currentMs * oscillationFreq))
             cvsEffectObject.fillColor[3] = alpha
         })
 
@@ -346,15 +346,14 @@ class EncounterMap extends BaseMap {
             onClick: ()=>this.selectObject(obj)
         })
         if (obj instanceof Ship) {
-            const index = ships.indexOf(obj)
             const {hull, shields} = obj
             
             const showActions = combatEnabled && obj.fleet == playerFleet && !obj.escaped && !obj.disabled && activeTurnFleet == playerFleet
             console.log('showing actions with props:', { combatEnabled, isPlayerShip: obj.fleet == playerFleet, isEscaped: obj.escaped, isDisabled: obj.disabled, isPlayerTurn: activeTurnFleet == playerFleet })
             const canAct = (obj.numActionsRemaining > 0) && (this.animations.length <= 0)
-            const canRecharge = obj.shields[0] < obj.shields[1]
+            const canRecharge = obj.shields[0] < obj.shields[1] && !obj.statusEffects.has(STATUS_EFFECTS.IONIZED)
             ce({parent:container, style: {margin: 'auto'}, onClick: ()=>this.selectObject(obj), children:[
-                this.cvs.getObject(`ship${index}`)?.asImage(25, COLORS.LightGreen) || null
+                this.cvs.getObject(`ship${obj.uuid}`)?.asImage(25, COLORS.LightGreen) || null
             ]})
              // Display status effects if any
             if (obj.statusEffects.size > 0) {
@@ -362,7 +361,7 @@ class EncounterMap extends BaseMap {
                     const turnsRemaining = obj.statusEffects.getAmount(effect)
                     return colorSpan(`${effect.name}${turnsRemaining > 0 ? ` (${turnsRemaining})` : ''}`, colorArrToRgbaString(effect.color))
                 })
-                ce({parent:container, innerHTML: statusEffectSpans.join(' | ')})
+                ce({parent:container, innerHTML: statusEffectSpans.join('<br/>')})
             }
             ce({parent:container, innerHTML: `Hull: ${statColorSpan(`${hull[0]}/${hull[1]}`, hull[0]/hull[1], true)}`})
             if (obj.shields[1] > 0) ce({parent:container, innerHTML: `Shields: ${statColorSpan(`${shields[0]}/${shields[1]}`, shields[0]/shields[1], true)}`})
@@ -372,23 +371,24 @@ class EncounterMap extends BaseMap {
             ce({parent:container, innerHTML: `Actions: ${statColorSpan(obj.numActionsRemaining, obj.numActionsRemaining/2, true)}`})
             ce({parent:container, innerHTML: obj.disabled ? `(Disabled)` : obj.escaped ? '(Escaped)' : ''})
             if (showActions) {
-                ce({parent:container, tag:'button', innerHTML:'Shoot', disabled: !canAct || !obj.canShoot, onClick: ()=>this.attackHandler.startTargeting(obj)})
-                ce({parent:container, tag:'button', innerHTML:'Move', disabled: !canAct, onClick: ()=>this.moveHandler.startTargeting(obj)})
-                ce({parent:container, tag:'button', innerHTML:'Ram', disabled: !canAct || !obj.canRam, onClick: ()=>this.ramHandler.startTargeting(obj)})
+                ce({parent:container, tag:'button', innerHTML:'Shoot', disabled: !canAct || !obj.canShoot, onClick: ()=>this.moveHandlerMap.get(MOVE_TYPES.Laser).startTargeting(obj)})
+                ce({parent:container, tag:'button', innerHTML:'Move', disabled: !canAct, onClick: ()=>this.moveHandlerMap.get(MOVE_TYPES.Move).startTargeting(obj)})
+                ce({parent:container, tag:'button', innerHTML:'Ram', disabled: !canAct || !obj.canRam, onClick: ()=>this.moveHandlerMap.get(MOVE_TYPES.Ram).startTargeting(obj)})
                 ce({parent:container, tag:'button', innerHTML:canRecharge ? 'Recharge' : 'Wait', disabled: !canAct, onClick: ()=>{
-                    if (canRecharge) this.rechargeHandler.attempt(obj)
-                    else this.waitHandler.attempt(obj)
+                    if (canRecharge) this.moveHandlerMap.get(MOVE_TYPES.Recharge).attempt(obj)
+                    else this.moveHandlerMap.get(MOVE_TYPES.Wait).attempt(obj)
                 }})
                 
-                for (const [module, handler] of this.moduleHandlerMap) {
-                    if (obj.modules.includes(module)) {
-                        const cooldown = obj.moduleCooldowns.getAmount(module)
-                        const onCooldown = cooldown > 0
-                        const label = cooldown > 0 ? `${module.name} (${cooldown})` : module.name
-                        ce({parent:container, tag:'button', innerHTML:label, disabled: !canAct || onCooldown || !obj.canUseModules, onClick: ()=>{
-                            handler.startTargeting(obj)
-                        }})
-                    }
+                for (const [move, handler] of this.moveHandlerMap) {
+                    const module = SHIP_MODULE_TYPES_ALL.find(m => m.moveType === move)
+                    if (!module) continue
+                    if (!obj.modules.includes(module)) continue
+                    const cooldown = obj.moduleCooldowns.getAmount(module)
+                    const onCooldown = cooldown > 0
+                    const label = cooldown > 0 ? `${move} (${cooldown})` : module.name
+                    ce({parent:container, tag:'button', innerHTML:label, disabled: !canAct || onCooldown || !obj.canUseModules, onClick: ()=>{
+                        handler.startTargeting(obj)
+                    }})
                 }
             }
         }
@@ -405,9 +405,9 @@ class EncounterMap extends BaseMap {
     }
 
     refreshStrokeColors() {
-        for (let i = 0; i < this.encounter.ships.length; i++) {
-            const obj = this.cvs.getObject(`ship${i}`)
-            obj.strokeColor = this.calcStrokeColorForObj(this.encounter.ships[i])
+        for (const ship of this.encounter.ships) {
+            const obj = this.cvs.getObject(`ship${ship.uuid}`)
+            if (obj) obj.strokeColor = this.calcStrokeColorForObj(ship)
         }
     }
 
@@ -485,21 +485,7 @@ class EncounterMap extends BaseMap {
         const nextMove = ai.calcNextMove()
         console.log('determined next AI move:',nextMove)
         if (nextMove) {
-            if (nextMove.actionType == MOVE_TYPES.Move) {
-                this.moveHandler.execute(nextMove)
-            }
-            else if (nextMove.actionType == MOVE_TYPES.Laser) {
-                this.attackHandler.execute(nextMove)
-            }
-            else if (nextMove.actionType == MOVE_TYPES.Recharge) {
-                this.rechargeHandler.execute(nextMove)
-            }
-            else if (nextMove.actionType == MOVE_TYPES.Ram) {
-                this.ramHandler.execute(nextMove)
-            }
-            else if (nextMove.actionType == MOVE_TYPES.Wait) {
-                this.waitHandler.execute(nextMove)
-            }
+            this.moveHandlerMap.get(nextMove.actionType).execute(nextMove)
         }
         this.checkTurnComplete()
     }
@@ -508,22 +494,22 @@ class EncounterMap extends BaseMap {
         //console.log('EncounterMap.checkTurnComplete')
         if (this.encounter.result) return
         const {encounter} = this
-        if (encounter.isTurnComplete()) {
-            encounter.handleTurnComplete()
-            for (let i = 0; i < encounter.activeTurnFleet.activeShips.length; i++) {
-                const ship = encounter.activeTurnFleet.activeShips[i]
-                if (ship.numActionsRemaining > ship.maxActionsPerTurn) {
-                    const txt = this.cvs.addText(`fast_${i}`, ship.x, ship.y, 0, -DEFAULT_FONT_SIZE, 'Fast!', COLORS.LightGreen)
-                    txt.setDurationMs()
-                }
-                else if (ship.numActionsRemaining < ship.maxActionsPerTurn) {
-                    const txt = this.cvs.addText(`slow_${i}`, ship.x, ship.y, 0, -DEFAULT_FONT_SIZE, 'Slow!', COLORS.LightRed)
-                    txt.setDurationMs() 
-                }
+        const isComplete = encounter.isTurnComplete()
+        if (!isComplete) return false
+        encounter.handleTurnComplete()
+        for (const ship of encounter.activeTurnFleet.activeShips) {
+            if (ship.numActionsRemaining > ship.maxActionsPerTurn) {
+                const txt = this.cvs.addText(`fast_${ship.uuid}`, ship.x, ship.y, 0, -DEFAULT_FONT_SIZE, 'Fast!', COLORS.LightGreen)
+                txt.setDurationMs()
             }
-            this.refreshLogic()
-            if (encounter.activeTurnFleet == gs.fleet) this.selectObject(encounter.playerShips[0] || null)
+            else if (ship.numActionsRemaining < ship.maxActionsPerTurn) {
+                const txt = this.cvs.addText(`slow_${ship.uuid}`, ship.x, ship.y, 0, -DEFAULT_FONT_SIZE, 'Slow!', COLORS.LightRed)
+                txt.setDurationMs() 
+            }
         }
+        this.refreshLogic()
+        if (encounter.activeTurnFleet == gs.fleet) this.selectObject(encounter.playerShips[0] || null)
+        return true
     }
 
     checkEncounterOver() {
