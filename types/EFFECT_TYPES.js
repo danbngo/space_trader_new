@@ -25,10 +25,10 @@ class EffectType {
 }
 
 const EFFECT_TYPES = Object.freeze({
-    DEBRIS_CLOUD: new EffectType('Debris Cloud', [92,64,64,0.25], SHAPES.FilledOval, 25, 25, 2, 4, 'Reduces laser accuracy (incoming and outgoing) and damages hull over time.'),
-    ICE_CLOUD: new EffectType('Ice Cloud', [64,64,92,0.25], SHAPES.FilledOval, 25, 25, 2, 4, 'Slows ships that enter it.'),
-    ION_CLOUD: new EffectType('Ion Cloud', [92,92,64,0.25], SHAPES.FilledOval, 25, 25, 2, 4, 'Damages shields over time and prevents using ship modules.'),
-    PLASMA_TRAIL: new EffectType('Plasma Trail', [255,165,0,0.25], SHAPES.Line, 8, 8, 2, 3, 'Does damage to ships that touch it.'),
+    DEBRIS_CLOUD: new EffectType('Debris Cloud', [92,64,64,0.25], SHAPES.FilledOval, 20, 30, 3, 5, 'Reduces laser accuracy (incoming and outgoing) and damages hull over time.'),
+    ICE_CLOUD: new EffectType('Ice Cloud', [64,64,92,0.25], SHAPES.FilledOval, 20, 30, 3, 5, 'Slows ships that enter it.'),
+    ION_CLOUD: new EffectType('Ion Cloud', [92,92,64,0.25], SHAPES.FilledOval, 20, 30, 3, 5, 'Damages shields over time and prevents using ship modules.'),
+    PLASMA_TRAIL: new EffectType('Plasma Trail', [255,165,0,0.25], SHAPES.FilledRectangle, 2, 2, 3, 5, 'Does damage to ships that touch it.'),
 })
 const EFFECT_TYPES_ALL = Object.values(EFFECT_TYPES)
 

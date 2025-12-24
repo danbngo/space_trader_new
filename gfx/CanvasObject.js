@@ -181,6 +181,13 @@ class CanvasObject {
                 //if (this.angle) ctx.rotate(this.angle);
             break;
             
+            case SHAPES.FilledRectangle:
+            // size is the width, minorSize is the height
+            if (this.angle) ctx.rotate(this.angle);
+            ctx.fillRect(-size / 2, -minorSize / 2, size, minorSize);
+            if (this.strokeColor) ctx.strokeRect(-size / 2, -minorSize / 2, size, minorSize);
+            break;
+            
             case SHAPES.EmptyCircle:
             ctx.beginPath();
             ctx.arc(0, 0, size, 0, Math.PI * 2);

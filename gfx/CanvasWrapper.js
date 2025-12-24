@@ -118,6 +118,11 @@ class CanvasWrapper {
         return this.addObject(obj)
     }
     
+    addFilledRectangle(id = "", x = 0, y = 0, width = 0, height = 0, minScreenSize = 0, fillColor = COLORS.LightGray, angle = 0, onClick = null) {
+        const obj = new CanvasObject({ id, shape: SHAPES.FilledRectangle, x, y, size: width, minorSize: height, minScreenSize, angle, fillColor, onClick });
+        return this.addObject(obj)
+    }
+    
     addEmptyCircle(id = "", x = 0, y = 0, size = 0, minScreenSize = 0, strokeColor = COLORS.LightGray, lineWidth = 1, onClick = null) {
         const obj = new CanvasObject({ id, shape: SHAPES.EmptyCircle, x, y, size, minScreenSize, strokeColor, onClick, lineWidth });
         return this.addObject(obj)

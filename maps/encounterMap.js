@@ -171,8 +171,10 @@ class EncounterMap extends BaseMap {
             const minorAxis = effect.radius * 0.5
             this.cvs.addFilledOval(`effect${effect.uuid}`, effect.x, effect.y, effect.radius, minorAxis, 0.5, effect.effectType.color, effect.angle)
         }
-        else if (effect.effectType.shape == SHAPES.Line) {
-            const cvsObj = this.cvs.addLine(`effect${effect.uuid}`, effect.x, effect.y, effect.toX, effect.toY, effect.effectType.color, effect.radius)
+        else if (effect.effectType.shape == SHAPES.FilledRectangle) {
+            const centerX = (effect.toX+effect.x)/2
+            const centerY = (effect.toY+effect.y)/2
+            const cvsObj = this.cvs.addFilledRectangle(`effect${effect.uuid}`, centerX, centerY, effect.path.distance, effect.radius, 2, effect.effectType.color, effect.angle)
             console.log('added line effect to canvas:', effect, cvsObj)
         }
     }
@@ -272,17 +274,24 @@ class EncounterMap extends BaseMap {
                 this.addEffectCanvasObject(effect)
                 return
             }
-            cvsEffectObject.x = effect.x
-            cvsEffectObject.y = effect.y
-            cvsEffectObject.size = effect.radius
             if (effect.effectType.shape == SHAPES.FilledOval) {
+                cvsEffectObject.x = effect.x
+                cvsEffectObject.y = effect.y
                 cvsEffectObject.angle = effect.angle
                 cvsEffectObject.minorSize = effect.radius * 0.5
+                cvsEffectObject.size = effect.radius
             }
-            else if (effect.effectType.shape == SHAPES.Line) {
-                cvsEffectObject.toX = effect.toX
-                cvsEffectObject.toY = effect.toY
+            else if (effect.effectType.shape == SHAPES.FilledRectangle) {
+                //cvsEffectObject.size = effect.path.distance
+                cvsEffectObject.minorSize = effect.radius
             }
+
+            // Oscillate effect alpha based on radius (larger effects pulse slower)
+            const currentMs = Date.now()
+            const radiusSpeed = effect.radius / 10 // Normalize radius value
+            const oscillationFreq = 0.001 * (0.001 + radiusSpeed) // Larger radius = faster oscillation
+            const alpha = 0.2 + 0.05 * Math.sin(currentMs * oscillationFreq)
+            cvsEffectObject.fillColor[3] = alpha
         })
 
         // Remove canvas objects for effects that no longer exist

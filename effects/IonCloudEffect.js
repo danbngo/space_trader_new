@@ -3,15 +3,11 @@ class IonCloudEffect extends Effect {
         super(EFFECT_TYPES.ION_CLOUD, x, y, x, y)
     }
 
-    onShipEnter(ship = new Ship()) {
+    hitShip(ship = new Ship()) {
         // Apply ionized status and damage shields when entering ion cloud
         console.log('Ship entered ion cloud:', ship.name)
         ship.statusEffects.raiseTo(STATUS_EFFECTS.IONIZED)
-    }
-
-    onShipPresent(ship = new Ship()) {
-        // Apply ionized status and damage shields for ships starting their turn in the ion cloud
-        console.log('Applying ion cloud penalties to:', ship.name)
-        ship.statusEffects.raiseTo(STATUS_EFFECTS.IONIZED)
+        const [hullDamage, shieldDamage, disabled] = ship.takeDamage(rng(5,1), false, true)
+        return [ShipAction.getDamageAction(ship, hullDamage, shieldDamage, disabled)]
     }
 }

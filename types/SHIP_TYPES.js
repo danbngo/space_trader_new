@@ -48,7 +48,7 @@ class ShipType {
 }
 
 const SHIP_TYPES = {
-    SHUTTLE: new ShipType('Shuttle', SHAPES.FilledTriangle, 0.1, 0.1, 0.1, 1, 1, 1, [], 1),
+    SHUTTLE: new ShipType('Shuttle', SHAPES.FilledTriangle, 0.1, 0.1, 0.1, 1, 1, 1, [SHIP_MODULES.BOOSTER], 1),
     PASSENGER_SHIP: new ShipType('Passenger Ship', SHAPES.FilledTriangle, 2, 0.5, 0.1, 1, 2, 0.5, [], 1),
     FREIGHTER: new ShipType('Freighter', SHAPES.FilledTriangle, 1, 0.25, 0.1, 1, 4, 0.5, [], 2),
     BLOCKADE_RUNNER: new ShipType('Blockade Runner', SHAPES.FilledTriangle, 1.5, 1, 0.5, 3, 2, 1, [SHIP_MODULES.CLOAK], 2),
@@ -56,7 +56,7 @@ const SHIP_TYPES = {
     DESTROYER: new ShipType('Destroyer', SHAPES.FilledTriangle, 2, 2, 4, 1, 0.5, 2, [SHIP_MODULES.EMP_PULSE], 3),
     BATTLESHIP: new ShipType('Battleship', SHAPES.FilledTriangle, 4, 4, 3, 0.5, 1, 1, [SHIP_MODULES.WARHEAD], 3),
     FIGHTER: new ShipType('Fighter', SHAPES.FilledTriangle, 1, 2, 2, 1, 0.1, 1, [SHIP_MODULES.BLINK], 2),
-    MINING_SHIP: new ShipType('Mining Ship', SHAPES.FilledTriangle, 2, 0.5, 1, 0.5, 2, 0.5, [], 1),
+    MINING_SHIP: new ShipType('Mining Ship', SHAPES.FilledTriangle, 2, 0.5, 1, 0.5, 2, 0.5, [SHIP_MODULES.MAGNETIZE], 1),
     GUARD_SHIP: new ShipType('Guard Ship', SHAPES.FilledTriangle, 1, 1.5, 1.5, 0.5, 0.25, 1.5, [SHIP_MODULES.SMOKE_BOMB], 2),
     PATROL_SHIP: new ShipType('Patrol Ship', SHAPES.FilledTriangle, 1.5, 1.5, 1.5, 2, 0.25, 2, [SHIP_MODULES.MAGNETIZE], 2),
 }

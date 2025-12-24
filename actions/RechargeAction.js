@@ -10,6 +10,8 @@ class RechargeAction extends ShipAction {
         const rechargedAmt = this.actor.rechargeShields()
         Object.assign(this, {actorShieldDamage: -rechargedAmt})
         const pseudoActions = this.encounter.handleShipActionComplete(this.actor)
+        const rcPseudoAction = ShipAction.getDamageAction(this.actor, 0, -rechargedAmt)
+        pseudoActions.push(rcPseudoAction)
         this.completed = true
         return pseudoActions
     }

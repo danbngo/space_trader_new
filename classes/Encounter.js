@@ -86,7 +86,7 @@ class Encounter {
         }
         for (const effect of this.effects) {
             if (effect.containsPoint(ship.x, ship.y)) {
-                effect.onShipPresent(ship)
+                effect.hitShip(ship)
             }
         }
         return pseudoActions
@@ -94,13 +94,15 @@ class Encounter {
 
     addEffect(effect = new Effect()) {
         console.log('Encounter.addEffect', { effect });
+        const pseudoActions = []
         this.effects.push(effect)
-        // Trigger onShipEnter for all ships currently within the effect's area
+        // Trigger hitShip for all ships currently within the effect's area
         for (const ship of this.ships) {
             if (effect.containsPoint(ship.x, ship.y)) {
-                effect.onShipEnter(ship)
+                pseudoActions.concat(effect.hitShip(ship))
             }
         }
+        return pseudoActions
     }
 
     updateEncounterResult() {
@@ -168,21 +170,21 @@ class Encounter {
     }
 
     checkShipMovementEffects(ship = new Ship()) {
+        const pseudoActions = []
         console.log('Encounter.checkShipMovementEffects', { ship });
-        
         // Check if ship entered any effects
         for (const effect of this.effects) {
             if (effect.containsPoint(ship.x, ship.y)) {
-                effect.onShipEnter(ship)
+                pseudoActions.push(...effect.hitShip(ship))
             }
         }
         
         // Check if ship escaped map
         const distanceFromCenter = calcDistance(0, 0, ship.x, ship.y)
         if (distanceFromCenter > this.mapRadius) {
+            pseudoActions.push(ShipAction.getDamageAction(ship, 0, 0, false, true))
             ship.escaped = true
-            return true
         }
-        return false
+        return pseudoActions
     }
 }

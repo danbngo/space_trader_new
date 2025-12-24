@@ -7,7 +7,7 @@ class RamAction extends ShipAction {
     execute() {
         console.log('RamAction.execute', { actor: this.actor, target: this.target });
         const {actor, target} = this
-
+        const pseudoActions = []
         //player has a 75% chance to miss at min range and 25% at max range
         const didMiss = this.path.distance > 0 ? (Math.random() < (0.75 - (0.5 * (this.path.distance / actor.maxMoveDistance)))) : false
         if (didMiss) {
@@ -33,14 +33,13 @@ class RamAction extends ShipAction {
             target.y += ky
             target.incrementAngle(rng(Math.PI/2, -Math.PI/2, false))
 
-            const targetEscaped = this.encounter.checkShipMovementEffects(target)
-            Object.assign(this, {actorHullDamage, actorShieldDamage, actorDisabled, targetHullDamage, targetShieldDamage, targetDisabled, targetEscaped})
+            pseudoActions.push(...this.encounter.checkShipMovementEffects(target))
+            Object.assign(this, {actorHullDamage, actorShieldDamage, actorDisabled, targetHullDamage, targetShieldDamage, targetDisabled})
         }
 
         //seems buggy but let's try it out
-        const actorEscaped = this.encounter.checkShipMovementEffects(actor)
-        Object.assign(this, {actorEscaped})
-        const pseudoActions = this.encounter.handleShipActionComplete(this.actor)
+        pseudoActions.push(...this.encounter.checkShipMovementEffects(actor))
+        pseudoActions.push(...this.encounter.handleShipActionComplete(actor))
         this.completed = true
         return pseudoActions
     }

@@ -23,6 +23,7 @@ const SHAPES = Object.freeze({
     Line: 'Line',
     FilledOval: 'FilledOval',
     EmptyOval: 'EmptyOval',
+    FilledRectangle: 'FilledRectangle',
 })
 
 /** @enum {string} */

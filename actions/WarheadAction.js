@@ -35,8 +35,8 @@ class WarheadAction extends ShipAction {
             ship.y += ky
             
             // Check if knocked out of bounds
-            const escaped = this.encounter.checkShipMovementEffects(ship)
-            pseudoActions.push(ShipAction.getDamageAction(ship, hullDamage, shieldDamage, disabled, escaped))
+            pseudoActions.push(...this.encounter.checkShipMovementEffects(ship))
+            pseudoActions.push(ShipAction.getDamageAction(ship, hullDamage, shieldDamage, disabled))
         }
         const morePseudoActions = this.encounter.handleShipActionComplete(this.actor)
         pseudoActions.push(...morePseudoActions)

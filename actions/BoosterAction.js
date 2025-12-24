@@ -12,26 +12,21 @@ class BoosterAction extends ShipAction {
     execute() {
         console.log('BoosterAction.execute', { actor: this.actor });
         const ship = this.actor
-        const startX = ship.x
-        const startY = ship.y
-        const newX = this.toX
-        const newY = this.toY
         
         // Create plasma trail from start to near end (90% of the way to avoid burning self)
-        const trailEndProgress = 0.9
-        const trailEndX = startX + (newX - startX) * trailEndProgress
-        const trailEndY = startY + (newY - startY) * trailEndProgress
-        const plasmaTrail = new PlasmaTrailEffect(startX, startY, trailEndX, trailEndY)
-        this.encounter.effects.push(plasmaTrail)
+        const trailEndProgress = 1//0.85
+        const trailEndX = this.startX + (this.toX - this.startX) * trailEndProgress
+        const trailEndY = this.startY + (this.toY - this.startY) * trailEndProgress
+        console.log('BoosterAction.execute creating plasma trail to', trailEndX, trailEndY, 'from:', this.startX, this.startY,'progress:', trailEndProgress)
+        const plasmaTrail = new PlasmaTrailEffect(this.startX, this.startY, trailEndX, trailEndY)
+        const pseudoActions = this.encounter.addEffect(plasmaTrail)
         
         // Update ship position
-        Object.assign(ship, { x: newX, y: newY })
+        Object.assign(ship, { x: this.toX, y: this.toY })
         
-        const pseudoActions = this.encounter.handleShipActionComplete(ship)
-        
+        pseudoActions.push(...this.encounter.handleShipActionComplete(ship))
         // Check if ship escaped the map
-        if (this.encounter) this.encounter.checkShipMovementEffects(ship)
-        
+        pseudoActions.push(...this.encounter.checkShipMovementEffects(ship))
         
         ship.moduleCooldowns.setAmount(SHIP_MODULES.BOOSTER, SHIP_MODULES.BOOSTER.cooldown)
         this.completed = true

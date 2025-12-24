@@ -32,6 +32,6 @@ class Line {
         
         // Check distance from point to closest point on line
         const dist = calcDistance(closestX, closestY, x, y);
-        return dist <= this.lineWidth;
+        return dist <= this.lineWidth/2;
     }
 }

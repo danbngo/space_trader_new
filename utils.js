@@ -111,6 +111,7 @@ function radiansToDegrees(rads = 0) {
     return rads * (180 / Math.PI);
 }
 
+//dont move to the Rectangle class, this needs to be efficient and Rect allows rotation so its less efficient
 function isPointInRect(px, py, rx, ry, rw, rh) {
     return px >= rx && px <= rx + rw &&
            py >= ry && py <= ry + rh;

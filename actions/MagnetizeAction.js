@@ -12,7 +12,7 @@ class MagnetizeAction extends ShipAction {
 
     execute() {
         console.log('MagnetizeAction.execute', { actor: this.actor, target: this.target });
-
+        const pseudoActions = []
         const {actor, target} = this
         actor.x = this.toX
         actor.y = this.toY
@@ -20,9 +20,9 @@ class MagnetizeAction extends ShipAction {
         target.y = this.targetToY
         
         // Check if either ship escaped
-        this.encounter.checkShipMovementEffects(target)
-        this.encounter.checkShipMovementEffects(actor)
-        const pseudoActions = this.encounter.handleShipActionComplete(actor)
+        pseudoActions.push(...this.encounter.checkShipMovementEffects(actor))
+        pseudoActions.push(...this.encounter.checkShipMovementEffects(target))
+        pseudoActions.push(...this.encounter.handleShipActionComplete(actor))
         
         actor.moduleCooldowns.setAmount(SHIP_MODULES.MAGNETIZE, SHIP_MODULES.MAGNETIZE.cooldown)
         this.completed = true

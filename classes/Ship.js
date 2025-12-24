@@ -144,23 +144,7 @@ class Ship {
         const pseudoActions = []
         this.numActionsRemaining = Math.max(0, this.numActionsRemaining - 1)
         
-        // Apply damage over time from status effects
-        if (this.statusEffects.has(STATUS_EFFECTS.OVERHEATED)) {
-            // Overheated damages hull over time (thermal stress)
-            const [hullDamage, shieldDamage, disabled] = this.takeDamage(rng(4,1), false, false)
-            pseudoActions.push(ShipAction.getDamageAction(this, hullDamage, shieldDamage, disabled))
-        }
-        //a bit redundant since disabled clears status effects, but just in case
-        if (!this.disabled && this.statusEffects.has(STATUS_EFFECTS.DUSTY)) {
-            // Dusty damages hull over time (abrasive debris)
-            const [hullDamage, shieldDamage, disabled] = this.takeDamage(rng(3,1), true, false)
-            pseudoActions.push(ShipAction.getDamageAction(this, hullDamage, shieldDamage, disabled))
-        }
-        if (!this.disabled &&this.statusEffects.has(STATUS_EFFECTS.IONIZED)) {
-            // Ionized damages shields over time (electromagnetic interference)
-            const [hullDamage, shieldDamage, disabled] = this.takeDamage(rng(5,1), false, true)
-            pseudoActions.push(ShipAction.getDamageAction(this, hullDamage, shieldDamage, disabled))
-        }
+        //we could later add dot damage here
 
         return pseudoActions
     }
