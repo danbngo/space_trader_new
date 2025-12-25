@@ -15,14 +15,15 @@ class StarMap extends BaseMap {
         console.log('CREATING STAR MAP FOR SYSTEM:',starSystem,'with autoselect obj:',autoSelectObject)
         this.starSystem = starSystem
 
-        this.gameYearsPerMs = 1/365/24/60 * 2
+        this.gameYearsPerMs = STAR_MAP_YEARS_PER_MS
 
-        this.initializeDOM(200, 20, 2000, NEPTUNE.orbit.radius)
+        this.initializeDOM(200, 20, 2000, this.starSystem.radius)
 
         for (const bgStar of starSystem.backgroundStars) bgStar.reset()
 
         // Allow clicking empty space to select arbitrary coordinates
         this.cvs.onClickWorldXY = (x, y) => {
+            if (calcDistance(x, y, 0 ,0) > starSystem.radius) return
             const waypoint = new Waypoint(x, y)
             this.selectObject(waypoint)
         }
@@ -30,6 +31,14 @@ class StarMap extends BaseMap {
         this.rebuildCanvas()
         this.refresh()
         this.selectObject(autoSelectObject || gs.fleet)
+        if (StarMap.lastZoom) this.adjustZoom(StarMap.lastZoom/this.cvs.zoom)
+    }
+
+    static lastZoom = 1
+
+    adjustZoom(modifier = 1.0) {
+        this.cvs.adjustZoom(modifier)
+        StarMap.lastZoom = this.cvs.zoom
     }
     
     onDeferredInit() {
@@ -54,8 +63,8 @@ class StarMap extends BaseMap {
             classNames: ['starmap-buttons'],
             children: [
                 ce({tag:'button', classNames: [(this.paused && !gs.location) || (!this.paused && gs.location) ? 'highlighted' : null] , innerHTML:this.paused ? '▶' : '⏸', onClick: () => this.togglePause()}),
-                ce({tag:'button', innerHTML:'+', onClick: () => this.cvs.adjustZoom(1.33)}),
-                ce({tag:'button', innerHTML:'-', onClick: () => this.cvs.adjustZoom(0.66)}),
+                ce({tag:'button', innerHTML:'+', onClick: () => this.adjustZoom(1.33)}),
+                ce({tag:'button', innerHTML:'-', onClick: () => this.adjustZoom(0.66)}),
                 ce({tag:'button', classNames: [gs.captain.skillPoints > 0 ? 'highlighted' : null], innerHTML:'?', onClick: () => this.openAssistant()}),
             ]
         })

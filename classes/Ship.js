@@ -19,7 +19,7 @@
  * @property {number} angle - The direction the ship is facing in radians.
  * @property {boolean} escaped - Indicates if the ship has escaped combat.
  * @property {number} maxActionsPerTurn - The maximum number of actions the ship can take per turn.
- * @property {number} numActionsRemaining - The number of actions remaining for the ship in the current turn.
+ * @property {number} actionsRemaining - The number of actions remaining for the ship in the current turn.
  * @property {any} aiType - The AI type of the ship (e.g., Ship, Asteroid).
  * @property {Array<ShipModule>} localModules - The modules installed locally on the ship.
  * @property {CountsMap} moduleCooldowns - A map tracking cooldowns for ship modules.
@@ -48,7 +48,7 @@ class Ship {
         this.angle = Math.PI*2; //direction ship is facing in. it can only accelerate/decelerate and shoot in that direction
         this.escaped = false;
         this.maxActionsPerTurn = maxActionsPerTurn;
-        this.numActionsRemaining = this.maxActionsPerTurn; //for encounter turn processing
+        this.actionsRemaining = this.maxActionsPerTurn; //for encounter turn processing
         this.aiType = null
         this.localModules = []
         this.moduleCooldowns = new CountsMap()
@@ -167,24 +167,22 @@ class Ship {
     }
 
     resetActions() {
-        this.numActionsRemaining = this.maxActionsPerTurn;
+        this.actionsRemaining = this.maxActionsPerTurn;
         
         // Check for SpeedModule - grants +1 action per turn
         const speedModule = this.modules.find(m => m.moduleType === SHIP_MODULE_TYPES.SPEED_MODULE)
-        if (speedModule) {
-            this.numActionsRemaining = this.numActionsRemaining + 1
+        if (speedModule && Math.random() > .8) {
+            this.actionsRemaining = this.actionsRemaining + 1
         }
-        console.log('checking for speed modules on ship:', this.name, this, this.modules, speedModule, this.numActionsRemaining);
-        
         // Commented out random slow - kept for reference
         // if (Math.random() < 0.1) {
-        //     this.numActionsRemaining = Math.max(1, this.numActionsRemaining - 1)
+        //     this.actionsRemaining = Math.max(1, this.actionsRemaining - 1)
         // }
     }
 
     spendAction() {
         const pseudoActions = []
-        this.numActionsRemaining = Math.max(0, this.numActionsRemaining - 1)
+        this.actionsRemaining = Math.max(0, this.actionsRemaining - 1)
         
         //we could later add dot damage here
 
@@ -294,7 +292,7 @@ class Ship {
     }
 
     get canRecharge() {
-        return !this.disabled && !this.escaped && !this.statusEffects.has(STATUS_EFFECTS.IONIZED)
+        return !this.disabled && !this.escaped && !this.statusEffects.has(STATUS_EFFECTS.IONIZED) && (this.shields[0] < this.shields[1])
     }
 
     get moduleSlots() {

@@ -69,9 +69,9 @@ const SHIP_TYPES_ALL = Object.values(SHIP_TYPES)
 const STARTING_SHIP_TYPE = new ShipType('Starting Ship', SHAPES.FilledTriangle, 1, 1, 1, 1, 1, 1, [], 1, 1)
 
 const ASTEROID_SHIP_TYPES = {
-    ASTEROID: new ShipType('Asteroid', SHAPES.FilledOval, 0.4, 0, 0, 8, 0.5, 1, [SHIP_MODULE_TYPES.MAGNETIZE], 0, 1),
-    CRYOID: new ShipType('Cryoid', SHAPES.FilledOval, 0.6, 0, 0, 8, 0.5, 1, [SHIP_MODULE_TYPES.SMOKE_BOMB], 0, 1),
-    PLASMOID: new ShipType('Plasmoid', SHAPES.FilledCircle, 0.5, 0.5, 0, 8, 0.5, 1, [SHIP_MODULE_TYPES.BOOSTER], 0, 1),
+    ASTEROID: new ShipType('Asteroid', SHAPES.FilledOval, 0.4, 0, 0, 5, 0.5, 1, [SHIP_MODULE_TYPES.MAGNETIZE], 0, 1),
+    CRYOID: new ShipType('Cryoid', SHAPES.FilledOval, 0.6, 0, 0, 4, 0.5, 1, [SHIP_MODULE_TYPES.SMOKE_BOMB], 0, 1),
+    PLASMOID: new ShipType('Plasmoid', SHAPES.FilledCircle, 0.5, 0.5, 0, 6, 0.5, 1, [SHIP_MODULE_TYPES.BOOSTER], 0, 1),
 }
 
 const ASTEROID_SHIP_TYPES_ALL = Object.values(ASTEROID_SHIP_TYPES)

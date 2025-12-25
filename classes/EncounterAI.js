@@ -7,7 +7,7 @@ class EncounterAI {
 
     calcShipsWithActions(fleet = new Fleet()) {
         console.log('EncounterAI.calcShipsWithActions', { fleet });
-        return fleet.activeShips.filter(s => s.numActionsRemaining > 0)
+        return fleet.activeShips.filter(s => s.actionsRemaining > 0)
     }
 
     calcNearestTarget(ship = new Ship()) {
@@ -65,7 +65,7 @@ class EncounterAI {
         let bestScore = -Infinity
         for (const ship of movableShips) {
             //always move ships with least remaining moves
-            const score = -ship.numActionsRemaining
+            const score = -ship.actionsRemaining
             if (score > bestScore) {
                 bestScore = score
                 bestShip = ship
@@ -291,10 +291,10 @@ class EncounterAI {
                 //attack targets if any available
                 return new LaserAction(encounter, ship, rndMember(attackableTargets))
             }
-            const inTheWayTargets = rammableTargets.filter(t => {
+            const inTheWayTargets = rammableTargets/* rammableTargets.filter(t => {
                 return this.calcIsFacing(ship, t)
-            })
-            if (inTheWayTargets.length > 0 && ship.canRam && Math.random() > .5) {
+            })*/
+            if (inTheWayTargets.length > 0 && ship.canRam) {
                 //ram targets that are in the way
                 const targetToRam = rndMember(inTheWayTargets)
                 return new RamAction(encounter, ship, targetToRam)

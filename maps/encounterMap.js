@@ -164,14 +164,16 @@ class EncounterMap extends BaseMap {
     }
 
     addEffectCanvasObject(effect = new Effect()) {
+        const onClick = ()=>{ this.selectObject(effect) }
+
         if (effect.effectType.shape == SHAPES.FilledOval) {
             const minorAxis = effect.radius * 0.5
-            this.cvs.addFilledOval(`effect${effect.uuid}`, effect.x, effect.y, effect.radius, minorAxis, 0.5, effect.effectType.color, effect.angle)
+            this.cvs.addFilledOval(`effect${effect.uuid}`, effect.x, effect.y, effect.radius, minorAxis, 0.5, effect.effectType.color, effect.angle, onClick)
         }
         else if (effect.effectType.shape == SHAPES.FilledRectangle) {
             const centerX = (effect.toX+effect.x)/2
             const centerY = (effect.toY+effect.y)/2
-            const cvsObj = this.cvs.addFilledRectangle(`effect${effect.uuid}`, centerX, centerY, effect.path.distance, effect.radius, 2, effect.effectType.color, effect.angle)
+            const cvsObj = this.cvs.addFilledRectangle(`effect${effect.uuid}`, centerX, centerY, effect.path.distance, effect.radius, 2, effect.effectType.color, effect.angle, onClick)
             console.log('added line effect to canvas:', effect, cvsObj)
         }
     }
@@ -262,7 +264,7 @@ class EncounterMap extends BaseMap {
             }
             else if (ship.fleet != activeTurnFleet) fontModifier = 'italic'
             else {
-                if (ship.numActionsRemaining == 0) fontModifier = null
+                if (ship.actionsRemaining == 0) fontModifier = null
                 else fontModifier = 'bold'
             }
             cvsLabelObject.fontModifier = fontModifier
@@ -327,11 +329,11 @@ class EncounterMap extends BaseMap {
 
         const container = ce({parent:this.objectPane, classNames:['starmap-object-panel']})
 
-        if (!this.selectedObject) {
+        if (!obj) {
             return;
         }
 
-        if (this.targetingLabel && this.targetingLabel.length > 0) {
+        if (this.targetingLabel && this.targetingLabel.length > 0 && obj instanceof Ship) {
             ce({parent:container, innerHTML: `${obj.shipType.name}: Targeting ${this.targetingLabel}`})
             ce({parent:container, innerHTML: '(Select target)'})
             ce({parent:container, tag:'button', innerHTML:'Cancel', onClick: ()=>{
@@ -350,7 +352,7 @@ class EncounterMap extends BaseMap {
             
             const showActions = combatEnabled && obj.fleet == playerFleet && !obj.escaped && !obj.disabled && activeTurnFleet == playerFleet
             console.log('showing actions with props:', { combatEnabled, isPlayerShip: obj.fleet == playerFleet, isEscaped: obj.escaped, disabled: obj.disabled, isPlayerTurn: activeTurnFleet == playerFleet })
-            const canAct = (obj.numActionsRemaining > 0) && (this.animations.length <= 0)
+            const canAct = (obj.actionsRemaining > 0) && (this.animations.length <= 0)
             ce({parent:container, style: {margin: 'auto'}, onClick: ()=>this.selectObject(obj), children:[
                 this.cvs.getObject(`ship${obj.uuid}`)?.asImage(25, COLORS.LightGreen) || null
             ]})
@@ -368,7 +370,7 @@ class EncounterMap extends BaseMap {
             if (obj.lasers > 0) ce({parent:container, innerHTML: `Lasers: ${statColorSpan(obj.lasers, obj.lasers/AVERAGE_SHIP_LASERS, true)}`})
             if (obj.engine) ce({parent:container,  innerHTML: `Engine: ${statColorSpan(obj.engine, obj.engine/AVERAGE_SHIP_ENGINE, true)}`})
             if (obj.radars) ce({parent:container, innerHTML: `Radars: ${statColorSpan(obj.radars, obj.radars/AVERAGE_SHIP_RADARS, true)}`})
-            ce({parent:container, innerHTML: `Actions: ${statColorSpan(obj.numActionsRemaining, obj.numActionsRemaining/2, true)}`})
+            ce({parent:container, innerHTML: `Actions: ${statColorSpan(obj.actionsRemaining, obj.actionsRemaining/2, true)}`})
             ce({parent:container, innerHTML: obj.disabled ? `(Disabled)` : obj.escaped ? '(Escaped)' : ''})
             if (showActions) {
                 ce({parent:container, tag:'button', innerHTML:'Shoot', disabled: !canAct || !obj.canShoot, onClick: ()=>this.moveHandlerMap.get(MOVE_TYPES.Laser).startTargeting(obj)})
@@ -390,14 +392,21 @@ class EncounterMap extends BaseMap {
                 }
             }
         }
+        else if (obj instanceof Effect) {
+            ce({parent:container, style: {margin: 'auto'}, onClick: ()=>this.selectObject(obj), children:[
+                this.cvs.getObject(`effect${obj.uuid}`)?.asImage(25, COLORS.LightGreen) || null
+            ]})
+        }
     }
 
+    /** @param {Ship|Effect} obj */
     selectObject(obj = new Ship()) {
         console.log('selected:',obj)
         if (this.onSelectObject) this.onSelectObject(obj);
         //if (this.uiMode !== UI_MODE.Default) return
         this.selectedObject = obj;
-        this.cvs.moveCameraTo(obj.x, obj.y)
+        //dont zoom onto effects, they can be way offscreen
+        if (obj instanceof Ship) this.cvs.moveCameraTo(obj.x, obj.y)
         this.refreshStrokeColors()
         this.refresh();
     }
@@ -422,7 +431,7 @@ class EncounterMap extends BaseMap {
     calcCanBeControlled(ship = new Ship()) {
         const {activeTurnFleet, playerFleet} = this.encounter
         if (ship.fleet != activeTurnFleet) return false
-        if (ship.numActionsRemaining <= 0) return false
+        if (ship.actionsRemaining <= 0) return false
         if (ship.fleet != playerFleet) return false
         return true
     }
@@ -496,11 +505,11 @@ class EncounterMap extends BaseMap {
         if (!isComplete) return false
         encounter.handleTurnComplete()
         for (const ship of encounter.activeTurnFleet.activeShips) {
-            if (ship.numActionsRemaining > ship.maxActionsPerTurn) {
+            if (ship.actionsRemaining > ship.maxActionsPerTurn) {
                 const txt = this.cvs.addText(`fast_${ship.uuid}`, ship.x, ship.y, 0, -DEFAULT_FONT_SIZE, 'Fast!', COLORS.LightGreen)
                 txt.setDurationMs()
             }
-            else if (ship.numActionsRemaining < ship.maxActionsPerTurn) {
+            else if (ship.actionsRemaining < ship.maxActionsPerTurn) {
                 const txt = this.cvs.addText(`slow_${ship.uuid}`, ship.x, ship.y, 0, -DEFAULT_FONT_SIZE, 'Slow!', COLORS.LightRed)
                 txt.setDurationMs() 
             }

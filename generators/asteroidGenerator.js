@@ -1,4 +1,6 @@
-function generateAsteroidBelts(radius = 1, numBelts = 1) {
+
+//need a really big overhaul here if we move to randomly generated asteroid belts
+/*function generateAsteroidBelts(radius = 1, numBelts = 1) {
     const asteroidBelts = []
     const beltDistances = []
     beltLoop: for (let i = 0; i < numBelts; i++) {
@@ -16,9 +18,9 @@ function generateAsteroidBelts(radius = 1, numBelts = 1) {
         asteroidBelts.push(belt)
     }
     return asteroidBelts
-}
+}*/
 
-function generateAsteroids(asteroidBelt = new AsteroidBelt(), averageColor = COLORS.Gray, numAsteroids = 1000, maxRadiusDifference = 0.2) {
+function generateAsteroids(asteroidBelt = new AsteroidBelt(), averageColor = COLORS.Gray, numAsteroids = 1000, maxRadiusDifference = 0.2, startingProgress = null, maxProgressDifference = 1) {
     const asteroids = []
     const beltDistance = asteroidBelt.orbit.radius
 
@@ -37,7 +39,8 @@ function generateAsteroids(asteroidBelt = new AsteroidBelt(), averageColor = COL
         const color = randomizeColor(averageColor, 32)
         //minutes
         const radius = Math.min(rng(3, 0.5, false), rng(3, 0.5, false), rng(3, 0.5, false), rng(3, 0.5, false), rng(3, 0.5, false))
-        const asteroid = new Asteroid("", color, radius, x, y, new Orbit(distance, Math.random()))
+        const progress = startingProgress !== null ? startingProgress + rng(maxProgressDifference, 0, false) - rng(maxProgressDifference, 0, false) : Math.random()
+        const asteroid = new Asteroid("", color, radius, x, y, new Orbit(distance, progress), asteroidBelt)
         asteroids.push(asteroid)
     }
     return asteroids

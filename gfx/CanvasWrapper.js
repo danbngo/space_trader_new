@@ -221,6 +221,14 @@ class CanvasWrapper {
             const textHeight = obj.size
             if (!isPointInRect(mouseX, mouseY, ox-textWidth/2, oy-textHeight/2, textWidth, textHeight)) return false
         }
+        if (obj.shape == SHAPES.FilledOval || obj.shape == SHAPES.EmptyOval) {
+            const ellipse = new Ellipse(ox, oy, Math.max(obj.size * this.zoom, obj.minScreenSize)/this.pixelRatio, Math.max((obj.minorSize || obj.size) * this.zoom, obj.minScreenSize)/this.pixelRatio, obj.angle);
+            if (!ellipse.containsPoint(mouseX, mouseY)) return false
+        }
+        else if (obj.shape == SHAPES.FilledRectangle) {
+            const rect = new Rectangle(ox, oy, Math.max(obj.size * this.zoom, obj.minScreenSize)/this.pixelRatio, Math.max((obj.minorSize || obj.size) * this.zoom, obj.minScreenSize)/this.pixelRatio, obj.angle);
+            if (!rect.containsPoint(mouseX, mouseY)) return false
+        }
         else {
             // basic circular hitbox for all shapes for now
             const dist = Math.hypot(ox - mouseX, oy - mouseY);
@@ -310,7 +318,7 @@ class CanvasWrapper {
     recalculateDrawOrder() {
         // Sort so dots at bottom, text at top
         const sorted = [...this.drawOrder].sort((a, b) => {
-            const order = { Line: 0, EmptyCircle: 1, FilledCircle: 2, FilledOval: 3, Triangle: 4, Text: 5 };
+            const order = { Line: 0, EmptyCircle: 1, EmptyOval: 2, EmptyTriangle: 3, FilledRectangle: 4, FilledCircle: 5, FilledOval: 6, Triangle: 7, Text: 8 };
             return order[a.shape] - order[b.shape];
         });
         this.drawOrder = sorted

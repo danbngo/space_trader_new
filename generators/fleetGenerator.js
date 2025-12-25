@@ -19,7 +19,7 @@ function generateFleet(fleetType = rndMember(FLEET_TYPES_ALL), planet = new Plan
     for (let i = 0; i < numShips; i++) {
         const shipType = i == 0 ? fleetType.shipTypes[0] : rndMember(fleetType.shipTypes)
         ships.push(generateShip(shipType, planet))
-        console.log('generated ship:',ships[ships.length-1])
+        //console.log('generated ship:',ships[ships.length-1])
     }
     if (ships.length == 0) {
         console.log({ fleetType, planet, numShips, populationMod})

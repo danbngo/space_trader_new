@@ -20,8 +20,9 @@ function describeTimespan(years = 0) {
 }
 
 function coloredName(obj = new SpaceObject()) {
-    let name = obj.name
+    let name = obj.name ? obj.name : ''
     if (obj instanceof Ship) name = obj.shipType.name
+    if (obj instanceof Effect) name = obj.effectType.name
 
     return `${colorSpan(name, colorArrToRgbaString(obj.color))}`
 }

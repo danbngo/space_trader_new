@@ -28,7 +28,7 @@ class ActionHandler {
     calcCanBeControlled(ship = new Ship()) {
         const {activeTurnFleet, playerFleet} = this.encounter
         if (ship.fleet != activeTurnFleet) return false
-        if (ship.numActionsRemaining <= 0) return false
+        if (ship.actionsRemaining <= 0) return false
         if (ship.fleet != playerFleet) return false
         return true
     }

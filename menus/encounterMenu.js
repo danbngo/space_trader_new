@@ -8,27 +8,24 @@ function startEncounter(encounter = gs.encounter) {
     const maxSpawnDistance = encounter.mapRadius*ENCOUNTER_SHIP_MAX_SPAWN_DISTANCE_RATIO
     const minSpawnDistance = maxSpawnDistance/5
 
-    let stormAngles = [rng(Math.PI/2, -Math.PI/2, false)]//, rng(Math.PI + Math.PI/2, Math.PI - Math.PI/2, false)]
-
     for (const ship of ships) {
         ship.resetCombatVars()
     }
 
     for (const ship of playerShips) {
-        const [x,y] = rotatePoint(rng(maxSpawnDistance, minSpawnDistance/2, false), 0, 0, 0, rng(Math.PI + Math.PI/2, Math.PI -Math.PI/2, false))
+        const [x,y] = rotatePoint(rng(maxSpawnDistance, minSpawnDistance/2, false), 0, 0, 0, rng(Math.PI + Math.PI/4, Math.PI  -Math.PI/4, false))
         Object.assign(ship, {x, y})
     }
     for (const ship of enemyShips) {
         Object.assign(ship, {color: encounter.encounterType.enemyColor})
         if (formationType == FORMATION_TYPES.FaceOff) {
-            const [x,y] = rotatePoint(rng(maxSpawnDistance, minSpawnDistance, false), 0, 0, 0, rng(Math.PI/2, -Math.PI/2, false))
+            const [x,y] = rotatePoint(rng(maxSpawnDistance, minSpawnDistance, false), 0, 0, 0, rng(0 + Math.PI/4, 0 -Math.PI/4, false))
             Object.assign(ship, {x, y})
         }
         else if (formationType == FORMATION_TYPES.Storm) {
-            const stormAngle = rndMember(stormAngles)
-            const angle = stormAngle + rng(Math.PI/2, -Math.PI/2, false)
-            const [x,y] = rotatePoint(rng(encounter.mapRadius, maxSpawnDistance, false), 0, 0, 0, angle + Math.PI*rng(1.25,0.75,false))
-            Object.assign(ship, {x, y, angle})
+            let [x,y] = rotatePoint(rng(encounter.mapRadius*0.9, minSpawnDistance, false), 0, 0, 0, rng(0 + Math.PI*3/4, 0 -Math.PI*3/4, false))
+            x += rng(encounter.mapRadius*2, 0, false)
+            Object.assign(ship, {x, y})
         }
     }
     for (const ship of playerShips) {
@@ -47,8 +44,8 @@ function startEncounter(encounter = gs.encounter) {
             }
         }
         else if (formationType == FORMATION_TYPES.Storm) {
-            //const angle = rng(stormAngle + Math.PI/8, stormAngle - Math.PI/8, false)
-            //Object.assign(ship, {angle})
+            const angle = rng(Math.PI + Math.PI/4, Math.PI - Math.PI/4, false)
+            Object.assign(ship, {angle})
         }
     }
 
@@ -206,7 +203,7 @@ function showTradeOfferPlayerSellModal() {
     if (!(ct instanceof CargoType)) throw new Error('wrong cargo type!')
     let onSell = null;
 
-    msg += `The merchants look through your wares.<br/>`
+    msg += `The ${fleetName} look through your wares.<br/>`
 
     if (!ct || gs.fleet.cargo.getAmount(ct) <= 0) {
         msg += `Finding no cargo aboard, they chide you for your lack of industry in the mercantile arena.<br/>`
@@ -224,7 +221,7 @@ function showTradeOfferPlayerSellModal() {
             gs.credits += finalSale
             showModal(fleetName, 
                 `You sold ${sellAmount} units of ${ct.name} for ${totalPrice}CR${officersShare ? ` (-${officersShare}CR for officers)` : ''}.<br/>
-                The merchants thank you and tell you to come again!<br/>`, [['Continue', ()=>endEncounter()]])
+                The ${fleetName} thank you and tell you to come again!<br/>`, [['Continue', ()=>endEncounter()]])
         }
 
         msg += `They offer to buy ${sellAmount} ${ct.name} for ${pricePerUnit}CR each (total: ${totalPrice}CR).<br/>`
@@ -249,7 +246,7 @@ function showTradeOfferPlayerBuyModal() {
     const availableCargoSpace = gs.fleet.availableCargoSpace
     let onBuy = null;
 
-    msg += `The merchants proudly display their wares.<br/>`
+    msg += `The ${fleetName} proudly display their wares.<br/>`
     if (!ct || gs.encounter.fleet.cargo.getAmount(ct) <= 0) {
         msg += `Unfortunately, they have nothing of interest to sell you.<br/>`
     }
@@ -261,18 +258,25 @@ function showTradeOfferPlayerBuyModal() {
         const buyAmount = rng(maxBuyAmount, 1)
         const pricePerUnit = Math.ceil(ct.value * rng(1.5, 0.75, false))
         const totalPrice = pricePerUnit * buyAmount
-        onBuy = () => {
-            gs.encounter.fleet.cargo.increment(ct, -buyAmount)
-            gs.fleet.cargo.increment(ct, buyAmount)
-            gs.credits -= totalPrice
-            showModal(fleetName, 
-                `You bought ${buyAmount} units of ${ct.name} for ${totalPrice}CR.<br/>
-                The merchants thank you and tell you to come again!<br/>`, [['Continue', ()=>endEncounter()]])
-        }
         msg += `They offer to sell you ${buyAmount} ${ct.name} for ${pricePerUnit}CR each (total: ${totalPrice}CR).<br/>`
-        msg += `Price vs. Market: ${roundToPlaces(100*pricePerUnit/ct.value,2)}%<br/>`
-        msg += `Your amount after purchase: ${gs.fleet.cargo.getAmount(ct) + buyAmount}<br/>`
-        msg += `Your CR after purchase: ${gs.credits - totalPrice}CR.<br/>`
+
+        if (gs.credits < totalPrice) {
+            msg += `The ${fleetName} shake their heads pityingly upon realizing you cannot afford their offer.<br/>`
+        }
+        else {
+            msg += `Price vs. Market: ${roundToPlaces(100*pricePerUnit/ct.value,2)}%<br/>`
+            msg += `Your amount after purchase: ${gs.fleet.cargo.getAmount(ct) + buyAmount}<br/>`
+            msg += `Your CR after purchase: ${gs.credits - totalPrice}CR.<br/>`
+
+            onBuy = () => {
+                gs.encounter.fleet.cargo.increment(ct, -buyAmount)
+                gs.fleet.cargo.increment(ct, buyAmount)
+                gs.credits -= totalPrice
+                showModal(fleetName, 
+                    `You bought ${buyAmount} units of ${ct.name} for ${totalPrice}CR.<br/>
+                    The merchants thank you and tell you to come again!<br/>`, [['Continue', ()=>endEncounter()]])
+            }
+        }
     }
     showModal(fleetName, msg, onBuy ? [
         ['Buy', ()=>onBuy()],
@@ -441,7 +445,7 @@ function showPlayerDefeatedByHazardsModal() {
 
 function showPlayerDefeatedByPiratesModal() {
     console.log('showPlayerDefeatedByPiratesModal');
-    const {fleetName, fleet, encounter, disabledPlayerShips} = gs.encounter
+    const {fleetName, fleet, disabledPlayerShips} = gs.encounter
     let msg = `Unfortunately, you were no match for the ${fleetName}.<br/>`
 
     if (disabledPlayerShips.length > 0) {
@@ -450,7 +454,7 @@ function showPlayerDefeatedByPiratesModal() {
     }
 
     msg += `Now that the fighting is over, the ${fleetName} eagerly board your ships.<br/>`
-    const lootableCargoAmount = fleet.cargo.total
+    const lootableCargoAmount = gs.fleet.cargo.total
     if (lootableCargoAmount <= 0) {
         msg += 'They are disgusted to find nothing worth looting!<br/>'
     }
@@ -584,6 +588,16 @@ function repairRandomly(ships = [], repairedAmt = 0) {
         if (damagedShips.length <= 0) break
         const ship = rndMember(damagedShips)
         ship.repairHull(1)
+    }
+    
+}
+function damageRandomly(ships = [], dmg = 0) {
+    if (ships.length <= 0 || dmg <= 0) return
+    for (let i=0; i<dmg; i++) {
+        const harmableShips = ships.filter(s=>s.hull[0] > 0)
+        if (harmableShips.length <= 0) break
+        const ship = rndMember(harmableShips)
+        ship.takeDamage(1, true)
     }
 }
 

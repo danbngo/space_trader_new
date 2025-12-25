@@ -1,7 +1,8 @@
 function generateEffects(encounterType, effectTypes = EFFECT_TYPES_ALL) {
     const mapRadius = encounterType.mapRadius
     const effects = []
-    const numToGenerate = rng(15, 5, false)
+    //now that effectTypes is an array and not a list, we want to generate only a few per effect
+    const numToGenerate = effectTypes.length*2//rng(15, 5, false)
 
     function isTooCloseToExistingEffect(newEffect, minDistance = -15) {
         for (const effect of effects) {
@@ -48,16 +49,19 @@ function generateEffects(encounterType, effectTypes = EFFECT_TYPES_ALL) {
 }
 
 function generateEffect(effectType = rndMember(EFFECT_TYPES_ALL), x = 0, y = 0, toX = null, toY = null) {
+    let effect;
     if (effectType === EFFECT_TYPES.ION_CLOUD) {
-        return new IonCloudEffect(x, y)
+        effect = new IonCloudEffect(x, y)
     }
     else if (effectType === EFFECT_TYPES.DEBRIS_CLOUD) {
-        return new DebrisCloudEffect(x, y)
+        effect = new DebrisCloudEffect(x, y)
     }
     else if (effectType === EFFECT_TYPES.ICE_CLOUD) {
-        return new IceCloudEffect(x, y)
+        effect = new IceCloudEffect(x, y)
     }
     else if (effectType === EFFECT_TYPES.PLASMA_TRAIL) {
-        return new PlasmaTrailEffect(x, y, toX, toY)
+        effect = new PlasmaTrailEffect(x, y, toX, toY)
     }
+    effect.radius *= rng(AMBIENT_EFFECT_MAX_RADIUS_MODIFIER, AMBIENT_EFFECT_MIN_RADIUS_MODIFIER)
+    return effect
 }

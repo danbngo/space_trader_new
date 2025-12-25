@@ -93,16 +93,16 @@ function normalizeAngle(angle = Math.PI*4) {
 function rndIndexWeighted(weights = [1]) {
     if (!weights || weights.length === 0) return -1;
 
-    console.log('rnd index weighted called w weights:',weights);
+    //console.log('rnd index weighted called w weights:',weights);
 
     const totalWeight = weights.reduce((sum, w) => sum + w, 0);
     if (totalWeight <= 0) return -1;
 
-    console.log('total weight:',totalWeight);
+    //console.log('total weight:',totalWeight);
 
     let r = Math.random() * totalWeight;
     for (let i = 0; i < weights.length; i++) {
-        console.log('i,r selected:',i,r,'weights[i]:',weights[i]);
+        //console.log('i,r selected:',i,r,'weights[i]:',weights[i]);
         if (r < weights[i]) return i;
         r -= weights[i];
     }

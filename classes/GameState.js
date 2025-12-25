@@ -8,7 +8,7 @@ class GameState {
         const playerShip = new Ship("Starting Ship", STARTING_SHIP_TYPE, COLORS.LightGray, [30,30], [20,20], 100, 10, 10, 10)
         
         // Give player all modules for testing
-        /*playerShip.localModules = [
+        playerShip.localModules = [
             new ShipModule(SHIP_MODULE_TYPES.CLOAK, 1),
             new ShipModule(SHIP_MODULE_TYPES.MAGNETIZE, 1),
             new ShipModule(SHIP_MODULE_TYPES.WARHEAD, 1),
@@ -17,7 +17,7 @@ class GameState {
             new ShipModule(SHIP_MODULE_TYPES.BOOSTER, 1),
             new ShipModule(SHIP_MODULE_TYPES.SMOKE_BOMB, 1),
             new ShipModule(SHIP_MODULE_TYPES.SPEED_MODULE, 1)
-        ]*/
+        ]
 
         // Create fleet
         this.fleet = new Fleet(

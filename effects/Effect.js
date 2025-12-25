@@ -41,6 +41,6 @@ class Effect {
     onTurnEnd() {
         if (this.remainingTurns == null || this.duration == null) return //some clouds can be permanent
         this.remainingTurns -= 1
-        this.radius = this.initialRadius * (0.1 + 0.9 * (this.remainingTurns / this.duration))
+        this.radius = this.initialRadius * (0.25 + 0.75 * (this.remainingTurns / this.duration))
     }
 }

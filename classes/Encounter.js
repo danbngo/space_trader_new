@@ -35,7 +35,7 @@ class Encounter {
         //console.log('Encounter.isTurnComplete', { activeTurnFleet: this.activeTurnFleet });
         const activeFleetShips = this.activeTurnFleet.ships.filter(s=>(!s.disabled && !s.escaped))
         for (const ship of activeFleetShips) {
-            if (ship.numActionsRemaining > 0) {
+            if (ship.actionsRemaining > 0) {
                 return false
             }
         }
@@ -47,7 +47,7 @@ class Encounter {
         if (!this.isTurnComplete()) return
         this.encounterType.onEndTurn?.(this)
         for (const ship of this.activeTurnFleet.ships) {
-            ship.numActionsRemaining = 0
+            ship.actionsRemaining = 0
             // Decrement module cooldowns
             for (const moduleType of Object.values(SHIP_MODULE_TYPES)) {
                 const currentCooldown = ship.moduleCooldowns.getAmount(moduleType)
@@ -197,9 +197,13 @@ class Encounter {
         
         // Check if ship escaped map
         const distanceFromCenter = calcDistance(0, 0, ship.x, ship.y)
+
+        //fooroids only escape if they reached the left side of the screen
         if (distanceFromCenter > this.mapRadius) {
-            pseudoActions.push(ShipAction.getDamageAction(this, ship, 0, 0, false, true))
-            ship.escaped = true
+            if (ship.aiType != AI_TYPES.Asteroid || ship.x < 0) {
+                pseudoActions.push(ShipAction.getDamageAction(this, ship, 0, 0, false, true))
+                ship.escaped = true
+            }
         }
         return pseudoActions
     }

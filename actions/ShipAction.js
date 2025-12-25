@@ -55,11 +55,11 @@ class ShipAction {
 
         const result = []
 
-        if (actorHullDamage > 0) {
+        if (actorHullDamage) {
             result.push(cvs.addText(`${popupId}_actor_hull`, actor.x, actor.y, 0, actorYOffset, `${dnc(-actorHullDamage)}hp`, COLORS.LightGray))
             actorYOffset -= DEFAULT_FONT_SIZE
         }
-        if (actorShieldDamage > 0) {
+        if (actorShieldDamage) {
             result.push(cvs.addText(`${popupId}_actor_shield`, actor.x, actor.y, 0, actorYOffset, `${dnc(-actorShieldDamage)}sp`, COLORS.Blue))
             actorYOffset -= DEFAULT_FONT_SIZE
         }
@@ -80,11 +80,11 @@ class ShipAction {
             actorYOffset -= DEFAULT_FONT_SIZE
         }
 
-        if (targetHullDamage > 0) {
+        if (targetHullDamage) {
             result.push(cvs.addText(`${popupId}_target_hull`, target.x, target.y, 0, targetYOffset, `${dnc(-targetHullDamage)}hp`, COLORS.LightGray))
             targetYOffset -= DEFAULT_FONT_SIZE
         }
-        if (targetShieldDamage > 0) {
+        if (targetShieldDamage) {
             result.push(cvs.addText(`${popupId}_target_shield`, target.x, target.y, 0, targetYOffset, `${dnc(-targetShieldDamage)}sp`, COLORS.Blue))
             targetYOffset -= DEFAULT_FONT_SIZE
         }
