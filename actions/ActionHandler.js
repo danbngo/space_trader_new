@@ -55,7 +55,6 @@ class ActionHandler {
             ActionHandler.checkOnDisabledEffects(a)
             a.addPopups(this.encounterMap.cvs)
         }
-
         this.encounterMap.refresh()
     }
 

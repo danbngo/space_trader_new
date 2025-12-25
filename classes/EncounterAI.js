@@ -103,7 +103,7 @@ class EncounterAI {
                     }
                 }
             }
-            const moveScore = distanceScore * 0.5 + angleScore * 0.5 + hazardPenalty
+            const moveScore = distanceScore * 0.75 + angleScore * 0.25 + hazardPenalty
             if (moveScore < bestMoveScore) {
                 bestMoveScore = moveScore
                 bestMove = [toX, toY]

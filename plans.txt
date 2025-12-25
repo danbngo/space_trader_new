@@ -4,18 +4,18 @@ CHECKED: -academy improvements - let players pay money for skills, some are chea
  -good way to improve - only grant cargo for meteors you personally destroyed
 -split up bounties, maybe reputation, by planet
 -make the "fast!" status effect come from a module and remove the "slow!" one
+-mining still feels off. too tedious, too much stuff happening on screen. maybe make few asteroids that are much more dangerous-damage text isnt showing on the very last action of a turn
+-loot seems skewed after asteroid mining - seems rare stuff is dropping more than non-rare?? simulate this.
 
 NEXT UP:
--mining still feels off. too tedious, too much stuff happening on screen. maybe make few asteroids that are much more dangerous-damage text isnt showing on the very last action of a turn
--plasmoids arent colored properly (new ones that spawned)
--in general, add some modules that do things other than grant new moves-regen, etc.
--loot seems skewed after asteroid mining - seems rare stuff is dropping more than non-rare?? simulate this.
+-asteroids changing shape each turn, probably has to do with them being ellipses
 -make spinning or being rammed animated - use new shipactions and/or anim handlers (not just pseudo)
+-in general, add some modules that do things other than grant new moves-regen, etc.
 
 -saving/loading (this is a big milestone, if you're ready for this means game is almost ready for release)
 
 take on bounty missions ?? letter of marque??
-
+b
 
 
 

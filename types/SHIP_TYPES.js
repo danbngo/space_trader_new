@@ -45,7 +45,8 @@ class ShipType {
         this.maxNumModules = maxNumModules
         this.maxActionsPerTurn = maxActionsPerTurn
         this.onDisabled = null
-        this.radiusModifier = 1
+        this.minRadiusModifier = 1
+        this.maxRadiusModifier = 1
     }
 }
 
@@ -75,7 +76,10 @@ const ASTEROID_SHIP_TYPES = {
 
 const ASTEROID_SHIP_TYPES_ALL = Object.values(ASTEROID_SHIP_TYPES)
 
-for (const st of ASTEROID_SHIP_TYPES_ALL) st.radiusModifier = 5
+for (const st of ASTEROID_SHIP_TYPES_ALL) {
+    st.minRadiusModifier = 1
+    st.maxRadiusModifier = 5
+}
 
 ASTEROID_SHIP_TYPES.ASTEROID.onDisabled = (died = new Ship(), encounter = new Encounter())=>{
     console.log('Asteroid.onDisabled', { died, encounter });

@@ -34,6 +34,10 @@ class RamAction extends ShipAction {
             target.incrementAngle(rng(Math.PI/2, -Math.PI/2, false))
 
             pseudoActions.push(...this.encounter.checkShipMovementEffects(target))
+
+            const collisionActions = this.handleCollisions()
+            pseudoActions.push(...collisionActions)
+
             Object.assign(this, {actorHullDamage, actorShieldDamage, actorDisabled, targetHullDamage, targetShieldDamage, targetDisabled})
         }
 

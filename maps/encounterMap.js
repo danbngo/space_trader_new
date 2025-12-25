@@ -61,7 +61,7 @@ class EncounterMap extends BaseMap {
         if (this.animations.length > 0) return;
         if (this.checkEncounterOver()) return;
         if (this.checkTurnComplete()) {
-            this.rebuildCanvas() //in case new ships were added
+            //this.rebuildCanvas() //in case new ships were added
             this.refreshCanvas(true)
         }
         this.handleEnemyActions()

@@ -56,6 +56,7 @@ class Ship {
         this.disabledByShip = null
 
         this.uuid = generateUUID('ship_');
+        this.radiusModifier = this.shipType ? rng(this.shipType.maxRadiusModifier, this.shipType.minRadiusModifier, false) : 1;
     }
 
     get modules() {
@@ -69,7 +70,7 @@ class Ship {
 
     get radius() {
         //use formula based on mass and radius of a sphere
-        return BASE_SHIP_RADIUS_IN_MILES * (1+Math.sqrt(this.mass)) * this.shipType.radiusModifier
+        return BASE_SHIP_RADIUS_IN_MILES * (1+Math.sqrt(this.mass)) * this.radiusModifier
     }
 
     get mass() {

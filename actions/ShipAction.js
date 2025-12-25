@@ -47,6 +47,7 @@ class ShipAction {
     }
 
     addPopups(cvs = new CanvasWrapper()) {
+        console.log('adding popups for action', this, 'to canvas:', cvs);
         const {actor, target, actorBadMessage, targetBadMessage, targetGoodMessage, actorGoodMessage, actorHullDamage, actorShieldDamage, actorDisabled, actorEscaped, targetHullDamage, targetShieldDamage, targetDisabled, targetEscaped} = this
         const popupId = `action_${Date.now()}_${Math.random()}`
         let actorYOffset = -DEFAULT_FONT_SIZE
@@ -106,6 +107,8 @@ class ShipAction {
 
         for (const r of result) r.setDurationMs()
 
+        console.log('ShipAction.addPopups result:', result)
+
         return result
     }
 
@@ -117,4 +120,69 @@ class ShipAction {
         pseudoShipAction.targetEscaped = escaped
         return pseudoShipAction
     }
+
+    handleCollisions() {
+        const pseudoActions = []
+        const COLLISION_BUFFER = 0.1 // Small additional amount for collision detection
+        const PUSH_DISTANCE_MULTIPLIER = 1.2 // How far to push ships away
+        const COLLISION_DAMAGE = 3 // Damage dealt on collision
+        
+        // Check all other ships in the encounter
+        for (const otherShip of this.encounter.ships) {
+            // Skip self, disabled ships, and escaped ships
+            if (otherShip === this.actor || otherShip.disabled || otherShip.escaped) continue
+            
+            // Calculate distance between ships
+            const distance = calcDistance(this.actor.x, this.actor.y, otherShip.x, otherShip.y)
+            const collisionRadius = this.actor.radius + otherShip.radius + COLLISION_BUFFER
+            
+            // Check if ships are overlapping
+            if (distance < collisionRadius) {
+                console.log('Ship collision detected:', this.actor.name, otherShip.name, distance, collisionRadius)
+                
+                // Calculate angle from moving ship to other ship
+                const dx = otherShip.x - this.actor.x
+                const dy = otherShip.y - this.actor.y
+                const angle = Math.atan2(dy, dx)
+                
+                // Calculate push distance (enough to separate them)
+                const pushDistance = (collisionRadius - distance) * PUSH_DISTANCE_MULTIPLIER
+                
+                // Calculate new position for the other ship
+                const x = otherShip.x + Math.cos(angle) * pushDistance
+                const y = otherShip.y + Math.sin(angle) * pushDistance
+                
+                // Push the other ship away
+                Object.assign(otherShip, {x, y})
+                pseudoActions.push(...this.encounter.checkShipMovementEffects(otherShip))
+                
+                // Check if ships are enemies
+                const areEnemies = (this.actor.fleet !== otherShip.fleet)
+                
+                if (areEnemies) {
+                    // Deal collision damage to both ships
+                    console.log('Enemy collision - dealing damage to both ships')
+                    
+                    // Damage to the other ship
+                    const damageAction1 = ShipAction.getDamageAction(
+                        this.encounter, 
+                        otherShip, 
+                        COLLISION_DAMAGE, 
+                    )
+                    pseudoActions.push(damageAction1)
+                    
+                    // Damage to the moving ship
+                    const damageAction2 = ShipAction.getDamageAction(
+                        this.encounter, 
+                        this.actor, 
+                        COLLISION_DAMAGE, 
+                    )
+                    pseudoActions.push(damageAction2)
+                }
+            }
+        }
+        
+        return pseudoActions
+    }
+
 }

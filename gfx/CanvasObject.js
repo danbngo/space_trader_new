@@ -141,7 +141,7 @@ class CanvasObject {
         return [this.fillColor[0], this.fillColor[1], this.fillColor[2], alpha]
     }
 
-    refresh(currentMs) {
+    refresh(currentMs = Date.now()) {
         if (!this.durationMs) return
         if (this.isExpired(currentMs)) {
             this.visible = false

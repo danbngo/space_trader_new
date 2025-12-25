@@ -13,13 +13,13 @@ function generateEffects(encounterType, effectTypes = EFFECT_TYPES_ALL) {
 
     for (let i = 0; i < numToGenerate; i++) {
         const effectType = rndMember(effectTypes)
-        const dist = mapRadius * (0.5 + Math.max(rng(1, 0, false), rng(0.6, 0, false))) //bias away from center
+        const dist = mapRadius * (0.5 + rng(0.5, 0, false)) //bias away from center
         let effect;
 
         if (effectType.shape === SHAPES.FilledOval) {
-            let [x,y] = rotatePoint(rng(dist, 0, false), 0, 0, 0, rng(Math.PI*2, -Math.PI*2, false))
-            const dist2 = mapRadius * (0.5 + Math.max(rng(1, 0, false), rng(0.6, 0, false))) //bias away from center
-            let [toX,toY] = rotatePoint(rng(dist2, 0, false), 0, 0, 0, rng(Math.PI*2, -Math.PI*2, false))
+            let [x,y] = rotatePoint(dist, 0, 0, 0, rng(Math.PI*2, -Math.PI*2, false))
+            const dist2 = mapRadius * (0.5 + rng(0.5, 0, false)) //bias away from center
+            let [toX,toY] = rotatePoint(dist2, 0, 0, 0, rng(Math.PI*2, -Math.PI*2, false))
             //beams are cooler when they go REALLY far
             //if effect would overlap with existing, skip it
             effect = generateEffect(effectType, x, y, toX, toY)
@@ -27,7 +27,7 @@ function generateEffects(encounterType, effectTypes = EFFECT_TYPES_ALL) {
         }
         else if (effectType.shape == SHAPES.FilledRectangle) {
             //make beams very long - extend 4x map radius in both directions from center point
-            let [cx,cy] = rotatePoint(rng(dist, 0, false), 0, 0, 0, rng(Math.PI*2, -Math.PI*2, false))
+            let [cx,cy] = rotatePoint(dist, 0, 0, 0, rng(Math.PI*2, -Math.PI*2, false))
             const angle = rng(Math.PI*2, -Math.PI*2, false)
             const beamExtent = mapRadius * 4 // Extend 4x map radius from center
             // Calculate start and end points that extend far in both directions through cx,cy

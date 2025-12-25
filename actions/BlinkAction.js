@@ -26,7 +26,6 @@ class BlinkAction extends ShipAction {
         // Check if ship escaped the map
         pseudoActions.push(...this.encounter.checkShipMovementEffects(ship))
         
-        
         ship.moduleCooldowns.setAmount(SHIP_MODULE_TYPES.BLINK, SHIP_MODULE_TYPES.BLINK.cooldown)
         this.completed = true
         return pseudoActions
