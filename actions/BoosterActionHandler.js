@@ -20,7 +20,7 @@ class BoosterActionHandler extends ActionHandler {
         
         // Click anywhere to confirm boost
         this.cvs.onClickWorldXY = (x, y) => this.attempt(attacker)
-        
+        this.encounterMap.cvs.objClickEnabled = false
         this.encounterMap.startTargeting('Booster', [boostLine], [])
     }
 
@@ -31,6 +31,7 @@ class BoosterActionHandler extends ActionHandler {
     attempt(attacker = new Ship()) {
         console.log('BoosterActionHandler.attempt', { attacker });
         const action = new BoosterAction(this.encounter, attacker)
+        this.encounterMap.cvs.objClickEnabled = true
         this.execute(action)
     }
 

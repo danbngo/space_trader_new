@@ -21,6 +21,43 @@ class Encounter {
         this.luck = [Math.random(),Math.random(),Math.random(),Math.random(),Math.random()] //used for initial encounter decisions
         this.fleetName = this.planet ? `${this.planet.ianName} ${this.encounterType.name}` : this.encounterType.name
         this.effects = effects
+
+        this.playerShipHullsAtStart = new Map()
+        for (const ship of this.playerShips) {
+            this.playerShipHullsAtStart.set(ship, ship.hull[0])
+        }
+    }
+
+    calcPlayerHullDamages() {
+        let totalDamage = 0
+        for (const ship of this.playerShips) {
+            const hullAtStart = this.playerShipHullsAtStart.get(ship) || ship.hull[1]
+            const damage = hullAtStart - ship.hull[0]
+            if (damage > 0) totalDamage += damage
+        }
+        return totalDamage
+    }
+
+    calcPlayerRepairableHull() {
+        let totalRepairable = 0
+        for (const ship of this.playerShips) {
+            if (ship.disabled) continue
+            const hullAtStart = this.playerShipHullsAtStart.get(ship) || ship.hull[1]
+            const repairable = hullAtStart - ship.hull[0]
+            if (repairable > 0) totalRepairable += repairable
+        }
+        return totalRepairable
+    }
+
+    calcPlayerDamagedShips() {
+        const damagedShips = []
+        for (const ship of this.playerShips) {
+            const hullAtStart = this.playerShipHullsAtStart.get(ship) || ship.hull[1]
+            if (ship.hull[0] < hullAtStart && !ship.disabled) {
+                damagedShips.push(ship)
+            }
+        }
+        return damagedShips
     }
 
     get disabledPlayerShips () { return this.playerShips.filter(s=>(s.disabled)) }

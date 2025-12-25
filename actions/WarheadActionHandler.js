@@ -21,7 +21,7 @@ class WarheadActionHandler extends ActionHandler {
         
         this.cvs.onClickWorldXY = (x, y) => this.attempt(attacker, targetArea, x, y)
         this.cvs.onMouseMoveWorldXY = (x, y) => this.target(x, y, targetArea)
-        
+        this.encounterMap.cvs.objClickEnabled = false
         this.encounterMap.startTargeting('Warhead', [targetingAreaCircle, targetingCvsCircle], [])
     }
 
@@ -40,6 +40,7 @@ class WarheadActionHandler extends ActionHandler {
         if (!targetArea.containsPoint(x, y)) {
             return
         }
+        this.encounterMap.cvs.objClickEnabled = true
         const action = new WarheadAction(this.encounter, attacker, null, x, y)
         this.execute(action)
     }

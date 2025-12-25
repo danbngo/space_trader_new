@@ -279,10 +279,13 @@ class EncounterAI {
 
         // First, try to use ship modules if available and off cooldown
         if (ship.canUseModules && ship.modules.length > 0 && Math.random() > .75) {
-            const moduleAction = this.calcModuleAction(ship, strategy, targets)
-            if (moduleAction) {
-                console.log('AI using module:', moduleAction)
-                return moduleAction
+            //dont use abilities if out of bounds - mostly applies to asteroids
+            if (calcDistance(0, 0, ship.x, ship.y) < encounter.mapRadius) {
+                const moduleAction = this.calcModuleAction(ship, strategy, targets)
+                if (moduleAction) {
+                    console.log('AI using module:', moduleAction)
+                    return moduleAction
+                }
             }
         }
 

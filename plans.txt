@@ -1,22 +1,15 @@
 DONE:
--mining still feels off. too tedious, too much stuff happening on screen. maybe make few asteroids that are much more dangerous-damage text isnt showing on the very last action of a turn
--loot seems skewed after asteroid mining - seems rare stuff is dropping more than non-rare?? simulate this.
--repairs are preventing the tow thing, make sure only non-disabled ships are getting repaired/factoring into max repair amt
--recharge is not showing the recharged amt
--make effects (plasma trail, dust cloud etc) spawned by ships smaller than the ones produced on map load
+-button on starmap to return to the fleet/select/center on it (maybe dont need cuz other changes)
 
 DONE BY AI, NEEDS TO BE CHECKED:
-
+-adjust damage when moving into ships - ship with more mass should take less dmg
 
 NEXT UP:
--when persistent effects spawn on battlefield, theres too many of them when player is far from inside of asteroid belt, scale it down
--warhead dmg seems weak, make it do a min damage even near the edge
+-warhead dmg seems weak, test it out some
 -make the AI for calcBestLaserCoords better - simulate up to 10 moves in advance and if any lead to a situation where we can shoot the enemy, favor them.
 -asteroids changing shape each turn, probably has to do with them being ellipses
 -make spinning or being rammed animated - use new shipactions and/or anim handlers (not just pseudo)
 -in general, add some modules that do things other than grant new moves-regen, etc.
--button on starmap to return to the fleet/select/center on it
--selecting objs by clicking them is a bit inaccurate for ellipses, maybe other shapes too, probably uses naive circle/radius approach
 -credits NaN bug is back
 
 -saving/loading (this is a big milestone, if you're ready for this means game is almost ready for release)

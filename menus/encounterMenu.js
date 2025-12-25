@@ -506,7 +506,7 @@ function showPlayerEscapedFromEnemyModal() {
     // Award experience points for successfully escaping
     const expGained = Math.round(AVERAGE_EXP_FROM_ESCAPING * (enemyFleet.combatRating / 10))
     
-    let msg = `You escaped from the ${fleetName}.<br/>`
+    let msg = `You escaped from the ${fleetName}!<br/>`
     msg += gs.captain.grantExperience(expGained)
     if (escapedPlayerShips.length > 0) msg += `${escapedPlayerShips.length == playerShips.length ? 'All' : escapedPlayerShips.length} of your ships exited the battlefield intact.<br/>`
     if (disabledPlayerShips.length > 0) {
@@ -526,7 +526,7 @@ function showPlayerEscapedFromHazardsModal() {
     // Award experience points for escaping hazards
     const expGained = Math.round(AVERAGE_EXP_FROM_ESCAPING * (escapedPlayerShips.length / (escapedPlayerShips.length + disabledPlayerShips.length)))
     
-    let msg = `You escaped from the ${fleetName}.<br/>`
+    let msg = `You escaped from the ${fleetName}!<br/>`
     msg += gs.captain.grantExperience(expGained)
     if (escapedPlayerShips.length > 0) msg += `${escapedPlayerShips.length == playerShips.length ? 'All' : escapedPlayerShips.length} of your ships made it out intact.<br/>`
     if (disabledPlayerShips.length > 0) {
@@ -561,16 +561,13 @@ function seizePlayerContraband() {
 
 function conductRepairs() {
     let msg = ''
-    const hullDamage = gs.fleet.ships.reduce( (total, ship) => {
-        return total + (ship.hull[1] - ship.hull[0])
-    }, 0)
-    if (hullDamage <= 0) return msg
+    const hullDamage = gs.encounter.calcPlayerHullDamages()
+    if (hullDamage <= 0) return ''
+
     const repairRatio = weightedAvg([0, 1], [25*Math.random(), gs.fleet.totalSkills.getAmount(SKILLS.Engineer)])
-    const repairableShips = gs.fleet.ships.filter(s=>!s.disabled)
+    const repairableShips = gs.encounter.calcPlayerDamagedShips()
     const nonRepairableShips = gs.fleet.ships.filter(s=>s.disabled)
-    const repairableHullDamage = repairableShips.reduce( (total, ship) => {
-        return total + (ship.hull[1] - ship.hull[0])
-    }, 0)
+    const repairableHullDamage = gs.encounter.calcPlayerRepairableHull()
     const repairedAmt = Math.floor(repairRatio * repairableHullDamage)
     msg += `Your ships suffered ${hullDamage} total hull damage.<br/>`
     if (repairedAmt <= 0) return msg

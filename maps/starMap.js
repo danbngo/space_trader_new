@@ -17,7 +17,7 @@ class StarMap extends BaseMap {
 
         this.gameYearsPerMs = STAR_MAP_YEARS_PER_MS
 
-        this.initializeDOM(200, 20, 2000, this.starSystem.radius)
+        this.initializeDOM(this.starSystem.radius*4, this.starSystem.radius*0.4, this.starSystem.radius*40, this.starSystem.radius*0.5)
 
         for (const bgStar of starSystem.backgroundStars) bgStar.reset()
 
@@ -314,6 +314,23 @@ class StarMap extends BaseMap {
         ce({parent:container, style: {margin: 'auto'}, onClick: ()=>this.selectObject(obj), children:[
             this.cvs.getObject(cvsId)?.asImage(25, COLORS.LightGreen) || null
         ]})
+        if (obj instanceof Fleet) {
+            const totalShips = obj.ships.length
+            const disabledShips = obj.ships.filter(ship => ship.disabled).length
+            const activeShips = totalShips - disabledShips
+            
+            // Calculate average hull percentage
+            let totalHullPercent = 0
+            if (totalShips > 0) {
+                totalHullPercent = obj.ships.reduce((sum, ship) => {
+                    const hullPercent = ship.hull[1] > 0 ? (ship.hull[0] / ship.hull[1]) * 100 : 0
+                    return sum + hullPercent
+                }, 0) / totalShips
+            }
+            
+            ce({parent:container, innerHTML:`Ships: ${activeShips}/${totalShips} active`})
+            ce({parent:container, innerHTML:`Hull: ${roundToPlaces(totalHullPercent, 1)}%`})
+        }
         if (obj == gs.fleet) {
             if (gs.location) ce({parent:container, tag:'button', innerHTML:`Dock (${coloredName(gs.location)})`, onClick:()=>this.explore(gs.location)})
         }

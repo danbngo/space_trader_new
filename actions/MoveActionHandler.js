@@ -14,6 +14,7 @@ class MoveActionHandler extends ActionHandler {
         this.cvs.onClickWorldXY = (x, y) => this.attempt(x, y, ellipse, mover)
         this.cvs.onMouseMoveWorldXY = (x, y) => this.target(x, y, ellipse)
         
+        this.encounterMap.cvs.objClickEnabled = false
         this.encounterMap.startTargeting('Move', [targetingCvsObject, targetingCvsCircle])
     }
 
@@ -32,6 +33,7 @@ class MoveActionHandler extends ActionHandler {
         if (!ellipse.containsPoint(x, y)) {
             return
         }
+        this.encounterMap.cvs.objClickEnabled = true
         this.execute(new MoveAction(this.encounter, mover, x, y))
     }
 

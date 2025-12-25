@@ -34,6 +34,7 @@ class CanvasWrapper {
         
         this.onClickWorldXY = null;
         this.onMouseMoveWorldXY = null;
+        this.objClickEnabled = true;
         this.isDragging = false;
         this.dragStartTime = 0;
         
@@ -297,7 +298,7 @@ class CanvasWrapper {
         }
         
         // Check objects in reverse draw order (top-most first)
-        for (let i = this.drawOrder.length - 1; i >= 0; i--) {
+        if (this.objClickEnabled) for (let i = this.drawOrder.length - 1; i >= 0; i--) {
             const obj = this.drawOrder[i];
             if (!obj.visible) continue;
             if (!obj.onClick) continue;
@@ -307,7 +308,7 @@ class CanvasWrapper {
             }
         }
         
-        //only fire the default positional handler if no objects clicked
+        //only fire the default positional handler if no objects clicked and objClickEnabled is true
         if (this.onClickWorldXY) {
             this.onClickWorldXY(...this.screenToWorld(mouseX, mouseY));
             return

@@ -17,7 +17,7 @@ class BlinkActionHandler extends ActionHandler {
         
         // Click anywhere to confirm blink
         this.cvs.onClickWorldXY = (x, y) => this.attempt(ship)
-        
+        this.encounterMap.cvs.objClickEnabled = false
         this.encounterMap.startTargeting('Blink', [blinkCircle], [])
     }
 
@@ -28,6 +28,7 @@ class BlinkActionHandler extends ActionHandler {
     attempt(ship = new Ship()) {
         console.log('BlinkActionHandler.attempt', { ship });
         const action = new BlinkAction(this.encounter, ship)
+        this.encounterMap.cvs.objClickEnabled = true
         this.execute(action)
     }
 

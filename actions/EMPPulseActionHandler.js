@@ -24,7 +24,7 @@ class EMPPulseActionHandler extends ActionHandler {
         
         //this.encounterMap.onSelectObject = (selectedObj) => this.attempt(ship)
         this.encounterMap.cvs.onClickWorldXY = (x, y) => this.attempt(ship)
-        
+        this.encounterMap.cvs.objClickEnabled = false
         this.encounterMap.startTargeting('EMP Pulse', [pulseCircle], validTargets)
     }
 
@@ -34,6 +34,7 @@ class EMPPulseActionHandler extends ActionHandler {
 
     attempt(ship = new Ship()) {
         console.log('EMPPulseActionHandler.attempt', { ship });
+        this.encounterMap.cvs.objClickEnabled = true
         const action = new EMPPulseAction(this.encounter, ship)
         this.execute(action)
     }

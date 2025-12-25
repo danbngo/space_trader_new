@@ -125,7 +125,7 @@ class ShipAction {
         const pseudoActions = []
         const COLLISION_BUFFER = 0.1 // Small additional amount for collision detection
         const PUSH_DISTANCE_MULTIPLIER = 1.2 // How far to push ships away
-        const COLLISION_DAMAGE = 3 // Damage dealt on collision
+        const MAX_COLLISION_DAMAGE = 6 // Base damage dealt on collision
         
         // Check all other ships in the encounter
         for (const otherShip of this.encounter.ships) {
@@ -140,42 +140,67 @@ class ShipAction {
             if (distance < collisionRadius) {
                 console.log('Ship collision detected:', this.actor.name, otherShip.name, distance, collisionRadius)
                 
+                // Calculate mass ratio for physics
+                const actorMass = this.actor.mass
+                const otherMass = otherShip.mass
+                const totalMass = actorMass + otherMass
+                
+                // Mass ratio: how much force the other ship takes (0 to 1)
+                // Heavier ship takes less force, lighter ship takes more
+                const otherShipMassRatio = actorMass / totalMass
+                const actorMassRatio = otherMass / totalMass
+                
                 // Calculate angle from moving ship to other ship
                 const dx = otherShip.x - this.actor.x
                 const dy = otherShip.y - this.actor.y
                 const angle = Math.atan2(dy, dx)
                 
-                // Calculate push distance (enough to separate them)
-                const pushDistance = (collisionRadius - distance) * PUSH_DISTANCE_MULTIPLIER
+                // Calculate base push distance (enough to separate them)
+                const basePushDistance = (collisionRadius - distance) * PUSH_DISTANCE_MULTIPLIER
                 
-                // Calculate new position for the other ship
-                const x = otherShip.x + Math.cos(angle) * pushDistance
-                const y = otherShip.y + Math.sin(angle) * pushDistance
+                // Push the other ship away (proportional to its mass ratio)
+                const otherShipPushDistance = basePushDistance * otherShipMassRatio
+                const x = otherShip.x + Math.cos(angle) * otherShipPushDistance
+                const y = otherShip.y + Math.sin(angle) * otherShipPushDistance
                 
-                // Push the other ship away
                 Object.assign(otherShip, {x, y})
                 pseudoActions.push(...this.encounter.checkShipMovementEffects(otherShip))
+                
+                // Push the actor ship back (proportional to its mass ratio)
+                const actorPushDistance = basePushDistance * actorMassRatio
+                const actorX = this.actor.x - Math.cos(angle) * actorPushDistance
+                const actorY = this.actor.y - Math.sin(angle) * actorPushDistance
+                
+                Object.assign(this.actor, {x: actorX, y: actorY})
+                pseudoActions.push(...this.encounter.checkShipMovementEffects(this.actor))
                 
                 // Check if ships are enemies
                 const areEnemies = (this.actor.fleet !== otherShip.fleet)
                 
                 if (areEnemies) {
-                    // Deal collision damage to both ships
-                    console.log('Enemy collision - dealing damage to both ships')
+                    // Deal collision damage based on mass ratio
+                    console.log('Enemy collision - dealing mass-based damage to both ships')
                     
-                    // Damage to the other ship
+                    // Heavier ship takes less damage, lighter ship takes more
+                    const otherShipDamage = Math.ceil(MAX_COLLISION_DAMAGE * actorMassRatio * Math.random())
+                    const actorDamage = Math.ceil(MAX_COLLISION_DAMAGE * otherShipMassRatio * Math.random())
+
+                    this.actor.takeDamage(actorDamage, true)
+                    otherShip.takeDamage(otherShipDamage, true)
+                    
+                    // Damage to the other ship (inversely proportional to its mass)
                     const damageAction1 = ShipAction.getDamageAction(
                         this.encounter, 
                         otherShip, 
-                        COLLISION_DAMAGE, 
+                        otherShipDamage, 
                     )
                     pseudoActions.push(damageAction1)
                     
-                    // Damage to the moving ship
+                    // Damage to the moving ship (inversely proportional to its mass)
                     const damageAction2 = ShipAction.getDamageAction(
                         this.encounter, 
                         this.actor, 
-                        COLLISION_DAMAGE, 
+                        actorDamage, 
                     )
                     pseudoActions.push(damageAction2)
                 }

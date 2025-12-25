@@ -458,11 +458,13 @@ function autoNavigateHazard(encounter = new Encounter()) {
     const {playerShips, enemyShips} = encounter
     const maxDamage = enemyShips.reduce((sum, ship)=>sum + ship.hull[1]*ship.engine*0.001, 0);
     const damage = rng(maxDamage, 0, true)
+    console.log('gs.fleet.flagShip hull before:', gs.fleet.flagship.hull[0], gs.fleet.flagship.hull[1]);
     damageRandomly(playerShips, damage)
     const disabledShips = playerShips.filter(s=>s.disabled)
     const survivedShips = playerShips.filter(s=>!s.disabled)
     for (const s of survivedShips) s.escaped = true
     console.log(`autoNavigateHazard`, {maxDamage, damage, disabledShips, playerShips});
+    console.log('gs.fleet.flagShip hull after:', gs.fleet.flagship.hull[0], gs.fleet.flagship.hull[1]);
     if (disabledShips.length >= playerShips.length) {
         showPlayerDefeatedByHazardsModal()
     }
