@@ -5,7 +5,7 @@ class GameState {
 
         // Create captain
         const captain = new Officer("Captain", STARTING_CREDITS);
-        const playerShip = new Ship("Starting Ship", PSEUDO_SHIP_TYPES.STARTING_SHIP, COLORS.LightGray, [30,30], [20,20], 10, 10, 10, 10)
+        const playerShip = new Ship("Starting Ship", STARTING_SHIP_TYPE, COLORS.LightGray, [30,30], [20,20], 10, 10, 10, 10)
         
         // Give player all modules for testing
         playerShip.localModules = [
@@ -147,7 +147,7 @@ class GameState {
             this.captain.skills = new CountsMap()
             for (const [skillName, amount] of Object.entries(data.captain.skills.counts)) {
                 // Find the skill constant by name
-                const skill = Object.values(SKILLS).find(s => s.name === skillName)
+                const skill = Object.values(SKILLS).find(s => s === skillName)
                 if (skill && amount > 0) {
                     this.captain.skills.setAmount(skill, amount)
                 }

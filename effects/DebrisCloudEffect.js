@@ -6,6 +6,7 @@ class DebrisCloudEffect extends Effect {
 
     hitShip(encounter = new Encounter(), ship = new Ship()) {
         // No immediate effect when entering
+        if (ASTEROID_SHIP_TYPES_ALL.includes(ship.shipType)) return []
         console.log('Ship entered dust cloud:', ship.name)
         ship.statusEffects.raiseTo(STATUS_EFFECTS.DUSTY)
         const [hullDamage, shieldDamage, disabled] = ship.takeDamage(rng(3,1), true, false)

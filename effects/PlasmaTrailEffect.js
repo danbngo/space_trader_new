@@ -7,6 +7,7 @@ class PlasmaTrailEffect extends Effect {
     hitShip(encounter = new Encounter(), ship = new Ship()) {
         // Deal damage and apply overheated status when entering plasma trail
         console.log('Ship entered plasma trail:', ship.name)
+        if (ASTEROID_SHIP_TYPES_ALL.includes(ship.shipType)) return []
         ship.statusEffects.raiseTo(STATUS_EFFECTS.OVERHEATED)
         const [hullDamage, shieldDamage, disabled] = ship.takeDamage(rng(4,1), false, false)
         return [ShipAction.getDamageAction(encounter, ship, hullDamage, shieldDamage, disabled)]

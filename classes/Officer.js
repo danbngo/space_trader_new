@@ -21,14 +21,15 @@ class Officer {
         let msg = ''
         this.expPoints += amount;
         if (this == gs.captain) {
-            msg += `You gained ${amount} experience points.\n`;
+            msg += `You gained ${amount} experience points.<br/>`;
         }
         if (this.canLevelUp) {
-            if (this == gs.captain) msg += colorSpan(`You leveled up to level ${this.level + 1}!\n`, colorArrToRgbaString(COLORS.LightGreen), true);
+            if (this == gs.captain) msg += colorSpan(`You leveled up to level ${this.level + 1}!<br/>`, colorArrToRgbaString(COLORS.LightGreen), true);
             while (autoLevelUp && this.canLevelUp) {
                 this.levelUp(autoImproveSkills);
             }
         }
+        return msg
     }
 
     grantInfamy(planet = new Planet(), amount = 1) {
@@ -98,7 +99,7 @@ class Officer {
     }
 
     get expToNextLevel() {
-        return (1+Math.pow(this.level,2))*10
+        return (1+Math.pow(this.level,2))*25
     }
 
     get canLevelUp() {

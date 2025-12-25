@@ -300,7 +300,7 @@ function showPlayerDefeatedEnemyModal(fameMultiplier = 0) {
     const cargoRatio = abandonedCargoCapacity / enemyFleet.totalCargoSpace
     const maxLootAmt = Math.floor(enemyFleet.cargo.total * cargoRatio)
     const baseLootAmt = Math.floor(Math.random() * maxLootAmt)
-    const lootAmt = weightedAvg([baseLootAmt, enemyFleet.cargo.total], [25, gs.fleet.totalSkills.getAmount(SKILLS.Salvage)])
+    const lootAmt = Math.ceil(weightedAvg([baseLootAmt, enemyFleet.cargo.total], [25, gs.fleet.totalSkills.getAmount(SKILLS.Salvage)]))
     const loot = enemyFleet.cargo.randomSubset(lootAmt)
     const disabledPlayerShips = gs.encounter.playerShips.filter(s=>s.disabled)
 
@@ -341,7 +341,7 @@ function showPlayerDefeatedHazardsModal() {
     const cargoRatio = abandonedCargoCapacity / enemyFleet.totalCargoSpace
     const maxLootAmt = Math.floor(enemyFleet.cargo.total * cargoRatio)
     const baseLootAmt = Math.floor(Math.random() * maxLootAmt)
-    const lootAmt = weightedAvg([baseLootAmt, enemyFleet.cargo.total], [25, gs.fleet.totalSkills.getAmount(SKILLS.Salvage)])
+    const lootAmt = Math.ceil(weightedAvg([baseLootAmt, enemyFleet.cargo.total], [25, gs.fleet.totalSkills.getAmount(SKILLS.Salvage)]))
     const loot = enemyFleet.cargo.randomSubset(lootAmt)
     const disabledPlayerShips = gs.encounter.playerShips.filter(s=>s.disabled)
     
@@ -496,14 +496,14 @@ function showPlayerDefeatedByPoliceModal() {
 
 function showPlayerEscapedFromEnemyModal() {
     console.log('showPlayerEscapedFromEnemyModal');
-    const {fleetName, disabledPlayerShips, escapedPlayerShips, enemyFleet} = gs.encounter
+    const {fleetName, disabledPlayerShips, escapedPlayerShips, enemyFleet, playerShips} = gs.encounter
     
     // Award experience points for successfully escaping
     const expGained = Math.round(AVERAGE_EXP_FROM_ESCAPING * (enemyFleet.combatRating / 10))
     
     let msg = `You escaped from the ${fleetName}.<br/>`
     msg += gs.captain.grantExperience(expGained)
-    if (escapedPlayerShips.length > 0) msg += `${escapedPlayerShips.length} of your ships exited the battlefield intact.<br/>`
+    if (escapedPlayerShips.length > 0) msg += `${escapedPlayerShips.length == playerShips.length ? 'All' : escapedPlayerShips.length} of your ships exited the battlefield intact.<br/>`
     if (disabledPlayerShips.length > 0) {
         msg += `However, ${disabledPlayerShips.length} were disabled in the fighting.<br/>`
         msg += loseCargoFromDisabledShips(disabledPlayerShips)
@@ -516,47 +516,27 @@ function showPlayerEscapedFromEnemyModal() {
 
 function showPlayerEscapedFromHazardsModal() {
     console.log('showPlayerEscapedFromHazardsModal');
-    const {fleetName, disabledPlayerShips, escapedPlayerShips, enemyFleet, disabledEnemyShips} = gs.encounter
+    const {fleetName, disabledPlayerShips, escapedPlayerShips, playerShips} = gs.encounter
     
     // Award experience points for escaping hazards
     const expGained = Math.round(AVERAGE_EXP_FROM_ESCAPING * (escapedPlayerShips.length / (escapedPlayerShips.length + disabledPlayerShips.length)))
-    gs.captain.expPoints += expGained
     
     let msg = `You escaped from the ${fleetName}.<br/>`
-    if (expGained > 0) msg += `You gained ${expGained} experience points for surviving.<br/>`
-    if (escapedPlayerShips.length > 0) msg += `${escapedPlayerShips.length} of your ships made it out intact.<br/>`
+    msg += gs.captain.grantExperience(expGained)
+    if (escapedPlayerShips.length > 0) msg += `${escapedPlayerShips.length == playerShips.length ? 'All' : escapedPlayerShips.length} of your ships made it out intact.<br/>`
     if (disabledPlayerShips.length > 0) {
         msg += `However, ${disabledPlayerShips.length} were disabled.<br/>`
-        msg += loseCargoFromDisabledShips(disabledPlayerShips)
-    }
-    const abandonedCargoCapacity = disabledEnemyShips.reduce( (total, ship) => {
-        return total + ship.cargoSpace
-    }, 0)
-    const cargoRatio = abandonedCargoCapacity / enemyFleet.totalCargoSpace
-    const maxLootAmt = Math.floor(enemyFleet.cargo.total * cargoRatio)
-    const baseLootAmt = Math.floor(Math.random() * maxLootAmt)
-    const lootAmt = weightedAvg([baseLootAmt, enemyFleet.cargo.total], [25, gs.fleet.totalSkills.getAmount(SKILLS.Salvage)])
-    const loot = enemyFleet.cargo.randomSubset(lootAmt)
-
-    if (disabledPlayerShips.length > 0) {
-        msg += `${disabledPlayerShips.length} of your ships were disabled in the fighting.<br/>`
         msg += loseCargoFromDisabledShips(disabledPlayerShips)
     }
 
     msg += conductRepairs()
 
-    if (disabledEnemyShips.length > 0) {
-        msg += `${disabledEnemyShips.length} of the ${fleetName} were destroyed!<br/>`
-        msg += `Your scanners reveal ${baseLootAmt} units of cargo amid the wreckage.<br/>`
-        if (lootAmt > baseLootAmt) msg += `Your salvaging skills allow you to recover an additional ${lootAmt - baseLootAmt} units of cargo.<br/>`
-    }
     showModal(gs.encounter.encounterType.name, msg, [
-        lootAmt > 0 ? ['Loot', ()=>showLootMenu(loot)] : ['Continue', ()=>endEncounter()]
+        ['Continue', ()=>endEncounter()]
     ])
 }
 
 /**
- * 
  * @returns {[number, CountsMap]} - [fine amount, seized cargo]
  */
 function seizePlayerContraband() {

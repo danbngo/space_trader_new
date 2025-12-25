@@ -69,7 +69,7 @@ class Ship {
 
     get radius() {
         //use formula based on mass and radius of a sphere
-        return BASE_SHIP_RADIUS_IN_MILES * (1+Math.sqrt(this.mass))
+        return BASE_SHIP_RADIUS_IN_MILES * (1+Math.sqrt(this.mass)) * this.shipType.radiusModifier
     }
 
     get mass() {

@@ -424,8 +424,10 @@ const ENCOUNTER_TYPES = {
         null
     ),
 }
+const ENCOUNTER_TYPES_ALL = Object.values(ENCOUNTER_TYPES)
 
-for (const et of [ENCOUNTER_TYPES.ASTEROIDS, ENCOUNTER_TYPES.CRYOIDS, ENCOUNTER_TYPES.PLASMOIDS]) et.onEndTurn = (encounter = new Encounter())=>{
+
+/*for (const et of [ENCOUNTER_TYPES.ASTEROIDS, ENCOUNTER_TYPES.CRYOIDS, ENCOUNTER_TYPES.PLASMOIDS]) et.onEndTurn = (encounter = new Encounter())=>{
     //make fooroids move faster each turn
     for (const ship of encounter.enemyShips) {
         if (Math.random() > .5) ship.engine = Math.ceil(ship.engine*1.1)
@@ -445,6 +447,5 @@ for (const et of [ENCOUNTER_TYPES.ASTEROIDS, ENCOUNTER_TYPES.CRYOIDS, ENCOUNTER_
         newShip.aiType = AI_TYPES.Asteroid
     }
 }
-
-const ENCOUNTER_TYPES_ALL = Object.values(ENCOUNTER_TYPES)
+*/
 

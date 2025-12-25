@@ -45,6 +45,7 @@ class ShipType {
         this.maxNumModules = maxNumModules
         this.maxActionsPerTurn = maxActionsPerTurn
         this.onDisabled = null
+        this.radiusModifier = 1
     }
 }
 
@@ -64,22 +65,27 @@ const SHIP_TYPES = {
 
 const SHIP_TYPES_ALL = Object.values(SHIP_TYPES)
 
-const PSEUDO_SHIP_TYPES = {
-    STARTING_SHIP: new ShipType('Starting Ship', SHAPES.FilledTriangle, 1, 1, 1, 1, 1, 1, [], 3, 1),
-    ASTEROID: new ShipType('Asteroid', SHAPES.FilledOval, 0.4, 0, 0, 4, 0.5, 4, [SHIP_MODULE_TYPES.MAGNETIZE], 0, 1),
-    CRYOID: new ShipType('Cryoid', SHAPES.FilledOval, 0.6, 0, 0, 2, 0.5, 4, [SHIP_MODULE_TYPES.SMOKE_BOMB], 0, 1),
-    PLASMOID: new ShipType('Plasmoid', SHAPES.FilledCircle, 0.5, 0.5, 0, 4, 0.5, 4, [SHIP_MODULE_TYPES.BOOSTER], 0, 1),
+const STARTING_SHIP_TYPE = new ShipType('Starting Ship', SHAPES.FilledTriangle, 1, 1, 1, 1, 1, 1, [], 3, 1)
+
+const ASTEROID_SHIP_TYPES = {
+    ASTEROID: new ShipType('Asteroid', SHAPES.FilledOval, 0.4, 0, 0, 8, 0.5, 1, [SHIP_MODULE_TYPES.MAGNETIZE], 0, 1),
+    CRYOID: new ShipType('Cryoid', SHAPES.FilledOval, 0.6, 0, 0, 8, 0.5, 1, [SHIP_MODULE_TYPES.SMOKE_BOMB], 0, 1),
+    PLASMOID: new ShipType('Plasmoid', SHAPES.FilledCircle, 0.5, 0.5, 0, 8, 0.5, 1, [SHIP_MODULE_TYPES.BOOSTER], 0, 1),
 }
 
-PSEUDO_SHIP_TYPES.ASTEROID.onDisabled = (died = new Ship(), encounter = new Encounter())=>{
+const ASTEROID_SHIP_TYPES_ALL = Object.values(ASTEROID_SHIP_TYPES)
+
+for (const st of ASTEROID_SHIP_TYPES_ALL) st.radiusModifier = 5
+
+ASTEROID_SHIP_TYPES.ASTEROID.onDisabled = (died = new Ship(), encounter = new Encounter())=>{
     console.log('Asteroid.onDisabled', { died, encounter });
     if (Math.random() > .5) encounter.addEffect(new DebrisCloudEffect(died.x, died.y, Math.random()*Math.PI*4))
 }
-PSEUDO_SHIP_TYPES.CRYOID.onDisabled = (died = new Ship(), encounter = new Encounter())=>{
+ASTEROID_SHIP_TYPES.CRYOID.onDisabled = (died = new Ship(), encounter = new Encounter())=>{
     console.log('Cryoid.onDisabled', { died, encounter });
     if (Math.random() > .5) encounter.addEffect(new IceCloudEffect(died.x, died.y, Math.random()*Math.PI*4))
 }
-PSEUDO_SHIP_TYPES.PLASMOID.onDisabled = (died = new Ship(), encounter = new Encounter())=>{
+ASTEROID_SHIP_TYPES.PLASMOID.onDisabled = (died = new Ship(), encounter = new Encounter())=>{
     console.log('Plasmoid.onDisabled', { died, encounter });
     if (Math.random() > .5) encounter.addEffect(new IonCloudEffect(died.x, died.y, Math.random()*Math.PI*4))
 }

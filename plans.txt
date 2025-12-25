@@ -1,15 +1,14 @@
 DONE BY AI, NEEDS TO BE CHECKED:
 CHECKED: -added new stuff to captain menu to see his reputation, bounty infamy etc.
--academy improvements - let players pay money for skills, some are cheaper than others
+CHECKED: -academy improvements - let players pay money for skills, some are cheaper than others
  -good way to improve - only grant cargo for meteors you personally destroyed
 -split up bounties, maybe reputation, by planet
 -make the "fast!" status effect come from a module and remove the "slow!" one
 
 NEXT UP:
--damage text isnt showing on the very last action of a turn
+-mining still feels off. too tedious, too much stuff happening on screen. maybe make few asteroids that are much more dangerous-damage text isnt showing on the very last action of a turn
 -plasmoids arent colored properly (new ones that spawned)
 -in general, add some modules that do things other than grant new moves-regen, etc.
--mining still feels off. too tedious, too much stuff happening on screen. maybe make few asteroids that are much more dangerous.
 -loot seems skewed after asteroid mining - seems rare stuff is dropping more than non-rare?? simulate this.
 -make spinning or being rammed animated - use new shipactions and/or anim handlers (not just pseudo)
 

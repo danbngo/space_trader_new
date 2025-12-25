@@ -133,7 +133,8 @@ class Encounter {
         console.log('Encounter.calcHarmableTargets', { attacker });
 
         //asteroids can target each other
-        const ships = (attacker.aiType == AI_TYPES.Asteroid) ? this.ships : this.calcOpposingFleet(attacker.fleet).ships;
+        //const ships = (attacker.aiType == AI_TYPES.Asteroid) ? this.ships : this.calcOpposingFleet(attacker.fleet).ships;
+        const ships = this.calcOpposingFleet(attacker.fleet).ships;
 
         return ships.filter(target => {
             if (target.statusEffects.has(STATUS_EFFECTS.CLOAKED)) return false
