@@ -97,7 +97,7 @@ function endCombat() {
 function handlePlayerStranded() {
     console.log('handlePlayerStranded');
     const [nearestPlanet, nearestDistance] = gs.system.calcNearestPlanet(gs.fleet)
-    const creditCost = 100 + rng(500*Math.sqrt(nearestDistance), 250*Math.sqrt(nearestDistance), false)
+    const creditCost = 100 + rng(500*Math.sqrt(nearestDistance), 250*Math.sqrt(nearestDistance), true)
     const canAfford = gs.credits >= creditCost
     const noCredits = gs.credits <= 0
     const dayCost = 1 + rng(1.5*nearestDistance, 0.75*nearestDistance, false)
@@ -291,16 +291,16 @@ function showPlayerDefeatedEnemyModal(fameMultiplier = 0) {
     const abandonedCargoCapacity = disabledEnemyShips.reduce( (total, ship) => {
         return total + ship.cargoSpace
     }, 0)
-    let creditsAmt = Math.floor(Math.random() * enemyFleet.credits * (abandonedCargoCapacity / enemyFleet.totalCargoSpace))
-    if (!isNaN(creditsAmt)) throw new Error('creditsAmt was NaN!')
+    let creditsAmt = Math.ceil(Math.random() * enemyFleet.credits * (abandonedCargoCapacity / enemyFleet.totalCargoSpace))
     const officersShare = gs.fleet.calcTotalCRShare(creditsAmt, true)
     const finalCredits = creditsAmt - officersShare
     gs.credits += finalCredits
+    if (!isNaN(gs.credits)) throw new Error('creditsAmt was NaN!')
     creditsAmt = finalCredits
     const cargoRatio = abandonedCargoCapacity / enemyFleet.totalCargoSpace
-    const maxLootAmt = Math.floor(enemyFleet.cargo.total * cargoRatio)
-    const baseLootAmt = Math.floor(Math.random() * maxLootAmt)
-    const lootAmt = Math.ceil(weightedAvg([baseLootAmt, enemyFleet.cargo.total], [25, gs.fleet.totalSkills.getAmount(SKILLS.Salvage)]))
+    const maxLootAmt = Math.ceil(enemyFleet.cargo.total * cargoRatio)
+    const baseLootAmt = Math.ceil(Math.random() * maxLootAmt)
+    const lootAmt = Math.floor(weightedAvg([baseLootAmt, maxLootAmt], [25, gs.fleet.totalSkills.getAmount(SKILLS.Salvage)]))
     const loot = enemyFleet.cargo.randomSubset(lootAmt)
     const disabledPlayerShips = gs.encounter.playerShips.filter(s=>s.disabled)
 
@@ -332,21 +332,23 @@ function showPlayerDefeatedEnemyModal(fameMultiplier = 0) {
 
 function showPlayerDefeatedHazardsModal() {
     console.log('showPlayerDefeatedHazardsModal');
-    const {enemyFleet, fleetName, disabledEnemyShips, playerFlagship} = gs.encounter
+    const {enemyFleet, fleetName, disabledEnemyShips} = gs.encounter
     // Only count ships disabled by the player flagship
-    const playerKilledShips = disabledEnemyShips.filter(ship => ship.disabledByShip === playerFlagship)
-    const abandonedCargoCapacity = playerKilledShips.reduce( (total, ship) => {
+    //const playerKilledShips = disabledEnemyShips.filter(ship => ship.disabledByShip === playerFlagship)
+    const abandonedCargoCapacity = disabledEnemyShips.reduce( (total, ship) => {
         return total + ship.cargoSpace
     }, 0)
     const cargoRatio = abandonedCargoCapacity / enemyFleet.totalCargoSpace
-    const maxLootAmt = Math.floor(enemyFleet.cargo.total * cargoRatio)
-    const baseLootAmt = Math.floor(Math.random() * maxLootAmt)
-    const lootAmt = Math.ceil(weightedAvg([baseLootAmt, enemyFleet.cargo.total], [25, gs.fleet.totalSkills.getAmount(SKILLS.Salvage)]))
+    const maxLootAmt = Math.ceil(enemyFleet.cargo.total * cargoRatio)
+    const baseLootAmt = Math.ceil(Math.random() * maxLootAmt)
+    const lootAmt = Math.floor(weightedAvg([baseLootAmt, maxLootAmt], [25, gs.fleet.totalSkills.getAmount(SKILLS.Salvage)]))
     const loot = enemyFleet.cargo.randomSubset(lootAmt)
     const disabledPlayerShips = gs.encounter.playerShips.filter(s=>s.disabled)
+
+    console.log('showPlayerDefeatedHazardsModal stats:', { abandonedCargoCapacity, cargoRatio, maxLootAmt, baseLootAmt, lootAmt, loot, disabledEnemyShips, disabledPlayerShips });
     
     // Award experience points based on mining success
-    const expGained = playerKilledShips.length > 0 ? Math.round(AVERAGE_EXP_FROM_MINING * (playerKilledShips.length / disabledEnemyShips.length)) : 0
+    const expGained = AVERAGE_EXP_FROM_MINING * (1+disabledEnemyShips.length)
     
     let msg = ''
     msg += `You survived the ${fleetName}!<br/>`
@@ -359,9 +361,8 @@ function showPlayerDefeatedHazardsModal() {
 
     msg += conductRepairs()
 
-
-    if (playerKilledShips.length > 0) {
-        msg += `You personally destroyed ${playerKilledShips.length} ${fleetName}!<br/>`
+    if (disabledEnemyShips.length > 0) {
+        msg += `You destroyed ${disabledEnemyShips.length} ${fleetName}!<br/>`
         msg += `Your scanners reveal ${baseLootAmt} units of usable material amid the wreckage.<br/>`
         if (lootAmt > baseLootAmt) msg += `Your salvaging skills allow you to recover an additional ${lootAmt - baseLootAmt} units of usable material.<br/>`
     }
@@ -369,7 +370,7 @@ function showPlayerDefeatedHazardsModal() {
         lootAmt > 0 ? ['Loot', ()=>showLootMenu(loot)] : ['Continue', ()=>endEncounter()]
     ])
 }
-
+    
 function showNeutralsBribePlayerModal(maxCredits = 1000, infamyModifier = 0) {
     const baseCredits = Math.ceil(maxCredits*Math.random()/2)
     const credits = Math.round(weightedAvg([baseCredits, maxCredits], [25, gs.fleet.totalSkills.getAmount(SKILLS.Barter)]))
@@ -561,8 +562,8 @@ function conductRepairs() {
     }, 0)
     if (hullDamage <= 0) return msg
     const repairRatio = weightedAvg([0, 1], [25*Math.random(), gs.fleet.totalSkills.getAmount(SKILLS.Engineer)])
-    const repairableShips = gs.fleet.ships.filter(s=>!s.isDisabled)
-    const nonRepairableShips = gs.fleet.ships.filter(s=>s.isDisabled)
+    const repairableShips = gs.fleet.ships.filter(s=>!s.disabled)
+    const nonRepairableShips = gs.fleet.ships.filter(s=>s.disabled)
     const repairableHullDamage = repairableShips.reduce( (total, ship) => {
         return total + (ship.hull[1] - ship.hull[0])
     }, 0)
@@ -572,6 +573,7 @@ function conductRepairs() {
     if (nonRepairableShips.length > 0) msg += `Because ${nonRepairableShips.length} ships were disabled, only ${repairableHullDamage} is repairable.<br/>`
     msg += `Your engineering skill lets you repair ${repairedAmt} points of hull damage across your fleet.<br/>`
     repairRandomly(repairableShips, repairedAmt)
+    console.log('conductRepairs', { hullDamage, repairRatio, repairableHullDamage, repairedAmt, repairableShips, nonRepairableShips, msg });
     return msg
 }
 

@@ -63,6 +63,10 @@ class Ship {
         return [...this.shipType.modules, ...this.localModules]
     }
 
+    get moduleTypes() {
+        return this.modules.map(m => m.moduleType)
+    }
+
     get isFlagship() {
         if (!this.fleet) return false
         return this.fleet.flagship == this
@@ -166,10 +170,11 @@ class Ship {
         this.numActionsRemaining = this.maxActionsPerTurn;
         
         // Check for SpeedModule - grants +1 action per turn
-        const hasSpeedModule = this.modules.some(m => m.moduleType === SHIP_MODULE_TYPES.SPEED_MODULE)
-        if (hasSpeedModule) {
+        const speedModule = this.modules.find(m => m.moduleType === SHIP_MODULE_TYPES.SPEED_MODULE)
+        if (speedModule) {
             this.numActionsRemaining = this.numActionsRemaining + 1
         }
+        console.log('checking for speed modules on ship:', this.name, this, this.modules, speedModule, this.numActionsRemaining);
         
         // Commented out random slow - kept for reference
         // if (Math.random() < 0.1) {
@@ -201,6 +206,10 @@ class Ship {
     takeDamage(dmg = 0, bypassShields = false, dontHurtHull = false, sourceShip = null) {
         console.log('applying dmg to ship:',this,dmg,bypassShields)
         if (this.disabled) return [0, 0, false]
+        
+        // Clear cloak status when taking damage
+        this.statusEffects.setAmount(STATUS_EFFECTS.CLOAKED, 0)
+        
         let disabled = false
         let shieldDamage = 0
         let hullDamage = 0
@@ -286,5 +295,16 @@ class Ship {
 
     get canRecharge() {
         return !this.disabled && !this.escaped && !this.statusEffects.has(STATUS_EFFECTS.IONIZED)
+    }
+
+    get moduleSlots() {
+        const available = this.shipType.moduleSlots
+        const used = this.localModules.length
+        return [used, available]
+    }
+
+    get unusedModuleSlots() {
+        const [used, available] = this.moduleSlots
+        return available-used
     }
 }

@@ -6,6 +6,8 @@ class SmokeBombAction extends ShipAction {
 
     execute() {
         console.log('SmokeBombAction.execute', { actor: this.actor });
+        // Clear cloak status when using smoke bomb module
+        this.actor.statusEffects.setAmount(STATUS_EFFECTS.CLOAKED, 0)
         const attacker = this.actor
         
         // Use toX/toY if provided, otherwise create near the player with random offset

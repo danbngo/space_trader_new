@@ -6,6 +6,8 @@ class BlinkAction extends ShipAction {
 
     execute() {
         console.log('BlinkAction.execute', { actor: this.actor });
+        // Clear cloak status when using blink module
+        this.actor.statusEffects.setAmount(STATUS_EFFECTS.CLOAKED, 0)
         const ship = this.actor
         const blinkDistance = 25
         
@@ -25,7 +27,9 @@ class BlinkAction extends ShipAction {
         
         // Check if ship escaped the map
         pseudoActions.push(...this.encounter.checkShipMovementEffects(ship))
-        
+        const collisionActions = this.handleCollisions()
+        pseudoActions.push(...collisionActions)
+
         ship.moduleCooldowns.setAmount(SHIP_MODULE_TYPES.BLINK, SHIP_MODULE_TYPES.BLINK.cooldown)
         this.completed = true
         return pseudoActions

@@ -15,7 +15,7 @@
  * @property {number} cargoSpace - The cargo space of the ship.
  * @property {number} radars - The radar capability of the ship.
  * @property {Array} modules - The modules equipped on the ship.
- * @property {number} maxNumModules - The maximum number of modules the ship can have.
+ * @property {number} moduleSlots - The maximum number of modules the ship can have.
  * @property {number} maxActionsPerTurn - The maximum number of actions the ship can perform per turn.
  * @constructor
  * @param {string} name - The name of the ship type.
@@ -27,12 +27,12 @@
  * @param {number} cargoSpace - The cargo space of the ship.
  * @param {number} radars - The radar capability of the ship.
  * @param {Array} modules - The modules equipped on the ship.
- * @param {number} maxNumModules - The maximum number of modules the ship can have.
+ * @param {number} moduleSlots - The maximum number of modules the ship can have.
  * @param {number} maxActionsPerTurn - The maximum number of actions the ship can perform per turn.
  * @returns {ShipType} The created ShipType instance.
  */
 class ShipType {
-    constructor(name = '', shape, hull = 1, shields = 1, lasers = 1, engine = 1, cargoSpace = 1, radars = 1, modules = [], maxNumModules = 0, maxActionsPerTurn = SHIP_NUM_MOVES_PER_TURN) {
+    constructor(name = '', shape, hull = 1, shields = 1, lasers = 1, engine = 1, cargoSpace = 1, radars = 1, modules = [], moduleSlots = 0, maxActionsPerTurn = SHIP_NUM_MOVES_PER_TURN) {
         this.name = name
         this.shape = shape;
         this.hull = hull
@@ -42,7 +42,7 @@ class ShipType {
         this.cargoSpace = cargoSpace
         this.radars = radars
         this.modules = modules
-        this.maxNumModules = maxNumModules
+        this.moduleSlots = moduleSlots
         this.maxActionsPerTurn = maxActionsPerTurn
         this.onDisabled = null
         this.minRadiusModifier = 1
@@ -66,7 +66,7 @@ const SHIP_TYPES = {
 
 const SHIP_TYPES_ALL = Object.values(SHIP_TYPES)
 
-const STARTING_SHIP_TYPE = new ShipType('Starting Ship', SHAPES.FilledTriangle, 1, 1, 1, 1, 1, 1, [], 3, 1)
+const STARTING_SHIP_TYPE = new ShipType('Starting Ship', SHAPES.FilledTriangle, 1, 1, 1, 1, 1, 1, [], 1, 1)
 
 const ASTEROID_SHIP_TYPES = {
     ASTEROID: new ShipType('Asteroid', SHAPES.FilledOval, 0.4, 0, 0, 8, 0.5, 1, [SHIP_MODULE_TYPES.MAGNETIZE], 0, 1),

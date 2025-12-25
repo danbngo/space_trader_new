@@ -6,6 +6,8 @@ class WarheadAction extends ShipAction {
 
     execute() {
         console.log('WarheadAction.execute', { actor: this.actor });
+        // Clear cloak status when using warhead module
+        this.actor.statusEffects.setAmount(STATUS_EFFECTS.CLOAKED, 0)
         const attacker = this.actor
         const explosionX = this.toX
         const explosionY = this.toY

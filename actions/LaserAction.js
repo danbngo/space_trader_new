@@ -5,8 +5,10 @@ class LaserAction extends ShipAction {
 
     execute() {
         console.log('LaserAction.execute', { attacker: this.actor, target: this.target });
-        //player has a 0% chance to miss at min range and 75% at max range
-        const baseMissChance = this.path.distance > 0 ? (0.75 * (this.path.distance / this.actor.maxAttackDistance)) : 0
+        // Clear cloak status when attacking
+        this.actor.statusEffects.setAmount(STATUS_EFFECTS.CLOAKED, 0)
+        //player has a 0% chance to miss at min range and 50% at max range
+        const baseMissChance = this.path.distance > 0 ? (0.5 * (this.path.distance / this.actor.maxAttackDistance)) : 0
         // Apply accuracy penalty if ship has DUSTY status effect
         //const anyoneIsDusty = this.actor.statusEffects.has(STATUS_EFFECTS.DUSTY) || this.target.statusEffects.has(STATUS_EFFECTS.DUSTY)
         //const adjustedMissChance = anyoneIsDusty ? baseMissChance / 0.75 : baseMissChance

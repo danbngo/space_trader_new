@@ -3,10 +3,16 @@ StarMap
 ticket speed: 1 hour per real life second
 default zoom distances: 1200px = half the size of the solar system
 */
+
+/**
+ * @param {StarSystem} starSystem
+ * @param {Fleet|Planet} autoSelectObject
+ * 
+ */
 class StarMap extends BaseMap {
-    constructor(starSystem = new StarSystem(), autoSelectObject = gs.fleet) {
+    constructor(starSystem = new StarSystem(), autoSelectObject) {
         super()
-        console.log('CREATING STAR MAP FOR SYSTEM:',starSystem)
+        console.log('CREATING STAR MAP FOR SYSTEM:',starSystem,'with autoselect obj:',autoSelectObject)
         this.starSystem = starSystem
 
         this.gameYearsPerMs = 1/365/24/60 * 2
@@ -29,7 +35,7 @@ class StarMap extends BaseMap {
     onDeferredInit() {
         this.cvs.autoResize()
         this.refresh()
-        this.selectObject(gs.fleet)
+        //this.selectObject(gs.fleet)
     }
 
     refresh() {
@@ -390,6 +396,10 @@ class StarMap extends BaseMap {
 }
 
 
+/**
+ * 
+ * @param {Fleet|Planet} autoSelectObject 
+ */
 function showStarMap(autoSelectObject = gs.fleet) {
     const starMap = new StarMap(gs.system, autoSelectObject)
     showMap(starMap)

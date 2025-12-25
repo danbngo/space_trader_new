@@ -1,7 +1,7 @@
 
 function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
     console.log('showCaptainSkillsMenu called with captain:',captain,'selectedSkill:',selectedSkill)
-    const {name, level, expPoints, expToNextLevel, skills, skillPoints} = captain
+    const {name, level, expPoints, expToNextLevel, skills, skillPoints, credits} = captain
 
     function improveSkill(skill = SKILLS_ALL[0]) {
         const cost = captain.calcSkillPointsToUpgrade(skill)
@@ -37,7 +37,7 @@ function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
     showModal(
         `Captain Overview`,
         ce({children:[
-            `Name: ${name}`,
+            `Name: ${name} | Credits ${credits}`,
             `Level: ${level} | Exp.: ${expPoints} | To Next Lvl: ${expToNextLevel}`,
             `Skill Points: ${colorSpan(String(skillPoints), skillPoints > 0 ? 'green' : '', true)}`,
             skillTable,

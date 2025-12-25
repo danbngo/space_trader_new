@@ -12,6 +12,8 @@ class MagnetizeAction extends ShipAction {
 
     execute() {
         console.log('MagnetizeAction.execute', { actor: this.actor, target: this.target });
+        // Clear cloak status when using magnetize module
+        this.actor.statusEffects.setAmount(STATUS_EFFECTS.CLOAKED, 0)
         const pseudoActions = []
         const {actor, target} = this
         actor.x = this.toX

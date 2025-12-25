@@ -1,4 +1,21 @@
 // Fleet class extends SpaceObject
+
+/**
+ * @class Fleet
+ * @extends SpaceObject
+ * Represents a fleet of ships in the game.
+ * @param {string} name - The name of the fleet.
+ * @param {string} color - The color of the fleet.
+ * @param {number} x - The x-coordinate of the fleet's position.
+ * @param {number} y - The y-coordinate of the fleet's position.
+ * @property {Ship} flagship - The flagship of the fleet.
+ * @property {Array<Ship>} ships - The ships in the fleet.
+ * @property {CountsMap} cargo - The cargo carried by the fleet.
+ * @property {Officer} captain - The captain of the fleet.
+ * @property {Array<Officer>} officers - The officers in the fleet.
+ * @property {Planet} location - The current location of the fleet.
+ * @property {Route|null} route - The route the fleet is following, if any.
+ */
 class Fleet extends SpaceObject {
     constructor(name = "Unnamed", color = COLORS.White, x = 0, y = 0) {
         super(name, color, FLEET_RADIUS, x, y);

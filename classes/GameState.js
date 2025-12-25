@@ -5,19 +5,19 @@ class GameState {
 
         // Create captain
         const captain = new Officer("Captain", STARTING_CREDITS);
-        const playerShip = new Ship("Starting Ship", STARTING_SHIP_TYPE, COLORS.LightGray, [30,30], [20,20], 10, 10, 10, 10)
+        const playerShip = new Ship("Starting Ship", STARTING_SHIP_TYPE, COLORS.LightGray, [30,30], [20,20], 100, 10, 10, 10)
         
         // Give player all modules for testing
-        playerShip.localModules = [
-            SHIP_MODULE_TYPES.CLOAK,
-            SHIP_MODULE_TYPES.MAGNETIZE,
-            SHIP_MODULE_TYPES.WARHEAD,
-            SHIP_MODULE_TYPES.EMP_PULSE,
-            SHIP_MODULE_TYPES.BLINK,
-            SHIP_MODULE_TYPES.BOOSTER,
-            SHIP_MODULE_TYPES.SMOKE_BOMB,
-            SHIP_MODULE_TYPES.SPEED_MODULE
-        ]
+        /*playerShip.localModules = [
+            new ShipModule(SHIP_MODULE_TYPES.CLOAK, 1),
+            new ShipModule(SHIP_MODULE_TYPES.MAGNETIZE, 1),
+            new ShipModule(SHIP_MODULE_TYPES.WARHEAD, 1),
+            new ShipModule(SHIP_MODULE_TYPES.EMP_PULSE, 1),
+            new ShipModule(SHIP_MODULE_TYPES.BLINK, 1),
+            new ShipModule(SHIP_MODULE_TYPES.BOOSTER, 1),
+            new ShipModule(SHIP_MODULE_TYPES.SMOKE_BOMB, 1),
+            new ShipModule(SHIP_MODULE_TYPES.SPEED_MODULE, 1)
+        ]*/
 
         // Create fleet
         this.fleet = new Fleet(

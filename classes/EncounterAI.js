@@ -32,7 +32,7 @@ class EncounterAI {
         const {fleet, aiType} = ship
         const opposingFleet = this.encounter.calcOpposingFleet(fleet)
         const fleetCombatBalance = fleet.combatRating / opposingFleet.combatRating
-        const shipState = (ship.hull[0] / ship.hull[1] + ship.shields[0] / ship.shields[1]) / 2
+        const shipState = (ship.hull[0] / ship.hull[1])
         let strategy;
         
         if (aiType == AI_TYPES.Ship) {

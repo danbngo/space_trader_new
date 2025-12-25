@@ -14,10 +14,10 @@ function createTradeInfoBuyTable(ct = CARGO_TYPES_ALL[0], onSelectPlanet = (p = 
         console.log('created route:',route)
         rows.push([
             coloredName(planet),
-            !market ? 'N/A' : statColorSpan(buyPrice, ct.value/buyPrice),
-            !market ? 'N/A' : statColorSpan(market.cargo.getAmount(ct), market.cargo.getAmount(ct)/MARKET_MAX_CARGO_PER_TYPE),
-            statColorSpan(Math.round(distance, 2), distScore),
-            statColorSpan(describeTimespan(route.travelTime), distScore),
+            !market ? 'N/A' : ''+statColorSpan(buyPrice, ct.value/buyPrice, true),
+            !market ? 'N/A' : ''+statColorSpan(market.cargo.getAmount(ct), market.cargo.getAmount(ct)/MARKET_MAX_CARGO_PER_TYPE, true),
+            ''+statColorSpan(roundToPlaces(distance, 2), distScore, true),
+            ''+statColorSpan(describeTimespan(route.travelTime), distScore, true),
         ])
     }
     return createTable(rows, (rowIndex = 0)=>onSelectPlanet(planets[rowIndex]))
@@ -38,10 +38,10 @@ function createTradeInfoSellTable(ct = CARGO_TYPES_ALL[0], onSelectPlanet = (p =
         const distScore = 2*(INNER_SOLAR_SYSTEM_RADIUS_IN_AU-distance)/INNER_SOLAR_SYSTEM_RADIUS_IN_AU
         rows.push([
             coloredName(planet),
-            !market ? 'N/A' : statColorSpan(sellPrice, sellPrice/ct.value),
-            !market ? 'N/A' : statColorSpan(market.credits, 2*market.credits/MARKET_MAX_CREDITS),
-            statColorSpan(Math.round(distance, 2), distScore),
-            statColorSpan(describeTimespan(route.travelTime), distScore),
+            !market ? 'N/A' : ''+statColorSpan(sellPrice, sellPrice/ct.value, true),
+            !market ? 'N/A' : ''+statColorSpan(market.credits, 2*market.credits/MARKET_MAX_CREDITS, true),
+            ''+statColorSpan(roundToPlaces(distance, 2), distScore, true),
+            ''+statColorSpan(describeTimespan(route.travelTime), distScore, true),
         ])
     }
     return createTable(rows, (rowIndex = 0)=>onSelectPlanet(planets[rowIndex]))
@@ -68,7 +68,7 @@ function showTradeInfoSellMenu(ct = CARGO_TYPES_ALL[0]) {
         `Trade Info - Sell ${ct.name}`,
         ce({children:[
             createTradeInfoSellTable(ct, onSelectPlanet),
-            `Your ${ct.name} amt: ${fleet.cargo.getAmount(ct)}`,
+            `Your ${ct.name} Amount: ${fleet.cargo.getAmount(ct)}`,
         ]}),
         options
     );
@@ -94,7 +94,7 @@ function showTradeInfoBuyMenu(ct = CARGO_TYPES_ALL[0]) {
         `Trade Info - Buy ${ct.name}`,
         ce({children:[
             createTradeInfoBuyTable(ct, onSelectPlanet),
-            `Your ${ct.name} amt: ${fleet.cargo.getAmount(ct)} | Your Cargo Space: ${fleet.cargo.total}/${fleet.totalCargoSpace} | Your credits: ${gs.credits}`,
+            `Your ${ct.name} Amount: ${fleet.cargo.getAmount(ct)} | Your Cargo Space: ${fleet.cargo.total}/${fleet.totalCargoSpace} | Your credits: ${gs.credits}`,
         ]}),
         options
     );

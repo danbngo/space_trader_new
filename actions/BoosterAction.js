@@ -11,6 +11,8 @@ class BoosterAction extends ShipAction {
 
     execute() {
         console.log('BoosterAction.execute', { actor: this.actor });
+        // Clear cloak status when using booster module
+        this.actor.statusEffects.setAmount(STATUS_EFFECTS.CLOAKED, 0)
         const ship = this.actor
         
         // Create plasma trail from start to near end (90% of the way to avoid burning self)

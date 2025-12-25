@@ -6,10 +6,12 @@ class RamAction extends ShipAction {
 
     execute() {
         console.log('RamAction.execute', { actor: this.actor, target: this.target });
+        // Clear cloak status when ramming
+        this.actor.statusEffects.setAmount(STATUS_EFFECTS.CLOAKED, 0)
         const {actor, target} = this
         const pseudoActions = []
-        //player has a 75% chance to miss at min range and 25% at max range
-        const didMiss = this.path.distance > 0 ? (Math.random() < (0.75 - (0.5 * (this.path.distance / actor.maxMoveDistance)))) : false
+        //player has a 50% chance to miss at min range and 25% at max range
+        const didMiss = this.path.distance > 0 ? (Math.random() < (0.50 - (0.25 * (this.path.distance / actor.maxMoveDistance)))) : false
         if (didMiss) {
             // Move past the target instead of landing on it
             const overshoot = actor.radius + target.radius + 1

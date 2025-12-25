@@ -46,13 +46,13 @@ function showPlanetOverviewMenu(planet = new Planet()) {
     const {culture} = planet
     const {territory, population, governmentRating, securityRating, commercialRating, industrialRating, crimeRating} = culture
     let msg = `<h3>${coloredName(planet)} Overview</h3>`    
-    msg += `Population: ${statColorSpan(describeLargeNumber(population * 1000), population, true)}M<br/>`
+    msg += `Population: ${statColorSpan(describeLargeNumber(Math.pow(1000,1+population)), population, true)}<br/>`
     msg += `Territory: ~${statColorSpan(roundToPlaces(territory,2), territory, true)}AU<br/>`
     msg += `Government Rating: ${statColorSpan(roundToPlaces(governmentRating,2), governmentRating, true)}x<br/>`
     msg += `Security Rating: ${statColorSpan(roundToPlaces(securityRating,2), securityRating, true)}x<br/>`
     msg += `Commercial Rating: ${statColorSpan(roundToPlaces(commercialRating,2), commercialRating, true)}x<br/>`
     msg += `Industrial Rating: ${statColorSpan(roundToPlaces(industrialRating,2), industrialRating, true)}x<br/>`
-    msg += `Crime Rating: ${statColorSpan(roundToPlaces(crimeRating,2), crimeRating, true)}x<br/>`
+    msg += `Crime Rating: ${statColorSpan(roundToPlaces(crimeRating,2), 1/crimeRating, true)}x<br/>`
     showModal(coloredName(planet), msg, [["Back", () => showPlanetMenu(planet)]]);
 }
 

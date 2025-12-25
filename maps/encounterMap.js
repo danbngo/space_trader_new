@@ -349,9 +349,8 @@ class EncounterMap extends BaseMap {
             const {hull, shields} = obj
             
             const showActions = combatEnabled && obj.fleet == playerFleet && !obj.escaped && !obj.disabled && activeTurnFleet == playerFleet
-            console.log('showing actions with props:', { combatEnabled, isPlayerShip: obj.fleet == playerFleet, isEscaped: obj.escaped, isDisabled: obj.disabled, isPlayerTurn: activeTurnFleet == playerFleet })
+            console.log('showing actions with props:', { combatEnabled, isPlayerShip: obj.fleet == playerFleet, isEscaped: obj.escaped, disabled: obj.disabled, isPlayerTurn: activeTurnFleet == playerFleet })
             const canAct = (obj.numActionsRemaining > 0) && (this.animations.length <= 0)
-            const canRecharge = obj.shields[0] < obj.shields[1] && !obj.statusEffects.has(STATUS_EFFECTS.IONIZED)
             ce({parent:container, style: {margin: 'auto'}, onClick: ()=>this.selectObject(obj), children:[
                 this.cvs.getObject(`ship${obj.uuid}`)?.asImage(25, COLORS.LightGreen) || null
             ]})
@@ -359,7 +358,8 @@ class EncounterMap extends BaseMap {
             if (obj.statusEffects.size > 0) {
                 const statusEffectSpans = obj.statusEffects.keys.map(effect=>{
                     const turnsRemaining = obj.statusEffects.getAmount(effect)
-                    return colorSpan(`${effect.name}${turnsRemaining > 0 ? ` (${turnsRemaining})` : ''}`, colorArrToRgbaString(effect.color))
+                    if (turnsRemaining > 0) return colorSpan(`${effect.name}${turnsRemaining > 0 ? ` (${turnsRemaining})` : ''}`, colorArrToRgbaString(effect.color))
+                    return ''
                 })
                 ce({parent:container, innerHTML: statusEffectSpans.join('<br/>')})
             }
@@ -374,15 +374,13 @@ class EncounterMap extends BaseMap {
                 ce({parent:container, tag:'button', innerHTML:'Shoot', disabled: !canAct || !obj.canShoot, onClick: ()=>this.moveHandlerMap.get(MOVE_TYPES.Laser).startTargeting(obj)})
                 ce({parent:container, tag:'button', innerHTML:'Move', disabled: !canAct, onClick: ()=>this.moveHandlerMap.get(MOVE_TYPES.Move).startTargeting(obj)})
                 ce({parent:container, tag:'button', innerHTML:'Ram', disabled: !canAct || !obj.canRam, onClick: ()=>this.moveHandlerMap.get(MOVE_TYPES.Ram).startTargeting(obj)})
-                ce({parent:container, tag:'button', innerHTML:canRecharge ? 'Recharge' : 'Wait', disabled: !canAct, onClick: ()=>{
-                    if (canRecharge) this.moveHandlerMap.get(MOVE_TYPES.Recharge).attempt(obj)
-                    else this.moveHandlerMap.get(MOVE_TYPES.Wait).attempt(obj)
-                }})
+                ce({parent:container, tag:'button', innerHTML:'Recharge', disabled: !canAct || !obj.canRecharge, onClick: ()=>this.moveHandlerMap.get(MOVE_TYPES.Recharge).attempt(obj)})
+                ce({parent:container, tag:'button', innerHTML:'Wait', disabled: !canAct, onClick: ()=>this.moveHandlerMap.get(MOVE_TYPES.Wait).attempt(obj)})
                 
                 for (const [move, handler] of this.moveHandlerMap) {
                     const module = SHIP_MODULE_TYPES_ALL.find(m => m.moveType === move)
                     if (!module) continue
-                    if (!obj.modules.includes(module)) continue
+                    if (!obj.moduleTypes.includes(module)) continue
                     const cooldown = obj.moduleCooldowns.getAmount(module)
                     const onCooldown = cooldown > 0
                     const label = cooldown > 0 ? `${move} (${cooldown})` : module.name

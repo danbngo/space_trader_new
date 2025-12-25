@@ -6,6 +6,8 @@ class EMPPulseAction extends ShipAction {
 
     execute() {
         console.log('EMPPulseAction.execute', { actor: this.actor });
+        // Clear cloak status when using EMP module
+        this.actor.statusEffects.setAmount(STATUS_EFFECTS.CLOAKED, 0)
         const pseudoActions = []
         const attacker = this.actor
         const pulseRadius = attacker.calcPulseArea().radius
