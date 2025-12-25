@@ -24,18 +24,8 @@ function generateOfficer(planet = new Planet()) {
         officer.levelUp(false) // Don't auto-improve skills during leveling
     }
     
-    // Manually distribute skill points with more variance
-    // Some officers might have spent more or fewer points than they've earned
-    const totalSkillPoints = officer.skillPoints + (level - 1) * SKILL_POINTS_PER_LEVEL
-    const pointsToSpend = Math.floor(totalSkillPoints * rng(1.2, 0.5, false)) // 50% to 120% of available points
-    
-    for (let i = 0; i < pointsToSpend; i++) {
-        const skill = rndMember(SKILLS_ALL)
-        officer.skills.increment(skill, 1)
-    }
-    
-    // Update remaining skill points
-    officer.skillPoints = Math.max(0, totalSkillPoints - pointsToSpend)
-    officer.expPoints = 0
+    officer.skillPoints = Math.max(0, officer.skillPoints*rng(2,0.5,false))
+    officer.autoImproveSkills()
+
     return officer
 }

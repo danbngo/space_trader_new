@@ -5,8 +5,8 @@ function createLootCargoTable(playerCargo = new CountsMap(), loot = new CountsMa
     for (const ct of CARGO_TYPES_ALL) {
         rows.push([
             ct.name,
-            loot.getAmount(ct),
-            playerCargo.getAmount(ct),
+            ''+loot.getAmount(ct),
+            ''+playerCargo.getAmount(ct),
         ])
     }
     return createTable(rows, (rowIndex = 0)=>onSelectCargoType(CARGO_TYPES_ALL[rowIndex]))
@@ -48,7 +48,7 @@ function showLootMenu(loot = new CountsMap()) {
             (amt)=>{
                 return `
                     Your Amount After Dumping: ${fleet.cargo.getAmount(ct)-amt}CR <br/>
-                    Total Cargo After Dumping: ${fleet.cargo.totalAmt}/${fleet.totalCargoSpace}<br/>
+                    Total Cargo After Dumping: ${fleet.cargo.total}/${fleet.totalCargoSpace}<br/>
                 `
             },
             'Dump', 'Cancel', (amt = 0)=>dumpCargo(ct, amt), ()=>reloadMenu(),
@@ -74,7 +74,7 @@ function showLootMenu(loot = new CountsMap()) {
         ]
     })
 
-    panel = showModal(
+    showModal(
         `Loot Cargo`,
         infoContainer,
         [['Continue', ()=>endEncounter()]],

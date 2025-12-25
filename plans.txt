@@ -1,9 +1,9 @@
 DONE BY AI, NEEDS TO BE CHECKED:
+CHECKED: -added new stuff to captain menu to see his reputation, bounty infamy etc.
+-academy improvements - let players pay money for skills, some are cheaper than others
  -good way to improve - only grant cargo for meteors you personally destroyed
 -split up bounties, maybe reputation, by planet
 -make the "fast!" status effect come from a module and remove the "slow!" one
--added new stuff to captain menu to see his reputation, bounty infamy etc.
--academy improvements - let players pay money for skills, some are cheaper than others
 
 NEXT UP:
 -damage text isnt showing on the very last action of a turn

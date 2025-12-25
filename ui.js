@@ -16,6 +16,7 @@ function removeChildren(parent = ce()) {
  */
 function refreshPanelButtons (panelId = '', buttons) {
     const panel = (panelId instanceof HTMLElement) ? panelId : document.body.querySelector(`#${panelId}`)
+    if (!panel) throw new Error(`Panel with id '${panelId}' not found for refreshPanelButtons`);
     const buttonsEl = panel.querySelector(".panel-buttons")
     removeChildren(buttonsEl)
     if (buttons) buttons.forEach((btnData) => {
@@ -210,7 +211,7 @@ function applyStyle(element, style = {}) {
 }
 
 // utils.js or tableUtil.js
-function createTable(rows = [ce()], onSelectRow = (index = 0)=>{}) {
+function createTable(rows = [ce()], onSelectRow = (index = 0)=>{}, firstSelectedIndex = 0) {
     const table = document.createElement("table");
     table.className = "ui-table";
 
@@ -221,6 +222,8 @@ function createTable(rows = [ce()], onSelectRow = (index = 0)=>{}) {
 
     let selectedRow = undefined
     rows.forEach((row, index) => {
+        const isFirstSelected = (index) === firstSelectedIndex
+
         const onRowClicked = ()=>{
             if (selectedRow) selectedRow.classList.remove('selected')
             tr.classList.add('selected')
@@ -231,9 +234,10 @@ function createTable(rows = [ce()], onSelectRow = (index = 0)=>{}) {
         const tr = ce({
             parent: table,
             tag:'tr',
-            classNames: [index == 0 ? 'ui-table-first-row' : 'ui-table-row'],
+            classNames: [index == 0 ? 'ui-table-first-row' : 'ui-table-row', isFirstSelected ? 'selected' : null],
             onClick: (index == 0 ? undefined : onRowClicked)
         })
+        if (isFirstSelected) selectedRow = tr
 
         for (let i = 0; i < colCount; i++) {
             ce({
@@ -245,6 +249,8 @@ function createTable(rows = [ce()], onSelectRow = (index = 0)=>{}) {
             })
         }
     });
+
+    //if (firstSelectedIndex !== undefined && firstSelectedIndex !== null) onSelectRow(firstSelectedIndex);
 
     return table;
 }

@@ -129,12 +129,10 @@ class Academy extends Building {
         this.skillCosts = skillCosts // CountsMap with skill cost modifiers (0.5-2 range)
     }
     
-    calcSkillUpgradeCost(skill = SKILLS_ALL[0], currentLevel = 0) {
+    calcSkillUpgradeCost(officer = new Officer(), skill = SKILLS_ALL[0]) {
         // Base cost scales exponentially with current skill level
-        const baseCost = Math.ceil(100 * Math.pow(1.5, currentLevel))
-        // Apply skill-specific cost modifier from academy's specialization
+        const baseCost = 250 * officer.calcSkillPointsToUpgrade(skill, false)
         const skillModifier = this.skillCosts.getAmount(skill) || 1
-        // Apply rake (overall cost modifier based on academy quality)
         return Math.ceil(baseCost * skillModifier * (1 + this.rake))
     }
 }

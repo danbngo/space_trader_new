@@ -1,67 +1,58 @@
 
-function showAcademyMenu(academy = new Academy()) {
+function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0]) {
     const {planet} = academy
-    const reloadMenu = ()=>showAcademyMenu(academy)
+    const reloadMenu = (skill = selectedSkill) => showAcademyMenu(academy, skill)
     const isDocked = gs.location == planet
 
     function upgradeSkill(skill = SKILLS_ALL[0]) {
-        const currentLevel = gs.captain.skills.getAmount(skill)
-        const cost = academy.calcSkillUpgradeCost(skill, currentLevel)
+        const cost = academy.calcSkillUpgradeCost(gs.captain, skill)
         
-        if (gs.credits >= cost) {
+        if (gs.credits >= cost && isDocked) {
             gs.credits -= cost
             gs.captain.skills.increment(skill, 1)
-            reloadMenu()
+            reloadMenu(skill)
         }
     }
 
-    function showSkillUpgradeInfo(skill = SKILLS_ALL[0]) {
-        const currentLevel = gs.captain.skills.getAmount(skill)
-        const cost = academy.calcSkillUpgradeCost(skill, currentLevel)
-        const skillModifier = academy.skillCosts.getAmount(skill) || 1
+    function onSelectSkill(skill = SKILLS_ALL[0]) {
+        const cost = academy.calcSkillUpgradeCost(gs.captain, skill)
+        const canAfford = gs.credits >= cost && isDocked
         
-        let msg = `<b>${skill}</b><br/>`
-        msg += `Current Level: ${currentLevel}<br/>`
-        msg += `Upgrade Cost: ${cost}CR<br/><br/>`
-        
-        // Show if this academy is good or bad for this skill
-        if (skillModifier < 0.8) {
-            msg += colorSpan(`This academy specializes in ${skill}!`, 'lightgreen', true) + `<br/>`
-        } else if (skillModifier > 1.5) {
-            msg += colorSpan(`This academy is not ideal for ${skill}.`, 'orange', true) + `<br/>`
-        }
-        
-        msg += `<br/>Upgrading will increase your ${skill} skill by 1.`
-        
-        showModal(
-            `${skill} Training`,
-            msg,
-            [
-                ['Upgrade', () => {
-                    upgradeSkill(skill)
-                }, gs.credits < cost || !isDocked],
-                ['Back', reloadMenu]
+        const buttons = [
+            ['Upgrade', () => upgradeSkill(skill), !canAfford],
+            ['Back', () => showPlanetMenu(planet)]
+        ]
+        refreshPanelButtons('academy_panel', buttons)
+    }
+
+    // Build skills table with columns: Skill Name, CR to Upgrade
+    const skillTableRows = [
+        ['Skill', 'Current Lvl', 'CR to Upgrade'],
+        ...SKILLS_ALL.map(skill => {
+            const currentLevel = gs.captain.skills.getAmount(skill)
+            const cost = academy.calcSkillUpgradeCost(gs.captain, skill)
+            const skillModifier = academy.skillCosts.getAmount(skill) || 1
+            const totalMultiplier = skillModifier * (1 + academy.rake)
+            // Calculate stat ratio: 1.0 rake and 1.0 skillCost = white (ratio 1)
+            // Higher = red (ratio < 1), Lower = green (ratio > 1)
+            const statRatio = 1 / totalMultiplier
+            
+            return [
+                skill,
+                currentLevel,
+                statColorSpan(cost, statRatio, true) + ' CR'
             ]
-        )
-    }
+        })
+    ]
 
-    const skillButtons = SKILLS_ALL.map(skill => {
-        const currentLevel = gs.captain.skills.getAmount(skill)
-        const cost = academy.calcSkillUpgradeCost(skill, currentLevel)
-        const skillModifier = academy.skillCosts.getAmount(skill) || 1
-        
-        // Add indicator for good/bad specialization
-        let label = `${skill} (${cost}CR)`
-        if (skillModifier < 0.8) label += ' ★'
-        
-        return [label, () => showSkillUpgradeInfo(skill), !isDocked]
-    })
+    const skillTable = createTable(skillTableRows, (rowIndex) => onSelectSkill(SKILLS_ALL[rowIndex]), selectedSkill ? SKILLS_ALL.indexOf(selectedSkill) + 1 : null)
 
     let infoContainer = ce({
         children: [
-            `Your CR: ${gs.credits}<br/>`,
-            `Academy Quality: ${statColorSpan(roundToPlaces(1/(1+academy.rake), 2), 1/(1+academy.rake), true)}x<br/>`,
             `<br/>${isDocked ? 'Select a skill to train:' : 'You must dock to use the academy.'}`,
+            skillTable,
+            `Your CR: ${gs.credits}<br/>`,
+            `Training Tax: ${statColorSpan(roundToPlaces(100*academy.rake, 2), 1/(1+academy.rake), true)}%<br/>`,
         ]
     })
 
@@ -69,16 +60,16 @@ function showAcademyMenu(academy = new Academy()) {
         `${coloredName(planet)} - Academy`,
         ce({
             children:[
-                `The academy offers training to enhance your skills for a price.<br/>`,
-                `Costs increase with your current skill level.<br/>`,
-                `★ indicates this academy specializes in that skill.<br/>`,
                 infoContainer,
             ]
         }),
         [
-            ...skillButtons,
             ['Back', ()=>showPlanetMenu(planet)]
         ],
         'academy_panel'
     );
+
+    if (selectedSkill) {
+        onSelectSkill(selectedSkill);
+    }
 }

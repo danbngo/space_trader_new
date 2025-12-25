@@ -17,15 +17,6 @@ class Officer {
         this.fleet = null;
     }
 
-    levelUp(autoImproveSkills = false) {
-        this.expPoints -= this.expToNextLevel;
-        this.level++;
-        this.skillPoints += SKILL_POINTS_PER_LEVEL;
-        if (autoImproveSkills) {
-            this.autoImproveSkills();
-        }
-    }
-
     grantExperience(amount = 0, autoLevelUp = (this !== gs.captain), autoImproveSkills = (this !== gs.captain)) {
         let msg = ''
         this.expPoints += amount;
@@ -80,11 +71,29 @@ class Officer {
         return ''
     }
 
+    calcSkillPointsToUpgrade(skill = SKILLS_ALL[0], rounded = true) {
+        const points = (1+this.skills.getAmount(skill)) / 1.5
+        return rounded ? Math.ceil(points) : points
+    }
+
+    levelUp(autoImproveSkills = false) {
+        this.expPoints -= this.expToNextLevel;
+        this.level++;
+        this.skillPoints += SKILL_POINTS_PER_LEVEL;
+        if (autoImproveSkills) {
+            this.autoImproveSkills();
+        }
+    }
+
     autoImproveSkills() {
-        while (this.skillPoints > 0) {
+        let attempts = 100
+        while (this.skillPoints > 0 && attempts-- > 0) {
             const skill = rndMember(SKILLS_ALL)
-            this.skills.increment(skill, 1)
-            this.skillPoints--
+            const costToUpgrade = this.calcSkillPointsToUpgrade(skill)
+            if (this.skillPoints >= costToUpgrade) {
+                this.skills.increment(skill, 1)
+                this.skillPoints -= costToUpgrade
+            }
         }
     }
 
@@ -98,7 +107,7 @@ class Officer {
 
     get value() {
         const totalSkillPoints = this.skills.total
-        return Math.pow(1 + totalSkillPoints, 2)*100
+        return Math.pow(1 + totalSkillPoints, 2)*10
     }
 
     get crShare() {

@@ -63,7 +63,7 @@ class StarMap extends BaseMap {
             ['Ships Manifest', ()=>showShipsMenu()],
             ['Cargo Manifest', ()=>showCargoMenu()],
             ['Officer Roster', ()=>showOfficersMenu()],
-            ['Captain Overview', ()=>showCaptainMenu(), false, hasSkillPoints ? 'highlighted' : null],
+            ['Captain Overview', ()=>showCaptainSkillsMenu(), false, hasSkillPoints ? 'highlighted' : null],
             ['Cancel', ()=>closeModal()],
         ])
     }
