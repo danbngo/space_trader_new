@@ -1,61 +1,70 @@
 
-// Ship class
-
 /**
+ * Represents a spaceship with various attributes and methods for combat and movement.
  * @class Ship
- * @description Represents a spaceship with various attributes and methods for combat and movement.
- * @property {string} name - The name of the ship.
- * @property {Object} shipType - The type of the ship, containing its modules and other characteristics.
- * @property {Array<number>} color - The RGB color of the ship.
- * @property {Array<number>} hull - The current and maximum hull integrity of the ship.
- * @property {Array<number>} shields - The current and maximum shield strength of the ship.
- * @property {number} lasers - The laser power of the ship.
- * @property {number} engine - The engine power of the ship.
- * @property {number} cargoSpace - The cargo space available on the ship.
- * @property {number} radars - The radar capability of the ship.
- * @property {Fleet|null} fleet - The fleet to which the ship belongs.
- * @property {number} x - The x-coordinate of the ship in combat.
- * @property {number} y - The y-coordinate of the ship in combat.
- * @property {number} angle - The direction the ship is facing in radians.
- * @property {boolean} escaped - Indicates if the ship has escaped combat.
- * @property {number} maxActionsPerTurn - The maximum number of actions the ship can take per turn.
- * @property {number} actionsRemaining - The number of actions remaining for the ship in the current turn.
- * @property {any} aiType - The AI type of the ship (e.g., Ship, Asteroid).
- * @property {Array<ShipModule>} localModules - The modules installed locally on the ship.
- * @property {CountsMap} moduleCooldowns - A map tracking cooldowns for ship modules.
- * @property {CountsMap} statusEffects - A map tracking status effects applied to the ship.
- * @method get modules() - Returns all modules installed on the ship.
- * @method get isFlagship() - Checks if the ship is the flagship of its fleet.
  */
-
-
 class Ship {
+    /**
+     * @param {string} name - The name of the ship.
+     * @param {ShipType} shipType - The type of the ship, containing its modules and other characteristics.
+     * @param {number[]} color - The RGB color of the ship.
+     * @param {number[]} hull - The current and maximum hull integrity [current, max].
+     * @param {number[]} shields - The current and maximum shield strength [current, max].
+     * @param {number} lasers - The laser power of the ship.
+     * @param {number} engine - The engine power of the ship.
+     * @param {number} cargoSpace - The cargo space available on the ship.
+     * @param {number} radars - The radar capability of the ship.
+     * @param {number} maxActionsPerTurn - The maximum number of actions the ship can take per turn.
+     */
     constructor(name = "Unnamed", shipType = SHIP_TYPES[0], color = COLORS.White, hull = [0, 0], shields = [0, 0], lasers = 0, engine = 0, cargoSpace = 0, radars = 0, maxActionsPerTurn = SHIP_NUM_MOVES_PER_TURN) {
+        /** @type {string} */
         this.name = name;
+        /** @type {ShipType} */
         this.shipType = shipType;
+        /** @type {number[]} */
         this.color = [...color];
+        /** @type {number[]} */
         this.hull = hull; //sustain more damage before being disabled
+        /** @type {number[]} */
         this.shields = shields; //take less damage from lasers
+        /** @type {number} */
         this.lasers = lasers; //do more damage in combat, and vs. asteroids
+        /** @type {number} */
         this.radars = radars; //shoot further, and detect enemies and asteroids at greater distances
+        /** @type {number} */
         this.engine = engine; //move further in combat, travel faster in systems, ram harder, regen shields faster
+        /** @type {number} */
         this.cargoSpace = cargoSpace; //hold more stuff in your ships
+        /** @type {Fleet} */
         this.fleet = null;
 
         //combat vars
+        /** @type {number} */
         this.x = 0; //used for encounters, only fleets travel in systems
+        /** @type {number} */
         this.y = 0;
+        /** @type {number} */
         this.angle = Math.PI*2; //direction ship is facing in. it can only accelerate/decelerate and shoot in that direction
+        /** @type {boolean} */
         this.escaped = false;
+        /** @type {number} */
         this.maxActionsPerTurn = maxActionsPerTurn;
+        /** @type {number} */
         this.actionsRemaining = this.maxActionsPerTurn; //for encounter turn processing
+        /** @type {AI_TYPES} */
         this.aiType = null
+        /** @type {ShipModule[]} */
         this.localModules = []
+        /** @type {CountsMap} */
         this.moduleCooldowns = new CountsMap()
+        /** @type {CountsMap} */
         this.statusEffects = new CountsMap()
+        /** @type {Ship} */
         this.disabledByShip = null
 
+        /** @type {string} */
         this.uuid = generateUUID('ship_');
+        /** @type {number} */
         this.radiusModifier = this.shipType ? rng(this.shipType.maxRadiusModifier, this.shipType.minRadiusModifier, false) : 1;
     }
 

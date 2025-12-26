@@ -1,32 +1,40 @@
 /**
+ * Represents a news event that affects planets and cultures over time.
  * @class News
- * @property {string} name
- * @property {string} newsType
- * @property {number} durationYears
- * @property {number} startYear
- * @property {number} endYear
- * @property {Planet} planet
- * @property {Planet|null} targetPlanet
- * @property {NewsEffect|null} effectOnStart
- * @property {NewsEffect|null} effectOnEnd
- * @property {boolean} started
- * @property {boolean} ended
  */
-
 class News {
+    /**
+     * @param {string} startedName - The name/description of the event when it starts.
+     * @param {string} endedName - The name/description of the event when it ends.
+     * @param {NewsType} newsType - The type of news event.
+     * @param {Planet} planet - The planet where the event originates.
+     * @param {Planet|null} targetPlanet - The target planet affected by the event (if any).
+     */
     constructor(startedName = '', endedName = '', newsType = NEWS_TYPES_ALL[0], planet = new Planet(), targetPlanet = null) {
         //console.log('instantiating News with:',{startedName, endedName, newsType, planet, targetPlanet});
+        /** @type {string} */
         this.startedName = startedName;
+        /** @type {string} */
         this.endedName = endedName;
+        /** @type {NewsType} */
         this.newsType = newsType;
+        /** @type {number} */
         this.durationYears = rng(this.newsType.maxYears, this.newsType.minYears, false);
+        /** @type {number} */
         this.startYear = gs.year;
+        /** @type {number} */
         this.endYear = this.startYear + this.durationYears;
+        /** @type {Planet} */
         this.planet = planet;
+        /** @type {Planet|null} */
         this.targetPlanet = targetPlanet;
+        /** @type {NewsEffect[]} */
         this.startEffects = [];
+        /** @type {NewsEffect[]} */
         this.endEffects = [];
+        /** @type {boolean} */
         this.started = false;
+        /** @type {boolean} */
         this.ended = false;
     }
 
@@ -93,20 +101,45 @@ class News {
 }
 
 
-/** @class NewsEffect
- * @property {Planet} planet
- * @property {Planet|null} targetPlanet
- * @property {GOVERNMENT_TYPES|null} governmentTypeChangedTo
- * @property {RELATIONSHIP_TYPES|null} relationshipToPlanetChangedTo
- * @property {number} marketPricesModifiedBy
- * @property {number} marketCargoAmountsModifiedBy
+/**
+ * Represents the effects a news event has on a planet's culture, economy, and relationships.
+ * @class NewsEffect
  */
 class NewsEffect {
+    /**
+     * @param {Object} params - The effect parameters.
+     * @param {Planet} params.planet - The planet affected.
+     * @param {Planet|null} [params.targetPlanet] - The target planet for relationship changes.
+     * @param {GovernmentType|null} [params.newGovernmentTypeType] - New government type to change to.
+     * @param {RelationshipType|null} [params.newRelationship] - New relationship with target planet.
+     * @param {number} [params.marketPricesModifiedBy] - Multiplier for market prices (inflation).
+     * @param {number} [params.marketCargoAmountsModifiedBy] - Multiplier for market cargo quantities.
+     * @param {number} [params.blackMarketPricesModifiedBy] - Multiplier for black market prices.
+     * @param {number} [params.blackMarketCargoAmountsModifiedBy] - Multiplier for black market cargo quantities.
+     * @param {number} [params.militaryRatingModifiedBy] - Multiplier for military rating.
+     * @param {number} [params.industrialRatingModifiedBy] - Multiplier for industrial rating.
+     * @param {number} [params.commercialRatingModifiedBy] - Multiplier for commercial rating.
+     * @param {number} [params.securityRatingModifiedBy] - Multiplier for security rating.
+     * @param {number} [params.crimeRatingModifiedBy] - Multiplier for crime rating.
+     * @param {number} [params.prestigeRatingModifiedBy] - Multiplier for prestige rating.
+     * @param {number} [params.populationModifiedBy] - Multiplier for population.
+     * @param {number} [params.territoryModifiedBy] - Multiplier for territory.
+     * @param {number} [params.shipQualityModifiedBy] - Multiplier for ship quality.
+     * @param {number} [params.officerQualityModifiedBy] - Multiplier for officer quality.
+     * @param {Building[]} [params.buildingsDisabled] - Buildings to disable.
+     * @param {Building[]} [params.buildingsEnabled] - Buildings to enable.
+     * @param {number} [params.shipyardNumShipsModifiedBy] - Multiplier for shipyard inventory.
+     * @param {number} [params.guildNumOfficersModifiedBy] - Multiplier for guild officer availability.
+     * @param {Map<CargoType, number>} [params.cargoPriceModifiers] - Cargo-specific price modifiers.
+     * @param {number} [params.creditsModifiedBy] - Multiplier for building credits.
+     * @param {boolean} [params.relationsReset] - Whether to reset all relationships to neutral.
+     * @param {function(): void} [params.onApply] - Custom callback function when effect is applied.
+     */
     constructor({
         planet = new Planet(),
         targetPlanet = null,
-        // Government changes
-        newGovernmentType = null,
+        // GovernmentType changes
+        newGovernmentTypeType = null,
     
         // Relationship changes
         newRelationship = null,
@@ -153,45 +186,73 @@ class NewsEffect {
 
         onApply = ()=>{},
     }) {
+        /** @type {Planet} */
         this.planet = planet;
+        /** @type {Planet|null} */
         this.targetPlanet = targetPlanet;
-        this.oldGovernmentType = planet.culture.governmentType;
-        this.newGovernmentType = newGovernmentType;
+        /** @type {GovernmentType} */
+        this.oldGovernmentTypeType = planet.culture.governmentType;
+        /** @type {GovernmentType|null} */
+        this.newGovernmentTypeType = newGovernmentTypeType;
+        /** @type {RelationshipType|null} */
         this.oldRelationship = planet.culture.relationships.get(targetPlanet) || null;
+        /** @type {RelationshipType|null} */
         this.newRelationship = newRelationship;
+        /** @type {number} */
         this.marketPricesModifiedBy = marketPricesModifiedBy;
+        /** @type {number} */
         this.marketCargoAmountsModifiedBy = marketCargoAmountsModifiedBy;
+        /** @type {number} */
         this.blackMarketPricesModifiedBy = blackMarketPricesModifiedBy;
+        /** @type {number} */
         this.blackMarketCargoAmountsModifiedBy = blackMarketCargoAmountsModifiedBy;
+        /** @type {number} */
         this.militaryRatingModifiedBy = militaryRatingModifiedBy;
+        /** @type {number} */
         this.industrialRatingModifiedBy = industrialRatingModifiedBy;
+        /** @type {number} */
         this.commercialRatingModifiedBy = commercialRatingModifiedBy;
+        /** @type {number} */
         this.securityRatingModifiedBy = securityRatingModifiedBy;
+        /** @type {number} */
         this.crimeRatingModifiedBy = crimeRatingModifiedBy;
+        /** @type {number} */
         this.prestigeRatingModifiedBy = prestigeRatingModifiedBy;
+        /** @type {number} */
         this.populationModifiedBy = populationModifiedBy;
+        /** @type {number} */
         this.territoryModifiedBy = territoryModifiedBy;
+        /** @type {Building[]} */
         this.buildingsDisabled = buildingsDisabled;
+        /** @type {Building[]} */
         this.buildingsEnabled = buildingsEnabled;
+        /** @type {number} */
         this.guildNumOfficersModifiedBy = guildNumOfficersModifiedBy;
+        /** @type {number} */
         this.shipyardNumShipsModifiedBy = shipyardNumShipsModifiedBy;
+        /** @type {number} */
         this.creditsModifiedBy = creditsModifiedBy;
+        /** @type {number} */
         this.shipQualityModifiedBy = shipQualityModifiedBy;
+        /** @type {number} */
         this.officerQualityModifiedBy = officerQualityModifiedBy;
+        /** @type {boolean} */
         this.relationsReset = relationsReset;
+        /** @type {Map<CargoType, number>} */
         this.cargoPriceModifiers = cargoPriceModifiers;
+        /** @type {function(): void} */
         this.onApply = onApply //use sparingly!
     }
 
     apply() {
-        const {planet, targetPlanet, militaryRatingModifiedBy, newGovernmentType, newRelationship, creditsModifiedBy, 
+        const {planet, targetPlanet, militaryRatingModifiedBy, newGovernmentTypeType, newRelationship, creditsModifiedBy, 
             blackMarketCargoAmountsModifiedBy, blackMarketPricesModifiedBy, buildingsDisabled, buildingsEnabled, territoryModifiedBy,
             populationModifiedBy, crimeRatingModifiedBy, marketPricesModifiedBy, securityRatingModifiedBy, commercialRatingModifiedBy, 
             guildNumOfficersModifiedBy, industrialRatingModifiedBy, shipyardNumShipsModifiedBy, marketCargoAmountsModifiedBy,
             shipQualityModifiedBy, officerQualityModifiedBy, relationsReset, prestigeRatingModifiedBy, cargoPriceModifiers} = this;
         const {settlement, culture} = planet
 
-        culture.governmentType = newGovernmentType || culture.governmentType;
+        culture.governmentType = newGovernmentTypeType || culture.governmentType;
         
         culture.shipQuality *= shipQualityModifiedBy;
         culture.officerQuality *= officerQualityModifiedBy;
@@ -251,7 +312,9 @@ class NewsEffect {
         const inverseEffect = new NewsEffect({
             planet: this.planet,
             targetPlanet: this.targetPlanet,
-            newGovernmentType: this.oldGovernmentType,
+            newGovernmentTypeType: this.oldGovernmentTypeType,
+            newRelationship: null,
+            onApply: null,
             //newRelationship: this.oldRelationship, //MUST be handled through onApply as relationships can evolve mid-event
             buildingsDisabled: this.buildingsEnabled,
             buildingsEnabled: this.buildingsDisabled,
@@ -279,7 +342,7 @@ class NewsEffect {
     }
 
     describe() {
-        const {planet, targetPlanet, militaryRatingModifiedBy, newGovernmentType, newRelationship, creditsModifiedBy, 
+        const {planet, targetPlanet, militaryRatingModifiedBy, newGovernmentTypeType, newRelationship, creditsModifiedBy, 
             blackMarketCargoAmountsModifiedBy, blackMarketPricesModifiedBy, buildingsDisabled, buildingsEnabled, territoryModifiedBy,
             populationModifiedBy, crimeRatingModifiedBy, marketPricesModifiedBy, securityRatingModifiedBy, commercialRatingModifiedBy, 
             guildNumOfficersModifiedBy, industrialRatingModifiedBy, shipyardNumShipsModifiedBy, marketCargoAmountsModifiedBy,
@@ -288,7 +351,7 @@ class NewsEffect {
 
         let msg = ''
 
-        if (newGovernmentType) msg += `- Government: ${coloredName(culture.governmentType)} ➜ ${coloredName(newGovernmentType)}.<br/>`
+        if (newGovernmentTypeType) msg += `- GovernmentType: ${coloredName(culture.governmentType)} ➜ ${coloredName(newGovernmentTypeType)}.<br/>`
         if (relationsReset) msg += `- All relationships reset to neutral.<br/>`
         if (targetPlanet && newRelationship) {
             msg += `- Relationship with ${coloredName(targetPlanet)}: ${coloredName(culture.relationships.get(targetPlanet))} ➜ ${coloredName(newRelationship)}.<br/>`
@@ -299,10 +362,10 @@ class NewsEffect {
         }
 
         for (const building of buildingsDisabled) {
-            msg += `${colorSpan(`- ${building.name} destroyed`, COLORS.Red, true)}<br/>`
+            msg += `${colorSpan(`- ${building.buildingType.name} destroyed`, COLORS.Red, true)}<br/>`
         }
         for (const building of buildingsEnabled) {
-            msg += `${colorSpan(`- ${building.name} built`, COLORS.Green, true)}<br/>`
+            msg += `${colorSpan(`- ${building.buildingType.name} built`, COLORS.Green, true)}<br/>`
         }
 
         for (const [cargoType, modifier] of cargoPriceModifiers.entries()) {
@@ -312,7 +375,7 @@ class NewsEffect {
         if (populationModifiedBy !== 1.0) msg += `- Population: ${describePopulation(culture.population)} ➜ ${describePopulation(culture.population*populationModifiedBy)}.<br/>`
         if (territoryModifiedBy !== 1.0) msg += `- Territory: ${describeTerritory(culture.territory)} ➜ ${describeTerritory(culture.territory*territoryModifiedBy)}.<br/>`
         if (prestigeRatingModifiedBy !== 1.0) msg += dscr('- Prestige', culture.prestigeRating, culture.prestigeRating*prestigeRatingModifiedBy)
-        if (militaryRatingModifiedBy !== 1.0) msg += dscr('- Government', culture.militaryRating, culture.militaryRating*militaryRatingModifiedBy)
+        if (militaryRatingModifiedBy !== 1.0) msg += dscr('- GovernmentType', culture.militaryRating, culture.militaryRating*militaryRatingModifiedBy)
         if (industrialRatingModifiedBy !== 1.0) msg += dscr('- Industrial', culture.industrialRating, culture.industrialRating*industrialRatingModifiedBy)
         if (commercialRatingModifiedBy !== 1.0) msg += dscr('- Commercial', culture.commercialRating, culture.commercialRating*commercialRatingModifiedBy)
         if (securityRatingModifiedBy !== 1.0) msg += dscr('- Security', culture.securityRating, culture.securityRating*securityRatingModifiedBy)

@@ -1,19 +1,17 @@
 /**
+ * Represents the overall state of the game, including the player's fleet, captain, and current star system.
  * @class GameState
- * @description Represents the overall state of the game, including the player's fleet, captain, and current star system.
- * @property {number} year - The current year in the game.
- * @property {StarSystem} system - The current star system the player is in.
- * @property {Fleet} fleet - The player's fleet.
- * @property {Encounter|null} encounter - The current encounter, if any.
  */
-
-
 class GameState {
     constructor() {
         console.log('instantiating gameState for star system:');
+        /** @type {number} */
         this.year = GAME_START_YEAR;
+        /** @type {StarSystem} */
         this.system = null;
+        /** @type {Fleet} */
         this.fleet = null;
+        /** @type {Encounter} */
         this.encounter = null;
     }
 

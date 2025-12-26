@@ -1,7 +1,15 @@
 
+/**
+ * AI controller for enemy ships in encounters.
+ * @class EncounterAI
+ */
 class EncounterAI {
+    /**
+     * @param {Encounter} encounter - The encounter this AI is controlling.
+     */
     constructor(encounter = new Encounter()) {
         console.log('EncounterAI.constructor', { encounter });
+        /** @type {Encounter} */
         this.encounter = encounter
     }
 

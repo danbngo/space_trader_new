@@ -3,7 +3,7 @@ function assessPlanets() {
     console.log('Total Planets:', gs.system.planets.length)
 
     const governmentTypes = gs.system.planets.map(p=>p.culture.governmentType)
-    console.log('Government Types:', governmentTypes)
+    console.log('GovernmentType Types:', governmentTypes)
     const relationshipCounts = {}
     for (const p of gs.system.planets) {
         for (const [otherPlanet, relationship] of p.culture.relationships) {
@@ -16,7 +16,10 @@ function assessPlanets() {
     console.log('Relationship Counts:', relationshipCounts)
 
     //list how many times specific news events occurred
+    const totalNews = gs.system.news.length
+    console.log('Total News Events:', totalNews)
     const newsTotalsPerType = {}
+    const newsTotalPercentsPerType = {}
     for (const n of gs.system.news) {
         const count = newsTotalsPerType[n.newsType.name] || 0
         newsTotalsPerType[n.newsType.name] = count + 1
@@ -24,7 +27,15 @@ function assessPlanets() {
     for (const nt of NEWS_TYPES_ALL) {
         if (!newsTotalsPerType[nt.name]) newsTotalsPerType[nt.name] = 0
     }
+    for (const [newsTypeName, count] of Object.entries(newsTotalsPerType)) {
+        const percent = (count / totalNews) * 100
+        newsTotalPercentsPerType[newsTypeName] = percent.toFixed(2) + '%'
+    }
     console.log('-----News Totals Per Type:------', newsTotalsPerType)
+    console.log('Total News Types as % of total:')
+    console.log(newsTotalPercentsPerType)
+
+    console.log('-----Average Planet Stats:------')
 
     const totalPopulation = gs.system.planets.reduce((sum,planet)=>sum+planet.culture.population,0)
     const totalTerritory = gs.system.planets.reduce((sum,planet)=>sum+planet.culture.territory,0)

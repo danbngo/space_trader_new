@@ -1,26 +1,55 @@
 
 
+/**
+ * Represents a combat encounter between fleets.
+ * @class Encounter
+ */
 class Encounter {
+    /**
+     * @param {GameState} gs - The game state.
+     * @param {EncounterType} encounterType - The type of encounter.
+     * @param {Planet} planet - The planet where the encounter occurs.
+     * @param {Fleet} fleet - The enemy fleet.
+     * @param {Effect[]} effects - Environmental effects active in the encounter.
+     */
     constructor(gs = new GameState(), encounterType = ENCOUNTER_TYPES_ALL[0], planet = new Planet(), fleet = new Fleet(), effects = []) {
         console.log('Encounter.constructor', { gs, encounterType, planet, fleet });
+        /** @type {EncounterType} */
         this.encounterType = encounterType;
+        /** @type {Planet} */
         this.planet = planet;
+        /** @type {Fleet} */
         this.fleet = fleet;
+        /** @type {boolean} */
         this.combatEnabled = false;
+        /** @type {number} */
         this.mapRadius = encounterType.mapRadius;
+        /** @type {Fleet} */
         this.playerFleet = gs.fleet
+        /** @type {Ship[]} */
         this.playerShips = this.playerFleet.ships
+        /** @type {Ship} */
         this.playerFlagship = this.playerFleet.flagship
+        /** @type {Fleet} */
         this.enemyFleet = this.fleet
+        /** @type {Ship[]} */
         this.enemyShips = this.enemyFleet.ships
+        /** @type {Ship} */
         this.enemyFlagship = this.enemyFleet.flagship
+        /** @type {Ship[]} */
         this.ships = [...this.playerShips, ...this.enemyShips]
+        /** @type {EncounterAI} */
         this.ai = new EncounterAI(this)
+        /** @type {ENCOUNTER_RESULTS|null} */
         this.result = null //playerVictory, playerDefeat, playerSurrendered,
+        /** @type {Fleet} */
         this.activeTurnFleet = this.playerFleet
+        /** @type {number[]} */
         this.luck = [Math.random(),Math.random(),Math.random(),Math.random(),Math.random()] //used for initial encounter decisions
+        /** @type {Effect[]} */
         this.effects = effects
 
+        /** @type {Map<Ship, number>} */
         this.playerShipHullsAtStart = new Map()
         for (const ship of this.playerShips) {
             this.playerShipHullsAtStart.set(ship, ship.hull[0])

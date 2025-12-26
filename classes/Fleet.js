@@ -1,31 +1,35 @@
 // Fleet class extends SpaceObject
 
 /**
- * @class Fleet
- * @extends SpaceObject
  * Represents a fleet of ships in the game.
- * @param {string} name - The name of the fleet.
- * @param {string} color - The color of the fleet.
- * @param {number} x - The x-coordinate of the fleet's position.
- * @param {number} y - The y-coordinate of the fleet's position.
- * @property {Ship} flagship - The flagship of the fleet.
- * @property {Array<Ship>} ships - The ships in the fleet.
- * @property {CountsMap} cargo - The cargo carried by the fleet.
- * @property {Officer} captain - The captain of the fleet.
- * @property {Array<Officer>} officers - The officers in the fleet.
- * @property {Planet} location - The current location of the fleet.
- * @property {Route|null} route - The route the fleet is following, if any.
+ * @class Fleet
+ * @extends {SpaceObject}
  */
 class Fleet extends SpaceObject {
+    /**
+     * @param {string} name - The name of the fleet.
+     * @param {number[]} color - The color of the fleet.
+     * @param {number} x - The x-coordinate of the fleet's position.
+     * @param {number} y - The y-coordinate of the fleet's position.
+     * @param {Planet} planet - The planet the fleet starts at.
+     */
     constructor(name = "Unnamed", color = COLORS.White, x = 0, y = 0, planet = null) {
         super(name, color, FLEET_RADIUS, x, y);
+        /** @type {Planet} */
         this.planet = planet;
+        /** @type {Ship} */
         this.flagship = null;
+        /** @type {Ship[]} */
         this.ships = []
+        /** @type {CountsMap} */
         this.cargo = new CountsMap();
+        /** @type {Officer} */
         this.captain = null;
+        /** @type {Officer[]} */
         this.officers = []
+        /** @type {Planet} */
         this.location = null;
+        /** @type {Route} */
         this.route = null //could be Route class
     }
 
@@ -86,7 +90,7 @@ class Fleet extends SpaceObject {
     }
 
     get totalRadar() {
-        return this.ships.reduce((total, ship) => total + ship.radar, 0);
+        return this.ships.reduce((total, ship) => total + ship.radars, 0);
     }
 
     get combatRating() {

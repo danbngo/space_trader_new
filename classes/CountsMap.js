@@ -1,11 +1,15 @@
 
 
-// Cargo class
+/**
+ * A map that tracks counts/amounts of various items or entities.
+ * @class CountsMap
+ */
 class CountsMap {
     /**
-     * @param {Map<any,number>} counts 
+     * @param {Map<any,number>} counts - A map of items to their counts.
      */
     constructor(counts = new Map([[{},0]])) {
+        /** @type {Map<any,number>} */
         this.counts = counts
     }
 

@@ -1,5 +1,5 @@
 function generateCulture(planet = new Planet()) {
-    const governmentType = rndMember(GOVERNMENT_TYPES_ALL)
+    const governmentType = rndMember(GOVERNMENT_TYPES_ALL.filter(gt => gt != GOVERNMENT_TYPES.PUPPET_STATE))
     const shipQuality = rng(4,1,false)/2
     const officerQuality = rng(4,1,false)/2
     const population = rng(8,1,false)/4

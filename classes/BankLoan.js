@@ -1,11 +1,29 @@
+/**
+ * Represents a bank loan taken by a player.
+ * @class BankLoan
+ */
 class BankLoan {
+    /**
+     * @param {number} principal - The principal amount of the loan.
+     * @param {number} interest - The interest amount on the loan.
+     * @param {number} term - The term duration of the loan in years.
+     * @param {number} startYear - The year when the loan was taken.
+     * @param {Planet} planet - The planet where this loan was taken.
+     */
     constructor(principal = 0, interest = 0, term = 0, startYear = gs.year, planet = null) {
+        /** @type {number} */
         this.principal = principal
+        /** @type {number} */
         this.interest = interest
+        /** @type {number} */
         this.term = term
+        /** @type {number} */
         this.startYear = startYear
+        /** @type {number} */
         this.dueYear = startYear + term
+        /** @type {number} */
         this.outstandingBalance = this.totalRepayable;
+        /** @type {Planet} */
         this.planet = planet // Track which planet this loan is from
     }
     repay(amount = 0) {

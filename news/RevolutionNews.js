@@ -13,7 +13,7 @@ class RevolutionNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                newGovernmentType: GOVERNMENT_TYPES.ANARCHY,
+                newGovernmentTypeType: GOVERNMENT_TYPES.ANARCHY,
                 militaryRatingModifiedBy: 0.6,
                 securityRatingModifiedBy: 0.7,
                 crimeRatingModifiedBy: 1.4,
@@ -28,7 +28,7 @@ class RevolutionNews extends News {
 
         //dont revert the government type back afterwards
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
-        this.endEffects[0].newGovernmentType = newGovType;
+        this.endEffects[0].newGovernmentTypeType = newGovType;
 
         //government related ratings randomize a bit after a revolution
         Object.assign(this.endEffects[0], {

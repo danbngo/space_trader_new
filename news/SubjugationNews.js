@@ -21,7 +21,7 @@ class SubjugationNews extends News {
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
-                newGovernmentType: GOVERNMENT_TYPES.PUPPET_STATE,
+                newGovernmentTypeType: GOVERNMENT_TYPES.PUPPET_STATE,
                 newRelationship: RELATIONSHIP_TYPES.SUBJECT,
                 territoryModifiedBy: 0.7,
                 militaryRatingModifiedBy: 0.5,

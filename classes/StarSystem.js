@@ -1,16 +1,44 @@
+/**
+ * Represents a star system with stars, planets, fleets, and other objects.
+ * @class StarSystem
+ * @extends {SpaceObject}
+ */
 class StarSystem extends SpaceObject {
+    /**
+     * @param {string} name - The name of the star system.
+     * @param {number[]} color - The color of the star system.
+     * @param {number} radius - The radius of the star system.
+     * @param {number} x - The x-coordinate of the star system.
+     * @param {number} y - The y-coordinate of the star system.
+     * @param {SpaceObject} barycenter - The barycenter of the star system.
+     * @param {Star[]} stars - The stars in the star system.
+     * @param {Planet[]} planets - The planets in the star system.
+     * @param {Fleet[]} fleets - The fleets in the star system.
+     * @param {AsteroidBelt[]} asteroidBelts - The asteroid belts in the star system.
+     * @param {Asteroid[]} asteroids - The asteroids in the star system.
+     * @param {BackgroundStar[]} backgroundStars - The background stars for visual effect.
+     */
     constructor(name = "Unnamed", color = COLORS.White, radius = 0, x = 0, y = 0, barycenter = null, stars = [], planets = [], fleets = [], asteroidBelts = [], asteroids = [], backgroundStars = []) {
         console.log('instantiating star system w name:', name, 'stars:', stars, 'planets:', planets, 'fleets:', fleets);
         super(name, color, radius, x, y)
+        /** @type {SpaceObject} */
         this.barycenter = barycenter
+        /** @type {Star[]} */
         this.stars = stars
+        /** @type {Planet[]} */
         this.planets = planets
+        /** @type {Fleet[]} */
         this.fleets = fleets
+        /** @type {AsteroidBelt[]} */
         this.asteroidBelts = asteroidBelts
+        /** @type {Asteroid[]} */
         this.asteroids = asteroids
+        /** @type {BackgroundStar[]} */
         this.backgroundStars = backgroundStars
         this.asteroids = asteroids
+        /** @type {News[]} */
         this.news = [] //actual News class objects, used to build a timeline
+        /** @type {string[]} */
         this.newsFeed = [] //strings that have more detailed data
     }
 

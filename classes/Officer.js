@@ -1,19 +1,40 @@
 
-// Officer class
+/**
+ * Represents an officer (player captain or crew member).
+ * @class Officer
+ */
 class Officer {
+    /**
+     * @param {string} name - The name of the officer.
+     * @param {number} credits - The credits owned by the officer.
+     * @param {CountsMap|number} fame - Fame per planet (or legacy number for backwards compatibility).
+     * @param {CountsMap|number} infamy - Infamy per planet (or legacy number for backwards compatibility).
+     * @param {CountsMap|number} bounty - Bounty per planet (or legacy number for backwards compatibility).
+     */
     constructor(name = "Unnamed", credits = 0, fame = 0, infamy = 0, bounty = 0) {
+        /** @type {string} */
         this.name = name;
+        /** @type {number} */
         this.credits = credits;
         // Convert old number values to CountsMap if needed (for backwards compatibility)
+        /** @type {CountsMap} */
         this.fame = (typeof fame === 'number') ? new CountsMap() : fame;
+        /** @type {CountsMap} */
         this.infamy = (typeof infamy === 'number') ? new CountsMap() : infamy;
+        /** @type {CountsMap} */
         this.bounty = (typeof bounty === 'number') ? new CountsMap() : bounty;
         // If we received numbers, we can't assign them to a planet, so leave maps empty
+        /** @type {CountsMap} */
         this.skills = new CountsMap();
+        /** @type {number} */
         this.level = 1;
+        /** @type {number} */
         this.skillPoints = STARTING_SKILL_POINTS;
+        /** @type {number} */
         this.expPoints = 0;
+        /** @type {BankLoan[]} */
         this.loans = []
+        /** @type {Fleet} */
         this.fleet = null;
     }
 

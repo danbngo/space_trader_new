@@ -1,7 +1,7 @@
 class CrackdownNews extends News {
     constructor(planet = new Planet()) {
         super(
-            `Government cracks down on crime on ${coloredName(planet)}!`,
+            `GovernmentType cracks down on crime on ${coloredName(planet)}!`,
             `The anti-crime crackdown on ${coloredName(planet)} ends.`,
             NEWS_TYPES.CRACKDOWN, planet
         )

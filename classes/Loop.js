@@ -1,11 +1,27 @@
+/**
+ * A loop that runs an animation or timed operation.
+ * @class Loop
+ */
 class Loop {
+    /**
+     * @param {number} durationMs - The duration of the loop in milliseconds.
+     * @param {function(number): void} onUpdate - Callback function called each frame with progress ratio (0-1).
+     * @param {function(): void} onComplete - Callback function called when the loop completes.
+     */
     constructor(durationMs = 1000, onUpdate = (progressRatio = 0)=>{}, onComplete = ()=>{}) {
+        /** @type {number} */
         this.durationMs = durationMs;
+        /** @type {function(number): void} */
         this.onUpdate = onUpdate;
+        /** @type {function(): void} */
         this.onComplete = onComplete;
+        /** @type {number} */
         this.startTime = null;
+        /** @type {number} */
         this.requestId = null;
+        /** @type {number} */
         this.startMs = null;
+        /** @type {boolean} */
         this.completed = false;
         this.update()
     }
