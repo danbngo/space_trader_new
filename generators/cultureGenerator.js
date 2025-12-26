@@ -13,7 +13,7 @@ function generateCulture(planet = new Planet()) {
 
     const cargoPriceModifiers = new CountsMap()
     for (const ct of CARGO_TYPES_ALL) {
-        cargoPriceModifiers.setAmount(ct, Math.random() > .5 ? 1/rng(5,1,false) : rng(5,1,false))
+        cargoPriceModifiers.setAmount(ct, rng(MARKET_MAX_CARGO_PRICE_MODIFIER, MARKET_MIN_CARGO_PRICE_MODIFIER, false))
     }
 
     return new Culture(planet, governmentType, cargoPriceModifiers, shipQuality, officerQuality, territory, population, militaryRating, industrialRating, commercialRating, securityRating, crimeRating, prestigeRating)

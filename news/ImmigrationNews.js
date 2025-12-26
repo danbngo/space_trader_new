@@ -1,9 +1,9 @@
 class ImmigrationNews extends News {
-    constructor(planet = new Planet(), startYear = gs.year) {
+    constructor(planet = new Planet()) {
         super(
             `${coloredName(planet)} experiences a massive influx of immigration!`,
             `The rush of immigration to ${coloredName(planet)} subsides.`,
-            NEWS_TYPES.IMMIGRATION, planet, null, startYear
+            NEWS_TYPES.IMMIGRATION, planet
         )
 
         this.startEffects = [
@@ -24,12 +24,13 @@ class ImmigrationNews extends News {
         })
     }
 
-    static isValid(planet = new Planet()) {
+    isValid() {
+        const {planet} = this
         //people generally go where theres economic opportunity
-        const ratingsValid = planet.culture.commercialRating >= 1.0
+        const ratingsValid = planet.culture.commercialRating >= 1.2
 
         const interferingEvent = 
-            News.hasNews(planet, NEWS_TYPES.IMMIGRATION) || News.hasNews(planet, NEWS_TYPES.CIVIL_WAR) ||
+            News.hasNews(planet, NEWS_TYPES.IMMIGRATION) || News.hasNews(planet, NEWS_TYPES.CIVIL_WAR) || News.hasNews(planet, NEWS_TYPES.PLAGUE) ||
             News.hasNews(planet, NEWS_TYPES.REVOLUTION) || News.hasNews(planet, NEWS_TYPES.DEPRESSION) ||
             News.hasNews(planet, NEWS_TYPES.SCARCITY) || News.hasNewsTargeting(planet, NEWS_TYPES.BOMBARDMENT)
         return ratingsValid && !interferingEvent

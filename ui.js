@@ -52,7 +52,7 @@ function createPanel(title = '', text = '', buttons = [], id = '') {
         classNames: ['panel'],
         children: [
             ce({classNames:['panel-title'], innerHTML: title}),
-            text,
+            ce({classNames:['panel-content'], children: [text]}),
             ce({classNames:['panel-buttons']})
         ]
     })
@@ -174,14 +174,14 @@ function statColorSpan(text = '', ratio = 1.0, asHtmlText = false) {
  * @returns {string | HTMLElement}
  */
 function colorSpan(text = '', color = '', asHtmlText = true) {
-    if (asHtmlText) {
-        // return HTML string instead of DOM element
-        return `<span style="color: ${color}">${text}</span>`;
-    }
-
     if (Array.isArray(color)) {
         // convert color array to rgba string
         color = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${color.length > 3 ? color[3] : 1})`;
+    }
+
+    if (asHtmlText) {
+        // return HTML string instead of DOM element
+        return `<span style="color: ${color}">${text}</span>`;
     }
 
     // return DOM element normally

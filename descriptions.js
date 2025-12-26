@@ -19,12 +19,23 @@ function describeTimespan(years = 0) {
     return format(hours, "hour");
 }
 
+/**
+ * @function coloredName
+ * @description Returns the name of a SpaceObject (Planet, Ship, Effect, etc.) wrapped in a colored span based on its color property.
+ * @param {SpaceObject | Ship | Fleet | CargoType | ShipModuleType} obj - The SpaceObject whose name is to be colored.
+ * @returns {string} - The colored name as an HTML string.
+ */
 function coloredName(obj = new SpaceObject()) {
     let name = obj.name ? obj.name : ''
     if (obj instanceof Ship) name = obj.shipType.name
     if (obj instanceof Effect) name = obj.effectType.name
+    if (obj instanceof Fleet) return obj.planet ? `${coloredIanName(obj.planet)} ${obj.name}` : obj.name
 
-    return `${colorSpan(name, COLORS.White, true)}`
+    return `${colorSpan(name, obj.color ? obj.color : '', true)}`
+}
+
+function coloredIanName(obj = new Planet()) {
+    return `${colorSpan(obj.ianName, obj.color, true)}`
 }
 
 function describeDate(year = 0, minutesEnabled = false) {

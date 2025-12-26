@@ -1,33 +1,39 @@
 class EconomicBoomNews extends News {
-    constructor(planet = new Planet(), startYear = gs.year) {
+    constructor(planet = new Planet()) {
         super(
-            `${coloredName(planet)} experiences an economic boom!`,
+            `${coloredName(planet)} experiences an economic boom! Its citizens are living in a gilded age!`,
             `${coloredName(planet)}'s booming economy normalizes.`,
-            NEWS_TYPES.ECONOMIC_BOOM, planet, null, startYear
+            NEWS_TYPES.ECONOMIC_BOOM, planet
         )
 
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                marketPricesModifiedBy: 1.1,
+                marketPricesModifiedBy: 0.8,
                 marketCargoAmountsModifiedBy: 1.5,
+                blackMarketCargoAmountsModifiedBy: 1.2,
                 commercialRatingModifiedBy: 1.4,
                 industrialRatingModifiedBy: 1.3,
-                populationModifiedBy: 1.1,
-                bankCreditsModifiedBy: 1.5,
+                creditsModifiedBy: 2,
                 shipyardNumShipsModifiedBy: 1.4,
+                cargoPriceModifiers: new Map([[CARGO_TYPES.HOLOCUBES, 2]]),
             })
         ]
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        //credit remains high After
+        Object.assign(this.endEffects[0], {
+            creditsModifiedBy: (1 + this.endEffects[0].creditsModifiedBy)/2,
+        })
     }
 
-    static isValid(planet = new Planet()) {
+    isValid() {
+        const {planet} = this
         //happens when economy is already somewhat good
-        const ratingsValid = planet.culture.commercialRating >= 1.0 && planet.culture.industrialRating >= 1.0
+        const ratingsValid = (planet.culture.commercialRating >= 1.2) && (planet.culture.industrialRating >= 1.2)
 
         const interferingEvent = 
-            News.hasNews(planet, NEWS_TYPES.DEPRESSION) || News.hasNews(planet, NEWS_TYPES.ECONOMIC_BOOM) ||
+            News.hasNews(planet, NEWS_TYPES.ECONOMIC_BOOM) || News.hasNews(planet, NEWS_TYPES.DEPRESSION) || News.hasNews(planet, NEWS_TYPES.PLAGUE) ||
             News.hasNews(planet, NEWS_TYPES.SCARCITY) || News.hasNews(planet, NEWS_TYPES.INFLATION) ||
             News.hasNewsTargeting(planet, NEWS_TYPES.WAR) || News.hasNewsTargeting(planet, NEWS_TYPES.BOMBARDMENT)
         return ratingsValid && !interferingEvent

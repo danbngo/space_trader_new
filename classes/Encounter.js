@@ -19,7 +19,6 @@ class Encounter {
         this.result = null //playerVictory, playerDefeat, playerSurrendered,
         this.activeTurnFleet = this.playerFleet
         this.luck = [Math.random(),Math.random(),Math.random(),Math.random(),Math.random()] //used for initial encounter decisions
-        this.fleetName = this.planet ? `${this.planet.ianName} ${this.encounterType.name}` : this.encounterType.name
         this.effects = effects
 
         this.playerShipHullsAtStart = new Map()

@@ -1,11 +1,9 @@
 class CivilStrifeNews extends News {
-    constructor(planet = new Planet(), startYear = gs.year) {
-        const newGovType = rndMember(GOVERNMENT_TYPES_ALL.filter(g => g !== planet.culture.governmentType));
-        
+    constructor(planet = new Planet()) {
         super(
             `Civil strife is consuming ${coloredName(planet)}!`,
             `${coloredName(planet)}'s civil strife is brought to an end!`,
-            NEWS_TYPES.CIVIL_STRIFE, planet, null, startYear
+            NEWS_TYPES.CIVIL_STRIFE, planet
         )
 
         this.startEffects = [
@@ -16,21 +14,23 @@ class CivilStrifeNews extends News {
                 crimeRatingModifiedBy: 1.3,
                 commercialRatingModifiedBy: 0.8,
                 industrialRatingModifiedBy: 0.6,
+                creditsModifiedBy: 0.7,
+                cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, 1.5]]), //this is the only thing that normalizes after
             })
         ]
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //some lingering security decrease
         Object.assign(this.endEffects[0], {
-            securityRatingModifiedBy: (1 + this.endEffects[0].securityRatingModifiedBy)/1,
+            securityRatingModifiedBy: (1 + this.endEffects[0].securityRatingModifiedBy)/2,
         })
     }
 
-    static isValid(planet = new Planet()) {
+    isValid() {
+        const {planet} = this
         //planet must not already be in anarchy or puppet state
         const agencyValid = planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY && planet.culture.governmentType != GOVERNMENT_TYPES.PUPPET_STATE
         const interferingEvent =
-            News.hasNews(planet, NEWS_TYPES.CIVIL_WAR) || News.hasNews(planet, NEWS_TYPES.REVOLUTION) ||
-            News.hasNewsTargeting(planet, NEWS_TYPES.BOMBARDMENT)
+            News.hasNews(planet, NEWS_TYPES.CIVIL_STRIFE) || News.hasNews(planet, NEWS_TYPES.CIVIL_WAR) || News.hasNews(planet, NEWS_TYPES.REVOLUTION)
         return agencyValid && !interferingEvent
     }
 }

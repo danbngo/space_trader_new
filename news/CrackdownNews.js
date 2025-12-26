@@ -1,9 +1,9 @@
 class CrackdownNews extends News {
-    constructor(planet = new Planet(), startYear = gs.year) {
+    constructor(planet = new Planet()) {
         super(
             `Government cracks down on crime on ${coloredName(planet)}!`,
             `The anti-crime crackdown on ${coloredName(planet)} ends.`,
-            NEWS_TYPES.CRACKDOWN, planet, null, startYear
+            NEWS_TYPES.CRACKDOWN, planet
         )
 
         this.startEffects = [
@@ -15,6 +15,7 @@ class CrackdownNews extends News {
                 blackMarketCargoAmountsModifiedBy: 0.6,
                 blackMarketPricesModifiedBy: 1.3,
                 prestigeRatingModifiedBy: 0.8, //other planets look unfavorably on this
+                cargoPriceModifiers: new Map([[CARGO_TYPES.DRUGS, 2]]),
             })
         ]
 
@@ -27,7 +28,8 @@ class CrackdownNews extends News {
         })
     }
 
-    static isValid(planet = new Planet()) {
+    isValid() {
+        const {planet} = this
         //wont happen if crime is already low
         const crimeValid = planet.culture.crimeRating > 1
 

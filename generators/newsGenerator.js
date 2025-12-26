@@ -10,52 +10,57 @@ const NEWS_TYPE_CLASSES = new Map([
     [NEWS_TYPES.DEPRESSION, DepressionNews],
     [NEWS_TYPES.ECONOMIC_BOOM, EconomicBoomNews],
     [NEWS_TYPES.EMBARGO, EmbargoNews],
+    [NEWS_TYPES.ENVIRONMENTAL_DISASTER, EnvironmentalDisasterNews],
     [NEWS_TYPES.IMMIGRATION, ImmigrationNews],
     [NEWS_TYPES.INFLATION, InflationNews],
+    [NEWS_TYPES.INVESTMENT, InvestmentNews],
+    [NEWS_TYPES.DISARMAMENT, DisarmamentNews],
+    [NEWS_TYPES.MILITARY_BUILDUP, MilitaryBuildupNews],
+    [NEWS_TYPES.PLAGUE, PlagueNews],
+    [NEWS_TYPES.RESEARCH_AGREEMENT, ResearchAgreementNews],
     [NEWS_TYPES.REVOLUTION, RevolutionNews],
     [NEWS_TYPES.SCARCITY, ScarcityNews],
     [NEWS_TYPES.SCIENTIFIC_BREAKTHROUGH, ScientificBreakthroughNews],
     [NEWS_TYPES.SUBJUGATION, SubjugationNews],
+    [NEWS_TYPES.SURPLUS, SurplusNews],
     [NEWS_TYPES.TENSIONS, TensionsNews],
     [NEWS_TYPES.TRADE_AGREEMENT, TradeAgreementNews],
     [NEWS_TYPES.WAR, WarNews],
 ])
 
+const NEWS_TYPE_CLASSES_ARRAY = Object.freeze(Array.from(NEWS_TYPE_CLASSES.values()))
+
 
 //unlike other generators this one can return null even if generation was possible, its rng basically
-function generateNews(year = gs.year) {
+//unlike other simulators, this one operates directly on gs.system
+function generateNews() {
     const planets = PLANETS
     const planet = rndMember(planets)
     const targetPlanet = rndMember(PLANETS.filter(p=>(p !== planet)))
-    const [type,cls] = rndMember(Array.from(NEWS_TYPE_CLASSES.entries()))
-    if (!cls.isValid(planet, targetPlanet)) return null
-    const news = new cls(planet, year, targetPlanet)
+    const cls = rndMember([...NEWS_TYPE_CLASSES_ARRAY])
+    const news = new cls(planet, targetPlanet)
+    const isValid = news.isValid()
+    if (!isValid) return null
     return news
 }
 
 
 //simulate news for a given time period
-function generateHistory(startYear = 2500, endYear = 3000) {
-    let activeNews = []
-    const completedNews = []
-    const years = endYear-startYear
-    for (let dayInYear = 0; dayInYear <= years*365; dayInYear += 1/365) {
+//unlike other simulators, this one operates directly on gs.system
+function addHistory(startYear = 3000, endYear = 3000) {
+    for (let y = startYear; y < endYear; y += 1/365) {
+        gs.year = y
         if (Math.random() < NEWS_CHANCE_PER_DAY) {
-            const news = generateNews(startYear + dayInYear/365)
+            const news = generateNews()
             if (!news) continue
-            activeNews.push(news)
+            gs.system.news.push(news)
             news.start()
         }
-        for (const n of activeNews) {
-            if (n.calcIsExpired()) {
+        for (const n of gs.system.news) {
+            // @ts-ignore
+            if (n.started && !n.ended && n.expired && (!n.isValidEnd || n.isValidEnd())) {
                 n.end()
-                completedNews.push(n)
             }
         }
-        activeNews = activeNews.filter(n => !n.ended)
     }
-    const news = [...activeNews, ...completedNews]
-    //sort news oldest to newest
-    news.sort((a,b)=>{ return a.startYear - b.startYear })
-    return news
 }

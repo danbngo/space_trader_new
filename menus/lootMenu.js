@@ -29,8 +29,8 @@ function showLootMenu(loot = new CountsMap()) {
 
     function showTakeCargoSlider(ct = CARGO_TYPES_ALL[0], takeableAmount = 0) {
         showSliderModal(
-            1, takeableAmount, `Take ${ct.name}`, 
-            `How many ${ct.name} would you like to take?`,
+            1, takeableAmount, `Take ${coloredName(ct)}`, 
+            `How many ${coloredName(ct)} would you like to take?`,
             (amt)=>{
                 return `
                     Your Amount After Taking: ${fleet.cargo.getAmount(ct)+amt}<br/>
@@ -43,8 +43,8 @@ function showLootMenu(loot = new CountsMap()) {
 
     function showDumpCargoSlider(ct = CARGO_TYPES_ALL[0], dumpableAmount = 0) {
         showSliderModal(
-            1, dumpableAmount, `Dump ${ct.name}`,
-            `How many ${ct.name} would you like to dump?`,
+            1, dumpableAmount, `Dump ${coloredName(ct)}`,
+            `How many ${coloredName(ct)} would you like to dump?`,
             (amt)=>{
                 return `
                     Your Amount After Dumping: ${fleet.cargo.getAmount(ct)-amt}CR <br/>

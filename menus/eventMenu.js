@@ -205,7 +205,7 @@ function checkDebtCollections(elapsedDays = 1) {
     if (bountyPlanet) gs.captain.bounty.increment(bountyPlanet, Math.ceil(convertedAmt + fees))
     let msg = `The bank isn't happy that you haven't paid your overdue loans of ${totalDebts}CR.<br/>`
     msg += `They have passed a portion of your debt, plus fees on to some rather ruthless collection agencies.<br/>`
-    msg += `Your new bounty${bountyPlanet ? ` on ${bountyPlanet.name}` : ''}: ${bountyPlanet ? gs.captain.bounty.getAmount(bountyPlanet) : gs.captain.bounty.total}CR<br/>`
+    msg += `Your new bounty${bountyPlanet ? ` on ${coloredName(bountyPlanet)}` : ''}: ${bountyPlanet ? gs.captain.bounty.getAmount(bountyPlanet) : gs.captain.bounty.total}CR<br/>`
     msg += `Your new total overdue debt: ${outstandingDebts-convertedAmt}CR<br/>`
     if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
     showModal('Bank: Collections', msg, [['Continue', ()=> closeModal()]])

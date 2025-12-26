@@ -57,7 +57,7 @@ function showTradeInfoSellMenu(ct = CARGO_TYPES_ALL[0]) {
     const options = []
     for (const cto of CARGO_TYPES_ALL) {
         const amt = fleet.cargo.getAmount(cto)
-        options.push([`${cto.name}: ${amt}`, ()=>showTradeInfoSellMenu(cto), (ct == cto)])
+        options.push([`${coloredName(cto)}: ${amt}`, ()=>showTradeInfoSellMenu(cto), (ct == cto)])
     }
     options.push(
         ["Buy Info", () => showTradeInfoBuyMenu(ct)],
@@ -65,10 +65,10 @@ function showTradeInfoSellMenu(ct = CARGO_TYPES_ALL[0]) {
     )
 
     showModal(
-        `Trade Info - Sell ${ct.name}`,
+        `Trade Info - Sell ${coloredName(ct)}`,
         ce({children:[
             createTradeInfoSellTable(ct, onSelectPlanet),
-            `Your ${ct.name} Amount: ${fleet.cargo.getAmount(ct)}`,
+            `Your ${coloredName(ct)} Amount: ${fleet.cargo.getAmount(ct)}`,
         ]}),
         options
     );
@@ -83,7 +83,7 @@ function showTradeInfoBuyMenu(ct = CARGO_TYPES_ALL[0]) {
 
     const options = []
     for (const cto of CARGO_TYPES_ALL) {
-        options.push([`${cto.name}`, ()=>showTradeInfoBuyMenu(cto), (ct == cto)])
+        options.push([`${coloredName(cto)}`, ()=>showTradeInfoBuyMenu(cto), (ct == cto)])
     }
     options.push(
         ["Sell Info", () => showTradeInfoSellMenu(ct)],
@@ -91,10 +91,10 @@ function showTradeInfoBuyMenu(ct = CARGO_TYPES_ALL[0]) {
     )
 
     showModal(
-        `Trade Info - Buy ${ct.name}`,
+        `Trade Info - Buy ${coloredName(ct)}`,
         ce({children:[
             createTradeInfoBuyTable(ct, onSelectPlanet),
-            `Your ${ct.name} Amount: ${fleet.cargo.getAmount(ct)} | Your Cargo Space: ${fleet.cargo.total}/${fleet.totalCargoSpace} | Your credits: ${gs.credits}`,
+            `Your ${coloredName(ct)} Amount: ${fleet.cargo.getAmount(ct)} | Your Cargo Space: ${fleet.cargo.total}/${fleet.totalCargoSpace} | Your credits: ${gs.credits}`,
         ]}),
         options
     );

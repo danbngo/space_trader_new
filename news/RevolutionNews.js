@@ -1,11 +1,11 @@
 class RevolutionNews extends News {
-    constructor(planet = new Planet(), startYear = gs.year) {
-        const newGovType = rndMember(GOVERNMENT_TYPES_ALL.filter(g => g !== planet.culture.governmentType));
+    constructor(planet = new Planet()) {
+        const newGovType = rndMember(GOVERNMENT_TYPES_ALL.filter(g => g !== planet.culture.governmentType && g !== GOVERNMENT_TYPES.PUPPET_STATE));
         
         super(
-            `The people of ${coloredName(planet)} rise up in revolution!`,
-            `${coloredName(planet)} stabilizes under new government: ${newGovType.name}!`,
-            NEWS_TYPES.REVOLUTION, planet, null, startYear
+            `The people of ${coloredName(planet)} revolt against the authorities!`,
+            `${coloredName(planet)} stabilizes under new government: ${coloredName(newGovType)}!`,
+            NEWS_TYPES.REVOLUTION, planet
         )
 
         const courthouseBuilding = this.planet.settlement.courthouse;
@@ -19,8 +19,10 @@ class RevolutionNews extends News {
                 crimeRatingModifiedBy: 1.4,
                 commercialRatingModifiedBy: 0.8,
                 industrialRatingModifiedBy: 0.8,
+                creditsModifiedBy: 0.5,
                 buildingsDisabled: courthouseBuilding ? [courthouseBuilding] : [],
-                relationsReset: true
+                cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, 1.5], [CARGO_TYPES.HOLOCUBES, 1.5]]),
+                //relationsReset: true
             })
         ]
 
@@ -32,10 +34,14 @@ class RevolutionNews extends News {
         Object.assign(this.endEffects[0], {
             militaryRatingModifiedBy: (rng(0.5,2,false) + this.endEffects[0].militaryRatingModifiedBy)/2,
             securityRatingModifiedBy: (rng(0.5,2,false)  + this.endEffects[0].securityRatingModifiedBy)/2,
+            industrialRatingModifiedBy: (rng(0.5,2,false)  + this.endEffects[0].industrialRatingModifiedBy)/2,
+            creditsModifiedBy: (rng(0.5,2,false)  + this.endEffects[0].creditsModifiedBy)/2,
+            prestigeRatingModifiedBy: (rng(0.5,2,false)  + this.endEffects[0].prestigeRatingModifiedBy)/2,
         })
     }
 
-    static isValid(planet = new Planet()) {
+    isValid() {
+        const {planet} = this
         //high security prevents this
         const ratingsValid = planet.culture.securityRating < 1.5
         //planet must not already be in anarchy or puppet state

@@ -1,9 +1,9 @@
 class ConstructionNews extends News {
-    constructor(planet = new Planet(), startYear = gs.year) {
+    constructor(planet = new Planet()) {
         super(
             `${coloredName(planet)} begins a grand construction project!`,
             `${coloredName(planet)} completes its grand construction project!`,
-            NEWS_TYPES.CONSTRUCTION, planet, null, startYear
+            NEWS_TYPES.CONSTRUCTION, planet
         )
 
         const buildingsToEnable = [];
@@ -17,26 +17,28 @@ class ConstructionNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                industrialRatingModifiedBy: 1.4,
-                commercialRatingModifiedBy: 1.1,
+                industrialRatingModifiedBy: 0.7,
+                commercialRatingModifiedBy: 0.9,
                 marketCargoAmountsModifiedBy: 0.8,
                 marketPricesModifiedBy: 1.2,
-                //buildingsEnabled: buildingsToEnable,
+                shipyardNumShipsModifiedBy: 1.2,
+                cargoPriceModifiers: new Map([[CARGO_TYPES.METAL, 2], [CARGO_TYPES.NANITES, 3]]),
             })
         ]
 
-        this.endEffects = [
-            new NewsEffect({
-                buildingsEnabled: buildingsToEnable,
-            })
-        ]
+        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        Object.assign(this.endEffects[0], {
+            industrialRatingModifiedBy: (2 + this.endEffects[0].industrialRatingModifiedBy)/2, //industrial base bounces back stronger
+            buildingsEnabled: buildingsToEnable,
+        })
     }
 
-    static isValid(planet = new Planet()) {
+    isValid() {
+        const {planet} = this
         //must be missing at least one building
         const buildingsValid = planet.settlement.buildings.filter(b => !b.enabled).length > 0
         const interferingEvent =
-            News.hasNews(planet, NEWS_TYPES.WAR) || News.hasNews(planet, NEWS_TYPES.CIVIL_WAR) || News.hasNews(planet, NEWS_TYPES.REVOLUTION) ||
+            News.hasNews(planet, NEWS_TYPES.WAR) || News.hasNews(planet, NEWS_TYPES.CIVIL_WAR) || News.hasNews(planet, NEWS_TYPES.REVOLUTION) || News.hasNews(planet, NEWS_TYPES.PLAGUE) ||
             News.hasNews(planet, NEWS_TYPES.CONSTRUCTION) || News.hasNewsTargeting(planet, NEWS_TYPES.WAR) || News.hasNewsTargeting(planet, NEWS_TYPES.BOMBARDMENT)
         return buildingsValid && !interferingEvent
     }

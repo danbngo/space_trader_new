@@ -123,14 +123,14 @@ function loseCargoFromDisabledShips(disabledShips = []) {
     const lostCargoAmt = Math.floor(gs.fleet.cargo.total * cargoRatio)
     if (lostCargoAmt <= 0) return ''
     let totalLostCargo = gs.fleet.cargo.randomSubset(lostCargoAmt)
-    gs.fleet.cargo.subtract(totalLostCargo)
+    gs.fleet.cargo.subtractAmounts(totalLostCargo)
     const msg = `${lostCargoAmt} units of cargo drift into space from your disabled ships.<br/>`
     return msg
 }
 
 function showPlayerRefuseSurrenderModal(fameMultiplier = 0, bountyMultiplier = 0) {
     console.log('showPlayerRefuseSurrenderModal', { fameMultiplier, bountyMultiplier });
-    const fleetName = gs.encounter.fleetName
+    const fleetName = coloredName(gs.encounter.fleet)
     const bounty = 100 * bountyMultiplier
     const fame = fameMultiplier > 0 ? 1 * fameMultiplier : 0
     const infamy = fameMultiplier < 0 ? 1 * Math.abs(fameMultiplier) : 0
@@ -138,12 +138,12 @@ function showPlayerRefuseSurrenderModal(fameMultiplier = 0, bountyMultiplier = 0
     if (infamy > 0) msg += `Your defiance of the authorities causes you to gain ${infamy} infamy.<br/>`
     if (fame > 0) msg += `Your fearlessness causes you to gain ${fame} fame.<br/>`
     if (bounty > 0) msg += `You bounty has risen by ${bounty}CR.<br/>`
-    showModal(gs.encounter.fleetName, msg, [['Continue', ()=>startCombat(false)]])
+    showModal(coloredName(gs.encounter.fleet), msg, [['Continue', ()=>startCombat(false)]])
 }
 
 function showPlayerDidSurrenderModal( fameLossMultiplier = 1) {
     console.log('showPlayerDidSurrenderModal', { fameLossMultiplier });
-    const fleetName = gs.encounter.fleetName
+    const fleetName = coloredName(gs.encounter.fleet)
     const planet = gs.encounter.planet
     const fameLoss = fameLossMultiplier < 0 ? 5 * fameLossMultiplier : 0
     const infamyLoss = fameLossMultiplier < 0 ? 5 * fameLossMultiplier : 0
@@ -158,7 +158,7 @@ function showPlayerDidSurrenderModal( fameLossMultiplier = 1) {
 
 function showPlayerAttackFleetModal(fameMultiplier = 0, bountyMultiplier = 0, sneakAttack = false, allowBribe = false) {
     console.log('showPlayerAttackFleetModal', { fameMultiplier, bountyMultiplier });
-    const fleetName = gs.encounter.fleetName
+    const fleetName = coloredName(gs.encounter.fleet)
     const planet = gs.encounter.planet
     const fame = fameMultiplier > 0 ? 1 * fameMultiplier : 0
     const infamy = fameMultiplier < 0 ? 1 * Math.abs(fameMultiplier) : 0
@@ -198,7 +198,7 @@ function showTradeOfferModal(allowSell = true) {
 function showTradeOfferPlayerSellModal() {
     console.log('showTradeOfferPlayerSellModal');
     let msg = ''
-    const fleetName = gs.encounter.fleetName
+    const fleetName = coloredName(gs.encounter.fleet)
     const ct = gs.fleet.cargo.randomItem(false)
     if (!(ct instanceof CargoType)) throw new Error('wrong cargo type!')
     let onSell = null;
@@ -220,11 +220,11 @@ function showTradeOfferPlayerSellModal() {
             gs.fleet.cargo.increment(ct, -sellAmount)
             gs.credits += finalSale
             showModal(fleetName, 
-                `You sold ${sellAmount} units of ${ct.name} for ${totalPrice}CR${officersShare ? ` (-${officersShare}CR for officers)` : ''}.<br/>
+                `You sold ${sellAmount} units of ${coloredName(ct)} for ${totalPrice}CR${officersShare ? ` (-${officersShare}CR for officers)` : ''}.<br/>
                 The ${fleetName} thank you and tell you to come again!<br/>`, [['Continue', ()=>endEncounter()]])
         }
 
-        msg += `They offer to buy ${sellAmount} ${ct.name} for ${pricePerUnit}CR each (total: ${totalPrice}CR).<br/>`
+        msg += `They offer to buy ${sellAmount} ${coloredName(ct)} for ${pricePerUnit}CR each (total: ${totalPrice}CR).<br/>`
         msg += `Price vs. Market: ${roundToPlaces(100*pricePerUnit/ct.value,2)}%<br/>`
         msg += `Your amount after sale: ${gs.fleet.cargo.getAmount(ct) - sellAmount}<br/>`
         msg += `Sale Price: ${finalSale}CR ${officersShare ? `(-${officersShare}CR for officers)` : ''}<br/>`
@@ -241,7 +241,7 @@ function showTradeOfferPlayerSellModal() {
 function showTradeOfferPlayerBuyModal() {
     console.log('showTradeOfferPlayerBuyModal');
     let msg = ''
-    const fleetName = gs.encounter.fleetName
+    const fleetName = coloredName(gs.encounter.fleet)
     const ct = gs.encounter.fleet.cargo.randomItem(false)
     const availableCargoSpace = gs.fleet.availableCargoSpace
     let onBuy = null;
@@ -258,7 +258,7 @@ function showTradeOfferPlayerBuyModal() {
         const buyAmount = rng(maxBuyAmount, 1)
         const pricePerUnit = Math.ceil(ct.value * rng(1.5, 0.75, false))
         const totalPrice = pricePerUnit * buyAmount
-        msg += `They offer to sell you ${buyAmount} ${ct.name} for ${pricePerUnit}CR each (total: ${totalPrice}CR).<br/>`
+        msg += `They offer to sell you ${buyAmount} ${coloredName(ct)} for ${pricePerUnit}CR each (total: ${totalPrice}CR).<br/>`
 
         if (gs.credits < totalPrice) {
             msg += `The ${fleetName} shake their heads pityingly upon realizing you cannot afford their offer.<br/>`
@@ -273,7 +273,7 @@ function showTradeOfferPlayerBuyModal() {
                 gs.fleet.cargo.increment(ct, buyAmount)
                 gs.credits -= totalPrice
                 showModal(fleetName, 
-                    `You bought ${buyAmount} units of ${ct.name} for ${totalPrice}CR.<br/>
+                    `You bought ${buyAmount} units of ${coloredName(ct)} for ${totalPrice}CR.<br/>
                     The merchants thank you and tell you to come again!<br/>`, [['Continue', ()=>endEncounter()]])
             }
         }
@@ -384,22 +384,22 @@ function showNeutralsBribePlayerModal(maxCredits = 1000, infamyModifier = 0) {
 
     let msg = ''
     if (isInfamous) {
-        msg = `The ${gs.encounter.fleetName} recognize your notorious reputation and hastily offer you ${credits}CR, desperately hoping to avoid your wrath!<br/>`
+        msg = `The ${coloredName(gs.encounter.fleet)} recognize your notorious reputation and hastily offer you ${credits}CR, desperately hoping to avoid your wrath!<br/>`
     } else {
-        msg = `The ${gs.encounter.fleetName} frantically offers you ${credits}CR to let them go unharmed!<br/>`
+        msg = `The ${coloredName(gs.encounter.fleet)} frantically offers you ${credits}CR to let them go unharmed!<br/>`
     }
     if (credits > baseCredits) msg += `You employ your haggling skills and make them an offer they can't refuse.<br/>Their offer increases to ${credits}CR.<br/>`
     
-    showModal(gs.encounter.fleetName, msg, [
+    showModal(coloredName(gs.encounter.fleet), msg, [
         ['Accept Bribe', ()=>{
             gs.credits += finalCredits
             const acceptMsg = isInfamous
-                ? `You accept the tribute of ${finalCredits}CR${officersShare ? ` (-${officersShare}CR for officers)` : ''}.<br/>The ${gs.encounter.fleetName} flee in terror, grateful to have escaped with their lives.<br/>`
-                : `You accept the tribute of ${finalCredits}CR${officersShare ? ` (-${officersShare}CR for officers)` : ''}.<br/>The ${gs.encounter.fleetName} anxiously departs before you can change your mind.<br/>`
-            showModal(gs.encounter.fleetName, acceptMsg, [['Continue', ()=>endEncounter()]])
+                ? `You accept the tribute of ${finalCredits}CR${officersShare ? ` (-${officersShare}CR for officers)` : ''}.<br/>The ${coloredName(gs.encounter.fleet)} flee in terror, grateful to have escaped with their lives.<br/>`
+                : `You accept the tribute of ${finalCredits}CR${officersShare ? ` (-${officersShare}CR for officers)` : ''}.<br/>The ${coloredName(gs.encounter.fleet)} anxiously departs before you can change your mind.<br/>`
+            showModal(coloredName(gs.encounter.fleet), acceptMsg, [['Continue', ()=>endEncounter()]])
         }],
         ['Refuse', ()=>{
-            showModal(gs.encounter.fleetName, `You scornfully refuse the tribute!<br/>The ${gs.encounter.fleetName} readies for combat!<br/>`, [['Continue', ()=>startCombat(false)]])
+            showModal(coloredName(gs.encounter.fleet), `You scornfully refuse the tribute!<br/>The ${coloredName(gs.encounter.fleet)} readies for combat!<br/>`, [['Continue', ()=>startCombat(false)]])
         }]
     ])
 }
@@ -469,7 +469,7 @@ function showPlayerDefeatedByPiratesModal() {
             const lootAmount = rng(maxLootAmount, maxLootAmount/2)
             msg += `They take ${lootAmount} units of loot from your cargo bays.<br/>`
             const looted = fleet.cargo.randomSubset(lootAmount)
-            fleet.cargo.subtract(looted)
+            fleet.cargo.subtractAmounts(looted)
             //encounter.fleet.add(looted) //not really needed
         }
     }
@@ -615,7 +615,7 @@ function showPlayerPoliceInspectionModal() {
 }
 
 function showFineOrJailModal(fine = 0) {
-    const {fleetName} = gs.encounter
+    const fleetName = coloredName(gs.encounter.fleet)
     const planet = gs.encounter.planet
     const currentBounty = planet ? gs.captain.bounty.getAmount(planet) : gs.captain.bounty.total
     const fineFromBounty = Math.ceil(Math.min(Math.max(currentBounty*Math.random(),100), currentBounty))

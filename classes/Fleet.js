@@ -17,8 +17,9 @@
  * @property {Route|null} route - The route the fleet is following, if any.
  */
 class Fleet extends SpaceObject {
-    constructor(name = "Unnamed", color = COLORS.White, x = 0, y = 0) {
+    constructor(name = "Unnamed", color = COLORS.White, x = 0, y = 0, planet = null) {
         super(name, color, FLEET_RADIUS, x, y);
+        this.planet = planet;
         this.flagship = null;
         this.ships = []
         this.cargo = new CountsMap();

@@ -6,11 +6,11 @@ function createShipsListMenu(ships = [new Ship()], onSelectShip = (s = new Ship(
     for (const ship of ships) {
         rows.push([
             ship.name,
-            statColorSpan(`${ship.hull[0]}/${ship.hull[1]}`, ship.hull[0]/ship.hull[1]),
-            statColorSpan(`${ship.shields[0]}/${ship.shields[1]}`, ship.shields[0]/ship.shields[1]),
-            ship.lasers,
-            ship.engine,
-            ship.cargoSpace,
+            ''+statColorSpan(`${ship.hull[0]}/${ship.hull[1]}`, ship.hull[0]/ship.hull[1]),
+            ''+statColorSpan(`${ship.shields[0]}/${ship.shields[1]}`, ship.shields[0]/ship.shields[1]),
+            ''+ship.lasers,
+            ''+ship.engine,
+            ''+ship.cargoSpace,
         ])
     }
     return createTable(rows, (rowIndex = 0)=>onSelectShip(ships[rowIndex]))
@@ -26,8 +26,8 @@ function showShipsMenu(ships = [...gs.fleet.ships]) {
     }
 
     function showDumpShipModal(ship = new Ship()) {
-        showModal(`Dump ${ship.name}`, 
-            `Are you sure you want to dump ${ship.name}?`,
+        showModal(`Dump ${coloredName(ship)}`, 
+            `Are you sure you want to dump ${coloredName(ship)}?`,
             [
                 ["Dump", () => dumpShip(ship)],
                 ["Cancel", () => reloadMenu()],

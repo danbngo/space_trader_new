@@ -1,9 +1,9 @@
 class CivilWarNews extends News {
-    constructor(planet = new Planet(), startYear = gs.year) {
+    constructor(planet = new Planet()) {
         super(
             `Civil war breaks out on ${coloredName(planet)}!`,
             `${coloredName(planet)}'s civil war ends!`,
-            NEWS_TYPES.CIVIL_WAR, planet, null, startYear
+            NEWS_TYPES.CIVIL_WAR, planet
         )
 
         const buildingsToDisable = [];
@@ -18,17 +18,19 @@ class CivilWarNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 newGovernmentType: GOVERNMENT_TYPES.ANARCHY,
-                militaryRatingModifiedBy: 0.3,
+                militaryRatingModifiedBy: 0.4,
                 securityRatingModifiedBy: 0.4,
                 crimeRatingModifiedBy: 1.4,
                 populationModifiedBy: 0.7,
                 commercialRatingModifiedBy: 0.5,
                 industrialRatingModifiedBy: 0.6,
                 marketCargoAmountsModifiedBy: 0.3,
-                blackMarketCargoAmountsModifiedBy: 1.8,
-                bankCreditsModifiedBy: 0.4,
+                marketPricesModifiedBy: 1.3,
+                blackMarketCargoAmountsModifiedBy: 1.4,
+                creditsModifiedBy: 0.4,
                 prestigeRatingModifiedBy: 0.6,
                 buildingsDisabled: buildingsToDisable,
+                cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, 2], [CARGO_TYPES.ANTIMATTER, 2]]),
             })
         ]
 
@@ -41,7 +43,8 @@ class CivilWarNews extends News {
             populationModifiedBy: (1 + this.endEffects[0].populationModifiedBy)/2,
         })
     }
-    static isValid(planet = new Planet()) {
+    isValid() {
+        const {planet} = this
         //planet must not already be in anarchy or puppet state
         const validGov = planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY && planet.culture.governmentType != GOVERNMENT_TYPES.PUPPET_STATE
         //cant be having any of: construction, economic boom, revolution

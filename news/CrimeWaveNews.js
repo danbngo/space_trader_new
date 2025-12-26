@@ -1,9 +1,9 @@
 class CrimeWaveNews extends News {
-    constructor(planet = new Planet(), startYear = gs.year) {
+    constructor(planet = new Planet()) {
         super(
             `Massive crime wave on ${coloredName(planet)}!`,
             `The massive crime wave on ${coloredName(planet)} ends!`,
-            NEWS_TYPES.CRIME_WAVE, planet, null, startYear
+            NEWS_TYPES.CRIME_WAVE, planet
         )
 
         this.startEffects = [
@@ -14,6 +14,7 @@ class CrimeWaveNews extends News {
                 militaryRatingModifiedBy: 0.9,
                 blackMarketCargoAmountsModifiedBy: 1.4,
                 blackMarketPricesModifiedBy: 0.7,
+                cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, 0.5], [CARGO_TYPES.DRUGS, 0.5]]),
             })
         ]
 
@@ -26,7 +27,8 @@ class CrimeWaveNews extends News {
         })
     }
 
-    static isValid(planet = new Planet()) {
+    isValid() {
+        const {planet} = this
         //wont happen if crime or security is already high
         const ratingsValid = planet.culture.crimeRating < 1 && planet.culture.securityRating < 2
         const interferingEvent = 

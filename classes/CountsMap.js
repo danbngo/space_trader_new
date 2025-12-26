@@ -34,6 +34,15 @@ class CountsMap {
         this.counts.set(key, newAmt)
     }
 
+    multiply(key = {}, amt = 1) {
+        const newAmt = this.getAmount(key) * amt
+        if (newAmt <= 0) {
+            this.counts.delete(key)
+            return
+        }
+        this.counts.set(key, newAmt)
+    }
+
     raiseTo(key = {}, amt = 1) {
         const currentAmt = this.getAmount(key)
         if (amt > currentAmt) {
@@ -89,13 +98,13 @@ class CountsMap {
         return subset
     }
 
-    add(added = new CountsMap()) {
+    addAmounts(added = new CountsMap()) {
         for (const [key, amt] of added.counts) {
             this.increment(key, amt)
         }
     }
 
-    subtract(subtracted = new CountsMap()) {
+    subtractAmounts(subtracted = new CountsMap()) {
         for (const [key, amt] of subtracted.counts) {
             this.increment(key, -amt)
         }

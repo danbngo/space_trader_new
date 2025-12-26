@@ -20,6 +20,11 @@
     margin-bottom: 10px;
 }
 
+.panel-content {
+    overflow-y: auto;
+    max-height: 80vh;
+}
+
 
 .panel-buttons {
     margin-top: 15px;

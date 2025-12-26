@@ -49,8 +49,8 @@ function showMarketMenu(market = new Market()) {
     function showSellCargoSlider(ct = CARGO_TYPES_ALL[0], sellableAmount = 0, sellPrice = 0) {
         const credits = gs.credits
         showSliderModal(
-            1, sellableAmount, `Sell ${ct.name}`, 
-            `How many ${ct.name} would you like to sell?`,
+            1, sellableAmount, `Sell ${coloredName(ct)}`, 
+            `How many ${coloredName(ct)} would you like to sell?`,
             (amt)=>{
                 const totalSalePrice = amt*sellPrice
                 const officersShare = gs.fleet.calcTotalCRShare(totalSalePrice, true)
@@ -66,8 +66,8 @@ function showMarketMenu(market = new Market()) {
 
     function showBuyCargoSlider(ct = CARGO_TYPES_ALL[0], buyableAmount = 0, buyPrice = 0) {
         showSliderModal(
-            1, buyableAmount, `Buy ${ct.name}`, 
-            `How many ${ct.name} would you like to buy?`,
+            1, buyableAmount, `Buy ${coloredName(ct)}`, 
+            `How many ${coloredName(ct)} would you like to buy?`,
             (amt)=>`Price: ${amt*buyPrice}CR`,
             'Buy', 'Cancel', (amt = 0)=>buyCargo(ct, amt), ()=>reloadMenu(),
         )

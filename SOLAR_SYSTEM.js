@@ -46,3 +46,4 @@ const SOLAR_SYSTEM = new StarSystem(
 );
 
 console.log("Generated solar system:", SOLAR_SYSTEM)
+

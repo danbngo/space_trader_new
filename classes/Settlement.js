@@ -108,22 +108,23 @@ class Guild extends Building {
 }
 
 class Market extends Building {
-    constructor(planet = new Planet(), blackMarket = false, cargo = new CountsMap(), credits = 0, baseRake = 1) {
+    constructor(planet = new Planet(), blackMarket = false, cargo = new CountsMap(), credits = 0, baseRake = 1, inflation = 1) {
         super(planet, baseRake, credits)
         this.blackMarket = blackMarket;
         this.cargo = cargo; // Cargo[]
-        this.baseCargoAmounts = cargo.clone()
+        this.baseCargo = cargo.clone()
+        this.inflation = inflation
     }
 
     normalize() {
         super.normalize()
-        this.cargo = this.baseCargoAmounts.clone()
+        this.cargo = this.baseCargo.clone()
     }
 
     calcCargoBuyPrices() {
         const prices = new CountsMap()
         for (const cargoType of CARGO_TYPES_ALL) {
-            const price = Math.round(cargoType.value * this.planet.culture.cargoPriceModifiers.getAmount(cargoType) * (1+this.rake))
+            const price = Math.round(cargoType.value * this.planet.culture.cargoPriceModifiers.getAmount(cargoType) * (1+this.rake) * this.inflation)
             prices.setAmount(cargoType, price)
         }
         return prices
@@ -132,7 +133,7 @@ class Market extends Building {
     calcCargoSellPrices() {
         const prices = new CountsMap()
             for (const cargoType of CARGO_TYPES_ALL) {
-            const price = Math.round(cargoType.value * this.planet.culture.cargoPriceModifiers.getAmount(cargoType) / (1+this.rake))
+            const price = Math.round(cargoType.value * this.planet.culture.cargoPriceModifiers.getAmount(cargoType) / (1+this.rake) * this.inflation)
             prices.setAmount(cargoType, price)
         }
         return prices
@@ -198,5 +199,9 @@ class Settlement {
         this.bank = bank;
         this.courthouse = courthouse;
         this.academy = academy;
+    }
+
+    get buildings() {
+        return [this.shipyard, this.market, this.blackMarket, this.guild, this.bank, this.courthouse, this.academy]
     }
 }

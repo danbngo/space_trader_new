@@ -1,9 +1,9 @@
 class ScarcityNews extends News {
-    constructor(planet = new Planet(), startYear = gs.year) {
+    constructor(planet = new Planet()) {
         super(
-            `Resource scarcity hits ${coloredName(planet)}!`,
-            `${coloredName(planet)}'s resource scarcity ends!`,
-            NEWS_TYPES.SCARCITY, planet, null, startYear
+            `${coloredName(planet)} is suffering famine and scarcity!`,
+            `${coloredName(planet)}'s great famine ends!`,
+            NEWS_TYPES.SCARCITY, planet
         )
 
         this.startEffects = [
@@ -15,15 +15,19 @@ class ScarcityNews extends News {
                 commercialRatingModifiedBy: 0.8,
                 blackMarketCargoAmountsModifiedBy: 1.5,
                 crimeRatingModifiedBy: 1.2,
+                shipQualityModifiedBy: 0.9,
+                cargoPriceModifiers: new Map([[CARGO_TYPES.WATER, 2]]),
+
             })
         ]
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
     }
 
-    static isValid(planet = new Planet()) {
+    isValid() {
+        const {planet} = this
         const interferingEvent = 
-            News.hasNews(planet, NEWS_TYPES.ECONOMIC_BOOM) || News.hasNews(planet, NEWS_TYPES.SCARCITY)
+            News.hasNews(planet, NEWS_TYPES.ECONOMIC_BOOM) || News.hasNews(planet, NEWS_TYPES.SCARCITY) || News.hasNews(planet, NEWS_TYPES.SURPLUS)
         return !interferingEvent
     }
 }

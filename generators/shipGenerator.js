@@ -11,7 +11,7 @@ function generateShip(planet = new Planet(), shipType = rndMember(SHIP_TYPES_ALL
     const hull = [maxHull, maxHull]
     const maxActionsPerTurn = shipType.maxActionsPerTurn || SHIP_NUM_MOVES_PER_TURN
 
-    const name = planet ? `${planet.ianName} ${shipType.name}` : shipType.name
+    const name = planet ? `${coloredIanName(planet)} ${shipType.name}` : shipType.name
 
     return new Ship(name, shipType, COLORS.LightGray, hull, shields, lasers, engine, cargoSpace, radars, maxActionsPerTurn);
 }

@@ -530,7 +530,7 @@ class EncounterMap extends BaseMap {
 
     onHail() {
         if (gs.encounter.combatEnabled) {
-            showModal(`Surrender?`, `Surrender to the ${gs.encounter.encounterType.name}?`, [
+            showModal(`Surrender?`, `Surrender to the ${coloredName(gs.encounter.fleet)}?`, [
                 ['Surrender', ()=>gs.encounter.encounterType.onSurrender()],
                 ['Cancel', ()=>closeModal()]
             ])

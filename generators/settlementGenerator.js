@@ -19,38 +19,38 @@ function generateShipModule(planet = new Planet(), moduleType = rndMember(SHIP_M
     return new ShipModule(moduleType, quality)
 }
 
-
+    
 function generateShipyard(planet = new Planet()) {
-    const count = rng(5, 1)
+    const count = Math.round(SHIPYARD_AVERAGE_NUM_SHIPS * rng(2,0,false))
     const ships = [];
     for(let i=0;i<count;i++) {
         ships.push(generateShip(planet));
     }
     
     // Generate modules
-    const moduleCount = rng(4, 1)
+    const moduleCount = Math.round(SHIPYARD_AVERAGE_NUM_MODULES * rng(2,0,false))
     const modules = []
     for(let i=0;i<moduleCount;i++) {
         modules.push(generateShipModule(planet))
     }
     
     const rake = rng(2, 0.5, false)
-    const credits = rng(200*1000, 10*1000);
+    const credits = Math.round(BANK_AVERAGE_CREDITS * rng(2,0,false));
     return new Shipyard(planet, ships, modules, credits, rake);
 }
 
 function generateMarket(planet = new Planet(), blackMarket = false) {
     const marketCargo = new CountsMap();
     for (const ct of CARGO_TYPES_ALL) {
-        marketCargo.setAmount(ct, Math.random() > .2 ? rng(MARKET_MAX_CARGO_PER_TYPE) : 0)
+        marketCargo.setAmount(ct, Math.round(MARKET_AVERAGE_CARGO_PER_TYPE * rng(2,0,false)))
     }
-    const credits = rng(MARKET_MAX_CREDITS, MARKET_MAX_CREDITS/10);
+    const credits = Math.round(MARKET_AVERAGE_CREDITS * rng(2,0,false));
     const rake = rng(2, 0.5, false);
     return new Market(planet, blackMarket, marketCargo, credits, rake);
 }
 
 function generateGuild(planet = new Planet()) {
-    const count = rng(5, 1)
+    const count = Math.round(GUILD_AVERAGE_NUM_OFFICERS * rng(2,0,false));
     const officers = [];
     for(let i=0;i<count;i++) {
         officers.push(generateOfficer(planet));
@@ -61,7 +61,7 @@ function generateGuild(planet = new Planet()) {
 
 function generateBank(planet = new Planet()) {
     const rake = rng(2, 0.5, false);
-    const credits = rng(1000*1000, 50*1000);
+    const credits = rng(0.5*BANK_AVERAGE_CREDITS, 2*BANK_AVERAGE_CREDITS);
     return new Bank(planet, credits, rake)    
 }
 

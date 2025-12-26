@@ -97,8 +97,8 @@ function showShipyardBuyMenu(shipyard = new Shipyard()) {
     function showBuyShipModal(ship = new Ship()) {
         const buyPrice = shipyard.calcBuyPrice(ship)
         showModal(
-            `Buy ${ship.name}?`,
-            `Are you sure you want to buy the ${ship.name} for ${buyPrice} credits?`,
+            `Buy ${coloredName(ship)}?`,
+            `Are you sure you want to buy the ${coloredName(ship)} for ${buyPrice} credits?`,
             [
                 ['Buy', () => buyShip(ship), !isDocked],
                 ['Cancel', () => rebuildMenu()],
@@ -172,10 +172,10 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
         const finalSale = salePrice - officersShare
 
         showModal(
-            `Sell ${ship.name}?`,
+            `Sell ${coloredName(ship)}?`,
             ce({children:[
-                !shipyardCanAfford ? `${colorSpan('Warning', COLORS.Yellow, true)}: Your ${ship.name} is worth ${salePrice}CR but the shipyard only has ${shipyard.credits} credits!` : ``,
-                `Are you sure you want to sell your ${ship.name} for ${Math.min(salePrice, shipyard.credits)} credits?`,
+                !shipyardCanAfford ? `${colorSpan('Warning', COLORS.Yellow, true)}: Your ${coloredName(ship)} is worth ${salePrice}CR but the shipyard only has ${shipyard.credits} credits!` : ``,
+                `Are you sure you want to sell your ${coloredName(ship)} for ${Math.min(salePrice, shipyard.credits)} credits?`,
                 `Sale Price: ${finalSale}CR ${officersShare ? `(-${officersShare}CR for officers)` : ''}`,
                 `CR After Sale: ${gs.credits+finalSale}CR`,
             ]}),
@@ -297,11 +297,11 @@ function showShipyardInstallModuleMenu(shipyard = new Shipyard(), module = new S
     }
     
     showModal(
-        `Install ${module.moduleType.name}`,
+        `Install ${coloredName(module.moduleType)}`,
         ce({children:[
             `Select a ship to install this module:`,
             createShipSelectionTable(),
-            `Module: ${module.moduleType.name} | Quality: ${roundToPlaces(module.quality*100, 1)}% | Price: ${buyPrice} credits`,
+            `Module: ${coloredName(module.moduleType)} | Quality: ${roundToPlaces(module.quality*100, 1)}% | Price: ${buyPrice} credits`,
             `Your Credits: ${gs.credits} | CR After Purchase: ${gs.credits - buyPrice}`,
         ]}),
         [

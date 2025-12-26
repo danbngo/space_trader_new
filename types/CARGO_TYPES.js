@@ -1,20 +1,21 @@
 class CargoType {
-    constructor(name = '', value = 1, illegal = false) {
+    constructor(name = '', color = COLORS.White, value = 1, illegal = false) {
         this.name = name
+        this.color = color;
         this.value = value
         this.illegal = illegal
     }
 }
 
 const CARGO_TYPES = {
-    METAL: new CargoType('Metal', 100, false),
-    ICE: new CargoType('Ice', 200, false),
-    ISOTOPES: new CargoType('Isotopes', 400, false),
-    NANITES: new CargoType('Nanites', 200, false),
-    BIOGEL: new CargoType('Bio-gel', 400, false),
-    HOLOCUBES: new CargoType('Holocubes', 800, false),
-    WEAPONS: new CargoType('Weapons', 400, true),
-    CLONES: new CargoType('Clones', 800, true),
-    DRUGS: new CargoType('Drugs', 1600, true),
+    METAL: new CargoType('Metal', COLORS.LightGray, 100, false), //industry
+    WATER: new CargoType('Water', COLORS.LightBlue, 200, false), //raw survival, famine, etc.
+    ISOTOPES: new CargoType('Isotopes', COLORS.LightYellow, 400, false), //science, technological development
+    NANITES: new CargoType('Nanites', COLORS.Gray, 200, false), //construction
+    MEDICINE: new CargoType('Medicine', COLORS.Blue, 400, false), //plagues, wars, etc.
+    HOLOCUBES: new CargoType('Holocubes', COLORS.Yellow, 800, false), //entertainment
+    WEAPONS: new CargoType('Weapons', COLORS.Red, 400, true), //civil war, conflict
+    DRUGS: new CargoType('Drugs', COLORS.Orange, 1600, true), //crime
+    ANTIMATTER: new CargoType('Antimatter', COLORS.Purple, 800, true), //military
 }
 const CARGO_TYPES_ALL = Object.values(CARGO_TYPES)
