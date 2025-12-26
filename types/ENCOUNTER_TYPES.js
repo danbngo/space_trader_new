@@ -429,30 +429,6 @@ const ENCOUNTER_TYPES = {
 }
 const ENCOUNTER_TYPES_ALL = Object.values(ENCOUNTER_TYPES)
 
-
-/*for (const et of [ENCOUNTER_TYPES.ASTEROIDS, ENCOUNTER_TYPES.CRYOIDS, ENCOUNTER_TYPES.PLASMOIDS]) et.onEndTurn = (encounter = new Encounter())=>{
-    //make fooroids move faster each turn
-    for (const ship of encounter.enemyShips) {
-        if (Math.random() > .5) ship.engine = Math.ceil(ship.engine*1.1)
-    }
-    //spawn more fooroids
-    const numToSpawn = Math.ceil(encounter.encounterType.fleetType.maxShips*Math.random()/5)
-    for (let i = 0; i < numToSpawn; i++) {
-        const mapRadius = encounter.mapRadius
-        const newShip = generateShip(rndMember(encounter.encounterType.fleetType.shipTypes), null)
-        encounter.enemyFleet.addShip(newShip)
-        encounter.ships.push(newShip)
-        const angle = Math.random()*Math.PI*2
-        const [x,y] = rotatePoint(0, mapRadius*1.01, 0, 0, angle)
-        newShip.angle = normalizeAngle(angle - Math.PI/2 + Math.random()*Math.PI/2 - Math.PI/4)
-        newShip.x = x
-        newShip.y = y
-        newShip.aiType = AI_TYPES.Asteroid
-    }
-}
-*/
-
-
 //simulates the player doing his best to escape the hazard, creates a random combat result basically
 function autoNavigateHazard(encounter = new Encounter()) {
     const {playerShips, enemyShips} = encounter

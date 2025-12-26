@@ -78,7 +78,7 @@ const ASTEROID_SHIP_TYPES_ALL = Object.values(ASTEROID_SHIP_TYPES)
 
 for (const st of ASTEROID_SHIP_TYPES_ALL) {
     st.minRadiusModifier = 1
-    st.maxRadiusModifier = 5
+    st.maxRadiusModifier = 4
 }
 
 ASTEROID_SHIP_TYPES.ASTEROID.onDisabled = (died = new Ship(), encounter = new Encounter())=>{

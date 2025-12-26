@@ -79,6 +79,7 @@ class StarMap extends BaseMap {
             ['Cargo Manifest', ()=>showCargoMenu()],
             ['Officer Roster', ()=>showOfficersMenu()],
             ['Captain Overview', ()=>showCaptainSkillsMenu(), false, hasSkillPoints ? 'highlighted' : null],
+            ['Galactic News', ()=>showNewsTimelineMenu(null, ()=>this.openAssistant())],
             ['Cancel', ()=>closeModal()],
         ])
     }

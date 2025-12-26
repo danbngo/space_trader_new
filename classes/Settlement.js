@@ -12,6 +12,11 @@ class Building {
         this.planet = planet
         this.baseRake = baseRake
         this.credits = credits
+        this.baseCredits = credits //gradually revert back towards this amount over time
+        this.enabled = true
+    }
+    normalize() {
+        this.credits = this.baseCredits
     }
     get rake() {
         console.log('Calculating rake for building on planet', this.planet.name,'with baseRake', this.baseRake,'and player barter skill', gs.fleet.totalSkills.getAmount(SKILLS.Barter),'skills:',gs.fleet.totalSkills)
@@ -25,6 +30,31 @@ class Shipyard extends Building {
         super(planet, baseRake, credits)
         this.ships = ships; // Ship[]
         this.modules = modules; // ShipModule[]
+        this.baseNumShips = ships.length
+        this.baseNumModules = modules.length
+    }
+    normalize(clearExisting = false) {
+        super.normalize()
+        if (clearExisting) {
+            this.ships = []
+            this.modules = []
+        }
+        const shipDiffFromBase = this.ships.length - this.baseNumShips
+        if (shipDiffFromBase > 0) {
+            this.ships.splice(0, shipDiffFromBase)
+        } else if (shipDiffFromBase < 0) {
+            for (let i = 0; i < -shipDiffFromBase; i++) {
+                this.ships.push(generateShip(this.planet))
+            }
+        }
+        const moduleDiffFromBase = this.modules.length - this.baseNumModules
+        if (moduleDiffFromBase > 0) {
+            this.modules.splice(0, moduleDiffFromBase)
+        } else if (moduleDiffFromBase < 0) {
+            for (let i = 0; i < -moduleDiffFromBase; i++) {
+                this.modules.push(generateShipModule(this.planet))
+            }
+        }
     }
 
     static state = new ShipyardState();
@@ -56,9 +86,24 @@ class Guild extends Building {
     constructor(planet = new Planet(), officers = [], baseRake = 1) {
         super(planet, baseRake)
         this.officers = officers; // Officer[]
+        this.baseNumOfficers = officers.length
     }
     calcHirePrice(officer = new Officer()) {
         return Math.round(officer.value * (1+this.rake))
+    }
+    normalize(clearExisting = false) {
+        super.normalize()
+        if (clearExisting) {
+            this.officers = []
+        }
+        const officerDiffFromBase = this.officers.length - this.baseNumOfficers
+        if (officerDiffFromBase > 0) {
+            this.officers.splice(0, officerDiffFromBase)
+        } else if (officerDiffFromBase < 0) {
+            for (let i = 0; i < -officerDiffFromBase; i++) {
+                this.officers.push(generateOfficer(this.planet))
+            }
+        }
     }
 }
 
@@ -67,6 +112,12 @@ class Market extends Building {
         super(planet, baseRake, credits)
         this.blackMarket = blackMarket;
         this.cargo = cargo; // Cargo[]
+        this.baseCargoAmounts = cargo.clone()
+    }
+
+    normalize() {
+        super.normalize()
+        this.cargo = this.baseCargoAmounts.clone()
     }
 
     calcCargoBuyPrices() {
@@ -128,7 +179,6 @@ class Academy extends Building {
         super(planet, baseRake)
         this.skillCosts = skillCosts // CountsMap with skill cost modifiers (0.5-2 range)
     }
-    
     calcSkillUpgradeCost(officer = new Officer(), skill = SKILLS_ALL[0]) {
         // Base cost scales exponentially with current skill level
         const baseCost = 250 * officer.calcSkillPointsToUpgrade(skill, false)
@@ -139,7 +189,8 @@ class Academy extends Building {
 
 
 class Settlement {
-    constructor(shipyard = null, market = null, blackMarket = null, guild = null, bank = null, courthouse = null, academy = null) {
+    constructor(planet = new Planet(), shipyard = null, market = null, blackMarket = null, guild = null, bank = null, courthouse = null, academy = null) {
+        this.planet = planet;
         this.shipyard = shipyard;
         this.market = market;
         this.blackMarket = blackMarket;

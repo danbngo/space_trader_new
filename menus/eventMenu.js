@@ -2,11 +2,27 @@ function checkForEvents(elapsedYears = 1) {
     //console.log('checkForEvents', { elapsedYears });
     const elapsedDays = elapsedYears*365
     if (checkGameOver()) return
+    checkForNews()
     if (checkForEncounter(elapsedDays)) return
     if (checkDebtCollections(elapsedDays)) return
     if (isNaN(gs.credits)) {
         throw new Error('GameState credits is NaN!')
     }
+}
+
+function checkForNews(elapsedDays = 1) {
+    //console.log('checkForNews', { elapsedDays });
+    const baseChance = Math.pow(NEWS_CHANCE_PER_DAY, 1/(elapsedDays))
+    if (Math.random() > baseChance) return
+    console.log('🚨 NEWS EVENT TRIGGERED', { baseChance })
+    const newsEvent = generateNews()
+    if (!newsEvent) return
+    newsEvent.start()
+    gs.system.news.push(newsEvent)
+}
+
+function checkForExpiredNews() {
+
 }
 
 function checkForEncounter(elapsedDays = 1) {
@@ -17,9 +33,11 @@ function checkForEncounter(elapsedDays = 1) {
 }
 
 function rollChanceOverTimespan(baseChancePerDay = 0.01, elapsedDays = 1) {
-    const lambda = -Math.log(1 - baseChancePerDay);
-    const perTickChance = 1 - Math.exp(-lambda * elapsedDays);
-    return Math.random() < perTickChance
+    //theoretically there could be multiple encounters in the elapsed time, but for simplicity we only roll once
+    //const lambda = -Math.log(1 - baseChancePerDay);
+    //const perTickChance = 1 - Math.exp(-lambda * elapsedDays);
+    //return Math.random() < perTickChance
+    return baseChancePerDay*elapsedDays*Math.random() > 0.5
 }
 
 function checkForAsteroidBeltEncounters(elapsedDays = 1) {
@@ -58,27 +76,6 @@ function checkForAsteroidBeltEncounters(elapsedDays = 1) {
     return true
 }
 
-/*function calcBeltProximityFactor(fleet = new Fleet(), belt = new AsteroidBelt()) {
-    // Get the belt's center distance from the sun
-    const beltCenterDistance = belt.orbit.radius
-    
-    // Get the belt's territory radius
-    const beltRadius = belt.radius
-    
-    // Calculate fleet's distance from the sun
-    const fleetDistanceFromSun = calcDistance(fleet.x, fleet.y, 0, 0)
-    
-    // Calculate distance from the belt's center ring
-    const distanceFromBeltCenter = Math.abs(fleetDistanceFromSun - beltCenterDistance)
-
-    // Calculate proximity factor using 1/(1+d/r) formula
-    // In the middle of belt (d=0): factor = 1.0
-    // At edge (d=beltRadius): factor = 0.5
-    // At 2x edge: factor = 0.5
-    const proximityFactor = 1 - (0.5 * distanceFromBeltCenter / beltRadius)
-    return Math.max(0, proximityFactor)
-}*/
-
 function checkForPlanetEncounters(elapsedDays = 1) {
     //console.log('checkForPlanetEncounters', { elapsedDays });
     //dont have encounters while docked or already in an encounter
@@ -106,13 +103,13 @@ function checkForPlanetEncounters(elapsedDays = 1) {
         const proximityFactor = 1 / (1 + distance / territory)
         
         // Base encounter chance influenced by culture properties
-        const {governmentRating, securityRating, crimeRating, commercialRating, industrialRating} = planet.culture
+        const {militaryRating, securityRating, crimeRating, commercialRating, industrialRating} = planet.culture
         
         // Build weighted encounter type array based on culture
         const encounterWeights = []
         
         // Police (influenced by government and security)
-        encounterWeights.push({type: ENCOUNTER_TYPES.POLICE, weight: (governmentRating + securityRating) * 2})
+        encounterWeights.push({type: ENCOUNTER_TYPES.POLICE, weight: (militaryRating + securityRating) * 2})
         
         // Pirates (influenced by crime, reduced by security)
         encounterWeights.push({type: ENCOUNTER_TYPES.PIRATES, weight: crimeRating * 3 / securityRating})
@@ -127,14 +124,14 @@ function checkForPlanetEncounters(elapsedDays = 1) {
         encounterWeights.push({type: ENCOUNTER_TYPES.MINERS, weight: industrialRating * 2})
         
         // Tourists (influenced by commercial and government)
-        encounterWeights.push({type: ENCOUNTER_TYPES.TOURISTS, weight: (commercialRating + governmentRating)})
+        encounterWeights.push({type: ENCOUNTER_TYPES.TOURISTS, weight: (commercialRating + militaryRating)})
         
         // Calculate total weight
         const totalWeight = encounterWeights.reduce((sum, e) => sum + e.weight, 0)
         if (totalWeight <= 0) continue
         
         // Adjust base chance by culture activity level
-        const activityLevel = (governmentRating + securityRating + crimeRating + commercialRating + industrialRating) / 5
+        const activityLevel = (militaryRating + securityRating + crimeRating + commercialRating + industrialRating) / 5
         if (!rollChanceOverTimespan(PLANET_ENCOUNTER_CHANCE_PER_DAY, elapsedDays * activityLevel * proximityFactor)) continue
         
         // Select encounter type using weighted random
@@ -150,7 +147,7 @@ function checkForPlanetEncounters(elapsedDays = 1) {
             }
         }
         
-        console.log(`🚨 PLANET ENCOUNTER TRIGGERED: ${planet.name} (${selectedType.name})`);
+        console.log(`🚨 PLANET ENCOUNTER TRIGGERED: ${coloredName(planet)} (${selectedType.name})`);
         
         // Start the encounter with the selected type
         if (currentMap && currentMap.togglePause) currentMap.togglePause(true)

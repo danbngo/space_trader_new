@@ -97,9 +97,9 @@ function showMarketMenu(market = new Market()) {
             createMarketCargoTable(blackMarket, fleet.cargo, market.cargo, buyPrices, sellPrices, onSelectCargoType),
             `Your Cargo Space: ${fleet.cargo.total}/${fleet.totalCargoSpace} | Your Credits: ${gs.credits}`,
             `Market Credits: ${market.credits}`
-            +` | Buy Tax: ${statColorSpan(roundToPlaces(100*market.baseRake, 2), 2/(1+market.baseRake),true)}%`
-            +` | Sell Tax: ${statColorSpan(roundToPlaces(100*market.baseRake/(market.baseRake+1), 2), 2/(market.baseRake+1),true)}%`,
-            (gs.fleet.totalSkills.getAmount(SKILLS.Barter) > 0) ? `Taxes After Barter | ${statColorSpan(roundToPlaces(100*(1+market.rake) - 100, 2), 2/(1+market.rake),true)}% Buy`
+            +` | Buy Fee: ${statColorSpan(roundToPlaces(100*market.baseRake, 2), 2/(1+market.baseRake),true)}%`
+            +` | Sell Fee: ${statColorSpan(roundToPlaces(100*market.baseRake/(market.baseRake+1), 2), 2/(market.baseRake+1),true)}%`,
+            (gs.fleet.totalSkills.getAmount(SKILLS.Barter) > 0) ? `Fee After Barter | ${statColorSpan(roundToPlaces(100*(1+market.rake) - 100, 2), 2/(1+market.rake),true)}% Buy`
             +` | ${statColorSpan(roundToPlaces(100*market.rake/(market.rake+1), 2), 2/(market.rake+1),true)}% Sell` : '',
         ]
     })

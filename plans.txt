@@ -1,13 +1,15 @@
 DONE:
 -button on starmap to return to the fleet/select/center on it (maybe dont need cuz other changes)
+-asteroids changing shape each turn, probably has to do with them being ellipses
+-warhead dmg seems weak, test it out some (fixed because we can target right onto units now)
 
 DONE BY AI, NEEDS TO BE CHECKED:
 -adjust damage when moving into ships - ship with more mass should take less dmg
 
 NEXT UP:
--warhead dmg seems weak, test it out some
+-folderize encounters, remove the luck concept, make it so modal cant be closed after opening
+-implement a scienceRating and explorers, scientists fleets etc.
 -make the AI for calcBestLaserCoords better - simulate up to 10 moves in advance and if any lead to a situation where we can shoot the enemy, favor them.
--asteroids changing shape each turn, probably has to do with them being ellipses
 -make spinning or being rammed animated - use new shipactions and/or anim handlers (not just pseudo)
 -in general, add some modules that do things other than grant new moves-regen, etc.
 -credits NaN bug is back

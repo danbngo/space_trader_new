@@ -11,6 +11,7 @@
 
 class GameState {
     constructor(starSystem = new StarSystem()) {
+        console.log('instantiating gameState for star system:', starSystem);
         this.year = GAME_START_YEAR;
         this.system = starSystem
 

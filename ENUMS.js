@@ -117,3 +117,4 @@ const ASTEROID_BELT_TYPES = Object.freeze({
     Icy: 'Icy',
     Plasma: 'Plasma',
 })
+

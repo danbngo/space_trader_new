@@ -9,6 +9,14 @@ class CountsMap {
         this.counts = counts
     }
 
+    clone() {
+        const newCounts = new Map()
+        for (const [key, amt] of this.counts) {
+            newCounts.set(key, amt)
+        }
+        return new CountsMap(newCounts)
+    }
+
     getAmount(key = {}) {
         return this.counts.get(key) || 0
     }
@@ -35,6 +43,10 @@ class CountsMap {
 
     setAmount(key = {}, amt = 0) {
         this.counts.set(key, amt)
+    }
+
+    get average() {
+        return this.total/this.size
     }
 
     get total() {

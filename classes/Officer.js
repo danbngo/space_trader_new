@@ -24,7 +24,7 @@ class Officer {
             msg += `You gained ${amount} experience points.<br/>`;
         }
         if (this.canLevelUp) {
-            if (this == gs.captain) msg += colorSpan(`You leveled up to level ${this.level + 1}!<br/>`, colorArrToRgbaString(COLORS.LightGreen), true);
+            if (this == gs.captain) msg += colorSpan(`You leveled up to level ${this.level + 1}!<br/>`, COLORS.LightGreen, true);
             while (autoLevelUp && this.canLevelUp) {
                 this.levelUp(autoImproveSkills);
             }
@@ -35,7 +35,7 @@ class Officer {
     grantInfamy(planet = new Planet(), amount = 1) {
         this.infamy.increment(planet, amount);
         if (this == gs.captain) {
-            return colorSpan(`You ${amount >= 0 ? 'gained' : 'lost'} ${Math.abs(amount)} infamy on ${planet.name}.<br/>`, colorArrToRgbaString(amount >= 0 ? COLORS.LightRed : COLORS.LightGreen));
+            return colorSpan(`You ${amount >= 0 ? 'gained' : 'lost'} ${Math.abs(amount)} infamy on ${coloredName(planet)}.<br/>`, amount >= 0 ? COLORS.LightRed : COLORS.LightGreen, true);
         }
         return ''
     }
@@ -43,7 +43,7 @@ class Officer {
     grantFame(planet = new Planet(), amount = 1) {
         this.fame.increment(planet, amount);
         if (this == gs.captain) {
-            return colorSpan(`You ${amount >= 0 ? 'gained' : 'lost'} ${Math.abs(amount)} fame on ${planet.name}.<br/>`, colorArrToRgbaString(amount >= 0 ? COLORS.LightGreen : COLORS.LightRed));
+            return colorSpan(`You ${amount >= 0 ? 'gained' : 'lost'} ${Math.abs(amount)} fame on ${coloredName(planet)}.<br/>`, amount >= 0 ? COLORS.LightGreen : COLORS.LightRed, true);
         }
         return ''
     }
@@ -67,7 +67,7 @@ class Officer {
     grantBounty(planet = new Planet(), amount = 1) {
         this.bounty.increment(planet, amount);
         if (this == gs.captain) {
-            return colorSpan(`You ${amount >= 0 ? 'gained' : 'lost'} ${Math.abs(amount)} bounty on ${planet.name}.<br/>`, colorArrToRgbaString(amount >= 0 ? COLORS.LightRed : COLORS.LightGreen));
+            return colorSpan(`You ${amount >= 0 ? 'gained' : 'lost'} ${Math.abs(amount)} bounty on ${coloredName(planet)}.<br/>`, amount >= 0 ? COLORS.LightRed : COLORS.LightGreen, true);
         }
         return ''
     }

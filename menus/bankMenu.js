@@ -6,7 +6,7 @@ function createBankLoansTable(loans = [new BankLoan()], onSelectLoan = (loan = n
     ]
     for (const loan of loans) {
         rows.push([
-            colorSpan(describeDate(loan.dueYear), gs.year >= loan.dueYear ? 'red' : ''),
+            colorSpan(describeDate(loan.dueYear), gs.year >= loan.dueYear ? COLORS.Red : ''),
             describeTimespan(loan.term),
             statColorSpan(loan.outstandingBalance, loan.outstandingBalance/loan.totalRepayable),
             loan.totalRepayable,

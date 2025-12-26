@@ -1,12 +1,22 @@
 function generateSettlement(planet = new Planet()) {
-    const shipyard = Math.random() > .2 ? generateShipyard(planet) : null;
-    const market =  Math.random() > .2 ? generateMarket(planet, false) : null
-    const blackMarket =  Math.random() > .2 ? generateMarket(planet, true) : null
-    const guild =  Math.random() > .2 ? generateGuild(planet) : null
-    const bank =  Math.random() > .2 ? generateBank(planet) : null
-    const courthouse = Math.random() > .2 ? generateCourthouse(planet) : null;
-    const academy = Math.random() > .2 ? generateAcademy(planet) : null;
-    return new Settlement(shipyard, market, blackMarket, guild, bank, courthouse, academy)
+    const shipyard = generateShipyard(planet)
+    const market =  generateMarket(planet, false)
+    const blackMarket =  generateMarket(planet, true) 
+    const guild =  generateGuild(planet) 
+    const bank =  generateBank(planet) 
+    const courthouse = generateCourthouse(planet)
+    const academy = generateAcademy(planet)
+
+    const buildings = [shipyard, market, blackMarket, guild, bank, courthouse, academy]
+    for (const building of buildings) if (Math.random() > .8) building.enabled = false
+
+    return new Settlement(planet, shipyard, market, blackMarket, guild, bank, courthouse, academy)
+}
+
+function generateShipModule(planet = new Planet(), moduleType = rndMember(SHIP_MODULE_TYPES_ALL)) {
+    const shipQuality = planet ? planet.culture.shipQuality : 1
+    const quality = rng(2, 0.5, false)*shipQuality
+    return new ShipModule(moduleType, quality)
 }
 
 
@@ -14,17 +24,14 @@ function generateShipyard(planet = new Planet()) {
     const count = rng(5, 1)
     const ships = [];
     for(let i=0;i<count;i++) {
-        ships.push(generateShip(rndMember(SHIP_TYPES_ALL), planet));
+        ships.push(generateShip(planet));
     }
     
     // Generate modules
     const moduleCount = rng(4, 1)
     const modules = []
-    const allModuleTypes = Object.values(SHIP_MODULE_TYPES)
     for(let i=0;i<moduleCount;i++) {
-        const moduleType = rndMember(allModuleTypes)
-        const quality = rng(1.5, 0.5, false)
-        modules.push(new ShipModule(moduleType, quality))
+        modules.push(generateShipModule(planet))
     }
     
     const rake = rng(2, 0.5, false)

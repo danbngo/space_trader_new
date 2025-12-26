@@ -52,7 +52,7 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0])
             `<br/>${isDocked ? 'Select a skill to train:' : 'You must dock to use the academy.'}`,
             skillTable,
             `Your CR: ${gs.credits}<br/>`,
-            `Training Tax: ${statColorSpan(roundToPlaces(100*academy.rake, 2), 1/(1+academy.rake), true)}%<br/>`,
+            `Training Fee: ${statColorSpan(roundToPlaces(100*academy.rake, 2), 1/(1+academy.rake), true)}%<br/>`,
         ]
     })
 

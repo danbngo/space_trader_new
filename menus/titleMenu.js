@@ -24,7 +24,7 @@ function createCharacter() {
 function continueGame() {
     gs.load()
     console.log("Game continued:", gs);
-    displayStarMap()
+    showStarMap()
 }
 
 function showAbout() {

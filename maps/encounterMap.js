@@ -99,7 +99,7 @@ class EncounterMap extends BaseMap {
         let msg = encounter.encounterType.name
         if (encounter.combatEnabled) {
             msg += ` - Turn: ${encounter.activeTurnFleet === encounter.playerFleet ?
-                colorSpan('Player', colorArrToRgbaString(COLORS.LightGray)) : colorSpan('Enemy', colorArrToRgbaString(COLORS.LightRed))}`
+                colorSpan('Player', COLORS.LightGray, true) : colorSpan('Enemy', COLORS.LightRed, true)}`
         }
         ce({
             parent:this.infoBar,
@@ -360,7 +360,7 @@ class EncounterMap extends BaseMap {
             if (obj.statusEffects.size > 0) {
                 const statusEffectSpans = obj.statusEffects.keys.map(effect=>{
                     const turnsRemaining = obj.statusEffects.getAmount(effect)
-                    if (turnsRemaining > 0) return colorSpan(`${effect.name}${turnsRemaining > 0 ? ` (${turnsRemaining})` : ''}`, colorArrToRgbaString(effect.color))
+                    if (turnsRemaining > 0) return colorSpan(`${effect.name}${turnsRemaining > 0 ? ` (${turnsRemaining})` : ''}`, effect.color, true)
                     return ''
                 })
                 ce({parent:container, innerHTML: statusEffectSpans.join('<br/>')})

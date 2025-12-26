@@ -1,0 +1,27 @@
+class RevoltNews extends News {
+    constructor(planet = new Planet(), startYear = gs.year, targetPlanet = new Planet()) {
+        super(
+            `${coloredName(planet)} revolts against ${coloredName(targetPlanet)}!`,
+            `${coloredName(planet)} achieves independence from ${coloredName(targetPlanet)}!`,
+            NEWS_TYPES.REVOLT, planet, targetPlanet, startYear
+        )
+
+        this.startEffects.push(
+            new NewsEffect({
+                planet: this.planet,
+                targetPlanet: this.targetPlanet,
+                newGovernmentType: GOVERNMENT_TYPES.ANARCHY,
+                militaryRatingModifiedBy: 1.3,
+                populationModifiedBy: 0.85,
+                commercialRatingModifiedBy: 0.8,
+                industrialRatingModifiedBy: 0.8,
+                securityRatingModifiedBy: 1.2,
+                marketCargoAmountsModifiedBy: 0.75,
+            })
+        );
+
+        const endEffect = this.startEffects[0].getInverse()
+        endEffect.newGovernmentType = rndMember(GOVERNMENT_TYPES_ALL.filter(g => g !== GOVERNMENT_TYPES.PUPPET_STATE))
+        this.endEffects.push(endEffect);
+    }
+}

@@ -1,5 +1,6 @@
 class StarSystem extends SpaceObject {
     constructor(name = "Unnamed", color = COLORS.White, radius = 0, x = 0, y = 0, barycenter = null, stars = [], planets = [], fleets = [], asteroidBelts = [], asteroids = [], backgroundStars = []) {
+        console.log('instantiating star system w name:', name, 'stars:', stars, 'planets:', planets, 'fleets:', fleets);
         super(name, color, radius, x, y)
         this.barycenter = barycenter
         this.stars = stars
@@ -9,6 +10,8 @@ class StarSystem extends SpaceObject {
         this.asteroids = asteroids
         this.backgroundStars = backgroundStars
         this.asteroids = asteroids
+        this.news = [] //actual News class objects, used to build a timeline
+        this.newsFeed = [] //strings that have more detailed data
     }
 
     /**

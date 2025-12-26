@@ -39,7 +39,7 @@ function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
         ce({children:[
             `Name: ${name} | Credits ${credits}`,
             `Level: ${level} | Exp.: ${expPoints} | To Next Lvl: ${expToNextLevel}`,
-            `Skill Points: ${colorSpan(String(skillPoints), skillPoints > 0 ? 'green' : '', true)}`,
+            `Skill Points: ${colorSpan(String(skillPoints), skillPoints > 0 ? COLORS.Green : '', true)}`,
             skillTable,
         ]}),
         [

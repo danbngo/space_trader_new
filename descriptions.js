@@ -24,7 +24,7 @@ function coloredName(obj = new SpaceObject()) {
     if (obj instanceof Ship) name = obj.shipType.name
     if (obj instanceof Effect) name = obj.effectType.name
 
-    return `${colorSpan(name, colorArrToRgbaString(obj.color))}`
+    return `${colorSpan(name, COLORS.White, true)}`
 }
 
 function describeDate(year = 0, minutesEnabled = false) {
@@ -79,3 +79,15 @@ function describeNumChange(delta = 0) {
     return `+0`
 }
 const dnc = describeNumChange
+
+function describePopulation(populationRating = 0) {
+    return `${statColorSpan(describeLargeNumber(Math.pow(1000,1+populationRating)), populationRating, true)}<br/>`
+}
+
+function describeTerritory(territoryRating = 0) {
+    return `${statColorSpan(roundToPlaces(territoryRating,2), territoryRating, true)} AU<br/>`
+}
+
+function describeRating(rating = 0, invertColor = false) {
+    return `${statColorSpan(roundToPlaces(rating,2), invertColor ? 1/rating : rating, true)}x`
+}

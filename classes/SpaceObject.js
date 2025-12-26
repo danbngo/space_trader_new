@@ -70,8 +70,19 @@ class Star extends OrbitingObject {
 }
 
 // Planet class extends SpaceObject
+/**
+ * @class Planet
+ * @extends {OrbitingObject}
+ * @param {string} name - The name of the planet.
+ * @param {number[]} color - The color of the planet.
+ * @param {number} radius - The radius of the planet.
+ * @property {Orbit} orbit - The orbit of the planet.
+ * @property {PLANET_TYPE} planetType - The type of the planet.
+ * @property {Settlement} settlement - The settlement on the planet.
+ * @property {Culture} culture - The culture of the planet.
+ */
 class Planet extends OrbitingObject {
-    constructor(name = "Unnamed", color = COLORS.White, radius = 0, x = 0, y = 0, orbit = null, planetType = PLANET_TYPES_ALL[0], settlement = new Settlement(), culture = new Culture()) {
+    constructor(name = "Unnamed", color = COLORS.White, radius = 0, x = 0, y = 0, orbit = null, planetType = PLANET_TYPES_ALL[0], settlement = null, culture = null) {
         super(name, color, radius, x, y, orbit);
         this.planetType = planetType
         this.settlement = settlement

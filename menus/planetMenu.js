@@ -10,12 +10,13 @@ function showPlanetMenu(planet = new Planet()) {
         console.log('1')
         const damagedShips = gs.fleet.ships.filter(s=>s.isDamaged())
         console.log('2:',damagedShips,gs.fleet.ships)
-        if (damagedShips.length > 0) msg += colorSpan(`Your ships receive complementary repairs courtesy of the dock's nanite swarm.<br/>`, 'lightgreen', true)
+        if (damagedShips.length > 0) msg += colorSpan(`Your ships receive complementary repairs courtesy of the dock's nanite swarm.<br/>`, COLORS.LightGreen, true)
         for (const s of damagedShips) s.repairHull()
         msg += `What would you like to do?<br/>`
     }
 
     const options = [[`Overview`, () => showPlanetOverviewMenu(planet)]];
+    options.push(["News", () => showNewsTimelineMenu(planet, () => showPlanetMenu(planet))]);
     if (settlement.shipyard) {
         options.push(["Shipyard", () => showShipyardBuyMenu(settlement.shipyard)]);
     }
@@ -37,26 +38,24 @@ function showPlanetMenu(planet = new Planet()) {
     if (settlement.academy) {
         options.push(["Academy", () => showAcademyMenu(settlement.academy)]);
     }
-    options.push([isDocked ? "Depart" : "Stop Scanning", () => departPlanet(planet)]);
+    options.push([isDocked ? "Depart" : "Stop Scanning", () => closeModal()]);
 
     showModal(coloredName(planet), msg, options);
 }
 
 function showPlanetOverviewMenu(planet = new Planet()) {
     const {culture} = planet
-    const {territory, population, governmentRating, securityRating, commercialRating, industrialRating, crimeRating} = culture
-    let msg = `<h3>${coloredName(planet)} Overview</h3>`    
-    msg += `Population: ${statColorSpan(describeLargeNumber(Math.pow(1000,1+population)), population, true)}<br/>`
-    msg += `Territory: ~${statColorSpan(roundToPlaces(territory,2), territory, true)}AU<br/>`
-    msg += `Government Rating: ${statColorSpan(roundToPlaces(governmentRating,2), governmentRating, true)}x<br/>`
-    msg += `Security Rating: ${statColorSpan(roundToPlaces(securityRating,2), securityRating, true)}x<br/>`
-    msg += `Commercial Rating: ${statColorSpan(roundToPlaces(commercialRating,2), commercialRating, true)}x<br/>`
-    msg += `Industrial Rating: ${statColorSpan(roundToPlaces(industrialRating,2), industrialRating, true)}x<br/>`
-    msg += `Crime Rating: ${statColorSpan(roundToPlaces(crimeRating,2), 1/crimeRating, true)}x<br/>`
-    showModal(coloredName(planet), msg, [["Back", () => showPlanetMenu(planet)]]);
-}
-
-
-function departPlanet(planet) {
-    closeModal()
+    const {territory, population, militaryRating, securityRating, commercialRating, industrialRating, crimeRating} = culture
+    let msg = ''
+    msg += `Population: ${describePopulation(population)}<br/>`
+    msg += `Territory: ${describeTerritory(territory)}<br/>`
+    msg += `Government: ${coloredName(culture.governmentType)}<br/>`
+    msg += `Military: ${describeRating(militaryRating)}<br/>`
+    msg += `Security: ${describeRating(securityRating)}<br/>`
+    msg += `Commerce: ${describeRating(commercialRating)}<br/>`
+    msg += `Industry: ${describeRating(industrialRating)}<br/>`
+    msg += `Crime: ${describeRating(crimeRating, true)}<br/>`
+    msg += `Ships: ${describeRating(culture.shipQuality)}<br/>`
+    msg += `Officers: ${describeRating(culture.officerQuality)}<br/>`
+    showModal(`${coloredName(planet)} - Overview`, msg, [["Back", () => showPlanetMenu(planet)]]);
 }

@@ -166,10 +166,22 @@ function statColorSpan(text = '', ratio = 1.0, asHtmlText = false) {
     return colorSpan(text, color, asHtmlText)
 }
 
+/** 
+ * @function colorSpan
+ * @param {string} text
+ * @param {string | Array<number>} color
+ * @param {boolean} asHtmlText
+ * @returns {string | HTMLElement}
+ */
 function colorSpan(text = '', color = '', asHtmlText = true) {
     if (asHtmlText) {
         // return HTML string instead of DOM element
         return `<span style="color: ${color}">${text}</span>`;
+    }
+
+    if (Array.isArray(color)) {
+        // convert color array to rgba string
+        color = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${color.length > 3 ? color[3] : 1})`;
     }
 
     // return DOM element normally

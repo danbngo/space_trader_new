@@ -113,42 +113,90 @@ class EncounterAI {
         return bestMove
     }
 
-    //simulates 100 moves. a move is considered good if it allows you to attack
+    //simulates moves looking ahead up to 5 moves to find a path that allows attacking
     calcBestLaserCoords(attacker = new Ship(), targets = [new Ship()], avoidHazards = true, simulations = 100) {
         console.log('EncounterAI.calcBestLaserCoords', { attacker, targets, simulations });
-        const moveArea = attacker.calcMoveArea()
-        let bestMove = null
-        let bestMoveScore = 0.1 //only consider moves that allow attacking
+        const maxDepth = 5
         const effects = avoidHazards ? this.encounter.effects : []
-        for (let i = 0; i < simulations; i++) {
-            const [toX, toY] = [rng(moveArea.x+moveArea.radiusX, moveArea.x-moveArea.radiusX, false), rng(moveArea.y+moveArea.radiusY, moveArea.y-moveArea.radiusY, false)]
-            if (!moveArea.containsPoint(toX, toY)) continue
-            const [t1, t2] = attacker.calcLaserAreas(toX, toY)
-            let canAttack = false
+        
+        // Helper to check if position allows attack
+        const canAttackFromPosition = (x, y) => {
+            const [t1, t2] = attacker.calcLaserAreas(x, y)
             for (const target of targets) {
                 if (t1.containsPoint(target.x, target.y) || t2.containsPoint(target.x, target.y)) {
-                    canAttack = true
-                    break
+                    return true
                 }
             }
-            const attackScore = canAttack ? 1.0 : 0.0
-            let hazardPenalty = 0
-            // Check if move position is in any hazard effects
-            if (avoidHazards) {
-                for (const effect of effects) {
-                    if (effect.containsPoint(toX, toY)) {
-                        hazardPenalty = 0.5 // Reduce score (worse) if in hazard
-                        break
-                    }
+            return false
+        }
+        
+        // Helper to calculate hazard penalty for a position
+        const getHazardPenalty = (x, y) => {
+            if (!avoidHazards) return 0
+            for (const effect of effects) {
+                if (effect.containsPoint(x, y)) {
+                    return 0.5
                 }
             }
-            const moveScore = attackScore * 1 - hazardPenalty
-            if (moveScore > bestMoveScore) {
-                bestMoveScore = moveScore
-                bestMove = [toX, toY]
+            return 0
+        }
+        
+        // BFS to find path to attack position
+        // Each node: {x, y, depth, firstMove: [x, y], hazardPenalty}
+        const queue = [{x: attacker.x, y: attacker.y, depth: 0, firstMove: null, totalHazardPenalty: 0}]
+        const visited = new Set()
+        visited.add(`${Math.round(attacker.x)},${Math.round(attacker.y)}`)
+        
+        let bestPath = null
+        let bestPathScore = Infinity
+        
+        while (queue.length > 0) {
+            const current = queue.shift()
+            
+            // Check if current position allows attack
+            if (current.depth > 0 && canAttackFromPosition(current.x, current.y)) {
+                const score = current.depth + current.totalHazardPenalty
+                if (score < bestPathScore) {
+                    bestPathScore = score
+                    bestPath = current.firstMove
+                }
+                continue // Found a path, but keep looking for better ones at same or lower depth
+            }
+            
+            // If at max depth, stop exploring this branch
+            if (current.depth >= maxDepth) continue
+            
+            // Generate next possible moves from current position
+            const moveArea = new Ellipse(current.x, current.y, attacker.maxMoveDistance, attacker.maxMoveDistance)
+            const movesPerDepth = Math.ceil(simulations / maxDepth)
+            
+            for (let i = 0; i < movesPerDepth; i++) {
+                const [toX, toY] = [
+                    rng(moveArea.x + moveArea.radiusX, moveArea.x - moveArea.radiusX, false),
+                    rng(moveArea.y + moveArea.radiusY, moveArea.y - moveArea.radiusY, false)
+                ]
+                
+                if (!moveArea.containsPoint(toX, toY)) continue
+                
+                const posKey = `${Math.round(toX)},${Math.round(toY)}`
+                if (visited.has(posKey)) continue
+                visited.add(posKey)
+                
+                const hazardPenalty = getHazardPenalty(toX, toY)
+                const firstMove = current.firstMove || [toX, toY]
+                
+                queue.push({
+                    x: toX,
+                    y: toY,
+                    depth: current.depth + 1,
+                    firstMove: firstMove,
+                    totalHazardPenalty: current.totalHazardPenalty + hazardPenalty
+                })
             }
         }
-        return bestMove
+        
+        console.log('found calcBestLaserCoords result:', bestPath, 'score:', bestPathScore)
+        return bestPath
     }
 
     calcModuleAction(ship = new Ship(), strategy = null, targets = [new Ship()]) {

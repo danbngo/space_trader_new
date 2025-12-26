@@ -1,0 +1,43 @@
+class ConstructionNews extends News {
+    constructor(planet = new Planet(), startYear = gs.year) {
+        super(
+            `${coloredName(planet)} begins a grand construction project!`,
+            `${coloredName(planet)} completes its grand construction project!`,
+            NEWS_TYPES.CONSTRUCTION, planet, null, startYear
+        )
+
+        const buildingsToEnable = [];
+        const numBuildings = Math.floor(Math.random() * 3) + 1; // 1-3 buildings
+        const disabledBuildings = planet.settlement.buildings.filter(b => !b.enabled);
+        for (let i = 0; i < Math.min(numBuildings, disabledBuildings.length); i++) {
+            const building = rndMember(disabledBuildings.filter(b => !b.enabled && !buildingsToEnable.includes(b)));
+            if (building) buildingsToEnable.push(building);
+        }
+
+        this.startEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                industrialRatingModifiedBy: 1.4,
+                commercialRatingModifiedBy: 1.1,
+                marketCargoAmountsModifiedBy: 0.8,
+                marketPricesModifiedBy: 1.2,
+                //buildingsEnabled: buildingsToEnable,
+            })
+        ]
+
+        this.endEffects = [
+            new NewsEffect({
+                buildingsEnabled: buildingsToEnable,
+            })
+        ]
+    }
+
+    static isValid(planet = new Planet()) {
+        //must be missing at least one building
+        const buildingsValid = planet.settlement.buildings.filter(b => !b.enabled).length > 0
+        const interferingEvent =
+            News.hasNews(planet, NEWS_TYPES.WAR) || News.hasNews(planet, NEWS_TYPES.CIVIL_WAR) || News.hasNews(planet, NEWS_TYPES.REVOLUTION) ||
+            News.hasNews(planet, NEWS_TYPES.CONSTRUCTION) || News.hasNewsTargeting(planet, NEWS_TYPES.WAR) || News.hasNewsTargeting(planet, NEWS_TYPES.BOMBARDMENT)
+        return buildingsValid && !interferingEvent
+    }
+}

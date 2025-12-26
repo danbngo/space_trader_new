@@ -126,8 +126,8 @@ function showShipyardBuyMenu(shipyard = new Shipyard()) {
             `Your # ships: ${fleet.ships.length}/${fleet.numPilots} | Your credits: ${gs.credits}`,
             //`Shipyard credits: ${shipyard.credits}`,
             `Local Ship Quality: ${roundToPlaces(100*shipyard.planet.culture.shipQuality, 2)}%`,
-            `Buy Tax: ${statColorSpan(roundToPlaces(100*shipyard.baseRake, 2), 2/(1+shipyard.baseRake),true)}%`,
-            (gs.fleet.totalSkills.getAmount(SKILLS.Barter) > 0) ? `Taxes After Barter | ${statColorSpan(roundToPlaces(100*(1+shipyard.rake) - 100, 2), 2/(1+shipyard.rake),true)}% Buy` : '',
+            `Buy Fee: ${statColorSpan(roundToPlaces(100*shipyard.baseRake, 2), 2/(1+shipyard.baseRake),true)}%`,
+            (gs.fleet.totalSkills.getAmount(SKILLS.Barter) > 0) ? `Fee After Barter | ${statColorSpan(roundToPlaces(100*(1+shipyard.rake) - 100, 2), 2/(1+shipyard.rake),true)}% Buy` : '',
         ]}),
         [
             ["Buy Modules", ()=>showShipyardBuyModulesMenu(shipyard)],
@@ -174,7 +174,7 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
         showModal(
             `Sell ${ship.name}?`,
             ce({children:[
-                !shipyardCanAfford ? `${colorSpan('Warning', 'yellow', true)}: Your ${ship.name} is worth ${salePrice}CR but the shipyard only has ${shipyard.credits} credits!` : ``,
+                !shipyardCanAfford ? `${colorSpan('Warning', COLORS.Yellow, true)}: Your ${ship.name} is worth ${salePrice}CR but the shipyard only has ${shipyard.credits} credits!` : ``,
                 `Are you sure you want to sell your ${ship.name} for ${Math.min(salePrice, shipyard.credits)} credits?`,
                 `Sale Price: ${finalSale}CR ${officersShare ? `(-${officersShare}CR for officers)` : ''}`,
                 `CR After Sale: ${gs.credits+finalSale}CR`,
@@ -191,11 +191,11 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
         ce({children:[
             `<b>Your ships</b>`,
             createSellShipMenu(fleet.ships, shipyard, (ship)=>onSelectPlayerShip(ship)),
-            `Your # ships: ${fleet.ships.length}/${fleet.numPilots}` + (fleet.ships.length < 2 ? colorSpan(` (You can't sell your last ship!)`, 'Yellow') : ''),
-            colorSpan(`Your credits: ${gs.credits}`, gs.credits == 0 ? '#f00' : ''),
-            colorSpan(`Shipyard credits: ${shipyard.credits}`, shipyard.credits == 0 ? '#f00' : ''),
-            `Sell Tax: ${statColorSpan(roundToPlaces(100*shipyard.baseRake/(shipyard.baseRake+1), 2), 2/(shipyard.baseRake+1),true)}%`,
-            (gs.fleet.totalSkills.getAmount(SKILLS.Barter) > 0) ? `Taxes After Barter | ${statColorSpan(roundToPlaces(100*shipyard.rake/(shipyard.rake+1), 2), 2/(shipyard.rake+1),true)}% Sell` : '',
+            `Your # ships: ${fleet.ships.length}/${fleet.numPilots}` + (fleet.ships.length < 2 ? colorSpan(` (You can't sell your last ship!)`, COLORS.Yellow) : ''),
+            colorSpan(`Your credits: ${gs.credits}`, gs.credits == 0 ? COLORS.Red : ''),
+            colorSpan(`Shipyard credits: ${shipyard.credits}`, shipyard.credits == 0 ? COLORS.Red : ''),
+            `Sell Fee: ${statColorSpan(roundToPlaces(100*shipyard.baseRake/(shipyard.baseRake+1), 2), 2/(shipyard.baseRake+1),true)}%`,
+            (gs.fleet.totalSkills.getAmount(SKILLS.Barter) > 0) ? `Fee After Barter | ${statColorSpan(roundToPlaces(100*shipyard.rake/(shipyard.rake+1), 2), 2/(shipyard.rake+1),true)}% Sell` : '',
         ]}),
         [
             ["Buy Modules", ()=>showShipyardBuyModulesMenu(shipyard)],
@@ -210,7 +210,6 @@ function showShipyardBuyModulesMenu(shipyard = new Shipyard()) {
     const {planet} = shipyard
     const {fleet} = gs
     const isDocked = fleet.location == planet
-    const rebuildMenu = ()=>showShipyardBuyModulesMenu(shipyard)
     const leave = ()=>leaveShipyard(shipyard)
 
     
@@ -238,8 +237,8 @@ function showShipyardBuyModulesMenu(shipyard = new Shipyard()) {
             `<b>Available Modules</b>`,
             createBuyModuleMenu(shipyard.modules, shipyard, (module)=>onSelectModule(module)),
             `Your credits: ${gs.credits} | Your Ships With Open Slots: ${fleet.ships.filter(s => s.unusedModuleSlots > 0).length} / ${fleet.ships.length}`,
-            `Buy Tax: ${statColorSpan(roundToPlaces(100*shipyard.baseRake, 2), 2/(1+shipyard.baseRake),true)}%`,
-            (gs.fleet.totalSkills.getAmount(SKILLS.Barter) > 0) ? `Taxes After Barter | ${statColorSpan(roundToPlaces(100*(1+shipyard.rake) - 100, 2), 2/(1+shipyard.rake),true)}% Buy` : '',
+            `Buy Fee: ${statColorSpan(roundToPlaces(100*shipyard.baseRake, 2), 2/(1+shipyard.baseRake),true)}%`,
+            (gs.fleet.totalSkills.getAmount(SKILLS.Barter) > 0) ? `Fee After Barter | ${statColorSpan(roundToPlaces(100*(1+shipyard.rake) - 100, 2), 2/(1+shipyard.rake),true)}% Buy` : '',
         ]}),
         [
             ["Buy Ships", ()=>showShipyardBuyMenu(shipyard)],

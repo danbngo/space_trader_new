@@ -1,3 +1,5 @@
+console.log("Generating solar system...");
+
 const SOL = new Star("Sol", hexToRgba('#ffff44'), 109, 0, 0);
 
 const MERCURY = new Planet("Mercury", hexToRgba('#aaaaaa'), 0.383, 0, 0, new Orbit(0.39), PLANET_TYPES.TERRESTRIAL);
