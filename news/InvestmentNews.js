@@ -43,10 +43,8 @@ class InvestmentNews extends News {
         const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.NEUTRAL || rel == RELATIONSHIP_TYPES.ALLY)
         //most of the below shouldnt be possible based on above checked but just in case
         const interferingEvent = 
-            News.hasNews(planet, NEWS_TYPES.ALLIANCE, targetPlanet) || News.hasNews(targetPlanet, NEWS_TYPES.ALLIANCE, planet) || 
-            News.hasNews(planet, NEWS_TYPES.WAR, targetPlanet) || News.hasNews(targetPlanet, NEWS_TYPES.WAR, planet) ||
-            News.hasNews(planet, NEWS_TYPES.TENSIONS, targetPlanet) || News.hasNews(targetPlanet, NEWS_TYPES.TENSIONS, planet) ||
-            News.hasNews(planet, NEWS_TYPES.BOMBARDMENT, targetPlanet) || News.hasNews(targetPlanet, NEWS_TYPES.BOMBARDMENT, planet)
+            News.hasNews(NEWS_TYPES.INVESTMENT, planet, targetPlanet) ||
+            News.hasAnyNewsBidirectional(planet, targetPlanet, NEWS_TYPES_PROGRESS_PREVENTING)
         return ratingsValid && relationshipsValid && !interferingEvent
     }
 }

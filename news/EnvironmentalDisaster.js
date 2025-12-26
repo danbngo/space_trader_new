@@ -34,10 +34,7 @@ class EnvironmentalDisasterNews extends News {
         const {planet} = this
         //happens when industry is getting out of hand
         const ratingsValid = planet.culture.industrialRating >= 1.2
-
-        const interferingEvent = //can happy anytime, anywhere!
-            News.hasNews(planet, NEWS_TYPES.ENVIRONMENTAL_DISASTER)
-
+        const interferingEvent = News.hasNews(NEWS_TYPES.ENVIRONMENTAL_DISASTER, planet)
         return ratingsValid && !interferingEvent
     }
 }

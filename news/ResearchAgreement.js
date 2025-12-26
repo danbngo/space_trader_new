@@ -48,12 +48,9 @@ class ResearchAgreementNews extends News {
         const developmentValid = Math.abs(planet.culture.officerQuality - targetPlanet.culture.officerQuality) < 0.5
 
         const interferingEvent =
-            News.hasNews(planet, NEWS_TYPES.RESEARCH_AGREEMENT, targetPlanet) || News.hasNews(targetPlanet, NEWS_TYPES.RESEARCH_AGREEMENT, planet) ||
-            News.hasNews(planet, NEWS_TYPES.WAR, targetPlanet) || News.hasNews(targetPlanet, NEWS_TYPES.WAR, planet) ||
-            News.hasNews(planet, NEWS_TYPES.TENSIONS, targetPlanet) || News.hasNews(targetPlanet, NEWS_TYPES.TENSIONS, planet) ||
-            News.hasNews(planet, NEWS_TYPES.BOMBARDMENT, targetPlanet) || News.hasNews(targetPlanet, NEWS_TYPES.BOMBARDMENT, planet) ||
-            News.hasNews(planet, NEWS_TYPES.SCARCITY) || News.hasNews(targetPlanet, NEWS_TYPES.SCARCITY) ||
-            News.hasNews(planet, NEWS_TYPES.PLAGUE) || News.hasNews(targetPlanet, NEWS_TYPES.PLAGUE)
+            //News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.RESEARCH_AGREEMENT, ...NEWS_TYPES_PROGRESS_PREVENTING]) || //already covered below
+            News.planetHasAnyNews(planet, NEWS_TYPES_PROGRESS_PREVENTING) ||
+            News.planetHasAnyNews(targetPlanet, NEWS_TYPES_PROGRESS_PREVENTING)
         return relationshipsValid && !interferingEvent && developmentValid
     }
 }

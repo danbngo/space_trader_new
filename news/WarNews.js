@@ -51,11 +51,7 @@ class WarNews extends News {
         //planets must be hostile
         const relationships = [planet.culture.relationships.get(targetPlanet), targetPlanet.culture.relationships.get(planet)]
         const relationshipValid = relationships.every(r => r === RELATIONSHIP_TYPES.HOSTILE)
-        const interferingEvent = 
-            News.hasNews(planet, NEWS_TYPES.WAR, targetPlanet) || News.hasNews(targetPlanet, NEWS_TYPES.WAR, planet) ||
-            News.hasNews(planet, NEWS_TYPES.ALLIANCE, targetPlanet) || News.hasNews(targetPlanet, NEWS_TYPES.ALLIANCE, planet) ||
-            News.hasNews(planet, NEWS_TYPES.TRADE_AGREEMENT, targetPlanet) || News.hasNews(targetPlanet, NEWS_TYPES.TRADE_AGREEMENT, planet) ||
-            News.hasNews(planet, NEWS_TYPES.RESEARCH_AGREEMENT, targetPlanet) || News.hasNews(targetPlanet, NEWS_TYPES.RESEARCH_AGREEMENT, planet)
+        const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.WAR, ...NEWS_TYPES_COOPERATIVE])
         return governmentsValid && agencyValid && fairTargetValid &&relationshipValid && !interferingEvent
     }
 }

@@ -60,9 +60,7 @@ class SubjugationNews extends News {
         const agencyValid = (planet.culture.governmentType !== GOVERNMENT_TYPES.ANARCHY && planet.culture.governmentType !== GOVERNMENT_TYPES.PUPPET_STATE)
         //planet must be at war with the target
         const relationshipValid = planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR
-        const interferingEvent = 
-            News.hasNews(planet, NEWS_TYPES.SUBJUGATION, targetPlanet) || News.hasNews(targetPlanet, NEWS_TYPES.SUBJUGATION, planet) ||
-            News.hasNews(planet, NEWS_TYPES.ALLIANCE, targetPlanet) || News.hasNews(targetPlanet, NEWS_TYPES.ALLIANCE, planet)
+        const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.SUBJUGATION, ...NEWS_TYPES_COOPERATIVE])
         return ratingsValid && agencyValid && relationshipValid && !interferingEvent
     }
 

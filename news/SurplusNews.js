@@ -29,9 +29,8 @@ class SurplusNews extends News {
 
     isValid() {
         const {planet} = this
-        const interferingEvent = 
-            News.hasNews(planet, NEWS_TYPES.SURPLUS) || News.hasNews(planet, NEWS_TYPES.DEPRESSION) ||
-            News.hasNews(planet, NEWS_TYPES.SCARCITY)
+        //more for flavor than anything, irl you could find goodies at any time
+        const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.SURPLUS, NEWS_TYPES.DEPRESSION, NEWS_TYPES.SCARCITY])
         return !interferingEvent
     }
 }

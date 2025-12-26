@@ -26,8 +26,7 @@ class ScarcityNews extends News {
 
     isValid() {
         const {planet} = this
-        const interferingEvent = 
-            News.hasNews(planet, NEWS_TYPES.ECONOMIC_BOOM) || News.hasNews(planet, NEWS_TYPES.SCARCITY) || News.hasNews(planet, NEWS_TYPES.SURPLUS)
+        const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.SCARCITY, ...NEWS_TYPES_ECONOMY_BOOSTING])
         return !interferingEvent
     }
 }

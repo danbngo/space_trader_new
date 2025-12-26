@@ -28,11 +28,9 @@ class ImmigrationNews extends News {
         const {planet} = this
         //people generally go where theres economic opportunity
         const ratingsValid = planet.culture.commercialRating >= 1.2
-
         const interferingEvent = 
-            News.hasNews(planet, NEWS_TYPES.IMMIGRATION) || News.hasNews(planet, NEWS_TYPES.CIVIL_WAR) || News.hasNews(planet, NEWS_TYPES.PLAGUE) ||
-            News.hasNews(planet, NEWS_TYPES.REVOLUTION) || News.hasNews(planet, NEWS_TYPES.DEPRESSION) ||
-            News.hasNews(planet, NEWS_TYPES.SCARCITY) || News.hasNewsTargeting(planet, NEWS_TYPES.BOMBARDMENT)
+            News.planetHasAnyNews(planet, NEWS_TYPES_PROGRESS_PREVENTING) ||
+            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_PROGRESS_PREVENTING)
         return ratingsValid && !interferingEvent
     }
 }

@@ -49,9 +49,8 @@ class CivilWarNews extends News {
         const validGov = planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY && planet.culture.governmentType != GOVERNMENT_TYPES.PUPPET_STATE
         //cant be having any of: construction, economic boom, revolution
         const interferingEvent =
-            News.hasNews(planet, NEWS_TYPES.CIVIL_WAR) || News.hasNews(planet, NEWS_TYPES.CONSTRUCTION) ||
-            News.hasNews(planet, NEWS_TYPES.ECONOMIC_BOOM) || News.hasNews(planet, NEWS_TYPES.REVOLUTION) ||
-            News.hasNewsTargeting(planet, NEWS_TYPES.WAR)
+            News.planetHasAnyNews(planet, [NEWS_TYPES.CIVIL_WAR, NEWS_TYPES.ECONOMIC_BOOM, NEWS_TYPES.REVOLUTION]) ||
+            News.hasNewsTargeting(NEWS_TYPES.WAR, planet)
         return validGov && !interferingEvent
     }
 }

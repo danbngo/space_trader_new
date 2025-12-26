@@ -37,14 +37,8 @@ class TradeAgreementNews extends News {
         //planets must be neutral or allied towards each other
         const relationships = [planet.culture.relationships.get(targetPlanet), targetPlanet.culture.relationships.get(planet)]
         const relationshipsValid = relationships.every(r => r == RELATIONSHIP_TYPES.NEUTRAL || r == RELATIONSHIP_TYPES.ALLY)
-        const interferingEvent =
-            News.hasNews(planet, NEWS_TYPES.TRADE_AGREEMENT, targetPlanet) || News.hasNews(targetPlanet, NEWS_TYPES.TRADE_AGREEMENT, planet) ||
-            News.hasNews(planet, NEWS_TYPES.RESEARCH_AGREEMENT, targetPlanet) || News.hasNews(targetPlanet, NEWS_TYPES.RESEARCH_AGREEMENT, planet) ||
-            News.hasNews(planet, NEWS_TYPES.WAR, targetPlanet) || News.hasNews(targetPlanet, NEWS_TYPES.WAR, planet) ||
-            News.hasNews(planet, NEWS_TYPES.TENSIONS, targetPlanet) || News.hasNews(targetPlanet, NEWS_TYPES.TENSIONS, planet) ||
-            News.hasNews(planet, NEWS_TYPES.BOMBARDMENT, targetPlanet) || News.hasNews(targetPlanet, NEWS_TYPES.BOMBARDMENT, planet) ||
-            News.hasNews(planet, NEWS_TYPES.SCARCITY) || News.hasNews(targetPlanet, NEWS_TYPES.SCARCITY) ||
-            News.hasNews(planet, NEWS_TYPES.PLAGUE) || News.hasNews(targetPlanet, NEWS_TYPES.PLAGUE)
+        //unlike research, trade is only blocked if you're actively hostile to each other. 
+        const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.TRADE_AGREEMENT, ...NEWS_TYPES_PROGRESS_PREVENTING])
         return relationshipsValid && !interferingEvent
     }
 }

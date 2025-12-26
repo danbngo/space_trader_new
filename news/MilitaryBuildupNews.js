@@ -32,13 +32,21 @@ class MilitaryBuildupNews extends News {
         const {planet} = this
         //dont do it if military is already big
         const ratingsValid = planet.culture.militaryRating < 1.2
+        //dont do it if no government are tense with us or vice versa
+        let politicsValid = false
+        for (const p of gs.system.planets) {
+            if (p !== planet) {
+                const relationship = planet.culture.relationships.get(p)
+                const relationship2 = p.culture.relationships.get(planet)
+                if (relationship == RELATIONSHIP_TYPES.HOSTILE || relationship2 == RELATIONSHIP_TYPES.HOSTILE) {
+                    politicsValid = true
+                    break
+                }
+            }
+        }
         //planet must not already be in anarchy or puppet state
         const validGov = planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY && planet.culture.governmentType != GOVERNMENT_TYPES.PUPPET_STATE
-        const interferingEvent =
-            News.hasNews(planet, NEWS_TYPES.CIVIL_WAR) || News.hasNews(planet, NEWS_TYPES.REVOLUTION) || News.hasNews(planet, NEWS_TYPES.PLAGUE) ||
-            News.hasNews(planet, NEWS_TYPES.WAR) || News.hasNewsTargeting(planet, NEWS_TYPES.WAR) || 
-            News.hasNews(planet, NEWS_TYPES.BOMBARDMENT) || News.hasNewsTargeting(planet, NEWS_TYPES.BOMBARDMENT) ||
-            News.hasNews(planet, NEWS_TYPES.DISARMAMENT)
+        const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.MILITARY_BUILDUP, ...NEWS_TYPES_PROGRESS_PREVENTING]) 
         return ratingsValid && validGov && !interferingEvent
     }
 }

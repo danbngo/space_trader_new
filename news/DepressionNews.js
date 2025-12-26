@@ -32,10 +32,9 @@ class DepressionNews extends News {
         const {planet} = this
         //more likely to happen when credit is REALLY high
         const ratingsValid = planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS > 1.5
-        const interferingEvent = 
-            News.hasNews(planet, NEWS_TYPES.DEPRESSION) || News.hasNews(planet, NEWS_TYPES.ECONOMIC_BOOM) ||
-            News.hasNews(planet, NEWS_TYPES.CONSTRUCTION) || News.hasNews(planet, NEWS_TYPES.WAR) ||
-            News.hasNews(planet, NEWS_TYPES.SCIENTIFIC_BREAKTHROUGH) || News.hasNews(planet, NEWS_TYPES.SURPLUS)
+        const interferingEvent =
+            News.planetHasAnyNews(planet, [NEWS_TYPES.DEPRESSION, ...NEWS_TYPES_ECONOMY_BOOSTING]) || 
+            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_ECONOMY_BOOSTING)
         return ratingsValid && !interferingEvent
     }
 }

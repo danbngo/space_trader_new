@@ -38,8 +38,8 @@ class ConstructionNews extends News {
         //must be missing at least one building
         const buildingsValid = planet.settlement.buildings.filter(b => !b.enabled).length > 0
         const interferingEvent =
-            News.hasNews(planet, NEWS_TYPES.WAR) || News.hasNews(planet, NEWS_TYPES.CIVIL_WAR) || News.hasNews(planet, NEWS_TYPES.REVOLUTION) || News.hasNews(planet, NEWS_TYPES.PLAGUE) ||
-            News.hasNews(planet, NEWS_TYPES.CONSTRUCTION) || News.hasNewsTargeting(planet, NEWS_TYPES.WAR) || News.hasNewsTargeting(planet, NEWS_TYPES.BOMBARDMENT)
+            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_HOSTILE) ||
+            News.planetHasAnyNews(planet, [NEWS_TYPES.CONSTRUCTION, ...NEWS_TYPES_PROGRESS_PREVENTING])
         return buildingsValid && !interferingEvent
     }
 }

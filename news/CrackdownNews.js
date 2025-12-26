@@ -1,7 +1,7 @@
 class CrackdownNews extends News {
     constructor(planet = new Planet()) {
         super(
-            `GovernmentType cracks down on crime on ${coloredName(planet)}!`,
+            `Government cracks down on crime on ${coloredName(planet)}!`,
             `The anti-crime crackdown on ${coloredName(planet)} ends.`,
             NEWS_TYPES.CRACKDOWN, planet
         )
@@ -30,11 +30,11 @@ class CrackdownNews extends News {
 
     isValid() {
         const {planet} = this
+        //wouldnt happen in an anarchy, just sayin
+        const govValid = planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY
         //wont happen if crime is already low
         const crimeValid = planet.culture.crimeRating > 1
-
-        const interferingEvent = 
-            News.hasNews(planet, NEWS_TYPES.CRACKDOWN)
-        return crimeValid && !interferingEvent
+        const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.CRACKDOWN, ...NEWS_TYPES_CRIME_PREVENTING])
+        return govValid && crimeValid && !interferingEvent
     }
 }

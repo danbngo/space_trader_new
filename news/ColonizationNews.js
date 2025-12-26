@@ -20,7 +20,7 @@ class ColonizationNews extends News {
         //system becomes more crowded over time...
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.endEffects[0], {
-            population: 1, //pop doesnt auto recover
+            populationModifiedBy: 1, //pop doesnt auto recover
             commercialRatingModifiedBy: 1.1,
             territoryModifiedBy: 1.2,
             prestigeRatingModifiedBy: 1.1,
@@ -31,9 +31,9 @@ class ColonizationNews extends News {
         const {planet} = this
         const ratingsValid = planet.culture.population >= 1.0
         //basically dont do it if ANYTHING bad is happening
-        const interferingEvent = News.hasNews(planet, NEWS_TYPES.COLONIZATION) || News.hasNewsTargeting(planet, NEWS_TYPES.BOMBARDMENT) || News.hasNews(planet, NEWS_TYPES.PLAGUE) || 
-            News.hasNews(planet, NEWS_TYPES.DEPRESSION) || News.hasNews(planet, NEWS_TYPES.SCARCITY) || News.hasNews(planet, NEWS_TYPES.REVOLUTION) || News.hasNews(planet, NEWS_TYPES.CIVIL_WAR) ||
-            News.hasNews(planet, NEWS_TYPES.WAR) || News.hasNewsTargeting(planet, NEWS_TYPES.WAR) || News.hasNews(planet, NEWS_TYPES.BOMBARDMENT)
+        const interferingEvent = 
+            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_PROGRESS_PREVENTING) ||
+            News.planetHasAnyNews(planet, [NEWS_TYPES.COLONIZATION, ...NEWS_TYPES_PROGRESS_PREVENTING]) 
         return ratingsValid && !interferingEvent
     }
 }

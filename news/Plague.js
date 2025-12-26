@@ -32,7 +32,7 @@ class PlagueNews extends News {
         const ratingsValid = planet.culture.population >= 1.2
 
         const interferingEvent = //can happy anytime, anywhere!
-            News.hasNews(planet, NEWS_TYPES.PLAGUE)
+            News.hasNews(NEWS_TYPES.PLAGUE, planet)
 
         return ratingsValid && !interferingEvent
     }

@@ -1,7 +1,7 @@
 class CivilStrifeNews extends News {
     constructor(planet = new Planet()) {
         super(
-            `Civil strife is consuming ${coloredName(planet)}!`,
+            `The citizens of ${coloredName(planet)} are fighting in the streets as civil strife erupts!`,
             `${coloredName(planet)}'s civil strife is brought to an end!`,
             NEWS_TYPES.CIVIL_STRIFE, planet
         )
@@ -29,8 +29,7 @@ class CivilStrifeNews extends News {
         const {planet} = this
         //planet must not already be in anarchy or puppet state
         const agencyValid = planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY && planet.culture.governmentType != GOVERNMENT_TYPES.PUPPET_STATE
-        const interferingEvent =
-            News.hasNews(planet, NEWS_TYPES.CIVIL_STRIFE) || News.hasNews(planet, NEWS_TYPES.CIVIL_WAR) || News.hasNews(planet, NEWS_TYPES.REVOLUTION)
+        const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.CIVIL_STRIFE, NEWS_TYPES.CIVIL_WAR, NEWS_TYPES.REVOLUTION])
         return agencyValid && !interferingEvent
     }
 }

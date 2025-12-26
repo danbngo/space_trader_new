@@ -29,11 +29,9 @@ class DisarmamentNews extends News {
         const {planet} = this
         //unlikely if planet has a low military already
         const ratingsValid = planet.culture.militaryRating >= 1.0
-        const interferingEvent = News.hasNews(planet, NEWS_TYPES.WAR) || News.hasNewsTargeting(planet, NEWS_TYPES.WAR) || 
-            News.hasNews(planet, NEWS_TYPES.DISARMAMENT) || News.hasNews(planet, NEWS_TYPES.MILITARY_BUILDUP) ||
-            News.hasNews(planet, NEWS_TYPES.BOMBARDMENT) || News.hasNewsTargeting(planet, NEWS_TYPES.BOMBARDMENT) ||
-            News.hasNews(planet, NEWS_TYPES.EMBARGO) || News.hasNewsTargeting(planet, NEWS_TYPES.EMBARGO)
-
+        const interferingEvent =
+            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_MARTIAL) ||
+            News.planetHasAnyNews(planet, NEWS_TYPES_MARTIAL)
         return ratingsValid && !interferingEvent
     }
 }

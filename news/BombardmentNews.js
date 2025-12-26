@@ -60,10 +60,8 @@ class BombardmentNews extends News {
         const ratingsValid = planet.culture.militaryRating > 1 //need to actually have enough ships to hurt them
         const relationshipValid = planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR
         const interferingEvent = 
-            News.hasNews(planet, NEWS_TYPES.BOMBARDMENT, targetPlanet) || 
-            News.hasNews(planet, NEWS_TYPES.ALLIANCE, targetPlanet) || News.hasNews(targetPlanet, NEWS_TYPES.ALLIANCE, planet) ||
-            News.hasNews(planet, NEWS_TYPES.TRADE_AGREEMENT, targetPlanet) || News.hasNews(targetPlanet, NEWS_TYPES.TRADE_AGREEMENT, planet) ||
-            News.hasNews(planet, NEWS_TYPES.RESEARCH_AGREEMENT, targetPlanet) || News.hasNews(targetPlanet, NEWS_TYPES.RESEARCH_AGREEMENT, planet)
+            News.hasNews(NEWS_TYPES.BOMBARDMENT, planet, targetPlanet) || 
+            News.hasAnyNewsBidirectional(planet, targetPlanet, NEWS_TYPES_COOPERATIVE)
         return ratingsValid && relationshipValid && !interferingEvent
     }
 }

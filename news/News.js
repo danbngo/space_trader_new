@@ -76,7 +76,7 @@ class News {
         }
     }
 
-    static getNews = (planet = new Planet(), newsType = NEWS_TYPES_ALL[0], targetPlanet = null) => {
+    static getNews = (newsType = null, planet = null, targetPlanet = null) => {
         return gs.system.news.filter(news => {
             if (news.ended || !news.started) return false
             if (newsType && news.newsType != newsType) return false
@@ -86,18 +86,39 @@ class News {
         })
     }
 
-    static getNewsTargeting = (targetPlanet = new Planet(), newsType = NEWS_TYPES_ALL[0], originPlanet = null) => {
-        return this.getNews(targetPlanet, newsType, originPlanet)
+    static getNewsTargeting = (newsType = NEWS_TYPES_ALL[0], targetPlanet = new Planet(), originPlanet = null) => {
+        return this.getNews(newsType, originPlanet, targetPlanet)
     }
 
-    static hasNews(planet = new Planet(), newsType = NEWS_TYPES_ALL[0], targetPlanet = null) {
-        return this.getNews(planet, newsType, targetPlanet).length > 0
+    static hasNews(newsType = NEWS_TYPES_ALL[0], planet = null, targetPlanet = null) {
+        return this.getNews(newsType, planet, targetPlanet).length > 0
     }
 
-    static hasNewsTargeting(targetPlanet = new Planet(), newsType = NEWS_TYPES_ALL[0], originPlanet = null) {
-        return this.getNewsTargeting(targetPlanet, newsType, originPlanet).length > 0
+    static planetHasAnyNews(planet = new Planet(), newsTypes = []) {
+        for (const nt of newsTypes) {
+            if (this.hasNews(nt, planet)) return true
+        }
+        return false
+    }
+    static planetHasAnyNewsTargeting(planet = new Planet(), newsTypes = []) {
+        for (const nt of newsTypes) {
+            if (this.hasNewsTargeting(nt, planet)) return true
+        }
+        return false
+    }
+    static hasNewsTargeting(newsType = NEWS_TYPES_ALL[0], targetPlanet = new Planet(), originPlanet = null) {
+        return this.getNewsTargeting(newsType, targetPlanet, originPlanet).length > 0
     }
 
+    static hasNewsBidirectional(planetA = new Planet(), planetB = new Planet(), newsType = NEWS_TYPES_ALL[0]) {
+        return this.hasNews(newsType, planetA, planetB) || this.hasNews(newsType, planetB, planetA)
+    }
+    static hasAnyNewsBidirectional(planetA = new Planet(), planetB = new Planet(), newsTypes = []) {
+        for (const nt of newsTypes) {
+            if (this.hasNewsBidirectional(planetA, planetB, nt)) return true
+        }
+        return false
+    }
 }
 
 
@@ -108,7 +129,7 @@ class News {
 class NewsEffect {
     /**
      * @param {Object} params - The effect parameters.
-     * @param {Planet} params.planet - The planet affected.
+     * @param {Planet} [params.planet] - The planet affected.
      * @param {Planet|null} [params.targetPlanet] - The target planet for relationship changes.
      * @param {GovernmentType|null} [params.newGovernmentTypeType] - New government type to change to.
      * @param {RelationshipType|null} [params.newRelationship] - New relationship with target planet.
@@ -136,7 +157,7 @@ class NewsEffect {
      * @param {function(): void} [params.onApply] - Custom callback function when effect is applied.
      */
     constructor({
-        planet = new Planet(),
+        planet = null,
         targetPlanet = null,
         // GovernmentType changes
         newGovernmentTypeType = null,
@@ -186,7 +207,7 @@ class NewsEffect {
 
         onApply = ()=>{},
     }) {
-        /** @type {Planet} */
+        /** @type {Planet|null} */
         this.planet = planet;
         /** @type {Planet|null} */
         this.targetPlanet = targetPlanet;
@@ -250,62 +271,69 @@ class NewsEffect {
             populationModifiedBy, crimeRatingModifiedBy, marketPricesModifiedBy, securityRatingModifiedBy, commercialRatingModifiedBy, 
             guildNumOfficersModifiedBy, industrialRatingModifiedBy, shipyardNumShipsModifiedBy, marketCargoAmountsModifiedBy,
             shipQualityModifiedBy, officerQualityModifiedBy, relationsReset, prestigeRatingModifiedBy, cargoPriceModifiers} = this;
-        const {settlement, culture} = planet
 
-        culture.governmentType = newGovernmentTypeType || culture.governmentType;
-        
-        culture.shipQuality *= shipQualityModifiedBy;
-        culture.officerQuality *= officerQualityModifiedBy;
-        culture.militaryRating *= militaryRatingModifiedBy;
-        culture.industrialRating *= industrialRatingModifiedBy;
-        culture.commercialRating *= commercialRatingModifiedBy;
-        culture.securityRating *= securityRatingModifiedBy;
-        culture.crimeRating *= crimeRatingModifiedBy;
-        culture.prestigeRating *= prestigeRatingModifiedBy;
-        culture.population *= populationModifiedBy;
-        culture.territory *= territoryModifiedBy;
-        for (const building of buildingsDisabled) {
-            building.enabled = false;
-        }
-        for (const building of buildingsEnabled) {
-            building.enabled = true;
-        }
-        if (creditsModifiedBy) {
-            for (const building of settlement.buildings) {
-                building.baseCredits = Math.round(building.baseCredits * creditsModifiedBy);
-                building.normalize();
+        if (planet && planet.culture) {
+            const {culture} = planet
+            culture.governmentType = newGovernmentTypeType || culture.governmentType;
+            culture.shipQuality *= shipQualityModifiedBy;
+            culture.officerQuality *= officerQualityModifiedBy;
+            culture.militaryRating *= militaryRatingModifiedBy;
+            culture.industrialRating *= industrialRatingModifiedBy;
+            culture.commercialRating *= commercialRatingModifiedBy;
+            culture.securityRating *= securityRatingModifiedBy;
+            culture.crimeRating *= crimeRatingModifiedBy;
+            culture.prestigeRating *= prestigeRatingModifiedBy;
+            culture.population *= populationModifiedBy;
+            culture.territory *= territoryModifiedBy;
+            if (relationsReset) {
+                const eventsToEnd = [...News.getNews(planet, NEWS_TYPES.WAR), ...News.getNews(planet, NEWS_TYPES.EMBARGO), ...News.getNews(planet, NEWS_TYPES.BOMBARDMENT)]
+                for (const ev of eventsToEnd) ev.setDuration(0)
+                //we cant just set the relationships directly because it'll interfere with ongoing news, leave modifiers in a screwy state
+                //instead, set all related news to expire immediately
+            }
+            if (targetPlanet && newRelationship) {
+                culture.relationships.set(targetPlanet, newRelationship);
+            }
+            for (const [cargoType, modifier] of cargoPriceModifiers) {
+                culture.cargoPriceModifiers.multiply(cargoType, modifier);
+            }
+
+            for (const building of buildingsDisabled) {
+                building.enabled = false;
+            }
+            for (const building of buildingsEnabled) {
+                building.enabled = true;
             }
         }
-        if (guildNumOfficersModifiedBy) {
-            settlement.guild.baseNumOfficers *= guildNumOfficersModifiedBy;
-            settlement.guild.normalize();
+
+        if (planet && planet.settlement) {
+            const {settlement} = planet
+            if (creditsModifiedBy) {
+                for (const building of settlement.buildings) {
+                    building.baseCredits = Math.round(building.baseCredits * creditsModifiedBy);
+                    building.normalize();
+                }
+            }
+            if (guildNumOfficersModifiedBy) {
+                settlement.guild.baseNumOfficers *= guildNumOfficersModifiedBy;
+                settlement.guild.normalize();
+            }
+            if (shipyardNumShipsModifiedBy) {
+                settlement.shipyard.baseNumShips *= shipyardNumShipsModifiedBy;
+                settlement.shipyard.baseNumModules *= shipyardNumShipsModifiedBy;
+                settlement.shipyard.normalize();
+            }
+            if (marketPricesModifiedBy) settlement.market.inflation *= marketPricesModifiedBy;
+            if (blackMarketPricesModifiedBy) settlement.blackMarket.inflation *= blackMarketPricesModifiedBy;
+            for (const ct of CARGO_TYPES_ALL) {
+                settlement.market.baseCargo.setAmount(ct, Math.round(settlement.market.cargo.getAmount(ct) * marketCargoAmountsModifiedBy));
+                settlement.blackMarket.baseCargo.setAmount(ct, Math.round(settlement.blackMarket.cargo.getAmount(ct) * blackMarketCargoAmountsModifiedBy));
+            }
+            if (marketCargoAmountsModifiedBy) settlement.market.normalize()
+            if (blackMarketCargoAmountsModifiedBy) settlement.blackMarket.normalize()
         }
-        if (shipyardNumShipsModifiedBy) {
-            settlement.shipyard.baseNumShips *= shipyardNumShipsModifiedBy;
-            settlement.shipyard.baseNumModules *= shipyardNumShipsModifiedBy;
-            settlement.shipyard.normalize();
-        }
-        if (marketPricesModifiedBy) settlement.market.inflation *= marketPricesModifiedBy;
-        if (blackMarketPricesModifiedBy) settlement.blackMarket.inflation *= blackMarketPricesModifiedBy;
-        for (const ct of CARGO_TYPES_ALL) {
-            settlement.market.baseCargo.setAmount(ct, Math.round(settlement.market.cargo.getAmount(ct) * marketCargoAmountsModifiedBy));
-            settlement.blackMarket.baseCargo.setAmount(ct, Math.round(settlement.blackMarket.cargo.getAmount(ct) * blackMarketCargoAmountsModifiedBy));
-        }
-        if (marketCargoAmountsModifiedBy) settlement.market.normalize()
-        if (blackMarketCargoAmountsModifiedBy) settlement.blackMarket.normalize()
-        if (relationsReset) {
-            const eventsToEnd = [...News.getNews(planet, NEWS_TYPES.WAR), ...News.getNews(planet, NEWS_TYPES.EMBARGO), ...News.getNews(planet, NEWS_TYPES.BOMBARDMENT)]
-            for (const ev of eventsToEnd) ev.setDuration(0)
-            //we cant just set the relationships directly because it'll interfere with ongoing news, leave modifiers in a screwy state
-            //instead, set all related news to expire immediately
-        }
-        if (targetPlanet && newRelationship) {
-            culture.relationships.set(targetPlanet, newRelationship);
-        }
-        for (const [cargoType, modifier] of cargoPriceModifiers) {
-            culture.cargoPriceModifiers.multiply(cargoType, modifier);
-        }
-        this.onApply();
+
+        if (this.onApply) this.onApply();
     }
 
     getInverse() {

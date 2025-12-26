@@ -36,8 +36,8 @@ class EmbargoNews extends News {
         //planet must already be hostile to the target planet
         const relationshipValid = planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.HOSTILE
         const interferingEvent = 
-            News.hasNews(planet, NEWS_TYPES.EMBARGO, targetPlanet) || 
-            News.hasNews(planet, NEWS_TYPES.ALLIANCE, targetPlanet) || News.hasNews(targetPlanet, NEWS_TYPES.ALLIANCE, planet)
+            News.hasNews(NEWS_TYPES.EMBARGO, planet, targetPlanet) || 
+            News.hasAnyNewsBidirectional(planet, targetPlanet, NEWS_TYPES_COOPERATIVE)
         return ratingsValid && agencyValid && relationshipValid && !interferingEvent
     }
 }

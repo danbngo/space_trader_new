@@ -47,9 +47,8 @@ class RevolutionNews extends News {
         //planet must not already be in anarchy or puppet state
         const agencyValid = planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY && planet.culture.governmentType != GOVERNMENT_TYPES.PUPPET_STATE
         const interferingEvent =
-            News.hasNews(planet, NEWS_TYPES.CIVIL_WAR) || News.hasNews(planet, NEWS_TYPES.REVOLUTION) ||
-            News.hasNews(planet, NEWS_TYPES.WAR) || News.hasNewsTargeting(planet, NEWS_TYPES.WAR) ||
-            News.hasNewsTargeting(planet, NEWS_TYPES.BOMBARDMENT)
+            News.planetHasAnyNews(planet, [NEWS_TYPES.REVOLUTION, NEWS_TYPES.WAR]) || News.hasNewsTargeting(NEWS_TYPES.WAR, planet) ||
+            News.planetHasAnyNews(planet, NEWS_TYPES_CRIME_PREVENTING)
         return ratingsValid && agencyValid && !interferingEvent
     }
 }

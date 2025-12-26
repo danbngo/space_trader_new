@@ -31,11 +31,9 @@ class EconomicBoomNews extends News {
         const {planet} = this
         //happens when economy is already somewhat good
         const ratingsValid = (planet.culture.commercialRating >= 1.2) && (planet.culture.industrialRating >= 1.2)
-
         const interferingEvent = 
-            News.hasNews(planet, NEWS_TYPES.ECONOMIC_BOOM) || News.hasNews(planet, NEWS_TYPES.DEPRESSION) || News.hasNews(planet, NEWS_TYPES.PLAGUE) ||
-            News.hasNews(planet, NEWS_TYPES.SCARCITY) || News.hasNews(planet, NEWS_TYPES.INFLATION) ||
-            News.hasNewsTargeting(planet, NEWS_TYPES.WAR) || News.hasNewsTargeting(planet, NEWS_TYPES.BOMBARDMENT)
+            News.planetHasAnyNews(planet, [NEWS_TYPES.ECONOMIC_BOOM, ...NEWS_TYPES_PROGRESS_PREVENTING]) ||
+            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_PROGRESS_PREVENTING)
         return ratingsValid && !interferingEvent
     }
 }

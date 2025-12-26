@@ -30,8 +30,8 @@ class ScientificBreakthroughNews extends News {
         const {planet} = this
         //generally need a functioning government and economy for this
         const stabilityValid = planet.culture.industrialRating > 1 && planet.culture.commercialRating > 1
-        const interferingEvent = 
-            News.hasNews(planet, NEWS_TYPES.SCIENTIFIC_BREAKTHROUGH)
+        //hard times dont block it, may actually accelerate technological progress
+        const interferingEvent = News.hasNews(NEWS_TYPES.SCIENTIFIC_BREAKTHROUGH, planet)
         return stabilityValid && !interferingEvent
     }
 }

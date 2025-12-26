@@ -38,7 +38,7 @@ function coloredIanName(obj = new Planet()) {
     return `${colorSpan(obj.ianName, obj.color, true)}`
 }
 
-function describeDate(year = 0, minutesEnabled = false) {
+function describeDate(year = 0, minutesEnabled = false, hoursEnabled = false) {
     const wholeYear = Math.floor(year);
     const fraction = year - wholeYear;
 
@@ -68,11 +68,11 @@ function describeDate(year = 0, minutesEnabled = false) {
     // Format time
     let hours = date.getUTCHours();
     const minutes = date.getUTCMinutes().toString().padStart(2, "0");
-    const ampm = hours >= 12 ? "PM" : "AM";
+    const ampm = hoursEnabled ? (hours >= 12 ? "PM" : "AM") : '';
     hours = hours % 12 === 0 ? 12 : hours % 12;
     const hourStr = hours.toString().padStart(2, "0");
     
-    return `${hourStr}${minutesEnabled ? ':'+minutes : ''}${ampm} ${months[date.getUTCMonth()]} ${getOrdinal(date.getUTCDate())} ${wholeYear}`;
+    return `${hoursEnabled ? hourStr : ''}${minutesEnabled ? ':'+minutes : ''}${ampm} ${months[date.getUTCMonth()]} ${getOrdinal(date.getUTCDate())} ${wholeYear}`;
 }
  
 //can display K, M, B, Tr
