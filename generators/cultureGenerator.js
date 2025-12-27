@@ -4,17 +4,17 @@ function generateCulture(planet = new Planet()) {
     const officerQuality = rng(4,1,false)/2
     const population = rng(8,1,false)/4
     const territory = rng(8,1,false)/4
-    const militaryRating = rng(8,1,false)/4
-    const securityRating = rng(8,1,false)/4
-    const commercialRating = rng(8,1,false)/4
-    const industrialRating = rng(8,1,false)/4
-    const crimeRating = rng(8,1,false)/4
-    const prestigeRating = rng(8,1,false)/4
+    const military = rng(8,1,false)/4
+    const security = rng(8,1,false)/4
+    const commerce = rng(8,1,false)/4
+    const industry = rng(8,1,false)/4
+    const crime = rng(8,1,false)/4
+    const prestige = rng(8,1,false)/4
 
     const cargoPriceModifiers = new CountsMap()
     for (const ct of CARGO_TYPES_ALL) {
         cargoPriceModifiers.setAmount(ct, rng(MARKET_MAX_CARGO_PRICE_MODIFIER, MARKET_MIN_CARGO_PRICE_MODIFIER, false))
     }
 
-    return new Culture(planet, governmentType, cargoPriceModifiers, shipQuality, officerQuality, territory, population, militaryRating, industrialRating, commercialRating, securityRating, crimeRating, prestigeRating)
+    return new Culture(planet, governmentType, cargoPriceModifiers, shipQuality, officerQuality, territory, population, military, industry, commerce, security, crime, prestige)
 }

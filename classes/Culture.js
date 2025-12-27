@@ -12,14 +12,14 @@ class Culture {
      * @param {number} officerQuality - Quality rating of officers from this culture.
      * @param {number} territory - The territorial reach of the culture in Astronomical Units (AUs).
      * @param {number} population - The population factor affecting fleet sizes and officer availability.
-     * @param {number} militaryRating - Rating affecting war fleets, bounty hunters, and bank credits.
-     * @param {number} industrialRating - Rating affecting merchants, miners, and ship availability.
-     * @param {number} commercialRating - Rating affecting merchants, smugglers, and market cargo availability.
-     * @param {number} securityRating - Rating affecting police and bounty hunter presence.
-     * @param {number} crimeRating - Rating affecting pirate and smuggler activity and black market cargo.
-     * @param {number} prestigeRating - Effects how planets interact with each other.
+     * @param {number} military - Rating affecting war fleets, bounty hunters, and bank credits.
+     * @param {number} industry - Rating affecting merchants, miners, and ship availability.
+     * @param {number} commerce - Rating affecting merchants, smugglers, and market cargo availability.
+     * @param {number} security - Rating affecting police and bounty hunter presence.
+     * @param {number} crime - Rating affecting pirate and smuggler activity and black market cargo.
+     * @param {number} prestige - Effects how planets interact with each other.
      */
-    constructor(planet = new Planet(), governmentType = GOVERNMENT_TYPES_ALL[0], cargoPriceModifiers = new CountsMap(), shipQuality = 1.0, officerQuality = 1.0, territory = 1, population = 1, militaryRating = 1, industrialRating = 1, commercialRating = 1, securityRating = 1, crimeRating = 1, prestigeRating = 1) {
+    constructor(planet = new Planet(), governmentType = GOVERNMENT_TYPES_ALL[0], cargoPriceModifiers = new CountsMap(), shipQuality = 1.0, officerQuality = 1.0, territory = 1, population = 1, military = 1, industry = 1, commerce = 1, security = 1, crime = 1, prestige = 1) {
         /** @type {CountsMap} */
         this.cargoPriceModifiers = cargoPriceModifiers
         /** @type {number} */
@@ -31,17 +31,17 @@ class Culture {
         /** @type {number} */
         this.population = population; //fleets are larger, more officers available
         /** @type {number} */
-        this.militaryRating = militaryRating; //more war fleets and bounty hunters, more credits at bank
+        this.military = military; //more war fleets and bounty hunters, more credits at bank
         /** @type {number} */
-        this.industrialRating = industrialRating; //more merchants and miners, more ships available
+        this.industry = industry; //more merchants and miners, more ships available
         /** @type {number} */
-        this.commercialRating = commercialRating; //more merchants and smugglers, more cargo available in market
+        this.commerce = commerce; //more merchants and smugglers, more cargo available in market
         /** @type {number} */
-        this.securityRating = securityRating; //more police and bounty hunters
+        this.security = security; //more police and bounty hunters
         /** @type {number} */
-        this.crimeRating = crimeRating; //more pirates and smugglers, more cargo in black market
+        this.crime = crime; //more pirates and smugglers, more cargo in black market
         /** @type {number} */
-        this.prestigeRating = prestigeRating
+        this.prestige = prestige
         /** @type {GovernmentType} */
         this.governmentType = governmentType;
         /** @type {Planet} */

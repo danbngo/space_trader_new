@@ -12,8 +12,8 @@ class EconomicBoomNews extends News {
                 marketPricesModifiedBy: 0.8,
                 marketCargoAmountsModifiedBy: 1.5,
                 blackMarketCargoAmountsModifiedBy: 1.2,
-                commercialRatingModifiedBy: 1.4,
-                industrialRatingModifiedBy: 1.3,
+                commerceModifiedBy: 1.4,
+                industryModifiedBy: 1.3,
                 creditsModifiedBy: 2,
                 shipyardNumShipsModifiedBy: 1.4,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.HOLOCUBES, 2]]),
@@ -29,11 +29,11 @@ class EconomicBoomNews extends News {
 
     isValid() {
         const {planet} = this
-        //happens when economy is already somewhat good
-        const ratingsValid = (planet.culture.commercialRating >= 1.2) && (planet.culture.industrialRating >= 1.2)
+        //happens when economy is already somewhat good. edit: nah, then it never happens lmao.
+        //const ratingsValid = (planet.culture.commerce >= 1.2) && (planet.culture.industry >= 1.2)
         const interferingEvent = 
-            News.planetHasAnyNews(planet, [NEWS_TYPES.ECONOMIC_BOOM, ...NEWS_TYPES_PROGRESS_PREVENTING]) ||
-            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_PROGRESS_PREVENTING)
-        return ratingsValid && !interferingEvent
+            News.planetHasAnyNews(planet, [NEWS_TYPES.ECONOMIC_BOOM, ...NEWS_TYPES_ECONOMY_PREVENTING]) ||
+            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_ECONOMY_PREVENTING)
+        return !interferingEvent
     }
 }

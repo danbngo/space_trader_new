@@ -1,7 +1,19 @@
+/**
+ * Represents a type of building that can exist on a planet.
+ * @class BuildingType
+ */
 class BuildingType {
+    /**
+     * @param {string} name - The name of the building type.
+     * @param {number[]} color - The color associated with this building type.
+     * @param {boolean} illegal - Whether this building type is illegal (e.g., black market).
+     */
     constructor(name = '', color = COLORS.White, illegal = false) {
+        /** @type {string} */
         this.name = name
+        /** @type {number[]} */
         this.color = color;
+        /** @type {boolean} */
         this.illegal = illegal
     }
 }

@@ -22,7 +22,7 @@ function describeTimespan(years = 0) {
 /**
  * @function coloredName
  * @description Returns the name of a SpaceObject (Planet, Ship, Effect, etc.) wrapped in a colored span based on its color property.
- * @param {SpaceObject | Ship | Fleet | CargoType | ShipModuleType | GovernmentType} obj - The SpaceObject whose name is to be colored.
+ * @param {SpaceObject | Ship | Fleet | CargoType | ShipModuleType | GovernmentType | RelationshipType} obj - The SpaceObject whose name is to be colored.
  * @returns {string} - The colored name as an HTML string.
  */
 function coloredName(obj = new SpaceObject()) {

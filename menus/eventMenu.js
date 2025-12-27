@@ -12,9 +12,7 @@ function checkForEvents(elapsedYears = 1) {
 
 function checkForNews(elapsedDays = 1) {
     //console.log('checkForNews', { elapsedDays });
-    const baseChance = Math.pow(NEWS_CHANCE_PER_DAY, 1/(elapsedDays))
-    if (Math.random() > baseChance) return
-    console.log('🚨 NEWS EVENT TRIGGERED', { baseChance })
+    if (!calcOccurencesPerTimespan(NEWS_CHANCE_PER_DAY, elapsedDays)) return false
     const newsEvent = generateNews()
     if (!newsEvent) return
     newsEvent.start()
@@ -30,14 +28,6 @@ function checkForEncounter(elapsedDays = 1) {
     //dont have encounters while docked or already in an encounter
     if (gs.location || gs.encounter) return
     return checkForPlanetEncounters(elapsedDays) || checkForAsteroidBeltEncounters(elapsedDays)
-}
-
-function rollChanceOverTimespan(baseChancePerDay = 0.01, elapsedDays = 1) {
-    //theoretically there could be multiple encounters in the elapsed time, but for simplicity we only roll once
-    //const lambda = -Math.log(1 - baseChancePerDay);
-    //const perTickChance = 1 - Math.exp(-lambda * elapsedDays);
-    //return Math.random() < perTickChance
-    return baseChancePerDay*elapsedDays*Math.random() > 0.5
 }
 
 function checkForAsteroidBeltEncounters(elapsedDays = 1) {
@@ -59,7 +49,7 @@ function checkForAsteroidBeltEncounters(elapsedDays = 1) {
     }
     
     // Check if encounter is triggered
-    if (!rollChanceOverTimespan(ASTEROIDS_ENCOUNTER_CHANCE_PER_DAY, elapsedDays * totalProximityFactor)) return false
+    if (!calcOccurencesPerTimespan(ASTEROIDS_ENCOUNTER_CHANCE_PER_DAY, elapsedDays * totalProximityFactor)) return false
     
     // Select a random nearby belt to determine encounter type
     const selectedAsteroidIndex = rndIndexWeighted(proximityFactors)
@@ -103,36 +93,36 @@ function checkForPlanetEncounters(elapsedDays = 1) {
         const proximityFactor = 1 / (1 + distance / territory)
         
         // Base encounter chance influenced by culture properties
-        const {militaryRating, securityRating, crimeRating, commercialRating, industrialRating} = planet.culture
+        const {military, security, crime, commerce, industry} = planet.culture
         
         // Build weighted encounter type array based on culture
         const encounterWeights = []
         
         // Police (influenced by government and security)
-        encounterWeights.push({type: ENCOUNTER_TYPES.POLICE, weight: (militaryRating + securityRating) * 2})
+        encounterWeights.push({type: ENCOUNTER_TYPES.POLICE, weight: (military + security) * 2})
         
         // Pirates (influenced by crime, reduced by security)
-        encounterWeights.push({type: ENCOUNTER_TYPES.PIRATES, weight: crimeRating * 3 / securityRating})
+        encounterWeights.push({type: ENCOUNTER_TYPES.PIRATES, weight: crime * 3 / security})
         
         // Smugglers (influenced by crime and commercial)
-        encounterWeights.push({type: ENCOUNTER_TYPES.SMUGGLERS, weight: ((crimeRating + commercialRating) * 1.5) / securityRating})
+        encounterWeights.push({type: ENCOUNTER_TYPES.SMUGGLERS, weight: ((crime + commerce) * 1.5) / security})
         
         // Merchants (influenced by commercial)
-        encounterWeights.push({type: ENCOUNTER_TYPES.MERCHANTS, weight: commercialRating * 3})
+        encounterWeights.push({type: ENCOUNTER_TYPES.MERCHANTS, weight: commerce * 3})
         
         // Miners (influenced by industrial)
-        encounterWeights.push({type: ENCOUNTER_TYPES.MINERS, weight: industrialRating * 2})
+        encounterWeights.push({type: ENCOUNTER_TYPES.MINERS, weight: industry * 2})
         
         // Tourists (influenced by commercial and government)
-        encounterWeights.push({type: ENCOUNTER_TYPES.TOURISTS, weight: (commercialRating + militaryRating)})
+        encounterWeights.push({type: ENCOUNTER_TYPES.TOURISTS, weight: (commerce + military)})
         
         // Calculate total weight
         const totalWeight = encounterWeights.reduce((sum, e) => sum + e.weight, 0)
         if (totalWeight <= 0) continue
         
         // Adjust base chance by culture activity level
-        const activityLevel = (militaryRating + securityRating + crimeRating + commercialRating + industrialRating) / 5
-        if (!rollChanceOverTimespan(PLANET_ENCOUNTER_CHANCE_PER_DAY, elapsedDays * activityLevel * proximityFactor)) continue
+        const activityLevel = (military + security + crime + commerce + industry) / 5
+        if (!calcOccurencesPerTimespan(PLANET_ENCOUNTER_CHANCE_PER_DAY, elapsedDays * activityLevel * proximityFactor)) continue
         
         // Select encounter type using weighted random
         const roll = Math.random() * totalWeight

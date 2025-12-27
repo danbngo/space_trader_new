@@ -8,10 +8,10 @@ class MilitaryBuildupNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                commercialRatingModifiedBy: 0.9,
-                industrialRatingModifiedBy: 0.8,
+                commerceModifiedBy: 0.9,
+                industryModifiedBy: 0.8,
                 marketCargoAmountsModifiedBy: 0.8,
-                prestigeRatingModifiedBy: 1.1,
+                prestigeModifiedBy: 1.1,
                 creditsModifiedBy: 0.8,
                 officerQualityModifiedBy: 1.1,
                 guildNumOfficersModifiedBy: 1.1,
@@ -22,8 +22,8 @@ class MilitaryBuildupNews extends News {
         //military effect is permanent
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.endEffects[0], {
-                militaryRatingModifiedBy: 1.4,
-                prestigeRatingModifiedBy: 1.1,
+                militaryModifiedBy: 1.4,
+                prestigeModifiedBy: 1.1,
                 officerQualityModifiedBy: 1,
                 guildNumOfficersModifiedBy: 1,
         })
@@ -31,7 +31,7 @@ class MilitaryBuildupNews extends News {
     isValid() {
         const {planet} = this
         //dont do it if military is already big
-        const ratingsValid = planet.culture.militaryRating < 1.2
+        const ratingsValid = planet.culture.military < 1.2
         //dont do it if no government are tense with us or vice versa
         let politicsValid = false
         for (const p of gs.system.planets) {
@@ -46,7 +46,8 @@ class MilitaryBuildupNews extends News {
         }
         //planet must not already be in anarchy or puppet state
         const validGov = planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY && planet.culture.governmentType != GOVERNMENT_TYPES.PUPPET_STATE
-        const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.MILITARY_BUILDUP, ...NEWS_TYPES_PROGRESS_PREVENTING]) 
+        //removed most requirements for this, even juntas do this on a whim
+        const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.MILITARY_BUILDUP]) 
         return ratingsValid && validGov && !interferingEvent
     }
 }

@@ -120,7 +120,7 @@ class EncounterMap extends BaseMap {
         if (!cvs.getObject('maplimits')) cvs.addEmptyCircle('maplimits', 0, 0, this.encounter.mapRadius, 24, COLORS.Cyan)
 
         if (cvs.pixels.length <= 0) starSystem.backgroundStars.forEach( (bgStar, index) => {
-            cvs.addPixel(bgStar.x*BG_STAR_DISTANCE_MOD, bgStar.y*BG_STAR_DISTANCE_MOD, bgStar.color, bgStar.size)
+            cvs.addPixel(bgStar.x*BG_STAR_DISTANCE_MOD, bgStar.y*BG_STAR_DISTANCE_MOD, bgStar.color, bgStar.radius)
         });
 
         ships.forEach((ship,index) => {
@@ -315,7 +315,7 @@ class EncounterMap extends BaseMap {
         const {backgroundStars} = starSystem
         backgroundStars.forEach( (bgStar, index) => {
             bgStar.twinkle(year)
-            cvs.pixels[index].a = bgStar.a
+            cvs.pixels[index].a = bgStar.color[3];
         });
     }
 

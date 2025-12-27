@@ -11,7 +11,7 @@ class InvestmentNews extends News {
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
                 marketCargoAmountsModifiedBy: 0.8,
-                commercialRatingModifiedBy: 0.8,
+                commerceModifiedBy: 0.8,
                 creditsModifiedBy: 0.6,
             }),
             new NewsEffect({
@@ -25,26 +25,27 @@ class InvestmentNews extends News {
 
         Object.assign(this.startEffects[0], {
             creditsModifiedBy: (1 + this.startEffects[0].creditsModifiedBy)/2,
-            prestigeRatingModifiedBy: 1.1,
+            prestigeModifiedBy: 1.1,
         })
         Object.assign(this.endEffects[1], {
-            creditsModifiedBy: 1.2, //even higher!
-            marketCargoAmountsModifiedBy: 1.2,
-            commercialRatingModifiedBy: 1.2,
+            marketCargoAmountsModifiedBy: 1.1,
+            commerceModifiedBy: 1.1,
+            prestigeModifiedBy: 0.9, //the hidden cost, debt = control
         })
     }
 
     isValid() {
         const {planet, targetPlanet} = this
         //need to have sufficient economy of our own
-        const ratingsValid = planet.culture.commercialRating >= 1.2 && planet.settlement.bank.baseCredits >= BANK_AVERAGE_CREDITS*1.2
+        const ratingsValid = planet.culture.commerce >= 1.2 && planet.settlement.bank.baseCredits >= BANK_AVERAGE_CREDITS*1.2
+        //our economy should be larger than theirs
+        const transferValid = planet.culture.commerce > targetPlanet.culture.commerce && planet.settlement.bank.baseCredits > targetPlanet.settlement.bank.baseCredits
         //both planets must be neutral or allies
         const relationships = [planet.culture.relationships.get(targetPlanet), targetPlanet.culture.relationships.get(planet)]
         const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.NEUTRAL || rel == RELATIONSHIP_TYPES.ALLY)
-        //most of the below shouldnt be possible based on above checked but just in case
+        //removed most of the requirements for this, can we not have like a marshall plan??
         const interferingEvent = 
-            News.hasNews(NEWS_TYPES.INVESTMENT, planet, targetPlanet) ||
-            News.hasAnyNewsBidirectional(planet, targetPlanet, NEWS_TYPES_PROGRESS_PREVENTING)
-        return ratingsValid && relationshipsValid && !interferingEvent
+            News.hasNews(NEWS_TYPES.INVESTMENT, planet, targetPlanet)
+        return transferValid && ratingsValid && relationshipsValid && !interferingEvent
     }
 }

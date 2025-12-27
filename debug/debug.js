@@ -1,6 +1,6 @@
 function assessPlanets() {
     console.log("Debugging Planets:")
-    console.log('Total Planets:', gs.system.planets.length)
+    console.log('Total Planets:', gs.system.planets.length, gs.system.planets)
 
     const governmentTypes = gs.system.planets.map(p=>p.culture.governmentType)
     console.log('GovernmentType Types:', governmentTypes)
@@ -15,6 +15,10 @@ function assessPlanets() {
     }
     console.log('Relationship Counts:', relationshipCounts)
 
+    console.log('news:', gs.system.news)
+    console.log('active news:',gs.system.news.filter(n=>(n.started && !n.ended)))
+    console.log('simpleNews:', gs.system.simpleNews)
+
     //list how many times specific news events occurred
     const totalNews = gs.system.news.length
     console.log('Total News Events:', totalNews)
@@ -25,6 +29,9 @@ function assessPlanets() {
         newsTotalsPerType[n.newsType.name] = count + 1
     }
     for (const nt of NEWS_TYPES_ALL) {
+        if (!newsTotalsPerType[nt.name]) newsTotalsPerType[nt.name] = 0
+    }
+    for (const nt of META_NEWS_TYPES_ALL) {
         if (!newsTotalsPerType[nt.name]) newsTotalsPerType[nt.name] = 0
     }
     for (const [newsTypeName, count] of Object.entries(newsTotalsPerType)) {
@@ -39,12 +46,12 @@ function assessPlanets() {
 
     const totalPopulation = gs.system.planets.reduce((sum,planet)=>sum+planet.culture.population,0)
     const totalTerritory = gs.system.planets.reduce((sum,planet)=>sum+planet.culture.territory,0)
-    const totalMilitary = gs.system.planets.reduce((sum,planet)=>sum+planet.culture.militaryRating,0)
-    const totalSecurity = gs.system.planets.reduce((sum,planet)=>sum+planet.culture.securityRating,0)
-    const totalCommercial = gs.system.planets.reduce((sum,planet)=>sum+planet.culture.commercialRating,0)
-    const totalIndustrial = gs.system.planets.reduce((sum,planet)=>sum+planet.culture.industrialRating,0)
-    const totalCrime = gs.system.planets.reduce((sum,planet)=>sum+planet.culture.crimeRating,0)
-    const totalPrestige = gs.system.planets.reduce((sum,planet)=>sum+planet.culture.prestigeRating,0)
+    const totalMilitary = gs.system.planets.reduce((sum,planet)=>sum+planet.culture.military,0)
+    const totalSecurity = gs.system.planets.reduce((sum,planet)=>sum+planet.culture.security,0)
+    const totalCommercial = gs.system.planets.reduce((sum,planet)=>sum+planet.culture.commerce,0)
+    const totalIndustrial = gs.system.planets.reduce((sum,planet)=>sum+planet.culture.industry,0)
+    const totalCrime = gs.system.planets.reduce((sum,planet)=>sum+planet.culture.crime,0)
+    const totalPrestige = gs.system.planets.reduce((sum,planet)=>sum+planet.culture.prestige,0)
     const totalMarketInflation = gs.system.planets.reduce((sum,planet)=>sum+planet.settlement.market.inflation,0)
     const totalBlackMarketInflation = gs.system.planets.reduce((sum,planet)=>sum+planet.settlement.blackMarket.inflation,0)
     const totalBankCredits = gs.system.planets.reduce((sum,planet)=>sum+planet.settlement.bank.baseCredits,0)

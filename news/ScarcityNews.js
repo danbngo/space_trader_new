@@ -11,10 +11,10 @@ class ScarcityNews extends News {
                 planet: this.planet,
                 marketPricesModifiedBy: 1.5,
                 marketCargoAmountsModifiedBy: 0.4,
-                industrialRatingModifiedBy: 0.8,
-                commercialRatingModifiedBy: 0.8,
+                industryModifiedBy: 0.8,
+                commerceModifiedBy: 0.8,
                 blackMarketCargoAmountsModifiedBy: 1.5,
-                crimeRatingModifiedBy: 1.2,
+                crimeModifiedBy: 1.2,
                 shipQualityModifiedBy: 0.9,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WATER, 2]]),
 
@@ -26,7 +26,9 @@ class ScarcityNews extends News {
 
     isValid() {
         const {planet} = this
+        //more likely if high pop and high industry
+        const ratingsValid = planet.culture.population >= 1.2 && planet.culture.industry >= 1.2
         const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.SCARCITY, ...NEWS_TYPES_ECONOMY_BOOSTING])
-        return !interferingEvent
+        return ratingsValid && !interferingEvent
     }
 }

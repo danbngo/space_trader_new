@@ -10,8 +10,8 @@ class PlagueNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 populationModifiedBy: 0.8,
-                commercialRatingModifiedBy: 0.7,
-                industrialRatingModifiedBy: 0.6,
+                commerceModifiedBy: 0.7,
+                industryModifiedBy: 0.6,
                 guildNumOfficersModifiedBy: 0.6,
                 marketPricesModifiedBy: 1.1,
                 marketCargoAmountsModifiedBy: 0.8,
@@ -29,7 +29,7 @@ class PlagueNews extends News {
     isValid() {
         const {planet} = this
         //happens when population is getting out of hand
-        const ratingsValid = planet.culture.population >= 1.2
+        const ratingsValid = planet.culture.population >= 1
 
         const interferingEvent = //can happy anytime, anywhere!
             News.hasNews(NEWS_TYPES.PLAGUE, planet)

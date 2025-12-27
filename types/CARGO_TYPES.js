@@ -1,8 +1,22 @@
+/**
+ * Represents a type of cargo that can be traded.
+ * @class CargoType
+ */
 class CargoType {
+    /**
+     * @param {string} name - The name of the cargo type.
+     * @param {number[]} color - The color associated with this cargo type.
+     * @param {number} value - The base value/price of this cargo type.
+     * @param {boolean} illegal - Whether this cargo is illegal (black market only).
+     */
     constructor(name = '', color = COLORS.White, value = 1, illegal = false) {
+        /** @type {string} */
         this.name = name
+        /** @type {number[]} */
         this.color = color;
+        /** @type {number} */
         this.value = value
+        /** @type {boolean} */
         this.illegal = illegal
     }
 }

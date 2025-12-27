@@ -1,42 +1,87 @@
 class SystemAtWarNews extends News {
+    static MIN_INITIAL_WARS = 2
+    static MAX_INITIAL_WARS = 4
+    static AVERAGE_ADDITIONAL_WARS_PER_YEAR = 0.5
+
     constructor() {
         super(
-            `${gs.system.name} ERUPTS INTO TOTAL WAR!`,
-            `${gs.system.name} GREAT WAR ENDS!`,
-            NEWS_TYPES.SYSTEM_AT_WAR
+            ''+colorSpan(`${gs.system.name} ERUPTS INTO TOTAL WAR!`, COLORS.Red, true),
+            ''+colorSpan(`${gs.system.name}'S TOTAL WAR ENDS!`, COLORS.Green, true),
+            META_NEWS_TYPES.SYSTEM_AT_WAR
         )
 
         this.startEffects = [
-            new NewsEffect({}),
-            new NewsEffect({})
+            new NewsEffect({
+                onApply: ()=>{
+                    console.log('starting world war')
+                    const wars = SystemAtWarNews.getWarsToSpread(rng(SystemAtWarNews.MAX_INITIAL_WARS, SystemAtWarNews.MIN_INITIAL_WARS, true))
+                    if (wars.length == 0) throw new Error('should not have been able to trigger system at war if no startable wars!')
+                    for (const w of wars) w.start()
+                }
+            }),
         ]
 
-        //dont automatically recover. lets add recovery events elsewhere
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
-        Object.assign(this.endEffects[1], {
-            populationModifiedBy: 1.0,
-            militaryRatingModifiedBy: 1.0,
-            industrialRatingModifiedBy: 1.0,
-            commercialRatingModifiedBy: 1.0,
-            securityRatingModifiedBy: 1.0,
-            marketCargoAmountsModifiedBy: 1.0,
-            //marketPricesModifiedBy: 1.0, //prices will normalize
-            shipQualityModifiedBy: 1.0,
-            officerQualityModifiedBy: 1.0,
-            buildingsEnabled: [],
-        })
+        this.ongoingEffects = [
+            new NewsEffect({
+                onApply: (elapsedYears)=>{
+                    console.log('world war tick')
+                    const numWarsToStart = calcOccurencesPerTimespan(SystemAtWarNews.AVERAGE_ADDITIONAL_WARS_PER_YEAR, elapsedYears)
+                    if (numWarsToStart < 1) return
+                    const wars = SystemAtWarNews.getWarsToSpread(numWarsToStart)
+                    if (wars.length > 0) SimpleNews.add(''+colorSpan(`${gs.system.name}'S TOTAL WAR SPREADS!`, COLORS.Red, true))
+                    for (const w of wars) w.start()
+                }
+            })
+        ]
+
+
+        this.endEffects = [
+            new NewsEffect({
+                onApply: ()=>{
+                    console.log('tearing down world war')
+                    //end all endable wars in the system
+                    const warNews = gs.system.news.filter(n=>(n.newsType == NEWS_TYPES.WAR && !n.ended))
+                    for (const wn of warNews) {
+                        wn.endAsap = true
+                        if (wn.shouldEnd()) wn.end()
+                    }
+                }
+            })
+        ]
     }
 
     isValid() {
-        const {planet, targetPlanet} = this
-        //planet must not already be at war with the target planet
-        const ratingsValid = planet.culture.militaryRating > 1 //need to actually have enough ships to hurt them
-        const relationshipValid = planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR
-        const interferingEvent = 
-            News.hasNews(META_NEWS_TYPES.SYSTEM_AT_WAR, planet) || 
-            News.hasNews(NEWS_TYPES.ALLIANCE, planet, targetPlanet) || News.hasNews(NEWS_TYPES.ALLIANCE, targetPlanet, planet) ||
-            News.hasNews(NEWS_TYPES.TRADE_AGREEMENT, planet, targetPlanet) || News.hasNews(NEWS_TYPES.TRADE_AGREEMENT, targetPlanet, planet) ||
-            News.hasNews(NEWS_TYPES.RESEARCH_AGREEMENT, planet, targetPlanet) || News.hasNews(NEWS_TYPES.RESEARCH_AGREEMENT, targetPlanet, planet)
-        return ratingsValid && relationshipValid && !interferingEvent
+        //at least 3 planets should be at war simultaneously
+        const {planets} = gs.system
+        const warCount = planets.reduce((count, planet) => {
+            const hostilePlanets = Array.from(planet.culture.relationships.entries()).filter(([targetPlanet, relationship]) => relationship == RELATIONSHIP_TYPES.WAR)
+            if (hostilePlanets.length >= 1) return count + 1
+            return count
+        }, 0)
+        //should be able to start at least 3 more wars
+        const possibleWars = SystemAtWarNews.getWarsToSpread(3)
+        const preconditionsValid = warCount >= 3 && possibleWars.length >= 3
+        const interferingNews = News.hasNews(META_NEWS_TYPES.SYSTEM_AT_WAR)
+        return preconditionsValid && !interferingNews
+
+    }
+    
+    static getWarsToSpread(numWarsToStart = 1) {
+        const {planets} = gs.system
+        const planetsRandom1 = rndShuffle(planets)
+        const planetsRandom2 = rndShuffle(planets)
+        const warsToStart = []
+        for (const planet of planetsRandom1) {
+            for (const targetPlanet of planetsRandom2) {
+                if (planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.HOSTILE) {
+                    const news = new WarNews(planet, targetPlanet)
+                    if (!news.isValid()) continue
+                    //news.setDuration(1000) //dont expire naturally
+                    warsToStart.push(news)
+                    if (numWarsToStart-- <= 0) break
+                }
+            }
+        }
+        return warsToStart
     }
 }

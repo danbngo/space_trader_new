@@ -11,7 +11,7 @@ class TradeAgreementNews extends News {
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
                 marketCargoAmountsModifiedBy: 1.3,
-                commercialRatingModifiedBy: 1.3,
+                commerceModifiedBy: 1.3,
                 //guildNumOfficersModifiedBy: 1.2,
                 //officerQualityModifiedBy: 1.1,
                 //shipQualityModifiedBy: 1.1,
@@ -21,7 +21,7 @@ class TradeAgreementNews extends News {
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
                 marketCargoAmountsModifiedBy: 1.3,
-                commercialRatingModifiedBy: 1.3,
+                commerceModifiedBy: 1.3,
                 //guildNumOfficersModifiedBy: 1.2,
                 //officerQualityModifiedBy: 1.1,
                 //shipQualityModifiedBy: 1.1,
@@ -37,8 +37,8 @@ class TradeAgreementNews extends News {
         //planets must be neutral or allied towards each other
         const relationships = [planet.culture.relationships.get(targetPlanet), targetPlanet.culture.relationships.get(planet)]
         const relationshipsValid = relationships.every(r => r == RELATIONSHIP_TYPES.NEUTRAL || r == RELATIONSHIP_TYPES.ALLY)
-        //unlike research, trade is only blocked if you're actively hostile to each other. 
-        const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.TRADE_AGREEMENT, ...NEWS_TYPES_PROGRESS_PREVENTING])
+        //trade is only blocked if you're actively hostile to each other. 
+        const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.TRADE_AGREEMENT, ...NEWS_TYPES_HOSTILE])
         return relationshipsValid && !interferingEvent
     }
 }

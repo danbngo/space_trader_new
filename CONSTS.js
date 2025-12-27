@@ -16,6 +16,7 @@ const PLANET_ENCOUNTER_CHANCE_PER_DAY = 0.2; //chance of random encounter per da
 const ASTEROIDS_ENCOUNTER_CHANCE_PER_DAY = 0.5; //chance of fooroid storms when in the middle of an asteroid belt
 const BANK_BOUNTY_CHANCE_PER_DAY = 0.01;
 const NEWS_CHANCE_PER_DAY = 1/30;
+const META_NEWS_CHANCE_PER_DAY = 1/365
 
 //combat distances = miles, time = seconds
 const ENCOUNTER_SHIP_MAX_SPAWN_DISTANCE_RATIO = 0.5

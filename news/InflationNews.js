@@ -9,11 +9,11 @@ class InflationNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                commercialRatingModifiedBy: 0.7,
+                commerceModifiedBy: 0.7,
                 marketPricesModifiedBy: 1.4,
                 marketCargoAmountsModifiedBy: 0.8,
                 creditsModifiedBy: 1.2,
-                crimeRatingModifiedBy: 1.2,
+                crimeModifiedBy: 1.2,
             })
         ]
 

@@ -1,27 +1,28 @@
 class CivilStrifeNews extends News {
     constructor(planet = new Planet()) {
         super(
-            `The citizens of ${coloredName(planet)} are fighting in the streets as civil strife erupts!`,
-            `${coloredName(planet)}'s civil strife is brought to an end!`,
+            `${coloredName(planet)}'s people are rioting in the streets against their government!'`,
+            `${coloredName(planet)}'s rioting is quelled!`,
             NEWS_TYPES.CIVIL_STRIFE, planet
         )
 
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                militaryRatingModifiedBy: 0.9,
-                securityRatingModifiedBy: 0.6,
-                crimeRatingModifiedBy: 1.3,
-                commercialRatingModifiedBy: 0.8,
-                industrialRatingModifiedBy: 0.6,
+                militaryModifiedBy: 0.9,
+                securityModifiedBy: 0.6,
+                crimeModifiedBy: 1.3,
+                commerceModifiedBy: 0.8,
+                industryModifiedBy: 0.6,
                 creditsModifiedBy: 0.7,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, 1.5]]), //this is the only thing that normalizes after
             })
         ]
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
-        //some lingering security decrease
+        //some lingering security and prestige decrease
         Object.assign(this.endEffects[0], {
-            securityRatingModifiedBy: (1 + this.endEffects[0].securityRatingModifiedBy)/2,
+            securityModifiedBy: (1 + this.endEffects[0].securityModifiedBy)/2,
+            prestigeModifiedBy: 0.9,
         })
     }
 

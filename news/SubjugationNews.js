@@ -12,26 +12,27 @@ class SubjugationNews extends News {
                 targetPlanet: this.targetPlanet,
                 newRelationship: RELATIONSHIP_TYPES.SOVEREIGN,
                 territoryModifiedBy: 1.4,
-                militaryRatingModifiedBy: 1.1,
-                commercialRatingModifiedBy: 1.2,
-                industrialRatingModifiedBy: 1.1,
+                militaryModifiedBy: 1.1,
+                commerceModifiedBy: 1.2,
+                industryModifiedBy: 1.1,
                 marketCargoAmountsModifiedBy: 1.4,
-                prestigeRatingModifiedBy: 1.2,
+                prestigeModifiedBy: 1.2,
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
-                newGovernmentTypeType: GOVERNMENT_TYPES.PUPPET_STATE,
+                newGovernmentType: GOVERNMENT_TYPES.PUPPET_STATE,
                 newRelationship: RELATIONSHIP_TYPES.SUBJECT,
                 territoryModifiedBy: 0.7,
-                militaryRatingModifiedBy: 0.5,
-                securityRatingModifiedBy: 0.6,
-                commercialRatingModifiedBy: 0.7,
-                industrialRatingModifiedBy: 0.75,
+                militaryModifiedBy: 0.5,
+                securityModifiedBy: 0.6,
+                commerceModifiedBy: 0.7,
+                industryModifiedBy: 0.75,
                 marketCargoAmountsModifiedBy: 0.6,
-                prestigeRatingModifiedBy: 0.6,
+                prestigeModifiedBy: 0.6,
                 relationsReset: true,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.ANTIMATTER, 0.5]]),
+                forcePeace: true,
             })
         ]
 
@@ -39,15 +40,15 @@ class SubjugationNews extends News {
         //subjugating others has some lingering positive effects on territory, military, presstige
         Object.assign(this.endEffects[0], {
             territoryModifiedBy: (1 + this.endEffects[0].territoryModifiedBy)/2,
-            militaryRatingModifiedBy: (1 + this.endEffects[0].militaryRatingModifiedBy)/2,
-            prestigeRatingModifiedBy: (1 + this.endEffects[0].prestigeRatingModifiedBy)/2,
+            militaryModifiedBy: (1 + this.endEffects[0].militaryModifiedBy)/2,
+            prestigeModifiedBy: (1 + this.endEffects[0].prestigeModifiedBy)/2,
             newRelationship: RELATIONSHIP_TYPES.NEUTRAL,
         })
         //being subjugated has some lingering ill effects on territory, military, prestige
         Object.assign(this.endEffects[1], {
             territoryModifiedBy: (1 + this.endEffects[1].territoryModifiedBy)/2,
-            militaryRatingModifiedBy: (1 + this.endEffects[1].militaryRatingModifiedBy)/2,
-            prestigeRatingModifiedBy: (1 + this.endEffects[0].prestigeRatingModifiedBy)/2,
+            militaryModifiedBy: (1 + this.endEffects[1].militaryModifiedBy)/2,
+            prestigeModifiedBy: (1 + this.endEffects[0].prestigeModifiedBy)/2,
             newRelationship: RELATIONSHIP_TYPES.NEUTRAL,
         })
     }
@@ -55,7 +56,7 @@ class SubjugationNews extends News {
     isValid() {
         const {planet, targetPlanet} = this
         //our army must be significantly better than theirs
-        const ratingsValid = planet.culture.militaryRating > targetPlanet.culture.militaryRating*1.2
+        const ratingsValid = planet.culture.military > targetPlanet.culture.military*1.2
         //cant be anarchic or puppet state
         const agencyValid = (planet.culture.governmentType !== GOVERNMENT_TYPES.ANARCHY && planet.culture.governmentType !== GOVERNMENT_TYPES.PUPPET_STATE)
         //planet must be at war with the target

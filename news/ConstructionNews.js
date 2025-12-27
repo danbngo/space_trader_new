@@ -17,8 +17,8 @@ class ConstructionNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                industrialRatingModifiedBy: 0.7,
-                commercialRatingModifiedBy: 0.9,
+                industryModifiedBy: 0.7,
+                commerceModifiedBy: 0.9,
                 marketCargoAmountsModifiedBy: 0.8,
                 marketPricesModifiedBy: 1.2,
                 shipyardNumShipsModifiedBy: 1.2,
@@ -28,7 +28,7 @@ class ConstructionNews extends News {
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.endEffects[0], {
-            industrialRatingModifiedBy: (2 + this.endEffects[0].industrialRatingModifiedBy)/2, //industrial base bounces back stronger
+            industryModifiedBy: (2 + this.endEffects[0].industryModifiedBy)/2, //industrial base bounces back stronger
             buildingsEnabled: buildingsToEnable,
         })
     }
@@ -39,7 +39,7 @@ class ConstructionNews extends News {
         const buildingsValid = planet.settlement.buildings.filter(b => !b.enabled).length > 0
         const interferingEvent =
             News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_HOSTILE) ||
-            News.planetHasAnyNews(planet, [NEWS_TYPES.CONSTRUCTION, ...NEWS_TYPES_PROGRESS_PREVENTING])
+            News.planetHasAnyNews(planet, [NEWS_TYPES.CONSTRUCTION, ...NEWS_TYPES_ECONOMY_PREVENTING])
         return buildingsValid && !interferingEvent
     }
 }

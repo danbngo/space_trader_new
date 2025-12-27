@@ -11,8 +11,8 @@ class EnvironmentalDisasterNews extends News {
                 planet: this.planet,
                 marketPricesModifiedBy: 1.1,
                 marketCargoAmountsModifiedBy: 0.8,
-                commercialRatingModifiedBy: 0.8,
-                industrialRatingModifiedBy: 0.8,
+                commerceModifiedBy: 0.8,
+                industryModifiedBy: 0.8,
                 populationModifiedBy: 0.9,
                 creditsModifiedBy: 0.8,
                 shipyardNumShipsModifiedBy: 0.8,
@@ -24,8 +24,8 @@ class EnvironmentalDisasterNews extends News {
         //market, commerce, industry, population do not fully bounce back
         Object.assign(this.endEffects[0], {
             marketPricesModifiedBy: (1 + this.endEffects[0].marketPricesModifiedBy)/2,
-            commercialRatingModifiedBy: (1 + this.endEffects[0].commercialRatingModifiedBy)/2,
-            industrialRatingModifiedBy: (1 + this.endEffects[0].industrialRatingModifiedBy)/2,
+            commerceModifiedBy: (1 + this.endEffects[0].commerceModifiedBy)/2,
+            industryModifiedBy: (1 + this.endEffects[0].industryModifiedBy)/2,
             populationModifiedBy: (1 + this.endEffects[0].populationModifiedBy)/2,
         })
     }
@@ -33,7 +33,7 @@ class EnvironmentalDisasterNews extends News {
     isValid() {
         const {planet} = this
         //happens when industry is getting out of hand
-        const ratingsValid = planet.culture.industrialRating >= 1.2
+        const ratingsValid = planet.culture.industry >= 1.2
         const interferingEvent = News.hasNews(NEWS_TYPES.ENVIRONMENTAL_DISASTER, planet)
         return ratingsValid && !interferingEvent
     }

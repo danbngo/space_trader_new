@@ -1,6 +1,16 @@
+/**
+ * Represents a type of diplomatic relationship between planets.
+ * @class RelationshipType
+ */
 class RelationshipType {
+    /**
+     * @param {string} name - The name of the relationship type.
+     * @param {number[]} color - The color associated with this relationship type.
+     */
     constructor(name = '', color = COLORS.White) {
+        /** @type {string} */
         this.name = name
+        /** @type {number[]} */
         this.color = color
     }
 }

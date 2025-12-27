@@ -10,14 +10,14 @@ class EmbargoNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
-                militaryRatingModifiedBy: 0.8, //get stretched thin
-                prestigeRatingModifiedBy: 1.1,
+                militaryModifiedBy: 0.8, //get stretched thin
+                prestigeModifiedBy: 1.1,
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
-                prestigeRatingModifiedBy: 0.9,
-                commercialRatingModifiedBy: 0.6,
+                prestigeModifiedBy: 0.9,
+                commerceModifiedBy: 0.6,
                 marketPricesModifiedBy: 1.4,
                 marketCargoAmountsModifiedBy: 0.7,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WATER, 1.5], [CARGO_TYPES.METAL, 1.5]]),
@@ -30,7 +30,7 @@ class EmbargoNews extends News {
     isValid() {
         const {planet, targetPlanet} = this
         //need to have enough ships for it
-        const ratingsValid = planet.culture.militaryRating > 1
+        const ratingsValid = planet.culture.military > 1
         //cant be anarchic or puppet state
         const agencyValid = (planet.culture.governmentType !== GOVERNMENT_TYPES.ANARCHY && planet.culture.governmentType !== GOVERNMENT_TYPES.PUPPET_STATE)
         //planet must already be hostile to the target planet

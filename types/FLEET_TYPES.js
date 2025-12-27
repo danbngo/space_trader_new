@@ -1,11 +1,29 @@
 
+/**
+ * Represents a type of fleet that can be encountered.
+ * @class FleetType
+ */
 class FleetType {
+    /**
+     * @param {string} name - The name of the fleet type.
+     * @param {ShipType[]} shipTypes - The types of ships this fleet can contain.
+     * @param {number} minShips - The minimum number of ships in this fleet type.
+     * @param {number} maxShips - The maximum number of ships in this fleet type.
+     * @param {number} maxCredits - The maximum credits this fleet can carry.
+     * @param {CargoType[]} cargoTypes - The types of cargo this fleet can carry.
+     */
     constructor(name = '', shipTypes = [], minShips = 1, maxShips = 1, maxCredits = 1, cargoTypes = []) {
+        /** @type {string} */
         this.name = name
+        /** @type {ShipType[]} */
         this.shipTypes = shipTypes
+        /** @type {number} */
         this.minShips = minShips
+        /** @type {number} */
         this.maxShips = maxShips
+        /** @type {number} */
         this.maxCredits = maxCredits
+        /** @type {CargoType[]} */
         this.cargoTypes = cargoTypes
     }
 }

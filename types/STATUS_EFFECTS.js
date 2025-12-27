@@ -1,7 +1,19 @@
+/**
+ * Represents a status effect that can be applied to ships in combat.
+ * @class StatusEffect
+ */
 class StatusEffect {
+    /**
+     * @param {string} name - The name of the status effect.
+     * @param {string} description - A description of what the status effect does.
+     * @param {number[]} color - The color associated with this status effect.
+     */
     constructor(name = '', description = '', color = COLORS.WHITE) {
+        /** @type {string} */
         this.name = name
+        /** @type {string} */
         this.description = description
+        /** @type {number[]} */
         this.color = color
     }
 }

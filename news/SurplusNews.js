@@ -11,8 +11,8 @@ class SurplusNews extends News {
                 planet: this.planet,
                 marketPricesModifiedBy: 0.8,
                 marketCargoAmountsModifiedBy: 1.5,
-                commercialRatingModifiedBy: 1.2,
-                industrialRatingModifiedBy: 1.4,
+                commerceModifiedBy: 1.2,
+                industryModifiedBy: 1.4,
                 creditsModifiedBy: 1.3,
                 shipyardNumShipsModifiedBy: 1.4,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.HOLOCUBES, 2]]),
@@ -29,8 +29,10 @@ class SurplusNews extends News {
 
     isValid() {
         const {planet} = this
+        //industry must be high, gotta have miners out there
+        const ratingsValid = planet.culture.industry >= 1.2
         //more for flavor than anything, irl you could find goodies at any time
         const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.SURPLUS, NEWS_TYPES.DEPRESSION, NEWS_TYPES.SCARCITY])
-        return !interferingEvent
+        return ratingsValid && !interferingEvent
     }
 }

@@ -11,16 +11,16 @@ class TensionsNews extends News {
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
                 newRelationship: RELATIONSHIP_TYPES.HOSTILE,
-                militaryRatingModifiedBy: 1.1,
-                commercialRatingModifiedBy: 0.9,
+                militaryModifiedBy: 1.1,
+                commerceModifiedBy: 0.9,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.ANTIMATTER, 1.5]]),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
                 newRelationship: RELATIONSHIP_TYPES.HOSTILE,
-                militaryRatingModifiedBy: 1.1,
-                commercialRatingModifiedBy: 0.9,
+                militaryModifiedBy: 1.1,
+                commerceModifiedBy: 0.9,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.ANTIMATTER, 1.5]]),
             })
         ]

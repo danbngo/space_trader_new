@@ -40,6 +40,7 @@ class StarSystem extends SpaceObject {
         this.news = [] //actual News class objects, used to build a timeline
         /** @type {string[]} */
         this.newsFeed = [] //strings that have more detailed data
+        this.simpleNews = []
     }
 
     /**
