@@ -63,6 +63,7 @@ class News {
 
     start() {
         if (this.started || this.ended) throw new Error('news cannot be started after ending or starting already!')
+        //console.log('started news event:',this)
         this.started = true
         //gs.system.newsFeed.push(this.startDescription)
         for (const fx of this.startEffects) {
@@ -86,6 +87,7 @@ class News {
 
     end() {
         if (!this.started) throw new Error('news must be started prior to ending!')
+        //console.log('ending news event:',this)
         this.ended = true
         this.endedYear = gs.year
         if (this.endEffects.length == 0) return; //no end effects to apply, dont update feeds

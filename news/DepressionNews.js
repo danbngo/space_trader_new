@@ -13,7 +13,7 @@ class DepressionNews extends News {
                 marketCargoAmountsModifiedBy: 0.4,
                 commerceModifiedBy: 0.6,
                 industryModifiedBy: 0.7,
-                creditsModifiedBy: 0.2,
+                creditsModifiedBy: 0.4,
                 crimeModifiedBy: 1.3,
                 guildNumOfficersModifiedBy: 1.2,
                 prestigeModifiedBy: 0.8,

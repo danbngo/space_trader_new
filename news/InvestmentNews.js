@@ -22,8 +22,8 @@ class InvestmentNews extends News {
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
 
-        Object.assign(this.startEffects[0], {
-            creditsModifiedBy: 1,
+        Object.assign(this.endEffects[0], {
+            creditsModifiedBy: (1 + this.startEffects[0].creditsModifiedBy)/2,
             marketCargoAmountsModifiedBy: (1 + this.startEffects[0].marketCargoAmountsModifiedBy)/2,
             prestigeModifiedBy: 1.2,
         })

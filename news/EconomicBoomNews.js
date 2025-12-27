@@ -14,7 +14,7 @@ class EconomicBoomNews extends News {
                 blackMarketCargoAmountsModifiedBy: 1.2,
                 commerceModifiedBy: 1.4,
                 industryModifiedBy: 1.3,
-                creditsModifiedBy: 2,
+                creditsModifiedBy: 1.5,
                 shipyardNumShipsModifiedBy: 1.4,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.HOLOCUBES, 2]]),
             })
@@ -23,6 +23,7 @@ class EconomicBoomNews extends News {
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //credit remains high After
         Object.assign(this.endEffects[0], {
+            //this has been causing problems, i think - danmod
             creditsModifiedBy: (1 + this.endEffects[0].creditsModifiedBy)/2,
         })
     }

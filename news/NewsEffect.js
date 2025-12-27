@@ -208,29 +208,36 @@ class NewsEffect {
 
         if (planet && planet.settlement) {
             const {settlement} = planet
-            if (creditsModifiedBy) {
+            if (creditsModifiedBy !== 1.0) {
                 for (const building of settlement.buildings) {
-                    building.baseCredits = Math.round(building.baseCredits * creditsModifiedBy);
+                    if (!building.baseCredits) continue
+                    //console.log('1 altering credits for building by factor:',creditsModifiedBy,'starting base credits:',building.baseCredits);
+                    building.baseCredits = Math.max(1, rndRound(building.baseCredits * creditsModifiedBy));
+                    //console.log('2 altered credits for building by factor:',creditsModifiedBy,'new base credits:',building.baseCredits);
                     building.normalize();
+                    if (building.baseCredits > MARKET_AVERAGE_CREDITS*1000) {
+                        console.log('building:',building,'this:',this)
+                        throw new Error('WARNING!!!!!!!!!!!!! building has extremely high credits after modification:')
+                    }
                 }
             }
-            if (guildNumOfficersModifiedBy) {
-                settlement.guild.baseNumOfficers *= guildNumOfficersModifiedBy;
+            if (guildNumOfficersModifiedBy !== 1.0) {
+                settlement.guild.baseNumOfficers = rndRound(settlement.guild.baseNumOfficers * guildNumOfficersModifiedBy);
                 settlement.guild.normalize();
             }
-            if (shipyardNumShipsModifiedBy) {
-                settlement.shipyard.baseNumShips *= shipyardNumShipsModifiedBy;
-                settlement.shipyard.baseNumModules *= shipyardNumShipsModifiedBy;
+            if (shipyardNumShipsModifiedBy !== 1.0) {
+                settlement.shipyard.baseNumShips = rndRound(settlement.shipyard.baseNumShips * shipyardNumShipsModifiedBy);
+                settlement.shipyard.baseNumModules = rndRound(settlement.shipyard.baseNumModules * shipyardNumShipsModifiedBy);
                 settlement.shipyard.normalize();
             }
-            if (marketPricesModifiedBy) settlement.market.inflation *= marketPricesModifiedBy;
-            if (blackMarketPricesModifiedBy) settlement.blackMarket.inflation *= blackMarketPricesModifiedBy;
+            if (marketPricesModifiedBy !== 1.0) settlement.market.inflation *= marketPricesModifiedBy;
+            if (blackMarketPricesModifiedBy !== 1.0) settlement.blackMarket.inflation *= blackMarketPricesModifiedBy;
             for (const ct of CARGO_TYPES_ALL) {
-                settlement.market.baseCargo.setAmount(ct, Math.floor(settlement.market.baseCargo.getAmount(ct) * marketCargoAmountsModifiedBy));
-                settlement.blackMarket.baseCargo.setAmount(ct, Math.floor(settlement.blackMarket.baseCargo.getAmount(ct) * blackMarketCargoAmountsModifiedBy));
+                if (marketCargoAmountsModifiedBy !== 1.0) settlement.market.baseCargo.setAmount(ct, rndRound(settlement.market.baseCargo.getAmount(ct) * marketCargoAmountsModifiedBy));
+                if (blackMarketCargoAmountsModifiedBy !== 1.0) settlement.blackMarket.baseCargo.setAmount(ct, rndRound(settlement.blackMarket.baseCargo.getAmount(ct) * blackMarketCargoAmountsModifiedBy));
             }
-            if (marketCargoAmountsModifiedBy) settlement.market.normalize()
-            if (blackMarketCargoAmountsModifiedBy) settlement.blackMarket.normalize()
+            if (marketCargoAmountsModifiedBy !== 1.0) settlement.market.normalize()
+            if (blackMarketCargoAmountsModifiedBy !== 1.0) settlement.blackMarket.normalize()
         }
 
         if (this.onApply) this.onApply(elapsedYears);
@@ -329,13 +336,13 @@ class NewsEffect {
                 msg += `- Shipyard Ships: ${settlement.shipyard.baseNumShips} ➜ ${Math.round(settlement.shipyard.baseNumShips * shipyardNumShipsModifiedBy)}.<br/>`
             }
             if (marketCargoAmountsModifiedBy) {
-                msg += `- Market Units Per Cargo Type: ${settlement.market.cargo.average} ➜ ${settlement.market.cargo.average * marketCargoAmountsModifiedBy}.<br/>`
+                msg += `- Market Units Per Cargo Type: ${settlement.market.baseCargo.average} ➜ ${settlement.market.baseCargo.average * marketCargoAmountsModifiedBy}.<br/>`
             }
             if (marketCargoAmountsModifiedBy) {
                 msg += `- Market Prices: ${settlement.market.inflation}x ➜ ${settlement.market.inflation * marketPricesModifiedBy}x.<br/>`
             }
             if (blackMarketCargoAmountsModifiedBy) {
-                msg += `- Black Market Units Per Cargo Type: ${settlement.blackMarket.cargo.average} ➜ ${settlement.blackMarket.cargo.average * blackMarketCargoAmountsModifiedBy}.<br/>`
+                msg += `- Black Market Units Per Cargo Type: ${settlement.blackMarket.baseCargo.average} ➜ ${settlement.blackMarket.baseCargo.average * blackMarketCargoAmountsModifiedBy}.<br/>`
             }
             if (blackMarketPricesModifiedBy) {
                 msg += `- Black Market Prices: ${settlement.blackMarket.inflation}x ➜ ${settlement.blackMarket.inflation * blackMarketPricesModifiedBy}x.<br/>`

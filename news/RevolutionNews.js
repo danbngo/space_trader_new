@@ -32,11 +32,11 @@ class RevolutionNews extends News {
 
         //government related ratings randomize a bit after a revolution
         Object.assign(this.endEffects[0], {
-            militaryModifiedBy: (rng(0.5,2,false) + this.endEffects[0].militaryModifiedBy)/2,
-            securityModifiedBy: (rng(0.5,2,false)  + this.endEffects[0].securityModifiedBy)/2,
-            industryModifiedBy: (rng(0.5,2,false)  + this.endEffects[0].industryModifiedBy)/2,
-            creditsModifiedBy: (rng(0.5,2,false)  + this.endEffects[0].creditsModifiedBy)/2,
-            prestigeModifiedBy: (rng(0.5,2,false)  + this.endEffects[0].prestigeModifiedBy)/2,
+            militaryModifiedBy: (rng(0.5,1.5,false) + this.endEffects[0].militaryModifiedBy)/2,
+            securityModifiedBy: (rng(0.5,1.5,false)  + this.endEffects[0].securityModifiedBy)/2,
+            industryModifiedBy: (rng(0.5,1.5,false)  + this.endEffects[0].industryModifiedBy)/2,
+            creditsModifiedBy: (rng(0.5,1.5,false)  + this.endEffects[0].creditsModifiedBy)/2,
+            prestigeModifiedBy: (rng(0.5,1.5,false)  + this.endEffects[0].prestigeModifiedBy)/2,
         })
     }
 

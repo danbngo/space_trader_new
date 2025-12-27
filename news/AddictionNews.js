@@ -31,7 +31,7 @@ class AddictionNews extends News {
     isValid() {
         const {planet} = this
         //more likely if lots of disposable income and not already awash in crime
-        const ratingsValid = planet.settlement.market.baseCredits / MARKET_AVERAGE_CREDITS > 1.5 && planet.settlement.blackMarket.cargo.average / MARKET_AVERAGE_CARGO_PER_TYPE < 1.5
+        const ratingsValid = planet.settlement.market.baseCredits / MARKET_AVERAGE_CREDITS > 1.5 && planet.settlement.blackMarket.baseCargo.average / MARKET_AVERAGE_CARGO_PER_TYPE < 1.5
         const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.ADDICTION, ...NEWS_TYPES_CRIME_PREVENTING])
         return ratingsValid && !interferingEvent
     }

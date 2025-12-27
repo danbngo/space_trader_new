@@ -347,3 +347,9 @@ function calcOccurrencesPerTimespan(chancePerTick = 0.1, numTicks = 1) {
 const calcOccurencesPerTimespan = function(chancePerTick = 0.1, numTicks = 1) {
     return calcOccurrencesPerTimespan(chancePerTick, numTicks);
 };
+
+function rndRound(fraction = 0.5) {
+    const lower = Math.floor(fraction);
+    const remainder = fraction - lower;
+    return lower + (Math.random() < remainder ? 1 : 0);
+}

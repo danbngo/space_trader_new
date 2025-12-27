@@ -13,7 +13,7 @@ class ForeignAidNews extends News {
                 marketCargoAmountsModifiedBy: 1.3,
                 commerceModifiedBy: 1.2,
                 industryModifiedBy: 1.1,
-                creditsModifiedBy: 1.3,
+                creditsModifiedBy: 1.1,
                 shipyardNumShipsModifiedBy: 1.2,
                 prestigeModifiedBy: 0.6,
             })

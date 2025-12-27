@@ -22,16 +22,15 @@ class InflationNews extends News {
         Object.assign(this.endEffects[0], {
             commerceModifiedBy: (1 + this.endEffects[0].commerceModifiedBy)/2,
             marketCargoAmountsModifiedBy: (1 + this.endEffects[0].marketCargoAmountsModifiedBy)/2,
-            creditsModifiedBy: 1/(1.5+1) //what goes up, must come down
+            creditsModifiedBy: 1/(1+1.5) //what goes up, must come down
         })
     }
 
     isValid() {
         const {planet} = this
-        //not likely when credit is high and higher than available goods
+        //not likely when credit is high 
         const ratingsValid = 
-            planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS > 1 &&
-            planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS > planet.settlement.market.baseCargo.average/MARKET_AVERAGE_CARGO_PER_TYPE
+            (planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS) > 1.5 
         const interferingEvent = News.hasNews(NEWS_TYPES.INFLATION, planet) //same time as economic boom is possible!
         return ratingsValid && !interferingEvent
     }
