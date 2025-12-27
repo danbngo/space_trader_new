@@ -8,6 +8,7 @@ class NewsType {
      * @param {number[]} color - The color associated with this news type.
      * @param {number} minYears - The minimum duration in years this news event can last.
      * @param {number} maxYears - The maximum duration in years this news event can last.
+     * @param {number} displayPriority - The display priority when multiple news events occur in the same year.
      */
     constructor(name = '', color = COLORS.White, minYears = null, maxYears = null, displayPriority = 0) {
         /** @type {string} */

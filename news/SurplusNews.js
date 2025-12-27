@@ -10,7 +10,7 @@ class SurplusNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 marketPricesModifiedBy: 0.8,
-                marketCargoAmountsModifiedBy: 1.5,
+                marketCargoAmountsModifiedBy: 1.3,
                 commerceModifiedBy: 1.2,
                 industryModifiedBy: 1.4,
                 creditsModifiedBy: 1.3,

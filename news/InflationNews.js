@@ -28,8 +28,10 @@ class InflationNews extends News {
 
     isValid() {
         const {planet} = this
-        //not likely when credit is higher than available goods
-        const ratingsValid = planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS > planet.settlement.market.baseCargo.average/MARKET_AVERAGE_CARGO_PER_TYPE
+        //not likely when credit is high and higher than available goods
+        const ratingsValid = 
+            planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS > 1 &&
+            planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS > planet.settlement.market.baseCargo.average/MARKET_AVERAGE_CARGO_PER_TYPE
         const interferingEvent = News.hasNews(NEWS_TYPES.INFLATION, planet) //same time as economic boom is possible!
         return ratingsValid && !interferingEvent
     }

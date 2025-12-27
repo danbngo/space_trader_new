@@ -6,7 +6,7 @@ class GovernmentType {
     /**
      * @param {string} name - The name of the government type.
      * @param {number[]} color - The color associated with this government type.
-     * @type {GovernmentType|null} opposingType - The opposing government type (if any).
+     * @property {GovernmentType|null} opposingType - The opposing government type (if any).
      */
     constructor(name = '', color = COLORS.White) {
         /** @type {string} */

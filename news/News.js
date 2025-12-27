@@ -13,9 +13,9 @@ class News {
     constructor(startedName = '', endedName = '', newsType = NEWS_TYPES_ALL[0], planet = new Planet(), targetPlanet = null) {
         //console.log('instantiating News with:',{startedName, endedName, newsType, planet, targetPlanet});
         /** @type {string} */
-        this.startedName = ''+colorSpan(startedName, newsType.color);
+        this.startedName = String(colorSpan(startedName, newsType.color));
         /** @type {string} */
-        this.endedName = ''+colorSpan(endedName, newsType.color);
+        this.endedName = String(colorSpan(endedName, newsType.color));
         /** @type {NewsType} */
         this.newsType = newsType;
         /** @type {number} */
@@ -100,8 +100,8 @@ class News {
         return gs.system.news.filter(news => {
             if (news.ended || !news.started) return false
             if (newsType && news.newsType != newsType) return false
-            if (planet && news.planet && planet != news.planet) return false
-            if (targetPlanet && news.targetPlanet && targetPlanet != news.targetPlanet) return false
+            if (planet && (!news.planet || planet != news.planet)) return false
+            if (targetPlanet && (!news.targetPlanet || targetPlanet != news.targetPlanet)) return false
             return true
         })
     }

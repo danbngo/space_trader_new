@@ -23,7 +23,7 @@ class SystemWidePlague extends News {
         this.ongoingEffects = [
             new NewsEffect({
                 onApply: (elapsedYears)=>{
-                    const numPlaguesToStart = calcOccurencesPerTimespan(SystemWidePlague.AVERAGE_ADDITIONAL_PLAGUES_PER_YEAR, elapsedYears)
+                    const numPlaguesToStart = calcOccurrencesPerTimespan(SystemWidePlague.AVERAGE_ADDITIONAL_PLAGUES_PER_YEAR, elapsedYears)
                     if (numPlaguesToStart < 1) return
                     const plagues = SystemWidePlague.getPlaguesToSpread(numPlaguesToStart)
                     if (plagues.length > 0) SimpleNews.add(''+colorSpan(`${gs.system.name}'S SYSTEM-WIDE PLAGUE SPREADS!`, COLORS.Red, true))

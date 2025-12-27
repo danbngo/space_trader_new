@@ -12,7 +12,7 @@ function checkForEvents(elapsedYears = 1) {
 
 function checkForNews(elapsedDays = 1) {
     //console.log('checkForNews', { elapsedDays });
-    if (!calcOccurencesPerTimespan(NEWS_CHANCE_PER_DAY, elapsedDays)) return false
+    if (!calcOccurrencesPerTimespan(NEWS_CHANCE_PER_DAY, elapsedDays)) return false
     const newsEvent = generateNews()
     if (!newsEvent) return
     newsEvent.start()
@@ -49,7 +49,7 @@ function checkForAsteroidBeltEncounters(elapsedDays = 1) {
     }
     
     // Check if encounter is triggered
-    if (!calcOccurencesPerTimespan(ASTEROIDS_ENCOUNTER_CHANCE_PER_DAY, elapsedDays * totalProximityFactor)) return false
+    if (!calcOccurrencesPerTimespan(ASTEROIDS_ENCOUNTER_CHANCE_PER_DAY, elapsedDays * totalProximityFactor)) return false
     
     // Select a random nearby belt to determine encounter type
     const selectedAsteroidIndex = rndIndexWeighted(proximityFactors)
@@ -122,7 +122,7 @@ function checkForPlanetEncounters(elapsedDays = 1) {
         
         // Adjust base chance by culture activity level
         const activityLevel = (military + security + crime + commerce + industry) / 5
-        if (!calcOccurencesPerTimespan(PLANET_ENCOUNTER_CHANCE_PER_DAY, elapsedDays * activityLevel * proximityFactor)) continue
+        if (!calcOccurrencesPerTimespan(PLANET_ENCOUNTER_CHANCE_PER_DAY, elapsedDays * activityLevel * proximityFactor)) continue
         
         // Select encounter type using weighted random
         const roll = Math.random() * totalWeight

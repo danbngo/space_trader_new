@@ -15,14 +15,17 @@ class CivilStrifeNews extends News {
                 commerceModifiedBy: 0.8,
                 industryModifiedBy: 0.6,
                 creditsModifiedBy: 0.7,
+                marketCargoAmountsModifiedBy: 0.7,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, 1.5]]), //this is the only thing that normalizes after
             })
         ]
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
-        //some lingering security and prestige decrease
+        //some lingering security and prestige decrease and destroyed goods
         Object.assign(this.endEffects[0], {
             securityModifiedBy: (1 + this.endEffects[0].securityModifiedBy)/2,
             prestigeModifiedBy: 0.9,
+            commerceModifiedBy: (1 + this.endEffects[0].commerceModifiedBy)/2,
+            marketCargoAmountsModifiedBy: (1 + this.endEffects[0].marketCargoAmountsModifiedBy)/2,
         })
     }
 

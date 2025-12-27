@@ -1,7 +1,7 @@
 class IsolationismNews extends News {
     constructor(planet = new Planet()) {
         super(
-            `${coloredName(planet)} retreats into isolationism!`,
+            `${coloredName(planet)} retreats into isolationism to take care of its own!`,
             `${coloredName(planet)} ends its isolationism!`,
             NEWS_TYPES.ISOLATIONISM, planet
         )
@@ -18,6 +18,7 @@ class IsolationismNews extends News {
                 creditsModifiedBy: 0.8,
                 officerQualityModifiedBy: 0.9,
                 shipQualityModifiedBy: 0.9,
+                prestigeModifiedBy: 0.7,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.ANTIMATTER, 0.5]]),
                 forceWithdrawal: true,
             })
@@ -26,9 +27,11 @@ class IsolationismNews extends News {
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //some lingering price increases and deflation
         Object.assign(this.endEffects[0], {
+            populationModifiedBy: 1.2,
             territoryModifiedBy: 1,
             officerQualityModifiedBy: 1, //lose some knowledge
             shipQualityModifiedBy: 1, //lose some knowledge
+            prestigeModifiedBy: 1,
         })
     }
 

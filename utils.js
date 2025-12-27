@@ -321,21 +321,29 @@ function rndShuffle(arr = []) {
  * @param {number} numTicks - The number of ticks (can be fractional, e.g., 10.3).
  * @returns {number} The number of times the event occurred.
  */
-function calcOccurencesPerTimespan(chancePerTick = 0.1, numTicks = 1) {
-    //returns a potentially infinite (with infitismal chance) number representing the number of occurences of a small probability event over a timespan
-    let occurences = 0
-    const wholeTicks = Math.floor(numTicks)
-    const tickFraction = numTicks - wholeTicks
+function calcOccurrencesPerTimespan(chancePerTick = 0.1, numTicks = 1) {
+    // returns a potentially infinite (with infinitesimal chance) number representing the number of occurrences of a small probability event over a timespan
+    let occurrences = 0;
+    const wholeTicks = Math.floor(numTicks);
+    const tickFraction = numTicks - wholeTicks;
 
     // Process whole ticks
     for (let i = 0; i < wholeTicks; i++) {
-        if (Math.random() < chancePerTick) occurences++
+        if (Math.random() < chancePerTick) occurrences++;
     }
     
     // Process fractional tick with proportional probability
     if (tickFraction > 0 && Math.random() < chancePerTick * tickFraction) {
-        occurences++
+        occurrences++;
     }
 
-    return occurences
+    return occurrences;
 }
+
+/**
+ * @deprecated Use {@link calcOccurrencesPerTimespan} instead.
+ * Kept for backward compatibility with existing callers.
+ */
+const calcOccurencesPerTimespan = function(chancePerTick = 0.1, numTicks = 1) {
+    return calcOccurrencesPerTimespan(chancePerTick, numTicks);
+};

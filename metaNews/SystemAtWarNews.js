@@ -25,7 +25,7 @@ class SystemAtWarNews extends News {
             new NewsEffect({
                 onApply: (elapsedYears)=>{
                     console.log('world war tick')
-                    const numWarsToStart = calcOccurencesPerTimespan(SystemAtWarNews.AVERAGE_ADDITIONAL_WARS_PER_YEAR, elapsedYears)
+                    const numWarsToStart = calcOccurrencesPerTimespan(SystemAtWarNews.AVERAGE_ADDITIONAL_WARS_PER_YEAR, elapsedYears)
                     if (numWarsToStart < 1) return
                     const wars = SystemAtWarNews.getWarsToSpread(numWarsToStart)
                     if (wars.length > 0) SimpleNews.add(''+colorSpan(`${gs.system.name}'S TOTAL WAR SPREADS!`, COLORS.Red, true))
