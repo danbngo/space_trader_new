@@ -9,9 +9,9 @@ class Environmentalism extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                commerceModifiedBy: 0.9,
-                industryModifiedBy: 0.4,
-                shipyardNumShipsModifiedBy: 0.8,
+                commerce: 0.9,
+                industry: 0.4,
+                shipyardNumShips: 0.8,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.NANITES, 0.5], [CARGO_TYPES.METAL, 0.5]]),
             })
         ]
@@ -19,11 +19,11 @@ class Environmentalism extends News {
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //market, commerce, industry do not fully bounce back
         Object.assign(this.endEffects[0], {
-            populationModifiedBy: 1.2,
-            shipyardNumShipsModifiedBy: (1 + this.endEffects[0].shipyardNumShipsModifiedBy)/2,
-            commerceModifiedBy: (1 + this.endEffects[0].commerceModifiedBy)/2,
-            industryModifiedBy: (1 + this.endEffects[0].industryModifiedBy)/2,
-            prestigeModifiedBy: 1.2,
+            population: 1.2,
+            shipyardNumShips: (1 + this.endEffects[0].shipyardNumShips)/2,
+            commerce: (1 + this.endEffects[0].commerce)/2,
+            industry: (1 + this.endEffects[0].industry)/2,
+            prestige: 1.2,
         })
     }
 

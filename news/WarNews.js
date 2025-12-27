@@ -11,30 +11,30 @@ class WarNews extends News {
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
                 newRelationship: RELATIONSHIP_TYPES.WAR,
-                militaryModifiedBy: 1.3,
-                securityModifiedBy: 1.2,
-                commerceModifiedBy: 0.7,
-                shipyardNumShipsModifiedBy: 0.7,
-                marketCargoAmountsModifiedBy: 0.8,
-                prestigeModifiedBy: 0.9, //the aggressor loses some prestige
+                military: 1.3,
+                security: 1.2,
+                commerce: 0.7,
+                shipyardNumShips: 0.7,
+                marketCargoAmounts: 0.8,
+                prestige: 0.9, //the aggressor loses some prestige
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, 2], [CARGO_TYPES.ANTIMATTER, 3]]),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
                 newRelationship: RELATIONSHIP_TYPES.WAR,
-                militaryModifiedBy: 1.3,
-                securityModifiedBy: 1.2,
-                commerceModifiedBy: 0.7,
-                shipyardNumShipsModifiedBy: 0.7,
-                marketCargoAmountsModifiedBy: 0.8,
+                military: 1.3,
+                security: 1.2,
+                commerce: 0.7,
+                shipyardNumShips: 0.7,
+                marketCargoAmounts: 0.8,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, 2], [CARGO_TYPES.ANTIMATTER, 3]]),
             })
         ]
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.endEffects[0], {
-            prestigeModifiedBy: 1, //being a warmonger = bad
+            prestige: 1, //being a warmonger = bad
         })
 
 

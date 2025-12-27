@@ -10,26 +10,26 @@ class NewsEffect {
      * @param {Planet|null} [params.targetPlanet] - The target planet for relationship changes.
      * @param {GovernmentType|null} [params.newGovernmentType] - New government type to change to.
      * @param {RelationshipType|null} [params.newRelationship] - New relationship with target planet.
-     * @param {number} [params.marketPricesModifiedBy] - Multiplier for market prices (inflation).
-     * @param {number} [params.marketCargoAmountsModifiedBy] - Multiplier for market cargo quantities.
-     * @param {number} [params.blackMarketPricesModifiedBy] - Multiplier for black market prices.
-     * @param {number} [params.blackMarketCargoAmountsModifiedBy] - Multiplier for black market cargo quantities.
-     * @param {number} [params.militaryModifiedBy] - Multiplier for military rating.
-     * @param {number} [params.industryModifiedBy] - Multiplier for industrial rating.
-     * @param {number} [params.commerceModifiedBy] - Multiplier for commercial rating.
-     * @param {number} [params.securityModifiedBy] - Multiplier for security rating.
-     * @param {number} [params.crimeModifiedBy] - Multiplier for crime rating.
-     * @param {number} [params.prestigeModifiedBy] - Multiplier for prestige rating.
-     * @param {number} [params.populationModifiedBy] - Multiplier for population.
-     * @param {number} [params.territoryModifiedBy] - Multiplier for territory.
-     * @param {number} [params.shipQualityModifiedBy] - Multiplier for ship quality.
-     * @param {number} [params.officerQualityModifiedBy] - Multiplier for officer quality.
+     * @param {number} [params.marketPrices] - Multiplier for market prices (inflation).
+     * @param {number} [params.marketCargoAmounts] - Multiplier for market cargo quantities.
+     * @param {number} [params.blackMarketPrices] - Multiplier for black market prices.
+     * @param {number} [params.blackMarketCargoAmounts] - Multiplier for black market cargo quantities.
+     * @param {number} [params.military] - Multiplier for military rating.
+     * @param {number} [params.industry] - Multiplier for industrial rating.
+     * @param {number} [params.commerce] - Multiplier for commercial rating.
+     * @param {number} [params.security] - Multiplier for security rating.
+     * @param {number} [params.crime] - Multiplier for crime rating.
+     * @param {number} [params.prestige] - Multiplier for prestige rating.
+     * @param {number} [params.population] - Multiplier for population.
+     * @param {number} [params.territory] - Multiplier for territory.
+     * @param {number} [params.shipQuality] - Multiplier for ship quality.
+     * @param {number} [params.officerQuality] - Multiplier for officer quality.
      * @param {Building[]} [params.buildingsDisabled] - Buildings to disable.
      * @param {Building[]} [params.buildingsEnabled] - Buildings to enable.
-     * @param {number} [params.shipyardNumShipsModifiedBy] - Multiplier for shipyard inventory.
-     * @param {number} [params.guildNumOfficersModifiedBy] - Multiplier for guild officer availability.
+     * @param {number} [params.shipyardNumShips] - Multiplier for shipyard inventory.
+     * @param {number} [params.guildNumOfficers] - Multiplier for guild officer availability.
      * @param {Map<CargoType, number>} [params.cargoPriceModifiers] - Cargo-specific price modifiers.
-     * @param {number} [params.creditsModifiedBy] - Multiplier for building credits.
+     * @param {number} [params.credits] - Multiplier for building credits.
      * @param {boolean} [params.relationsReset] - Whether to reset all relationships to neutral.
      * @param {boolean} [params.forcePeace] - Whether to cease hostilities TARGETING this planet.
      * @param {boolean} [params.forceWithdrawal] - Whether to force this planet to withdraw from the solar stage.
@@ -45,42 +45,42 @@ class NewsEffect {
         newRelationship = null,
         
         // Market/Economic changes
-        marketPricesModifiedBy = 1.0,
-        marketCargoAmountsModifiedBy = 1.0,
-        blackMarketPricesModifiedBy = 1.0,
-        blackMarketCargoAmountsModifiedBy = 1.0,
+        marketPrices = 1.0,
+        marketCargoAmounts = 1.0,
+        blackMarketPrices = 1.0,
+        blackMarketCargoAmounts = 1.0,
         
         // Culture rating changes
-        militaryModifiedBy = 1.0,
-        industryModifiedBy = 1.0,
-        commerceModifiedBy = 1.0,
-        securityModifiedBy = 1.0,
-        crimeModifiedBy = 1.0,
-        prestigeModifiedBy = 1.0,
+        military = 1.0,
+        industry = 1.0,
+        commerce = 1.0,
+        security = 1.0,
+        crime = 1.0,
+        prestige = 1.0,
         
         // Population and territory changes
-        populationModifiedBy = 1.0,
-        territoryModifiedBy = 1.0,
+        population = 1.0,
+        territory = 1.0,
 
         // tech changes
-        shipQualityModifiedBy = 1.0,
-        officerQualityModifiedBy = 1.0,
+        shipQuality = 1.0,
+        officerQuality = 1.0,
         
         // Building changes
         buildingsDisabled = [],
         buildingsEnabled = [],
         
         // Shipyard changes
-        shipyardNumShipsModifiedBy = 1.0,
+        shipyardNumShips = 1.0,
         
         // Guild changes
-        guildNumOfficersModifiedBy = 1.0,
+        guildNumOfficers = 1.0,
 
         //Market and black market changes
         cargoPriceModifiers = new Map(),
         
         // Bank changes
-        creditsModifiedBy = 1.0,
+        credits = 1.0,
 
         relationsReset = false,
         forcePeace = false,
@@ -101,43 +101,43 @@ class NewsEffect {
         /** @type {RelationshipType|null} */
         this.newRelationship = newRelationship;
         /** @type {number} */
-        this.marketPricesModifiedBy = marketPricesModifiedBy;
+        this.marketPrices = marketPrices;
         /** @type {number} */
-        this.marketCargoAmountsModifiedBy = marketCargoAmountsModifiedBy;
+        this.marketCargoAmounts = marketCargoAmounts;
         /** @type {number} */
-        this.blackMarketPricesModifiedBy = blackMarketPricesModifiedBy;
+        this.blackMarketPrices = blackMarketPrices;
         /** @type {number} */
-        this.blackMarketCargoAmountsModifiedBy = blackMarketCargoAmountsModifiedBy;
+        this.blackMarketCargoAmounts = blackMarketCargoAmounts;
         /** @type {number} */
-        this.militaryModifiedBy = militaryModifiedBy;
+        this.military = military;
         /** @type {number} */
-        this.industryModifiedBy = industryModifiedBy;
+        this.industry = industry;
         /** @type {number} */
-        this.commerceModifiedBy = commerceModifiedBy;
+        this.commerce = commerce;
         /** @type {number} */
-        this.securityModifiedBy = securityModifiedBy;
+        this.security = security;
         /** @type {number} */
-        this.crimeModifiedBy = crimeModifiedBy;
+        this.crime = crime;
         /** @type {number} */
-        this.prestigeModifiedBy = prestigeModifiedBy;
+        this.prestige = prestige;
         /** @type {number} */
-        this.populationModifiedBy = populationModifiedBy;
+        this.population = population;
         /** @type {number} */
-        this.territoryModifiedBy = territoryModifiedBy;
+        this.territory = territory;
         /** @type {Building[]} */
         this.buildingsDisabled = buildingsDisabled;
         /** @type {Building[]} */
         this.buildingsEnabled = buildingsEnabled;
         /** @type {number} */
-        this.guildNumOfficersModifiedBy = guildNumOfficersModifiedBy;
+        this.guildNumOfficers = guildNumOfficers;
         /** @type {number} */
-        this.shipyardNumShipsModifiedBy = shipyardNumShipsModifiedBy;
+        this.shipyardNumShips = shipyardNumShips;
         /** @type {number} */
-        this.creditsModifiedBy = creditsModifiedBy;
+        this.credits = credits;
         /** @type {number} */
-        this.shipQualityModifiedBy = shipQualityModifiedBy;
+        this.shipQuality = shipQuality;
         /** @type {number} */
-        this.officerQualityModifiedBy = officerQualityModifiedBy;
+        this.officerQuality = officerQuality;
         /** @type {boolean} */
         this.relationsReset = relationsReset;
         /** @type {boolean} */
@@ -152,27 +152,27 @@ class NewsEffect {
     }
 
     apply(elapsedYears = 0) {
-        const {planet, targetPlanet, militaryModifiedBy, newGovernmentType, newRelationship, creditsModifiedBy, 
-            blackMarketCargoAmountsModifiedBy, blackMarketPricesModifiedBy, buildingsDisabled, buildingsEnabled, territoryModifiedBy,
-            populationModifiedBy, crimeModifiedBy, marketPricesModifiedBy, securityModifiedBy, commerceModifiedBy, 
-            guildNumOfficersModifiedBy, industryModifiedBy, shipyardNumShipsModifiedBy, marketCargoAmountsModifiedBy, fired,
-            shipQualityModifiedBy, officerQualityModifiedBy, relationsReset, forcePeace, forceWithdrawal, prestigeModifiedBy, cargoPriceModifiers} = this;
+        const {planet, targetPlanet, military, newGovernmentType, newRelationship, credits, 
+            blackMarketCargoAmounts, blackMarketPrices, buildingsDisabled, buildingsEnabled, territory,
+            population, crime, marketPrices, security, commerce, 
+            guildNumOfficers, industry, shipyardNumShips, marketCargoAmounts, fired,
+            shipQuality, officerQuality, relationsReset, forcePeace, forceWithdrawal, prestige, cargoPriceModifiers} = this;
 
         this.fired = true;
 
         if (planet && planet.culture) {
             const {culture} = planet
             culture.governmentType = newGovernmentType || culture.governmentType;
-            culture.shipQuality *= shipQualityModifiedBy;
-            culture.officerQuality *= officerQualityModifiedBy;
-            culture.military *= militaryModifiedBy;
-            culture.industry *= industryModifiedBy;
-            culture.commerce *= commerceModifiedBy;
-            culture.security *= securityModifiedBy;
-            culture.crime *= crimeModifiedBy;
-            culture.prestige *= prestigeModifiedBy;
-            culture.population *= populationModifiedBy;
-            culture.territory *= territoryModifiedBy;
+            culture.shipQuality *= shipQuality;
+            culture.officerQuality *= officerQuality;
+            culture.military *= military;
+            culture.industry *= industry;
+            culture.commerce *= commerce;
+            culture.security *= security;
+            culture.crime *= crime;
+            culture.prestige *= prestige;
+            culture.population *= population;
+            culture.territory *= territory;
             //FIRST end any wars to let their endEffects run
             if (forcePeace) {
                 News.forcePeace(planet)
@@ -208,12 +208,12 @@ class NewsEffect {
 
         if (planet && planet.settlement) {
             const {settlement} = planet
-            if (creditsModifiedBy !== 1.0) {
+            if (credits !== 1.0) {
                 for (const building of settlement.buildings) {
                     if (!building.baseCredits) continue
-                    //console.log('1 altering credits for building by factor:',creditsModifiedBy,'starting base credits:',building.baseCredits);
-                    building.baseCredits = Math.max(1, rndRound(building.baseCredits * creditsModifiedBy));
-                    //console.log('2 altered credits for building by factor:',creditsModifiedBy,'new base credits:',building.baseCredits);
+                    //console.log('1 altering credits for building by factor:',credits,'starting base credits:',building.baseCredits);
+                    building.baseCredits = Math.max(1, rndRound(building.baseCredits * credits));
+                    //console.log('2 altered credits for building by factor:',credits,'new base credits:',building.baseCredits);
                     building.normalize();
                     if (building.baseCredits > MARKET_AVERAGE_CREDITS*1000) {
                         console.log('building:',building,'this:',this)
@@ -221,23 +221,23 @@ class NewsEffect {
                     }
                 }
             }
-            if (guildNumOfficersModifiedBy !== 1.0) {
-                settlement.guild.baseNumOfficers = rndRound(settlement.guild.baseNumOfficers * guildNumOfficersModifiedBy);
+            if (guildNumOfficers !== 1.0) {
+                settlement.guild.baseNumOfficers = rndRound(settlement.guild.baseNumOfficers * guildNumOfficers);
                 settlement.guild.normalize();
             }
-            if (shipyardNumShipsModifiedBy !== 1.0) {
-                settlement.shipyard.baseNumShips = rndRound(settlement.shipyard.baseNumShips * shipyardNumShipsModifiedBy);
-                settlement.shipyard.baseNumModules = rndRound(settlement.shipyard.baseNumModules * shipyardNumShipsModifiedBy);
+            if (shipyardNumShips !== 1.0) {
+                settlement.shipyard.baseNumShips = rndRound(settlement.shipyard.baseNumShips * shipyardNumShips);
+                settlement.shipyard.baseNumModules = rndRound(settlement.shipyard.baseNumModules * shipyardNumShips);
                 settlement.shipyard.normalize();
             }
-            if (marketPricesModifiedBy !== 1.0) settlement.market.inflation *= marketPricesModifiedBy;
-            if (blackMarketPricesModifiedBy !== 1.0) settlement.blackMarket.inflation *= blackMarketPricesModifiedBy;
+            if (marketPrices !== 1.0) settlement.market.inflation *= marketPrices;
+            if (blackMarketPrices !== 1.0) settlement.blackMarket.inflation *= blackMarketPrices;
             for (const ct of CARGO_TYPES_ALL) {
-                if (marketCargoAmountsModifiedBy !== 1.0) settlement.market.baseCargo.setAmount(ct, rndRound(settlement.market.baseCargo.getAmount(ct) * marketCargoAmountsModifiedBy));
-                if (blackMarketCargoAmountsModifiedBy !== 1.0) settlement.blackMarket.baseCargo.setAmount(ct, rndRound(settlement.blackMarket.baseCargo.getAmount(ct) * blackMarketCargoAmountsModifiedBy));
+                if (marketCargoAmounts !== 1.0) settlement.market.baseCargo.setAmount(ct, rndRound(settlement.market.baseCargo.getAmount(ct) * marketCargoAmounts));
+                if (blackMarketCargoAmounts !== 1.0) settlement.blackMarket.baseCargo.setAmount(ct, rndRound(settlement.blackMarket.baseCargo.getAmount(ct) * blackMarketCargoAmounts));
             }
-            if (marketCargoAmountsModifiedBy !== 1.0) settlement.market.normalize()
-            if (blackMarketCargoAmountsModifiedBy !== 1.0) settlement.blackMarket.normalize()
+            if (marketCargoAmounts !== 1.0) settlement.market.normalize()
+            if (blackMarketCargoAmounts !== 1.0) settlement.blackMarket.normalize()
         }
 
         if (this.onApply) this.onApply(elapsedYears);
@@ -253,23 +253,23 @@ class NewsEffect {
             //newRelationship: this.oldRelationship, //MUST be handled through onApply as relationships can evolve mid-event
             buildingsDisabled: this.buildingsEnabled,
             buildingsEnabled: this.buildingsDisabled,
-            marketPricesModifiedBy: 1 / this.marketPricesModifiedBy,
-            marketCargoAmountsModifiedBy: 1 / this.marketCargoAmountsModifiedBy,
-            blackMarketPricesModifiedBy: 1 / this.blackMarketPricesModifiedBy,
-            blackMarketCargoAmountsModifiedBy: 1 / this.blackMarketCargoAmountsModifiedBy,
-            militaryModifiedBy: 1 / this.militaryModifiedBy,
-            industryModifiedBy: 1 / this.industryModifiedBy,
-            commerceModifiedBy: 1 / this.commerceModifiedBy,
-            securityModifiedBy: 1 / this.securityModifiedBy,
-            crimeModifiedBy: 1 / this.crimeModifiedBy,
-            prestigeModifiedBy: 1 / this.prestigeModifiedBy,
-            populationModifiedBy: 1 / this.populationModifiedBy,
-            territoryModifiedBy: 1 / this.territoryModifiedBy,
-            shipQualityModifiedBy: 1 / this.shipQualityModifiedBy,
-            officerQualityModifiedBy: 1 / this.officerQualityModifiedBy,
-            guildNumOfficersModifiedBy: 1/this.guildNumOfficersModifiedBy,
-            shipyardNumShipsModifiedBy: 1/this.shipyardNumShipsModifiedBy,
-            creditsModifiedBy: 1 / this.creditsModifiedBy,
+            marketPrices: 1 / this.marketPrices,
+            marketCargoAmounts: 1 / this.marketCargoAmounts,
+            blackMarketPrices: 1 / this.blackMarketPrices,
+            blackMarketCargoAmounts: 1 / this.blackMarketCargoAmounts,
+            military: 1 / this.military,
+            industry: 1 / this.industry,
+            commerce: 1 / this.commerce,
+            security: 1 / this.security,
+            crime: 1 / this.crime,
+            prestige: 1 / this.prestige,
+            population: 1 / this.population,
+            territory: 1 / this.territory,
+            shipQuality: 1 / this.shipQuality,
+            officerQuality: 1 / this.officerQuality,
+            guildNumOfficers: 1/this.guildNumOfficers,
+            shipyardNumShips: 1/this.shipyardNumShips,
+            credits: 1 / this.credits,
             cargoPriceModifiers: new Map(Array.from(this.cargoPriceModifiers.entries()).map(([ct, mod]) => [ct, 1/mod])),
             relationsReset: false, //this cant be undone.
         });
@@ -281,11 +281,11 @@ class NewsEffect {
             return `${label}: ${describeRating(rating, invertColor)} ➜ ${describeRating(newRating, invertColor)}.<br/>`
         }
 
-        const {planet, targetPlanet, militaryModifiedBy, newGovernmentType, newRelationship, creditsModifiedBy, 
-            blackMarketCargoAmountsModifiedBy, blackMarketPricesModifiedBy, buildingsDisabled, buildingsEnabled, territoryModifiedBy,
-            populationModifiedBy, crimeModifiedBy, marketPricesModifiedBy, securityModifiedBy, commerceModifiedBy, 
-            guildNumOfficersModifiedBy, industryModifiedBy, shipyardNumShipsModifiedBy, marketCargoAmountsModifiedBy,
-            shipQualityModifiedBy, officerQualityModifiedBy, relationsReset, prestigeModifiedBy, cargoPriceModifiers, forcePeace} = this;
+        const {planet, targetPlanet, military, newGovernmentType, newRelationship, credits, 
+            blackMarketCargoAmounts, blackMarketPrices, buildingsDisabled, buildingsEnabled, territory,
+            population, crime, marketPrices, security, commerce, 
+            guildNumOfficers, industry, shipyardNumShips, marketCargoAmounts,
+            shipQuality, officerQuality, relationsReset, prestige, cargoPriceModifiers, forcePeace} = this;
         
         let msg = ''
         
@@ -311,41 +311,41 @@ class NewsEffect {
                 msg += `- Demand for ${cargoType.name}: ${culture.cargoPriceModifiers.getAmount(cargoType)}x ➜ ${culture.cargoPriceModifiers.getAmount(cargoType)*modifier}x.<br/>`
             }
 
-            if (populationModifiedBy !== 1.0) msg += `- Population: ${describePopulation(culture.population)} ➜ ${describePopulation(culture.population*populationModifiedBy)}.<br/>`
-            if (territoryModifiedBy !== 1.0) msg += `- Territory: ${describeTerritory(culture.territory)} ➜ ${describeTerritory(culture.territory*territoryModifiedBy)}.<br/>`
-            if (prestigeModifiedBy !== 1.0) msg += dscr('- Prestige', culture.prestige, culture.prestige*prestigeModifiedBy)
-            if (militaryModifiedBy !== 1.0) msg += dscr('- GovernmentType', culture.military, culture.military*militaryModifiedBy)
-            if (industryModifiedBy !== 1.0) msg += dscr('- Industrial', culture.industry, culture.industry*industryModifiedBy)
-            if (commerceModifiedBy !== 1.0) msg += dscr('- Commercial', culture.commerce, culture.commerce*commerceModifiedBy)
-            if (securityModifiedBy !== 1.0) msg += dscr('- Security', culture.security, culture.security*securityModifiedBy)
-            if (crimeModifiedBy !== 1.0) msg += dscr('- Crime', culture.crime, culture.crime*crimeModifiedBy, true)
-            if (shipQualityModifiedBy !== 1.0) msg += dscr('- Ships', culture.shipQuality, culture.shipQuality*shipQualityModifiedBy)
-            if (officerQualityModifiedBy !== 1.0) msg += dscr('- Officers', culture.officerQuality, culture.officerQuality*officerQualityModifiedBy)
+            if (population !== 1.0) msg += `- Population: ${describePopulation(culture.population)} ➜ ${describePopulation(culture.population*population)}.<br/>`
+            if (territory !== 1.0) msg += `- Territory: ${describeTerritory(culture.territory)} ➜ ${describeTerritory(culture.territory*territory)}.<br/>`
+            if (prestige !== 1.0) msg += dscr('- Prestige', culture.prestige, culture.prestige*prestige)
+            if (military !== 1.0) msg += dscr('- GovernmentType', culture.military, culture.military*military)
+            if (industry !== 1.0) msg += dscr('- Industrial', culture.industry, culture.industry*industry)
+            if (commerce !== 1.0) msg += dscr('- Commercial', culture.commerce, culture.commerce*commerce)
+            if (security !== 1.0) msg += dscr('- Security', culture.security, culture.security*security)
+            if (crime !== 1.0) msg += dscr('- Crime', culture.crime, culture.crime*crime, true)
+            if (shipQuality !== 1.0) msg += dscr('- Ships', culture.shipQuality, culture.shipQuality*shipQuality)
+            if (officerQuality !== 1.0) msg += dscr('- Officers', culture.officerQuality, culture.officerQuality*officerQuality)
 
         }
 
         if (planet && planet.settlement) {
             const {settlement} = planet
-            if (creditsModifiedBy !== 1.0) {
-                msg += `- Bank Credits: ${settlement.bank.baseCredits} ➜ ${settlement.bank.baseCredits*creditsModifiedBy}.<br/>`
+            if (credits !== 1.0) {
+                msg += `- Bank Credits: ${settlement.bank.baseCredits} ➜ ${settlement.bank.baseCredits*credits}.<br/>`
             }
-            if (guildNumOfficersModifiedBy) {
-                msg += `- Guild Officers: ${settlement.guild.baseNumOfficers} ➜ ${Math.round(settlement.guild.baseNumOfficers * guildNumOfficersModifiedBy)}.<br/>`
+            if (guildNumOfficers) {
+                msg += `- Guild Officers: ${settlement.guild.baseNumOfficers} ➜ ${Math.round(settlement.guild.baseNumOfficers * guildNumOfficers)}.<br/>`
             }
-            if (shipyardNumShipsModifiedBy) {
-                msg += `- Shipyard Ships: ${settlement.shipyard.baseNumShips} ➜ ${Math.round(settlement.shipyard.baseNumShips * shipyardNumShipsModifiedBy)}.<br/>`
+            if (shipyardNumShips) {
+                msg += `- Shipyard Ships: ${settlement.shipyard.baseNumShips} ➜ ${Math.round(settlement.shipyard.baseNumShips * shipyardNumShips)}.<br/>`
             }
-            if (marketCargoAmountsModifiedBy) {
-                msg += `- Market Units Per Cargo Type: ${settlement.market.baseCargo.average} ➜ ${settlement.market.baseCargo.average * marketCargoAmountsModifiedBy}.<br/>`
+            if (marketCargoAmounts) {
+                msg += `- Market Units Per Cargo Type: ${settlement.market.baseCargo.average} ➜ ${settlement.market.baseCargo.average * marketCargoAmounts}.<br/>`
             }
-            if (marketCargoAmountsModifiedBy) {
-                msg += `- Market Prices: ${settlement.market.inflation}x ➜ ${settlement.market.inflation * marketPricesModifiedBy}x.<br/>`
+            if (marketCargoAmounts) {
+                msg += `- Market Prices: ${settlement.market.inflation}x ➜ ${settlement.market.inflation * marketPrices}x.<br/>`
             }
-            if (blackMarketCargoAmountsModifiedBy) {
-                msg += `- Black Market Units Per Cargo Type: ${settlement.blackMarket.baseCargo.average} ➜ ${settlement.blackMarket.baseCargo.average * blackMarketCargoAmountsModifiedBy}.<br/>`
+            if (blackMarketCargoAmounts) {
+                msg += `- Black Market Units Per Cargo Type: ${settlement.blackMarket.baseCargo.average} ➜ ${settlement.blackMarket.baseCargo.average * blackMarketCargoAmounts}.<br/>`
             }
-            if (blackMarketPricesModifiedBy) {
-                msg += `- Black Market Prices: ${settlement.blackMarket.inflation}x ➜ ${settlement.blackMarket.inflation * blackMarketPricesModifiedBy}x.<br/>`
+            if (blackMarketPrices) {
+                msg += `- Black Market Prices: ${settlement.blackMarket.inflation}x ➜ ${settlement.blackMarket.inflation * blackMarketPrices}x.<br/>`
             }
         }
 

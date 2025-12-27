@@ -9,25 +9,25 @@ class ForeignAidNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                marketPricesModifiedBy: 0.8,
-                marketCargoAmountsModifiedBy: 1.3,
-                commerceModifiedBy: 1.2,
-                industryModifiedBy: 1.1,
-                creditsModifiedBy: 1.1,
-                shipyardNumShipsModifiedBy: 1.2,
-                prestigeModifiedBy: 0.6,
+                marketPrices: 0.8,
+                marketCargoAmounts: 1.4,
+                commerce: 1.2,
+                industry: 1.2,
+                credits: 1.4,
+                shipyardNumShips: 1.2,
+                prestige: 0.6,
             })
         ]
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
 
         Object.assign(this.endEffects[0], {
-            marketCargoAmountsModifiedBy: (1 + this.endEffects[0].marketCargoAmountsModifiedBy)/2,
-            commerceModifiedBy: (1 + this.endEffects[0].commerceModifiedBy)/2,
-            creditsModifiedBy: (1 + this.endEffects[0].creditsModifiedBy)/2,
-            industryModifiedBy: (1 + this.endEffects[0].industryModifiedBy)/2,
-            shipyardNumShipsModifiedBy: (1 + this.endEffects[0].shipyardNumShipsModifiedBy)/2,
-            prestigeModifiedBy: 1 //not the best for your reputation
+            marketCargoAmounts: (1 + this.endEffects[0].marketCargoAmounts)/2,
+            commerce: (1 + this.endEffects[0].commerce)/2,
+            credits: (1 + this.endEffects[0].credits)/2,
+            industry: (1 + this.endEffects[0].industry)/2,
+            shipyardNumShips: (1 + this.endEffects[0].shipyardNumShips)/2,
+            prestige: 1 //not the best for your reputation
         })
     }
 

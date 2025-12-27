@@ -9,9 +9,9 @@ class DisarmamentNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                militaryModifiedBy: 0.6,
-                territoryModifiedBy: 0.9,
-                guildNumOfficersModifiedBy: 0.6,
+                military: 0.6,
+                territory: 0.9,
+                guildNumOfficers: 0.6,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.ANTIMATTER, 0.5]]),
             })
         ]
@@ -19,12 +19,12 @@ class DisarmamentNews extends News {
         //system becomes more crowded over time...
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.endEffects[0], {
-            militaryModifiedBy: 1, 
-            territoryModifiedBy: 1,
-            guildNumOfficersModifiedBy: 1,
-            commerceModifiedBy: 1.1, //small bonuses to the economy
-            industryModifiedBy: 1.1,
-            prestigeModifiedBy: 1.2,
+            military: 1, 
+            territory: 1,
+            guildNumOfficers: 1,
+            commerce: 1.1, //small bonuses to the economy
+            industry: 1.1,
+            prestige: 1.2,
         })
     }
 

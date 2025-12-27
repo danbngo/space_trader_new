@@ -9,12 +9,12 @@ class CrackdownNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                securityModifiedBy: 1.4,
-                crimeModifiedBy: 0.7,
-                militaryModifiedBy: 1.1,
-                blackMarketCargoAmountsModifiedBy: 0.6,
-                blackMarketPricesModifiedBy: 1.3,
-                prestigeModifiedBy: 0.8, //other planets look unfavorably on this
+                security: 1.4,
+                crime: 0.7,
+                military: 1.1,
+                blackMarketCargoAmounts: 0.6,
+                blackMarketPrices: 1.3,
+                prestige: 0.8, //other planets look unfavorably on this
                 cargoPriceModifiers: new Map([[CARGO_TYPES.DRUGS, 2]]),
             })
         ]
@@ -22,9 +22,9 @@ class CrackdownNews extends News {
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //some lingering crime decrease
         Object.assign(this.endEffects[0], {
-            crimeModifiedBy: (1 + this.endEffects[0].crimeModifiedBy)/2,
-            blackMarketPricesModifiedBy: (1 + this.endEffects[0].blackMarketPricesModifiedBy)/2,
-            blackMarketCargoAmountsModifiedBy: (1 + this.endEffects[0].blackMarketCargoAmountsModifiedBy)/2,
+            crime: (1 + this.endEffects[0].crime)/2,
+            blackMarketPrices: (1 + this.endEffects[0].blackMarketPrices)/2,
+            blackMarketCargoAmounts: (1 + this.endEffects[0].blackMarketCargoAmounts)/2,
         })
     }
 

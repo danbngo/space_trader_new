@@ -9,7 +9,7 @@ class RevivalNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                officerQualityModifiedBy: 0.7,
+                officerQuality: 0.7,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.HOLOCUBES, 1.5], [CARGO_TYPES.ISOTOPES, 0.5]]),
                 //relationsReset: true
             })
@@ -18,8 +18,8 @@ class RevivalNews extends News {
 
         //dont revert ratings, but raise birthrates
         Object.assign(this.endEffects[0], {
-            populationModifiedBy: 1.4,
-            officerQualityModifiedBy: 1,
+            population: 1.4,
+            officerQuality: 1,
         })
     }
 

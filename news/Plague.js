@@ -9,12 +9,12 @@ class PlagueNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                populationModifiedBy: 0.6,
-                commerceModifiedBy: 0.7,
-                industryModifiedBy: 0.6,
-                guildNumOfficersModifiedBy: 0.6,
-                marketPricesModifiedBy: 1.1,
-                marketCargoAmountsModifiedBy: 0.8,
+                population: 0.6,
+                commerce: 0.7,
+                industry: 0.6,
+                guildNumOfficers: 0.6,
+                marketPrices: 1.1,
+                marketCargoAmounts: 0.8,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.MEDICINE, 3]]),
             })
         ]
@@ -22,8 +22,8 @@ class PlagueNews extends News {
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //population does not fully bounce back
         Object.assign(this.endEffects[0], {
-            populationModifiedBy: (1 + this.endEffects[0].populationModifiedBy)/2,
-            guildNumOfficersModifiedBy: (1 + this.endEffects[0].guildNumOfficersModifiedBy)/2,
+            population: (1 + this.endEffects[0].population)/2,
+            guildNumOfficers: (1 + this.endEffects[0].guildNumOfficers)/2,
         })
     }
 

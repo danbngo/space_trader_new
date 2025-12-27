@@ -14,12 +14,12 @@ class RevolutionNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 newGovernmentType: GOVERNMENT_TYPES.ANARCHY,
-                militaryModifiedBy: 0.6,
-                securityModifiedBy: 0.7,
-                crimeModifiedBy: 1.4,
-                commerceModifiedBy: 0.8,
-                industryModifiedBy: 0.8,
-                creditsModifiedBy: 0.5,
+                military: 0.6,
+                security: 0.7,
+                crime: 1.4,
+                commerce: 0.8,
+                industry: 0.8,
+                credits: 0.5,
                 buildingsDisabled: courthouseBuilding ? [courthouseBuilding] : [],
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, 1.5], [CARGO_TYPES.HOLOCUBES, 1.5]]),
                 //relationsReset: true
@@ -32,11 +32,11 @@ class RevolutionNews extends News {
 
         //government related ratings randomize a bit after a revolution
         Object.assign(this.endEffects[0], {
-            militaryModifiedBy: (rng(0.5,1.5,false) + this.endEffects[0].militaryModifiedBy)/2,
-            securityModifiedBy: (rng(0.5,1.5,false)  + this.endEffects[0].securityModifiedBy)/2,
-            industryModifiedBy: (rng(0.5,1.5,false)  + this.endEffects[0].industryModifiedBy)/2,
-            creditsModifiedBy: (rng(0.5,1.5,false)  + this.endEffects[0].creditsModifiedBy)/2,
-            prestigeModifiedBy: (rng(0.5,1.5,false)  + this.endEffects[0].prestigeModifiedBy)/2,
+            military: (rng(0.5,1.5,false) + this.endEffects[0].military)/2,
+            security: (rng(0.5,1.5,false)  + this.endEffects[0].security)/2,
+            industry: (rng(0.5,1.5,false)  + this.endEffects[0].industry)/2,
+            credits: (rng(0.5,1.5,false)  + this.endEffects[0].credits)/2,
+            prestige: (rng(0.5,1.5,false)  + this.endEffects[0].prestige)/2,
         })
     }
 

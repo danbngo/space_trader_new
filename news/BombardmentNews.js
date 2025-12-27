@@ -18,22 +18,22 @@ class BombardmentNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
-                prestigeModifiedBy: 1.2, //this makes you scary...
-                militaryModifiedBy: 0.9, //but expends some of your arsenal
+                prestige: 1.2, //this makes you scary...
+                military: 0.9, //but expends some of your arsenal
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
-                populationModifiedBy: 0.85,
-                militaryModifiedBy: 0.5,
-                industryModifiedBy: 0.4,
-                commerceModifiedBy: 0.7,
-                securityModifiedBy: 0.8,
-                marketCargoAmountsModifiedBy: 0.8,
-                marketPricesModifiedBy: 2,
-                shipQualityModifiedBy: 0.8, //back to the stone age!
-                officerQualityModifiedBy: 0.8,
-                prestigeModifiedBy: 0.6,
+                population: 0.85,
+                military: 0.5,
+                industry: 0.4,
+                commerce: 0.7,
+                security: 0.8,
+                marketCargoAmounts: 0.8,
+                marketPrices: 2,
+                shipQuality: 0.8, //back to the stone age!
+                officerQuality: 0.8,
+                prestige: 0.6,
                 buildingsDisabled: buildingsToDisable,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WATER, 2], [CARGO_TYPES.MEDICINE, 2], [CARGO_TYPES.HOLOCUBES, 0.5]]), //this is the only thing that normalizes after
             })
@@ -42,16 +42,16 @@ class BombardmentNews extends News {
         //dont automatically recover. lets add recovery events elsewhere
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.endEffects[1], {
-            populationModifiedBy: 1.0,
-            militaryModifiedBy: 1.0,
-            industryModifiedBy: 1.0,
-            commerceModifiedBy: 1.0,
-            securityModifiedBy: 1.0,
-            marketCargoAmountsModifiedBy: 1.0,
-            //marketPricesModifiedBy: 1.0, //prices will normalize
-            shipQualityModifiedBy: 1.0,
-            officerQualityModifiedBy: 1.0,
-            prestigeModifiedBy: 1.0,
+            population: 1.0,
+            military: 1.0,
+            industry: 1.0,
+            commerce: 1.0,
+            security: 1.0,
+            marketCargoAmounts: 1.0,
+            //marketPrices: 1.0, //prices will normalize
+            shipQuality: 1.0,
+            officerQuality: 1.0,
+            prestige: 1.0,
             buildingsEnabled: [],
             forcePeace: true,
         })

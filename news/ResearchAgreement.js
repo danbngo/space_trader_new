@@ -9,16 +9,16 @@ class ResearchAgreementNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                industryModifiedBy: 0.8,
-                creditsModifiedBy: 0.8,
-                marketCargoAmountsModifiedBy: 0.9,
+                industry: 0.8,
+                credits: 0.8,
+                marketCargoAmounts: 0.9,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.ISOTOPES, 2]]),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                industryModifiedBy: 0.8,
-                creditsModifiedBy: 0.8,
-                marketCargoAmountsModifiedBy: 0.9,
+                industry: 0.8,
+                credits: 0.8,
+                marketCargoAmounts: 0.9,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.ISOTOPES, 2]]),
             }),      
         ]
@@ -26,14 +26,14 @@ class ResearchAgreementNews extends News {
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //actual knowledge gained cannot be lost
         Object.assign(this.endEffects[0], {
-            shipQualityModifiedBy: 1.1,
-            officerQualityModifiedBy: 1.2,
-            militaryModifiedBy: 1.1,
+            shipQuality: 1.1,
+            officerQuality: 1.2,
+            military: 1.1,
         })
         Object.assign(this.endEffects[1], {
-            shipQualityModifiedBy: 1.1,
-            officerQualityModifiedBy: 1.2,
-            militaryModifiedBy: 1.1,
+            shipQuality: 1.1,
+            officerQuality: 1.2,
+            military: 1.1,
         })
     }
 

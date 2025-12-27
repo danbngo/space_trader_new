@@ -9,10 +9,10 @@ class ImperialismNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                militaryModifiedBy: 0.8,
-                territoryModifiedBy: 1.3,
-                commerceModifiedBy: 0.8,
-                prestigeModifiedBy: 0.6, //people dont like power players
+                military: 0.8,
+                territory: 1.3,
+                commerce: 0.8,
+                prestige: 0.6, //people dont like power players
             })
         ]
 
@@ -20,9 +20,9 @@ class ImperialismNews extends News {
 
         //some lingering drops, especially prestige
         Object.assign(this.endEffects[0], {
-            territoryModifiedBy: 1,
-            prestigeModifiedBy: 1,
-            militaryModifiedBy: (1 + this.endEffects[0].militaryModifiedBy)/2,
+            territory: 1,
+            prestige: 1,
+            military: (1 + this.endEffects[0].military)/2,
         })
     }
 

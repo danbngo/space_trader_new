@@ -9,20 +9,20 @@ class InflationNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                commerceModifiedBy: 0.7,
-                marketPricesModifiedBy: 1.4,
-                marketCargoAmountsModifiedBy: 0.8,
-                creditsModifiedBy: 1.5,
-                crimeModifiedBy: 1.2,
+                commerce: 0.7,
+                marketPrices: 1.4,
+                marketCargoAmounts: 0.8,
+                credits: 1.5,
+                crime: 1.2,
             })
         ]
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //some lingering price increases and deflation
         Object.assign(this.endEffects[0], {
-            commerceModifiedBy: (1 + this.endEffects[0].commerceModifiedBy)/2,
-            marketCargoAmountsModifiedBy: (1 + this.endEffects[0].marketCargoAmountsModifiedBy)/2,
-            creditsModifiedBy: 1/(1+1.5) //what goes up, must come down
+            commerce: (1 + this.endEffects[0].commerce)/2,
+            marketCargoAmounts: (1 + this.endEffects[0].marketCargoAmounts)/2,
+            credit: (1/(1+1.5))
         })
     }
 

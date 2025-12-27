@@ -9,16 +9,16 @@ class IsolationismNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                territoryModifiedBy: 0.7,
-                commerceModifiedBy: 0.7,
-                marketPricesModifiedBy: 0.8,
-                marketCargoAmountsModifiedBy: 0.8,
-                blackMarketCargoAmountsModifiedBy: 0.8,
-                blackMarketPricesModifiedBy: 0.8,
-                creditsModifiedBy: 0.8,
-                officerQualityModifiedBy: 0.9,
-                shipQualityModifiedBy: 0.9,
-                prestigeModifiedBy: 0.8,
+                territory: 0.7,
+                commerce: 0.7,
+                marketPrices: 0.8,
+                marketCargoAmounts: 0.8,
+                blackMarketCargoAmounts: 0.8,
+                blackMarketPrices: 0.8,
+                credits: 0.8,
+                officerQuality: 0.9,
+                shipQuality: 0.9,
+                prestige: 0.8,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.ANTIMATTER, 0.5]]),
                 forceWithdrawal: true,
             })
@@ -27,11 +27,11 @@ class IsolationismNews extends News {
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //some lingering price increases and deflation
         Object.assign(this.endEffects[0], {
-            populationModifiedBy: 1.2,
-            territoryModifiedBy: (1 + this.endEffects[0].territoryModifiedBy)/2,
-            officerQualityModifiedBy: (1 + this.endEffects[0].officerQualityModifiedBy)/2, //lose some knowledge
-            shipQualityModifiedBy: (1 + this.endEffects[0].shipQualityModifiedBy)/2, //lose some knowledge
-            prestigeModifiedBy: 1,
+            population: 1.2,
+            territory: (1 + this.endEffects[0].territory)/2,
+            officerQuality: (1 + this.endEffects[0].officerQuality)/2, //lose some knowledge
+            shipQuality: (1 + this.endEffects[0].shipQuality)/2, //lose some knowledge
+            prestige: 1,
         })
     }
 

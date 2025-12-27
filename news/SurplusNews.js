@@ -9,21 +9,21 @@ class SurplusNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                marketPricesModifiedBy: 0.8,
-                marketCargoAmountsModifiedBy: 1.5,
-                commerceModifiedBy: 1.2,
-                industryModifiedBy: 1.4,
-                creditsModifiedBy: 1.3,
-                shipyardNumShipsModifiedBy: 1.4,
+                marketPrices: 0.8,
+                marketCargoAmounts: 1.5,
+                commerce: 1.2,
+                industry: 1.4,
+                credits: 1.3,
+                shipyardNumShips: 1.4,
             })
         ]
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //goods remain high After
         Object.assign(this.endEffects[0], {
-            industryModifiedBy: (1 + this.endEffects[0].industryModifiedBy)/2,
-            commerceModiifiedBy: (1 + this.endEffects[0].commerceModifiedBy)/2,
-            marketCargoAmountsModifiedBy: (1 + this.endEffects[0].marketCargoAmountsModifiedBy)/2,
+            industry: (1 + this.endEffects[0].industry)/2,
+            commerceModiifiedBy: (1 + this.endEffects[0].commerce)/2,
+            marketCargoAmounts: (1 + this.endEffects[0].marketCargoAmounts)/2,
         })
     }
 

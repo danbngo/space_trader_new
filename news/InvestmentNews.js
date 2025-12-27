@@ -10,25 +10,28 @@ class InvestmentNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
-                creditsModifiedBy: 0.6,
-                marketCargoAmountsModifiedBy: 0.6,
+                credits: 0.8,
+                marketCargoAmounts: 0.6,
+                shipyardNumShips: 0.6,
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                creditsModifiedBy: 1.2,
+                credits: 1.2,
             })
-
         ]
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
 
         Object.assign(this.endEffects[0], {
-            creditsModifiedBy: (1 + this.startEffects[0].creditsModifiedBy)/2,
-            marketCargoAmountsModifiedBy: (1 + this.startEffects[0].marketCargoAmountsModifiedBy)/2,
-            prestigeModifiedBy: 1.2,
+            credits: (1 + this.startEffects[0].credits)/2,
+            marketCargoAmounts: (1 + this.startEffects[0].marketCargoAmounts)/2,
+            prestige: 1.2,
         })
         Object.assign(this.endEffects[1], {
-            industryModifiedBy: 1.5,
+            credits: 1,
+            industry: 1.5,
+            commerce: 1.1,
+            shipyardNumShips: 1.2,
         })
     }
 

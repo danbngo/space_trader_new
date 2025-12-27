@@ -8,10 +8,10 @@ class MilitaryBuildupNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                commerceModifiedBy: 0.7,
-                industryModifiedBy: 0.8,
-                marketCargoAmountsModifiedBy: 0.8,
-                creditsModifiedBy: 0.8,
+                commerce: 0.7,
+                industry: 0.8,
+                marketCargoAmounts: 0.8,
+                credits: 0.8,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, 1.5], [CARGO_TYPES.ANTIMATTER, 2]]),
             })
         ]
@@ -19,11 +19,11 @@ class MilitaryBuildupNews extends News {
         //military effect is permanent
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.endEffects[0], {
-                militaryModifiedBy: 1.4,
-                prestigeModifiedBy: 1.1,
-                officerQualityModifiedBy: 1.2,
-                guildNumOfficersModifiedBy: 1.2,
-                creditsModifiedBy: 1, //so is wasting money
+                military: 1.4,
+                prestige: 1.1,
+                officerQuality: 1.2,
+                guildNumOfficers: 1.2,
+                credits: 1, //so is wasting money
         })
     }
     isValid() {

@@ -9,10 +9,10 @@ class ColonizationNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                populationModifiedBy: 0.7,
-                guildNumOfficersModifiedBy: 1.4,
-                marketPricesModifiedBy: 1.2,
-                shipyardNumShipsModifiedBy: 1.4,
+                population: 0.7,
+                guildNumOfficers: 1.4,
+                marketPrices: 1.2,
+                shipyardNumShips: 1.4,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.METAL, 1.5], [CARGO_TYPES.ISOTOPES, 2]]),
             })
         ]
@@ -20,10 +20,10 @@ class ColonizationNews extends News {
         //system becomes more crowded over time...
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.endEffects[0], {
-            populationModifiedBy: 1, //pop doesnt auto recover
-            commerceModifiedBy: 1.1,
-            territoryModifiedBy: 1.2,
-            prestigeModifiedBy: 1.1,
+            population: 1, //pop doesnt auto recover
+            commerce: 1.1,
+            territory: 1.2,
+            prestige: 1.1,
         })
     }
 

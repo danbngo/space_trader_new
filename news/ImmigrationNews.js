@@ -9,18 +9,18 @@ class ImmigrationNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                populationModifiedBy: 1.4,
-                commerceModifiedBy: 1.1,
-                militaryModifiedBy: 0.9,
-                securityModifiedBy: 0.9,
-                crimeModifiedBy: 1.1,
+                population: 1.4,
+                commerce: 1.1,
+                military: 0.9,
+                security: 0.9,
+                crime: 1.1,
             })
         ]
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //only the population boost lingers
         Object.assign(this.endEffects[0], {
-            populationModifiedBy: 1,
+            population: 1,
         })
     }
 
