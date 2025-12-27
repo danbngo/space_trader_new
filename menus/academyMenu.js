@@ -1,4 +1,8 @@
-
+/**
+ * Displays the academy menu where the player can upgrade captain skills.
+ * @param {Academy} academy - The academy building to interact with.
+ * @param {SkillType} selectedSkill - The currently selected skill to highlight (member of SKILLS_ALL).
+ */
 function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0]) {
     const {planet} = academy
     const reloadMenu = (skill = selectedSkill) => showAcademyMenu(academy, skill)

@@ -1,5 +1,7 @@
-
-
+/**
+ * Displays the courthouse menu for paying bounties and serving jail time.
+ * @param {Courthouse} courthouse - The courthouse building to interact with.
+ */
 function showCourthouseMenu(courthouse = new Courthouse()) {
     const {planet} = courthouse
     const reloadMenu = ()=>showCourthouseMenu(courthouse)

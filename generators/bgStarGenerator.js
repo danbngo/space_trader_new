@@ -1,3 +1,9 @@
+/**
+ * Generates a field of background stars for visual effect.
+ * @param {number} radius - The radius of the area to populate with stars.
+ * @param {number} numStars - Number of background stars to generate.
+ * @returns {BackgroundStar[]} Array of generated background stars.
+ */
 function generateBackgroundStars(radius = 1, numStars = 1) {
     const backgroundStars = []
     for (let i = 0; i < numStars; i++) {

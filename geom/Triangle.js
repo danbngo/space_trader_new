@@ -1,4 +1,16 @@
+/**
+ * Represents a triangle geometric shape that can be rotated.
+ * @class
+ */
 class Triangle {
+    /**
+     * Creates a triangle.
+     * @param {number} x - The x-coordinate of the triangle's center.
+     * @param {number} y - The y-coordinate of the triangle's center.
+     * @param {number} base - The base width of the triangle.
+     * @param {number} height - The height of the triangle.
+     * @param {number} angle - Rotation angle in radians, 0 = pointing right.
+     */
     constructor(x = 0, y = 0, base = 1, height = 1, angle = 0) {
         this.x = x;
         this.y = y;
@@ -21,10 +33,21 @@ class Triangle {
         }
     }
 
+    /**
+     * Calculates the height of an equilateral triangle given its base.
+     * @param {number} base - The base of the triangle.
+     * @returns {number} The height of the equilateral triangle.
+     */
     static calcEquilateralTriangleHeight(base = 0) {
         return (Math.sqrt(3) / 2) * base;
     }
 
+    /**
+     * Checks if a point lies within the triangle using barycentric coordinates.
+     * @param {number} x - The x-coordinate of the point.
+     * @param {number} y - The y-coordinate of the point.
+     * @returns {boolean} True if the point is inside the triangle.
+     */
     containsPoint(x = 0, y = 0) {
         // Apply barycentric coordinates method
         const [A, B, C] = this.points;

@@ -222,19 +222,19 @@ class NewsEffect {
                 }
             }
             if (guildNumOfficers !== 1.0) {
-                settlement.guild.baseNumOfficers = rndRound(settlement.guild.baseNumOfficers * guildNumOfficers);
+                settlement.guild.baseNumOfficers = Math.max(1, rndRound(settlement.guild.baseNumOfficers * guildNumOfficers))
                 settlement.guild.normalize();
             }
             if (shipyardNumShips !== 1.0) {
-                settlement.shipyard.baseNumShips = rndRound(settlement.shipyard.baseNumShips * shipyardNumShips);
-                settlement.shipyard.baseNumModules = rndRound(settlement.shipyard.baseNumModules * shipyardNumShips);
+                settlement.shipyard.baseNumShips = Math.max(1, rndRound(settlement.shipyard.baseNumShips * shipyardNumShips));
+                settlement.shipyard.baseNumModules = Math.max(1, rndRound(settlement.shipyard.baseNumModules * shipyardNumShips));
                 settlement.shipyard.normalize();
             }
             if (marketPrices !== 1.0) settlement.market.inflation *= marketPrices;
             if (blackMarketPrices !== 1.0) settlement.blackMarket.inflation *= blackMarketPrices;
             for (const ct of CARGO_TYPES_ALL) {
-                if (marketCargoAmounts !== 1.0) settlement.market.baseCargo.setAmount(ct, rndRound(settlement.market.baseCargo.getAmount(ct) * marketCargoAmounts));
-                if (blackMarketCargoAmounts !== 1.0) settlement.blackMarket.baseCargo.setAmount(ct, rndRound(settlement.blackMarket.baseCargo.getAmount(ct) * blackMarketCargoAmounts));
+                if (marketCargoAmounts !== 1.0) settlement.market.baseCargo.setAmount(ct, Math.max(1, rndRound(settlement.market.baseCargo.getAmount(ct) * marketCargoAmounts)));
+                if (blackMarketCargoAmounts !== 1.0) settlement.blackMarket.baseCargo.setAmount(ct, Math.max(1, rndRound(settlement.blackMarket.baseCargo.getAmount(ct) * blackMarketCargoAmounts)));
             }
             if (marketCargoAmounts !== 1.0) settlement.market.normalize()
             if (blackMarketCargoAmounts !== 1.0) settlement.blackMarket.normalize()

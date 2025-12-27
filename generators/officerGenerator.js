@@ -1,3 +1,8 @@
+/**
+ * Generates a procedural name for an officer.
+ * @param {Planet} planet - The planet the officer is from.
+ * @returns {string} The generated officer name.
+ */
 function generateOfficerName(planet = new Planet()) {
     const syllables = ["ka", "zo", "ri", "tan", "vek", "shi", "lor", "an", "ex", "qu"];
     let name = "";
@@ -8,7 +13,11 @@ function generateOfficerName(planet = new Planet()) {
     name += ' of ' + planet.name
     return name.charAt(0).toUpperCase() + name.slice(1);
 }
-
+/**
+ * Generates an officer with skills based on planet quality.
+ * @param {Planet} planet - The planet the officer is from.
+ * @returns {Officer} The generated officer.
+ */
 function generateOfficer(planet = new Planet()) {
     const {culture} = planet
     const {officerQuality} = culture

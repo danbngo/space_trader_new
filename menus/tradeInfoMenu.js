@@ -1,3 +1,9 @@
+/**
+ * Creates a table showing buy prices for a cargo type across all planets.
+ * @param {CargoType} ct - The cargo type to show buy prices for.
+ * @param {(planet: Planet) => void} onSelectPlanet - Callback when a planet is selected.
+ * @returns {HTMLTableElement} The trade info table.
+ */
 function createTradeInfoBuyTable(ct = CARGO_TYPES_ALL[0], onSelectPlanet = (p = new Planet())=>{}) {
     const {illegal} = ct
     const {system, fleet} = gs
@@ -22,7 +28,12 @@ function createTradeInfoBuyTable(ct = CARGO_TYPES_ALL[0], onSelectPlanet = (p = 
     }
     return createTable(rows, (rowIndex = 0)=>onSelectPlanet(planets[rowIndex]))
 }
-
+/**
+ * Creates a table showing sell prices for a cargo type across all planets.
+ * @param {CargoType} ct - The cargo type to show sell prices for.
+ * @param {(planet: Planet) => void} onSelectPlanet - Callback when a planet is selected.
+ * @returns {HTMLTableElement} The trade info table.
+ */
 function createTradeInfoSellTable(ct = CARGO_TYPES_ALL[0], onSelectPlanet = (p = PLANETS[0])=>{}) {
     const {illegal} = ct
     const {system, fleet} = gs

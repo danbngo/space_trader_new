@@ -51,7 +51,11 @@ const META_NEWS_TYPE_CLASSES = new Map([
 
 const META_NEWS_TYPE_CLASSES_ARRAY = Object.freeze(Array.from(META_NEWS_TYPE_CLASSES.values()))
 
-
+/**
+ * Generates a random news event that affects planets.
+ * @param {number} attemptsRemaining - Maximum attempts to generate valid news.
+ * @returns {News|null} The generated news event or null if unable to generate.
+ */
 function generateNews(attemptsRemaining = 100) {
     const planets = PLANETS
     const planet = rndMember(planets)
@@ -65,7 +69,11 @@ function generateNews(attemptsRemaining = 100) {
     }
     return news
 }
-
+/**
+ * Generates system-wide meta news events.
+ * @param {Function[]} newsTypesAttempted - Array of news types already attempted.
+ * @returns {News|null} The generated meta news event or null.
+ */
 function generateMetaNews(newsTypesAttempted = []) {
     if (newsTypesAttempted.length >= META_NEWS_TYPE_CLASSES_ARRAY.length) return null
     const newsTypesNotAttempted = META_NEWS_TYPE_CLASSES_ARRAY.filter(cls=>(!newsTypesAttempted.includes(cls)))
@@ -77,7 +85,11 @@ function generateMetaNews(newsTypesAttempted = []) {
     return news
 }
 
-
+/**
+ * Generates historical news events for a time period.
+ * @param {number} startYear - The starting year for history generation.
+ * @param {number} endYear - The ending year for history generation.
+ */
 function addHistory(startYear = 3000, endYear = 3000) {
     for (let y = startYear; y < endYear; y += 1/365) {
         gs.year = y

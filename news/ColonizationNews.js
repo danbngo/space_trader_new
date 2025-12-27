@@ -12,7 +12,7 @@ class ColonizationNews extends News {
                 population: 0.8,
                 guildNumOfficers: 0.8,
                 marketPrices: 1.2,
-                shipyardNumShips: 0.8,
+                shipyardNumShips: 0.6,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.METAL, 1.5], [CARGO_TYPES.ISOTOPES, 2]]),
             })
         ]

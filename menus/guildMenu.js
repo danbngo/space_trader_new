@@ -1,6 +1,10 @@
-//TODO: start implementing officer skills
-//TODO: limit how many officers (and hence ships) player can have
-
+/**
+ * Creates an HTML table displaying available officers for hire.
+ * @param {Officer[]} officers - Array of officers available for hire.
+ * @param {Guild} guild - The guild building.
+ * @param {(officer: Officer) => void} onSelectOfficer - Callback when an officer is selected.
+ * @returns {HTMLTableElement|string} The table element or "(None)" if no officers.
+ */
 function createHireOfficerMenu(officers = [new Officer()], guild = new Guild(), onSelectOfficer = (officer = new Officer())=>{}) {
     console.log('creating hire officer menu:',officers)
     if (officers.length == 0) return `(None)`
@@ -21,7 +25,10 @@ function createHireOfficerMenu(officers = [new Officer()], guild = new Guild(), 
     console.log('creating hire officer table')
     return createTable(rows, (rowIndex = 0)=>onSelectOfficer(officers[rowIndex]))
 }
-
+/**
+ * Displays the guild menu for hiring officers.
+ * @param {Guild} guild - The guild building to interact with.
+ */
 function showGuildMenu(guild = new Guild()) {
     const {planet} = guild
     const {fleet, captain} = gs

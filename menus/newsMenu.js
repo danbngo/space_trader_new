@@ -1,4 +1,8 @@
-
+/**
+ * Displays a timeline of news events for a planet or the entire system.
+ * @param {Planet|null} planet - The planet to show news for, or null for all news.
+ * @param {Function|null} backFunction - Custom back button handler.
+ */
 function showNewsTimelineMenu(planet = null, backFunction = null) {
     // If no planet specified, show all news
         console.log('0a')

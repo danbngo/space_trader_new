@@ -1,3 +1,10 @@
+/**
+ * Creates an HTML table comparing player cargo and available loot.
+ * @param {CountsMap} playerCargo - The player's current cargo.
+ * @param {CountsMap} loot - The available loot cargo.
+ * @param {(cargoType: CargoType) => void} onSelectCargoType - Callback when cargo type is selected.
+ * @returns {HTMLTableElement} The cargo comparison table.
+ */
 function createLootCargoTable(playerCargo = new CountsMap(), loot = new CountsMap(), onSelectCargoType = (ct = CARGO_TYPES_ALL[0])=>{}) {
     const rows = [
         ['Cargo Type', 'Loot Amt.', 'Your Amt.']
@@ -11,7 +18,10 @@ function createLootCargoTable(playerCargo = new CountsMap(), loot = new CountsMa
     }
     return createTable(rows, (rowIndex = 0)=>onSelectCargoType(CARGO_TYPES_ALL[rowIndex]))
 }
-
+/**
+ * Displays the loot menu for taking or dumping cargo after combat.
+ * @param {CountsMap} loot - The available loot to collect.
+ */
 function showLootMenu(loot = new CountsMap()) {
     const {fleet} = gs;
     const reloadMenu = ()=>showLootMenu(loot)

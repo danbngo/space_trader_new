@@ -28,12 +28,12 @@ class ResearchAgreementNews extends News {
         Object.assign(this.endEffects[0], {
             shipQuality: 1.1,
             officerQuality: 1.2,
-            military: 1.1,
+            military: 1.2,
         })
         Object.assign(this.endEffects[1], {
             shipQuality: 1.1,
             officerQuality: 1.2,
-            military: 1.1,
+            military: 1.2,
         })
     }
 

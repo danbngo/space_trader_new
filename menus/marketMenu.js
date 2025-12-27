@@ -1,3 +1,13 @@
+/**
+ * Creates an HTML table displaying market cargo with buy/sell prices.
+ * @param {boolean} blackMarket - Whether this is a black market (shows only illegal goods).
+ * @param {CountsMap} playerCargo - The player's current cargo.
+ * @param {CountsMap} marketCargo - The market's available cargo.
+ * @param {CountsMap} buyPrices - The buy prices for each cargo type.
+ * @param {CountsMap} sellPrices - The sell prices for each cargo type.
+ * @param {(cargoType: CargoType) => void} onSelectCargoType - Callback when cargo type is selected.
+ * @returns {HTMLTableElement} The market cargo table.
+ */
 function createMarketCargoTable(blackMarket = false, playerCargo = new CountsMap(), marketCargo = new CountsMap(), buyPrices = new CountsMap(), sellPrices = new CountsMap(), onSelectCargoType = (ct = CARGO_TYPES_ALL[0])=>{}) {
     /** @type {any[]} */
     const rows = [
@@ -7,7 +17,7 @@ function createMarketCargoTable(blackMarket = false, playerCargo = new CountsMap
     for (const ct of cargoTypes) {
         rows.push([
             ct.name,
-            statColorSpan(marketCargo.getAmount(ct), marketCargo.getAmount(ct)/MARKET_MAX_CARGO_PER_TYPE),
+            statColorSpan(marketCargo.getAmount(ct), marketCargo.getAmount(ct)/MARKET_AVERAGE_CARGO_PER_TYPE),
             statColorSpan(buyPrices.getAmount(ct), ct.value/buyPrices.getAmount(ct)),
             playerCargo.getAmount(ct),
             statColorSpan(sellPrices.getAmount(ct), sellPrices.getAmount(ct)/ct.value),
@@ -16,7 +26,10 @@ function createMarketCargoTable(blackMarket = false, playerCargo = new CountsMap
     console.log('creating cargo table w rows:',rows)
     return createTable(rows, (rowIndex = 0)=>onSelectCargoType(cargoTypes[rowIndex]))
 }
-
+/**
+ * Displays the market menu for buying and selling cargo.
+ * @param {Market} market - The market building to interact with.
+ */
 function showMarketMenu(market = new Market()) {
     const {blackMarket, planet} = market
     const {fleet} = gs;

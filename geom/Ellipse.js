@@ -1,4 +1,16 @@
+/**
+ * Represents an ellipse geometric shape that can be rotated.
+ * @class
+ */
 class Ellipse {
+    /**
+     * Creates an ellipse.
+     * @param {number} x - The x-coordinate of the ellipse's center.
+     * @param {number} y - The y-coordinate of the ellipse's center.
+     * @param {number} radiusX - Half-width (local X axis).
+     * @param {number} radiusY - Half-height (local Y axis).
+     * @param {number} angle - Rotation angle in radians, 0 = aligned with +X.
+     */
     constructor(
         x = 0,
         y = 0,
@@ -13,6 +25,12 @@ class Ellipse {
         this.angle = angle;
     }
     
+    /**
+     * Checks if a point lies within the ellipse.
+     * @param {number} x - The x-coordinate of the point.
+     * @param {number} y - The y-coordinate of the point.
+     * @returns {boolean} True if the point is inside the ellipse.
+     */
     containsPoint(x = 0, y = 0) {
         // 1. Translate point into ellipse space
         const dx = x - this.x;

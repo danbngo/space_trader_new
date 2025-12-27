@@ -20,6 +20,17 @@
     return asteroidBelts
 }*/
 
+/**
+ * Generates a field of asteroids for an asteroid belt.
+ * @param {AsteroidBelt} asteroidBelt - The asteroid belt to populate.
+ * @param {number[]} averageColor - The average RGBA color for asteroids.
+ * @param {number} numAsteroids - Number of asteroids to generate.
+ * @param {number} maxRadius - Maximum radius for asteroids.
+ * @param {number} maxOrbitalRadiusDifference - Max variation in orbital radius.
+ * @param {number|null} startingProgress - Starting orbital progress or null for random.
+ * @param {number} maxProgressDifference - Max variation in orbital progress.
+ * @returns {Asteroid[]} Array of generated asteroids.
+ */
 function generateAsteroids(asteroidBelt = new AsteroidBelt(), averageColor = COLORS.Gray, numAsteroids = 1000, maxRadius = 3, maxOrbitalRadiusDifference = 0.2, startingProgress = null, maxProgressDifference = 1) {
     const asteroids = []
     const beltDistance = asteroidBelt.orbit.radius

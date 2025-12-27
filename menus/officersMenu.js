@@ -1,3 +1,9 @@
+/**
+ * Creates an HTML table displaying the player's officers.
+ * @param {Officer[]} officers - Array of officers to display.
+ * @param {(officer: Officer) => void} onSelectOfficer - Callback when officer is selected.
+ * @returns {HTMLTableElement|string} The officers table or "(None)" if no officers.
+ */
 function createOfficersTable(officers = [new Officer()], onSelectOfficer = (officer = new Officer())=>{}) {
     if (officers.length == 0) return `(None)`
     const rows = [
@@ -13,7 +19,10 @@ function createOfficersTable(officers = [new Officer()], onSelectOfficer = (offi
     }
     return createTable(rows, (rowIndex = 0)=>onSelectOfficer(officers[rowIndex]))
 }
-
+/**
+ * Displays the officers roster menu for managing hired officers.
+ * @param {Officer[]} officers - Array of officers to display.
+ */
 function showOfficersMenu(officers = gs.fleet.officers) {
     const reloadMenu = ()=>showOfficersMenu(officers)
 

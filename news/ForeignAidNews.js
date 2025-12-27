@@ -34,7 +34,7 @@ class ForeignAidNews extends News {
     isValid() {
         const {planet} = this
         //more likely to happen when economy is poor
-        const ratingsValid = planet.culture.commerce < 0.8 && planet.culture.industry < 0.8 && planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS < 0.8
+        const ratingsValid = planet.culture.commerce < 0.75 && planet.culture.industry < 0.75 && planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS < 0.75
         const interferingEvent =
             News.planetHasAnyNews(planet, [NEWS_TYPES.FOREIGN_AID, ...NEWS_TYPES_ECONOMY_BOOSTING]) || 
             News.planetHasAnyNews(planet, NEWS_TYPES_HOSTILE)

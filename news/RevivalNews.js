@@ -30,9 +30,8 @@ class RevivalNews extends News {
         //cant become even dumber if we're already low
         const ratingsValid = planet.culture.officerQuality > 0.75
         //planet must not already be in anarchy or puppet state
-        const agencyValid = planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY && planet.culture.governmentType != GOVERNMENT_TYPES.PUPPET_STATE
         const interferingEvent =
             News.planetHasAnyNews(planet, [NEWS_TYPES.REVIVAL])
-        return ratingsValid && agencyValid && !interferingEvent
+        return ratingsValid && !interferingEvent
     }
 }

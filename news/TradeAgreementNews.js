@@ -30,6 +30,15 @@ class TradeAgreementNews extends News {
         ]
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        //some lingering benefits after
+        Object.assign(this.endEffects[0], {
+            commerce: (1 + this.endEffects[0].commerce)/2,
+            credits: (1 + this.endEffects[0].credits)/2,
+        })
+        Object.assign(this.endEffects[1], {
+            commerce: (1 + this.endEffects[1].commerce)/2,
+            credits: (1 + this.endEffects[1].credits)/2,
+        })
     }
 
     isValid() {

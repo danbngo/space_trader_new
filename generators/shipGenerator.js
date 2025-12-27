@@ -1,3 +1,9 @@
+/**
+ * Generates a ship with stats based on planet quality and ship type.
+ * @param {Planet} planet - The planet determining ship quality.
+ * @param {ShipType} shipType - The type of ship to generate.
+ * @returns {Ship} The generated ship.
+ */
 function generateShip(planet = new Planet(), shipType = rndMember(SHIP_TYPES_ALL)) {
     const shipQuality = planet ? planet.culture.shipQuality : 1
 

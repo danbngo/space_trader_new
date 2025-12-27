@@ -1,3 +1,9 @@
+/**
+ * Generates environmental effects for an encounter map.
+ * @param {EncounterType} encounterType - The type of encounter.
+ * @param {EffectType[]} effectTypes - Array of effect types to generate from.
+ * @returns {Effect[]} Array of generated effects.
+ */
 function generateEffects(encounterType, effectTypes = EFFECT_TYPES_ALL) {
     const mapRadius = encounterType.mapRadius
     const effects = []

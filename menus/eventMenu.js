@@ -1,3 +1,7 @@
+/**
+ * Checks for random events (news, encounters, debt collections) during time passage.
+ * @param {number} elapsedYears - The amount of game time that has passed in years.
+ */
 function checkForEvents(elapsedYears = 1) {
     //console.log('checkForEvents', { elapsedYears });
     const elapsedDays = elapsedYears*365
@@ -9,7 +13,11 @@ function checkForEvents(elapsedYears = 1) {
         throw new Error('GameState credits is NaN!')
     }
 }
-
+/**
+ * Checks if a news event should occur and generates it.
+ * @param {number} elapsedDays - Days that have elapsed.
+ * @returns {boolean} Whether news was generated.
+ */
 function checkForNews(elapsedDays = 1) {
     //console.log('checkForNews', { elapsedDays });
     if (!calcOccurrencesPerTimespan(NEWS_CHANCE_PER_DAY, elapsedDays)) return false
@@ -22,7 +30,11 @@ function checkForNews(elapsedDays = 1) {
 function checkForExpiredNews() {
 
 }
-
+/**
+ * Checks if a space encounter should occur.
+ * @param {number} elapsedDays - Days that have elapsed.
+ * @returns {boolean} Whether an encounter was triggered.
+ */
 function checkForEncounter(elapsedDays = 1) {
     //console.log('checkForEncounter', { elapsedDays, location: gs.location, encounter: gs.encounter });
     //dont have encounters while docked or already in an encounter

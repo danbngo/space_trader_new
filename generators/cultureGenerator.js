@@ -1,3 +1,8 @@
+/**
+ * Generates a culture for a planet with randomized attributes.
+ * @param {Planet} planet - The planet to generate culture for.
+ * @returns {Culture} The generated culture.
+ */
 function generateCulture(planet = new Planet()) {
     const governmentType = rndMember(GOVERNMENT_TYPES_ALL.filter(gt => gt != GOVERNMENT_TYPES.PUPPET_STATE))
     const shipQuality = rng(4,1,false)/2

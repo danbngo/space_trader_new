@@ -1,3 +1,7 @@
+/**
+ * Initializes and starts a space encounter, positioning ships and setting up combat.
+ * @param {Encounter} encounter - The encounter to start.
+ */
 function startEncounter(encounter = gs.encounter) {
     console.log('startEncounter');
     gs.encounter = encounter
@@ -49,12 +53,14 @@ function startEncounter(encounter = gs.encounter) {
         }
     }
 
-    showModal(encounter.fleetName, encounter.encounterType.description, [['Ok', ()=>{
+    showModal(coloredName(encounter.fleet), encounter.encounterType.description, [['Ok', ()=>{
         showEncounterMap()
         if (encounter.encounterType.aiType == AI_TYPES.Asteroid) encounter.encounterType.onStart()
     }]])
 }
-
+/**
+ * Ends the current encounter and returns to the star map.
+ */
 function endEncounter() {
     console.log('endEncounter');
     gs.encounter = undefined
@@ -67,7 +73,10 @@ function endEncounter() {
         return
     }
 }
-
+/**
+ * Starts active combat in the current encounter.
+ * @param {boolean} playerHasInitiative - Whether the player acts first.
+ */
 function startCombat(playerHasInitiative = false) {
     console.log('startCombat', { playerHasInitiative });
     gs.encounter.combatEnabled = true;
@@ -75,7 +84,9 @@ function startCombat(playerHasInitiative = false) {
     closeModal()
     if (currentMap && currentMap.togglePause) currentMap.togglePause(false)
 }
-
+/**
+ * Ends combat in the current encounter.
+ */
 function endCombat() {
     console.log('endCombat');
     const {encounter} = gs
@@ -280,7 +291,7 @@ function showTradeOfferPlayerBuyModal() {
     }
     showModal(fleetName, msg, onBuy ? [
         ['Buy', ()=>onBuy()],
-        ['Decline', ()=>endEncounter()]
+        ['Decline', ()=>endEncounter()] 
     ] :
     [['Continue', ()=>endEncounter()]])
 }
@@ -288,14 +299,14 @@ function showTradeOfferPlayerBuyModal() {
 
 function showPlayerDefeatedEnemyModal(fameMultiplier = 0) {
     console.log('showPlayerDefeatedEnemyModal', { fameMultiplier });
-    const {enemyFleet, fleetName, disabledEnemyShips} = gs.encounter
+    const {enemyFleet, disabledEnemyShips} = gs.encounter
     const planet = gs.encounter.planet
     const fame = fameMultiplier > 0 ? 5 * fameMultiplier : 0
     const infamy = fameMultiplier < 0 ? 5 * Math.abs(fameMultiplier) : 0
     const abandonedCargoCapacity = disabledEnemyShips.reduce( (total, ship) => {
         return total + ship.cargoSpace
     }, 0)
-    let creditsAmt = Math.ceil(Math.random() * enemyFleet.credits * (abandonedCargoCapacity / enemyFleet.totalCargoSpace))
+    let creditsAmt = Math.ceil(Math.random() * enemyFleet.captain.credits * (abandonedCargoCapacity / enemyFleet.totalCargoSpace))
     const officersShare = gs.fleet.calcTotalCRShare(creditsAmt, true)
     const finalCredits = creditsAmt - officersShare
     gs.credits += finalCredits
@@ -311,7 +322,7 @@ function showPlayerDefeatedEnemyModal(fameMultiplier = 0) {
     // Award experience points based on enemy fleet strength
     const expGained = Math.round(AVERAGE_EXP_FROM_COMBAT * (enemyFleet.combatRating / 10))
 
-    let msg = `You defeated the ${fleetName}!<br/>`
+    let msg = `You defeated the ${coloredName(enemyFleet)}!<br/>`
     msg += gs.captain.grantExperience(expGained)
     if (infamy && planet) msg += gs.captain.grantInfamy(planet, infamy)
     if (fame && planet) msg += gs.captain.grantFame(planet, fame)
@@ -324,7 +335,7 @@ function showPlayerDefeatedEnemyModal(fameMultiplier = 0) {
     msg += conductRepairs()
 
     if (disabledEnemyShips.length > 0) {
-        msg += `The ${fleetName} left behind ${disabledEnemyShips.length} disabled ships!<br/>`
+        msg += `The ${coloredName(enemyFleet)} left behind ${disabledEnemyShips.length} disabled ships!<br/>`
         msg += `Your scanners reveal ${baseLootAmt} units of cargo amid the wreckage.<br/>`
         if (lootAmt > baseLootAmt) msg += `Your salvaging skills allow you to recover an additional ${lootAmt - baseLootAmt} units of cargo.<br/>`
         if (!isNaN(creditsAmt) && creditsAmt > 0) msg += `You also salvage ${finalCredits}CR from the wreckage${officersShare ? ` (-${officersShare}CR for officers)` : ''}.<br/>`
@@ -336,7 +347,7 @@ function showPlayerDefeatedEnemyModal(fameMultiplier = 0) {
 
 function showPlayerDefeatedHazardsModal() {
     console.log('showPlayerDefeatedHazardsModal');
-    const {enemyFleet, fleetName, disabledEnemyShips} = gs.encounter
+    const {enemyFleet, disabledEnemyShips} = gs.encounter
     // Only count ships disabled by the player flagship
     //const playerKilledShips = disabledEnemyShips.filter(ship => ship.disabledByShip === playerFlagship)
     const abandonedCargoCapacity = disabledEnemyShips.reduce( (total, ship) => {
@@ -355,7 +366,7 @@ function showPlayerDefeatedHazardsModal() {
     const expGained = AVERAGE_EXP_FROM_MINING * (1+disabledEnemyShips.length)
     
     let msg = ''
-    msg += `You survived the ${fleetName}!<br/>`
+    msg += `You survived the ${coloredName(enemyFleet)}!<br/>`
     msg += gs.captain.grantExperience(expGained)
 
     if (disabledPlayerShips.length > 0) {
@@ -366,7 +377,7 @@ function showPlayerDefeatedHazardsModal() {
     msg += conductRepairs()
 
     if (disabledEnemyShips.length > 0) {
-        msg += `You destroyed ${disabledEnemyShips.length} ${fleetName}!<br/>`
+        msg += `You destroyed ${disabledEnemyShips.length} ${coloredName(enemyFleet)}!<br/>`
         msg += `Your scanners reveal ${baseLootAmt} units of usable material amid the wreckage.<br/>`
         if (lootAmt > baseLootAmt) msg += `Your salvaging skills allow you to recover an additional ${lootAmt - baseLootAmt} units of usable material.<br/>`
     }
@@ -406,13 +417,13 @@ function showNeutralsBribePlayerModal(maxCredits = 1000, infamyModifier = 0) {
 
 function showPlayerDefeatedByNeutralsModal( infamyLossMultiplier = 1) {
     console.log('showPlayerDefeatedByNeutralsModal', { infamyLossMultiplier });
-    const {fleetName, disabledPlayerShips} = gs.encounter
+    const {enemyFleet, disabledPlayerShips} = gs.encounter
     const planet = gs.encounter.planet
     
     const infamyLoss = 5 * infamyLossMultiplier
 
     let msg = ''
-    msg += `The ${fleetName} seem shocked to have defeated you.<br/>`
+    msg += `The ${coloredName(enemyFleet)} seem shocked to have defeated you.<br/>`
     msg += `They quickly depart the scene in case there are other attackers nearby.<br/>`
 
     if (infamyLoss && planet) msg += gs.captain.grantInfamy(planet, -infamyLoss)
@@ -428,10 +439,10 @@ function showPlayerDefeatedByNeutralsModal( infamyLossMultiplier = 1) {
 
 function showPlayerDefeatedByHazardsModal() {
     console.log('showPlayerDefeatedByHazardsModal');
-    const {fleetName, disabledPlayerShips} = gs.encounter
+    const {enemyFleet, disabledPlayerShips} = gs.encounter
     
     let msg = ''
-    msg += `Your ships were scattered by the ${fleetName}.<br/>`
+    msg += `Your ships were scattered by the ${coloredName(enemyFleet)}.<br/>`
 
     if (disabledPlayerShips.length > 0) {
         msg += `${disabledPlayerShips.length} of your ships were disabled in the fighting.<br/>`
@@ -445,15 +456,15 @@ function showPlayerDefeatedByHazardsModal() {
 
 function showPlayerDefeatedByPiratesModal() {
     console.log('showPlayerDefeatedByPiratesModal');
-    const {fleetName, fleet, disabledPlayerShips} = gs.encounter
-    let msg = `Unfortunately, you were no match for the ${fleetName}.<br/>`
+    const {enemyFleet, fleet, disabledPlayerShips} = gs.encounter
+    let msg = `Unfortunately, you were no match for the ${coloredName(enemyFleet)}.<br/>`
 
     if (disabledPlayerShips.length > 0) {
         msg += `${disabledPlayerShips.length} of your ships were disabled in the fighting.<br/>`
         msg += loseCargoFromDisabledShips(disabledPlayerShips)
     }
 
-    msg += `Now that the fighting is over, the ${fleetName} eagerly board your ships.<br/>`
+    msg += `Now that the fighting is over, the ${coloredName(enemyFleet)} eagerly board your ships.<br/>`
     const lootableCargoAmount = gs.fleet.cargo.total
     if (lootableCargoAmount <= 0) {
         msg += 'They are disgusted to find nothing worth looting!<br/>'
@@ -480,7 +491,7 @@ function showPlayerDefeatedByPiratesModal() {
         const stolenCreditsAmount = rng(gs.credits*0.5, gs.credits*0.1)
         msg += `They help themselves to ${stolenCreditsAmount} of your credits.<br/>`
     }
-    msg += `The ${fleetName} sadronically thank you for your time and depart.<br/>`
+    msg += `The ${coloredName(enemyFleet)} sadronically thank you for your time and depart.<br/>`
 
     msg += conductRepairs()
 
@@ -489,24 +500,24 @@ function showPlayerDefeatedByPiratesModal() {
 
 function showPlayerDefeatedByPoliceModal() {
     console.log('showPlayerDefeatedByPoliceModal');
-    const {fleetName} = gs.encounter
+    const {enemyFleet} = gs.encounter
     let fine = 5000
-    let msg = `The ${fleetName} are taking you in! You are fined ${fine} for resisting arrest!<br/>`
+    let msg = `The ${coloredName(enemyFleet)} are taking you in! You are fined ${fine} for resisting arrest!<br/>`
     msg += `Your ships are roughly searched for illegal goods.<br/>`
     const [smugglingFine, seized] = seizePlayerContraband()
     msg += smugglingFine > 0 ? `They confiscate ${seized.total} units of contraband, and add a fine of ${smugglingFine} to your existing bounty.<br/>`
     : `They find no contraband aboard your ships, but that hardly excuses your other crimes.<br/>`
-    showModal(fleetName, msg, [['Continue', ()=> showFineOrJailModal(fine+smugglingFine)]])
+    showModal(coloredName(enemyFleet), msg, [['Continue', ()=> showFineOrJailModal(fine+smugglingFine)]])
 }
 
 function showPlayerEscapedFromEnemyModal() {
     console.log('showPlayerEscapedFromEnemyModal');
-    const {fleetName, disabledPlayerShips, escapedPlayerShips, enemyFleet, playerShips} = gs.encounter
+    const {enemyFleet, disabledPlayerShips, escapedPlayerShips, playerShips} = gs.encounter
     
     // Award experience points for successfully escaping
     const expGained = Math.round(AVERAGE_EXP_FROM_ESCAPING * (enemyFleet.combatRating / 10))
     
-    let msg = `You escaped from the ${fleetName}!<br/>`
+    let msg = `You escaped from the ${coloredName(enemyFleet)}!<br/>`
     msg += gs.captain.grantExperience(expGained)
     if (escapedPlayerShips.length > 0) msg += `${escapedPlayerShips.length == playerShips.length ? 'All' : escapedPlayerShips.length} of your ships exited the battlefield intact.<br/>`
     if (disabledPlayerShips.length > 0) {
@@ -521,12 +532,12 @@ function showPlayerEscapedFromEnemyModal() {
 
 function showPlayerEscapedFromHazardsModal() {
     console.log('showPlayerEscapedFromHazardsModal');
-    const {fleetName, disabledPlayerShips, escapedPlayerShips, playerShips} = gs.encounter
+    const {enemyFleet, disabledPlayerShips, escapedPlayerShips, playerShips} = gs.encounter
     
     // Award experience points for escaping hazards
     const expGained = Math.round(AVERAGE_EXP_FROM_ESCAPING * (escapedPlayerShips.length / (escapedPlayerShips.length + disabledPlayerShips.length)))
     
-    let msg = `You escaped from the ${fleetName}!<br/>`
+    let msg = `You escaped from the ${coloredName(enemyFleet)}!<br/>`
     msg += gs.captain.grantExperience(expGained)
     if (escapedPlayerShips.length > 0) msg += `${escapedPlayerShips.length == playerShips.length ? 'All' : escapedPlayerShips.length} of your ships made it out intact.<br/>`
     if (disabledPlayerShips.length > 0) {
@@ -601,16 +612,16 @@ function damageRandomly(ships = [], dmg = 0) {
 function showPlayerPoliceInspectionModal() {
     console.log('showPlayerPoliceInspectionModal');
     let msg = ''
-    const {fleetName} = gs.encounter
+    const {enemyFleet} = gs.encounter
     const [fine, seized] = seizePlayerContraband()
     if (fine == 0) {
-        msg += `The ${fleetName} inspect your cargo and find nothing illegal. They thank you for your cooperation and wish you a safe journey.<br/>`
-        showModal(fleetName, msg, [['Continue', ()=>endEncounter()]])
+        msg += `The ${coloredName(enemyFleet)} inspect your cargo and find nothing illegal. They thank you for your cooperation and wish you a safe journey.<br/>`
+        showModal(coloredName(enemyFleet), msg, [['Continue', ()=>endEncounter()]])
     }
     else {
-        msg += `The ${fleetName} inspect your cargo and discover ${seized.total} units of contraband!<br/>`
+        msg += `The ${coloredName(enemyFleet)} inspect your cargo and discover ${seized.total} units of contraband!<br/>`
         msg += `All of your contraband is confiscated.<br/>`
-        showModal(fleetName, msg, [['Continue', ()=> showFineOrJailModal(fine)]])
+        showModal(coloredName(enemyFleet), msg, [['Continue', ()=> showFineOrJailModal(fine)]])
     }
 }
 

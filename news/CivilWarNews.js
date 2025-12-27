@@ -17,7 +17,7 @@ class CivilWarNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                newGovernmentType: GOVERNMENT_TYPES.ANARCHY,
+                //newGovernmentType: GOVERNMENT_TYPES.ANARCHY, //there IS a government still
                 territory: 0.8,
                 military: 0.4,
                 security: 0.7,
@@ -37,7 +37,7 @@ class CivilWarNews extends News {
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //end up with a new form of government
-        this.endEffects[0].newGovernmentType = Math.random() > .5 ? this.planet.culture.governmentType : rndMember(GOVERNMENT_TYPES_ALL.filter(g => g !== GOVERNMENT_TYPES.ANARCHY && g !== GOVERNMENT_TYPES.PUPPET_STATE)),
+        this.endEffects[0].newGovernmentType = Math.random() > .5 ? this.planet.culture.governmentType : rndMember(GOVERNMENT_TYPES_ALL.filter(g => g !== GOVERNMENT_TYPES.PUPPET_STATE)),
 
         //some lingering ill effects on population, prestige, territory, military
         Object.assign(this.endEffects[0], {

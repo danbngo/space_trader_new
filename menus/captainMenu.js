@@ -1,4 +1,8 @@
-
+/**
+ * Displays the captain's skill menu for upgrading skills with skill points.
+ * @param {Officer} captain - The captain whose skills to display.
+ * @param {SkillType|null} selectedSkill - The currently selected skill to highlight.
+ */
 function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
     console.log('showCaptainSkillsMenu called with captain:',captain,'selectedSkill:',selectedSkill)
     const {name, level, expPoints, expToNextLevel, skills, skillPoints, credits} = captain

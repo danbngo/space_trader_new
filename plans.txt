@@ -2,12 +2,19 @@ DONE:
 -button on starmap to return to the fleet/select/center on it (maybe dont need cuz other changes)
 -asteroids changing shape each turn, probably has to do with them being ellipses
 -warhead dmg seems weak, test it out some (fixed because we can target right onto units now)
+-need population raising event. religious revival? refugees?
 
 DONE BY AI, NEEDS TO BE CHECKED:
 -adjust damage when moving into ships - ship with more mass should take less dmg
 
 NEXT UP:
--need population raising event. religious revival? refugees?
+-more desperation events:
+ conscription for military
+ forced labor for industry
+ enslavement for population+economy ??
+ raiding for cargo
+ pop control for overpopulation
+ genocide for security (gulp)
 
 -market credits and rakes are other big factors that events could modify. global rake = corruption?
 -folderize encounters, remove the luck concept, make it so modal cant be closed after opening

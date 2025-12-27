@@ -1,4 +1,14 @@
-/** @enum {string} */
+/** @typedef {'Victory'|'Defeat'|'Surrendered'|'Escaped'} EncounterResultType */
+/** @typedef {'Attack'|'Escape'|'Asteroid'} CombatStrategyType */
+/** @typedef {'FilledCircle'|'EmptyCircle'|'FilledTriangle'|'EmptyTriangle'|'Text'|'Line'|'FilledOval'|'EmptyOval'|'FilledRectangle'} ShapeType */
+/** @typedef {'Pilot'|'Stealth'|'Barter'|'Engineer'|'Salvage'} SkillType */
+/** @typedef {'Earthlike'|'Terrestrial'|'Gas Giant'|'Gas Dwarf'|'Ice Giant'|'Ice Dwarf'} PlanetTypeValue */
+/** @typedef {'Move'|'Laser'|'Ram'|'Recharge'|'Wait'|'Blink'|'Booster'|'Cloak'|'Warhead'|'EMPPulse'|'Magnetize'|'SmokeBomb'} MoveType */
+/** @typedef {'FaceOff'|'Storm'} FormationType */
+/** @typedef {'Ship'|'Asteroid'} AIType */
+/** @typedef {'Rocky'|'Icy'|'Plasma'} AsteroidBeltType */
+
+/** @enum {EncounterResultType} */
 const ENCOUNTER_RESULTS = Object.freeze({
     Victory: 'Victory',
     Defeat: 'Defeat',
@@ -6,14 +16,14 @@ const ENCOUNTER_RESULTS = Object.freeze({
     Escaped: 'Escaped'
 })
 
-/** @enum {string} */
+/** @enum {CombatStrategyType} */
 const COMBAT_STRATEGIES = Object.freeze({
     Attack: 'Attack',
     Escape: 'Escape',
     Asteroid: 'Asteroid'
 })
 
-/** @enum {string} */
+/** @enum {ShapeType} */
 const SHAPES = Object.freeze({
     FilledCircle: 'FilledCircle',
     EmptyCircle: 'EmptyCircle',
@@ -26,7 +36,7 @@ const SHAPES = Object.freeze({
     FilledRectangle: 'FilledRectangle',
 })
 
-/** @enum {string} */
+/** @enum {SkillType} */
 const SKILLS = Object.freeze({
     Pilot: 'Pilot', //avoid hazards, fleet (not ships) goes faster
     Stealth: 'Stealth', //avoid fleet encounters, sneak attacks
@@ -40,7 +50,7 @@ const SKILLS = Object.freeze({
 
 const SKILLS_ALL = Object.values(SKILLS)
 
-/** @enum {string} */
+/** @enum {PlanetTypeValue} */
 const PLANET_TYPES = Object.freeze({
   EARTHLIKE: "Earthlike",
   TERRESTRIAL: "Terrestrial",
@@ -80,7 +90,7 @@ const COLORS = Object.freeze({
     TargetingConfirm: [0,255,0,1], // rgba(0,255,0,0.7)
 })
 
-/** @enum {string} */
+/** @enum {MoveType} */
 const MOVE_TYPES = Object.freeze({
     Move: 'Move',
     Laser: 'Laser',
@@ -97,7 +107,7 @@ const MOVE_TYPES = Object.freeze({
 })
 const MOVE_TYPES_ALL = Object.values(MOVE_TYPES)
 
-/** @enum {string} */
+/** @enum {FormationType} */
 const FORMATION_TYPES = Object.freeze({
     //Ambush: 'Ambush',
     FaceOff: 'FaceOff', //ships all facing each other initially
@@ -105,13 +115,13 @@ const FORMATION_TYPES = Object.freeze({
 })
 const FORMATION_TYPES_ALL = Object.values(FORMATION_TYPES)
 
-/** @enum {string} */
+/** @enum {AIType} */
 const AI_TYPES = Object.freeze({
     Ship: 'Ship',
     Asteroid: 'Asteroid', //mostly move in same direction unless able to ram
 })
 
-/** @enum {string} */
+/** @enum {AsteroidBeltType} */
 const ASTEROID_BELT_TYPES = Object.freeze({
     Rocky: 'Rocky',
     Icy: 'Icy',

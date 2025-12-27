@@ -19,11 +19,12 @@ class MilitaryBuildupNews extends News {
         //military effect is permanent
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.endEffects[0], {
-                military: 1.4,
+                military: 1.8,
                 prestige: 1.1,
                 officerQuality: 1.2,
                 guildNumOfficers: 1.2,
                 credits: 1, //so is wasting money
+                commerce: 1,
         })
     }
     isValid() {

@@ -24,6 +24,7 @@ class SurplusNews extends News {
             industry: (1 + this.endEffects[0].industry)/2,
             commerceModiifiedBy: (1 + this.endEffects[0].commerce)/2,
             marketCargoAmounts: (1 + this.endEffects[0].marketCargoAmounts)/2,
+            credits: (1 + this.endEffects[0].credits)/2,
         })
     }
 

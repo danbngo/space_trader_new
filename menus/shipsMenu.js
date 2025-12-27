@@ -1,3 +1,9 @@
+/**
+ * Creates an HTML table displaying the player's ships.
+ * @param {Ship[]} ships - Array of ships to display.
+ * @param {(ship: Ship) => void} onSelectShip - Callback when a ship is selected.
+ * @returns {HTMLTableElement|string} The ships table or "(None)" if no ships.
+ */
 function createShipsListMenu(ships = [new Ship()], onSelectShip = (s = new Ship())=>{}) {
     if (ships.length == 0) return `(None)`
     const rows = [
@@ -16,7 +22,10 @@ function createShipsListMenu(ships = [new Ship()], onSelectShip = (s = new Ship(
     return createTable(rows, (rowIndex = 0)=>onSelectShip(ships[rowIndex]))
 }
 
-
+/**
+ * Displays the ships manifest menu for managing the player's fleet.
+ * @param {Ship[]} ships - Array of ships to display and manage.
+ */
 function showShipsMenu(ships = [...gs.fleet.ships]) {
     const reloadMenu = ()=>showShipsMenu(ships)
 

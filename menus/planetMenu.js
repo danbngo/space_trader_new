@@ -1,3 +1,7 @@
+/**
+ * Displays the main planet menu with access to all buildings.
+ * @param {Planet} planet - The planet to interact with.
+ */
 function showPlanetMenu(planet = new Planet()) {
     const isDocked = gs.location == planet
     const {settlement} = planet
@@ -42,7 +46,10 @@ function showPlanetMenu(planet = new Planet()) {
 
     showModal(coloredName(planet), msg, options);
 }
-
+/**
+ * Displays detailed information about a planet's culture and statistics.
+ * @param {Planet} planet - The planet to display information for.
+ */
 function showPlanetOverviewMenu(planet = new Planet()) {
     const {culture} = planet
     const {territory, population, military, security, commerce, industry, crime} = culture

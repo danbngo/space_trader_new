@@ -1,5 +1,16 @@
-
+/**
+ * Represents a path from one point to another with various calculated properties.
+ * @class
+ */
 class Path {
+    /**
+     * Creates a path between two points.
+     * @param {number} startX - Starting x-coordinate.
+     * @param {number} startY - Starting y-coordinate.
+     * @param {number} toX - Ending x-coordinate.
+     * @param {number} toY - Ending y-coordinate.
+     * @param {boolean} normalize - Whether to apply smooth curve to progress.
+     */
     constructor(startX = 0, startY = 0, toX = 0, toY = 0, normalize = true) {
         this.startX = startX
         this.startY = startY
@@ -19,6 +30,11 @@ class Path {
         this.normalize = normalize
     }
 
+    /**
+     * Calculates a position along the path at a given progress ratio.
+     * @param {number} progressRatio - Progress along path (0-1).
+     * @returns {[number, number]} The [x, y] coordinates at that progress.
+     */
     positionAtProgress(progressRatio = 0.0) {
         if (progressRatio <= 0) return [this.startX, this.startY]
         if (progressRatio >= 1) return [this.toX, this.toY]

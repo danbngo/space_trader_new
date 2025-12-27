@@ -22,6 +22,7 @@ class CrackdownNews extends News {
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //some lingering crime decrease
         Object.assign(this.endEffects[0], {
+            security: (1 + this.endEffects[0].security)/2,
             crime: (1 + this.endEffects[0].crime)/2,
             blackMarketPrices: 1/(1.5+1),
             blackMarketCargoAmounts: (1 + this.endEffects[0].blackMarketCargoAmounts)/2,

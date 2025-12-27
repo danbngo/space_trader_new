@@ -1,3 +1,9 @@
+/**
+ * Creates an HTML table displaying active bank loans.
+ * @param {BankLoan[]} loans - Array of loan objects to display.
+ * @param {(loan: BankLoan) => void} onSelectLoan - Callback when a loan is selected.
+ * @returns {HTMLTableElement|string} The table element or "(None)" if no loans.
+ */
 function createBankLoansTable(loans = [new BankLoan()], onSelectLoan = (loan = new BankLoan())=>{}) {
     if (loans.length == 0) return `(None)`
     /** @type {Array<Array<string|number|HTMLElement>>} */
@@ -17,7 +23,10 @@ function createBankLoansTable(loans = [new BankLoan()], onSelectLoan = (loan = n
     return createTable(rows, (rowIndex = 0)=>onSelectLoan(loans[rowIndex]))
 }
 
-
+/**
+ * Displays the bank menu for depositing, withdrawing, and managing loans.
+ * @param {Bank} bank - The bank building to interact with.
+ */
 function showBankMenu(bank = new Bank()) {
     const {planet} = bank
     const reloadMenu = ()=>showBankMenu(bank)

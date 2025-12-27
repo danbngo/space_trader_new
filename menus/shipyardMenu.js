@@ -1,3 +1,10 @@
+/**
+ * Creates an HTML table displaying ships available for purchase.
+ * @param {Ship[]} ships - Array of ships for sale.
+ * @param {Shipyard} shipyard - The shipyard building.
+ * @param {(ship: Ship) => void} onSelectShip - Callback when a ship is selected.
+ * @returns {HTMLTableElement|string} The ships table or "(None)" if no ships.
+ */
 function createBuyShipMenu(ships = [new Ship()], shipyard = new Shipyard(), onSelectShip = (ship = new Ship())=>{}) {
     if (ships.length == 0) return `(None)`
     /** @type {any[]} */
@@ -18,7 +25,13 @@ function createBuyShipMenu(ships = [new Ship()], shipyard = new Shipyard(), onSe
     }
     return createTable(rows, (rowIndex = 0)=>onSelectShip(ships[rowIndex]))
 }
-
+/**
+ * Creates an HTML table displaying ship modules available for purchase.
+ * @param {ShipModule[]} modules - Array of modules for sale.
+ * @param {Shipyard} shipyard - The shipyard building.
+ * @param {(module: ShipModule) => void} onSelectModule - Callback when a module is selected.
+ * @returns {HTMLTableElement|string} The modules table or "(None)" if no modules.
+ */
 function createBuyModuleMenu(modules = [new ShipModule()], shipyard = new Shipyard(), onSelectModule = (module = new ShipModule())=>{}) {
     if (modules.length == 0) return `(None)`
     /** @type {any[]} */
@@ -36,7 +49,13 @@ function createBuyModuleMenu(modules = [new ShipModule()], shipyard = new Shipya
     }
     return createTable(rows, (rowIndex = 0)=>onSelectModule(modules[rowIndex]))
 }
-
+/**
+ * Creates an HTML table displaying player ships available for sale.
+ * @param {Ship[]} ships - Array of player ships.
+ * @param {Shipyard} shipyard - The shipyard building.
+ * @param {(ship: Ship) => void} onSelectShip - Callback when a ship is selected.
+ * @returns {HTMLTableElement|string} The ships table or "(None)" if no ships.
+ */
 function createSellShipMenu(ships = [new Ship()], shipyard = new Shipyard(), onSelectShip = (ship = new Ship())=>{}) {
     if (ships.length == 0) return `(None)`
     /** @type {any[]} */

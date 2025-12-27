@@ -1,3 +1,6 @@
+/**
+ * Displays the game's title screen with main menu options.
+ */
 function showTitleScreen() {
     showBackgroundMap()
     showModal(
@@ -10,7 +13,9 @@ function showTitleScreen() {
         ]
     );
 }
-
+/**
+ * Initializes and starts a new game with default settings.
+ */
 function startNewGame() {
     gs = new GameState()
     gs.year = GAME_START_YEAR
@@ -71,7 +76,9 @@ function startNewGame() {
 function createCharacter() {
     showCaptainCreationMenu(gs.captain, ()=>showStarMap(gs.fleet))
 }
-
+/**
+ * Continues a previously saved game.
+ */
 function continueGame() {
     //gs.load()
     console.log("Game continued:", gs);

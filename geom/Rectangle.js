@@ -1,4 +1,16 @@
+/**
+ * Represents a rectangle geometric shape that can be rotated.
+ * @class
+ */
 class Rectangle {
+    /**
+     * Creates a rectangle.
+     * @param {number} x - The x-coordinate of the rectangle's center.
+     * @param {number} y - The y-coordinate of the rectangle's center.
+     * @param {number} width - The width of the rectangle.
+     * @param {number} height - The height of the rectangle.
+     * @param {number} angle - Rotation angle in radians, 0 = aligned with +X axis.
+     */
     constructor(x = 0, y = 0, width = 1, height = 1, angle = 0) {
         this.x = x;
         this.y = y;
@@ -24,6 +36,12 @@ class Rectangle {
         }
     }
 
+    /**
+     * Checks if a point lies within the rectangle.
+     * @param {number} x - The x-coordinate of the point.
+     * @param {number} y - The y-coordinate of the point.
+     * @returns {boolean} True if the point is inside the rectangle.
+     */
     containsPoint(x = 0, y = 0) {
         // Translate point into rectangle space
         const dx = x - this.x;
@@ -43,6 +61,15 @@ class Rectangle {
         return Math.abs(localX) <= halfWidth && Math.abs(localY) <= halfHeight;
     }
 
+    /**
+     * Creates a rectangle from a path between two points.
+     * @param {number} x1 - Starting x-coordinate.
+     * @param {number} y1 - Starting y-coordinate.
+     * @param {number} x2 - Ending x-coordinate.
+     * @param {number} y2 - Ending y-coordinate.
+     * @param {number} width - Width of the rectangle.
+     * @returns {Rectangle} A rectangle aligned with the path.
+     */
     static fromPath(x1 = 0, y1 = 0, x2 = 0, y2 = 0, width = 1) {
         const centerX = (x1 + x2) / 2;
         const centerY = (y1 + y2) / 2;

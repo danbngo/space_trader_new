@@ -17,8 +17,8 @@ class DepressionNews extends News {
                 crime: 1.3,
                 guildNumOfficers: 1.2,
                 prestige: 0.8,
-                blackMarketCargoAmounts: 0.7,
-                blackMarketPrices: 0.7,
+                //blackMarketCargoAmounts: 0.7, -recession-proof industry
+                //blackMarketPrices: 0.7,
             })
         ]
 
@@ -30,8 +30,8 @@ class DepressionNews extends News {
             marketCargoAmounts: (1 + this.endEffects[0].marketCargoAmounts)/2,
             marketPrices: (1 + this.endEffects[0].marketPrices)/2,
             commerce: (1 + this.endEffects[0].commerce)/2,
-            blackMarketPrices: (1 + this.endEffects[0].blackMarketPrices)/2,
-            blackMarketCargoAmounts: (1 + this.endEffects[0].blackMarketCargoAmounts)/2,
+            //blackMarketPrices: (1 + this.endEffects[0].blackMarketPrices)/2,
+            //blackMarketCargoAmounts: (1 + this.endEffects[0].blackMarketCargoAmounts)/2,
         })
     }
 

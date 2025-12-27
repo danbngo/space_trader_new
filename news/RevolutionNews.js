@@ -3,7 +3,8 @@ class RevolutionNews extends News {
         const newGovType = rndMember(GOVERNMENT_TYPES_ALL.filter(g => g !== planet.culture.governmentType && g !== GOVERNMENT_TYPES.PUPPET_STATE));
         
         super(
-            `${coloredName(planet)}'s people have deposed the government and begin a glorious revolution!`,
+            planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY ? `${coloredName(planet)}'s people have deposed the government and begin a glorious revolution!` :
+            `${coloredName(planet)}'s people clamor for a government to take the reigns and end the anarchy they live in!`,
             `${coloredName(planet)} stabilizes under new government: ${coloredName(newGovType)}!`,
             NEWS_TYPES.REVOLUTION, planet
         )
@@ -13,7 +14,7 @@ class RevolutionNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                newGovernmentType: GOVERNMENT_TYPES.ANARCHY,
+                newGovernmentType: GOVERNMENT_TYPES.ANARCHY ? null : GOVERNMENT_TYPES.ANARCHY,
                 military: 0.6,
                 security: 0.7,
                 crime: 1.4,
@@ -44,8 +45,8 @@ class RevolutionNews extends News {
         const {planet} = this
         //high security prevents this
         const ratingsValid = planet.culture.security < 1.5
-        //planet must not already be in anarchy or puppet state
-        const agencyValid = planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY && planet.culture.governmentType != GOVERNMENT_TYPES.PUPPET_STATE
+        //planet must not be puppet state (anarcy is fine otherwise how do we get back out of it)
+        const agencyValid = planet.culture.governmentType != GOVERNMENT_TYPES.PUPPET_STATE
         const interferingEvent =
             News.planetHasAnyNews(planet, [NEWS_TYPES.REVOLUTION, NEWS_TYPES.WAR]) || News.hasNewsTargeting(NEWS_TYPES.WAR, planet) ||
             News.planetHasAnyNews(planet, NEWS_TYPES_CRIME_PREVENTING)

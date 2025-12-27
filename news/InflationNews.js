@@ -22,7 +22,7 @@ class InflationNews extends News {
         Object.assign(this.endEffects[0], {
             commerce: (1 + this.endEffects[0].commerce)/2,
             marketCargoAmounts: (1 + this.endEffects[0].marketCargoAmounts)/2,
-            credit: (1/(1+1.5))
+            credit: (1/(0.5+1.5))
         })
     }
 

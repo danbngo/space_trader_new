@@ -23,15 +23,22 @@ function assessPlanets() {
 
     //list how many times specific news events occurred
     const totalNews = gs.system.news.length
-    console.log('Total News Events:', totalNews)
+    const activeNews = gs.system.news.filter(n=>(n.started && !n.ended)).length
     const newsTotalsPerType = {}
     const newsTotalPercentsPerType = {}
+    const activeNewsTotalsPerType = {}
+    const activeNewsTotalPercentsPerType = {}
     for (const n of gs.system.news) {
         const count = newsTotalsPerType[n.newsType.name] || 0
         newsTotalsPerType[n.newsType.name] = count + 1
+        if (n.started && !n.ended) {
+            const activeCount = activeNewsTotalsPerType[n.newsType.name] || 0
+            activeNewsTotalsPerType[n.newsType.name] = activeCount + 1
+        }
     }
     for (const nt of NEWS_TYPES_ALL) {
         if (!newsTotalsPerType[nt.name]) newsTotalsPerType[nt.name] = 0
+        if (!activeNewsTotalsPerType[nt.name]) activeNewsTotalsPerType[nt.name] = 0
     }
     for (const nt of META_NEWS_TYPES_ALL) {
         if (!newsTotalsPerType[nt.name]) newsTotalsPerType[nt.name] = 0
@@ -40,9 +47,18 @@ function assessPlanets() {
         const percent = (count / totalNews) * 100
         newsTotalPercentsPerType[newsTypeName] = percent.toFixed(2) + '%'
     }
+    for (const [newsTypeName, count] of Object.entries(activeNewsTotalsPerType)) {
+        const percent = (count / activeNews) * 100
+        activeNewsTotalPercentsPerType[newsTypeName] = percent.toFixed(2) + '%'
+    }
     console.log('-----News Totals Per Type:------', newsTotalsPerType)
+    console.log('Total News Events Ever:', totalNews)
     console.log('Total News Types as % of total:')
     console.log(newsTotalPercentsPerType)
+    console.log('Active News Events:', activeNews)
+    console.log('Active News Totals Per Type:------', activeNewsTotalsPerType)
+    console.log('Active News Types as % of active total:')
+    console.log(activeNewsTotalPercentsPerType)
 
     console.log('-----Average Planet Stats:------')
 
