@@ -13,7 +13,7 @@ class CrackdownNews extends News {
                 crime: 0.7,
                 military: 1.1,
                 blackMarketCargoAmounts: 0.6,
-                blackMarketPrices: 1.3,
+                blackMarketPrices: 1.5,
                 prestige: 0.8, //other planets look unfavorably on this
                 cargoPriceModifiers: new Map([[CARGO_TYPES.DRUGS, 2]]),
             })
@@ -23,7 +23,7 @@ class CrackdownNews extends News {
         //some lingering crime decrease
         Object.assign(this.endEffects[0], {
             crime: (1 + this.endEffects[0].crime)/2,
-            blackMarketPrices: (1 + this.endEffects[0].blackMarketPrices)/2,
+            //blackMarketPrices: (1 + this.endEffects[0].blackMarketPrices)/2,
             blackMarketCargoAmounts: (1 + this.endEffects[0].blackMarketCargoAmounts)/2,
         })
     }

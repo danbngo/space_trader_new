@@ -21,9 +21,7 @@ class EconomicBoomNews extends News {
         ]
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
-        //credit remains high After
         Object.assign(this.endEffects[0], {
-            //this has been causing problems, i think - danmod
             credits: (1 + this.endEffects[0].credits)/2,
         })
     }

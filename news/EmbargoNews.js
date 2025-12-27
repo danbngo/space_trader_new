@@ -20,6 +20,8 @@ class EmbargoNews extends News {
                 commerce: 0.6,
                 marketPrices: 1.4,
                 marketCargoAmounts: 0.7,
+                blackMarketPrices: 1.3,
+                blackMarketCargoAmounts: 0.7,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WATER, 1.5], [CARGO_TYPES.METAL, 1.5]]),
             })
         ]

@@ -36,6 +36,7 @@ const NEWS_TYPE_CLASSES = new Map([
     [NEWS_TYPES.SUBJUGATION, SubjugationNews],
     [NEWS_TYPES.SURPLUS, SurplusNews],
     [NEWS_TYPES.TENSIONS, TensionsNews],
+    [NEWS_TYPES.TOURISM, TourismNews],
     [NEWS_TYPES.TRADE_AGREEMENT, TradeAgreementNews],
     [NEWS_TYPES.WAR, WarNews],
 ])

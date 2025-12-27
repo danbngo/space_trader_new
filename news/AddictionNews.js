@@ -10,7 +10,7 @@ class AddictionNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 security: 0.6,
-                crime: 1.3,
+                crime: 1.5,
                 commerce: 0.8,
                 blackMarketCargoAmounts: 1.5,
                 blackMarketPrices: 0.6,

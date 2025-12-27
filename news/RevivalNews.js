@@ -11,6 +11,8 @@ class RevivalNews extends News {
                 planet: this.planet,
                 officerQuality: 0.7,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.HOLOCUBES, 1.5], [CARGO_TYPES.ISOTOPES, 0.5]]),
+                blackMarketCargoAmounts: 0.8,
+                blackMarketPrices: 0.7,
                 //relationsReset: true
             })
         ]

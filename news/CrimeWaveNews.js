@@ -10,7 +10,7 @@ class CrimeWaveNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 security: 0.7,
-                crime: 1.4,
+                crime: 1.7,
                 military: 0.9,
                 blackMarketCargoAmounts: 1.4,
                 blackMarketPrices: 0.7,

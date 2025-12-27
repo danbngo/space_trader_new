@@ -16,7 +16,6 @@ class InvestmentNews extends News {
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                credits: 1.2,
             })
         ]
 
@@ -28,7 +27,6 @@ class InvestmentNews extends News {
             prestige: 1.2,
         })
         Object.assign(this.endEffects[1], {
-            credits: 1,
             industry: 1.5,
             commerce: 1.1,
             shipyardNumShips: 1.2,

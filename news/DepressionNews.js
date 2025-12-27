@@ -2,7 +2,7 @@ class DepressionNews extends News {
     constructor(planet = new Planet()) {
         super(
             `${coloredName(planet)} enters a Depression!`,
-            `${coloredName(planet)} recovers from its Depression!`,
+            `${coloredName(planet)} is stumbling out of its Depression!`,
             NEWS_TYPES.DEPRESSION, planet
         )
 
@@ -17,6 +17,8 @@ class DepressionNews extends News {
                 crime: 1.3,
                 guildNumOfficers: 1.2,
                 prestige: 0.8,
+                blackMarketCargoAmounts: 0.7,
+                blackMarketPrices: 0.7,
             })
         ]
 
@@ -26,7 +28,10 @@ class DepressionNews extends News {
         Object.assign(this.endEffects[0], {
             credits: (1 + this.endEffects[0].credits)/2,
             marketCargoAmounts: (1 + this.endEffects[0].marketCargoAmounts)/2,
+            marketPrices: (1 + this.endEffects[0].marketPrices)/2,
             commerce: (1 + this.endEffects[0].commerce)/2,
+            blackMarketPrices: (1 + this.endEffects[0].blackMarketPrices)/2,
+            blackMarketCargoAmounts: (1 + this.endEffects[0].blackMarketCargoAmounts)/2,
         })
     }
 

@@ -57,6 +57,7 @@ const NEWS_TYPES = {
     FOREIGN_AID: new NewsType('Foreign Aid', COLORS.LightBlue, 3, 8, 1),
     ENVIRONMENTALISM: new NewsType('Environmentalism', COLORS.LightGreen, 5, 15, 1),
     ADDICTION: new NewsType('Addiction', COLORS.Orange, 3, 8, 1),
+    TOURISM: new NewsType('Tourism', COLORS.LightCyan, 3, 8, 1),
     //more to come later: environmental disasters, terraforming, etc.
 }
 
