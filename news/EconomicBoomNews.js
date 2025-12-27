@@ -29,11 +29,13 @@ class EconomicBoomNews extends News {
 
     isValid() {
         const {planet} = this
-        //happens when economy is already somewhat good. edit: nah, then it never happens lmao.
         //const ratingsValid = (planet.culture.commerce >= 1.2) && (planet.culture.industry >= 1.2)
+        //basically just a bonus for not being in a war or anything stupid
         const interferingEvent = 
             News.planetHasAnyNews(planet, [NEWS_TYPES.ECONOMIC_BOOM, ...NEWS_TYPES_ECONOMY_PREVENTING]) ||
-            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_ECONOMY_PREVENTING)
+            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_ECONOMY_PREVENTING) ||
+            News.planetHasAnyNews(planet, NEWS_TYPES_HOSTILE) ||
+            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_HOSTILE)
         return !interferingEvent
     }
 }

@@ -9,10 +9,8 @@ class RevivalNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                industryModifiedBy: 0.8,
-                shipQualityModifiedBy: 0.9,
-                officerQualityModifiedBy: 0.8,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.HOLOCUBES, 1.5]]),
+                officerQualityModifiedBy: 0.7,
+                cargoPriceModifiers: new Map([[CARGO_TYPES.HOLOCUBES, 1.5], [CARGO_TYPES.ISOTOPES, 0.5]]),
                 //relationsReset: true
             })
         ]
@@ -21,16 +19,14 @@ class RevivalNews extends News {
         //dont revert ratings, but raise birthrates
         Object.assign(this.endEffects[0], {
             populationModifiedBy: 1.4,
-            industryModifiedBy: 1,
-            shipQualityModifiedBy: 1,
             officerQualityModifiedBy: 1,
         })
     }
 
     isValid() {
         const {planet} = this
-        //high security prevents this
-        const ratingsValid = planet.culture.security < 1.5
+        //cant become even dumber if we're already low
+        const ratingsValid = planet.culture.officerQuality > 0.75
         //planet must not already be in anarchy or puppet state
         const agencyValid = planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY && planet.culture.governmentType != GOVERNMENT_TYPES.PUPPET_STATE
         const interferingEvent =

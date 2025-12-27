@@ -27,13 +27,11 @@ class ResearchAgreementNews extends News {
         //actual knowledge gained cannot be lost
         Object.assign(this.endEffects[0], {
             shipQualityModifiedBy: 1.1,
-            prestigeModifiedBy: 1.1,
             officerQualityModifiedBy: 1.2,
             militaryModifiedBy: 1.1,
         })
         Object.assign(this.endEffects[1], {
             shipQualityModifiedBy: 1.1,
-            prestigeModifiedBy: 1.1,
             officerQualityModifiedBy: 1.2,
             militaryModifiedBy: 1.1,
         })

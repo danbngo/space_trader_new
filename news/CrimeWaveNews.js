@@ -30,7 +30,7 @@ class CrimeWaveNews extends News {
     isValid() {
         const {planet} = this
         //wont happen if crime or security is already high
-        const ratingsValid = planet.culture.crime < 1 && planet.culture.security < 2
+        const ratingsValid = planet.culture.crime < 0.75
         const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.CRIME_WAVE, ...NEWS_TYPES_CRIME_PREVENTING])
         return ratingsValid && !interferingEvent
     }

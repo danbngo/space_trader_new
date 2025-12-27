@@ -1,7 +1,7 @@
 class CivilStrifeNews extends News {
     constructor(planet = new Planet()) {
         super(
-            `${coloredName(planet)}'s people are rioting in the streets against their government!'`,
+            `${coloredName(planet)}'s people are rioting in the streets against their oppressive government!'`,
             `${coloredName(planet)}'s rioting is quelled!`,
             NEWS_TYPES.CIVIL_STRIFE, planet
         )
@@ -25,15 +25,18 @@ class CivilStrifeNews extends News {
             securityModifiedBy: (1 + this.endEffects[0].securityModifiedBy)/2,
             prestigeModifiedBy: 0.9,
             commerceModifiedBy: (1 + this.endEffects[0].commerceModifiedBy)/2,
+            industryModifiedBy: (1 + this.endEffects[0].industryModifiedBy)/2,
             marketCargoAmountsModifiedBy: (1 + this.endEffects[0].marketCargoAmountsModifiedBy)/2,
         })
     }
 
     isValid() {
         const {planet} = this
+        //more likely if security is too high
+        const ratingsValid = planet.culture.security > 1.5
         //planet must not already be in anarchy or puppet state
         const agencyValid = planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY && planet.culture.governmentType != GOVERNMENT_TYPES.PUPPET_STATE
         const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.CIVIL_STRIFE, NEWS_TYPES.CIVIL_WAR, NEWS_TYPES.REVOLUTION])
-        return agencyValid && !interferingEvent
+        return ratingsValid && agencyValid && !interferingEvent
     }
 }

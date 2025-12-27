@@ -12,7 +12,7 @@ class EnvironmentalDisasterNews extends News {
                 marketPricesModifiedBy: 1.1,
                 marketCargoAmountsModifiedBy: 0.8,
                 commerceModifiedBy: 0.8,
-                industryModifiedBy: 0.8,
+                industryModifiedBy: 0.4,
                 populationModifiedBy: 0.9,
                 creditsModifiedBy: 0.8,
                 shipyardNumShipsModifiedBy: 0.8,
@@ -33,7 +33,7 @@ class EnvironmentalDisasterNews extends News {
     isValid() {
         const {planet} = this
         //happens when industry is getting out of hand
-        const ratingsValid = planet.culture.industry >= 1.2
+        const ratingsValid = planet.culture.industry >= 1.5
         const interferingEvent = News.hasNews(NEWS_TYPES.ENVIRONMENTAL_DISASTER, planet)
         return ratingsValid && !interferingEvent
     }

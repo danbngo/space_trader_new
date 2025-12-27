@@ -9,8 +9,8 @@ class ColonizationNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                populationModifiedBy: 0.8,
-                guildNumOfficersModifiedBy: 0.8,
+                populationModifiedBy: 0.7,
+                guildNumOfficersModifiedBy: 1.4,
                 marketPricesModifiedBy: 1.2,
                 shipyardNumShipsModifiedBy: 1.4,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.METAL, 1.5], [CARGO_TYPES.ISOTOPES, 2]]),
@@ -29,7 +29,7 @@ class ColonizationNews extends News {
 
     isValid() {
         const {planet} = this
-        const ratingsValid = planet.culture.population >= 1.0
+        const ratingsValid = planet.culture.population > 1.5
         //basically dont do it if ANYTHING bad is happening
         const interferingEvent = 
             News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_ECONOMY_PREVENTING) ||

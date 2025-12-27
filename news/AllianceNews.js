@@ -60,9 +60,10 @@ class AllianceNews extends News {
         const opposingGovernmentsValid = 
             (planet.culture.governmentType.opposingType !== targetPlanet.culture.governmentType)
             && (targetPlanet.culture.governmentType.opposingType !== planet.culture.governmentType)
-        const alliedToOpposingGovtValid = 
+        /*const alliedToOpposingGovtValid = 
             !(this.getAllies(targetPlanet).some(ally => ally.culture.governmentType === planet.culture.governmentType.opposingType))
-            && !(this.getAllies(planet).some(ally => ally.culture.governmentType === targetPlanet.culture.governmentType.opposingType))
+            && !(this.getAllies(planet).some(ally => ally.culture.governmentType === targetPlanet.culture.governmentType.opposingType))*/
+        const alliedToOpposingGovtValid = true //was a bit too harsh earlier
         //most of the below shouldnt be possible based on above checked but just in case
         const interferingEvent = 
             News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.ALLIANCE, ...NEWS_TYPES_HOSTILE]) || 

@@ -19,7 +19,7 @@ class ScientificBreakthroughNews extends News {
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //actual knowledge gained cannot be lost
         Object.assign(this.endEffects[0], {
-            shipQualityModifiedBy: 1.2,
+            shipQualityModifiedBy: 1.3,
             prestigeModifiedBy: 1.1,
             officerQualityModifiedBy: 1.1,
             militaryModifiedBy: 1.1,
@@ -28,10 +28,10 @@ class ScientificBreakthroughNews extends News {
 
     isValid() {
         const {planet} = this
-        //generally need a functioning government and economy for this
-        const stabilityValid = planet.culture.industry > 1 && planet.culture.commerce > 1
+        //wont bother if we're already at the top
+        const ratingsValid = planet.culture.shipQuality < 1.5
         //hard times dont block it, may actually accelerate technological progress
         const interferingEvent = News.hasNews(NEWS_TYPES.SCIENTIFIC_BREAKTHROUGH, planet)
-        return stabilityValid && !interferingEvent
+        return ratingsValid && !interferingEvent
     }
 }

@@ -5,6 +5,7 @@
 
 // @ts-ignore
 const NEWS_TYPE_CLASSES = new Map([
+    [NEWS_TYPES.ADDICTION, AddictionNews],
     [NEWS_TYPES.ALLIANCE, AllianceNews],
     [NEWS_TYPES.BOMBARDMENT, BombardmentNews],
     [NEWS_TYPES.CIVIL_STRIFE, CivilStrifeNews],
@@ -17,7 +18,10 @@ const NEWS_TYPE_CLASSES = new Map([
     [NEWS_TYPES.ECONOMIC_BOOM, EconomicBoomNews],
     [NEWS_TYPES.EMBARGO, EmbargoNews],
     [NEWS_TYPES.ENVIRONMENTAL_DISASTER, EnvironmentalDisasterNews],
+    [NEWS_TYPES.ENVIRONMENTALISM, Environmentalism],
+    [NEWS_TYPES.FOREIGN_AID, ForeignAidNews],
     [NEWS_TYPES.IMMIGRATION, ImmigrationNews],
+    [NEWS_TYPES.IMPERIALISM, ImperialismNews],
     [NEWS_TYPES.INFLATION, InflationNews],
     [NEWS_TYPES.INVESTMENT, InvestmentNews],
     [NEWS_TYPES.ISOLATIONISM, IsolationismNews],

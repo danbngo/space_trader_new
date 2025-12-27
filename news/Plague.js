@@ -9,7 +9,7 @@ class PlagueNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                populationModifiedBy: 0.8,
+                populationModifiedBy: 0.6,
                 commerceModifiedBy: 0.7,
                 industryModifiedBy: 0.6,
                 guildNumOfficersModifiedBy: 0.6,
@@ -23,13 +23,14 @@ class PlagueNews extends News {
         //population does not fully bounce back
         Object.assign(this.endEffects[0], {
             populationModifiedBy: (1 + this.endEffects[0].populationModifiedBy)/2,
+            guildNumOfficersModifiedBy: (1 + this.endEffects[0].guildNumOfficersModifiedBy)/2,
         })
     }
 
     isValid() {
         const {planet} = this
         //happens when population is getting out of hand
-        const ratingsValid = planet.culture.population >= 1
+        const ratingsValid = planet.culture.population >= 1.5
 
         const interferingEvent = //can happy anytime, anywhere!
             News.hasNews(NEWS_TYPES.PLAGUE, planet)

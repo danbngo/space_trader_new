@@ -64,9 +64,9 @@ class News {
     start() {
         if (this.started || this.ended) throw new Error('news cannot be started after ending or starting already!')
         this.started = true
-        gs.system.newsFeed.push(this.startDescription)
+        //gs.system.newsFeed.push(this.startDescription)
         for (const fx of this.startEffects) {
-            gs.system.newsFeed.push(fx.describe())
+            //gs.system.newsFeed.push(fx.describe())
             fx.apply()
         }
         gs.system.news.push(this)
@@ -89,9 +89,9 @@ class News {
         this.ended = true
         this.endedYear = gs.year
         if (this.endEffects.length == 0) return; //no end effects to apply, dont update feeds
-        gs.system.newsFeed.push(this.endDescription)
+        //gs.system.newsFeed.push(this.endDescription)
         for (const fx of this.endEffects) {
-            gs.system.newsFeed.push(fx.describe())
+            //gs.system.newsFeed.push(fx.describe())
             fx.apply()
         }
     }
@@ -100,8 +100,10 @@ class News {
         return gs.system.news.filter(news => {
             if (news.ended || !news.started) return false
             if (newsType && news.newsType != newsType) return false
-            if (planet && (!news.planet || planet != news.planet)) return false
-            if (targetPlanet && (!news.targetPlanet || targetPlanet != news.targetPlanet)) return false
+            if (planet && !news.planet) return false
+            if (planet && planet != news.planet) return false
+            if (targetPlanet && !news.targetPlanet) return false
+            if (targetPlanet && targetPlanet != news.targetPlanet) return false
             return true
         })
     }
@@ -154,13 +156,13 @@ class News {
 
     static forcePeace(targetPlanet = new Planet()) {
         //all hostile news involving this planet expire immediately
-        console.log('ceasing all hostilities involving:',targetPlanet.name)
+        //console.log('ceasing all hostilities involving:',targetPlanet.name)
         const newsToEnd = gs.system.news.filter(n=>(
             (n.planet === targetPlanet || n.targetPlanet === targetPlanet) &&
             NEWS_TYPES_HOSTILE.includes(n.newsType) &&
             !n.ended
         ))
-        console.log('found news items to end:',newsToEnd)
+        //console.log('found news items to end:',newsToEnd)
         for (const n of newsToEnd) {
             n.endAsap = true
             if (n.shouldEnd()) n.end()
@@ -169,13 +171,13 @@ class News {
 
     static forceWithdrawal(planet = new Planet()) {
         //all hostile or cooperative acts FROM this planet expire immediately
-        console.log('ceasing all foreign activity involving:',planet.name)
+        //console.log('ceasing all foreign activity involving:',planet.name)
         const newsToEnd = gs.system.news.filter(n=>(
             (n.planet === planet) &&
             (NEWS_TYPES_HOSTILE.includes(n.newsType) || NEWS_TYPES_COOPERATIVE.includes(n.newsType))
             && !n.ended
         ))
-        console.log('found news items to end:',newsToEnd)
+        //console.log('found news items to end:',newsToEnd)
         for (const n of newsToEnd) {
             n.endAsap = true
             if (n.shouldEnd()) n.end()
@@ -183,12 +185,23 @@ class News {
     }
 
     static processNews(elapsedYears = 0) {
+        //remove anything older than the threshold
+        const ancientHistory = []
         for (const news of gs.system.news) {
             if (news.shouldEnd()) {
                 news.end()
             }
             else {
                 if (!news.ended && news.started && news.ongo) news.ongo(elapsedYears)
+            }
+            if (news.ended && (gs.year - news.endedYear) >= NEWS_MAX_AGE) {
+                ancientHistory.push(news)
+            }
+        }
+        if (!DEBUG_MODE_ENABLED) for (const oldNews of ancientHistory) {
+            const index = gs.system.news.indexOf(oldNews)
+            if (index > -1) {
+                gs.system.news.splice(index, 1)
             }
         }
     }

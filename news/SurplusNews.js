@@ -10,27 +10,27 @@ class SurplusNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 marketPricesModifiedBy: 0.8,
-                marketCargoAmountsModifiedBy: 1.3,
+                marketCargoAmountsModifiedBy: 1.5,
                 commerceModifiedBy: 1.2,
                 industryModifiedBy: 1.4,
                 creditsModifiedBy: 1.3,
                 shipyardNumShipsModifiedBy: 1.4,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.HOLOCUBES, 2]]),
             })
         ]
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
-        //credit and goods remain high After
+        //goods remain high After
         Object.assign(this.endEffects[0], {
-            creditsModifiedBy: (1 + this.endEffects[0].creditsModifiedBy)/2,
+            industryModifiedBy: (1 + this.endEffects[0].industryModifiedBy)/2,
+            commerceModiifiedBy: (1 + this.endEffects[0].commerceModifiedBy)/2,
             marketCargoAmountsModifiedBy: (1 + this.endEffects[0].marketCargoAmountsModifiedBy)/2,
         })
     }
 
     isValid() {
         const {planet} = this
-        //industry must be high, gotta have miners out there
-        const ratingsValid = planet.culture.industry >= 1.2
+        //we needed to be resource scarce to be looking for them so hard
+        const ratingsValid = planet.settlement.market.baseCargo.average/MARKET_AVERAGE_CARGO_PER_TYPE < 0.75
         //more for flavor than anything, irl you could find goodies at any time
         const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.SURPLUS, NEWS_TYPES.DEPRESSION, NEWS_TYPES.SCARCITY])
         return ratingsValid && !interferingEvent

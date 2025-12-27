@@ -29,7 +29,7 @@ class SubjugationNews extends News {
                 commerceModifiedBy: 0.7,
                 industryModifiedBy: 0.75,
                 marketCargoAmountsModifiedBy: 0.6,
-                prestigeModifiedBy: 0.6,
+                prestigeModifiedBy: 0.2,
                 relationsReset: true,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.ANTIMATTER, 0.5]]),
                 forcePeace: true,
@@ -56,7 +56,7 @@ class SubjugationNews extends News {
     isValid() {
         const {planet, targetPlanet} = this
         //our army must be significantly better than theirs
-        const ratingsValid = planet.culture.military > targetPlanet.culture.military*1.2
+        const ratingsValid = planet.culture.military > targetPlanet.culture.military*2
         //cant be anarchic or puppet state
         const agencyValid = (planet.culture.governmentType !== GOVERNMENT_TYPES.ANARCHY && planet.culture.governmentType !== GOVERNMENT_TYPES.PUPPET_STATE)
         //planet must be at war with the target

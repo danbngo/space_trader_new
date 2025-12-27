@@ -25,15 +25,15 @@ class BombardmentNews extends News {
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
                 populationModifiedBy: 0.85,
-                militaryModifiedBy: 0.8,
-                industryModifiedBy: 0.7,
+                militaryModifiedBy: 0.5,
+                industryModifiedBy: 0.4,
                 commerceModifiedBy: 0.7,
                 securityModifiedBy: 0.8,
                 marketCargoAmountsModifiedBy: 0.8,
                 marketPricesModifiedBy: 2,
-                shipQualityModifiedBy: 0.9, //back to the stone age!
-                officerQualityModifiedBy: 0.9,
-                prestigeModifiedBy: 0.8,
+                shipQualityModifiedBy: 0.8, //back to the stone age!
+                officerQualityModifiedBy: 0.8,
+                prestigeModifiedBy: 0.6,
                 buildingsDisabled: buildingsToDisable,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WATER, 2], [CARGO_TYPES.MEDICINE, 2], [CARGO_TYPES.HOLOCUBES, 0.5]]), //this is the only thing that normalizes after
             })
@@ -60,7 +60,7 @@ class BombardmentNews extends News {
     isValid() {
         const {planet, targetPlanet} = this
         //planet must not already be at war with the target planet
-        const ratingsValid = planet.culture.military > targetPlanet.culture.military
+        const ratingsValid = planet.culture.military > targetPlanet.culture.military * 1.5
         const relationshipValid = planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR
         const interferingEvent = 
             News.hasNews(NEWS_TYPES.BOMBARDMENT, planet, targetPlanet) || 

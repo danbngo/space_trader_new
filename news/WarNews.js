@@ -16,6 +16,7 @@ class WarNews extends News {
                 commerceModifiedBy: 0.7,
                 shipyardNumShipsModifiedBy: 0.7,
                 marketCargoAmountsModifiedBy: 0.8,
+                prestigeModifiedBy: 0.9, //the aggressor loses some prestige
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, 2], [CARGO_TYPES.ANTIMATTER, 3]]),
             }),
             new NewsEffect({
@@ -32,6 +33,11 @@ class WarNews extends News {
         ]
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        Object.assign(this.endEffects[0], {
+            prestigeModifiedBy: 1, //being a warmonger = bad
+        })
+
+
         this.endEffects[0].onApply = ()=>{
             //dont revert relationships if one was vassalized
             if (planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR) planet.culture.relationships.set(targetPlanet, RELATIONSHIP_TYPES.NEUTRAL)
@@ -61,7 +67,7 @@ class WarNews extends News {
     isValid() {
         const {planet, targetPlanet} = this
         //planets tend not to want to go to war with stronger ones
-        const prestigeValid = planet.culture.prestige > targetPlanet.culture.prestige
+        const prestigeValid = planet.culture.prestige > targetPlanet.culture.prestige || planet.culture.military > targetPlanet.culture.military
         //must not have same form of government
         const governmentsValid = (planet.culture.governmentType !== targetPlanet.culture.governmentType)
         //must not be anarchic or a puppet state

@@ -53,6 +53,10 @@ const NEWS_TYPES = {
     RESEARCH_AGREEMENT: new NewsType('Research Agreement', COLORS.LightGreen, 2, 8, 1), 
     REVIVAL: new NewsType('Religious Revival', COLORS.White, 10, 20, 1),
     ISOLATIONISM: new NewsType('Isolationism', COLORS.DimGray, 5, 15, 1),
+    IMPERIALISM: new NewsType('Imperialism', COLORS.Purple, 10, 30, 1),
+    FOREIGN_AID: new NewsType('Foreign Aid', COLORS.LightBlue, 3, 8, 1),
+    ENVIRONMENTALISM: new NewsType('Environmentalism', COLORS.LightGreen, 5, 15, 1),
+    ADDICTION: new NewsType('Addiction', COLORS.Orange, 3, 8, 1),
     //more to come later: environmental disasters, terraforming, etc.
 }
 

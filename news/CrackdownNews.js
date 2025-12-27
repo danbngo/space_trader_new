@@ -32,8 +32,8 @@ class CrackdownNews extends News {
         const {planet} = this
         //wouldnt happen in an anarchy, just sayin
         const govValid = planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY
-        //wont happen if crime is already low
-        const crimeValid = planet.culture.crime > 1
+        //wont happen if crime is already low AND black market amount/price is low
+        const crimeValid = (planet.culture.crime > 1.5 || planet.settlement.blackMarket.inflation > 1.5 || planet.settlement.blackMarket.cargo.average / MARKET_AVERAGE_CARGO_PER_TYPE > 1.5)
         const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.CRACKDOWN, ...NEWS_TYPES_CRIME_PREVENTING])
         return govValid && crimeValid && !interferingEvent
     }

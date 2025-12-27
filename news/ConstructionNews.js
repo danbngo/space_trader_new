@@ -1,8 +1,8 @@
 class ConstructionNews extends News {
     constructor(planet = new Planet()) {
         super(
-            `${coloredName(planet)} begins a grand construction project!`,
-            `${coloredName(planet)} completes its grand construction project!`,
+            `${coloredName(planet)} begins a grand infrastructure building project!`,
+            `${coloredName(planet)} completes its grand infrastructure building project!`,
             NEWS_TYPES.CONSTRUCTION, planet
         )
 
@@ -17,7 +17,6 @@ class ConstructionNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                industryModifiedBy: 0.7,
                 commerceModifiedBy: 0.9,
                 marketCargoAmountsModifiedBy: 0.8,
                 marketPricesModifiedBy: 1.2,
@@ -28,18 +27,19 @@ class ConstructionNews extends News {
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.endEffects[0], {
-            industryModifiedBy: (2 + this.endEffects[0].industryModifiedBy)/2, //industrial base bounces back stronger
+            industryModifiedBy: 1.3,
             buildingsEnabled: buildingsToEnable,
         })
     }
 
     isValid() {
         const {planet} = this
-        //must be missing at least one building
+        //must be missing at least one building OR industry is low
         const buildingsValid = planet.settlement.buildings.filter(b => !b.enabled).length > 0
+        const industryValid = planet.culture.industry < 0.75
         const interferingEvent =
             News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_HOSTILE) ||
             News.planetHasAnyNews(planet, [NEWS_TYPES.CONSTRUCTION, ...NEWS_TYPES_ECONOMY_PREVENTING])
-        return buildingsValid && !interferingEvent
+        return (buildingsValid || industryValid) && !interferingEvent
     }
 }

@@ -12,7 +12,7 @@ class InflationNews extends News {
                 commerceModifiedBy: 0.7,
                 marketPricesModifiedBy: 1.4,
                 marketCargoAmountsModifiedBy: 0.8,
-                creditsModifiedBy: 1.2,
+                creditsModifiedBy: 1.5,
                 crimeModifiedBy: 1.2,
             })
         ]
@@ -20,9 +20,9 @@ class InflationNews extends News {
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //some lingering price increases and deflation
         Object.assign(this.endEffects[0], {
+            commerceModifiedBy: (1 + this.endEffects[0].commerceModifiedBy)/2,
             marketCargoAmountsModifiedBy: (1 + this.endEffects[0].marketCargoAmountsModifiedBy)/2,
-            marketPricesModifiedBy: (1 + this.endEffects[0].marketPricesModifiedBy)/2,
-            creditsModifiedBy: (1 + this.endEffects[0].creditsModifiedBy)/2,
+            creditsModifiedBy: 1/(1.5+1) //what goes up, must come down
         })
     }
 

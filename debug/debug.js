@@ -1,3 +1,5 @@
+let DEBUG_MODE_ENABLED = true
+
 function assessPlanets() {
     console.log("Debugging Planets:")
     console.log('Total Planets:', gs.system.planets.length, gs.system.planets)

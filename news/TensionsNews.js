@@ -38,9 +38,15 @@ class TensionsNews extends News {
         //cant have same government type or be a puppet
         const governmentsValid = planet.culture.governmentType != GOVERNMENT_TYPES.PUPPET_STATE && targetPlanet.culture.governmentType != GOVERNMENT_TYPES.PUPPET_STATE
         const governmentsValid2 = planet.culture.governmentType != targetPlanet.culture.governmentType
+
+        //there generally won't be beef if the power disparity is too large
+        const powerRatio = planet.culture.military / targetPlanet.culture.military
+        const powerRatioInv = targetPlanet.culture.military / planet.culture.military
+        const powerValid = powerRatio <= 2 && powerRatioInv <= 2
+
         const relationshipValid = planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.NEUTRAL && targetPlanet.culture.relationships.get(planet) == RELATIONSHIP_TYPES.NEUTRAL
         const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.TENSIONS, ...NEWS_TYPES_HOSTILE, ...NEWS_TYPES_COOPERATIVE])
-        return governmentsValid && governmentsValid2 && relationshipValid && !interferingEvent
+        return powerValid && governmentsValid && governmentsValid2 && relationshipValid && !interferingEvent
     }
 
     isValidEnd() {

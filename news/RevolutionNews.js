@@ -3,7 +3,7 @@ class RevolutionNews extends News {
         const newGovType = rndMember(GOVERNMENT_TYPES_ALL.filter(g => g !== planet.culture.governmentType && g !== GOVERNMENT_TYPES.PUPPET_STATE));
         
         super(
-            `The people of ${coloredName(planet)} revolt against the authorities!`,
+            `${coloredName(planet)}'s people have deposed the government and begin a glorious revolution!`,
             `${coloredName(planet)} stabilizes under new government: ${coloredName(newGovType)}!`,
             NEWS_TYPES.REVOLUTION, planet
         )

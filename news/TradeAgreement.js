@@ -1,8 +1,8 @@
 class TradeAgreementNews extends News {
     constructor(planet = new Planet(), targetPlanet = new Planet()) {
         super(
-            `Trade agreement signed between ${coloredName(planet)} and ${coloredName(targetPlanet)}`,
-            `Trade agreement ended between ${coloredName(planet)} and ${coloredName(targetPlanet)}`,
+            `${coloredName(planet)} and ${coloredName(targetPlanet)} sign an expansive trade agreement, benefitting both planets!`,
+            `${coloredName(planet)} and ${coloredName(targetPlanet)}'s trade agreement has lapsed!`,
             NEWS_TYPES.TRADE_AGREEMENT, planet, targetPlanet
         )
 
@@ -12,9 +12,9 @@ class TradeAgreementNews extends News {
                 targetPlanet: this.targetPlanet,
                 marketCargoAmountsModifiedBy: 1.3,
                 commerceModifiedBy: 1.2,
-                //guildNumOfficersModifiedBy: 1.2,
-                //officerQualityModifiedBy: 1.1,
-                //shipQualityModifiedBy: 1.1,
+                guildNumOfficersModifiedBy: 1.2,
+                officerQualityModifiedBy: 1.1,
+                shipQualityModifiedBy: 1.1,
                 creditsModifiedBy: 1.2,
             }),
             new NewsEffect({
@@ -22,9 +22,9 @@ class TradeAgreementNews extends News {
                 targetPlanet: this.planet,
                 marketCargoAmountsModifiedBy: 1.3,
                 commerceModifiedBy: 1.2,
-                //guildNumOfficersModifiedBy: 1.2,
-                //officerQualityModifiedBy: 1.1,
-                //shipQualityModifiedBy: 1.1,
+                guildNumOfficersModifiedBy: 1.2,
+                officerQualityModifiedBy: 1.1,
+                shipQualityModifiedBy: 1.1,
                 creditsModifiedBy: 1.2,
             })
         ]

@@ -61,7 +61,7 @@ function generateGuild(planet = new Planet()) {
 
 function generateBank(planet = new Planet()) {
     const rake = rng(2, 0.5, false);
-    const credits = rng(0.5*BANK_AVERAGE_CREDITS, 2*BANK_AVERAGE_CREDITS);
+    const credits = Math.round(BANK_AVERAGE_CREDITS * rng(2,0,false));
     return new Bank(planet, credits, rake)    
 }
 

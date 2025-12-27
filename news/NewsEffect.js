@@ -226,8 +226,8 @@ class NewsEffect {
             if (marketPricesModifiedBy) settlement.market.inflation *= marketPricesModifiedBy;
             if (blackMarketPricesModifiedBy) settlement.blackMarket.inflation *= blackMarketPricesModifiedBy;
             for (const ct of CARGO_TYPES_ALL) {
-                settlement.market.baseCargo.setAmount(ct, Math.round(settlement.market.cargo.getAmount(ct) * marketCargoAmountsModifiedBy));
-                settlement.blackMarket.baseCargo.setAmount(ct, Math.round(settlement.blackMarket.cargo.getAmount(ct) * blackMarketCargoAmountsModifiedBy));
+                settlement.market.baseCargo.setAmount(ct, Math.floor(settlement.market.baseCargo.getAmount(ct) * marketCargoAmountsModifiedBy));
+                settlement.blackMarket.baseCargo.setAmount(ct, Math.floor(settlement.blackMarket.baseCargo.getAmount(ct) * blackMarketCargoAmountsModifiedBy));
             }
             if (marketCargoAmountsModifiedBy) settlement.market.normalize()
             if (blackMarketCargoAmountsModifiedBy) settlement.blackMarket.normalize()
@@ -320,7 +320,7 @@ class NewsEffect {
         if (planet && planet.settlement) {
             const {settlement} = planet
             if (creditsModifiedBy !== 1.0) {
-                msg += `- Bank Credits: ${settlement.bank.baseCredits} ➜ ${settlement.bank.credits*creditsModifiedBy}.<br/>`
+                msg += `- Bank Credits: ${settlement.bank.baseCredits} ➜ ${settlement.bank.baseCredits*creditsModifiedBy}.<br/>`
             }
             if (guildNumOfficersModifiedBy) {
                 msg += `- Guild Officers: ${settlement.guild.baseNumOfficers} ➜ ${Math.round(settlement.guild.baseNumOfficers * guildNumOfficersModifiedBy)}.<br/>`

@@ -10,9 +10,8 @@ class InvestmentNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
-                marketCargoAmountsModifiedBy: 0.8,
-                commerceModifiedBy: 0.8,
                 creditsModifiedBy: 0.6,
+                marketCargoAmountsModifiedBy: 0.6,
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
@@ -24,21 +23,19 @@ class InvestmentNews extends News {
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
 
         Object.assign(this.startEffects[0], {
-            commerceModifiedBy: (1 + this.startEffects[0].commerceModifiedBy)/2,
-            creditsModifiedBy: (1 + this.startEffects[0].creditsModifiedBy)/2,
+            creditsModifiedBy: 1,
             marketCargoAmountsModifiedBy: (1 + this.startEffects[0].marketCargoAmountsModifiedBy)/2,
-            prestigeModifiedBy: 1.1,
+            prestigeModifiedBy: 1.2,
         })
         Object.assign(this.endEffects[1], {
             industryModifiedBy: 1.5,
-            prestigeModifiedBy: 0.9, //the hidden cost, debt = control
         })
     }
 
     isValid() {
         const {planet, targetPlanet} = this
         //need to have sufficient economy of our own
-        const ratingsValid = planet.culture.commerce >= 1.2 && planet.settlement.bank.baseCredits >= BANK_AVERAGE_CREDITS*1.2 && planet.settlement.market.baseCargo.average/MARKET_AVERAGE_CARGO_PER_TYPE >= 1.2
+        const ratingsValid = planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS >= 1.25 || planet.settlement.market.baseCargo.average/MARKET_AVERAGE_CARGO_PER_TYPE > 1.25
         //our economy should be larger than theirs
         const transferValid = planet.culture.commerce > targetPlanet.culture.commerce && planet.settlement.bank.baseCredits > targetPlanet.settlement.bank.baseCredits && planet.settlement.market.baseCargo.average > targetPlanet.settlement.market.baseCargo.average
         //both planets must be neutral or allies

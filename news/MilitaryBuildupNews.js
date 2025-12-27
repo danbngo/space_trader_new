@@ -8,13 +8,10 @@ class MilitaryBuildupNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                commerceModifiedBy: 0.9,
+                commerceModifiedBy: 0.7,
                 industryModifiedBy: 0.8,
                 marketCargoAmountsModifiedBy: 0.8,
-                prestigeModifiedBy: 1.1,
                 creditsModifiedBy: 0.8,
-                officerQualityModifiedBy: 1.1,
-                guildNumOfficersModifiedBy: 1.1,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, 1.5], [CARGO_TYPES.ANTIMATTER, 2]]),
             })
         ]
@@ -24,14 +21,15 @@ class MilitaryBuildupNews extends News {
         Object.assign(this.endEffects[0], {
                 militaryModifiedBy: 1.4,
                 prestigeModifiedBy: 1.1,
-                officerQualityModifiedBy: 1,
-                guildNumOfficersModifiedBy: 1,
+                officerQualityModifiedBy: 1.2,
+                guildNumOfficersModifiedBy: 1.2,
+                creditsModifiedBy: 1, //so is wasting money
         })
     }
     isValid() {
         const {planet} = this
         //dont do it if military is already big
-        const ratingsValid = planet.culture.military < 1.2
+        const ratingsValid = planet.culture.military < 0.75
         //dont do it if no government are tense with us or vice versa
         let politicsValid = false
         for (const p of gs.system.planets) {

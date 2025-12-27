@@ -23,12 +23,12 @@ class CivilWarNews extends News {
                 securityModifiedBy: 0.7,
                 crimeModifiedBy: 1.4,
                 populationModifiedBy: 0.7,
-                commerceModifiedBy: 0.5,
-                industryModifiedBy: 0.6,
-                marketCargoAmountsModifiedBy: 0.3,
+                commerceModifiedBy: 0.7,
+                industryModifiedBy: 0.7,
+                marketCargoAmountsModifiedBy: 0.8,
                 marketPricesModifiedBy: 1.3,
                 blackMarketCargoAmountsModifiedBy: 1.4,
-                creditsModifiedBy: 0.4,
+                creditsModifiedBy: 0.8,
                 prestigeModifiedBy: 0.8,
                 buildingsDisabled: buildingsToDisable,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, 2], [CARGO_TYPES.ANTIMATTER, 2]]),
@@ -50,7 +50,7 @@ class CivilWarNews extends News {
     isValid() {
         const {planet} = this
         //usually happens when military is large
-        const ratingsValid = planet.culture.military > 1.0
+        const ratingsValid = planet.culture.military > 1.5
         //planet must not already be in anarchy or puppet state
         const validGov = planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY && planet.culture.governmentType != GOVERNMENT_TYPES.PUPPET_STATE
         //cant be having any of: construction, economic boom, revolution

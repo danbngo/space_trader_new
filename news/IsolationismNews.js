@@ -18,7 +18,7 @@ class IsolationismNews extends News {
                 creditsModifiedBy: 0.8,
                 officerQualityModifiedBy: 0.9,
                 shipQualityModifiedBy: 0.9,
-                prestigeModifiedBy: 0.7,
+                prestigeModifiedBy: 0.8,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.ANTIMATTER, 0.5]]),
                 forceWithdrawal: true,
             })
@@ -28,21 +28,23 @@ class IsolationismNews extends News {
         //some lingering price increases and deflation
         Object.assign(this.endEffects[0], {
             populationModifiedBy: 1.2,
-            territoryModifiedBy: 1,
-            officerQualityModifiedBy: 1, //lose some knowledge
-            shipQualityModifiedBy: 1, //lose some knowledge
+            territoryModifiedBy: (1 + this.endEffects[0].territoryModifiedBy)/2,
+            officerQualityModifiedBy: (1 + this.endEffects[0].officerQualityModifiedBy)/2, //lose some knowledge
+            shipQualityModifiedBy: (1 + this.endEffects[0].shipQualityModifiedBy)/2, //lose some knowledge
             prestigeModifiedBy: 1,
         })
     }
 
     isValid() {
         const {planet} = this
+        //more likely after population collapse
+        const ratingsValid = planet.culture.population < 1
         //must not be a puppet state or anarchic
         const governmentValid = (planet.culture.governmentType != GOVERNMENT_TYPES.PUPPET_STATE) && (planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY)
         //must not be at engaged in or targeted by any hostile acts
         const interferingEvent =
             News.planetHasAnyNews(planet, NEWS_TYPES_DANGEROUS) ||
-            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_DANGEROUS)
-        return governmentValid && !interferingEvent
+            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_DANGEROUS) 
+        return ratingsValid && governmentValid && !interferingEvent
     }
 }
