@@ -21,6 +21,7 @@ class ImmigrationNews extends News {
         //only the population boost lingers
         Object.assign(this.endEffects[0], {
             population: 1,
+            guildNumOfficers: 1.3,
         })
     }
 

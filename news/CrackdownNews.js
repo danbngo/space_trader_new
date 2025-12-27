@@ -10,7 +10,7 @@ class CrackdownNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 security: 1.4,
-                crime: 0.7,
+                crime: 0.3,
                 military: 1.1,
                 blackMarketCargoAmounts: 0.6,
                 blackMarketPrices: 1.5,
@@ -23,7 +23,7 @@ class CrackdownNews extends News {
         //some lingering crime decrease
         Object.assign(this.endEffects[0], {
             crime: (1 + this.endEffects[0].crime)/2,
-            //blackMarketPrices: (1 + this.endEffects[0].blackMarketPrices)/2,
+            blackMarketPrices: 1/(1.5+1),
             blackMarketCargoAmounts: (1 + this.endEffects[0].blackMarketCargoAmounts)/2,
         })
     }

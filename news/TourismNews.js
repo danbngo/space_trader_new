@@ -21,8 +21,8 @@ class TourismNews extends News {
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.endEffects[0], {
             industry: (1 + this.endEffects[0].industry)/2, //industry doesnt fully recover
-            //credits: 1.5/(0.7),
-            //blackMarketPrices: 1.1,
+            credits: 1.5/(0.7),
+            blackMarketPrices: 1.1,
         })
     }
 

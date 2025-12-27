@@ -11,7 +11,6 @@ class DisarmamentNews extends News {
                 planet: this.planet,
                 military: 0.6,
                 territory: 0.9,
-                guildNumOfficers: 0.6,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.ANTIMATTER, 0.5]]),
                 blackMarketCargoAmounts: 0.8,
                 blackMarketPrices: 0.6,
@@ -23,7 +22,6 @@ class DisarmamentNews extends News {
         Object.assign(this.endEffects[0], {
             military: 1, 
             territory: 1,
-            guildNumOfficers: 1,
             commerce: 1.1, //small bonuses to the economy
             industry: 1.1,
             prestige: 1.2,
