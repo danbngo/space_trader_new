@@ -9,22 +9,22 @@ class AddictionNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                population: 0.9,
-                security: 0.6,
-                crime: 1.3,
-                commerce: 0.8,
-                blackMarketCargoAmounts: 0.6,
-                blackMarketPrices: 1.4,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.MEDICINE, 1.5], [CARGO_TYPES.DRUGS, 3]]), //this is the only thing that normalizes after
+                population: CL.LOW,
+                security: CL.VERY_LOW,
+                crime: CL.HIGH,
+                commerce: CL.LOW,
+                blackMarketCargoAmounts: CL.VERY_LOW,
+                blackMarketPrices: CL.VERY_HIGH,
+                cargoPriceModifiers: new Map([[CARGO_TYPES.MEDICINE, CL.VERY_HIGH], [CARGO_TYPES.DRUGS, 3]]), //this is the only thing that normalizes after
             })
         ]
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //some lingering security and prestige decrease and destroyed goods
         Object.assign(this.endEffects[0], {
-            population: 1,
-            blackMarketPrices: (1 + this.endEffects[0].blackMarketPrices)/2,
-            blackMarketCargoAmounts: (1 + this.endEffects[0].blackMarketCargoAmounts)/2,
-            crime: (1 + this.endEffects[0].crime)/2,
+            population: News.CL_NO_REGRESSION,
+            blackMarketPrices: News.clHalfRegression(this.endEffects[0].blackMarketPrices),
+            blackMarketCargoAmounts: News.clHalfRegression(this.endEffects[0].blackMarketCargoAmounts),
+            crime: News.clHalfRegression(this.endEffects[0].crime),
         })
     }
 

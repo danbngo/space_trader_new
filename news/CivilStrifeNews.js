@@ -9,24 +9,24 @@ class CivilStrifeNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                military: 0.9,
-                security: 0.6,
-                crime: 1.3,
-                commerce: 0.8,
-                industry: 0.6,
-                credits: 0.7,
-                marketCargoAmounts: 0.7,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, 1.5]]), //this is the only thing that normalizes after
+                military: CL.SLIGHTLY_LOW,
+                security: CL.VERY_LOW,
+                crime: CL.HIGH,
+                commerce: CL.LOW,
+                industry: CL.VERY_LOW,
+                credits: CL.LOW,
+                marketCargoAmounts: CL.LOW,
+                cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, CL.VERY_HIGH]]), //this is the only thing that normalizes after
             })
         ]
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //some lingering security and prestige decrease and destroyed goods
         Object.assign(this.endEffects[0], {
-            security: (1 + this.endEffects[0].security)/2,
-            prestige: 0.9,
-            commerce: (1 + this.endEffects[0].commerce)/2,
-            industry: (1 + this.endEffects[0].industry)/2,
-            marketCargoAmounts: (1 + this.endEffects[0].marketCargoAmounts)/2,
+            security: News.clHalfRegression(this.endEffects[0].security),
+            prestige: CL.SLIGHTLY_LOW,
+            commerce: News.clHalfRegression(this.endEffects[0].commerce),
+            industry: News.clHalfRegression(this.endEffects[0].industry),
+            marketCargoAmounts: News.clHalfRegression(this.endEffects[0].marketCargoAmounts),
         })
     }
 

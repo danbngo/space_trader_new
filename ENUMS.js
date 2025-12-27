@@ -128,3 +128,14 @@ const ASTEROID_BELT_TYPES = Object.freeze({
     Plasma: 'Plasma',
 })
 
+const CL = Object.freeze({
+    EXTREMELY_LOW: 8/16,
+    VERY_LOW: 8/12,
+    LOW: 8/10,
+    SLIGHTLY_LOW: 8/9,
+    NONE: 1,
+    SLIGHTLY_HIGH: 9/8,
+    HIGH: 10/8,
+    VERY_HIGH: 12/8,
+    EXTREMELY_HIGH: 16/8
+})

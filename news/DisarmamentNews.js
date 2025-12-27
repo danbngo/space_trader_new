@@ -9,24 +9,24 @@ class DisarmamentNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                military: 0.7,
-                territory: 0.9,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.ANTIMATTER, 0.5], [CARGO_TYPES.WEAPONS, 0.5]]),
-                blackMarketCargoAmounts: 0.8, //bit less weapons
-                blackMarketPrices: 0.6,
-                shipyardNumShips: 0.7,
+                military: CL.LOW,
+                territory: CL.SLIGHTLY_LOW,
+                cargoPriceModifiers: new Map([[CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_LOW], [CARGO_TYPES.WEAPONS, CL.EXTREMELY_LOW]]),
+                blackMarketCargoAmounts: CL.LOW, //bit less weapons
+                blackMarketPrices: CL.VERY_LOW,
+                shipyardNumShips: CL.LOW,
             })
         ]
 
         //system becomes more crowded over time...
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.endEffects[0], {
-            military: 1, 
-            territory: 1,
-            commerce: 1.1, //small bonuses to the economy
-            industry: 1.1,
-            prestige: 1.2,
-            shipyardNumShips: 1,
+            military: News.CL_NO_REGRESSION, 
+            territory: News.CL_NO_REGRESSION,
+            commerce: CL.SLIGHTLY_HIGH, //small bonuses to the economy
+            industry: CL.SLIGHTLY_HIGH,
+            prestige: CL.HIGH,
+            shipyardNumShips: News.CL_NO_REGRESSION,
         })
     }
 

@@ -9,21 +9,21 @@ class CrimeWaveNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                security: 0.7,
-                crime: 1.7,
-                military: 0.9,
-                blackMarketCargoAmounts: 1.4,
-                blackMarketPrices: 0.7,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, 0.5], [CARGO_TYPES.DRUGS, 0.5]]),
+                security: CL.LOW,
+                crime: CL.EXTREMELY_HIGH,
+                military: CL.SLIGHTLY_LOW,
+                blackMarketCargoAmounts: CL.VERY_HIGH,
+                blackMarketPrices: CL.LOW,
+                cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, CL.EXTREMELY_LOW], [CARGO_TYPES.DRUGS, CL.EXTREMELY_LOW]]),
             })
         ]
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //some lingering crime increase
         Object.assign(this.endEffects[0], {
-            crime: (1 + this.endEffects[0].crime)/2,
-            blackMarketPrices: (1 + this.endEffects[0].blackMarketPrices)/2,
-            blackMarketCargoAmounts: (1 + this.endEffects[0].blackMarketCargoAmounts)/2,
+            crime: News.clHalfRegression(this.endEffects[0].crime),
+            blackMarketPrices: News.clHalfRegression(this.endEffects[0].blackMarketPrices),
+            blackMarketCargoAmounts: News.clHalfRegression(this.endEffects[0].blackMarketCargoAmounts),
         })
     }
 

@@ -8,20 +8,20 @@ class TourismNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                marketPrices: 1.4,
-                marketCargoAmounts: 0.7,
-                industry: 0.7,
-                credits: 0.7,
+                marketPrices: CL.VERY_HIGH,
+                marketCargoAmounts: CL.LOW,
+                industry: CL.LOW,
+                credits: CL.LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.METAL, 2], [CARGO_TYPES.NANITES, 2]]),
             })
         ]
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.endEffects[0], {
-            industry: (1 + this.endEffects[0].industry)/2, //industry doesnt fully recover
+            industry: News.clHalfRegression(this.endEffects[0].industry), //industry doesnt fully recover
             credits: 1.5/(0.7),
-            blackMarketCargoAmounts: 1.4,
-            blackMarketPrices: 1.4,
+            blackMarketCargoAmounts: CL.VERY_HIGH,
+            blackMarketPrices: CL.VERY_HIGH,
         })
     }
 

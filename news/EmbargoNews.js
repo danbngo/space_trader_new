@@ -10,19 +10,19 @@ class EmbargoNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
-                military: 0.8, //get stretched thin
-                prestige: 1.1,
+                military: CL.LOW, //get stretched thin
+                prestige: CL.SLIGHTLY_HIGH,
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
-                prestige: 0.9,
-                commerce: 0.6,
-                marketPrices: 1.4,
-                marketCargoAmounts: 0.7,
-                blackMarketPrices: 1.3,
-                blackMarketCargoAmounts: 0.7,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.WATER, 1.5], [CARGO_TYPES.METAL, 1.5]]),
+                prestige: CL.SLIGHTLY_LOW,
+                commerce: CL.VERY_LOW,
+                marketPrices: CL.VERY_HIGH,
+                marketCargoAmounts: CL.LOW,
+                blackMarketPrices: CL.HIGH,
+                blackMarketCargoAmounts: CL.LOW,
+                cargoPriceModifiers: new Map([[CARGO_TYPES.WATER, CL.VERY_HIGH], [CARGO_TYPES.METAL, CL.VERY_HIGH]]),
             })
         ]
 

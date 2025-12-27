@@ -17,17 +17,17 @@ class ConstructionNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                commerce: 0.9,
-                marketCargoAmounts: 0.8,
-                marketPrices: 1.2,
-                shipyardNumShips: 1.2,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.METAL, 2], [CARGO_TYPES.NANITES, 3]]),
+                commerce: CL.SLIGHTLY_LOW,
+                marketCargoAmounts: CL.LOW,
+                marketPrices: CL.HIGH,
+                shipyardNumShips: CL.HIGH,
+                cargoPriceModifiers: new Map([[CARGO_TYPES.METAL, CL.EXTREMELY_HIGH], [CARGO_TYPES.NANITES, 3]]),
             })
         ]
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.endEffects[0], {
-            industry: 1.3,
+            industry: CL.HIGH,
             buildingsEnabled: buildingsToEnable,
         })
     }

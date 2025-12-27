@@ -9,18 +9,18 @@ class ConscriptionNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                military: 1.5,
-                commerce: 0.7,
-                industry: 0.7,
+                military: CL.VERY_HIGH,
+                commerce: CL.LOW,
+                industry: CL.LOW,
             })
         ]
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         // Military gains are kept, but commerce/industry/prestige damage is permanent
         Object.assign(this.endEffects[0], {
-            military: 1, // normalize back
-            commerce: 1, // keep the damage
-            industry: 1, // keep the damage
-            prestige: 0.85, // permanent prestige loss
+            military: News.CL_NO_REGRESSION, // normalize back
+            commerce: News.CL_NO_REGRESSION, // keep the damage
+            industry: News.CL_NO_REGRESSION, // keep the damage
+            prestige: CL.SLIGHTLY_LOW, // permanent prestige loss
         })
     }
 

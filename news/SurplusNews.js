@@ -9,22 +9,22 @@ class SurplusNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                marketPrices: 0.8,
-                marketCargoAmounts: 1.5,
-                commerce: 1.2,
-                industry: 1.4,
-                credits: 1.3,
-                shipyardNumShips: 1.4,
+                marketPrices: CL.LOW,
+                marketCargoAmounts: CL.VERY_HIGH,
+                commerce: CL.HIGH,
+                industry: CL.VERY_HIGH,
+                credits: CL.HIGH,
+                shipyardNumShips: CL.VERY_HIGH,
             })
         ]
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //goods remain high After
         Object.assign(this.endEffects[0], {
-            industry: (1 + this.endEffects[0].industry)/2,
-            commerceModiifiedBy: (1 + this.endEffects[0].commerce)/2,
-            marketCargoAmounts: (1 + this.endEffects[0].marketCargoAmounts)/2,
-            credits: (1 + this.endEffects[0].credits)/2,
+            industry: News.clHalfRegression(this.endEffects[0].industry),
+            commerceModiifiedBy: News.clHalfRegression(this.endEffects[0].commerce),
+            marketCargoAmounts: News.clHalfRegression(this.endEffects[0].marketCargoAmounts),
+            credits: News.clHalfRegression(this.endEffects[0].credits),
         })
     }
 

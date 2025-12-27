@@ -22,7 +22,7 @@ const NEWS_TYPE_CLASSES = new Map([
     [NEWS_TYPES.FOREIGN_AID, ForeignAidNews],
     [NEWS_TYPES.IMMIGRATION, ImmigrationNews],
     [NEWS_TYPES.IMPERIALISM, ImperialismNews],
-    [NEWS_TYPES.INFLATION, InflationNews],
+    [NEWS_TYPES.STOCK_MARKET_CRASH, StockMarketCrashNews],
     [NEWS_TYPES.INVESTMENT, InvestmentNews],
     [NEWS_TYPES.ISOLATIONISM, IsolationismNews],
     [NEWS_TYPES.DISARMAMENT, DisarmamentNews],

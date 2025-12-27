@@ -9,14 +9,14 @@ class DepressionNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                marketPrices: 0.5,
+                marketPrices: CL.EXTREMELY_LOW,
                 marketCargoAmounts: 0.4,
-                commerce: 0.6,
-                industry: 0.7,
-                credits: 0.6,
-                crime: 1.3,
-                guildNumOfficers: 1.2,
-                prestige: 0.8,
+                commerce: CL.VERY_LOW,
+                industry: CL.LOW,
+                credits: CL.VERY_LOW,
+                crime: CL.HIGH,
+                guildNumOfficers: CL.HIGH,
+                prestige: CL.LOW,
                 //blackMarketCargoAmounts: 0.7, -recession-proof industry
                 //blackMarketPrices: 0.7,
             })
@@ -26,10 +26,10 @@ class DepressionNews extends News {
 
         //some lingering price rate, cargo, commercial, and credit rate decreases
         Object.assign(this.endEffects[0], {
-            credits: (1 + this.endEffects[0].credits)/2,
-            marketCargoAmounts: (1 + this.endEffects[0].marketCargoAmounts)/2,
-            marketPrices: (1 + this.endEffects[0].marketPrices)/2,
-            commerce: (1 + this.endEffects[0].commerce)/2,
+            credits: News.clHalfRegression(this.endEffects[0].credits),
+            marketCargoAmounts: News.clHalfRegression(this.endEffects[0].marketCargoAmounts),
+            marketPrices: News.clHalfRegression(this.endEffects[0].marketPrices),
+            commerce: News.clHalfRegression(this.endEffects[0].commerce),
             //blackMarketPrices: (1 + this.endEffects[0].blackMarketPrices)/2,
             //blackMarketCargoAmounts: (1 + this.endEffects[0].blackMarketCargoAmounts)/2,
         })

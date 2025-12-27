@@ -15,14 +15,14 @@ class RevolutionNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 newGovernmentType: GOVERNMENT_TYPES.ANARCHY ? null : GOVERNMENT_TYPES.ANARCHY,
-                military: 0.6,
-                security: 0.7,
-                crime: 1.4,
-                commerce: 0.8,
-                industry: 0.8,
-                credits: 0.5,
+                military: CL.VERY_LOW,
+                security: CL.LOW,
+                crime: CL.VERY_HIGH,
+                commerce: CL.LOW,
+                industry: CL.LOW,
+                credits: CL.EXTREMELY_LOW,
                 buildingsDisabled: courthouseBuilding ? [courthouseBuilding] : [],
-                cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, 1.5], [CARGO_TYPES.HOLOCUBES, 1.5]]),
+                cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, CL.VERY_HIGH], [CARGO_TYPES.HOLOCUBES, CL.VERY_HIGH]]),
                 //relationsReset: true
             })
         ]

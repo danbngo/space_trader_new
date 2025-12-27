@@ -9,20 +9,20 @@ class EconomicBoomNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                marketPrices: 0.8,
-                marketCargoAmounts: 1.5,
-                blackMarketCargoAmounts: 1.2,
-                commerce: 1.4,
-                industry: 1.3,
-                credits: 1.5,
-                shipyardNumShips: 1.4,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.HOLOCUBES, 2]]),
+                marketPrices: CL.LOW,
+                marketCargoAmounts: CL.VERY_HIGH,
+                blackMarketCargoAmounts: CL.HIGH,
+                commerce: CL.VERY_HIGH,
+                industry: CL.HIGH,
+                credits: CL.VERY_HIGH,
+                shipyardNumShips: CL.VERY_HIGH,
+                cargoPriceModifiers: new Map([[CARGO_TYPES.HOLOCUBES, CL.EXTREMELY_HIGH]]),
             })
         ]
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.endEffects[0], {
-            credits: (1 + this.endEffects[0].credits)/2,
+            credits: News.clHalfRegression(this.endEffects[0].credits),
         })
     }
 

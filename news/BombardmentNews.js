@@ -18,22 +18,22 @@ class BombardmentNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
-                prestige: 1.2, //this makes you scary...
-                military: 0.9, //but expends some of your arsenal
+                prestige: CL.HIGH, //this makes you scary...
+                military: CL.SLIGHTLY_LOW, //but expends some of your arsenal
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
-                population: 0.85,
-                military: 0.5,
+                population: CL.SLIGHTLY_LOW,
+                military: CL.EXTREMELY_LOW,
                 industry: 0.4,
-                commerce: 0.7,
-                security: 0.8,
-                marketCargoAmounts: 0.8,
-                marketPrices: 2,
-                shipQuality: 0.8, //back to the stone age!
-                officerQuality: 0.8,
-                prestige: 0.6,
+                commerce: CL.LOW,
+                security: CL.LOW,
+                marketCargoAmounts: CL.LOW,
+                marketPrices: CL.EXTREMELY_HIGH,
+                shipQuality: CL.LOW, //back to the stone age!
+                officerQuality: CL.LOW,
+                prestige: CL.VERY_LOW,
                 buildingsDisabled: buildingsToDisable,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WATER, 2], [CARGO_TYPES.MEDICINE, 2], [CARGO_TYPES.HOLOCUBES, 0.5]]), //this is the only thing that normalizes after
             })
@@ -42,16 +42,16 @@ class BombardmentNews extends News {
         //dont automatically recover. lets add recovery events elsewhere
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.endEffects[1], {
-            population: 1.0,
-            military: 1.0,
-            industry: 1.0,
-            commerce: 1.0,
-            security: 1.0,
-            marketCargoAmounts: 1.0,
-            //marketPrices: 1.0, //prices will normalize
-            shipQuality: 1.0,
-            officerQuality: 1.0,
-            prestige: 1.0,
+            population: News.CL_NO_REGRESSION,
+            military: News.CL_NO_REGRESSION,
+            industry: News.CL_NO_REGRESSION,
+            commerce: News.CL_NO_REGRESSION,
+            security: News.CL_NO_REGRESSION,
+            marketCargoAmounts: News.CL_NO_REGRESSION,
+            //marketPrices: News.CL_NO_REGRESSION, //prices will normalize
+            shipQuality: News.CL_NO_REGRESSION,
+            officerQuality: News.CL_NO_REGRESSION,
+            prestige: News.CL_NO_REGRESSION,
             buildingsEnabled: [],
             forcePeace: true,
         })

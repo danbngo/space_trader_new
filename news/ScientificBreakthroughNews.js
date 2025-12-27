@@ -9,9 +9,9 @@ class ScientificBreakthroughNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                industry: 0.8,
-                credits: 0.8,
-                marketCargoAmounts: 0.9,
+                industry: CL.LOW,
+                credits: CL.LOW,
+                marketCargoAmounts: CL.SLIGHTLY_LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.ISOTOPES, 2]]),
             })
         ]
@@ -19,10 +19,10 @@ class ScientificBreakthroughNews extends News {
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //actual knowledge gained cannot be lost
         Object.assign(this.endEffects[0], {
-            shipQuality: 1.3,
-            prestige: 1.1,
-            officerQuality: 1.1,
-            military: 1.1,
+            shipQuality: CL.HIGH,
+            prestige: CL.SLIGHTLY_HIGH,
+            officerQuality: CL.SLIGHTLY_HIGH,
+            military: CL.SLIGHTLY_HIGH,
         })
     }
 

@@ -18,18 +18,18 @@ class CivilWarNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 //newGovernmentType: GOVERNMENT_TYPES.ANARCHY, //there IS a government still
-                territory: 0.8,
+                territory: CL.LOW,
                 military: 0.4,
-                security: 0.7,
-                crime: 1.4,
-                population: 0.7,
-                commerce: 0.7,
-                industry: 0.7,
-                marketCargoAmounts: 0.8,
-                marketPrices: 1.3,
-                blackMarketCargoAmounts: 1.4,
-                credits: 0.8,
-                prestige: 0.8,
+                security: CL.LOW,
+                crime: CL.VERY_HIGH,
+                population: CL.LOW,
+                commerce: CL.LOW,
+                industry: CL.LOW,
+                marketCargoAmounts: CL.LOW,
+                marketPrices: CL.HIGH,
+                blackMarketCargoAmounts: CL.VERY_HIGH,
+                credits: CL.LOW,
+                prestige: CL.LOW,
                 buildingsDisabled: buildingsToDisable,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, 2], [CARGO_TYPES.ANTIMATTER, 2]]),
             })
@@ -41,10 +41,10 @@ class CivilWarNews extends News {
 
         //some lingering ill effects on population, prestige, territory, military
         Object.assign(this.endEffects[0], {
-            population: (1 + this.endEffects[0].population)/2,
-            prestige: (1 + this.endEffects[0].prestige)/2,
-            territory: (1 + this.endEffects[0].territory)/2,
-            military: (1 + this.endEffects[0].military)/2,
+            population: News.clHalfRegression(this.endEffects[0].population),
+            prestige: News.clHalfRegression(this.endEffects[0].prestige),
+            territory: News.clHalfRegression(this.endEffects[0].territory),
+            military: News.clHalfRegression(this.endEffects[0].military),
         })
     }
     isValid() {

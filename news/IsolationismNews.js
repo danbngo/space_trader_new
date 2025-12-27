@@ -9,17 +9,17 @@ class IsolationismNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                territory: 0.7,
-                commerce: 0.7,
-                marketPrices: 0.8,
-                marketCargoAmounts: 0.8,
-                blackMarketCargoAmounts: 0.8,
-                blackMarketPrices: 0.8,
-                credits: 0.8,
-                officerQuality: 0.9,
-                shipQuality: 0.9,
-                prestige: 0.8,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.ANTIMATTER, 0.5]]),
+                territory: CL.LOW,
+                commerce: CL.LOW,
+                marketPrices: CL.LOW,
+                marketCargoAmounts: CL.LOW,
+                blackMarketCargoAmounts: CL.LOW,
+                blackMarketPrices: CL.LOW,
+                credits: CL.LOW,
+                officerQuality: CL.SLIGHTLY_LOW,
+                shipQuality: CL.SLIGHTLY_LOW,
+                prestige: CL.LOW,
+                cargoPriceModifiers: new Map([[CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_LOW]]),
                 forceWithdrawal: true,
             })
         ]
@@ -27,11 +27,11 @@ class IsolationismNews extends News {
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //some lingering price increases and deflation
         Object.assign(this.endEffects[0], {
-            population: 1.2,
-            territory: (1 + this.endEffects[0].territory)/2,
-            officerQuality: (1 + this.endEffects[0].officerQuality)/2, //lose some knowledge
-            shipQuality: (1 + this.endEffects[0].shipQuality)/2, //lose some knowledge
-            prestige: 1,
+            population: CL.HIGH,
+            territory: News.clHalfRegression(this.endEffects[0].territory),
+            officerQuality: News.clHalfRegression(this.endEffects[0].officerQuality), //lose some knowledge
+            shipQuality: News.clHalfRegression(this.endEffects[0].shipQuality), //lose some knowledge
+            prestige: News.CL_NO_REGRESSION,
         })
     }
 

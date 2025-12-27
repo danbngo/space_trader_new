@@ -41,6 +41,11 @@ class News {
         this.endedYear = null;
     }
 
+    static clHalfRegression(magnitude=1.0) {
+        return 1/(1 + magnitude)
+    }
+    static CL_NO_REGRESSION = 0
+
     //implement in sub-classes
     isValid() {
         return true

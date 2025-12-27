@@ -39,7 +39,7 @@ const NEWS_TYPES = {
     IMMIGRATION: new NewsType('Immigration', COLORS.LightGray, 5, 10, 1), //influx of population to the planet
     CONSTRUCTION: new NewsType('Construction', COLORS.Green, 3, 8, 1), //enables some buildings on the target planet
     COLONIZATION: new NewsType('Colonization', COLORS.LightGreen, 7, 15, 1), //establishes a new colony on an uninhabited planet
-    INFLATION: new NewsType('Inflation', COLORS.Orange, 3, 8, 1), //prices go up across the board
+    STOCK_MARKET_CRASH: new NewsType('Stock Market Crash', COLORS.Red, 3, 8, 1), //financial crash damages commerce and credits
     SCIENTIFIC_BREAKTHROUGH: new NewsType('Scientific Breakthrough', COLORS.Green, 1, 4, 1), //improves industrial and commercial ratings
     CRACKDOWN: new NewsType('Crackdown', COLORS.LightGray, 3, 8, 1), //temporary increase in security and decrease in crime
     CRIME_WAVE: new NewsType('Crime Wave', COLORS.Orange, 3, 8, 1), //temporary increase in crime and decrease in security

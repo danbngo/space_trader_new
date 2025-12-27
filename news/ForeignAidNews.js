@@ -9,25 +9,25 @@ class ForeignAidNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                marketPrices: 0.8,
-                marketCargoAmounts: 1.4,
-                commerce: 1.2,
-                industry: 1.2,
-                credits: 1.4,
-                shipyardNumShips: 1.2,
-                prestige: 0.6,
+                marketPrices: CL.LOW,
+                marketCargoAmounts: CL.VERY_HIGH,
+                commerce: CL.HIGH,
+                industry: CL.HIGH,
+                credits: CL.VERY_HIGH,
+                shipyardNumShips: CL.HIGH,
+                prestige: CL.VERY_LOW,
             })
         ]
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
 
         Object.assign(this.endEffects[0], {
-            marketCargoAmounts: (1 + this.endEffects[0].marketCargoAmounts)/2,
-            commerce: (1 + this.endEffects[0].commerce)/2,
-            credits: (1 + this.endEffects[0].credits)/2,
-            industry: (1 + this.endEffects[0].industry)/2,
-            shipyardNumShips: (1 + this.endEffects[0].shipyardNumShips)/2,
-            prestige: 1 //not the best for your reputation
+            marketCargoAmounts: News.clHalfRegression(this.endEffects[0].marketCargoAmounts),
+            commerce: News.clHalfRegression(this.endEffects[0].commerce),
+            credits: News.clHalfRegression(this.endEffects[0].credits),
+            industry: News.clHalfRegression(this.endEffects[0].industry),
+            shipyardNumShips: News.clHalfRegression(this.endEffects[0].shipyardNumShips),
+            prestige: News.CL_NO_REGRESSION //not the best for your reputation
         })
     }
 

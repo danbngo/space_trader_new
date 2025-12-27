@@ -1,23 +1,30 @@
 class GenocideNews extends News {
     constructor(planet = new Planet()) {
         super(
-            `${coloredName(planet)} begins horrifically purging its society of undesirable elements! The other planets condemn this vile act!'`,
-            `${coloredName(planet)}'s purge of its people finally comes to an end!`,
+            `${coloredName(planet)} begins purging its society of 'undesirable' elements! The other planets condemn this vile act!'`,
+            `${coloredName(planet)}'s purge of its own people finally comes to an end!`,
             NEWS_TYPES.GENOCIDE, planet
         )
 
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                population: 0.7,
+                population: CL.LOW,
+                prestige: CL.EXTREMELY_LOW,
+                military: CL.LOW,
+                commerce: CL.LOW,
+                officerQuality: CL.LOW
             })
         ]
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //some lingering security and prestige decrease and destroyed goods
         Object.assign(this.endEffects[0], {
-            population: 1,
-            security: 1.5,
-            prestige: 0.9,
+            population: News.CL_NO_REGRESSION,
+            security: CL.EXTREMELY_HIGH,
+            prestige: News.CL_NO_REGRESSION,
+            military: News.CL_NO_REGRESSION,
+            commerce: News.CL_NO_REGRESSION,
+            officerQuality: News.CL_NO_REGRESSION
         })
     }
 

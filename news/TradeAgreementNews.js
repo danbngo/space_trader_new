@@ -10,34 +10,34 @@ class TradeAgreementNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
-                marketCargoAmounts: 1.3,
-                commerce: 1.2,
-                guildNumOfficers: 1.2,
-                officerQuality: 1.1,
-                shipQuality: 1.1,
-                credits: 1.2,
+                marketCargoAmounts: CL.HIGH,
+                commerce: CL.HIGH,
+                guildNumOfficers: CL.HIGH,
+                officerQuality: CL.SLIGHTLY_HIGH,
+                shipQuality: CL.SLIGHTLY_HIGH,
+                credits: CL.HIGH,
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
-                marketCargoAmounts: 1.3,
-                commerce: 1.2,
-                guildNumOfficers: 1.2,
-                officerQuality: 1.1,
-                shipQuality: 1.1,
-                credits: 1.2,
+                marketCargoAmounts: CL.HIGH,
+                commerce: CL.HIGH,
+                guildNumOfficers: CL.HIGH,
+                officerQuality: CL.SLIGHTLY_HIGH,
+                shipQuality: CL.SLIGHTLY_HIGH,
+                credits: CL.HIGH,
             })
         ]
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //some lingering benefits after
         Object.assign(this.endEffects[0], {
-            commerce: (1 + this.endEffects[0].commerce)/2,
-            credits: (1 + this.endEffects[0].credits)/2,
+            commerce: News.clHalfRegression(this.endEffects[0].commerce),
+            credits: News.clHalfRegression(this.endEffects[0].credits),
         })
         Object.assign(this.endEffects[1], {
-            commerce: (1 + this.endEffects[1].commerce)/2,
-            credits: (1 + this.endEffects[1].credits)/2,
+            commerce: News.clHalfRegression(this.endEffects[1].commerce),
+            credits: News.clHalfRegression(this.endEffects[1].credits),
         })
     }
 

@@ -9,15 +9,15 @@ class ScarcityNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                population: 0.7,
-                marketPrices: 1.5,
+                population: CL.LOW,
+                marketPrices: CL.VERY_HIGH,
                 marketCargoAmounts: 0.4,
-                industry: 0.8,
-                commerce: 0.8,
-                blackMarketCargoAmounts: 0.7,
-                blackMarketPrices: 1.4,
-                crime: 1.2,
-                shipyardNumShips: 0.7,
+                industry: CL.LOW,
+                commerce: CL.LOW,
+                blackMarketCargoAmounts: CL.LOW,
+                blackMarketPrices: CL.VERY_HIGH,
+                crime: CL.HIGH,
+                shipyardNumShips: CL.LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WATER, 2]]),
             })
         ]
@@ -25,8 +25,8 @@ class ScarcityNews extends News {
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //population does not fully bounce back
         Object.assign(this.endEffects[0], {
-            population: (1 + this.endEffects[0].population)/2,
-            industry: (1+ this.endEffects[0].industry)/2,
+            population: News.clHalfRegression(this.endEffects[0].population),
+            industry: News.clHalfRegression(this.endEffects[0].industry),
         })
     }
 

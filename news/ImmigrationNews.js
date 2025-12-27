@@ -9,19 +9,19 @@ class ImmigrationNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                population: 1.4,
-                commerce: 1.1,
-                military: 0.9,
-                security: 0.9,
-                crime: 1.1,
+                population: CL.VERY_HIGH,
+                commerce: CL.SLIGHTLY_HIGH,
+                military: CL.SLIGHTLY_LOW,
+                security: CL.SLIGHTLY_LOW,
+                crime: CL.SLIGHTLY_HIGH,
             })
         ]
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //only the population boost lingers
         Object.assign(this.endEffects[0], {
-            population: 1,
-            guildNumOfficers: 1.3,
+            population: News.CL_NO_REGRESSION,
+            guildNumOfficers: CL.HIGH,
         })
     }
 
