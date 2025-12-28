@@ -10,15 +10,15 @@ class ScarcityNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 population: CL.LOW,
-                marketPrices: CL.VERY_HIGH,
-                marketCargoAmounts: 0.4,
+                marketPrices: CL.EXTREMELY_HIGH,
+                marketCargoAmounts: CL.EXTREMELY_LOW,
                 industry: CL.LOW,
                 commerce: CL.LOW,
                 blackMarketCargoAmounts: CL.LOW,
-                blackMarketPrices: CL.VERY_HIGH,
+                blackMarketPrices: CL.HIGH,
                 crime: CL.HIGH,
-                shipyardNumShips: CL.LOW,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.WATER, 2]]),
+                shipyardNumShips: CL.VERY_LOW,
+                cargoPriceModifiers: new Map([[CARGO_TYPES.WATER, CL.ASTRONOMICAL]]),
             })
         ]
 
@@ -27,13 +27,14 @@ class ScarcityNews extends News {
         Object.assign(this.endEffects[0], {
             population: News.clHalfRegression(this.endEffects[0].population),
             industry: News.clHalfRegression(this.endEffects[0].industry),
+            commerce: News.clHalfRegression(this.endEffects[0].commerce),
         })
     }
 
     isValid() {
         const {planet} = this
         //more likely if high pop and high industry
-        const ratingsValid = planet.culture.population >= 1.25 && planet.culture.industry >= 1.25
+        const ratingsValid = planet.culture.population > CL.HIGH && planet.culture.industry >= CL.HIGH
         const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.SCARCITY, ...NEWS_TYPES_ECONOMY_BOOSTING])
         return ratingsValid && !interferingEvent
     }

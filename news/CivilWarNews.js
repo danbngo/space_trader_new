@@ -19,7 +19,7 @@ class CivilWarNews extends News {
                 planet: this.planet,
                 //newGovernmentType: GOVERNMENT_TYPES.ANARCHY, //there IS a government still
                 territory: CL.LOW,
-                military: 0.4,
+                military: CL.VERY_LOW,
                 security: CL.LOW,
                 crime: CL.VERY_HIGH,
                 population: CL.LOW,
@@ -50,7 +50,7 @@ class CivilWarNews extends News {
     isValid() {
         const {planet} = this
         //usually happens when military is large
-        const ratingsValid = planet.culture.military > 1.5
+        const ratingsValid = planet.culture.military > CL.HIGH
         //planet must not already be in anarchy or puppet state
         const validGov = planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY && planet.culture.governmentType != GOVERNMENT_TYPES.PUPPET_STATE
         //cant be having any of: construction, economic boom, revolution

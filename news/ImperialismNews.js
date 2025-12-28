@@ -1,17 +1,17 @@
 class ImperialismNews extends News {
     constructor(planet = new Planet()) {
         super(
-            `${coloredName(planet)} enacts blatant land grabs, expanding their territory!`,
+            `${coloredName(planet)} carries out blatant land grabs, expanding their territory!`,
             `${coloredName(planet)}'s imperialist expansion finally grinds to a halt!`,
             NEWS_TYPES.IMPERIALISM, planet
         )
 
+        //this event seems kinda weak, may need a rewrite later
+
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                military: CL.LOW,
-                territory: CL.HIGH,
-                commerce: CL.LOW,
+                military: CL.VERY_LOW,
                 prestige: CL.VERY_LOW, //people dont like power players
             })
         ]
@@ -20,8 +20,8 @@ class ImperialismNews extends News {
 
         //some lingering drops, especially prestige
         Object.assign(this.endEffects[0], {
-            territory: News.CL_NO_REGRESSION,
-            prestige: News.CL_NO_REGRESSION,
+            territory: CL.HIGH,
+            prestige: CL.NO_REGRESSION,
             military: News.clHalfRegression(this.endEffects[0].military),
         })
     }

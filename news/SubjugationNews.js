@@ -12,10 +12,9 @@ class SubjugationNews extends News {
                 targetPlanet: this.targetPlanet,
                 newRelationship: RELATIONSHIP_TYPES.SOVEREIGN,
                 territory: CL.VERY_HIGH,
-                military: CL.SLIGHTLY_HIGH,
+                military: CL.SLIGHTLY_LOW,
                 commerce: CL.HIGH,
-                industry: CL.SLIGHTLY_HIGH,
-                marketCargoAmounts: CL.VERY_HIGH,
+                marketCargoAmounts: CL.HIGH,
                 prestige: CL.HIGH,
             }),
             new NewsEffect({
@@ -23,12 +22,11 @@ class SubjugationNews extends News {
                 targetPlanet: this.planet,
                 newGovernmentType: GOVERNMENT_TYPES.PUPPET_STATE,
                 newRelationship: RELATIONSHIP_TYPES.SUBJECT,
-                territory: CL.LOW,
+                territory: CL.VERY_LOW,
                 military: CL.EXTREMELY_LOW,
                 security: CL.VERY_LOW,
                 commerce: CL.LOW,
-                industry: 0.75,
-                marketCargoAmounts: CL.VERY_LOW,
+                marketCargoAmounts: CL.LOW,
                 prestige: 0.2,
                 relationsReset: true,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_LOW]]),
@@ -37,7 +35,7 @@ class SubjugationNews extends News {
         ]
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
-        //subjugating others has some lingering positive effects on territory, military, presstige
+        //subjugating others has some lingering effects on territory, military, presstige
         Object.assign(this.endEffects[0], {
             territory: News.clHalfRegression(this.endEffects[0].territory),
             military: News.clHalfRegression(this.endEffects[0].military),
@@ -55,8 +53,8 @@ class SubjugationNews extends News {
 
     isValid() {
         const {planet, targetPlanet} = this
-        //our army must be significantly better than theirs
-        const ratingsValid = planet.culture.military > targetPlanet.culture.military*2
+        //our army must be both large and  significantly better than theirs
+        const ratingsValid = (planet.culture.military > CL.HIGH) && (planet.culture.military > targetPlanet.culture.military*2)
         //cant be anarchic or puppet state
         const agencyValid = (planet.culture.governmentType !== GOVERNMENT_TYPES.ANARCHY && planet.culture.governmentType !== GOVERNMENT_TYPES.PUPPET_STATE)
         //planet must be at war with the target

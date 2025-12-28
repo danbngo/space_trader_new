@@ -20,9 +20,9 @@ class ColonizationNews extends News {
         //system becomes more crowded over time...
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.endEffects[0], {
-            population: News.CL_NO_REGRESSION, //pop doesnt auto recover
-            guildNumOfficers: News.CL_NO_REGRESSION,
-            shipyardNumShips: News.CL_NO_REGRESSION,
+            population: CL.NO_REGRESSION, //pop doesnt auto recover
+            guildNumOfficers: CL.NO_REGRESSION,
+            shipyardNumShips: CL.NO_REGRESSION,
             commerce: CL.SLIGHTLY_HIGH,
             territory: CL.HIGH,
             prestige: CL.SLIGHTLY_HIGH,

@@ -1,8 +1,8 @@
 class EnvironmentalDisasterNews extends News {
     constructor(planet = new Planet()) {
         super(
-            `${coloredName(planet)}'s polluting has led to environmental disaster!`,
-            `${coloredName(planet)} has successfully mitigated their environmental disaster!`,
+            `${coloredName(planet)}'s polluting has led to environmental disaster! Cleanup efforts are underway!`,
+            `${coloredName(planet)} has cleaned up their environmental disaster, but lasting damage to the planet remains!`,
             NEWS_TYPES.ENVIRONMENTAL_DISASTER, planet
         )
 
@@ -11,8 +11,8 @@ class EnvironmentalDisasterNews extends News {
                 planet: this.planet,
                 marketPrices: CL.SLIGHTLY_HIGH,
                 marketCargoAmounts: CL.LOW,
-                commerce: CL.LOW,
-                industry: 0.4,
+                commerce: CL.SLIGHTLY_LOW,
+                industry: CL.VERY_LOW,
                 population: CL.SLIGHTLY_LOW,
                 credits: CL.LOW,
                 shipyardNumShips: CL.LOW,
@@ -24,7 +24,7 @@ class EnvironmentalDisasterNews extends News {
         //market, commerce, industry, population do not fully bounce back
         Object.assign(this.endEffects[0], {
             marketPrices: News.clHalfRegression(this.endEffects[0].marketPrices),
-            commerce: News.clHalfRegression(this.endEffects[0].commerce),
+            marketCargoAmounts: News.clHalfRegression(this.endEffects[0].marketCargoAmounts),
             industry: News.clHalfRegression(this.endEffects[0].industry),
             population: News.clHalfRegression(this.endEffects[0].population),
         })
@@ -33,7 +33,7 @@ class EnvironmentalDisasterNews extends News {
     isValid() {
         const {planet} = this
         //happens when industry is getting out of hand
-        const ratingsValid = planet.culture.industry >= 1.5
+        const ratingsValid = planet.culture.industry >= CL.HIGH
         const interferingEvent = News.hasNews(NEWS_TYPES.ENVIRONMENTAL_DISASTER, planet)
         return ratingsValid && !interferingEvent
     }

@@ -42,10 +42,8 @@ class News {
     }
 
     static clHalfRegression(magnitude=1.0) {
-        return 1/(1 + magnitude)
+        return (1+magnitude)/2
     }
-    static CL_NO_REGRESSION = 0
-
     //implement in sub-classes
     isValid() {
         return true

@@ -34,7 +34,7 @@ class WarNews extends News {
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.endEffects[0], {
-            prestige: News.CL_NO_REGRESSION, //being a warmonger = bad
+            prestige: CL.NO_REGRESSION, //being a warmonger = bad
         })
 
 

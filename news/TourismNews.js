@@ -20,6 +20,7 @@ class TourismNews extends News {
         Object.assign(this.endEffects[0], {
             industry: News.clHalfRegression(this.endEffects[0].industry), //industry doesnt fully recover
             credits: 1.5/(0.7),
+            crime: CL.SLIGHTLY_HIGH,
             blackMarketCargoAmounts: CL.VERY_HIGH,
             blackMarketPrices: CL.VERY_HIGH,
         })
@@ -28,7 +29,7 @@ class TourismNews extends News {
     isValid() {
         const {planet} = this
         //more likely to try this out if we need money
-        const ratingsValid = planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS < 0.75
+        const ratingsValid = planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS < CL.LOW
         const interferingEvent = 
             News.planetHasAnyNews(planet, [NEWS_TYPES.TOURISM, ...NEWS_TYPES_ECONOMY_PREVENTING]) ||
             News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_ECONOMY_PREVENTING) ||

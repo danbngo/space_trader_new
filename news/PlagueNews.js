@@ -1,7 +1,7 @@
 class PlagueNews extends News {
     constructor(planet = new Planet()) {
         super(
-            `${coloredName(planet)} is struck by plague!`,
+            `${coloredName(planet)} is struck by a vicious plague! The population is being decimated!`,
             `${coloredName(planet)} develops a cure for their plague!`,
             NEWS_TYPES.PLAGUE, planet
         )
@@ -10,11 +10,11 @@ class PlagueNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 population: CL.VERY_LOW,
-                commerce: CL.LOW,
+                commerce: CL.VERY_LOW,
                 industry: CL.VERY_LOW,
                 guildNumOfficers: CL.VERY_LOW,
                 marketPrices: CL.SLIGHTLY_HIGH,
-                marketCargoAmounts: CL.LOW,
+                marketCargoAmounts: CL.SLIGHTLY_LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.MEDICINE, 3]]),
             })
         ]
@@ -30,7 +30,7 @@ class PlagueNews extends News {
     isValid() {
         const {planet} = this
         //happens when population is getting out of hand
-        const ratingsValid = planet.culture.population >= 1.5
+        const ratingsValid = planet.culture.population > CL.MEDIUM
 
         const interferingEvent = //can happy anytime, anywhere!
             News.hasNews(NEWS_TYPES.PLAGUE, planet)

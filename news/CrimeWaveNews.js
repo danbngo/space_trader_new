@@ -9,11 +9,10 @@ class CrimeWaveNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                security: CL.LOW,
+                security: CL.HIGH,
                 crime: CL.EXTREMELY_HIGH,
-                military: CL.SLIGHTLY_LOW,
                 blackMarketCargoAmounts: CL.VERY_HIGH,
-                blackMarketPrices: CL.LOW,
+                blackMarketPrices: CL.VERY_LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, CL.EXTREMELY_LOW], [CARGO_TYPES.DRUGS, CL.EXTREMELY_LOW]]),
             })
         ]
@@ -30,7 +29,7 @@ class CrimeWaveNews extends News {
     isValid() {
         const {planet} = this
         //wont happen if crime or security is already high
-        const ratingsValid = planet.culture.crime < 0.75
+        const ratingsValid = planet.culture.crime < CL.MEDIUM && planet.culture.security < CL.MEDIUM
         const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.CRIME_WAVE, ...NEWS_TYPES_CRIME_PREVENTING])
         return ratingsValid && !interferingEvent
     }

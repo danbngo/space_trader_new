@@ -20,15 +20,15 @@ class RevivalNews extends News {
 
         //dont revert ratings, but raise birthrates
         Object.assign(this.endEffects[0], {
-            population: CL.VERY_HIGH,
-            officerQuality: News.CL_NO_REGRESSION,
+            population: CL.HIGH,
+            officerQuality: CL.NO_REGRESSION,
         })
     }
 
     isValid() {
         const {planet} = this
         //cant become even dumber if we're already low
-        const ratingsValid = planet.culture.officerQuality > 0.75
+        const ratingsValid = planet.culture.officerQuality > CL.LOW
         //planet must not already be in anarchy or puppet state
         const interferingEvent =
             News.planetHasAnyNews(planet, [NEWS_TYPES.REVIVAL])

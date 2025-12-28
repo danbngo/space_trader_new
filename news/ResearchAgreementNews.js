@@ -9,16 +9,12 @@ class ResearchAgreementNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                industry: CL.LOW,
                 credits: CL.LOW,
-                marketCargoAmounts: CL.SLIGHTLY_LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.ISOTOPES, 2]]),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                industry: CL.LOW,
                 credits: CL.LOW,
-                marketCargoAmounts: CL.SLIGHTLY_LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.ISOTOPES, 2]]),
             }),      
         ]
@@ -28,12 +24,12 @@ class ResearchAgreementNews extends News {
         Object.assign(this.endEffects[0], {
             shipQuality: CL.SLIGHTLY_HIGH,
             officerQuality: CL.HIGH,
-            military: CL.HIGH,
+            military: CL.SLIGHTLY_HIGH,
         })
         Object.assign(this.endEffects[1], {
             shipQuality: CL.SLIGHTLY_HIGH,
             officerQuality: CL.HIGH,
-            military: CL.HIGH,
+            military: CL.SLIGHTLY_HIGH,
         })
     }
 

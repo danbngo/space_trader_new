@@ -9,9 +9,8 @@ class Environmentalism extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                commerce: CL.SLIGHTLY_LOW,
-                industry: 0.4,
-                shipyardNumShips: CL.LOW,
+                industry: CL.EXTREMELY_LOW,
+                shipyardNumShips: CL.VERY_LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.NANITES, CL.EXTREMELY_LOW], [CARGO_TYPES.METAL, CL.EXTREMELY_LOW]]),
             })
         ]
@@ -21,7 +20,6 @@ class Environmentalism extends News {
         Object.assign(this.endEffects[0], {
             population: CL.HIGH,
             shipyardNumShips: News.clHalfRegression(this.endEffects[0].shipyardNumShips),
-            commerce: News.clHalfRegression(this.endEffects[0].commerce),
             industry: News.clHalfRegression(this.endEffects[0].industry),
             prestige: CL.HIGH,
         })
@@ -30,7 +28,7 @@ class Environmentalism extends News {
     isValid() {
         const {planet} = this
         //happens when industry is getting out of hand
-        const ratingsValid = planet.culture.industry >= 1.5
+        const ratingsValid = planet.culture.industry >= CL.HIGH
         const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.ENVIRONMENTALISM, ...NEWS_TYPES_ECONOMY_PREVENTING])
         return ratingsValid && !interferingEvent
     }

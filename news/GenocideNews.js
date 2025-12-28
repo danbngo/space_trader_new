@@ -10,21 +10,21 @@ class GenocideNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 population: CL.LOW,
-                prestige: CL.EXTREMELY_LOW,
                 military: CL.LOW,
                 commerce: CL.LOW,
-                officerQuality: CL.LOW
+                officerQuality: CL.LOW,
+                prestige: CL.EXTREMELY_LOW,
             })
         ]
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //some lingering security and prestige decrease and destroyed goods
         Object.assign(this.endEffects[0], {
-            population: News.CL_NO_REGRESSION,
+            population: CL.NO_REGRESSION,
+            prestige: CL.NO_REGRESSION,
+            military: CL.NO_REGRESSION,
+            commerce: CL.NO_REGRESSION,
+            officerQuality: CL.NO_REGRESSION,
             security: CL.EXTREMELY_HIGH,
-            prestige: News.CL_NO_REGRESSION,
-            military: News.CL_NO_REGRESSION,
-            commerce: News.CL_NO_REGRESSION,
-            officerQuality: News.CL_NO_REGRESSION
         })
     }
 

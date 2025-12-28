@@ -24,9 +24,9 @@ class BombardmentNews extends News {
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
-                population: CL.SLIGHTLY_LOW,
+                population: CL.LOW,
                 military: CL.EXTREMELY_LOW,
-                industry: 0.4,
+                industry: CL.LOW,
                 commerce: CL.LOW,
                 security: CL.LOW,
                 marketCargoAmounts: CL.LOW,
@@ -42,16 +42,15 @@ class BombardmentNews extends News {
         //dont automatically recover. lets add recovery events elsewhere
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.endEffects[1], {
-            population: News.CL_NO_REGRESSION,
-            military: News.CL_NO_REGRESSION,
-            industry: News.CL_NO_REGRESSION,
-            commerce: News.CL_NO_REGRESSION,
-            security: News.CL_NO_REGRESSION,
-            marketCargoAmounts: News.CL_NO_REGRESSION,
-            //marketPrices: News.CL_NO_REGRESSION, //prices will normalize
-            shipQuality: News.CL_NO_REGRESSION,
-            officerQuality: News.CL_NO_REGRESSION,
-            prestige: News.CL_NO_REGRESSION,
+            population: CL.NO_REGRESSION,
+            military: CL.NO_REGRESSION,
+            industry: CL.NO_REGRESSION,
+            commerce: CL.NO_REGRESSION,
+            security: CL.NO_REGRESSION,
+            marketCargoAmounts: CL.NO_REGRESSION,
+            shipQuality: CL.NO_REGRESSION,
+            officerQuality: CL.NO_REGRESSION,
+            prestige: CL.NO_REGRESSION,
             buildingsEnabled: [],
             forcePeace: true,
         })

@@ -2,7 +2,7 @@ class RaidingNews extends News {
     constructor(planet = new Planet()) {
         super(
             `${coloredName(planet)} launches raids on neighboring settlements! Plundered goods flood their markets!`,
-            `${coloredName(planet)} ceases its raiding operations.`,
+            `${coloredName(planet)} ceases its raiding operations!`,
             NEWS_TYPES.RAIDING, planet
         )
 
@@ -11,8 +11,8 @@ class RaidingNews extends News {
                 planet: this.planet,
                 marketCargoAmounts: CL.VERY_HIGH,
                 blackMarketCargoAmounts: CL.VERY_HIGH,
-                marketPrices: CL.LOW,
-                blackMarketPrices: CL.LOW,
+                marketPrices: CL.VERY_LOW,
+                blackMarketPrices: CL.VERY_LOW,
                 commerce: CL.HIGH,
                 military: CL.LOW, // diverting forces to raiding weakens defense
                 prestige: CL.LOW,
@@ -21,13 +21,13 @@ class RaidingNews extends News {
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         // Market goods normalize back, but commerce gains, military loss, and prestige damage are permanent
         Object.assign(this.endEffects[0], {
-            marketCargoAmounts: News.CL_NO_REGRESSION,
-            blackMarketCargoAmounts: News.CL_NO_REGRESSION,
+            prestige: CL.NO_REGRESSION,
             commerce: News.clHalfRegression(this.endEffects[0].commerce),
             military: News.clHalfRegression(this.endEffects[0].military),
             marketPrices: News.clHalfRegression(this.endEffects[0].marketPrices),
             blackMarketPrices: News.clHalfRegression(this.endEffects[0].blackMarketPrices),
-            prestige: News.CL_NO_REGRESSION,
+            marketCargoAmounts: CL.NO_REGRESSION,
+            blackMarketCargoAmounts: CL.NO_REGRESSION,
         })
     }
 

@@ -10,7 +10,7 @@ class AddictionNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 population: CL.LOW,
-                security: CL.VERY_LOW,
+                security: CL.LOW,
                 crime: CL.HIGH,
                 commerce: CL.LOW,
                 blackMarketCargoAmounts: CL.VERY_LOW,
@@ -21,7 +21,7 @@ class AddictionNews extends News {
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //some lingering security and prestige decrease and destroyed goods
         Object.assign(this.endEffects[0], {
-            population: News.CL_NO_REGRESSION,
+            population: News.clHalfRegression(this.endEffects[0].population),
             blackMarketPrices: News.clHalfRegression(this.endEffects[0].blackMarketPrices),
             blackMarketCargoAmounts: News.clHalfRegression(this.endEffects[0].blackMarketCargoAmounts),
             crime: News.clHalfRegression(this.endEffects[0].crime),
@@ -31,7 +31,7 @@ class AddictionNews extends News {
     isValid() {
         const {planet} = this
         //more likely if high drug availability
-        const ratingsValid = (planet.settlement.blackMarket.baseCargo.getAmount(CARGO_TYPES.DRUGS) / MARKET_AVERAGE_CARGO_PER_TYPE) > 1.25
+        const ratingsValid = (planet.settlement.blackMarket.baseCargo.getAmount(CARGO_TYPES.DRUGS) / MARKET_AVERAGE_CARGO_PER_TYPE) > CL.HIGH
         const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.ADDICTION, ...NEWS_TYPES_CRIME_PREVENTING])
         return ratingsValid && !interferingEvent
     }

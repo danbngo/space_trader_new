@@ -9,25 +9,27 @@ class ConscriptionNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                military: CL.VERY_HIGH,
+                population: CL.LOW,
                 commerce: CL.LOW,
                 industry: CL.LOW,
+                prestige: CL.SLIGHTLY_LOW, // permanent prestige loss
             })
         ]
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         // Military gains are kept, but commerce/industry/prestige damage is permanent
         Object.assign(this.endEffects[0], {
-            military: News.CL_NO_REGRESSION, // normalize back
-            commerce: News.CL_NO_REGRESSION, // keep the damage
-            industry: News.CL_NO_REGRESSION, // keep the damage
-            prestige: CL.SLIGHTLY_LOW, // permanent prestige loss
+            population: CL.NO_REGRESSION,
+            military: CL.VERY_HIGH,
+            commerce: CL.NO_REGRESSION, // keep the damage
+            industry: CL.NO_REGRESSION, // keep the damage
+            prestige: CL.NO_REGRESSION, // permanent prestige loss
         })
     }
 
     isValid() {
         const {planet} = this
         // More likely if military is low or security is low (militarizing society)
-        const ratingsValid = planet.culture.military < 0.6 || planet.culture.security < 0.5
+        const ratingsValid = planet.culture.military < CL.LOW && planet.culture.population > CL.MEDIUM
         // Police states and authoritarian regimes would do this; not democracies or anarchies
         const govCheck = planet.culture.governmentType != GOVERNMENT_TYPES.DEMOCRACY 
             && planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY

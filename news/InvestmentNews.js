@@ -1,8 +1,8 @@
 class InvestmentNews extends News {
     constructor(planet = new Planet(), targetPlanet = new Planet()) {
         super(
-            `${coloredName(planet)} sends a massive investment to ${coloredName(targetPlanet)}!`,
-            `${coloredName(planet)}'s investment in ${coloredName(targetPlanet)} is complete!`,
+            `${coloredName(planet)} sends a massive economic investment to ${coloredName(targetPlanet)}!`,
+            `${coloredName(planet)}'s economic investment in ${coloredName(targetPlanet)} is complete!`,
             NEWS_TYPES.INVESTMENT, planet, targetPlanet
         )
 
@@ -16,6 +16,8 @@ class InvestmentNews extends News {
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
+                marketCargoAmounts: CL.VERY_HIGH,
+                credits: CL.HIGH,
             })
         ]
 
@@ -29,14 +31,14 @@ class InvestmentNews extends News {
         Object.assign(this.endEffects[1], {
             industry: CL.VERY_HIGH,
             commerce: CL.SLIGHTLY_HIGH,
-            shipyardNumShips: CL.HIGH,
+            shipyardNumShips: CL.SLIGHTLY_HIGH,
         })
     }
 
     isValid() {
         const {planet, targetPlanet} = this
         //need to have sufficient economy of our own
-        const ratingsValid = planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS >= 1.25 || planet.settlement.market.baseCargo.average/MARKET_AVERAGE_CARGO_PER_TYPE > 1.25
+        const ratingsValid = planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS >= CL.SLIGHTLY_HIGH || planet.settlement.market.baseCargo.average/MARKET_AVERAGE_CARGO_PER_TYPE > CL.SLIGHTLY_HIGH
         //our economy should be larger than theirs
         const transferValid = planet.culture.commerce > targetPlanet.culture.commerce && planet.settlement.bank.baseCredits > targetPlanet.settlement.bank.baseCredits && planet.settlement.market.baseCargo.average > targetPlanet.settlement.market.baseCargo.average
         //both planets must be neutral or allies

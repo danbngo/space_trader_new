@@ -11,7 +11,7 @@ class StockMarketCrashNews extends News {
                 planet: this.planet,
                 industry: CL.VERY_LOW,
                 commerce: CL.VERY_LOW,
-                credits: 0.2,
+                credits: CL.EXTREMELY_LOW,
                 marketCargoAmounts: CL.LOW,
                 marketPrices: CL.HIGH,
             })

@@ -19,6 +19,7 @@ class ScientificBreakthroughNews extends News {
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //actual knowledge gained cannot be lost
         Object.assign(this.endEffects[0], {
+            credits: News.clHalfRegression(this.endEffects[0].credits),
             shipQuality: CL.HIGH,
             prestige: CL.SLIGHTLY_HIGH,
             officerQuality: CL.SLIGHTLY_HIGH,
@@ -28,8 +29,8 @@ class ScientificBreakthroughNews extends News {
 
     isValid() {
         const {planet} = this
-        //wont bother if we're already at the top
-        const ratingsValid = planet.culture.shipQuality < 1.5
+        //needs money. wont bother if we're already at the top
+        const ratingsValid = planet.settlement.market.baseCredits/MARKET_AVERAGE_CREDITS > CL.MEDIUM && planet.culture.shipQuality < CL.EXTREMELY_HIGH
         //hard times dont block it, may actually accelerate technological progress
         const interferingEvent = News.hasNews(NEWS_TYPES.SCIENTIFIC_BREAKTHROUGH, planet)
         return ratingsValid && !interferingEvent

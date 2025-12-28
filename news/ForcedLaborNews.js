@@ -13,24 +13,25 @@ class ForcedLaborNews extends News {
                 commerce: CL.LOW,
                 population: CL.LOW,
                 prestige: CL.LOW,
-                marketCargoAmounts: CL.VERY_HIGH,
-                marketPrices: CL.LOW,
+                marketCargoAmounts: CL.HIGH,
+                //marketPrices: CL.LOW,
             })
         ]
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         // Industrial gains are permanent, commerce damage and prestige loss are permanent
         Object.assign(this.endEffects[0], {
             industry: News.clHalfRegression(this.endEffects[0].industry),
+            commerce: News.clHalfRegression(this.endEffects[0].commerce),
             population: News.clHalfRegression(this.endEffects[0].population),
-            commerce: News.CL_NO_REGRESSION, // keep the damage
-            prestige: News.CL_NO_REGRESSION, // permanent prestige loss
+            marketCargoAmounts: News.clHalfRegression(this.endEffects[0].marketCargoAmounts),
+            prestige: CL.NO_REGRESSION, // permanent prestige loss
         })
     }
 
     isValid() {
         const {planet} = this
         // More likely if industry is low (trying to industrialize)
-        const ratingsValid = planet.culture.industry < 0.5
+        const ratingsValid = planet.culture.industry < CL.LOW
         // Authoritarian governments, police states, and communist states would do this
         // Not democracies or anarchies
         const govCheck = planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY

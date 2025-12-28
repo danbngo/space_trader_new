@@ -9,12 +9,13 @@ class EconomicBoomNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                marketPrices: CL.LOW,
+                marketPrices: CL.VERY_LOW,
                 marketCargoAmounts: CL.VERY_HIGH,
-                blackMarketCargoAmounts: CL.HIGH,
-                commerce: CL.VERY_HIGH,
-                industry: CL.HIGH,
-                credits: CL.VERY_HIGH,
+                blackMarketCargoAmounts: CL.VERY_HIGH,
+                //dont effect BM prices due to decadent spending!
+                commerce: CL.EXTREMELY_HIGH,
+                industry: CL.VERY_HIGH,
+                credits: CL.EXTREMELY_HIGH,
                 shipyardNumShips: CL.VERY_HIGH,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.HOLOCUBES, CL.EXTREMELY_HIGH]]),
             })
@@ -28,7 +29,6 @@ class EconomicBoomNews extends News {
 
     isValid() {
         const {planet} = this
-        //const ratingsValid = (planet.culture.commerce >= 1.2) && (planet.culture.industry >= 1.2)
         //basically just a bonus for not being in a war or anything stupid
         const interferingEvent = 
             News.planetHasAnyNews(planet, [NEWS_TYPES.ECONOMIC_BOOM, ...NEWS_TYPES_ECONOMY_PREVENTING]) ||

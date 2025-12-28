@@ -137,5 +137,8 @@ const CL = Object.freeze({
     SLIGHTLY_HIGH: 9/8,
     HIGH: 10/8,
     VERY_HIGH: 12/8,
-    EXTREMELY_HIGH: 16/8
+    EXTREMELY_HIGH: 16/8,
+    ASTRONOMICAL: 32/8,
+    NO_REGRESSION: 1,
+    MEDIUM: 1
 })

@@ -16,11 +16,11 @@ class RevolutionNews extends News {
                 planet: this.planet,
                 newGovernmentType: GOVERNMENT_TYPES.ANARCHY ? null : GOVERNMENT_TYPES.ANARCHY,
                 military: CL.VERY_LOW,
-                security: CL.LOW,
+                security: CL.VERY_LOW,
                 crime: CL.VERY_HIGH,
                 commerce: CL.LOW,
                 industry: CL.LOW,
-                credits: CL.EXTREMELY_LOW,
+                credits: CL.VERY_LOW,
                 buildingsDisabled: courthouseBuilding ? [courthouseBuilding] : [],
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, CL.VERY_HIGH], [CARGO_TYPES.HOLOCUBES, CL.VERY_HIGH]]),
                 //relationsReset: true

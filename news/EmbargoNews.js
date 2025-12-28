@@ -27,12 +27,16 @@ class EmbargoNews extends News {
         ]
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        //dont fully recover commerce
+        Object.assign(this.endEffects[0], {
+            commerce: News.clHalfRegression(this.endEffects[0].commerce),
+        })
     }
 
     isValid() {
         const {planet, targetPlanet} = this
         //need to have enough ships for it
-        const ratingsValid = planet.culture.military > 1
+        const ratingsValid = planet.culture.military > CL.MEDIUM
         //cant be anarchic or puppet state
         const agencyValid = (planet.culture.governmentType !== GOVERNMENT_TYPES.ANARCHY && planet.culture.governmentType !== GOVERNMENT_TYPES.PUPPET_STATE)
         //planet must already be hostile to the target planet

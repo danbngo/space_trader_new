@@ -23,14 +23,15 @@ class MilitaryBuildupNews extends News {
                 prestige: CL.SLIGHTLY_HIGH,
                 officerQuality: CL.HIGH,
                 guildNumOfficers: CL.HIGH,
-                credits: News.CL_NO_REGRESSION, //so is wasting money
-                commerce: News.CL_NO_REGRESSION,
+                credits: CL.NO_REGRESSION, //so is wasting money
+                commerce: CL.NO_REGRESSION,
+                industry: CL.NO_REGRESSION,
         })
     }
     isValid() {
         const {planet} = this
         //dont do it if military is already big
-        const ratingsValid = planet.culture.military < 0.75
+        const ratingsValid = planet.culture.military < CL.MEDIUM
         //dont do it if no government are tense with us or vice versa
         let politicsValid = false
         for (const p of gs.system.planets) {

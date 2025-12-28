@@ -31,7 +31,7 @@ class IsolationismNews extends News {
             territory: News.clHalfRegression(this.endEffects[0].territory),
             officerQuality: News.clHalfRegression(this.endEffects[0].officerQuality), //lose some knowledge
             shipQuality: News.clHalfRegression(this.endEffects[0].shipQuality), //lose some knowledge
-            prestige: News.CL_NO_REGRESSION,
+            prestige: CL.NO_REGRESSION,
         })
     }
 

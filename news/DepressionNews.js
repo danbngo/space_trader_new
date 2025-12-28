@@ -10,13 +10,13 @@ class DepressionNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 marketPrices: CL.EXTREMELY_LOW,
-                marketCargoAmounts: 0.4,
-                commerce: CL.VERY_LOW,
-                industry: CL.LOW,
-                credits: CL.VERY_LOW,
+                marketCargoAmounts: CL.EXTREMELY_LOW,
+                commerce: CL.EXTREMELY_LOW,
+                industry: CL.VERY_LOW,
+                credits: CL.EXTREMELY_LOW,
                 crime: CL.HIGH,
                 guildNumOfficers: CL.HIGH,
-                prestige: CL.LOW,
+                prestige: CL.SLIGHTLY_LOW,
                 //blackMarketCargoAmounts: 0.7, -recession-proof industry
                 //blackMarketPrices: 0.7,
             })
@@ -38,7 +38,7 @@ class DepressionNews extends News {
     isValid() {
         const {planet} = this
         //more likely to happen when credit is REALLY high
-        const ratingsValid = (planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS) > 1.5
+        const ratingsValid = (planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS) > CL.HIGH
         const interferingEvent =
             News.planetHasAnyNews(planet, [NEWS_TYPES.DEPRESSION, ...NEWS_TYPES_ECONOMY_BOOSTING]) || 
             News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_ECONOMY_BOOSTING)

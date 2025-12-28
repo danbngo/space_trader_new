@@ -41,8 +41,7 @@ class TensionsNews extends News {
 
         //there generally won't be beef if the power disparity is too large
         const powerRatio = planet.culture.military / targetPlanet.culture.military
-        const powerRatioInv = targetPlanet.culture.military / planet.culture.military
-        const powerValid = powerRatio <= 2 && powerRatioInv <= 2
+        const powerValid = powerRatio < CL.VERY_HIGH && powerRatio > CL.VERY_LOW
 
         const relationshipValid = planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.NEUTRAL && targetPlanet.culture.relationships.get(planet) == RELATIONSHIP_TYPES.NEUTRAL
         const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.TENSIONS, ...NEWS_TYPES_HOSTILE, ...NEWS_TYPES_COOPERATIVE])

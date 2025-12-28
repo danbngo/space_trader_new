@@ -16,14 +16,15 @@ class CivilStrifeNews extends News {
                 industry: CL.VERY_LOW,
                 credits: CL.LOW,
                 marketCargoAmounts: CL.LOW,
+                prestige: CL.SLIGHTLY_LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, CL.VERY_HIGH]]), //this is the only thing that normalizes after
             })
         ]
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //some lingering security and prestige decrease and destroyed goods
         Object.assign(this.endEffects[0], {
+            prestige: CL.NO_REGRESSION,
             security: News.clHalfRegression(this.endEffects[0].security),
-            prestige: CL.SLIGHTLY_LOW,
             commerce: News.clHalfRegression(this.endEffects[0].commerce),
             industry: News.clHalfRegression(this.endEffects[0].industry),
             marketCargoAmounts: News.clHalfRegression(this.endEffects[0].marketCargoAmounts),
@@ -33,7 +34,7 @@ class CivilStrifeNews extends News {
     isValid() {
         const {planet} = this
         //more likely if security is too high
-        const ratingsValid = planet.culture.security > 1.5
+        const ratingsValid = planet.culture.security > CL.HIGH
         //planet must not already be in anarchy or puppet state
         const agencyValid = planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY && planet.culture.governmentType != GOVERNMENT_TYPES.PUPPET_STATE
         const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.CIVIL_STRIFE, NEWS_TYPES.CIVIL_WAR, NEWS_TYPES.REVOLUTION])
