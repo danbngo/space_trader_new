@@ -29,7 +29,7 @@ class CivilWarNews extends News {
                 marketPrices: CL.HIGH,
                 blackMarketCargoAmounts: CL.VERY_HIGH,
                 credits: CL.LOW,
-                prestige: CL.LOW,
+                prestige: CL.SLIGHTLY_LOW,
                 buildingsDisabled: buildingsToDisable,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, 2], [CARGO_TYPES.ANTIMATTER, 2]]),
             })

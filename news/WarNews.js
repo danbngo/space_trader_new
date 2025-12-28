@@ -16,7 +16,7 @@ class WarNews extends News {
                 commerce: CL.LOW,
                 shipyardNumShips: CL.LOW,
                 marketCargoAmounts: CL.LOW,
-                prestige: CL.SLIGHTLY_LOW, //the aggressor loses some prestige
+                //prestige: CL.SLIGHTLY_LOW, //the aggressor loses some prestige
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, 2], [CARGO_TYPES.ANTIMATTER, 3]]),
             }),
             new NewsEffect({
@@ -33,9 +33,9 @@ class WarNews extends News {
         ]
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
-        Object.assign(this.endEffects[0], {
+        /*Object.assign(this.endEffects[0], {
             prestige: CL.NO_REGRESSION, //being a warmonger = bad
-        })
+        })*/
 
 
         this.endEffects[0].onApply = ()=>{

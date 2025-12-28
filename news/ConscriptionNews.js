@@ -12,7 +12,6 @@ class ConscriptionNews extends News {
                 population: CL.LOW,
                 commerce: CL.LOW,
                 industry: CL.LOW,
-                prestige: CL.SLIGHTLY_LOW, // permanent prestige loss
             })
         ]
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
@@ -22,7 +21,6 @@ class ConscriptionNews extends News {
             military: CL.VERY_HIGH,
             commerce: CL.NO_REGRESSION, // keep the damage
             industry: CL.NO_REGRESSION, // keep the damage
-            prestige: CL.NO_REGRESSION, // permanent prestige loss
         })
     }
 

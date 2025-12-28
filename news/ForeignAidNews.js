@@ -11,11 +11,11 @@ class ForeignAidNews extends News {
                 planet: this.planet,
                 marketPrices: CL.LOW,
                 marketCargoAmounts: CL.HIGH,
-                commerce: CL.HIGH,
-                industry: CL.HIGH,
+                commerce: CL.SLIGHTLY_HIGH,
+                industry: CL.SLIGHTLY_HIGH,
                 credits: CL.HIGH,
-                shipyardNumShips: CL.HIGH,
-                prestige: CL.VERY_LOW,
+                shipyardNumShips: CL.SLIGHTLY_HIGH,
+                prestige: CL.LOW,
             })
         ]
 

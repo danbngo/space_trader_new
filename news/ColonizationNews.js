@@ -10,7 +10,6 @@ class ColonizationNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 population: CL.LOW,
-                guildNumOfficers: CL.LOW,
                 marketPrices: CL.HIGH,
                 shipyardNumShips: CL.VERY_LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.METAL, CL.VERY_HIGH], [CARGO_TYPES.ISOTOPES, CL.EXTREMELY_HIGH]]),
@@ -21,17 +20,16 @@ class ColonizationNews extends News {
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.endEffects[0], {
             population: CL.NO_REGRESSION, //pop doesnt auto recover
-            guildNumOfficers: CL.NO_REGRESSION,
             shipyardNumShips: CL.NO_REGRESSION,
             commerce: CL.SLIGHTLY_HIGH,
-            territory: CL.HIGH,
+            territory: CL.VERY_HIGH,
             prestige: CL.SLIGHTLY_HIGH,
         })
     }
 
     isValid() {
         const {planet} = this
-        const ratingsValid = planet.culture.population > 1.5 || planet.settlement.shipyard.baseNumShips > 1.5 || planet.settlement.guild.baseNumOfficers > 1.5
+        const ratingsValid = planet.culture.population > CL.MEDIUM && (planet.settlement.shipyard.baseNumShips > CL.MEDIUM)
         //basically dont do it if ANYTHING bad is happening
         const interferingEvent = 
             News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_ECONOMY_PREVENTING) ||

@@ -42,6 +42,8 @@ const NEWS_TYPES = {
     ENSLAVEMENT: new NewsType('Enslavement', COLORS.Purple, 10, 30, 1), //planet enslaves a portion of its population for industry boost
     ENVIRONMENTAL_DISASTER: new NewsType('Environmental Disaster', COLORS.Orange, 2, 6, 1), //temporary decrease in population and industrial rating
     ENVIRONMENTALISM: new NewsType('Environmentalism', COLORS.LightGreen, 5, 15, 1),
+    EXPLORATION: new NewsType('Exploration', COLORS.LightBlue, 5, 15, 1), //planet undertakes exploration missions, temporarily lowering guild officers and shipyard capacity
+    FESTIVAL: new NewsType('Festival', COLORS.LightCyan, 2, 5, 1), //planet holds a festival, boosting prestige but hurting economy temporarily
     FORCED_LABOR: new NewsType('Forced Labor', COLORS.Purple, 10, 30, 1), //planet forces a portion of its population to work for commerce boost
     FOREIGN_AID: new NewsType('Foreign Aid', COLORS.LightBlue, 3, 8, 1),
     GENOCIDE: new NewsType('Genocide', COLORS.DarkRed, 5, 15, 1), //planet purges part of
@@ -55,6 +57,7 @@ const NEWS_TYPES = {
     RESEARCH_AGREEMENT: new NewsType('Research Agreement', COLORS.LightGreen, 2, 8, 1), 
     REVIVAL: new NewsType('Religious Revival', COLORS.White, 10, 20, 1),
     REVOLUTION: new NewsType('Revolution', COLORS.Yellow, 3, 8, 1), //changes political system
+    SANCTIONS: new NewsType('Sanctions', COLORS.LightRed, 3, 15, 1), //one planet places economic sanctions on another
     SCARCITY: new NewsType('Scarcity', COLORS.Orange, 3, 8, 1), //decreases availability of goods, but increases price
     SCIENTIFIC_BREAKTHROUGH: new NewsType('Scientific Breakthrough', COLORS.Green, 1, 4, 1), //improves industrial and commercial ratings
     STOCK_MARKET_CRASH: new NewsType('Stock Market Crash', COLORS.Red, 3, 8, 1), //financial crash damages commerce and credits

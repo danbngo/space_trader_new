@@ -2,7 +2,7 @@ class MilitaryBuildupNews extends News {
     constructor(planet = new Planet()) {
         super(
             `${coloredName(planet)} begins a massive military buildup!`,
-            `${coloredName(planet)}'s military buildup is complete!`,
+            `${coloredName(planet)}'s military buildup is complete! They host a grand military parade!`,
             NEWS_TYPES.MILITARY_BUILDUP, planet
         )
         this.startEffects = [
@@ -20,7 +20,7 @@ class MilitaryBuildupNews extends News {
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.endEffects[0], {
                 military: CL.EXTREMELY_HIGH,
-                prestige: CL.SLIGHTLY_HIGH,
+                prestige: CL.HIGH,
                 officerQuality: CL.HIGH,
                 guildNumOfficers: CL.HIGH,
                 credits: CL.NO_REGRESSION, //so is wasting money

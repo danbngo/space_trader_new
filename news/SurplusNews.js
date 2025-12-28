@@ -11,7 +11,7 @@ class SurplusNews extends News {
                 planet: this.planet,
                 marketPrices: CL.EXTREMELY_LOW,
                 marketCargoAmounts: CL.EXTREMELY_HIGH,
-                commerce: CL.HIGH,
+                commerce: CL.SLIGHTLY_HIGH,
                 industry: CL.HIGH,
                 credits: CL.HIGH,
                 shipyardNumShips: CL.VERY_HIGH,

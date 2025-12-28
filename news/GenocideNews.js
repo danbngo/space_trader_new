@@ -13,7 +13,7 @@ class GenocideNews extends News {
                 military: CL.LOW,
                 commerce: CL.LOW,
                 officerQuality: CL.LOW,
-                prestige: CL.EXTREMELY_LOW,
+                prestige: CL.LOW,
             })
         ]
         this.endEffects = this.startEffects.map(effect => effect.getInverse())

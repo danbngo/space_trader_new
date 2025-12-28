@@ -1,4 +1,4 @@
-let DEBUG_MODE_ENABLED = false
+let DEBUG_MODE_ENABLED = true
 
 function assessPlanets() {
     console.log("Debugging Planets:")

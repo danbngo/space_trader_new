@@ -13,6 +13,7 @@ class RaidingNews extends News {
                 blackMarketCargoAmounts: CL.VERY_HIGH,
                 marketPrices: CL.VERY_LOW,
                 blackMarketPrices: CL.VERY_LOW,
+                territory: CL.SLIGHTLY_HIGH,
                 commerce: CL.HIGH,
                 military: CL.LOW, // diverting forces to raiding weakens defense
                 prestige: CL.LOW,
@@ -26,6 +27,7 @@ class RaidingNews extends News {
             military: News.clHalfRegression(this.endEffects[0].military),
             marketPrices: News.clHalfRegression(this.endEffects[0].marketPrices),
             blackMarketPrices: News.clHalfRegression(this.endEffects[0].blackMarketPrices),
+            territoy: CL.NO_REGRESSION,
             marketCargoAmounts: CL.NO_REGRESSION,
             blackMarketCargoAmounts: CL.NO_REGRESSION,
         })

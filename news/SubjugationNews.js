@@ -15,7 +15,7 @@ class SubjugationNews extends News {
                 military: CL.SLIGHTLY_LOW,
                 commerce: CL.HIGH,
                 marketCargoAmounts: CL.HIGH,
-                prestige: CL.HIGH,
+                prestige: CL.VERY_HIGH,
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
@@ -27,7 +27,7 @@ class SubjugationNews extends News {
                 security: CL.VERY_LOW,
                 commerce: CL.LOW,
                 marketCargoAmounts: CL.LOW,
-                prestige: 0.2,
+                prestige: CL.VERY_LOW,
                 relationsReset: true,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_LOW]]),
                 forcePeace: true,

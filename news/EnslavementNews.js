@@ -13,7 +13,7 @@ class EnslavementNews extends News {
                 industry: CL.HIGH,
                 population: CL.VERY_HIGH,
                 security: CL.VERY_LOW,
-                prestige: CL.VERY_LOW,
+                prestige: CL.LOW,
             })
         ]
         this.endEffects = this.startEffects.map(effect => effect.getInverse())

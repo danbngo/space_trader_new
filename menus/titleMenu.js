@@ -34,7 +34,7 @@ function startNewGame() {
     gs.system.refreshPositions(gs.year)
 
     //gs.system.news = generateHistory(GAME_START_YEAR - 10, GAME_START_YEAR)
-    addHistory(GAME_START_YEAR - 100, GAME_START_YEAR)
+    addHistory(GAME_START_YEAR - 200, GAME_START_YEAR)
 
     // Create captain
     const captain = new Officer("Captain", STARTING_CREDITS);

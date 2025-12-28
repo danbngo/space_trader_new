@@ -18,7 +18,7 @@ class IsolationismNews extends News {
                 credits: CL.LOW,
                 officerQuality: CL.SLIGHTLY_LOW,
                 shipQuality: CL.SLIGHTLY_LOW,
-                prestige: CL.LOW,
+                prestige: CL.SLIGHTLY_LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_LOW]]),
                 forceWithdrawal: true,
             })
