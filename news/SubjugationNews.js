@@ -1,8 +1,8 @@
 class SubjugationNews extends News {
     constructor(planet = new Planet(), targetPlanet = new Planet()) {
         super(
-            `${coloredName(planet)} conquers ${coloredName(targetPlanet)}!`,
-            `${coloredName(targetPlanet)} regains independence from ${coloredName(planet)}!`,
+            `${coloredName(planet)} conquers and occupies ${coloredName(targetPlanet)}!`,
+            `${coloredName(targetPlanet)} regains independence from ${coloredName(planet)}, bringing the occupation to an end!`,
             NEWS_TYPES.SUBJUGATION, planet, targetPlanet
         )
 
@@ -35,7 +35,7 @@ class SubjugationNews extends News {
         ]
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
-        //subjugating others has some lingering effects on territory, military, presstige
+        //subjugating others has some lingering effects on territory, military, prestige
         Object.assign(this.endEffects[0], {
             territory: News.clHalfRegression(this.endEffects[0].territory),
             military: News.clHalfRegression(this.endEffects[0].military),
@@ -56,11 +56,10 @@ class SubjugationNews extends News {
         //our army must be both large and  significantly better than theirs
         const ratingsValid = (planet.culture.military > CL.HIGH) && (planet.culture.military > targetPlanet.culture.military*2)
         //cant be anarchic or puppet state
-        const agencyValid = (planet.culture.governmentType !== GOVERNMENT_TYPES.ANARCHY && planet.culture.governmentType !== GOVERNMENT_TYPES.PUPPET_STATE)
         //planet must be at war with the target
         const relationshipValid = planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR
         const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.SUBJUGATION, ...NEWS_TYPES_COOPERATIVE])
-        return ratingsValid && agencyValid && relationshipValid && !interferingEvent
+        return ratingsValid && relationshipValid && !interferingEvent
     }
 
 }

@@ -1,16 +1,15 @@
 DONE:
--button on starmap to return to the fleet/select/center on it (maybe dont need cuz other changes)
--asteroids changing shape each turn, probably has to do with them being ellipses
--warhead dmg seems weak, test it out some (fixed because we can target right onto units now)
--need population raising event. religious revival? refugees?
+
 
 DONE BY AI, NEEDS TO BE CHECKED:
--adjust damage when moving into ships - ship with more mass should take less dmg
 
 NEXT UP:
--need 2 more events for limiting economy/prestige, 1 for raising territory, 1 for limiting market 
-cargo.. 
-
+-need to limit prestige
+-should be able to surrender in a war
+-battle in a war that swings it for one side?
+-bitter stalemate battle in a war
+-sneak attack when tense
+-need an oligarchs, political purge event types
 
 -we need some events to be cancellable
 -do a rewrite so some events are not triggered by some polity types
@@ -21,6 +20,7 @@ cargo..
 -make spinning or being rammed animated - use new shipactions and/or anim handlers (not just pseudo)
 -in general, add some modules that do things other than grant new moves-regen, etc.
 -credits NaN bug is back
+-policies system - stuff like isolationism can slot in here
 
 -saving/loading (this is a big milestone, if you're ready for this means game is almost ready for release)
 

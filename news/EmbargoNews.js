@@ -38,12 +38,11 @@ class EmbargoNews extends News {
         //need to have enough ships for it
         const ratingsValid = planet.culture.military > CL.MEDIUM
         //cant be anarchic or puppet state
-        const agencyValid = (planet.culture.governmentType !== GOVERNMENT_TYPES.ANARCHY && planet.culture.governmentType !== GOVERNMENT_TYPES.PUPPET_STATE)
         //planet must already be hostile to the target planet
         const relationshipValid = planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.TENSE || planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR
         const interferingEvent = 
             News.hasNews(NEWS_TYPES.EMBARGO, planet, targetPlanet) || 
             News.hasAnyNewsBidirectional(planet, targetPlanet, NEWS_TYPES_COOPERATIVE)
-        return ratingsValid && agencyValid && relationshipValid && !interferingEvent
+        return ratingsValid && relationshipValid && !interferingEvent
     }
 }

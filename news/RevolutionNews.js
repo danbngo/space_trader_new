@@ -1,11 +1,11 @@
 class RevolutionNews extends News {
     constructor(planet = new Planet()) {
-        const newGovType = rndMember(GOVERNMENT_TYPES_ALL.filter(g => g !== planet.culture.governmentType && g !== GOVERNMENT_TYPES.PUPPET_STATE));
+        const newGovernmentType = rndMember(GOVERNMENT_TYPES_ALL.filter(g => g !== planet.culture.governmentType && g !== GOVERNMENT_TYPES.PUPPET_STATE));
         
         super(
             planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY ? `${coloredName(planet)}'s people have deposed the government and begin a glorious revolution!` :
             `${coloredName(planet)}'s people clamor for a government to take the reigns and end the anarchy they live in!`,
-            `${coloredName(planet)} stabilizes under new government: ${coloredName(newGovType)}!`,
+            `${coloredName(planet)} stabilizes under new government: ${coloredName(newGovernmentType)}!`,
             NEWS_TYPES.REVOLUTION, planet
         )
 
@@ -20,7 +20,7 @@ class RevolutionNews extends News {
                 crime: CL.VERY_HIGH,
                 economy: CL.LOW,
                 industry: CL.LOW,
-                credits: CL.VERY_LOW,
+                //credits: CL.VERY_LOW,
                 buildingsDisabled: courthouseBuilding ? [courthouseBuilding] : [],
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, CL.VERY_HIGH], [CARGO_TYPES.HOLOCUBES, CL.VERY_HIGH]]),
                 //relationsReset: true
@@ -29,10 +29,10 @@ class RevolutionNews extends News {
 
         //dont revert the government type back afterwards
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
-        this.endEffects[0].newGovernmentType = newGovType;
 
         //government related ratings randomize a bit after a revolution
         Object.assign(this.endEffects[0], {
+            newGovernmentType,
             military: (rng(0.5,1.5,false) + this.endEffects[0].military)/2,
             security: (rng(0.5,1.5,false)  + this.endEffects[0].security)/2,
             industry: (rng(0.5,1.5,false)  + this.endEffects[0].industry)/2,
@@ -46,10 +46,9 @@ class RevolutionNews extends News {
         //a generally robust economy/govt less prone to this
         const ratingsValid = planet.culture.security < CL.MEDIUM || planet.culture.military < CL.MEDIUM || planet.culture.prestige < CL.MEDIUM || planet.culture.crime > CL.MEDIUM || planet.culture.security < CL.MEDIUM || planet.culture.economy < CL.MEDIUM
         //planet must not be puppet state (anarcy is fine otherwise how do we get back out of it)
-        const agencyValid = planet.culture.governmentType != GOVERNMENT_TYPES.PUPPET_STATE
         const interferingEvent =
             News.planetHasAnyNews(planet, [NEWS_TYPES.REVOLUTION, NEWS_TYPES.WAR]) || News.hasNewsTargeting(NEWS_TYPES.WAR, planet) ||
             News.planetHasAnyNews(planet, NEWS_TYPES_CRIME_PREVENTING)
-        return ratingsValid && agencyValid && !interferingEvent
+        return ratingsValid && !interferingEvent
     }
 }

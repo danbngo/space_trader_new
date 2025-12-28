@@ -34,8 +34,8 @@ class TourismNews extends News {
         const interferingEvent = 
             News.planetHasAnyNews(planet, [NEWS_TYPES.TOURISM, ...NEWS_TYPES_ECONOMY_PREVENTING]) ||
             News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_ECONOMY_PREVENTING) ||
-            News.planetHasAnyNews(planet, NEWS_TYPES_TENSE) ||
-            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_TENSE)
+            News.planetHasAnyNews(planet, NEWS_TYPES_DANGEROUS) ||
+            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_DANGEROUS)
         return ratingsValid && !interferingEvent
     }
 }

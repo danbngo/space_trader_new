@@ -40,7 +40,7 @@ class ConstructionNews extends News {
         const buildingsValid = planet.settlement.buildings.filter(b => !b.enabled).length > 0
         const industryValid = planet.culture.industry < CL.LOW && planet.settlement.market.cargo.average/MARKET_AVERAGE_CARGO_PER_TYPE > CL.MEDIUM
         const interferingEvent =
-            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_TENSE) ||
+            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_DANGEROUS) ||
             News.planetHasAnyNews(planet, [NEWS_TYPES.CONSTRUCTION, ...NEWS_TYPES_ECONOMY_PREVENTING])
         return (buildingsValid || industryValid) && !interferingEvent
     }

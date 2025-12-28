@@ -71,7 +71,6 @@ class WarNews extends News {
         //must not have same form of government
         const governmentsValid = (planet.culture.governmentType !== targetPlanet.culture.governmentType)
         //must not be anarchic or a puppet state
-        const agencyValid = (planet.culture.governmentType !== GOVERNMENT_TYPES.ANARCHY && planet.culture.governmentType !== GOVERNMENT_TYPES.PUPPET_STATE)
         //target cant be a puppet state
         const fairTargetValid = (targetPlanet.culture.governmentType !== GOVERNMENT_TYPES.PUPPET_STATE)
         //planets must be hostile
@@ -80,6 +79,6 @@ class WarNews extends News {
         const interferingEvent = 
             News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.WAR, ...NEWS_TYPES_COOPERATIVE]) ||
             News.planetHasAnyNews(planet, NEWS_TYPES_CRIME_PREVENTING)
-        return prestigeValid && governmentsValid && agencyValid && fairTargetValid &&relationshipValid && !interferingEvent
+        return prestigeValid && governmentsValid && fairTargetValid &&relationshipValid && !interferingEvent
     }
 }

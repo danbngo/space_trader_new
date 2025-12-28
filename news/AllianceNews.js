@@ -66,7 +66,7 @@ class AllianceNews extends News {
         const alliedToOpposingGovtValid = true //was a bit too harsh earlier
         //most of the below shouldnt be possible based on above checked but just in case
         const interferingEvent = 
-            News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.ALLIANCE, ...NEWS_TYPES_TENSE]) || 
+            News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.ALLIANCE, ...NEWS_TYPES_COOPERATION_PREVENTING]) || 
             News.hasNews(NEWS_TYPES.PLAGUE, planet) || News.hasNews(NEWS_TYPES.PLAGUE, targetPlanet)
         return opposingGovernmentsValid && relationshipsValid && alliedToOpposingGovtValid && !interferingEvent
     }

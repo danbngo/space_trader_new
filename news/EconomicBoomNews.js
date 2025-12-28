@@ -35,9 +35,7 @@ class EconomicBoomNews extends News {
         //basically just a bonus for not being in a war or anything stupid
         const interferingEvent = 
             News.planetHasAnyNews(planet, [NEWS_TYPES.ECONOMIC_BOOM, ...NEWS_TYPES_ECONOMY_PREVENTING]) ||
-            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_ECONOMY_PREVENTING) ||
-            News.planetHasAnyNews(planet, NEWS_TYPES_TENSE) ||
-            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_TENSE)
+            News.planetHasAnyNewsTargeting(planet, [...NEWS_TYPES_DANGEROUS, ...NEWS_TYPES_ECONOMY_PREVENTING])
         return ratingsValid && !interferingEvent
     }
 }

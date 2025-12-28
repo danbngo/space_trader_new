@@ -1,7 +1,7 @@
 class RaidingNews extends News {
     constructor(planet = new Planet(), targetPlanet = new Planet()) {
         super(
-            `${coloredName(planet)} launches devastating raids on ${coloredName(targetPlanet)}! Plundered goods flood their markets!`,
+            `${coloredName(planet)} launches raids on ${coloredName(targetPlanet)}! Plundered goods flood their markets!`,
             `${coloredName(planet)} ceases its raiding operations against ${coloredName(targetPlanet)}!`,
             NEWS_TYPES.RAIDING, planet, targetPlanet
         )

@@ -11,6 +11,7 @@ const NEWS_TYPE_CLASSES = new Map([
     [NEWS_TYPES.BOMBARDMENT, BombardmentNews],
     [NEWS_TYPES.CIVIL_STRIFE, CivilStrifeNews],
     [NEWS_TYPES.CIVIL_WAR, CivilWarNews],
+    [NEWS_TYPES.COUP_DETAT, CoupDetatNews],
     [NEWS_TYPES.COLONIZATION, ColonizationNews],
     [NEWS_TYPES.CONSTRUCTION, ConstructionNews],
     [NEWS_TYPES.CONSCRIPTION, ConscriptionNews],

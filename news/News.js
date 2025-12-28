@@ -164,7 +164,7 @@ class News {
         //console.log('ceasing all hostilities involving:',targetPlanet.name)
         const newsToEnd = gs.system.news.filter(n=>(
             (n.planet === targetPlanet || n.targetPlanet === targetPlanet) &&
-            NEWS_TYPES_TENSE.includes(n.newsType) &&
+            NEWS_TYPES_MARTIAL.includes(n.newsType) &&
             !n.ended
         ))
         //console.log('found news items to end:',newsToEnd)
@@ -179,7 +179,7 @@ class News {
         //console.log('ceasing all foreign activity involving:',planet.name)
         const newsToEnd = gs.system.news.filter(n=>(
             (n.planet === planet) &&
-            (NEWS_TYPES_TENSE.includes(n.newsType) || NEWS_TYPES_COOPERATIVE.includes(n.newsType))
+            (NEWS_TYPES_COOPERATION_PREVENTING.includes(n.newsType) || NEWS_TYPES_COOPERATIVE.includes(n.newsType))
             && !n.ended
         ))
         //console.log('found news items to end:',newsToEnd)

@@ -49,7 +49,7 @@ class TradeAgreementNews extends News {
         //dont trade with opposing governments
         const govTypesValid = planet.culture.governmentType.opposingType !== targetPlanet.culture.governmentType && targetPlanet.culture.governmentType.opposingType !== planet.culture.governmentType
         //trade is only blocked if you're actively hostile to each other. 
-        const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.TRADE_AGREEMENT, ...NEWS_TYPES_TENSE])
+        const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.TRADE_AGREEMENT, ...NEWS_TYPES_COOPERATION_PREVENTING])
         return govTypesValid && relationshipsValid && !interferingEvent
     }
 }

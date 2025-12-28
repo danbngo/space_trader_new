@@ -44,7 +44,7 @@ class TensionsNews extends News {
         const powerValid = powerRatio < CL.VERY_HIGH && powerRatio > CL.VERY_LOW
 
         const relationshipValid = planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.NEUTRAL && targetPlanet.culture.relationships.get(planet) == RELATIONSHIP_TYPES.NEUTRAL
-        const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.TENSIONS, ...NEWS_TYPES_TENSE, ...NEWS_TYPES_COOPERATIVE])
+        const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.TENSIONS, ...NEWS_TYPES_COOPERATIVE])
         return powerValid && governmentsValid && governmentsValid2 && relationshipValid && !interferingEvent
     }
 

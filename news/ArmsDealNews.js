@@ -47,8 +47,7 @@ class ArmsDealNews extends News {
         const relationships = [planet.culture.relationships.get(targetPlanet), targetPlanet.culture.relationships.get(planet)]
         const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.NEUTRAL || rel == RELATIONSHIP_TYPES.ALLY)
         const interferingEvent = 
-            News.hasNews(NEWS_TYPES.ARMS_DEAL, planet, targetPlanet) ||
-            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_TENSE)
+            News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.ARMS_DEAL, ...NEWS_TYPES_COOPERATION_PREVENTING])
         return transferValid && ratingsValid && relationshipsValid && !interferingEvent
     }
 }

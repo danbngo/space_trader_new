@@ -36,8 +36,7 @@ class CivilStrifeNews extends News {
         //more likely if security is too high
         const ratingsValid = planet.culture.security > CL.HIGH
         //planet must not already be in anarchy or puppet state
-        const agencyValid = planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY && planet.culture.governmentType != GOVERNMENT_TYPES.PUPPET_STATE
         const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.CIVIL_STRIFE, NEWS_TYPES.CIVIL_WAR, NEWS_TYPES.REVOLUTION])
-        return ratingsValid && agencyValid && !interferingEvent
+        return ratingsValid && !interferingEvent
     }
 }
