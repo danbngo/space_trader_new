@@ -1,7 +1,7 @@
-class SubjugationNews extends News {
+class WarSubjugationNews extends News {
     constructor(planet = new Planet(), targetPlanet = new Planet()) {
         super(
-            `${coloredName(planet)} conquers and occupies ${coloredName(targetPlanet)}!`,
+            `${coloredName(planet)} lands its ships and occupies ${coloredName(targetPlanet)}! Its armies raise the flag of ${coloredName(planet)} over the conquered world.`,
             `${coloredName(targetPlanet)} regains independence from ${coloredName(planet)}, bringing the occupation to an end!`,
             NT.SUBJUGATION, planet, targetPlanet
         )
@@ -53,9 +53,8 @@ class SubjugationNews extends News {
 
     isValid() {
         const {planet, targetPlanet} = this
-        //our army must be both large and  significantly better than theirs
-        const ratingsValid = (planet.culture.military > CL.HIGH) && (planet.culture.military > targetPlanet.culture.military*2)
-        //cant be anarchic or puppet state
+        //our army must be both large and  significantly better than theirs in every way
+        const ratingsValid = (planet.armyPower/targetPlanet.armyPower > CL.HIGH) && (planet.navyPower/targetPlanet.navyPower > CL.HIGH)
         //planet must be at war with the target
         const relationshipValid = planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR
         const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.SUBJUGATION, ...NT_COOPERATIVE])

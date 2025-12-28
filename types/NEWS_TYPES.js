@@ -43,7 +43,6 @@ const NT = {
     ADDICTION: new NewsType('Addiction', COLORS.Orange, 1, 3, 8, 1, [], [], [GT.POLICE_STATE]),
     ALLIANCE: new NewsType('Alliance', COLORS.Green, 1, 10, 40, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.DEMOCRACY], []), //two neutral planets become allies
     ARMS_DEAL: new NewsType('Arms Deal', COLORS.LightOrange, 1, 3, 8, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.CORPORATISM], []), //one planet sends military equipment to another
-    BOMBARDMENT: new NewsType('Bombardment', COLORS.Red, 1, 0.1, 0.5, 200, [GT.ANARCHY, GT.PUPPET_STATE], [], []), //the target planet loses some buildings (temporarily disabled)
     CIVIL_STRIFE: new NewsType('Civil Strife', COLORS.Yellow, 1, 3, 8, 1, [GT.POLICE_STATE], [], []),
     CIVIL_WAR: new NewsType('Civil War', COLORS.Red, 1, 3, 15, 1, [GT.ANARCHY, GT.POLICE_STATE, GT.PUPPET_STATE], [], []),
     COALITION: new NewsType('Coalition', COLORS.LightRed, 1, 10, 30, 300, [GT.PUPPET_STATE], [], []),
@@ -82,13 +81,21 @@ const NT = {
     SCARCITY: new NewsType('Scarcity', COLORS.Orange, 1, 3, 8, 1, [], [], []),
     SCIENTIFIC_BREAKTHROUGH: new NewsType('Scientific Breakthrough', COLORS.Green, 1, 1, 4, 1, [], [GT.TECHNOCRACY], []),
     STOCK_MARKET_CRASH: new NewsType('Stock Market Crash', COLORS.Red, 1, 3, 8, 1, [GT.COMMUNISM], [GT.CORPORATISM], []),
-    SUBJUGATION: new NewsType('Subjugation', COLORS.LightPurple, 1, 25, 100, 200, [GT.ANARCHY, GT.PUPPET_STATE], [GT.POLICE_STATE, GT.ARISTOCRACY, GT.COMMUNISM], []),
     SURPLUS: new NewsType('Surplus', COLORS.Green, 1, 3, 8, 1, [], [], []), 
     TENSIONS: new NewsType('Tensions', COLORS.Yellow, 1, 5, 40, 1, [GT.PUPPET_STATE, GT.ANARCHY], [], []), //two neutral planets have relations changed to hostile
     TERRAFORMING: new NewsType('Terraforming', COLORS.Green, 1, 5, 40, 1, [], [GT.TECHNOCRACY, GT.CORPORATISM], []), //two neutral planets have relations changed to hostile
     TOURISM: new NewsType('Tourism', COLORS.LightCyan, 1, 3, 8, 1, [], [GT.DEMOCRACY, GT.CORPORATISM], []),
     TRADE_AGREEMENT: new NewsType('Trade Agreement', COLORS.LightGreen, 1, 10, 20, 1, [], [GT.CORPORATISM, GT.DEMOCRACY], []), //two neutral or allied planets have improved trade relations
-    WAR: new NewsType('War', COLORS.Red, 1, 3, 12, 100, [GT.ANARCHY, GT.PUPPET_STATE], [GT.POLICE_STATE, GT.ARISTOCRACY], []), //two planets where at least one was hostile go to war
+    WAR_ALLY: new NewsType('War Ally', COLORS.Red, 1, 3, 15, 150, [], [GT.ARISTOCRACY, GT.DEMOCRACY], []),
+    WAR_BOMBARDMENT: new NewsType('Bombardment', COLORS.Red, 1, 0.1, 0.5, 200, [], [GT.TECHNOCRACY], []), //the target planet loses some buildings (temporarily disabled)
+    WAR_HUMAN_WAVE: new NewsType('War Human Wave', COLORS.DarkRed, 1, 0.5, 2, 150, [GT.DEMOCRACY], [GT.POLICE_STATE, GT.COMMUNISM], []),
+    WAR_INVASION: new NewsType('War Invasion', COLORS.DarkRed, 1, 1, 5, 150, [], [GT.POLICE_STATE, GT.ARISTOCRACY], []),
+    WAR: new NewsType('War', COLORS.Red, 1, 5, 20, 100, [GT.ANARCHY, GT.PUPPET_STATE], [GT.POLICE_STATE, GT.ARISTOCRACY], []), //two planets where at least one was hostile go to war
+    WAR_OFFENSIVE: new NewsType('War Offensive', COLORS.Red, 1, 1, 5, 150, [], [], []),
+    WAR_SABOTAGE: new NewsType('War Sabotage', COLORS.DarkRed, 1, 0.5, 2, 150, [], [GT.TECHNOCRACY, GT.ANARCHY], []),
+    WAR_SCORCHED_EARTH: new NewsType('War Scorched Earth', COLORS.DarkRed, 1, 0.5, 2, 150, [], [GT.COMMUNISM], []),
+    WAR_SUBJUGATION: new NewsType('Subjugation', COLORS.LightPurple, 1, 25, 100, 200, [], [GT.POLICE_STATE, GT.ARISTOCRACY, GT.COMMUNISM], []),
+    WAR_SURRENDER: new NewsType('War Surrender', COLORS.Orange, 1, 0.1, 0.5, 250, [], [], []),
     //more to come later: environmental disasters, terraforming, etc.
 }
 

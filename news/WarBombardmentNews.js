@@ -1,7 +1,7 @@
-class BombardmentNews extends News {
+class WarBombardmentNews extends News {
     constructor(planet = new Planet(), targetPlanet = new Planet()) {
         super(
-            `${coloredName(planet)} commences orbital bombardment of ${coloredName(targetPlanet)}!`,
+            `${coloredName(planet)} brings in its heavy bombers and commences orbital bombardment of ${coloredName(targetPlanet)}!`,
             `${coloredName(planet)}'s orbital bombardment of ${coloredName(targetPlanet)} has forced their surrender!`,
             NT.BOMBARDMENT, planet, targetPlanet
         )
@@ -58,12 +58,13 @@ class BombardmentNews extends News {
 
     isValid() {
         const {planet, targetPlanet} = this
-        //planet must not already be at war with the target planet
-        const ratingsValid = planet.culture.military > targetPlanet.culture.military * 1.5
+        //our military must be significantly stronger than theirs and navy must be MUCH stronger
+        const navyAdvantage = planet.culture.military > targetPlanet.culture.military * CL.HIGH && planet.navyPower > targetPlanet.navyPower * CL.VERY_HIGH
+        
         const relationshipValid = planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR
         const interferingEvent = 
             News.hasNews(NT.BOMBARDMENT, planet, targetPlanet) || 
             News.hasAnyNewsBidirectional(planet, targetPlanet, NT_COOPERATIVE)
-        return ratingsValid && relationshipValid && !interferingEvent
+        return navyAdvantage && relationshipValid && !interferingEvent
     }
 }

@@ -1,7 +1,7 @@
 class CoalitionNews extends News {
     constructor(planet = new Planet()) {
         super(
-            `${coloredName(planet)}'s dominance on the solar stage has prompted the other planets to form a coalition against them!`,
+            `${coloredName(planet)}'s dominance on the solar stage is sparking tensions with other planets!`,
             `The anti-${coloredName(planet)} coalition begins to fracture!`,
             NT.COALITION, planet
         )
@@ -11,9 +11,9 @@ class CoalitionNews extends News {
                 planet: this.planet,
                 prestige: CL.LOW,
                 onApply: ()=>{
-                    const news = this.getRelationshipWorseningNews()
+                    const [badNews] = News.calcRelationshipWorseningNews(planet)
                     const numToWorsen = rng(5,3)
-                    const rNews = rndMembers(news, numToWorsen)
+                    const rNews = rndMembers(badNews, numToWorsen)
                     for (const n of rNews) n.start()
                 }
             })
@@ -33,27 +33,8 @@ class CoalitionNews extends News {
         const ratingsValid = planet.culture.prestige > CL.VERY_HIGH
         const interferingEvent =
             News.planetHasAnyNews(planet, [NT.COALITION])
-        const canFormCoalition = this.getRelationshipWorseningNews().length >= 3
+        const [badNews] = News.calcRelationshipWorseningNews(planet)
+        const canFormCoalition = badNews.length >= 3
         return ratingsValid && canFormCoalition && !interferingEvent
-    }
-
-    getRelationshipWorseningNews = () => {
-        const possibleHostileNews = []
-        const possibleWarNews = []
-        for (const otherPlanet of gs.system.planets) {
-            if (otherPlanet == this.planet) continue
-            const relationship = otherPlanet.culture.relationships.get(this.planet)
-            if (relationship == RELATIONSHIP_TYPES.NEUTRAL) {
-                const n = new TensionsNews(otherPlanet, this.planet)
-                //skip political considerations as this is about raw power/survival
-                if (n.isValid(true)) possibleHostileNews.push(n)
-            } else if (relationship == RELATIONSHIP_TYPES.TENSE) {
-                const n = new WarNews(otherPlanet, this.planet)
-                //skip political considerations as this is about raw power/survival
-                if (n.isValid(true)) possibleWarNews.push(n)
-            }
-        }
-        const news = [...possibleHostileNews, ...possibleWarNews]
-        return news
     }
 }

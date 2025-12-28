@@ -112,6 +112,18 @@ class Planet extends OrbitingObject {
         if (baseName.endsWith('sian')) baseName = baseName.replace('sian', 'tian') //mars
         return baseName
     }
+
+    get navyPower() {
+        return this.culture.military * this.settlement.shipyard.baseNumShips * this.culture.shipQuality
+    }
+
+    get armyPower() {
+        return this.culture.military * this.settlement.guild.baseNumOfficers * this.culture.officerQuality
+    }
+
+    get militaryPower() {
+        return this.navyPower + this.armyPower
+    }
 }
 
 /**

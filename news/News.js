@@ -10,12 +10,16 @@ class News {
      * @param {Planet} planet - The planet where the event originates.
      * @param {Planet|null} targetPlanet - The target planet affected by the event (if any).
      */
-    constructor(startedName = '', endedName = '', newsType = NT_ALL[0], planet = new Planet(), targetPlanet = null) {
+    constructor(startedName = '', endedName = '', failedName = '', cancelledName = '', newsType = NT_ALL[0], planet = new Planet(), targetPlanet = null) {
         //console.log('instantiating News with:',{startedName, endedName, newsType, planet, targetPlanet});
         /** @type {string} */
         this.startedName = String(colorSpan(startedName, newsType.color));
         /** @type {string} */
         this.endedName = String(colorSpan(endedName, newsType.color));
+        /** @type {string} */
+        this.failedName = String(colorSpan(failedName, COLORS.Gray));
+        /** @type {string} */
+        this.cancelledName = String(colorSpan(cancelledName, COLORS.Gray));
         /** @type {NewsType} */
         this.newsType = newsType;
         /** @type {number} */
@@ -32,12 +36,24 @@ class News {
         this.startEffects = [];
         /** @type {NewsEffect[]} */
         this.endEffects = [];
+        /** @type {NewsEffect[]} */
+        /** @type {NewsEffect[]} */
+        this.ongoingEffects = []
+        /** @type {NewsEffect[]} */
+        this.failEndEffects = [];
+        /** @type {NewsEffect[]} */
+        this.cancelEndEffects = [];
         /** @type {boolean} */
         this.started = false;
         /** @type {boolean} */
         this.ended = false;
-        this.ongoingEffects = []
+        /** @type {boolean} */
+        this.failed = false;
+        /** @type {boolean} */
+        this.cancelled = false;
+        /** @type {boolean} */
         this.endAsap = false;
+        /** @type {number|null} */
         this.endedYear = null;
     }
 
@@ -99,6 +115,10 @@ class News {
             //gs.system.newsFeed.push(fx.describe())
             fx.apply()
         }
+    }
+
+    determineEnding() {
+        //implement in subclasses, no this.failed or this.cancelled = succeeded or went off normally
     }
 
     static getNews = (newsType = null, planet = null, targetPlanet = null) => {
@@ -209,6 +229,26 @@ class News {
                 gs.system.news.splice(index, 1)
             }
         }
+    }
+
+    static calcRelationshipWorseningNews = (targetPlanet = new Planet()) => {
+        const possibleHostileNews = []
+        const possibleWarNews = []
+        for (const otherPlanet of gs.system.planets) {
+            if (otherPlanet == targetPlanet) continue
+            const relationship = otherPlanet.culture.relationships.get(targetPlanet)
+            if (relationship == RELATIONSHIP_TYPES.NEUTRAL) {
+                const n = new TensionsNews(otherPlanet, targetPlanet)
+                //skip political considerations as this is about raw power/survival
+                if (n.isValid(true)) possibleHostileNews.push(n)
+            } else if (relationship == RELATIONSHIP_TYPES.TENSE) {
+                const n = new WarNews(otherPlanet, targetPlanet)
+                //skip political considerations as this is about raw power/survival
+                if (n.isValid(true)) possibleWarNews.push(n)
+            }
+        }
+        const news = [...possibleHostileNews, ...possibleWarNews]
+        return [news, possibleWarNews, possibleHostileNews]
     }
 }
 
