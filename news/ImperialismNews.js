@@ -33,7 +33,7 @@ class ImperialismNews extends News {
         })
         //victim recovers partially
         Object.assign(this.endEffects[1], {
-            territory: CL.NO_REGRESSION,
+            territory: CL.LOW,
             prestige: CL.NO_REGRESSION,
         })
     }

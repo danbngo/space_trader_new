@@ -21,7 +21,7 @@ class ScientificBreakthroughNews extends News {
         Object.assign(this.endEffects[0], {
             credits: News.clHalfRegression(this.endEffects[0].credits),
             shipQuality: CL.HIGH,
-            prestige: CL.HIGH,
+            prestige: CL.SLIGHTLY_HIGH,
             officerQuality: CL.SLIGHTLY_HIGH,
             military: CL.SLIGHTLY_HIGH,
         })

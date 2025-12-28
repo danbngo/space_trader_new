@@ -21,7 +21,7 @@ class EnvironmentalismNews extends News {
             population: CL.SLIGHTLY_HIGH,
             shipyardNumShips: News.clHalfRegression(this.endEffects[0].shipyardNumShips),
             industry: News.clHalfRegression(this.endEffects[0].industry),
-            prestige: CL.HIGH,
+            prestige: CL.SLIGHTLY_HIGH,
         })
     }
 

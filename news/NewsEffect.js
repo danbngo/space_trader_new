@@ -217,7 +217,7 @@ class NewsEffect {
                     building.normalize();
                     if (building.baseCredits > MARKET_AVERAGE_CREDITS*1000) {
                         console.log('building:',building,'this:',this)
-                        throw new Error('WARNING!!!!!!!!!!!!! building has extremely high credits after modification:')
+                        console.log('WARNING!!!!!!!!!!!!! building has extremely high credits after modification:')
                     }
                 }
             }

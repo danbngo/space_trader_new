@@ -26,7 +26,7 @@ class InvestmentNews extends News {
         Object.assign(this.endEffects[0], {
             credits: News.clHalfRegression(this.endEffects[0].credits),
             marketCargoAmounts: News.clHalfRegression(this.endEffects[0].marketCargoAmounts),
-            prestige: CL.HIGH,
+            prestige: CL.SLIGHTLY_HIGH,
         })
         Object.assign(this.endEffects[1], {
             industry: CL.VERY_HIGH,

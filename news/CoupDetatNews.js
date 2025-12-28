@@ -29,10 +29,10 @@ class CoupDetatNews extends News {
                 crime: CL.VERY_HIGH,
                 economy: CL.LOW,
                 industry: CL.LOW,
+                prestige: CL.LOW,
                 //credits: CL.VERY_LOW,
                 buildingsDisabled: courthouseBuilding ? [courthouseBuilding] : [],
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, CL.VERY_HIGH]]),
-                //relationsReset: true
             })
         ]
 
@@ -49,19 +49,22 @@ class CoupDetatNews extends News {
             industry: (rng(0.5,1.5,false)  + this.endEffects[0].industry)/2,
             credits: (rng(0.5,1.5,false)  + this.endEffects[0].credits)/2,
             prestige: (rng(0.5,1.5,false)  + this.endEffects[0].prestige)/2,
+            forcePeace: true,
+            newRelationship: RELATIONSHIP_TYPES.NEUTRAL,
         })
     }
 
     isValid() {
         const {planet, targetPlanet} = this
-        // Aggressor must have high prestige, target must have low prestige
-        const ratingsValid = planet.culture.prestige > CL.HIGH && targetPlanet.culture.prestige < CL.MEDIUM
-        // Target must have opposing government type
-        const govValid = planet.culture.governmentType.opposingType === targetPlanet.culture.governmentType
-        // Must be TENSE beforehand
-        const relationshipValid = planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.TENSE && targetPlanet.culture.relationships.get(planet) == RELATIONSHIP_TYPES.TENSE
-        const interferingEvent = News.planetHasAnyNews(targetPlanet, [NT.COUP, ...NT_CRIME_PREVENTING])
-        return ratingsValid && govValid && relationshipValid && !interferingEvent
+        // Aggressor must have high prestige, target must have lowER prestige
+        const ratingsValid = (planet.culture.prestige > CL.HIGH) && (planet.culture.prestige > (targetPlanet.culture.prestige * CL.HIGH))
+        // Target must have opposing government type - nevermind, CIA flouts this all the time
+        //const govValid = planet.culture.governmentType.opposingType == targetPlanet.culture.governmentType
+        // Must be at least TENSE beforehand
+        const relationships = [planet.culture.relationships.get(targetPlanet), targetPlanet.culture.relationships.get(planet)]
+        const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.TENSE || rel == RELATIONSHIP_TYPES.WAR)
+        const interferingEvent = News.planetHasAnyNews(targetPlanet, [NT.COUP_DETAT, ...NT_CRIME_PREVENTING])
+        return ratingsValid && relationshipsValid && !interferingEvent
     }
 
 }

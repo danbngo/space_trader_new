@@ -25,7 +25,7 @@ class FestivalNews extends News {
             marketCargoAmounts: News.clHalfRegression(this.endEffects[0].marketCargoAmounts),
             crime: News.clHalfRegression(this.endEffects[0].crime),
             //blackMarketPrices: News.clHalfRegression(this.endEffects[0].blackMarketPrices),
-            prestige: CL.HIGH,
+            prestige: CL.SLIGHTLY_HIGH,
         })
     }
 

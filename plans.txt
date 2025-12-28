@@ -1,15 +1,14 @@
 DONE:
-
+-need to limit prestige
+-need an oligarchs, political purge event types
 
 DONE BY AI, NEEDS TO BE CHECKED:
 
 NEXT UP:
--need to limit prestige
 -should be able to surrender in a war
 -battle in a war that swings it for one side?
 -bitter stalemate battle in a war
 -sneak attack when tense
--need an oligarchs, political purge event types
 
 -we need some events to be cancellable
 -do a rewrite so some events are not triggered by some polity types

@@ -29,6 +29,7 @@ class EmbargoNews extends News {
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //dont fully recover economy
         Object.assign(this.endEffects[0], {
+            prestige: News.clHalfRegression(this.endEffects[0].prestige),
             economy: News.clHalfRegression(this.endEffects[0].economy),
         })
     }

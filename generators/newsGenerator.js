@@ -3,14 +3,15 @@
 //WARNING: unlike other simulators, this one operates directly on gs.system
 
 
-// @ts-ignore
-const NEWS_TYPE_CLASSES = new Map([
+/** @type {[NewsType, any][]} */
+const NEWS_TYPE_CLASSES = [
     [NT.ADDICTION, AddictionNews],
     [NT.ALLIANCE, AllianceNews],
     [NT.ARMS_DEAL, ArmsDealNews],
     [NT.BOMBARDMENT, BombardmentNews],
     [NT.CIVIL_STRIFE, CivilStrifeNews],
     [NT.CIVIL_WAR, CivilWarNews],
+    [NT.COALITION, CoalitionNews],
     [NT.COUP_DETAT, CoupDetatNews],
     [NT.COLONIZATION, ColonizationNews],
     [NT.CONSTRUCTION, ConstructionNews],
@@ -35,6 +36,7 @@ const NEWS_TYPE_CLASSES = new Map([
     [NT.ISOLATIONISM, IsolationismNews],
     [NT.LUDDITISM, LudditismNews],
     [NT.MILITARY_BUILDUP, MilitaryBuildupNews],
+    [NT.OLIGARCHY, OligarchyNews],
     [NT.ORGANIZED_CRIME, OrganizedCrimeNews],
     [NT.PLAGUE, PlagueNews],
     [NT.RAIDING, RaidingNews],
@@ -48,42 +50,57 @@ const NEWS_TYPE_CLASSES = new Map([
     [NT.SUBJUGATION, SubjugationNews],
     [NT.SURPLUS, SurplusNews],
     [NT.TENSIONS, TensionsNews],
+    [NT.TERRAFORMING, TerraformingNews],
     [NT.TOURISM, TourismNews],
     [NT.TRADE_AGREEMENT, TradeAgreementNews],
     [NT.WAR, WarNews],
-])
+]
 
-const NEWS_TYPE_CLASSES_ARRAY = Object.freeze(Array.from(NEWS_TYPE_CLASSES.values()))
+const NEWS_TYPE_CLASSES_ARRAY = Object.freeze(NEWS_TYPE_CLASSES.map(pair => pair[1]))
 
 // @ts-ignore
-const META_NEWS_TYPE_CLASSES = new Map([
+const META_NEWS_TYPE_CLASSES = [
     [META_NT.SYSTEM_AT_WAR, SystemAtWarNews],
     [META_NT.SYSTEM_WIDE_PLAGUE, SystemWidePlague],
-])
+]
 
-const META_NEWS_TYPE_CLASSES_ARRAY = Object.freeze(Array.from(META_NEWS_TYPE_CLASSES.values()))
+const META_NEWS_TYPE_CLASSES_ARRAY = Object.freeze(META_NEWS_TYPE_CLASSES.map(pair => pair[1]))
 
 /**
  * Generates a random news event that affects planets.
  * @param {number} attemptsRemaining - Maximum attempts to generate valid news.
  * @returns {News|null} The generated news event or null if unable to generate.
  */
-function generateNews(attemptsRemaining = 100) {
+function generateNews(attemptsRemaining = 100, weights = []) {//only needs to be computed once) {
     const planets = PLANETS
     const planet = rndMember(planets)
     const targetPlanet = rndMember(PLANETS.filter(p=>(p !== planet)))
-    const cls = rndMember(NEWS_TYPE_CLASSES_ARRAY)
-    const news = new cls(planet, targetPlanet)
-    const isValid = news.isValid()
-    if (!isValid) {
-        if (attemptsRemaining <= 0) return null
-        return generateNews(attemptsRemaining - 1)
+    
+    // Use weighted selection based on news type weights, with 3x multiplier for favorite govs
+    if (weights.length == 0) weights = NEWS_TYPE_CLASSES.map(([newsType, cls]) => {
+        let weight = newsType.weight || 1
+        // Triple the weight if this planet's government is a favorite for this news type
+        if (newsType.favoriteGovs.includes(planet.culture.governmentType)) {
+            weight *= 3
+        }
+        return weight
+    })
+    const index = rndIndexWeighted(weights)
+    const [newsType, cls] = NEWS_TYPE_CLASSES[index]
+    
+    if (!newsType.forbiddenGovs.includes(planet.culture.governmentType)) {
+        if (!newsType.immuneGovs.includes(targetPlanet.culture.governmentType)) {
+            /** @ts-ignore */
+            const news = new cls(planet, targetPlanet)
+            if (news.isValid()) return news
+        }
     }
-    return news
+    if (attemptsRemaining <= 0) return null
+    return generateNews(attemptsRemaining - 1, weights)
 }
 /**
  * Generates system-wide meta news events.
- * @param {Function[]} newsTypesAttempted - Array of news types already attempted.
+ * @param {any[]} newsTypesAttempted - Array of news types already attempted.
  * @returns {News|null} The generated meta news event or null.
  */
 function generateMetaNews(newsTypesAttempted = []) {
@@ -91,9 +108,9 @@ function generateMetaNews(newsTypesAttempted = []) {
     const newsTypesNotAttempted = META_NEWS_TYPE_CLASSES_ARRAY.filter(cls=>(!newsTypesAttempted.includes(cls)))
     const cls = rndMember([...newsTypesNotAttempted])
     newsTypesAttempted.push(cls)
+    // @ts-ignore
     const news = new cls()
-    const isValid = news.isValid()
-    if (!isValid) return null
+    if (!news.isValid()) return null
     return news
 }
 

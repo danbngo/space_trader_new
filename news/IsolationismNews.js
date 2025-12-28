@@ -9,7 +9,7 @@ class IsolationismNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                territory: CL.SLIGHTLY_LOW,
+                territory: CL.LOW,
                 economy: CL.LOW,
                 marketPrices: CL.LOW,
                 marketCargoAmounts: CL.LOW,
@@ -38,8 +38,8 @@ class IsolationismNews extends News {
 
     isValid() {
         const {planet} = this
-        //more likely after population collapse and internal dissent
-        const ratingsValid = planet.culture.population < CL.SLIGHTLY_HIGH && planet.culture.security < CL.SLIGHTLY_LOW
+        //more likely after population collapse or being stretched thin
+        const ratingsValid = planet.culture.population < CL.SLIGHTLY_HIGH && planet.culture.territory > CL.HIGH
         //must not be a puppet state or anarchic
         const governmentValid = (planet.culture.governmentType != GT.PUPPET_STATE) && (planet.culture.governmentType != GT.ANARCHY)
         //must not be at engaged in or targeted by any hostile acts

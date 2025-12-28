@@ -64,21 +64,19 @@ class WarNews extends News {
         }
     }
 
-    isValid() {
+    isValid(ignorePolitics = false) {
         const {planet, targetPlanet} = this
         //planets tend not to want to go to war with stronger ones
         const prestigeValid = planet.culture.prestige > targetPlanet.culture.prestige || planet.culture.military > targetPlanet.culture.military
         //must not have same form of government
         const governmentsValid = (planet.culture.governmentType !== targetPlanet.culture.governmentType)
         //must not be anarchic or a puppet state
-        //target cant be a puppet state
-        const fairTargetValid = (targetPlanet.culture.governmentType !== GT.PUPPET_STATE)
         //planets must be hostile
         const relationships = [planet.culture.relationships.get(targetPlanet), targetPlanet.culture.relationships.get(planet)]
         const relationshipValid = relationships.every(r => r === RELATIONSHIP_TYPES.TENSE)
         const interferingEvent = 
             News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.WAR, ...NT_COOPERATIVE]) ||
             News.planetHasAnyNews(planet, NT_CRIME_PREVENTING)
-        return prestigeValid && governmentsValid && fairTargetValid &&relationshipValid && !interferingEvent
+        return (prestigeValid) && (governmentsValid) && (relationshipValid) && !interferingEvent
     }
 }

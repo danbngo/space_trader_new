@@ -17,7 +17,7 @@ class DepressionNews extends News {
                 crime: CL.HIGH,
                 guildNumOfficers: CL.HIGH,
                 //blackMarketCargoAmounts: 0.7, -recession-proof industry
-                //blackMarketPrices: 0.7,
+                blackMarketPrices: CL.SLIGHTLY_LOW,
             })
         ]
 
@@ -29,7 +29,7 @@ class DepressionNews extends News {
             marketCargoAmounts: News.clHalfRegression(this.endEffects[0].marketCargoAmounts),
             marketPrices: News.clHalfRegression(this.endEffects[0].marketPrices),
             economy: News.clHalfRegression(this.endEffects[0].economy),
-            //blackMarketPrices: (1 + this.endEffects[0].blackMarketPrices)/2,
+            blackMarketPrices: (1 + this.endEffects[0].blackMarketPrices)/2,
             //blackMarketCargoAmounts: (1 + this.endEffects[0].blackMarketCargoAmounts)/2,
         })
     }

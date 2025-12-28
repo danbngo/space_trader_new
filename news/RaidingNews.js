@@ -38,6 +38,7 @@ class RaidingNews extends News {
             military: News.clHalfRegression(this.endEffects[0].military),
             marketPrices: News.clHalfRegression(this.endEffects[0].marketPrices),
             blackMarketPrices: News.clHalfRegression(this.endEffects[0].blackMarketPrices),
+            prestige: CL.NO_REGRESSION,
             territory: CL.NO_REGRESSION,
             marketCargoAmounts: CL.NO_REGRESSION,
             blackMarketCargoAmounts: CL.NO_REGRESSION,

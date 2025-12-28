@@ -13,6 +13,8 @@ class ArmsDealNews extends News {
                 military: CL.LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, CL.SLIGHTLY_LOW], [CARGO_TYPES.ANTIMATTER, CL.SLIGHTLY_LOW]]),
                 shipyardNumShips: CL.LOW,
+                blackMarketCargoAmounts: CL.LOW,
+                blackMarketPrices: CL.HIGH,
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
@@ -29,18 +31,22 @@ class ArmsDealNews extends News {
             shipyardNumShips: News.clHalfRegression(this.endEffects[0].shipyardNumShips),
             prestige: CL.SLIGHTLY_HIGH,
             credits: CL.HIGH,
+            blackMarketCargoAmounts: CL.NO_REGRESSION,
+            blackMarketPrices: CL.NO_REGRESSION,
         })
         Object.assign(this.endEffects[1], {
             credits: CL.NO_REGRESSION,
             military: News.clHalfRegression(this.endEffects[1].military),
             shipyardNumShips: News.clHalfRegression(this.endEffects[1].shipyardNumShips),
+            blackMarketCargoAmounts: CL.HIGH,
+            blackMarketPrices: CL.LOW,
         })
     }
 
     isValid() {
         const {planet, targetPlanet} = this
         //need to have sufficient military of our own
-        const ratingsValid = planet.culture.military >= CL.HIGH || planet.settlement.shipyard.baseNumShips > CL.HIGH
+        const ratingsValid = (planet.culture.military >= CL.HIGH || planet.settlement.shipyard.baseNumShips > CL.HIGH) && planet.settlement.blackMarket.baseCargo.average/MARKET_AVERAGE_CARGO_PER_TYPE > CL.MEDIUM
         //our military should be larger than theirs
         const transferValid = planet.culture.military > targetPlanet.culture.military && planet.settlement.shipyard.baseNumShips > targetPlanet.settlement.shipyard.baseNumShips
         //both planets must be neutral or allies

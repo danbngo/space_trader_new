@@ -10,7 +10,7 @@ class DisarmamentNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 military: CL.VERY_LOW,
-                territory: CL.LOW,
+                territory: CL.SLIGHTLY_LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_LOW], [CARGO_TYPES.WEAPONS, CL.EXTREMELY_LOW]]),
                 blackMarketCargoAmounts: CL.SLIGHTLY_LOW,
                 shipyardNumShips: CL.VERY_LOW,
@@ -32,7 +32,7 @@ class DisarmamentNews extends News {
     isValid() {
         const {planet} = this
         //unlikely if planet has a low military already
-        const ratingsValid = (planet.culture.military > CL.HIGH) || (planet.settlement.shipyard.baseNumShips > CL.HIGH)
+        const ratingsValid = (planet.culture.military > CL.HIGH) && (planet.settlement.shipyard.baseNumShips > CL.HIGH)
         const interferingEvent =
             News.planetHasAnyNewsTargeting(planet, NT_MARTIAL) ||
             News.planetHasAnyNews(planet, NT_MARTIAL)

@@ -1,16 +1,19 @@
 class ExplorationNews extends News {
     constructor(planet = new Planet()) {
         super(
-            `${coloredName(planet)} launches an exploration initiative to survey and claim small bodies across the system!`,
-            `${coloredName(planet)}'s exploration mission succeeds, claiming new territories!`,
+            `${coloredName(planet)} sends out its best and brightest explorers to survey and claim small bodies in the kuiper belt!`,
+            `${coloredName(planet)}'s exploration mission succeeds, claiming vast new territories!`,
             NT.EXPLORATION, planet
         )
 
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                guildNumOfficers: CL.VERY_LOW,
-                marketCargoAmounts: CL.LOW,
+                guildNumOfficers: CL.LOW,
+                officerQuality: CL.LOW,
+                marketCargoAmounts: CL.SLIGHTLY_LOW,
+                shipQuality: CL.LOW,
+                shipyardNumShips: CL.SLIGHTLY_LOW,
                 credits: CL.LOW,
             })
         ]
@@ -19,10 +22,14 @@ class ExplorationNews extends News {
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.endEffects[0], {
             guildNumOfficers: CL.NO_REGRESSION, //officers don't auto return
+            officerQuality: CL.NO_REGRESSION,
             credits: News.clHalfRegression(this.endEffects[0].credits),
             marketCargoAmounts: News.clHalfRegression(this.endEffects[0].marketCargoAmounts),
-            territory: CL.VERY_HIGH,
-            prestige: CL.HIGH,
+            //economy: CL.SLIGHTLY_HIGH,
+            //industry: CL.SLIGHTLY_HIGH,
+            shipQuality: CL.NO_REGRESSION,
+            territory: CL.HIGH,
+            prestige: CL.SLIGHTLY_HIGH,
         })
     }
 

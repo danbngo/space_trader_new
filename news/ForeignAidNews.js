@@ -15,7 +15,7 @@ class ForeignAidNews extends News {
                 industry: CL.SLIGHTLY_HIGH,
                 credits: CL.HIGH,
                 shipyardNumShips: CL.SLIGHTLY_HIGH,
-                prestige: CL.LOW,
+                prestige: CL.SLIGHTLY_LOW,
             })
         ]
 

@@ -18,7 +18,7 @@ class CivilWarNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 //newGovernmentType: GT.ANARCHY, //there IS a government still
-                territory: CL.LOW,
+                territory: CL.SLIGHTLY_LOW,
                 military: CL.VERY_LOW,
                 security: CL.LOW,
                 crime: CL.VERY_HIGH,
@@ -29,7 +29,7 @@ class CivilWarNews extends News {
                 marketPrices: CL.HIGH,
                 blackMarketCargoAmounts: CL.VERY_HIGH,
                 credits: CL.LOW,
-                prestige: CL.SLIGHTLY_LOW,
+                prestige: CL.LOW,
                 buildingsDisabled: buildingsToDisable,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, 2], [CARGO_TYPES.ANTIMATTER, 2]]),
             })
