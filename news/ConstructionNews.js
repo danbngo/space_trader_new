@@ -3,6 +3,8 @@ class ConstructionNews extends News {
         super(
             `${coloredName(planet)} begins a grand infrastructure building project!`,
             `${coloredName(planet)} completes its grand infrastructure building project!`,
+            `${coloredName(planet)}'s construction project fails! Resources wasted!`,
+            '',
             NT.CONSTRUCTION, planet
         )
 
@@ -32,6 +34,24 @@ class ConstructionNews extends News {
             economy: CL.SLIGHTLY_HIGH,
             buildingsEnabled: buildingsToEnable,
         })
+
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                economy: CL.NO_REGRESSION,
+                marketCargoAmounts: CL.NO_REGRESSION,
+                prestige: CL.LOW,
+                buildingsEnabled: [],
+                cargoPriceModifiers: new Map([[CARGO_TYPES.METAL, CL.NO_REGRESSION], [CARGO_TYPES.NANITES, CL.NO_REGRESSION]]),
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet} = this
+        // Higher industry and economy = more likely to succeed
+        const successProbability = (planet.culture.industry + planet.culture.economy) / 2
+        this.failed = Math.random() > successProbability
     }
 
     isValid() {

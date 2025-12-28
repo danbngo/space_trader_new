@@ -3,6 +3,8 @@ class CoalitionNews extends News {
         super(
             `${coloredName(planet)}'s dominance on the solar stage is sparking tensions with other planets!`,
             `The anti-${coloredName(planet)} coalition begins to fracture!`,
+            `The anti-${coloredName(planet)} coalition solidifies into lasting hostility!`,
+            ``,
             NT.COALITION, planet
         )
 
@@ -25,6 +27,22 @@ class CoalitionNews extends News {
             population: CL.HIGH,
             prestige: News.clHalfRegression(this.endEffects[0].prestige),
         })
+
+        // Failed: coalition persists, permanent diplomatic damage
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                prestige: CL.NO_REGRESSION, // lasting damage
+                // Relationships already worsened, no further effect needed
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet} = this
+        // Coalition persists if planet maintains very high prestige (threat remains)
+        const failProbability = planet.culture.prestige > CL.VERY_HIGH ? 0.4 : 0.1
+        this.failed = Math.random() < failProbability
     }
 
     isValid() {

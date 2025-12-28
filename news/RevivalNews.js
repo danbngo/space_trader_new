@@ -3,6 +3,8 @@ class RevivalNews extends News {
         super(
             `${coloredName(planet)} is undergoing a religious revival!`,
             `${coloredName(planet)}'s religious revival has ended!`,
+            ``,
+            ``,
             NT.REVIVAL, planet
         )
 

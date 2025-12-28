@@ -7,7 +7,9 @@ class CoupDetatNews extends News {
         const newGovernmentType = availableGovTypes[Math.floor(Math.random() * availableGovTypes.length)]
         super(
             `${coloredName(planet)} orchestrates a coup d'état in ${coloredName(targetPlanet)}, toppling their government!`,
-            `${coloredName(planet)}'s coup in ${coloredName(targetPlanet)} succeeds! A new ${coloredName(newGovernmentType)} government is established!`,
+            `${coloredName(planet)}'s coup in ${coloredName(targetPlanet)} succeeds! A new ${newGovernmentType.name} government is established!`,
+            `${coloredName(planet)}'s coup attempt in ${coloredName(targetPlanet)} is crushed by loyalist forces!`,
+            ``,
             NT.COUP_DETAT, planet, targetPlanet
         )
 
@@ -52,6 +54,29 @@ class CoupDetatNews extends News {
             forcePeace: true,
             newRelationship: RELATIONSHIP_TYPES.NEUTRAL,
         })
+
+        // Failed: coup crushed, instigator embarrassed
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                prestige: CL.VERY_LOW, // international humiliation
+                credits: CL.NO_REGRESSION, // wasted funds
+            }),
+            new NewsEffect({
+                planet: this.targetPlanet,
+                military: News.clHalfRegression(CL.VERY_LOW), // fought off coup
+                security: CL.HIGH, // crackdown on insurgents
+                prestige: CL.HIGH, // survived coup attempt
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet, targetPlanet} = this
+        // Coup fails if target has high security or military
+        const resistanceProbability = (targetPlanet.culture.security + targetPlanet.culture.military) / 2
+        const failProbability = resistanceProbability * 0.4
+        this.failed = Math.random() < failProbability
     }
 
     isValid() {

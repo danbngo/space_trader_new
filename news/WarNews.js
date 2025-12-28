@@ -3,6 +3,8 @@ class WarNews extends News {
         super(
             `${coloredName(planet)} declares war on ${coloredName(targetPlanet)}!`,
             `Peace treaty signed between ${coloredName(planet)} and ${coloredName(targetPlanet)}!`,
+            '',
+            `War between ${coloredName(planet)} and ${coloredName(targetPlanet)} is called off prematurely!`,
             NT.WAR, planet, targetPlanet
         )
 
@@ -62,6 +64,16 @@ class WarNews extends News {
                 }
             }
         }
+
+        this.cancelEndEffects = this.endEffects.map(effect => effect.clone())
+    }
+
+    determineEnding() {
+        const {planet, targetPlanet} = this
+        // Check if peace was forced (relationships changed during war)
+        const currentRel1 = planet.culture.relationships.get(targetPlanet)
+        const currentRel2 = targetPlanet.culture.relationships.get(planet)
+        this.cancelled = (currentRel1 !== RELATIONSHIP_TYPES.WAR || currentRel2 !== RELATIONSHIP_TYPES.WAR)
     }
 
     isValid(ignorePolitics = false) {

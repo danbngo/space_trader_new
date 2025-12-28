@@ -3,6 +3,8 @@ class EnslavementNews extends News {
         super(
             `${coloredName(planet)} begins enslaving populations from ${coloredName(targetPlanet)}! Forced labor crews arrive in chains!`,
             `${coloredName(planet)} officially ends its slavery programs against ${coloredName(targetPlanet)}.`,
+            `Slave revolts in ${coloredName(planet)} force end to enslavement of ${coloredName(targetPlanet)}'s people!`,
+            `Peace treaty forces ${coloredName(planet)} to free enslaved populations from ${coloredName(targetPlanet)}!`,
             NT.ENSLAVEMENT, planet, targetPlanet
         )
 
@@ -42,6 +44,52 @@ class EnslavementNews extends News {
             industry: News.clHalfRegression(this.endEffects[1].industry),
             security: News.clHalfRegression(this.endEffects[1].security),
         })
+
+        // Failed: slave revolts
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                population: CL.LOW, // casualties in revolts
+                security: CL.VERY_LOW, // civil unrest
+                economy: CL.LOW, // disruption
+                industry: CL.LOW,
+                prestige: CL.VERY_LOW, // humanitarian crisis
+            }),
+            new NewsEffect({
+                planet: this.targetPlanet,
+                population: News.clHalfRegression(CL.LOW), // some freed slaves return
+                prestige: CL.HIGH, // liberation celebrated
+            })
+        ]
+
+        // Cancelled: peace forces liberation
+        this.cancelEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                population: News.clHalfRegression(CL.VERY_HIGH),
+                economy: News.clHalfRegression(CL.HIGH),
+                industry: News.clHalfRegression(CL.HIGH),
+                security: News.clHalfRegression(CL.VERY_LOW),
+                prestige: News.clHalfRegression(CL.LOW),
+            }),
+            new NewsEffect({
+                planet: this.targetPlanet,
+                population: News.clHalfRegression(CL.LOW), // partial return
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet, targetPlanet} = this
+        // Check if peace declared
+        const rel = planet.culture.relationships.get(targetPlanet)
+        if (rel === RELATIONSHIP_TYPES.NEUTRAL || rel === RELATIONSHIP_TYPES.ALLY) {
+            this.cancelled = true
+            return
+        }
+        // Slavery fails if security too low (revolts)
+        const revoltProbability = (1 - planet.culture.security) * 0.45
+        this.failed = Math.random() < revoltProbability
     }
 
     isValid() {

@@ -3,6 +3,8 @@ class WarBombardmentNews extends News {
         super(
             `${coloredName(planet)} brings in its heavy bombers and commences orbital bombardment of ${coloredName(targetPlanet)}!`,
             `${coloredName(planet)}'s orbital bombardment of ${coloredName(targetPlanet)} has forced their surrender!`,
+            '',
+            `${coloredName(planet)}'s bombardment of ${coloredName(targetPlanet)} is halted by peace treaty!`,
             NT.BOMBARDMENT, planet, targetPlanet
         )
 
@@ -54,6 +56,33 @@ class WarBombardmentNews extends News {
             buildingsEnabled: [],
             forcePeace: true,
         })
+
+        this.cancelEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                targetPlanet: this.targetPlanet,
+                prestige: CL.NO_REGRESSION,
+                military: News.clHalfRegression(this.endEffects[0].military),
+            }),
+            new NewsEffect({
+                planet: this.targetPlanet,
+                targetPlanet: this.planet,
+                population: News.clHalfRegression(this.endEffects[1].population),
+                military: News.clHalfRegression(this.endEffects[1].military),
+                industry: News.clHalfRegression(this.endEffects[1].industry),
+                economy: News.clHalfRegression(this.endEffects[1].economy),
+                security: News.clHalfRegression(this.endEffects[1].security),
+                forcePeace: true,
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet, targetPlanet} = this
+        // Check if peace was forced (relationships changed during bombardment)
+        const currentRel1 = planet.culture.relationships.get(targetPlanet)
+        const currentRel2 = targetPlanet.culture.relationships.get(planet)
+        this.cancelled = (currentRel1 !== RELATIONSHIP_TYPES.WAR || currentRel2 !== RELATIONSHIP_TYPES.WAR)
     }
 
     isValid() {

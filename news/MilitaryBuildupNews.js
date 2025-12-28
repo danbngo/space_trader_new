@@ -3,6 +3,8 @@ class MilitaryBuildupNews extends News {
         super(
             `${coloredName(planet)} begins a massive military buildup!`,
             `${coloredName(planet)}'s military buildup is complete! They host a grand military parade!`,
+            `${coloredName(planet)}'s military buildup collapses due to economic constraints!`,
+            ``,
             NT.MILITARY_BUILDUP, planet
         )
         this.startEffects = [
@@ -27,6 +29,24 @@ class MilitaryBuildupNews extends News {
                 economy: CL.NO_REGRESSION,
                 industry: CL.NO_REGRESSION,
         })
+
+        // Failed: buildup collapses, no military gain
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                credits: CL.NO_REGRESSION, // money wasted
+                economy: CL.NO_REGRESSION, // damage permanent
+                industry: CL.NO_REGRESSION,
+                prestige: CL.LOW, // failed militarization
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet} = this
+        // Buildup fails if economy collapses during the process
+        const failProbability = (1 - planet.culture.economy) * 0.35
+        this.failed = Math.random() < failProbability
     }
     isValid() {
         const {planet} = this

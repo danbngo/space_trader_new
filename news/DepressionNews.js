@@ -3,6 +3,8 @@ class DepressionNews extends News {
         super(
             `${coloredName(planet)} enters a Depression!`,
             `${coloredName(planet)} is stumbling out of its Depression!`,
+            `${coloredName(planet)}'s Depression deepens! Economic collapse imminent!`,
+            '',
             NT.DEPRESSION, planet
         )
 
@@ -32,6 +34,26 @@ class DepressionNews extends News {
             blackMarketPrices: (1 + this.endEffects[0].blackMarketPrices)/2,
             //blackMarketCargoAmounts: (1 + this.endEffects[0].blackMarketCargoAmounts)/2,
         })
+
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                marketPrices: CL.NO_REGRESSION,
+                marketCargoAmounts: CL.NO_REGRESSION,
+                economy: CL.NO_REGRESSION,
+                industry: CL.NO_REGRESSION,
+                credits: CL.NO_REGRESSION,
+                crime: CL.NO_REGRESSION,
+                prestige: CL.VERY_LOW,
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet} = this
+        // Higher industry and prestige = more likely to recover
+        const recoveryProbability = (planet.culture.industry + planet.culture.prestige) / 2
+        this.failed = Math.random() > recoveryProbability
     }
 
     isValid() {

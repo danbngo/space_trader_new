@@ -3,6 +3,8 @@ class OligarchyNews extends News {
         super(
             `${coloredName(planet)}'s economy is seized by powerful oligarchs who carve out private fiefdoms!`,
             `${coloredName(planet)}'s oligarchs lose their grip on power as the masses rise up!`,
+            `${coloredName(planet)}'s oligarchs consolidate permanent control over the economy!`,
+            ``,
             NT.OLIGARCHY, planet
         )
 
@@ -22,6 +24,25 @@ class OligarchyNews extends News {
             //prestige: News.clHalfRegression(this.endEffects[0].prestige),
             economy: News.clHalfRegression(this.endEffects[0].economy),
         })
+
+        // Failed: oligarchs entrench permanently
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                economy: CL.NO_REGRESSION, // permanent economic damage
+                prestige: CL.NO_REGRESSION,
+                security: CL.NO_REGRESSION,
+                credits: CL.NO_REGRESSION,
+                crime: CL.HIGH, // corruption entrenched
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet} = this
+        // Oligarchy becomes permanent if security too weak to resist
+        const failProbability = (1 - planet.culture.security) * 0.4
+        this.failed = Math.random() < failProbability
     }
 
     isValid() {

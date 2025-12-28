@@ -3,6 +3,8 @@ class TradeAgreementNews extends News {
         super(
             `${coloredName(planet)} and ${coloredName(targetPlanet)} sign an expansive trade agreement, benefitting both planets!`,
             `${coloredName(planet)} and ${coloredName(targetPlanet)}'s trade agreement has lapsed!`,
+            `Trade negotiations between ${coloredName(planet)} and ${coloredName(targetPlanet)} collapse due to economic instability!`,
+            `Rising tensions force ${coloredName(planet)} and ${coloredName(targetPlanet)} to suspend trade agreement!`,
             NT.TRADE_AGREEMENT, planet, targetPlanet
         )
 
@@ -39,6 +41,51 @@ class TradeAgreementNews extends News {
             economy: News.clHalfRegression(this.endEffects[1].economy),
             credits: News.clHalfRegression(this.endEffects[1].credits),
         })
+
+        // Failed: economic collapse ruins trade benefits
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                economy: CL.LOW, // economic disruption
+                credits: CL.LOW,
+            }),
+            new NewsEffect({
+                planet: this.targetPlanet,
+                economy: CL.LOW,
+                credits: CL.LOW,
+            })
+        ]
+
+        // Cancelled: tensions suspend trade early
+        this.cancelEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                marketCargoAmounts: News.clHalfRegression(CL.HIGH),
+                economy: News.clHalfRegression(CL.SLIGHTLY_HIGH),
+                credits: News.clHalfRegression(CL.HIGH),
+            }),
+            new NewsEffect({
+                planet: this.targetPlanet,
+                marketCargoAmounts: News.clHalfRegression(CL.HIGH),
+                economy: News.clHalfRegression(CL.SLIGHTLY_HIGH),
+                credits: News.clHalfRegression(CL.HIGH),
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet, targetPlanet} = this
+        // Check for hostile relationships
+        const rel1 = planet.culture.relationships.get(targetPlanet)
+        const rel2 = targetPlanet.culture.relationships.get(planet)
+        if (rel1 === RELATIONSHIP_TYPES.HOSTILE || rel1 === RELATIONSHIP_TYPES.WAR ||
+            rel2 === RELATIONSHIP_TYPES.HOSTILE || rel2 === RELATIONSHIP_TYPES.WAR) {
+            this.cancelled = true
+            return
+        }
+        // Check for economic collapse
+        const economyCheck = (planet.culture.economy < CL.LOW) || (targetPlanet.culture.economy < CL.LOW)
+        this.failed = economyCheck
     }
 
     isValid() {

@@ -3,6 +3,8 @@ class CivilStrifeNews extends News {
         super(
             `${coloredName(planet)}'s people are rioting in the streets against their oppressive government!'`,
             `${coloredName(planet)}'s rioting is quelled!`,
+            `${coloredName(planet)} fails to stop the riots! The situation deteriorates!`,
+            '',
             NT.CIVIL_STRIFE, planet
         )
 
@@ -29,6 +31,27 @@ class CivilStrifeNews extends News {
             industry: News.clHalfRegression(this.endEffects[0].industry),
             marketCargoAmounts: News.clHalfRegression(this.endEffects[0].marketCargoAmounts),
         })
+
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                military: CL.NO_REGRESSION,
+                security: CL.NO_REGRESSION,
+                crime: CL.NO_REGRESSION,
+                economy: CL.NO_REGRESSION,
+                industry: CL.NO_REGRESSION,
+                prestige: CL.NO_REGRESSION,
+                marketCargoAmounts: CL.NO_REGRESSION,
+                cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, CL.NO_REGRESSION]]),
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet} = this
+        // Higher military and security = more likely to quell riots
+        const quellProbability = (planet.culture.military + planet.culture.security) / 2
+        this.failed = Math.random() > quellProbability
     }
 
     isValid() {

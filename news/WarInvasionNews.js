@@ -3,6 +3,8 @@ class WarInvasionNews extends News {
         super(
             `${coloredName(planet)} launches drop pods and begins a ground invasion of ${coloredName(targetPlanet)}!`,
             `The invasion of ${coloredName(targetPlanet)} concludes with heavy casualties!`,
+            '',
+            `${coloredName(planet)}'s invasion of ${coloredName(targetPlanet)} is called off! Ceasefire declared!`,
             NT.WAR_INVASION, planet, targetPlanet
         )
 
@@ -42,6 +44,32 @@ class WarInvasionNews extends News {
             population: News.clHalfRegression(this.endEffects[1].population),
             military: CL.LOW,
         })
+
+        this.cancelEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                targetPlanet: this.targetPlanet,
+                guildNumOfficers: News.clHalfRegression(this.endEffects[0].guildNumOfficers),
+                shipyardNumShips: News.clHalfRegression(this.endEffects[0].shipyardNumShips),
+                officerQuality: News.clHalfRegression(this.endEffects[0].officerQuality),
+            }),
+            new NewsEffect({
+                planet: this.targetPlanet,
+                targetPlanet: this.planet,
+                security: News.clHalfRegression(this.endEffects[1].security),
+                economy: News.clHalfRegression(this.endEffects[1].economy),
+                industry: News.clHalfRegression(this.endEffects[1].industry),
+                population: News.clHalfRegression(this.endEffects[1].population),
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet, targetPlanet} = this
+        // Check if peace was forced (relationships changed during invasion)
+        const currentRel1 = planet.culture.relationships.get(targetPlanet)
+        const currentRel2 = targetPlanet.culture.relationships.get(planet)
+        this.cancelled = (currentRel1 !== RELATIONSHIP_TYPES.WAR || currentRel2 !== RELATIONSHIP_TYPES.WAR)
     }
 
     isValid() {

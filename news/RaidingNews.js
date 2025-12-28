@@ -3,6 +3,8 @@ class RaidingNews extends News {
         super(
             `${coloredName(planet)} launches raids on ${coloredName(targetPlanet)}! Plundered goods flood their markets!`,
             `${coloredName(planet)} ceases its raiding operations against ${coloredName(targetPlanet)}!`,
+            `${coloredName(targetPlanet)} repels ${coloredName(planet)}'s raiders, inflicting heavy losses!`,
+            `Peace treaty forces ${coloredName(planet)} to end raids on ${coloredName(targetPlanet)}!`,
             NT.RAIDING, planet, targetPlanet
         )
 
@@ -51,6 +53,51 @@ class RaidingNews extends News {
             credits: News.clHalfRegression(this.endEffects[1].credits),
             security: News.clHalfRegression(this.endEffects[1].security),
         })
+
+        // Failed: raiders repelled, heavy losses
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                military: CL.VERY_LOW, // raiders destroyed
+                prestige: CL.VERY_LOW, // humiliation
+                economy: CL.NO_REGRESSION, // no plunder gained
+            }),
+            new NewsEffect({
+                planet: this.targetPlanet,
+                prestige: CL.HIGH, // victory
+                military: News.clHalfRegression(CL.LOW),
+            })
+        ]
+
+        // Cancelled: peace ends raids early
+        this.cancelEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                marketCargoAmounts: News.clHalfRegression(CL.VERY_HIGH),
+                economy: News.clHalfRegression(CL.HIGH),
+                military: News.clHalfRegression(CL.LOW),
+                territory: News.clHalfRegression(CL.SLIGHTLY_HIGH),
+            }),
+            new NewsEffect({
+                planet: this.targetPlanet,
+                marketCargoAmounts: News.clHalfRegression(CL.LOW),
+                economy: News.clHalfRegression(CL.LOW),
+                security: News.clHalfRegression(CL.LOW),
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet, targetPlanet} = this
+        // Check if peace declared
+        const rel = planet.culture.relationships.get(targetPlanet)
+        if (rel === RELATIONSHIP_TYPES.NEUTRAL || rel === RELATIONSHIP_TYPES.ALLY) {
+            this.cancelled = true
+            return
+        }
+        // Raids fail if target has strong defense
+        const failProbability = (targetPlanet.culture.military / planet.culture.military) * 0.3
+        this.failed = Math.random() < failProbability
     }
 
     isValid() {

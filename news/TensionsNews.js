@@ -3,6 +3,8 @@ class TensionsNews extends News {
         super(
             `Tensions rise between ${coloredName(planet)} and ${coloredName(targetPlanet)}!`,
             `Tensions cease between ${coloredName(planet)} and ${coloredName(targetPlanet)}!`,
+            '',
+            `Tensions between ${coloredName(planet)} and ${coloredName(targetPlanet)} de-escalate suddenly!`,
             NT.TENSIONS, planet, targetPlanet
         )
 
@@ -31,6 +33,17 @@ class TensionsNews extends News {
                 if (planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.TENSE) planet.culture.relationships.set(targetPlanet, RELATIONSHIP_TYPES.NEUTRAL)
             }
         }
+
+        this.cancelEndEffects = this.endEffects.map(effect => effect.clone())
+    }
+
+    determineEnding() {
+        const {planet, targetPlanet} = this
+        // Check if relationships improved (became allies) or escalated to war
+        const currentRel1 = planet.culture.relationships.get(targetPlanet)
+        const currentRel2 = targetPlanet.culture.relationships.get(planet)
+        this.cancelled = (currentRel1 === RELATIONSHIP_TYPES.ALLY || currentRel2 === RELATIONSHIP_TYPES.ALLY || 
+                         currentRel1 === RELATIONSHIP_TYPES.WAR || currentRel2 === RELATIONSHIP_TYPES.WAR)
     }
 
     isValid(ignorePolitics = false) {

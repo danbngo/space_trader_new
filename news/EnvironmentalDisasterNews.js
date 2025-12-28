@@ -3,6 +3,8 @@ class EnvironmentalDisasterNews extends News {
         super(
             `${coloredName(planet)}'s polluting has led to environmental disaster! Cleanup efforts are underway!`,
             `${coloredName(planet)} has cleaned up their environmental disaster, but lasting damage to the planet remains!`,
+            `${coloredName(planet)}'s cleanup efforts fail, leaving the planet permanently scarred!`,
+            ``,
             NT.ENVIRONMENTAL_DISASTER, planet
         )
 
@@ -28,6 +30,25 @@ class EnvironmentalDisasterNews extends News {
             industry: News.clHalfRegression(this.endEffects[0].industry),
             population: News.clHalfRegression(this.endEffects[0].population),
         })
+
+        // Failed: cleanup fails, permanent environmental collapse
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                industry: CL.NO_REGRESSION, // permanent damage
+                population: CL.NO_REGRESSION,
+                economy: CL.NO_REGRESSION,
+                marketCargoAmounts: CL.NO_REGRESSION,
+                prestige: CL.VERY_LOW, // ecological disaster
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet} = this
+        // Cleanup fails if economy/industry too weak to recover
+        const failProbability = (1 - planet.culture.economy) * (1 - planet.culture.industry) * 0.35
+        this.failed = Math.random() < failProbability
     }
 
     isValid() {

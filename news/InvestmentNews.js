@@ -3,6 +3,8 @@ class InvestmentNews extends News {
         super(
             `${coloredName(planet)} sends a massive economic investment to ${coloredName(targetPlanet)}!`,
             `${coloredName(planet)}'s economic investment in ${coloredName(targetPlanet)} is complete!`,
+            `${coloredName(planet)}'s investment in ${coloredName(targetPlanet)} collapses due to mismanagement!`,
+            `Tensions force ${coloredName(planet)} to pull investment from ${coloredName(targetPlanet)}!`,
             NT.INVESTMENT, planet, targetPlanet
         )
 
@@ -33,6 +35,52 @@ class InvestmentNews extends News {
             economy: CL.SLIGHTLY_HIGH,
             shipyardNumShips: CL.SLIGHTLY_HIGH,
         })
+
+        // Failed: investment collapses, money lost
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                credits: CL.NO_REGRESSION, // money lost
+                prestige: CL.LOW, // investment failure
+            }),
+            new NewsEffect({
+                planet: this.targetPlanet,
+                economy: CL.LOW, // economic disruption
+                industry: News.clHalfRegression(CL.VERY_HIGH), // partial development
+            })
+        ]
+
+        // Cancelled: investment withdrawn early
+        this.cancelEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                credits: News.clHalfRegression(CL.LOW),
+                marketCargoAmounts: News.clHalfRegression(CL.VERY_LOW),
+                prestige: News.clHalfRegression(CL.SLIGHTLY_HIGH),
+            }),
+            new NewsEffect({
+                planet: this.targetPlanet,
+                marketCargoAmounts: News.clHalfRegression(CL.VERY_HIGH),
+                credits: News.clHalfRegression(CL.HIGH),
+                industry: News.clHalfRegression(CL.VERY_HIGH),
+                economy: News.clHalfRegression(CL.SLIGHTLY_HIGH),
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet, targetPlanet} = this
+        // Check if relationship deteriorated
+        const rel1 = planet.culture.relationships.get(targetPlanet)
+        const rel2 = targetPlanet.culture.relationships.get(planet)
+        if (rel1 === RELATIONSHIP_TYPES.TENSE || rel1 === RELATIONSHIP_TYPES.HOSTILE || rel1 === RELATIONSHIP_TYPES.WAR ||
+            rel2 === RELATIONSHIP_TYPES.TENSE || rel2 === RELATIONSHIP_TYPES.HOSTILE || rel2 === RELATIONSHIP_TYPES.WAR) {
+            this.cancelled = true
+            return
+        }
+        // Investment fails if target has poor governance
+        const failProbability = (1 - targetPlanet.culture.economy) * (1 - targetPlanet.culture.security) * 0.35
+        this.failed = Math.random() < failProbability
     }
 
     isValid() {

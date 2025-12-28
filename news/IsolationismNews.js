@@ -3,6 +3,8 @@ class IsolationismNews extends News {
         super(
             `${coloredName(planet)} retreats into isolationism to take care of its own!`,
             `${coloredName(planet)} ends its isolationism!`,
+            `External threats force ${coloredName(planet)} to abandon isolationism!`,
+            ``,
             NT.ISOLATIONISM, planet
         )
 
@@ -34,6 +36,34 @@ class IsolationismNews extends News {
             shipQuality: News.clHalfRegression(this.endEffects[0].shipQuality), //lose some knowledge
             prestige: CL.NO_REGRESSION,
         })
+
+        // Failed: forced to abandon due to external threats
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                economy: CL.NO_REGRESSION, // economic isolation damage persists
+                credits: CL.NO_REGRESSION,
+                officerQuality: CL.NO_REGRESSION, // knowledge loss is permanent
+                shipQuality: CL.NO_REGRESSION,
+                prestige: CL.LOW, // failed policy
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet} = this
+        // Isolationism fails if external threats emerge
+        let threatsDetected = false
+        for (const p of gs.system.planets) {
+            if (p !== planet) {
+                const rel = p.culture.relationships.get(planet)
+                if (rel === RELATIONSHIP_TYPES.HOSTILE || rel === RELATIONSHIP_TYPES.WAR) {
+                    threatsDetected = true
+                    break
+                }
+            }
+        }
+        this.failed = threatsDetected
     }
 
     isValid() {

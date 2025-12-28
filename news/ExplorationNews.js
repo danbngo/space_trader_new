@@ -3,6 +3,8 @@ class ExplorationNews extends News {
         super(
             `${coloredName(planet)} sends out its best and brightest explorers to survey and claim small bodies in the kuiper belt!`,
             `${coloredName(planet)}'s exploration mission succeeds, claiming vast new territories!`,
+            `${coloredName(planet)}'s exploration mission fails! Explorers lost in deep space!`,
+            '',
             NT.EXPLORATION, planet
         )
 
@@ -31,6 +33,24 @@ class ExplorationNews extends News {
             territory: CL.HIGH,
             prestige: CL.SLIGHTLY_HIGH,
         })
+
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                guildNumOfficers: CL.NO_REGRESSION,
+                officerQuality: CL.NO_REGRESSION,
+                shipQuality: CL.NO_REGRESSION,
+                prestige: CL.LOW,
+                credits: CL.NO_REGRESSION,
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet} = this
+        // Higher prestige and officer quality = more likely to succeed
+        const successProbability = (planet.culture.prestige + planet.settlement.guild.officerQualityMod) / 2
+        this.failed = Math.random() > successProbability
     }
 
     isValid() {

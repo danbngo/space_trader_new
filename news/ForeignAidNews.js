@@ -3,6 +3,8 @@ class ForeignAidNews extends News {
         super(
             `${coloredName(planet)}'s plight inspires other planets to send it foreign aid!`,
             `${coloredName(planet)}'s foreign aid finally dries up!`,
+            `${coloredName(planet)} squanders foreign aid on corruption and mismanagement!`,
+            ``,
             NT.FOREIGN_AID, planet
         )
 
@@ -30,6 +32,25 @@ class ForeignAidNews extends News {
             shipyardNumShips: News.clHalfRegression(this.endEffects[0].shipyardNumShips),
             prestige: CL.NO_REGRESSION //not the best for your reputation
         })
+
+        // Failed: aid wasted through corruption
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                economy: CL.NO_REGRESSION, // no economic gain
+                industry: CL.NO_REGRESSION,
+                credits: CL.NO_REGRESSION,
+                prestige: CL.VERY_LOW, // international embarrassment
+                crime: CL.HIGH, // corruption spike
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet} = this
+        // Aid fails if governance is too weak (low security means corruption)
+        const failProbability = (1 - planet.culture.security) * 0.4
+        this.failed = Math.random() < failProbability
     }
 
     isValid() {

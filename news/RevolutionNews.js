@@ -6,6 +6,8 @@ class RevolutionNews extends News {
             planet.culture.governmentType != GT.ANARCHY ? `${coloredName(planet)}'s people have deposed the government and begin a glorious revolution!` :
             `${coloredName(planet)}'s people clamor for a government to take the reigns and end the anarchy they live in!`,
             `${coloredName(planet)} stabilizes under new government: ${coloredName(newGovernmentType)}!`,
+            `${coloredName(planet)}'s revolution fails! Chaos reigns!`,
+            '',
             NT.REVOLUTION, planet
         )
 
@@ -39,6 +41,28 @@ class RevolutionNews extends News {
             credits: (rng(0.5,1.5,false)  + this.endEffects[0].credits)/2,
             prestige: (rng(0.5,1.5,false)  + this.endEffects[0].prestige)/2,
         })
+
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                newGovernmentType: GT.ANARCHY,
+                military: CL.NO_REGRESSION,
+                security: CL.NO_REGRESSION,
+                crime: CL.NO_REGRESSION,
+                economy: CL.NO_REGRESSION,
+                industry: CL.NO_REGRESSION,
+                prestige: CL.VERY_LOW,
+                buildingsEnabled: courthouseBuilding ? [] : [],
+                cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, CL.NO_REGRESSION]]),
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet} = this
+        // Higher military and prestige = more likely to succeed
+        const successProbability = (planet.culture.military + planet.culture.prestige) / 2
+        this.failed = Math.random() > successProbability
     }
 
     isValid() {

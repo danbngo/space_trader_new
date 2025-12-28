@@ -3,6 +3,8 @@ class WarSubjugationNews extends News {
         super(
             `${coloredName(planet)} lands its ships and occupies ${coloredName(targetPlanet)}! Its armies raise the flag of ${coloredName(planet)} over the conquered world.`,
             `${coloredName(targetPlanet)} regains independence from ${coloredName(planet)}, bringing the occupation to an end!`,
+            `${coloredName(targetPlanet)} mounts fierce resistance and repels ${coloredName(planet)}'s occupation forces!`,
+            `Peace treaty forces ${coloredName(planet)} to abandon occupation of ${coloredName(targetPlanet)}!`,
             NT.SUBJUGATION, planet, targetPlanet
         )
 
@@ -49,6 +51,53 @@ class WarSubjugationNews extends News {
             prestige: News.clHalfRegression(this.endEffects[0].prestige),
             newRelationship: RELATIONSHIP_TYPES.NEUTRAL,
         })
+
+        // Failed: occupation repelled, attacker loses forces
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                military: CL.LOW, // failed invasion losses
+                shipyardNumShips: CL.LOW,
+                prestige: CL.LOW, // humiliation
+            }),
+            new NewsEffect({
+                planet: this.targetPlanet,
+                prestige: CL.HIGH, // victory boosts morale
+                military: News.clHalfRegression(CL.EXTREMELY_LOW), // but fighting took toll
+            })
+        ]
+
+        // Cancelled: peace forces withdrawal
+        this.cancelEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                territory: News.clHalfRegression(CL.VERY_HIGH),
+                military: News.clHalfRegression(CL.SLIGHTLY_LOW),
+                economy: News.clHalfRegression(CL.HIGH),
+                prestige: News.clHalfRegression(CL.VERY_HIGH),
+            }),
+            new NewsEffect({
+                planet: this.targetPlanet,
+                territory: News.clHalfRegression(CL.VERY_LOW),
+                military: News.clHalfRegression(CL.EXTREMELY_LOW),
+                security: News.clHalfRegression(CL.VERY_LOW),
+                economy: News.clHalfRegression(CL.LOW),
+                prestige: News.clHalfRegression(CL.VERY_LOW),
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet, targetPlanet} = this
+        // Check if war still ongoing
+        const stillAtWar = planet.culture.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
+        if (!stillAtWar) {
+            this.cancelled = true
+            return
+        }
+        // Resistance probability based on target's military strength relative to occupier
+        const resistanceProbability = (targetPlanet.militaryPower / planet.militaryPower) * 0.3
+        this.failed = Math.random() < resistanceProbability
     }
 
     isValid() {

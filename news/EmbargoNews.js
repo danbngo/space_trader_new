@@ -3,6 +3,8 @@ class EmbargoNews extends News {
         super(
             `Embargo imposed by ${coloredName(planet)} on ${coloredName(targetPlanet)}!`,
             `${coloredName(planet)} lifts embargo on ${coloredName(targetPlanet)}!`,
+            ``,
+            `${coloredName(planet)}'s embargo on ${coloredName(targetPlanet)} collapses as relations improve!`,
             NT.EMBARGO, planet, targetPlanet
         )
 
@@ -32,6 +34,30 @@ class EmbargoNews extends News {
             prestige: News.clHalfRegression(this.endEffects[0].prestige),
             economy: News.clHalfRegression(this.endEffects[0].economy),
         })
+
+        // Cancelled: relations improve, embargo lifted early
+        this.cancelEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                military: News.clHalfRegression(CL.LOW),
+                prestige: News.clHalfRegression(CL.SLIGHTLY_HIGH),
+            }),
+            new NewsEffect({
+                planet: this.targetPlanet,
+                economy: News.clHalfRegression(CL.VERY_LOW),
+                marketPrices: News.clHalfRegression(CL.VERY_HIGH),
+                marketCargoAmounts: News.clHalfRegression(CL.LOW),
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet, targetPlanet} = this
+        // Check if relationship improved to neutral
+        const rel = planet.culture.relationships.get(targetPlanet)
+        if (rel === RELATIONSHIP_TYPES.NEUTRAL || rel === RELATIONSHIP_TYPES.ALLY) {
+            this.cancelled = true
+        }
     }
 
     isValid() {

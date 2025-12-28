@@ -3,6 +3,8 @@ class CivilWarNews extends News {
         super(
             `Civil war breaks out on ${coloredName(planet)}!`,
             `${coloredName(planet)}'s civil war ends!`,
+            `${coloredName(planet)}'s civil war ends in disaster! The planet is devastated!`,
+            '',
             NT.CIVIL_WAR, planet
         )
 
@@ -46,6 +48,29 @@ class CivilWarNews extends News {
             territory: News.clHalfRegression(this.endEffects[0].territory),
             military: News.clHalfRegression(this.endEffects[0].military),
         })
+
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                territory: CL.NO_REGRESSION,
+                military: CL.NO_REGRESSION,
+                security: CL.NO_REGRESSION,
+                crime: CL.NO_REGRESSION,
+                population: CL.NO_REGRESSION,
+                economy: CL.NO_REGRESSION,
+                industry: CL.NO_REGRESSION,
+                prestige: CL.NO_REGRESSION,
+                buildingsEnabled: [],
+                cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, CL.NO_REGRESSION], [CARGO_TYPES.ANTIMATTER, CL.NO_REGRESSION]]),
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet} = this
+        // Higher prestige and economy = more likely to end cleanly
+        const resolveProbability = (planet.culture.prestige + planet.culture.economy) / 2
+        this.failed = Math.random() > resolveProbability
     }
     isValid() {
         const {planet} = this

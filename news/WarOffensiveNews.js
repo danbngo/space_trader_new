@@ -3,6 +3,8 @@ class WarOffensiveNews extends News {
         super(
             `${coloredName(planet)} launches a major offensive against ${coloredName(targetPlanet)}, relying on its generals!`,
             `${coloredName(planet)}'s brilliant offensive has wreaked havoc on ${coloredName(targetPlanet)}!`,
+            '',
+            `${coloredName(planet)}'s offensive against ${coloredName(targetPlanet)} is cancelled! Peace treaty signed!`,
             NT.WAR_OFFENSIVE, planet, targetPlanet
         )
 
@@ -35,6 +37,21 @@ class WarOffensiveNews extends News {
             guildNumOfficers: CL.NO_REGRESSION,
             military: CL.SLIGHTLY_LOW,
         })
+
+        this.cancelEndEffects = this.endEffects.map(effect => {
+            const e = effect.clone()
+            e.shipyardNumShips = News.clHalfRegression(effect.shipyardNumShips)
+            e.guildNumOfficers = News.clHalfRegression(effect.guildNumOfficers)
+            return e
+        })
+    }
+
+    determineEnding() {
+        const {planet, targetPlanet} = this
+        // Check if peace was forced during offensive
+        const currentRel1 = planet.culture.relationships.get(targetPlanet)
+        const currentRel2 = targetPlanet.culture.relationships.get(planet)
+        this.cancelled = (currentRel1 !== RELATIONSHIP_TYPES.WAR || currentRel2 !== RELATIONSHIP_TYPES.WAR)
     }
 
     isValid() {

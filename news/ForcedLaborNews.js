@@ -3,6 +3,8 @@ class ForcedLaborNews extends News {
         super(
             `${coloredName(planet)} implements brutal forced labor programs! Citizens are pressed into industrial work camps!`,
             `${coloredName(planet)}'s forced labor camps are finally dismantled!`,
+            `Slave revolts force ${coloredName(planet)} to shut down labor camps!`,
+            ``,
             NT.FORCED_LABOR, planet
         )
 
@@ -25,6 +27,25 @@ class ForcedLaborNews extends News {
             marketCargoAmounts: News.clHalfRegression(this.endEffects[0].marketCargoAmounts),
             prestige: CL.NO_REGRESSION, // permanent prestige loss
         })
+
+        // Failed: revolts shut down camps, no industrial gain
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                population: CL.VERY_LOW, // mass casualties in revolts
+                economy: CL.LOW, // disruption
+                prestige: CL.VERY_LOW, // humanitarian crisis
+                crime: CL.VERY_HIGH, // lawlessness from revolts
+                military: CL.LOW, // military stretched dealing with revolts
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet} = this
+        // Forced labor fails if security too low (revolts succeed)
+        const revoltProbability = (1 - planet.culture.security) * 0.4
+        this.failed = Math.random() < revoltProbability
     }
 
     isValid() {

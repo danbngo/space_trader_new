@@ -3,6 +3,8 @@ class FestivalNews extends News {
         super(
             `${coloredName(planet)} announces an extravagant festival open to all visitors, diverting resources to celebrate!`,
             `${coloredName(planet)}'s festival concludes, leaving the planet with enhanced prestige!`,
+            `${coloredName(planet)}'s festival is marred by violence and disasters!`,
+            ``,
             NT.FESTIVAL, planet
         )
 
@@ -27,6 +29,24 @@ class FestivalNews extends News {
             //blackMarketPrices: News.clHalfRegression(this.endEffects[0].blackMarketPrices),
             prestige: CL.SLIGHTLY_HIGH,
         })
+
+        // Failed: festival disaster, no prestige gain
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                credits: CL.NO_REGRESSION, // money wasted
+                economy: CL.NO_REGRESSION,
+                crime: CL.NO_REGRESSION, // crime persists
+                prestige: CL.LOW, // embarrassment
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet} = this
+        // Festival fails if security too low (riots, crime)
+        const failProbability = (1 - planet.culture.security) * 0.3
+        this.failed = Math.random() < failProbability
     }
 
     isValid() {

@@ -3,6 +3,8 @@ class WarSabotageNews extends News {
         super(
             `${coloredName(planet)} launches covert sabotage operations against ${coloredName(targetPlanet)}!`,
             `${coloredName(planet)}'s sabotage campaign against ${coloredName(targetPlanet)} concludes!`,
+            '',
+            `${coloredName(planet)}'s sabotage operations against ${coloredName(targetPlanet)} are called off!`,
             NT.WAR_SABOTAGE, planet, targetPlanet
         )
 
@@ -35,6 +37,30 @@ class WarSabotageNews extends News {
             military: CL.NO_REGRESSION,
             industry: News.clHalfRegression(this.endEffects[1].industry),
         })
+
+        this.cancelEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                targetPlanet: this.targetPlanet,
+                security: News.clHalfRegression(this.endEffects[0].security),
+                guildNumOfficers: News.clHalfRegression(this.endEffects[0].guildNumOfficers),
+                officerQuality: News.clHalfRegression(this.endEffects[0].officerQuality),
+            }),
+            new NewsEffect({
+                planet: this.targetPlanet,
+                targetPlanet: this.planet,
+                military: News.clHalfRegression(this.endEffects[1].military),
+                industry: News.clHalfRegression(this.endEffects[1].industry),
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet, targetPlanet} = this
+        // Check if peace was forced during sabotage
+        const currentRel1 = planet.culture.relationships.get(targetPlanet)
+        const currentRel2 = targetPlanet.culture.relationships.get(planet)
+        this.cancelled = (currentRel1 !== RELATIONSHIP_TYPES.WAR || currentRel2 !== RELATIONSHIP_TYPES.WAR)
     }
 
     isValid() {

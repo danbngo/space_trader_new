@@ -3,6 +3,8 @@ class ImperialismNews extends News {
         super(
             `${coloredName(planet)} carries out imperialist expansion, seizing territory from ${coloredName(targetPlanet)}!`,
             `${coloredName(planet)}'s imperialist expansion against ${coloredName(targetPlanet)} finally grinds to a halt!`,
+            `${coloredName(targetPlanet)} repels ${coloredName(planet)}'s imperialist aggression!`,
+            `Peace treaty forces ${coloredName(planet)} to abandon expansion into ${coloredName(targetPlanet)}!`,
             NT.IMPERIALISM, planet, targetPlanet
         )
 
@@ -36,6 +38,49 @@ class ImperialismNews extends News {
             territory: CL.LOW,
             prestige: CL.NO_REGRESSION,
         })
+
+        // Failed: expansion repelled, aggressor humiliated
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                military: CL.NO_REGRESSION, // losses remain
+                security: CL.NO_REGRESSION,
+                prestige: CL.VERY_LOW, // failed expansion
+            }),
+            new NewsEffect({
+                planet: this.targetPlanet,
+                military: News.clHalfRegression(CL.LOW),
+                prestige: CL.HIGH, // victory boosts morale
+            })
+        ]
+
+        // Cancelled: peace forces withdrawal
+        this.cancelEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                military: News.clHalfRegression(CL.LOW),
+                security: News.clHalfRegression(CL.LOW),
+                territory: News.clHalfRegression(CL.HIGH), // partial gains
+            }),
+            new NewsEffect({
+                planet: this.targetPlanet,
+                military: News.clHalfRegression(CL.LOW),
+                territory: News.clHalfRegression(CL.LOW), // partial losses
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet, targetPlanet} = this
+        // Check if peace declared
+        const rel = planet.culture.relationships.get(targetPlanet)
+        if (rel === RELATIONSHIP_TYPES.NEUTRAL || rel === RELATIONSHIP_TYPES.ALLY) {
+            this.cancelled = true
+            return
+        }
+        // Expansion fails if target resists successfully
+        const resistanceProbability = (targetPlanet.militaryPower / planet.militaryPower) * 0.35
+        this.failed = Math.random() < resistanceProbability
     }
 
     isValid() {

@@ -3,6 +3,8 @@ class ColonizationNews extends News {
         super(
             `${coloredName(planet)} begins building a fleet to colonize resource-rich asteroids in the central belt!`,
             `${coloredName(planet)}'s colony ships have finished building settlements on resource laden asteroids!`,
+            `${coloredName(planet)}'s colonization effort fails! Ships lost!`,
+            '',
             NT.COLONIZATION, planet
         )
 
@@ -29,6 +31,25 @@ class ColonizationNews extends News {
             industry: CL.HIGH,
             territory: CL.HIGH,
         })
+
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                population: CL.NO_REGRESSION,
+                shipyardNumShips: CL.NO_REGRESSION,
+                shipQuality: CL.NO_REGRESSION,
+                prestige: CL.LOW,
+                credits: CL.NO_REGRESSION,
+                cargoPriceModifiers: new Map([[CARGO_TYPES.METAL, CL.NO_REGRESSION], [CARGO_TYPES.ISOTOPES, CL.NO_REGRESSION]]),
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet} = this
+        // Higher industry and territory = more likely to succeed
+        const successProbability = (planet.culture.industry + planet.culture.territory) / 2
+        this.failed = Math.random() > successProbability
     }
 
     isValid() {

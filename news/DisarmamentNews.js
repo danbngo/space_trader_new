@@ -3,6 +3,8 @@ class DisarmamentNews extends News {
         super(
             `${coloredName(planet)} seeks system-wide peace and begins a period of disarmament!`,
             `${coloredName(planet)}'s disarmament period comes to an end!`,
+            `External threats force ${coloredName(planet)} to abandon disarmament prematurely!`,
+            ``,
             NT.DISARMAMENT, planet
         )
 
@@ -27,6 +29,33 @@ class DisarmamentNews extends News {
             industry: CL.SLIGHTLY_HIGH,
             prestige: CL.SLIGHTLY_HIGH,
         })
+
+        // Failed: forced to rearm, economic benefits lost
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                military: CL.NO_REGRESSION, // stayed weak
+                shipyardNumShips: CL.NO_REGRESSION,
+                territory: CL.NO_REGRESSION,
+                prestige: CL.LOW, // seen as weak
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet} = this
+        // Disarmament fails if tensions arise
+        let tensionsDetected = false
+        for (const p of gs.system.planets) {
+            if (p !== planet) {
+                const rel = p.culture.relationships.get(planet)
+                if (rel === RELATIONSHIP_TYPES.TENSE || rel === RELATIONSHIP_TYPES.HOSTILE || rel === RELATIONSHIP_TYPES.WAR) {
+                    tensionsDetected = true
+                    break
+                }
+            }
+        }
+        this.failed = tensionsDetected
     }
 
     isValid() {

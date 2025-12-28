@@ -3,6 +3,8 @@ class StockMarketCrashNews extends News {
         super(
             `The stock market on ${coloredName(planet)} crashes catastrophically! Financial institutions reel from massive losses!`,
             `${coloredName(planet)}'s financial markets stabilize from their crash.`,
+            ``,
+            ``,
             NT.STOCK_MARKET_CRASH, planet
         )
 

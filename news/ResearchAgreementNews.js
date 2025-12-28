@@ -3,6 +3,8 @@ class ResearchAgreementNews extends News {
         super(
             `${coloredName(planet)} and ${coloredName(targetPlanet)} announce a joint research project!`,
             `${coloredName(planet)} and ${coloredName(targetPlanet)} conclude their joint research project!`,
+            `Research collaboration between ${coloredName(planet)} and ${coloredName(targetPlanet)} yields no breakthroughs!`,
+            `Tensions force ${coloredName(planet)} and ${coloredName(targetPlanet)} to abandon research collaboration!`,
             NT.RESEARCH_AGREEMENT, planet, targetPlanet
         )
 
@@ -31,6 +33,50 @@ class ResearchAgreementNews extends News {
             officerQuality: CL.HIGH,
             military: CL.SLIGHTLY_HIGH,
         })
+
+        // Failed: research yields nothing, wasted resources
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                credits: CL.NO_REGRESSION, // money wasted
+            }),
+            new NewsEffect({
+                planet: this.targetPlanet,
+                credits: CL.NO_REGRESSION,
+            })
+        ]
+
+        // Cancelled: tensions end collaboration early
+        this.cancelEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                credits: News.clHalfRegression(CL.LOW),
+                shipQuality: CL.SLIGHTLY_HIGH, // partial gains
+                officerQuality: News.clHalfRegression(CL.HIGH),
+            }),
+            new NewsEffect({
+                planet: this.targetPlanet,
+                credits: News.clHalfRegression(CL.LOW),
+                shipQuality: CL.SLIGHTLY_HIGH,
+                officerQuality: News.clHalfRegression(CL.HIGH),
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet, targetPlanet} = this
+        // Check if relationship deteriorated
+        const rel1 = planet.culture.relationships.get(targetPlanet)
+        const rel2 = targetPlanet.culture.relationships.get(planet)
+        if (rel1 === RELATIONSHIP_TYPES.TENSE || rel1 === RELATIONSHIP_TYPES.HOSTILE || rel1 === RELATIONSHIP_TYPES.WAR ||
+            rel2 === RELATIONSHIP_TYPES.TENSE || rel2 === RELATIONSHIP_TYPES.HOSTILE || rel2 === RELATIONSHIP_TYPES.WAR) {
+            this.cancelled = true
+            return
+        }
+        // Research fails based on combined officer quality
+        const avgQuality = (planet.culture.officerQuality + targetPlanet.culture.officerQuality) / 2
+        const successProbability = avgQuality * 0.7 + 0.2
+        this.failed = Math.random() > successProbability
     }
 
     isValid() {

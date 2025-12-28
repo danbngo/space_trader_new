@@ -3,6 +3,8 @@ class CrimeWaveNews extends News {
         super(
             `Chronic poverty on ${coloredName(planet)} leads to a massive crime wave!`,
             `Authorities regain control as the crime wave on ${coloredName(planet)} ends!`,
+            `${coloredName(planet)} fails to stop the crime wave! Lawlessness reigns!`,
+            '',
             NT.CRIME_WAVE, planet
         )
 
@@ -24,6 +26,25 @@ class CrimeWaveNews extends News {
             blackMarketPrices: News.clHalfRegression(this.endEffects[0].blackMarketPrices),
             blackMarketCargoAmounts: News.clHalfRegression(this.endEffects[0].blackMarketCargoAmounts),
         })
+
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                security: CL.NO_REGRESSION,
+                crime: CL.NO_REGRESSION,
+                blackMarketCargoAmounts: CL.NO_REGRESSION,
+                blackMarketPrices: CL.NO_REGRESSION,
+                prestige: CL.LOW,
+                cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, CL.NO_REGRESSION], [CARGO_TYPES.DRUGS, CL.NO_REGRESSION]]),
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet} = this
+        // Higher security and military = more likely to stop crime
+        const stopProbability = (planet.culture.security + planet.culture.military) / 2
+        this.failed = Math.random() > stopProbability
     }
 
     isValid() {

@@ -3,6 +3,8 @@ class TourismNews extends News {
         super(
             `${planet.name} turns one of its moons into a resort to attract tourists from across the system!`,
             `${coloredName(planet)} completes its lunar resort, attracting a rush of lucrative tourism!`,
+            `${coloredName(planet)}'s lunar resort project fails to attract tourists!`,
+            ``,
             NT.TOURISM, planet
         )
         this.startEffects = [
@@ -25,6 +27,23 @@ class TourismNews extends News {
             blackMarketCargoAmounts: CL.VERY_HIGH,
             blackMarketPrices: CL.VERY_HIGH,
         })
+
+        // Failed: resort attracts no tourists, investment wasted
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                credits: CL.NO_REGRESSION, // money lost
+                industry: CL.NO_REGRESSION, // damaged industry
+                prestige: CL.LOW, // embarrassment
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet} = this
+        // Tourism fails if planet has low prestige or poor economy during construction
+        const failProbability = (1 - planet.culture.prestige) * (1 - planet.culture.economy) * 0.3
+        this.failed = Math.random() < failProbability
     }
 
     isValid() {

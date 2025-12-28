@@ -3,6 +3,8 @@ class CrackdownNews extends News {
         super(
             `Government cracks down on crime on ${coloredName(planet)}!`,
             `The anti-crime crackdown on ${coloredName(planet)} ends.`,
+            `${coloredName(planet)}'s crackdown fails! Crime is emboldened!`,
+            '',
             NT.CRACKDOWN, planet
         )
 
@@ -27,6 +29,24 @@ class CrackdownNews extends News {
             //blackMarketPrices: News.clHalfRegression(this.endEffects[0].blackMarketPrices),
             blackMarketCargoAmounts: News.clHalfRegression(this.endEffects[0].blackMarketCargoAmounts),
         })
+
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                security: CL.LOW,
+                crime: CL.HIGH,
+                prestige: CL.VERY_LOW,
+                blackMarketCargoAmounts: CL.HIGH,
+                cargoPriceModifiers: new Map([[CARGO_TYPES.DRUGS, CL.NO_REGRESSION]]),
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet} = this
+        // Higher security and military = more likely crackdown succeeds
+        const successProbability = (planet.culture.security + planet.culture.military) / 2
+        this.failed = Math.random() > successProbability
     }
 
     isValid() {

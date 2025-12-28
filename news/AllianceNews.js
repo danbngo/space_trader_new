@@ -3,6 +3,8 @@ class AllianceNews extends News {
         super(
             `Alliance formed between ${coloredName(planet)} and ${coloredName(targetPlanet)}!`,
             `Alliance dissolved between ${coloredName(planet)} and ${coloredName(targetPlanet)}!`,
+            ``,
+            `Tensions between ${coloredName(planet)} and ${coloredName(targetPlanet)} prevent alliance formation!`,
             NT.ALLIANCE, planet, targetPlanet
         )
 
@@ -38,6 +40,35 @@ class AllianceNews extends News {
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //this is the only relationship that cannot be dissolved mid-event
         for (const fx of this.endEffects) fx.newRelationship = RELATIONSHIP_TYPES.NEUTRAL
+
+        // Cancelled: relationship soured before alliance solidified
+        this.cancelEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                targetPlanet: this.targetPlanet,
+                territory: News.clHalfRegression(CL.HIGH),
+                marketCargoAmounts: News.clHalfRegression(CL.SLIGHTLY_HIGH),
+                prestige: CL.LOW, // diplomatic failure
+            }),
+            new NewsEffect({
+                planet: this.targetPlanet,
+                targetPlanet: this.planet,
+                territory: News.clHalfRegression(CL.HIGH),
+                marketCargoAmounts: News.clHalfRegression(CL.SLIGHTLY_HIGH),
+                prestige: CL.LOW,
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet, targetPlanet} = this
+        // Check if relationships are still friendly
+        const rel1 = planet.culture.relationships.get(targetPlanet)
+        const rel2 = targetPlanet.culture.relationships.get(planet)
+        if (rel1 === RELATIONSHIP_TYPES.TENSE || rel1 === RELATIONSHIP_TYPES.HOSTILE || rel1 === RELATIONSHIP_TYPES.WAR ||
+            rel2 === RELATIONSHIP_TYPES.TENSE || rel2 === RELATIONSHIP_TYPES.HOSTILE || rel2 === RELATIONSHIP_TYPES.WAR) {
+            this.cancelled = true
+        }
     }
 
     getAllies(planet = new Planet()) {

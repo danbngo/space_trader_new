@@ -3,6 +3,8 @@ class TerraformingNews extends News {
         super(
             `${coloredName(planet)} sends its best engineers and terraformers to terraform its moon!`,
             `${coloredName(planet)}'s moon terraforming project is complete, yielding new territory and industry!`,
+            `${coloredName(planet)}'s terraforming project fails catastrophically! Resources squandered!`,
+            '',
             NT.TERRAFORMING, planet
         )
 
@@ -26,6 +28,25 @@ class TerraformingNews extends News {
             economy: CL.SLIGHTLY_HIGH, // permanent economy boost
             territory: CL.SLIGHTLY_HIGH, // permanent territory gain
         })
+
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                shipyardNumShips: CL.NO_REGRESSION,
+                guildNumOfficers: CL.NO_REGRESSION,
+                officerQuality: CL.NO_REGRESSION,
+                credits: CL.NO_REGRESSION,
+                prestige: CL.LOW,
+                cargoPriceModifiers: new Map([[CARGO_TYPES.METAL, CL.NO_REGRESSION], [CARGO_TYPES.NANITES, CL.NO_REGRESSION]]),
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet} = this
+        // Higher industry and officer quality = more likely to succeed
+        const successProbability = (planet.culture.industry + planet.settlement.guild.officerQualityMod) / 2
+        this.failed = Math.random() > successProbability
     }
 
     isValid() {

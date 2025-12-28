@@ -3,6 +3,8 @@ class AddictionNews extends News {
         super(
             `${coloredName(planet)} is suffering an addiction crisis! Synthetic drugs are ravaging the population!`,
             `${coloredName(planet)}'s addiction crisis begins to mellow out!`,
+            `${coloredName(planet)}'s addiction crisis spirals out of control!`,
+            '',
             NT.ADDICTION, planet
         )
 
@@ -27,6 +29,25 @@ class AddictionNews extends News {
             blackMarketCargoAmounts: News.clHalfRegression(this.endEffects[0].blackMarketCargoAmounts),
             crime: News.clHalfRegression(this.endEffects[0].crime),
         })
+
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                population: CL.NO_REGRESSION,
+                security: CL.NO_REGRESSION,
+                crime: CL.NO_REGRESSION,
+                economy: CL.NO_REGRESSION,
+                prestige: CL.VERY_LOW,
+                cargoPriceModifiers: new Map([[CARGO_TYPES.DRUGS, CL.NO_REGRESSION]]),
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet} = this
+        // Higher security and economy = more likely to overcome addiction
+        const overcomeProbability = (planet.culture.security + planet.culture.economy) / 2
+        this.failed = Math.random() > overcomeProbability
     }
 
     isValid() {

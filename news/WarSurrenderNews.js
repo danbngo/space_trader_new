@@ -3,6 +3,8 @@ class WarSurrenderNews extends News {
         super(
             `${coloredName(targetPlanet)} sues for peace with ${coloredName(planet)}, offering indemnity and territorial concessions!`,
             `${coloredName(targetPlanet)} has negotiated the terms of its surrender to ${coloredName(planet)}!`,
+            ``,
+            `Negotiations collapse as ${coloredName(targetPlanet)} rejects surrender terms from ${coloredName(planet)}!`,
             NT.WAR_SURRENDER, planet, targetPlanet
         )
 
@@ -36,6 +38,32 @@ class WarSurrenderNews extends News {
             prestige: CL.LOW, // shame of defeat
             forcePeace: true, // ends the war
         })
+
+        // Cancelled: negotiations break down, war continues
+        this.cancelEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                // Victor just wastes time
+            }),
+            new NewsEffect({
+                planet: this.targetPlanet,
+                military: News.clHalfRegression(CL.LOW), // partial recovery
+                prestige: News.clHalfRegression(CL.LOW),
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet, targetPlanet} = this
+        // Check if war still ongoing
+        const stillAtWar = planet.culture.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
+        if (!stillAtWar) {
+            this.cancelled = true
+            return
+        }
+        // Negotiations succeed unless target suddenly regains strength
+        const rejectProbability = (targetPlanet.militaryPower / planet.militaryPower) * 0.2
+        this.cancelled = Math.random() < rejectProbability
     }
 
     isValid() {

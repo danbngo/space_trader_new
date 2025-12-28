@@ -3,6 +3,8 @@ class EnvironmentalismNews extends News {
         super(
             `${coloredName(planet)}'s people are de-industrializing to save their planet's natural beauty!`,
             `${coloredName(planet)} has de-industrialized, giving their planet room to breathe again!`,
+            `${coloredName(planet)}'s environmental movement collapses amid economic crisis!`,
+            ``,
             NT.ENVIRONMENTALISM, planet
         )
 
@@ -23,6 +25,23 @@ class EnvironmentalismNews extends News {
             industry: News.clHalfRegression(this.endEffects[0].industry),
             prestige: CL.SLIGHTLY_HIGH,
         })
+
+        // Failed: movement collapses, industry rebounds but damage to environment
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                industry: News.clHalfRegression(CL.EXTREMELY_LOW), // partial de-industrialization
+                economy: CL.LOW, // economic disruption
+                prestige: CL.LOW, // movement failure
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet} = this
+        // Movement fails if economy becomes too weak to sustain
+        const failProbability = (1 - planet.culture.economy) * 0.35
+        this.failed = Math.random() < failProbability
     }
 
     isValid() {

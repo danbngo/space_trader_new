@@ -109,9 +109,21 @@ class News {
         //console.log('ending news event:',this)
         this.ended = true
         this.endedYear = gs.year
-        if (this.endEffects.length == 0) return; //no end effects to apply, dont update feeds
+        
+        // Determine the ending state (failed, cancelled, or normal)
+        this.determineEnding()
+        
+        // Select which effects to apply based on the ending state
+        let effectsToApply = this.endEffects
+        if (this.failed && this.failEndEffects.length > 0) {
+            effectsToApply = this.failEndEffects
+        } else if (this.cancelled && this.cancelEndEffects.length > 0) {
+            effectsToApply = this.cancelEndEffects
+        }
+        
+        if (effectsToApply.length == 0) return; //no end effects to apply, dont update feeds
         //gs.system.newsFeed.push(this.endDescription)
-        for (const fx of this.endEffects) {
+        for (const fx of effectsToApply) {
             //gs.system.newsFeed.push(fx.describe())
             fx.apply()
         }

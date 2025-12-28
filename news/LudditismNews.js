@@ -3,6 +3,8 @@ class LudditismNews extends News {
         super(
             `${coloredName(planet)} embraces a return-to-soil movement, rejecting advanced technology for a simpler life!`,
             `${coloredName(planet)}'s people have completed their transition to a more pastoral life!`,
+            `${coloredName(planet)}'s luddite movement collapses as technological needs overwhelm ideology!`,
+            ``,
             NT.LUDDITISM, planet
         )
 
@@ -37,6 +39,37 @@ class LudditismNews extends News {
             blackMarketCargoAmounts: CL.LOW,
             blackMarketPrices: CL.LOW,
         })
+
+        // Failed: movement collapses, no benefits
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                shipQuality: CL.NO_REGRESSION, // tech degradation remains
+                officerQuality: CL.NO_REGRESSION,
+                military: CL.NO_REGRESSION,
+                economy: CL.NO_REGRESSION,
+                industry: CL.NO_REGRESSION,
+                population: News.clHalfRegression(CL.HIGH), // partial growth
+                prestige: CL.LOW, // movement failure
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet} = this
+        // Movement fails if external pressures (economy/military threats)
+        let threatsDetected = false
+        for (const p of gs.system.planets) {
+            if (p !== planet) {
+                const rel = p.culture.relationships.get(planet)
+                if (rel === RELATIONSHIP_TYPES.TENSE || rel === RELATIONSHIP_TYPES.HOSTILE || rel === RELATIONSHIP_TYPES.WAR) {
+                    threatsDetected = true
+                    break
+                }
+            }
+        }
+        const failProbability = threatsDetected ? 0.5 : ((1 - planet.culture.economy) * 0.25)
+        this.failed = Math.random() < failProbability
     }
 
     isValid() {

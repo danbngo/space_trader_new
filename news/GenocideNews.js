@@ -3,6 +3,8 @@ class GenocideNews extends News {
         super(
             `${coloredName(planet)} begins purging its society of 'undesirable' elements! The other planets condemn this vile act!'`,
             `${coloredName(planet)}'s purge of its own people finally comes to an end!`,
+            ``,
+            ``,
             NT.GENOCIDE, planet
         )
 

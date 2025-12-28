@@ -3,6 +3,8 @@ class WarHumanWaveNews extends News {
         super(
             `${coloredName(planet)} launches desperate human wave attacks against ${coloredName(targetPlanet)}!`,
             `${coloredName(planet)}'s human wave offensive finally ends with staggering casualties!`,
+            ``,
+            `Peace treaty ends ${coloredName(planet)}'s human wave offensive before full deployment!`,
             NT.WAR_HUMAN_WAVE, planet, targetPlanet
         )
 
@@ -31,6 +33,29 @@ class WarHumanWaveNews extends News {
             guildNumOfficers: CL.LOW, // officers killed defending
             military: CL.SLIGHTLY_LOW, // ground forces worn down
         })
+
+        // Cancelled: peace declared mid-offensive, troops pull back
+        this.cancelEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                population: News.clHalfRegression(CL.VERY_LOW), // some casualties already taken
+                guildNumOfficers: News.clHalfRegression(CL.LOW),
+            }),
+            new NewsEffect({
+                planet: this.targetPlanet,
+                guildNumOfficers: News.clHalfRegression(CL.LOW),
+                military: News.clHalfRegression(CL.SLIGHTLY_LOW),
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet, targetPlanet} = this
+        // Check if war still ongoing
+        const stillAtWar = planet.culture.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
+        if (!stillAtWar) {
+            this.cancelled = true
+        }
     }
 
     isValid() {

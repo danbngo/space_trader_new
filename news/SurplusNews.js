@@ -3,6 +3,8 @@ class SurplusNews extends News {
         super(
             `${coloredName(planet)}'s miners have hit the motherlode! A surplus of goods floods the market!`,
             `${coloredName(planet)}'s resource-rich economy returns to normal.`,
+            `${coloredName(planet)}'s resource boom collapses as reserves are exhausted!`,
+            ``,
             NT.SURPLUS, planet
         )
 
@@ -26,6 +28,22 @@ class SurplusNews extends News {
             marketCargoAmounts: News.clHalfRegression(this.endEffects[0].marketCargoAmounts),
             credits: News.clHalfRegression(this.endEffects[0].credits),
         })
+
+        // Failed: boom goes bust, reserves exhausted
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                industry: CL.LOW, // extraction infrastructure damaged
+                economy: CL.LOW, // economic disruption
+                marketCargoAmounts: CL.NO_REGRESSION, // back to scarcity
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet} = this
+        // Surplus fails (goes bust) with small probability
+        this.failed = Math.random() < 0.15
     }
 
     isValid() {

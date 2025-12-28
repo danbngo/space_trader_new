@@ -3,6 +3,8 @@ class ScarcityNews extends News {
         super(
             `${coloredName(planet)}'s overconsumption has led to famine and scarcity!`,
             `${coloredName(planet)}'s great famine ends!`,
+            `${coloredName(planet)}'s famine spirals into catastrophic collapse!`,
+            ``,
             NT.SCARCITY, planet
         )
 
@@ -29,6 +31,25 @@ class ScarcityNews extends News {
             industry: News.clHalfRegression(this.endEffects[0].industry),
             economy: News.clHalfRegression(this.endEffects[0].economy),
         })
+
+        // Failed: famine becomes catastrophic
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                population: CL.NO_REGRESSION, // massive die-off
+                industry: CL.NO_REGRESSION,
+                economy: CL.NO_REGRESSION,
+                crime: CL.NO_REGRESSION, // lawlessness persists
+                prestige: CL.VERY_LOW, // failed state
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet} = this
+        // Scarcity becomes catastrophic if economy/industry collapse further
+        const failProbability = (1 - planet.culture.economy) * (1 - planet.culture.industry) * 0.3
+        this.failed = Math.random() < failProbability
     }
 
     isValid() {

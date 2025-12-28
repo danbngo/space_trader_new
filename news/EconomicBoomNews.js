@@ -3,6 +3,8 @@ class EconomicBoomNews extends News {
         super(
             `${coloredName(planet)} experiences an economic boom! Its citizens are living in a gilded age!`,
             `${coloredName(planet)}'s booming economy normalizes.`,
+            `${coloredName(planet)}'s economic bubble bursts! Recession hits!`,
+            '',
             NT.ECONOMIC_BOOM, planet
         )
 
@@ -26,6 +28,26 @@ class EconomicBoomNews extends News {
             credits: News.clHalfRegression(this.endEffects[0].credits),
             economy: News.clHalfRegression(this.endEffects[0].economy),
         })
+
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                marketPrices: CL.HIGH,
+                marketCargoAmounts: CL.LOW,
+                blackMarketCargoAmounts: CL.LOW,
+                economy: CL.LOW,
+                industry: CL.LOW,
+                credits: CL.VERY_LOW,
+                cargoPriceModifiers: new Map([[CARGO_TYPES.HOLOCUBES, CL.NO_REGRESSION]]),
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet} = this
+        // Higher industry and economy = more sustainable boom
+        const sustainProbability = (planet.culture.industry + planet.culture.economy) / 2
+        this.failed = Math.random() > sustainProbability
     }
 
     isValid() {

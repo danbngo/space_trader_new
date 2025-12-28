@@ -3,6 +3,8 @@ class ImmigrationNews extends News {
         super(
             `${coloredName(planet)}'s wealth attracts a massive wave of immigration from ${coloredName(targetPlanet)}!`,
             `${coloredName(planet)}'s flood of immigration from ${coloredName(targetPlanet)} subsides.`,
+            `${coloredName(planet)}'s economic downturn causes immigrants from ${coloredName(targetPlanet)} to return home!`,
+            `Rising tensions force ${coloredName(planet)} to close borders to ${coloredName(targetPlanet)}!`,
             NT.IMMIGRATION, planet, targetPlanet
         )
 
@@ -33,6 +35,49 @@ class ImmigrationNews extends News {
             population: CL.NO_REGRESSION, // population gain is permanent
             economy: News.clHalfRegression(this.endEffects[0].economy),
         })
+
+        // Failed: economic collapse, immigrants return
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                population: News.clHalfRegression(CL.HIGH), // some stayed
+                security: CL.NO_REGRESSION, // instability persists
+                economy: CL.LOW, // economic crisis
+            }),
+            new NewsEffect({
+                planet: this.targetPlanet,
+                population: News.clHalfRegression(CL.LOW), // some returned
+            })
+        ]
+
+        // Cancelled: borders closed early
+        this.cancelEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                population: News.clHalfRegression(CL.HIGH),
+                economy: News.clHalfRegression(CL.SLIGHTLY_HIGH),
+                security: News.clHalfRegression(CL.LOW),
+            }),
+            new NewsEffect({
+                planet: this.targetPlanet,
+                population: News.clHalfRegression(CL.LOW),
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet, targetPlanet} = this
+        // Check if relationship deteriorated
+        const rel1 = planet.culture.relationships.get(targetPlanet)
+        const rel2 = targetPlanet.culture.relationships.get(planet)
+        if (rel1 === RELATIONSHIP_TYPES.HOSTILE || rel1 === RELATIONSHIP_TYPES.WAR ||
+            rel2 === RELATIONSHIP_TYPES.HOSTILE || rel2 === RELATIONSHIP_TYPES.WAR) {
+            this.cancelled = true
+            return
+        }
+        // Immigration fails if economy collapses
+        const failProbability = (1 - planet.culture.economy) * 0.3
+        this.failed = Math.random() < failProbability
     }
 
     isValid() {

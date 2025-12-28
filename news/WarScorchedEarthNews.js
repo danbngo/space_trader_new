@@ -3,6 +3,8 @@ class WarScorchedEarthNews extends News {
         super(
             `${coloredName(planet)} adopts a scorched earth policy, destroying territory to blunt ${coloredName(targetPlanet)}'s advance!`,
             `${coloredName(planet)}'s scorched earth campaign ends, leaving devastation in its wake!`,
+            ``,
+            `Peace treaty halts ${coloredName(planet)}'s scorched earth policy mid-execution!`,
             NT.WAR_SCORCHED_EARTH, planet, targetPlanet
         )
 
@@ -36,6 +38,31 @@ class WarScorchedEarthNews extends News {
             shipQuality: CL.NO_REGRESSION,
             guildNumOfficers: CL.NO_REGRESSION,
         })
+
+        // Cancelled: peace before full destruction, partial damage
+        this.cancelEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                territory: News.clHalfRegression(CL.LOW),
+                industry: News.clHalfRegression(CL.LOW),
+                marketCargoAmounts: News.clHalfRegression(CL.LOW),
+            }),
+            new NewsEffect({
+                planet: this.targetPlanet,
+                shipyardNumShips: News.clHalfRegression(CL.LOW),
+                shipQuality: News.clHalfRegression(CL.LOW),
+                guildNumOfficers: News.clHalfRegression(CL.SLIGHTLY_LOW),
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet, targetPlanet} = this
+        // Check if war still ongoing
+        const stillAtWar = planet.culture.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
+        if (!stillAtWar) {
+            this.cancelled = true
+        }
     }
 
     isValid() {

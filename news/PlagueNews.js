@@ -3,6 +3,8 @@ class PlagueNews extends News {
         super(
             `${coloredName(planet)} is struck by a vicious plague! The population is being decimated!`,
             `${coloredName(planet)} develops a cure for their plague!`,
+            `${coloredName(planet)} fails to contain the plague! The death toll is catastrophic!`,
+            '',
             NT.PLAGUE, planet
         )
 
@@ -25,6 +27,25 @@ class PlagueNews extends News {
             population: News.clHalfRegression(this.endEffects[0].population),
             guildNumOfficers: News.clHalfRegression(this.endEffects[0].guildNumOfficers),
         })
+
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                population: CL.NO_REGRESSION,
+                economy: CL.NO_REGRESSION,
+                industry: CL.NO_REGRESSION,
+                guildNumOfficers: CL.NO_REGRESSION,
+                prestige: CL.VERY_LOW,
+                cargoPriceModifiers: new Map([[CARGO_TYPES.MEDICINE, CL.NO_REGRESSION]]),
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet} = this
+        // Higher economy/industry = better medical infrastructure
+        const cureProbability = (planet.culture.economy + planet.culture.industry) / 2
+        this.failed = Math.random() > cureProbability
     }
 
     isValid() {

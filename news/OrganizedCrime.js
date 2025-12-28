@@ -3,6 +3,8 @@ class OrganizedCrimeNews extends News {
         super(
             `${coloredName(planet)} is infiltrated by organized crime syndicates, corrupting the planet!`,
             `${coloredName(planet)} conducts high profile arrests and declares victory over the syndicates!`,
+            `${coloredName(planet)}'s crackdown on organized crime fails as syndicates consolidate power!`,
+            ``,
             NT.ORGANIZED_CRIME, planet
         )
 
@@ -29,6 +31,25 @@ class OrganizedCrimeNews extends News {
             crime: News.clHalfRegression(this.endEffects[0].crime),
             blackMarketCargoAmounts: News.clHalfRegression(this.endEffects[0].blackMarketCargoAmounts),
         })
+
+        // Failed: syndicates win, permanent corruption
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                economy: CL.NO_REGRESSION, // permanent economic damage
+                security: CL.NO_REGRESSION,
+                crime: CL.NO_REGRESSION, // crime entrenched
+                credits: CL.NO_REGRESSION,
+                prestige: CL.LOW, // failed state
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet} = this
+        // Crime crackdown fails if security too low
+        const failProbability = (1 - planet.culture.security) * 0.45
+        this.failed = Math.random() < failProbability
     }
 
     isValid() {

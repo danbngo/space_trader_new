@@ -3,6 +3,8 @@ class ScientificBreakthroughNews extends News {
         super(
             `${coloredName(planet)} begins work on a major scientific project!`,
             `${coloredName(planet)} completes their scientific project, unlocking a major new technology!`,
+            `${coloredName(planet)}'s scientific project fails to yield results!`,
+            ``,
             NT.SCIENTIFIC_BREAKTHROUGH, planet
         )
 
@@ -25,6 +27,22 @@ class ScientificBreakthroughNews extends News {
             officerQuality: CL.SLIGHTLY_HIGH,
             military: CL.SLIGHTLY_HIGH,
         })
+
+        // Failed: research yields nothing, resources wasted
+        this.failEndEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                credits: CL.NO_REGRESSION, // money wasted
+                prestige: CL.LOW, // scientific embarrassment
+            })
+        ]
+    }
+
+    determineEnding() {
+        const {planet} = this
+        // Research fails based on officer quality and economy
+        const successProbability = (planet.culture.officerQuality * 0.6) + (planet.culture.economy * 0.3) + 0.1
+        this.failed = Math.random() > successProbability
     }
 
     isValid() {
