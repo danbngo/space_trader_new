@@ -14,12 +14,12 @@ class Culture {
      * @param {number} population - The population factor affecting fleet sizes and officer availability.
      * @param {number} military - Rating affecting war fleets, bounty hunters, and bank credits.
      * @param {number} industry - Rating affecting merchants, miners, and ship availability.
-     * @param {number} commerce - Rating affecting merchants, smugglers, and market cargo availability.
+     * @param {number} economy - Rating affecting merchants, smugglers, and market cargo availability.
      * @param {number} security - Rating affecting police and bounty hunter presence.
      * @param {number} crime - Rating affecting pirate and smuggler activity and black market cargo.
      * @param {number} prestige - Effects how planets interact with each other.
      */
-    constructor(planet = new Planet(), governmentType = GOVERNMENT_TYPES_ALL[0], cargoPriceModifiers = new CountsMap(), shipQuality = 1.0, officerQuality = 1.0, territory = 1, population = 1, military = 1, industry = 1, commerce = 1, security = 1, crime = 1, prestige = 1) {
+    constructor(planet = new Planet(), governmentType = GOVERNMENT_TYPES_ALL[0], cargoPriceModifiers = new CountsMap(), shipQuality = 1.0, officerQuality = 1.0, territory = 1, population = 1, military = 1, industry = 1, economy = 1, security = 1, crime = 1, prestige = 1) {
         /** @type {CountsMap} */
         this.cargoPriceModifiers = cargoPriceModifiers
         /** @type {number} */
@@ -35,7 +35,7 @@ class Culture {
         /** @type {number} */
         this.industry = industry; //more merchants and miners, more ships available
         /** @type {number} */
-        this.commerce = commerce; //more merchants and smugglers, more cargo available in market
+        this.economy = economy; //more merchants and smugglers, more cargo available in market
         /** @type {number} */
         this.security = security; //more police and bounty hunters
         /** @type {number} */

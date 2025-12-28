@@ -12,7 +12,7 @@ class CivilStrifeNews extends News {
                 military: CL.SLIGHTLY_LOW,
                 security: CL.VERY_LOW,
                 crime: CL.HIGH,
-                commerce: CL.LOW,
+                economy: CL.LOW,
                 industry: CL.VERY_LOW,
                 credits: CL.LOW,
                 marketCargoAmounts: CL.LOW,
@@ -25,7 +25,7 @@ class CivilStrifeNews extends News {
         Object.assign(this.endEffects[0], {
             prestige: CL.NO_REGRESSION,
             security: News.clHalfRegression(this.endEffects[0].security),
-            commerce: News.clHalfRegression(this.endEffects[0].commerce),
+            economy: News.clHalfRegression(this.endEffects[0].economy),
             industry: News.clHalfRegression(this.endEffects[0].industry),
             marketCargoAmounts: News.clHalfRegression(this.endEffects[0].marketCargoAmounts),
         })

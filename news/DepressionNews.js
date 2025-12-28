@@ -11,7 +11,7 @@ class DepressionNews extends News {
                 planet: this.planet,
                 marketPrices: CL.EXTREMELY_LOW,
                 marketCargoAmounts: CL.EXTREMELY_LOW,
-                commerce: CL.EXTREMELY_LOW,
+                economy: CL.EXTREMELY_LOW,
                 industry: CL.VERY_LOW,
                 credits: CL.EXTREMELY_LOW,
                 crime: CL.HIGH,
@@ -28,7 +28,7 @@ class DepressionNews extends News {
             credits: News.clHalfRegression(this.endEffects[0].credits),
             marketCargoAmounts: News.clHalfRegression(this.endEffects[0].marketCargoAmounts),
             marketPrices: News.clHalfRegression(this.endEffects[0].marketPrices),
-            commerce: News.clHalfRegression(this.endEffects[0].commerce),
+            economy: News.clHalfRegression(this.endEffects[0].economy),
             //blackMarketPrices: (1 + this.endEffects[0].blackMarketPrices)/2,
             //blackMarketCargoAmounts: (1 + this.endEffects[0].blackMarketCargoAmounts)/2,
         })
@@ -37,7 +37,7 @@ class DepressionNews extends News {
     isValid() {
         const {planet} = this
         //more likely to happen when credit is REALLY high
-        const ratingsValid = (planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS) > CL.HIGH && planet.culture.commerce < CL.HIGH
+        const ratingsValid = (planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS) > CL.HIGH && planet.culture.economy < CL.HIGH
         const interferingEvent =
             News.planetHasAnyNews(planet, [NEWS_TYPES.DEPRESSION, ...NEWS_TYPES_ECONOMY_BOOSTING]) || 
             News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_ECONOMY_BOOSTING)

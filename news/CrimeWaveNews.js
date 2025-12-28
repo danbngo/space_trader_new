@@ -1,15 +1,15 @@
 class CrimeWaveNews extends News {
     constructor(planet = new Planet()) {
         super(
-            `Massive crime wave on ${coloredName(planet)}!`,
-            `The massive crime wave on ${coloredName(planet)} ends!`,
+            `Chronic poverty on ${coloredName(planet)} leads to a massive crime wave!`,
+            `Authorities regain control as the crime wave on ${coloredName(planet)} ends!`,
             NEWS_TYPES.CRIME_WAVE, planet
         )
 
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                security: CL.HIGH,
+                security: CL.LOW,
                 crime: CL.EXTREMELY_HIGH,
                 blackMarketCargoAmounts: CL.VERY_HIGH,
                 blackMarketPrices: CL.VERY_LOW,
@@ -29,8 +29,9 @@ class CrimeWaveNews extends News {
     isValid() {
         const {planet} = this
         //wont happen if crime or security is already high
+        const povertyValid = planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS < CL.MEDIUM
         const ratingsValid = planet.culture.crime < CL.MEDIUM && planet.culture.security < CL.MEDIUM
         const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.CRIME_WAVE, ...NEWS_TYPES_CRIME_PREVENTING])
-        return ratingsValid && !interferingEvent
+        return ratingsValid && povertyValid && !interferingEvent
     }
 }

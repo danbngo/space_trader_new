@@ -10,7 +10,7 @@ class PlagueNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 population: CL.VERY_LOW,
-                commerce: CL.VERY_LOW,
+                economy: CL.VERY_LOW,
                 industry: CL.VERY_LOW,
                 guildNumOfficers: CL.VERY_LOW,
                 marketPrices: CL.SLIGHTLY_HIGH,

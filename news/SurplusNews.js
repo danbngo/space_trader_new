@@ -11,7 +11,7 @@ class SurplusNews extends News {
                 planet: this.planet,
                 marketPrices: CL.EXTREMELY_LOW,
                 marketCargoAmounts: CL.EXTREMELY_HIGH,
-                commerce: CL.SLIGHTLY_HIGH,
+                economy: CL.HIGH,
                 industry: CL.HIGH,
                 credits: CL.HIGH,
                 shipyardNumShips: CL.VERY_HIGH,
@@ -22,7 +22,7 @@ class SurplusNews extends News {
         //goods remain high After
         Object.assign(this.endEffects[0], {
             industry: News.clHalfRegression(this.endEffects[0].industry),
-            commerce: News.clHalfRegression(this.endEffects[0].commerce),
+            //economy: News.clHalfRegression(this.endEffects[0].economy),
             marketCargoAmounts: News.clHalfRegression(this.endEffects[0].marketCargoAmounts),
             credits: News.clHalfRegression(this.endEffects[0].credits),
         })

@@ -8,14 +8,12 @@ DONE BY AI, NEEDS TO BE CHECKED:
 -adjust damage when moving into ships - ship with more mass should take less dmg
 
 NEXT UP:
--more desperation events:
- conscription for military
- forced labor for industry
- enslavement for population+economy ??
- raiding for cargo
- pop control for overpopulation
- genocide for security (gulp)
+-need 2 more events for limiting economy/prestige, 1 for raising territory, 1 for limiting market 
+cargo.. 
 
+
+-we need some events to be cancellable
+-do a rewrite so some events are not triggered by some polity types
 -market credits and rakes are other big factors that events could modify. global rake = corruption?
 -folderize encounters, remove the luck concept, make it so modal cant be closed after opening
 -implement a scienceRating and explorers, scientists fleets etc.

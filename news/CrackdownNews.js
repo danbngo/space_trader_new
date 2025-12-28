@@ -24,7 +24,7 @@ class CrackdownNews extends News {
             prestige: CL.NO_REGRESSION,
             security: News.clHalfRegression(this.endEffects[0].security),
             crime: News.clHalfRegression(this.endEffects[0].crime),
-            blackMarketPrices: News.clHalfRegression(this.endEffects[0].blackMarketPrices),
+            //blackMarketPrices: News.clHalfRegression(this.endEffects[0].blackMarketPrices),
             blackMarketCargoAmounts: News.clHalfRegression(this.endEffects[0].blackMarketCargoAmounts),
         })
     }

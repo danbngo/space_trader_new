@@ -105,7 +105,7 @@ function checkForPlanetEncounters(elapsedDays = 1) {
         const proximityFactor = 1 / (1 + distance / territory)
         
         // Base encounter chance influenced by culture properties
-        const {military, security, crime, commerce, industry} = planet.culture
+        const {military, security, crime, economy, industry} = planet.culture
         
         // Build weighted encounter type array based on culture
         const encounterWeights = []
@@ -117,23 +117,23 @@ function checkForPlanetEncounters(elapsedDays = 1) {
         encounterWeights.push({type: ENCOUNTER_TYPES.PIRATES, weight: crime * 3 / security})
         
         // Smugglers (influenced by crime and commercial)
-        encounterWeights.push({type: ENCOUNTER_TYPES.SMUGGLERS, weight: ((crime + commerce) * 1.5) / security})
+        encounterWeights.push({type: ENCOUNTER_TYPES.SMUGGLERS, weight: ((crime + economy) * 1.5) / security})
         
         // Merchants (influenced by commercial)
-        encounterWeights.push({type: ENCOUNTER_TYPES.MERCHANTS, weight: commerce * 3})
+        encounterWeights.push({type: ENCOUNTER_TYPES.MERCHANTS, weight: economy * 3})
         
         // Miners (influenced by industrial)
         encounterWeights.push({type: ENCOUNTER_TYPES.MINERS, weight: industry * 2})
         
         // Tourists (influenced by commercial and government)
-        encounterWeights.push({type: ENCOUNTER_TYPES.TOURISTS, weight: (commerce + military)})
+        encounterWeights.push({type: ENCOUNTER_TYPES.TOURISTS, weight: (economy + military)})
         
         // Calculate total weight
         const totalWeight = encounterWeights.reduce((sum, e) => sum + e.weight, 0)
         if (totalWeight <= 0) continue
         
         // Adjust base chance by culture activity level
-        const activityLevel = (military + security + crime + commerce + industry) / 5
+        const activityLevel = (military + security + crime + economy + industry) / 5
         if (!calcOccurrencesPerTimespan(PLANET_ENCOUNTER_CHANCE_PER_DAY, elapsedDays * activityLevel * proximityFactor)) continue
         
         // Select encounter type using weighted random

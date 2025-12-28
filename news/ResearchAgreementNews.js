@@ -42,7 +42,7 @@ class ResearchAgreementNews extends News {
         const developmentValid = Math.abs(planet.culture.officerQuality - targetPlanet.culture.officerQuality) < 0.5
         //removed most requirements for this
         const interferingEvent =
-            News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.RESEARCH_AGREEMENT, ...NEWS_TYPES_HOSTILE])
+            News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.RESEARCH_AGREEMENT, ...NEWS_TYPES_TENSE])
         return relationshipsValid && !interferingEvent && developmentValid
     }
 }

@@ -15,7 +15,7 @@ class AllianceNews extends News {
                 marketCargoAmounts: CL.SLIGHTLY_HIGH,
                 guildNumOfficers: CL.HIGH,
                 security: CL.SLIGHTLY_HIGH,
-                commerce: CL.SLIGHTLY_HIGH,
+                economy: CL.SLIGHTLY_HIGH,
                 officerQuality: CL.SLIGHTLY_HIGH,
                 shipQuality: CL.SLIGHTLY_HIGH,
                 prestige: CL.SLIGHTLY_HIGH,
@@ -28,7 +28,7 @@ class AllianceNews extends News {
                 marketCargoAmounts: CL.SLIGHTLY_HIGH,
                 guildNumOfficers: CL.HIGH,
                 security: CL.SLIGHTLY_HIGH,
-                commerce: CL.SLIGHTLY_HIGH,
+                economy: CL.SLIGHTLY_HIGH,
                 officerQuality: CL.SLIGHTLY_HIGH,
                 shipQuality: CL.SLIGHTLY_HIGH,
                 prestige: CL.SLIGHTLY_HIGH,
@@ -66,7 +66,7 @@ class AllianceNews extends News {
         const alliedToOpposingGovtValid = true //was a bit too harsh earlier
         //most of the below shouldnt be possible based on above checked but just in case
         const interferingEvent = 
-            News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.ALLIANCE, ...NEWS_TYPES_HOSTILE]) || 
+            News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.ALLIANCE, ...NEWS_TYPES_TENSE]) || 
             News.hasNews(NEWS_TYPES.PLAGUE, planet) || News.hasNews(NEWS_TYPES.PLAGUE, targetPlanet)
         return opposingGovernmentsValid && relationshipsValid && alliedToOpposingGovtValid && !interferingEvent
     }

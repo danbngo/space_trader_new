@@ -11,7 +11,7 @@ class TradeAgreementNews extends News {
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
                 marketCargoAmounts: CL.HIGH,
-                commerce: CL.HIGH,
+                economy: CL.SLIGHTLY_HIGH,
                 guildNumOfficers: CL.HIGH,
                 officerQuality: CL.SLIGHTLY_HIGH,
                 shipQuality: CL.SLIGHTLY_HIGH,
@@ -21,7 +21,7 @@ class TradeAgreementNews extends News {
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
                 marketCargoAmounts: CL.HIGH,
-                commerce: CL.HIGH,
+                economy: CL.SLIGHTLY_HIGH,
                 guildNumOfficers: CL.HIGH,
                 officerQuality: CL.SLIGHTLY_HIGH,
                 shipQuality: CL.SLIGHTLY_HIGH,
@@ -32,11 +32,11 @@ class TradeAgreementNews extends News {
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //some lingering benefits after
         Object.assign(this.endEffects[0], {
-            commerce: News.clHalfRegression(this.endEffects[0].commerce),
+            economy: News.clHalfRegression(this.endEffects[0].economy),
             credits: News.clHalfRegression(this.endEffects[0].credits),
         })
         Object.assign(this.endEffects[1], {
-            commerce: News.clHalfRegression(this.endEffects[1].commerce),
+            economy: News.clHalfRegression(this.endEffects[1].economy),
             credits: News.clHalfRegression(this.endEffects[1].credits),
         })
     }
@@ -46,8 +46,10 @@ class TradeAgreementNews extends News {
         //planets must be neutral or allied towards each other
         const relationships = [planet.culture.relationships.get(targetPlanet), targetPlanet.culture.relationships.get(planet)]
         const relationshipsValid = relationships.every(r => r == RELATIONSHIP_TYPES.NEUTRAL || r == RELATIONSHIP_TYPES.ALLY)
+        //dont trade with opposing governments
+        const govTypesValid = planet.culture.governmentType.opposingType !== targetPlanet.culture.governmentType && targetPlanet.culture.governmentType.opposingType !== planet.culture.governmentType
         //trade is only blocked if you're actively hostile to each other. 
-        const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.TRADE_AGREEMENT, ...NEWS_TYPES_HOSTILE])
-        return relationshipsValid && !interferingEvent
+        const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.TRADE_AGREEMENT, ...NEWS_TYPES_TENSE])
+        return govTypesValid && relationshipsValid && !interferingEvent
     }
 }

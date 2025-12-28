@@ -17,7 +17,7 @@ class EmbargoNews extends News {
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
                 prestige: CL.SLIGHTLY_LOW,
-                commerce: CL.VERY_LOW,
+                economy: CL.VERY_LOW,
                 marketPrices: CL.VERY_HIGH,
                 marketCargoAmounts: CL.LOW,
                 blackMarketPrices: CL.HIGH,
@@ -27,9 +27,9 @@ class EmbargoNews extends News {
         ]
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
-        //dont fully recover commerce
+        //dont fully recover economy
         Object.assign(this.endEffects[0], {
-            commerce: News.clHalfRegression(this.endEffects[0].commerce),
+            economy: News.clHalfRegression(this.endEffects[0].economy),
         })
     }
 
@@ -40,7 +40,7 @@ class EmbargoNews extends News {
         //cant be anarchic or puppet state
         const agencyValid = (planet.culture.governmentType !== GOVERNMENT_TYPES.ANARCHY && planet.culture.governmentType !== GOVERNMENT_TYPES.PUPPET_STATE)
         //planet must already be hostile to the target planet
-        const relationshipValid = planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.HOSTILE
+        const relationshipValid = planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.TENSE || planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR
         const interferingEvent = 
             News.hasNews(NEWS_TYPES.EMBARGO, planet, targetPlanet) || 
             News.hasAnyNewsBidirectional(planet, targetPlanet, NEWS_TYPES_COOPERATIVE)

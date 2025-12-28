@@ -10,7 +10,7 @@ class FestivalNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 credits: CL.LOW,
-                commerce: CL.LOW,
+                economy: CL.LOW,
                 industry: CL.LOW,
                 marketCargoAmounts: CL.LOW,
                 crime: CL.HIGH,
@@ -24,7 +24,7 @@ class FestivalNews extends News {
             credits: News.clHalfRegression(this.endEffects[0].credits),
             marketCargoAmounts: News.clHalfRegression(this.endEffects[0].marketCargoAmounts),
             crime: News.clHalfRegression(this.endEffects[0].crime),
-            blackMarketPrices: News.clHalfRegression(this.endEffects[0].blackMarketPrices),
+            //blackMarketPrices: News.clHalfRegression(this.endEffects[0].blackMarketPrices),
             prestige: CL.HIGH,
         })
     }

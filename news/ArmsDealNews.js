@@ -12,13 +12,13 @@ class ArmsDealNews extends News {
                 targetPlanet: this.targetPlanet,
                 military: CL.LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, CL.SLIGHTLY_LOW], [CARGO_TYPES.ANTIMATTER, CL.SLIGHTLY_LOW]]),
-                shipyardNumShips: CL.SLIGHTLY_LOW,
+                shipyardNumShips: CL.LOW,
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 credits: CL.LOW,
                 military: CL.HIGH,
-                shipyardNumShips: CL.SLIGHTLY_HIGH,
+                shipyardNumShips: CL.HIGH,
             })
         ]
 
@@ -33,7 +33,7 @@ class ArmsDealNews extends News {
         Object.assign(this.endEffects[1], {
             credits: CL.NO_REGRESSION,
             military: News.clHalfRegression(this.endEffects[1].military),
-            shipyardNumShips: News.clHalfRegression(this.startEffects[1].shipyardNumShips),
+            shipyardNumShips: News.clHalfRegression(this.endEffects[1].shipyardNumShips),
         })
     }
 
@@ -48,7 +48,7 @@ class ArmsDealNews extends News {
         const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.NEUTRAL || rel == RELATIONSHIP_TYPES.ALLY)
         const interferingEvent = 
             News.hasNews(NEWS_TYPES.ARMS_DEAL, planet, targetPlanet) ||
-            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_HOSTILE)
+            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_TENSE)
         return transferValid && ratingsValid && relationshipsValid && !interferingEvent
     }
 }

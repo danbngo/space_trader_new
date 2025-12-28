@@ -73,7 +73,7 @@ class SystemAtWarNews extends News {
         const warsToStart = []
         for (const planet of planetsRandom1) {
             for (const targetPlanet of planetsRandom2) {
-                if (planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.HOSTILE) {
+                if (planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.TENSE) {
                     const news = new WarNews(planet, targetPlanet)
                     if (!news.isValid()) continue
                     //news.setDuration(1000) //dont expire naturally

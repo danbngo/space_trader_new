@@ -16,7 +16,7 @@ class NewsEffect {
      * @param {number} [params.blackMarketCargoAmounts] - Multiplier for black market cargo quantities.
      * @param {number} [params.military] - Multiplier for military rating.
      * @param {number} [params.industry] - Multiplier for industrial rating.
-     * @param {number} [params.commerce] - Multiplier for commercial rating.
+     * @param {number} [params.economy] - Multiplier for commercial rating.
      * @param {number} [params.security] - Multiplier for security rating.
      * @param {number} [params.crime] - Multiplier for crime rating.
      * @param {number} [params.prestige] - Multiplier for prestige rating.
@@ -53,7 +53,7 @@ class NewsEffect {
         // Culture rating changes
         military = 1.0,
         industry = 1.0,
-        commerce = 1.0,
+        economy = 1.0,
         security = 1.0,
         crime = 1.0,
         prestige = 1.0,
@@ -113,7 +113,7 @@ class NewsEffect {
         /** @type {number} */
         this.industry = industry;
         /** @type {number} */
-        this.commerce = commerce;
+        this.economy = economy;
         /** @type {number} */
         this.security = security;
         /** @type {number} */
@@ -154,7 +154,7 @@ class NewsEffect {
     apply(elapsedYears = 0) {
         const {planet, targetPlanet, military, newGovernmentType, newRelationship, credits, 
             blackMarketCargoAmounts, blackMarketPrices, buildingsDisabled, buildingsEnabled, territory,
-            population, crime, marketPrices, security, commerce, 
+            population, crime, marketPrices, security, economy, 
             guildNumOfficers, industry, shipyardNumShips, marketCargoAmounts, fired,
             shipQuality, officerQuality, relationsReset, forcePeace, forceWithdrawal, prestige, cargoPriceModifiers} = this;
 
@@ -167,7 +167,7 @@ class NewsEffect {
             culture.officerQuality *= officerQuality;
             culture.military *= military;
             culture.industry *= industry;
-            culture.commerce *= commerce;
+            culture.economy *= economy;
             culture.security *= security;
             culture.crime *= crime;
             culture.prestige *= prestige;
@@ -182,8 +182,8 @@ class NewsEffect {
             }
             //THEN reset all relationships
             if (relationsReset) {
-                const eventsToEnd = News.planetGetAnyNewsTargeting(planet, [NEWS_TYPES.SUBJUGATION, ...NEWS_TYPES_HOSTILE]) || []
-                eventsToEnd.concat(News.planetGetAnyNews(planet, [NEWS_TYPES.SUBJUGATION, ...NEWS_TYPES_HOSTILE]) || [])
+                const eventsToEnd = News.planetGetAnyNewsTargeting(planet, [NEWS_TYPES.SUBJUGATION, ...NEWS_TYPES_TENSE]) || []
+                eventsToEnd.concat(News.planetGetAnyNews(planet, [NEWS_TYPES.SUBJUGATION, ...NEWS_TYPES_TENSE]) || [])
                 for (const ev of eventsToEnd) {
                     ev.endAsap = true
                     if (ev.shouldEnd()) ev.end()
@@ -259,7 +259,7 @@ class NewsEffect {
             blackMarketCargoAmounts: 1 / this.blackMarketCargoAmounts,
             military: 1 / this.military,
             industry: 1 / this.industry,
-            commerce: 1 / this.commerce,
+            economy: 1 / this.economy,
             security: 1 / this.security,
             crime: 1 / this.crime,
             prestige: 1 / this.prestige,
@@ -283,7 +283,7 @@ class NewsEffect {
 
         const {planet, targetPlanet, military, newGovernmentType, newRelationship, credits, 
             blackMarketCargoAmounts, blackMarketPrices, buildingsDisabled, buildingsEnabled, territory,
-            population, crime, marketPrices, security, commerce, 
+            population, crime, marketPrices, security, economy, 
             guildNumOfficers, industry, shipyardNumShips, marketCargoAmounts,
             shipQuality, officerQuality, relationsReset, prestige, cargoPriceModifiers, forcePeace} = this;
         
@@ -316,7 +316,7 @@ class NewsEffect {
             if (prestige !== 1.0) msg += dscr('- Prestige', culture.prestige, culture.prestige*prestige)
             if (military !== 1.0) msg += dscr('- GovernmentType', culture.military, culture.military*military)
             if (industry !== 1.0) msg += dscr('- Industrial', culture.industry, culture.industry*industry)
-            if (commerce !== 1.0) msg += dscr('- Commercial', culture.commerce, culture.commerce*commerce)
+            if (economy !== 1.0) msg += dscr('- Economic', culture.economy, culture.economy*economy)
             if (security !== 1.0) msg += dscr('- Security', culture.security, culture.security*security)
             if (crime !== 1.0) msg += dscr('- Crime', culture.crime, culture.crime*crime, true)
             if (shipQuality !== 1.0) msg += dscr('- Ships', culture.shipQuality, culture.shipQuality*shipQuality)

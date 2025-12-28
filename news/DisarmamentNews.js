@@ -23,16 +23,16 @@ class DisarmamentNews extends News {
             military: CL.NO_REGRESSION, 
             territory: CL.NO_REGRESSION,
             shipyardNumShips: CL.NO_REGRESSION,
-            commerce: CL.SLIGHTLY_HIGH, //small bonuses to the economy
+            economy: CL.SLIGHTLY_HIGH, //small bonuses to the economy
             industry: CL.SLIGHTLY_HIGH,
-            prestige: CL.HIGH,
+            prestige: CL.SLIGHTLY_HIGH,
         })
     }
 
     isValid() {
         const {planet} = this
         //unlikely if planet has a low military already
-        const ratingsValid = planet.culture.military > CL.HIGH || planet.settlement.shipyard.baseNumShips > CL.HIGH
+        const ratingsValid = (planet.culture.military > CL.HIGH) || (planet.settlement.shipyard.baseNumShips > CL.HIGH)
         const interferingEvent =
             News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_MARTIAL) ||
             News.planetHasAnyNews(planet, NEWS_TYPES_MARTIAL)

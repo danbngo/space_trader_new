@@ -17,7 +17,7 @@ class ConstructionNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                commerce: CL.SLIGHTLY_LOW,
+                economy: CL.SLIGHTLY_LOW,
                 marketCargoAmounts: CL.LOW,
                 marketPrices: CL.HIGH,
                 shipyardNumShips: CL.HIGH,
@@ -29,6 +29,7 @@ class ConstructionNews extends News {
         Object.assign(this.endEffects[0], {
             marketCargoAmounts: CL.NO_REGRESSION,
             industry: CL.HIGH,
+            economy: CL.SLIGHTLY_HIGH,
             buildingsEnabled: buildingsToEnable,
         })
     }
@@ -39,7 +40,7 @@ class ConstructionNews extends News {
         const buildingsValid = planet.settlement.buildings.filter(b => !b.enabled).length > 0
         const industryValid = planet.culture.industry < CL.LOW && planet.settlement.market.cargo.average/MARKET_AVERAGE_CARGO_PER_TYPE > CL.MEDIUM
         const interferingEvent =
-            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_HOSTILE) ||
+            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_TENSE) ||
             News.planetHasAnyNews(planet, [NEWS_TYPES.CONSTRUCTION, ...NEWS_TYPES_ECONOMY_PREVENTING])
         return (buildingsValid || industryValid) && !interferingEvent
     }

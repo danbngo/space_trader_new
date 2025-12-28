@@ -11,7 +11,7 @@ class ForeignAidNews extends News {
                 planet: this.planet,
                 marketPrices: CL.LOW,
                 marketCargoAmounts: CL.HIGH,
-                commerce: CL.SLIGHTLY_HIGH,
+                economy: CL.SLIGHTLY_HIGH,
                 industry: CL.SLIGHTLY_HIGH,
                 credits: CL.HIGH,
                 shipyardNumShips: CL.SLIGHTLY_HIGH,
@@ -24,7 +24,7 @@ class ForeignAidNews extends News {
         Object.assign(this.endEffects[0], {
             marketPrices: News.clHalfRegression(this.endEffects[0].marketPrices),
             marketCargoAmounts: News.clHalfRegression(this.endEffects[0].marketCargoAmounts),
-            commerce: News.clHalfRegression(this.endEffects[0].commerce),
+            economy: News.clHalfRegression(this.endEffects[0].economy),
             credits: News.clHalfRegression(this.endEffects[0].credits),
             industry: News.clHalfRegression(this.endEffects[0].industry),
             shipyardNumShips: News.clHalfRegression(this.endEffects[0].shipyardNumShips),
@@ -35,11 +35,11 @@ class ForeignAidNews extends News {
     isValid() {
         const {planet} = this
         //more likely to happen when economy is poor and has some prestige to burn
-        const economyValid = planet.culture.commerce < CL.LOW && planet.culture.industry < CL.LOW && planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS < CL.LOW
+        const economyValid = planet.culture.economy < CL.LOW && planet.culture.industry < CL.LOW && planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS < CL.LOW
         const prestigeValid = planet.culture.prestige > CL.LOW
         const interferingEvent =
             News.planetHasAnyNews(planet, [NEWS_TYPES.FOREIGN_AID, ...NEWS_TYPES_ECONOMY_BOOSTING]) || 
-            News.planetHasAnyNews(planet, NEWS_TYPES_HOSTILE)
+            News.planetHasAnyNews(planet, NEWS_TYPES_TENSE)
         return economyValid && prestigeValid && !interferingEvent
     }
 }

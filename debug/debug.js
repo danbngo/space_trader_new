@@ -66,7 +66,7 @@ function assessPlanets() {
     const totalTerritory = gs.system.planets.reduce((sum,planet)=>sum+planet.culture.territory,0)
     const totalMilitary = gs.system.planets.reduce((sum,planet)=>sum+planet.culture.military,0)
     const totalSecurity = gs.system.planets.reduce((sum,planet)=>sum+planet.culture.security,0)
-    const totalCommercial = gs.system.planets.reduce((sum,planet)=>sum+planet.culture.commerce,0)
+    const totalEconomic = gs.system.planets.reduce((sum,planet)=>sum+planet.culture.economy,0)
     const totalIndustrial = gs.system.planets.reduce((sum,planet)=>sum+planet.culture.industry,0)
     const totalCrime = gs.system.planets.reduce((sum,planet)=>sum+planet.culture.crime,0)
     const totalPrestige = gs.system.planets.reduce((sum,planet)=>sum+planet.culture.prestige,0)
@@ -86,7 +86,7 @@ function assessPlanets() {
     const averageTerritory = totalTerritory / gs.system.planets.length
     const averageMilitary = totalMilitary / gs.system.planets.length
     const averageSecurity = totalSecurity / gs.system.planets.length
-    const averageCommercial = totalCommercial / gs.system.planets.length
+    const averageEconomic = totalEconomic / gs.system.planets.length
     const averageIndustrial = totalIndustrial / gs.system.planets.length
     const averageCrime = totalCrime / gs.system.planets.length
     const averagePrestige = totalPrestige / gs.system.planets.length
@@ -107,7 +107,7 @@ function assessPlanets() {
     console.log('Territory:', averageTerritory.toFixed(2))
     console.log('Military Rating:', averageMilitary.toFixed(2))
     console.log('Security Rating:', averageSecurity.toFixed(2))
-    console.log('Commercial Rating:', averageCommercial.toFixed(2))
+    console.log('Economic Rating:', averageEconomic.toFixed(2))
     console.log('Industrial Rating:', averageIndustrial.toFixed(2))
     console.log('Crime Rating:', averageCrime.toFixed(2))
     console.log('Prestige Rating:', averagePrestige.toFixed(2))

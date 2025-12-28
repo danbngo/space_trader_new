@@ -10,7 +10,7 @@ class ImmigrationNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 population: CL.HIGH,
-                commerce: CL.SLIGHTLY_HIGH,
+                economy: CL.SLIGHTLY_HIGH,
                 military: CL.SLIGHTLY_LOW,
                 security: CL.LOW,
             })
@@ -26,7 +26,7 @@ class ImmigrationNews extends News {
     isValid() {
         const {planet} = this
         //people generally go where theres economic opportunity and population not already bursting
-        const ratingsValid = planet.culture.commerce >= 1 && planet.culture.population < 1.5
+        const ratingsValid = planet.culture.economy >= 1 && planet.culture.population < 1.5
         const interferingEvent = 
             News.planetHasAnyNews(planet, NEWS_TYPES_ECONOMY_PREVENTING) ||
             News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_ECONOMY_PREVENTING)

@@ -16,7 +16,7 @@ class EnvironmentalismNews extends News {
         ]
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
-        //market, commerce, industry do not fully bounce back
+        //market, economy, industry do not fully bounce back
         Object.assign(this.endEffects[0], {
             population: CL.SLIGHTLY_HIGH,
             shipyardNumShips: News.clHalfRegression(this.endEffects[0].shipyardNumShips),

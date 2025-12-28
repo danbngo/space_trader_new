@@ -52,14 +52,14 @@ function showPlanetMenu(planet = new Planet()) {
  */
 function showPlanetOverviewMenu(planet = new Planet()) {
     const {culture} = planet
-    const {territory, population, military, security, commerce, industry, crime} = culture
+    const {territory, population, military, security, economy, industry, crime} = culture
     let msg = ''
     msg += `Population: ${describePopulation(population)}<br/>`
     msg += `Territory: ${describeTerritory(territory)}<br/>`
     msg += `GovernmentType: ${coloredName(culture.governmentType)}<br/>`
     msg += `Military: ${describeRating(military)}<br/>`
     msg += `Security: ${describeRating(security)}<br/>`
-    msg += `Commerce: ${describeRating(commerce)}<br/>`
+    msg += `Economy: ${describeRating(economy)}<br/>`
     msg += `Industry: ${describeRating(industry)}<br/>`
     msg += `Crime: ${describeRating(crime, true)}<br/>`
     msg += `Ships: ${describeRating(culture.shipQuality)}<br/>`

@@ -10,7 +10,7 @@ class ForcedLaborNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 industry: CL.VERY_HIGH,
-                commerce: CL.LOW,
+                economy: CL.LOW,
                 population: CL.LOW,
                 prestige: CL.LOW,
                 marketCargoAmounts: CL.HIGH,
@@ -18,10 +18,10 @@ class ForcedLaborNews extends News {
             })
         ]
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
-        // Industrial gains are permanent, commerce damage and prestige loss are permanent
+        // Industrial gains are permanent, economy damage and prestige loss are permanent
         Object.assign(this.endEffects[0], {
             industry: News.clHalfRegression(this.endEffects[0].industry),
-            commerce: News.clHalfRegression(this.endEffects[0].commerce),
+            economy: News.clHalfRegression(this.endEffects[0].economy),
             population: News.clHalfRegression(this.endEffects[0].population),
             marketCargoAmounts: News.clHalfRegression(this.endEffects[0].marketCargoAmounts),
             prestige: CL.NO_REGRESSION, // permanent prestige loss

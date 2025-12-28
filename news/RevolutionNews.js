@@ -18,7 +18,7 @@ class RevolutionNews extends News {
                 military: CL.VERY_LOW,
                 security: CL.VERY_LOW,
                 crime: CL.VERY_HIGH,
-                commerce: CL.LOW,
+                economy: CL.LOW,
                 industry: CL.LOW,
                 credits: CL.VERY_LOW,
                 buildingsDisabled: courthouseBuilding ? [courthouseBuilding] : [],
@@ -44,7 +44,7 @@ class RevolutionNews extends News {
     isValid() {
         const {planet} = this
         //a generally robust economy/govt less prone to this
-        const ratingsValid = planet.culture.security < CL.MEDIUM || planet.culture.military < CL.MEDIUM || planet.culture.prestige < CL.MEDIUM || planet.culture.crime > CL.MEDIUM || planet.culture.security < CL.MEDIUM || planet.culture.commerce < CL.MEDIUM
+        const ratingsValid = planet.culture.security < CL.MEDIUM || planet.culture.military < CL.MEDIUM || planet.culture.prestige < CL.MEDIUM || planet.culture.crime > CL.MEDIUM || planet.culture.security < CL.MEDIUM || planet.culture.economy < CL.MEDIUM
         //planet must not be puppet state (anarcy is fine otherwise how do we get back out of it)
         const agencyValid = planet.culture.governmentType != GOVERNMENT_TYPES.PUPPET_STATE
         const interferingEvent =

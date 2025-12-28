@@ -10,17 +10,17 @@ class TensionsNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
-                newRelationship: RELATIONSHIP_TYPES.HOSTILE,
+                newRelationship: RELATIONSHIP_TYPES.TENSE,
                 military: CL.SLIGHTLY_HIGH,
-                commerce: CL.SLIGHTLY_LOW,
+                economy: CL.SLIGHTLY_LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.ANTIMATTER, CL.VERY_HIGH]]),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
-                newRelationship: RELATIONSHIP_TYPES.HOSTILE,
+                newRelationship: RELATIONSHIP_TYPES.TENSE,
                 military: CL.SLIGHTLY_HIGH,
-                commerce: CL.SLIGHTLY_LOW,
+                economy: CL.SLIGHTLY_LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.ANTIMATTER, CL.VERY_HIGH]]),
             })
         ]
@@ -28,7 +28,7 @@ class TensionsNews extends News {
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         for (const fx of this.endEffects) {
             fx.onApply = ()=>{
-                if (planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.HOSTILE) planet.culture.relationships.set(targetPlanet, RELATIONSHIP_TYPES.NEUTRAL)
+                if (planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.TENSE) planet.culture.relationships.set(targetPlanet, RELATIONSHIP_TYPES.NEUTRAL)
             }
         }
     }
@@ -44,7 +44,7 @@ class TensionsNews extends News {
         const powerValid = powerRatio < CL.VERY_HIGH && powerRatio > CL.VERY_LOW
 
         const relationshipValid = planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.NEUTRAL && targetPlanet.culture.relationships.get(planet) == RELATIONSHIP_TYPES.NEUTRAL
-        const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.TENSIONS, ...NEWS_TYPES_HOSTILE, ...NEWS_TYPES_COOPERATIVE])
+        const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.TENSIONS, ...NEWS_TYPES_TENSE, ...NEWS_TYPES_COOPERATIVE])
         return powerValid && governmentsValid && governmentsValid2 && relationshipValid && !interferingEvent
     }
 

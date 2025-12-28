@@ -13,7 +13,7 @@ class EconomicBoomNews extends News {
                 marketCargoAmounts: CL.VERY_HIGH,
                 blackMarketCargoAmounts: CL.VERY_HIGH,
                 //dont effect BM prices due to decadent spending!
-                commerce: CL.EXTREMELY_HIGH,
+                economy: CL.EXTREMELY_HIGH,
                 industry: CL.VERY_HIGH,
                 credits: CL.EXTREMELY_HIGH,
                 shipyardNumShips: CL.VERY_HIGH,
@@ -24,17 +24,20 @@ class EconomicBoomNews extends News {
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.endEffects[0], {
             credits: News.clHalfRegression(this.endEffects[0].credits),
+            economy: News.clHalfRegression(this.endEffects[0].economy),
         })
     }
 
     isValid() {
         const {planet} = this
+        //cant already having a booming economy
+        const ratingsValid = planet.culture.economy < CL.VERY_HIGH && planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS < CL.VERY_HIGH
         //basically just a bonus for not being in a war or anything stupid
         const interferingEvent = 
             News.planetHasAnyNews(planet, [NEWS_TYPES.ECONOMIC_BOOM, ...NEWS_TYPES_ECONOMY_PREVENTING]) ||
             News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_ECONOMY_PREVENTING) ||
-            News.planetHasAnyNews(planet, NEWS_TYPES_HOSTILE) ||
-            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_HOSTILE)
-        return !interferingEvent
+            News.planetHasAnyNews(planet, NEWS_TYPES_TENSE) ||
+            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_TENSE)
+        return ratingsValid && !interferingEvent
     }
 }

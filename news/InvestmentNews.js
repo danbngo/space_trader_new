@@ -24,13 +24,13 @@ class InvestmentNews extends News {
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
 
         Object.assign(this.endEffects[0], {
-            credits: News.clHalfRegression(this.startEffects[0].credits),
-            marketCargoAmounts: News.clHalfRegression(this.startEffects[0].marketCargoAmounts),
+            credits: News.clHalfRegression(this.endEffects[0].credits),
+            marketCargoAmounts: News.clHalfRegression(this.endEffects[0].marketCargoAmounts),
             prestige: CL.HIGH,
         })
         Object.assign(this.endEffects[1], {
             industry: CL.VERY_HIGH,
-            commerce: CL.SLIGHTLY_HIGH,
+            economy: CL.SLIGHTLY_HIGH,
             shipyardNumShips: CL.SLIGHTLY_HIGH,
         })
     }
@@ -40,7 +40,7 @@ class InvestmentNews extends News {
         //need to have sufficient economy of our own
         const ratingsValid = planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS >= CL.SLIGHTLY_HIGH || planet.settlement.market.baseCargo.average/MARKET_AVERAGE_CARGO_PER_TYPE > CL.SLIGHTLY_HIGH
         //our economy should be larger than theirs
-        const transferValid = planet.culture.commerce > targetPlanet.culture.commerce && planet.settlement.bank.baseCredits > targetPlanet.settlement.bank.baseCredits && planet.settlement.market.baseCargo.average > targetPlanet.settlement.market.baseCargo.average
+        const transferValid = planet.culture.economy > targetPlanet.culture.economy && planet.settlement.bank.baseCredits > targetPlanet.settlement.bank.baseCredits && planet.settlement.market.baseCargo.average > targetPlanet.settlement.market.baseCargo.average
         //both planets must be neutral or allies
         const relationships = [planet.culture.relationships.get(targetPlanet), targetPlanet.culture.relationships.get(planet)]
         const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.NEUTRAL || rel == RELATIONSHIP_TYPES.ALLY)

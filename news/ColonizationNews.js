@@ -21,7 +21,7 @@ class ColonizationNews extends News {
         Object.assign(this.endEffects[0], {
             population: CL.NO_REGRESSION, //pop doesnt auto recover
             shipyardNumShips: CL.NO_REGRESSION,
-            commerce: CL.SLIGHTLY_HIGH,
+            economy: CL.SLIGHTLY_HIGH,
             territory: CL.VERY_HIGH,
             prestige: CL.SLIGHTLY_HIGH,
         })

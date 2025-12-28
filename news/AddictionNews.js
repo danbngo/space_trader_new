@@ -12,7 +12,7 @@ class AddictionNews extends News {
                 population: CL.LOW,
                 security: CL.LOW,
                 crime: CL.HIGH,
-                commerce: CL.LOW,
+                economy: CL.LOW,
                 blackMarketCargoAmounts: CL.VERY_LOW,
                 blackMarketPrices: CL.VERY_HIGH,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.MEDICINE, CL.VERY_HIGH], [CARGO_TYPES.DRUGS, 3]]), //this is the only thing that normalizes after

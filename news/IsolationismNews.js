@@ -9,8 +9,8 @@ class IsolationismNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                territory: CL.LOW,
-                commerce: CL.LOW,
+                territory: CL.SLIGHTLY_LOW,
+                economy: CL.LOW,
                 marketPrices: CL.LOW,
                 marketCargoAmounts: CL.LOW,
                 blackMarketCargoAmounts: CL.LOW,
@@ -28,8 +28,8 @@ class IsolationismNews extends News {
         //some lingering price increases and deflation
         Object.assign(this.endEffects[0], {
             population: CL.SLIGHTLY_HIGH,
-            security: CL.HIGH,
-            territory: News.clHalfRegression(this.endEffects[0].territory),
+            security: CL.SLIGHTLY_HIGH,
+            territory: News.clHalfRegression(this.endEffects[0].territory), //territory is zero sum, so this will eventually lead to no one having any
             officerQuality: News.clHalfRegression(this.endEffects[0].officerQuality), //lose some knowledge
             shipQuality: News.clHalfRegression(this.endEffects[0].shipQuality), //lose some knowledge
             prestige: CL.NO_REGRESSION,
@@ -38,8 +38,8 @@ class IsolationismNews extends News {
 
     isValid() {
         const {planet} = this
-        //more likely after population collapse
-        const ratingsValid = planet.culture.population < 1
+        //more likely after population collapse and internal dissent
+        const ratingsValid = planet.culture.population < CL.SLIGHTLY_HIGH && planet.culture.security < CL.SLIGHTLY_LOW
         //must not be a puppet state or anarchic
         const governmentValid = (planet.culture.governmentType != GOVERNMENT_TYPES.PUPPET_STATE) && (planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY)
         //must not be at engaged in or targeted by any hostile acts

@@ -13,7 +13,7 @@ class ScarcityNews extends News {
                 marketPrices: CL.EXTREMELY_HIGH,
                 marketCargoAmounts: CL.EXTREMELY_LOW,
                 industry: CL.LOW,
-                commerce: CL.LOW,
+                economy: CL.LOW,
                 blackMarketCargoAmounts: CL.LOW,
                 blackMarketPrices: CL.HIGH,
                 crime: CL.HIGH,
@@ -27,14 +27,14 @@ class ScarcityNews extends News {
         Object.assign(this.endEffects[0], {
             population: News.clHalfRegression(this.endEffects[0].population),
             industry: News.clHalfRegression(this.endEffects[0].industry),
-            commerce: News.clHalfRegression(this.endEffects[0].commerce),
+            economy: News.clHalfRegression(this.endEffects[0].economy),
         })
     }
 
     isValid() {
         const {planet} = this
         //more likely if high pop and high industry
-        const ratingsValid = planet.culture.population > CL.HIGH && planet.culture.industry >= CL.HIGH
+        const ratingsValid = planet.culture.population > CL.HIGH || planet.culture.industry >= CL.HIGH
         const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.SCARCITY, ...NEWS_TYPES_ECONOMY_BOOSTING])
         return ratingsValid && !interferingEvent
     }

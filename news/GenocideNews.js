@@ -11,9 +11,10 @@ class GenocideNews extends News {
                 planet: this.planet,
                 population: CL.LOW,
                 military: CL.LOW,
-                commerce: CL.LOW,
+                economy: CL.LOW,
                 officerQuality: CL.LOW,
                 prestige: CL.LOW,
+                crime: CL.LOW
             })
         ]
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
@@ -22,8 +23,9 @@ class GenocideNews extends News {
             population: CL.NO_REGRESSION,
             prestige: CL.NO_REGRESSION,
             military: CL.NO_REGRESSION,
-            commerce: CL.NO_REGRESSION,
+            economy: CL.NO_REGRESSION,
             officerQuality: CL.NO_REGRESSION,
+            crime: CL.NO_REGRESSION,
             security: CL.VERY_HIGH,
         })
     }
@@ -32,11 +34,10 @@ class GenocideNews extends News {
         const {planet} = this
         //more likely if security is very low (except in a police state)
         const ratingsValid = planet.culture.military > CL.MEDIUM && planet.culture.security < CL.VERY_LOW
-        const isPoliceState = planet.culture.governmentType == GOVERNMENT_TYPES.POLICE_STATE
         //cant be anarchy
         const govCheck = planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY
         //planet must not already be in anarchy or puppet state
         const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.GENOCIDE])
-        return (ratingsValid || isPoliceState) && govCheck && !interferingEvent
+        return (ratingsValid) && govCheck && !interferingEvent
     }
 }

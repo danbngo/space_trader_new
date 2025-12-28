@@ -8,7 +8,7 @@ class MilitaryBuildupNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                commerce: CL.LOW,
+                economy: CL.LOW,
                 industry: CL.LOW,
                 marketCargoAmounts: CL.LOW,
                 credits: CL.LOW,
@@ -20,25 +20,25 @@ class MilitaryBuildupNews extends News {
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.endEffects[0], {
                 military: CL.EXTREMELY_HIGH,
-                prestige: CL.HIGH,
+                prestige: CL.SLIGHTLY_HIGH,
                 officerQuality: CL.HIGH,
                 guildNumOfficers: CL.HIGH,
                 credits: CL.NO_REGRESSION, //so is wasting money
-                commerce: CL.NO_REGRESSION,
+                economy: CL.NO_REGRESSION,
                 industry: CL.NO_REGRESSION,
         })
     }
     isValid() {
         const {planet} = this
         //dont do it if military is already big
-        const ratingsValid = planet.culture.military < CL.MEDIUM
+        const ratingsValid = (planet.culture.military < CL.MEDIUM) && (planet.culture.prestige < CL.VERY_HIGH)
         //dont do it if no government are tense with us or vice versa
         let politicsValid = false
         for (const p of gs.system.planets) {
             if (p !== planet) {
                 const relationship = planet.culture.relationships.get(p)
                 const relationship2 = p.culture.relationships.get(planet)
-                if (relationship == RELATIONSHIP_TYPES.HOSTILE || relationship2 == RELATIONSHIP_TYPES.HOSTILE) {
+                if (relationship == RELATIONSHIP_TYPES.TENSE || relationship2 == RELATIONSHIP_TYPES.TENSE) {
                     politicsValid = true
                     break
                 }

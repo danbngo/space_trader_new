@@ -23,7 +23,7 @@ class CivilWarNews extends News {
                 security: CL.LOW,
                 crime: CL.VERY_HIGH,
                 population: CL.LOW,
-                commerce: CL.LOW,
+                economy: CL.LOW,
                 industry: CL.LOW,
                 marketCargoAmounts: CL.LOW,
                 marketPrices: CL.HIGH,

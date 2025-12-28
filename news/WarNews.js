@@ -13,7 +13,7 @@ class WarNews extends News {
                 newRelationship: RELATIONSHIP_TYPES.WAR,
                 military: CL.HIGH,
                 security: CL.HIGH,
-                commerce: CL.LOW,
+                economy: CL.LOW,
                 shipyardNumShips: CL.LOW,
                 marketCargoAmounts: CL.LOW,
                 //prestige: CL.SLIGHTLY_LOW, //the aggressor loses some prestige
@@ -25,7 +25,7 @@ class WarNews extends News {
                 newRelationship: RELATIONSHIP_TYPES.WAR,
                 military: CL.HIGH,
                 security: CL.HIGH,
-                commerce: CL.LOW,
+                economy: CL.LOW,
                 shipyardNumShips: CL.LOW,
                 marketCargoAmounts: CL.LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, 2], [CARGO_TYPES.ANTIMATTER, 3]]),
@@ -76,7 +76,7 @@ class WarNews extends News {
         const fairTargetValid = (targetPlanet.culture.governmentType !== GOVERNMENT_TYPES.PUPPET_STATE)
         //planets must be hostile
         const relationships = [planet.culture.relationships.get(targetPlanet), targetPlanet.culture.relationships.get(planet)]
-        const relationshipValid = relationships.every(r => r === RELATIONSHIP_TYPES.HOSTILE)
+        const relationshipValid = relationships.every(r => r === RELATIONSHIP_TYPES.TENSE)
         const interferingEvent = 
             News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.WAR, ...NEWS_TYPES_COOPERATIVE]) ||
             News.planetHasAnyNews(planet, NEWS_TYPES_CRIME_PREVENTING)

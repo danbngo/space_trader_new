@@ -11,7 +11,7 @@ function generateCulture(planet = new Planet()) {
     const territory = rng(8,1,false)/4
     const military = rng(8,1,false)/4
     const security = rng(8,1,false)/4
-    const commerce = rng(8,1,false)/4
+    const economy = rng(8,1,false)/4
     const industry = rng(8,1,false)/4
     const crime = rng(8,1,false)/4
     const prestige = rng(8,1,false)/4
@@ -21,5 +21,5 @@ function generateCulture(planet = new Planet()) {
         cargoPriceModifiers.setAmount(ct, rng(MARKET_MAX_CARGO_PRICE_MODIFIER, MARKET_MIN_CARGO_PRICE_MODIFIER, false))
     }
 
-    return new Culture(planet, governmentType, cargoPriceModifiers, shipQuality, officerQuality, territory, population, military, industry, commerce, security, crime, prestige)
+    return new Culture(planet, governmentType, cargoPriceModifiers, shipQuality, officerQuality, territory, population, military, industry, economy, security, crime, prestige)
 }

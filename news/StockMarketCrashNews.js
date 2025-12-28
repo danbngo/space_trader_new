@@ -10,7 +10,7 @@ class StockMarketCrashNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 industry: CL.VERY_LOW,
-                commerce: CL.VERY_LOW,
+                economy: CL.VERY_LOW,
                 credits: CL.EXTREMELY_LOW,
                 marketCargoAmounts: CL.LOW,
                 marketPrices: CL.HIGH,
@@ -18,11 +18,11 @@ class StockMarketCrashNews extends News {
         ]
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
-        // Commerce damage and credit scarcity are partially permanent
+        // Economy damage and credit scarcity are partially permanent
         Object.assign(this.endEffects[0], {
             credits: News.clHalfRegression(this.endEffects[0].credits),
             industry: News.clHalfRegression(this.endEffects[0].industry),
-            commerce: News.clHalfRegression(this.endEffects[0].commerce),
+            economy: News.clHalfRegression(this.endEffects[0].economy),
         })
     }
 
