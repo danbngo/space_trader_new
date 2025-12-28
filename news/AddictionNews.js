@@ -21,6 +21,7 @@ class AddictionNews extends News {
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
         //some lingering security and prestige decrease and destroyed goods
         Object.assign(this.endEffects[0], {
+            security: News.clHalfRegression(this.endEffects[0].security),
             population: News.clHalfRegression(this.endEffects[0].population),
             blackMarketPrices: News.clHalfRegression(this.endEffects[0].blackMarketPrices),
             blackMarketCargoAmounts: News.clHalfRegression(this.endEffects[0].blackMarketCargoAmounts),

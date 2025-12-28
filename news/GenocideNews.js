@@ -24,14 +24,14 @@ class GenocideNews extends News {
             military: CL.NO_REGRESSION,
             commerce: CL.NO_REGRESSION,
             officerQuality: CL.NO_REGRESSION,
-            security: CL.EXTREMELY_HIGH,
+            security: CL.VERY_HIGH,
         })
     }
 
     isValid() {
         const {planet} = this
         //more likely if security is very low (except in a police state)
-        const ratingsValid = planet.culture.security < 0.5
+        const ratingsValid = planet.culture.military > CL.MEDIUM && planet.culture.security < CL.VERY_LOW
         const isPoliceState = planet.culture.governmentType == GOVERNMENT_TYPES.POLICE_STATE
         //cant be anarchy
         const govCheck = planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY

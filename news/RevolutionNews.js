@@ -43,8 +43,8 @@ class RevolutionNews extends News {
 
     isValid() {
         const {planet} = this
-        //high security prevents this
-        const ratingsValid = planet.culture.security < 1.5
+        //a generally robust economy/govt less prone to this
+        const ratingsValid = planet.culture.security < CL.MEDIUM || planet.culture.military < CL.MEDIUM || planet.culture.prestige < CL.MEDIUM || planet.culture.crime > CL.MEDIUM || planet.culture.security < CL.MEDIUM || planet.culture.commerce < CL.MEDIUM
         //planet must not be puppet state (anarcy is fine otherwise how do we get back out of it)
         const agencyValid = planet.culture.governmentType != GOVERNMENT_TYPES.PUPPET_STATE
         const interferingEvent =

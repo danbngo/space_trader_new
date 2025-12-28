@@ -24,41 +24,46 @@ class NewsType {
 }
 
 const NEWS_TYPES = {
+    ADDICTION: new NewsType('Addiction', COLORS.Orange, 3, 8, 1),
     ALLIANCE: new NewsType('Alliance', COLORS.Green, 10, 40, 1), //two neutral planets become allies
-    EMBARGO: new NewsType('Embargo', COLORS.LightRed, 3, 30, 1), //a hostile planet places a blockade on another planet
-    WAR: new NewsType('War', COLORS.Red, 3, 12, 100), //two planets where at least one was hostile go to war
-    TENSIONS: new NewsType('Tensions', COLORS.Yellow, 5, 40, 1), //two neutral planets have relations changed to hostile
+    ARMS_DEAL: new NewsType('Arms Deal', COLORS.LightOrange, 3, 8, 1), //one planet sends military equipment to another
     BOMBARDMENT: new NewsType('Bombardment', COLORS.Red, 0.1, 0.5, 200), //the target planet loses some buildings (temporarily disabled)
-    TRADE_AGREEMENT: new NewsType('Trade Agreement', COLORS.LightGreen, 10, 20, 1), //two neutral or allied planets have improved trade relations
-    ECONOMIC_BOOM: new NewsType('Economic Boom', COLORS.LightGreen, 5, 10, 1), //prices go up and availability goes up
-    DEPRESSION: new NewsType('Depression', COLORS.Orange, 7, 15, 1), //prices go down and availability goes down
-    SCARCITY: new NewsType('Scarcity', COLORS.Orange, 3, 8, 1), //decreases availability of goods, but increases price
-    REVOLUTION: new NewsType('Revolution', COLORS.Yellow, 3, 8, 1), //changes political system
+    CIVIL_STRIFE: new NewsType('Civil Strife', COLORS.Yellow, 3, 8, 1), //temporary increase in crime and decrease in security
     CIVIL_WAR: new NewsType('Civil War', COLORS.Red, 3, 15, 1), //temporary anarchy and lose some buildings
-    SUBJUGATION: new NewsType('Subjugation', COLORS.LightPurple, 25, 100, 200), //for conquering planets, make the target planet a puppet state
-    IMMIGRATION: new NewsType('Immigration', COLORS.LightGray, 5, 10, 1), //influx of population to the planet
-    CONSTRUCTION: new NewsType('Construction', COLORS.Green, 3, 8, 1), //enables some buildings on the target planet
     COLONIZATION: new NewsType('Colonization', COLORS.LightGreen, 7, 15, 1), //establishes a new colony on an uninhabited planet
-    STOCK_MARKET_CRASH: new NewsType('Stock Market Crash', COLORS.Red, 3, 8, 1), //financial crash damages commerce and credits
-    SCIENTIFIC_BREAKTHROUGH: new NewsType('Scientific Breakthrough', COLORS.Green, 1, 4, 1), //improves industrial and commercial ratings
+    CONSCRIPTION: new NewsType('Conscription', COLORS.LightRed, 3, 8, 1), //temporary increase in military rating, decrease in commerce and industry
+    CONSTRUCTION: new NewsType('Construction', COLORS.Green, 3, 8, 1), //enables some buildings on the target planet
     CRACKDOWN: new NewsType('Crackdown', COLORS.LightGray, 3, 8, 1), //temporary increase in security and decrease in crime
     CRIME_WAVE: new NewsType('Crime Wave', COLORS.Orange, 3, 8, 1), //temporary increase in crime and decrease in security
-    CIVIL_STRIFE: new NewsType('Civil Strife', COLORS.Yellow, 3, 8, 1), //temporary increase in crime and decrease in security
-    MILITARY_BUILDUP: new NewsType('Military Buildup', COLORS.LightRed, 5, 10, 1), //temporary increase in military rating
-    INVESTMENT: new NewsType('Investment', COLORS.LightGreen, 5, 10, 1), //one planet invests in another
-    ARMS_DEAL: new NewsType('Arms Deal', COLORS.LightOrange, 3, 8, 1), //one planet sends military equipment to another
+    DEPRESSION: new NewsType('Depression', COLORS.Orange, 7, 15, 1), //prices go down and availability goes down
     DISARMAMENT: new NewsType('Disarmament', COLORS.LightGreen, 5, 10, 1), //gets rid of some excess military/territory for prestige 
+    ECONOMIC_BOOM: new NewsType('Economic Boom', COLORS.LightGreen, 5, 10, 1), //prices go up and availability goes up
+    EMBARGO: new NewsType('Embargo', COLORS.LightRed, 3, 30, 1), //a hostile planet places a blockade on another planet
+    ENSLAVEMENT: new NewsType('Enslavement', COLORS.Purple, 10, 30, 1), //planet enslaves a portion of its population for industry boost
     ENVIRONMENTAL_DISASTER: new NewsType('Environmental Disaster', COLORS.Orange, 2, 6, 1), //temporary decrease in population and industrial rating
-    PLAGUE: new NewsType('Plague', COLORS.Red, 2, 6, 1), 
-    SURPLUS: new NewsType('Surplus', COLORS.Green, 3, 8, 1), 
+    ENVIRONMENTALISM: new NewsType('Environmentalism', COLORS.LightGreen, 5, 15, 1),
+    FORCED_LABOR: new NewsType('Forced Labor', COLORS.Purple, 10, 30, 1), //planet forces a portion of its population to work for commerce boost
+    FOREIGN_AID: new NewsType('Foreign Aid', COLORS.LightBlue, 3, 8, 1),
+    GENOCIDE: new NewsType('Genocide', COLORS.DarkRed, 5, 15, 1), //planet purges part of
+    IMMIGRATION: new NewsType('Immigration', COLORS.LightGray, 5, 10, 1), //influx of population to the planet
+    IMPERIALISM: new NewsType('Imperialism', COLORS.Purple, 10, 30, 1),
+    INVESTMENT: new NewsType('Investment', COLORS.LightGreen, 5, 10, 1), //one planet invests in another
+    ISOLATIONISM: new NewsType('Isolationism', COLORS.DimGray, 5, 15, 1),
+    MILITARY_BUILDUP: new NewsType('Military Buildup', COLORS.LightRed, 5, 10, 1), //temporary increase in military rating
+    PLAGUE: new NewsType('Plague', COLORS.Red, 2, 6, 1),
+    RAIDING: new NewsType('Raiding', COLORS.Orange, 15, 30, 1), //one planet raids another for goods/credits 
     RESEARCH_AGREEMENT: new NewsType('Research Agreement', COLORS.LightGreen, 2, 8, 1), 
     REVIVAL: new NewsType('Religious Revival', COLORS.White, 10, 20, 1),
-    ISOLATIONISM: new NewsType('Isolationism', COLORS.DimGray, 5, 15, 1),
-    IMPERIALISM: new NewsType('Imperialism', COLORS.Purple, 10, 30, 1),
-    FOREIGN_AID: new NewsType('Foreign Aid', COLORS.LightBlue, 3, 8, 1),
-    ENVIRONMENTALISM: new NewsType('Environmentalism', COLORS.LightGreen, 5, 15, 1),
-    ADDICTION: new NewsType('Addiction', COLORS.Orange, 3, 8, 1),
+    REVOLUTION: new NewsType('Revolution', COLORS.Yellow, 3, 8, 1), //changes political system
+    SCARCITY: new NewsType('Scarcity', COLORS.Orange, 3, 8, 1), //decreases availability of goods, but increases price
+    SCIENTIFIC_BREAKTHROUGH: new NewsType('Scientific Breakthrough', COLORS.Green, 1, 4, 1), //improves industrial and commercial ratings
+    STOCK_MARKET_CRASH: new NewsType('Stock Market Crash', COLORS.Red, 3, 8, 1), //financial crash damages commerce and credits
+    SUBJUGATION: new NewsType('Subjugation', COLORS.LightPurple, 25, 100, 200), //for conquering planets, make the target planet a puppet state
+    SURPLUS: new NewsType('Surplus', COLORS.Green, 3, 8, 1), 
+    TENSIONS: new NewsType('Tensions', COLORS.Yellow, 5, 40, 1), //two neutral planets have relations changed to hostile
     TOURISM: new NewsType('Tourism', COLORS.LightCyan, 3, 8, 1),
+    TRADE_AGREEMENT: new NewsType('Trade Agreement', COLORS.LightGreen, 10, 20, 1), //two neutral or allied planets have improved trade relations
+    WAR: new NewsType('War', COLORS.Red, 3, 12, 100), //two planets where at least one was hostile go to war
     //more to come later: environmental disasters, terraforming, etc.
 }
 

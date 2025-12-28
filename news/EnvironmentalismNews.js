@@ -1,4 +1,4 @@
-class Environmentalism extends News {
+class EnvironmentalismNews extends News {
     constructor(planet = new Planet()) {
         super(
             `${coloredName(planet)}'s people are de-industrializing to save their planet's natural beauty!`,

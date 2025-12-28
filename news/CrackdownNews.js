@@ -35,7 +35,8 @@ class CrackdownNews extends News {
         const govValid = planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY
         //wont happen if crime is already low AND black market amount/price is low
         const crimeValid = (planet.culture.crime > CL.HIGH || planet.settlement.blackMarket.inflation > CL.HIGH || planet.settlement.blackMarket.baseCargo.average / MARKET_AVERAGE_CARGO_PER_TYPE > CL.HIGH)
+        const securityValid = planet.culture.security < CL.HIGH
         const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.CRACKDOWN, ...NEWS_TYPES_CRIME_PREVENTING])
-        return govValid && crimeValid && !interferingEvent
+        return govValid && crimeValid && securityValid && !interferingEvent
     }
 }
