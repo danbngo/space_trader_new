@@ -9,7 +9,7 @@ class ColonizationNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                population: CL.LOW,
+                population: CL.VERY_LOW,
                 marketPrices: CL.HIGH,
                 shipyardNumShips: CL.VERY_LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.METAL, CL.VERY_HIGH], [CARGO_TYPES.ISOTOPES, CL.EXTREMELY_HIGH]]),

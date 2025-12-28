@@ -9,7 +9,7 @@ class ImmigrationNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                population: CL.VERY_HIGH,
+                population: CL.HIGH,
                 commerce: CL.SLIGHTLY_HIGH,
                 military: CL.SLIGHTLY_LOW,
                 security: CL.LOW,
