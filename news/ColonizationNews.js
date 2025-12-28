@@ -3,7 +3,7 @@ class ColonizationNews extends News {
         super(
             `${coloredName(planet)} begins building a fleet to colonize small bodies in the solar system!`,
             `${coloredName(planet)} has built settlements on small bodies throughout the system!`,
-            NEWS_TYPES.COLONIZATION, planet
+            NT.COLONIZATION, planet
         )
 
         this.startEffects = [
@@ -32,8 +32,8 @@ class ColonizationNews extends News {
         const ratingsValid = planet.culture.population > CL.MEDIUM && (planet.settlement.shipyard.baseNumShips > CL.MEDIUM)
         //basically dont do it if ANYTHING bad is happening
         const interferingEvent = 
-            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_ECONOMY_PREVENTING) ||
-            News.planetHasAnyNews(planet, [NEWS_TYPES.COLONIZATION, ...NEWS_TYPES_ECONOMY_PREVENTING]) 
+            News.planetHasAnyNewsTargeting(planet, NT_ECONOMY_PREVENTING) ||
+            News.planetHasAnyNews(planet, [NT.COLONIZATION, ...NT_ECONOMY_PREVENTING]) 
         return ratingsValid && !interferingEvent
     }
 }

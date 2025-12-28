@@ -3,7 +3,7 @@ class ConscriptionNews extends News {
         super(
             `${coloredName(planet)} institutes mandatory military conscription! Citizens are drafted en masse into the armed forces!`,
             `${coloredName(planet)}'s forced conscription program finally ends, but the economic damage lingers.`,
-            NEWS_TYPES.CONSCRIPTION, planet
+            NT.CONSCRIPTION, planet
         )
 
         this.startEffects = [
@@ -29,10 +29,10 @@ class ConscriptionNews extends News {
         // More likely if military is low or security is low (militarizing society)
         const ratingsValid = planet.culture.military < CL.LOW && planet.culture.population > CL.MEDIUM
         // Police states and authoritarian regimes would do this; not democracies or anarchies
-        const govCheck = planet.culture.governmentType != GOVERNMENT_TYPES.DEMOCRACY 
-            && planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY
+        const govCheck = planet.culture.governmentType != GT.DEMOCRACY 
+            && planet.culture.governmentType != GT.ANARCHY
         // Planet must not already have this event
-        const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.CONSCRIPTION])
+        const interferingEvent = News.planetHasAnyNews(planet, [NT.CONSCRIPTION])
         return ratingsValid && govCheck && !interferingEvent
     }
 }

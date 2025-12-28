@@ -3,7 +3,7 @@ class EmbargoNews extends News {
         super(
             `Embargo imposed by ${coloredName(planet)} on ${coloredName(targetPlanet)}!`,
             `${coloredName(planet)} lifts embargo on ${coloredName(targetPlanet)}!`,
-            NEWS_TYPES.EMBARGO, planet, targetPlanet
+            NT.EMBARGO, planet, targetPlanet
         )
 
         this.startEffects = [
@@ -41,8 +41,8 @@ class EmbargoNews extends News {
         //planet must already be hostile to the target planet
         const relationshipValid = planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.TENSE || planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR
         const interferingEvent = 
-            News.hasNews(NEWS_TYPES.EMBARGO, planet, targetPlanet) || 
-            News.hasAnyNewsBidirectional(planet, targetPlanet, NEWS_TYPES_COOPERATIVE)
+            News.hasNews(NT.EMBARGO, planet, targetPlanet) || 
+            News.hasAnyNewsBidirectional(planet, targetPlanet, NT_COOPERATIVE)
         return ratingsValid && relationshipValid && !interferingEvent
     }
 }

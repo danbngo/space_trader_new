@@ -19,7 +19,7 @@ class Culture {
      * @param {number} crime - Rating affecting pirate and smuggler activity and black market cargo.
      * @param {number} prestige - Effects how planets interact with each other.
      */
-    constructor(planet = new Planet(), governmentType = GOVERNMENT_TYPES_ALL[0], cargoPriceModifiers = new CountsMap(), shipQuality = 1.0, officerQuality = 1.0, territory = 1, population = 1, military = 1, industry = 1, economy = 1, security = 1, crime = 1, prestige = 1) {
+    constructor(planet = new Planet(), governmentType = GT_ALL[0], cargoPriceModifiers = new CountsMap(), shipQuality = 1.0, officerQuality = 1.0, territory = 1, population = 1, military = 1, industry = 1, economy = 1, security = 1, crime = 1, prestige = 1) {
         /** @type {CountsMap} */
         this.cargoPriceModifiers = cargoPriceModifiers
         /** @type {number} */

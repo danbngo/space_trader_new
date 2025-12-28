@@ -3,7 +3,7 @@ class ImmigrationNews extends News {
         super(
             `${coloredName(planet)}'s wealth attracts a massive wave of immigration from ${coloredName(targetPlanet)}!`,
             `${coloredName(planet)}'s flood of immigration from ${coloredName(targetPlanet)} subsides.`,
-            NEWS_TYPES.IMMIGRATION, planet, targetPlanet
+            NT.IMMIGRATION, planet, targetPlanet
         )
 
         this.startEffects = [
@@ -43,8 +43,8 @@ class ImmigrationNews extends News {
         const relationships = [planet.culture.relationships.get(targetPlanet), targetPlanet.culture.relationships.get(planet)]
         const relationshipsValid = relationships.every(rel => rel != RELATIONSHIP_TYPES.WAR)
         const interferingEvent = 
-            News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.IMMIGRATION]) ||
-            News.planetHasAnyNews(targetPlanet, NEWS_TYPES_ECONOMY_PREVENTING)
+            News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.IMMIGRATION]) ||
+            News.planetHasAnyNews(targetPlanet, NT_ECONOMY_PREVENTING)
         return ratingsValid && relationshipsValid && !interferingEvent
     }
 }

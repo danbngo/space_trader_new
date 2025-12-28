@@ -3,7 +3,7 @@ class LudditismNews extends News {
         super(
             `${coloredName(planet)} embraces a return-to-soil movement, rejecting advanced technology for a simpler life!`,
             `${coloredName(planet)}'s people have completed their transition to a more pastoral life!`,
-            NEWS_TYPES.LUDDITISM, planet
+            NT.LUDDITISM, planet
         )
 
         this.startEffects = [
@@ -45,8 +45,8 @@ class LudditismNews extends News {
         const ratingsValid = planet.culture.shipQuality > CL.HIGH && planet.culture.industry > CL.MEDIUM
         //must not be at engaged in or targeted by any hostile acts
         const interferingEvent =
-            News.planetHasAnyNews(planet, [NEWS_TYPES.LUDDITISM, ...NEWS_TYPES_DANGEROUS]) ||
-            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_DANGEROUS) 
+            News.planetHasAnyNews(planet, [NT.LUDDITISM, ...NT_DANGEROUS]) ||
+            News.planetHasAnyNewsTargeting(planet, NT_DANGEROUS) 
         return ratingsValid && !interferingEvent
     }
 }

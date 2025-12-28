@@ -3,7 +3,7 @@ class SanctionsNews extends News {
         super(
             `${coloredName(planet)} imposes economic sanctions on ${coloredName(targetPlanet)}, damaging both economies!`,
             `${coloredName(planet)}'s sanctions on ${coloredName(targetPlanet)} have been lifted!`,
-            NEWS_TYPES.SANCTIONS, planet, targetPlanet
+            NT.SANCTIONS, planet, targetPlanet
         )
 
         this.startEffects = [
@@ -43,7 +43,7 @@ class SanctionsNews extends News {
         const aggressorRelationship = planet.culture.relationships.get(targetPlanet)
         const relationshipsValid = aggressorRelationship == RELATIONSHIP_TYPES.TENSE
         //blocked if already at war or other hostile actions
-        const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.SANCTIONS, ...NEWS_TYPES_COOPERATIVE])
+        const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.SANCTIONS, ...NT_COOPERATIVE])
         return ratingsValid && relationshipsValid && !interferingEvent
     }
 }

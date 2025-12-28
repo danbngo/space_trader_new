@@ -3,7 +3,7 @@ class RevivalNews extends News {
         super(
             `${coloredName(planet)} is undergoing a religious revival!`,
             `${coloredName(planet)}'s religious revival has ended!`,
-            NEWS_TYPES.REVIVAL, planet
+            NT.REVIVAL, planet
         )
 
         this.startEffects = [
@@ -31,7 +31,7 @@ class RevivalNews extends News {
         const ratingsValid = planet.culture.officerQuality > CL.LOW
         //planet must not already be in anarchy or puppet state
         const interferingEvent =
-            News.planetHasAnyNews(planet, [NEWS_TYPES.REVIVAL])
+            News.planetHasAnyNews(planet, [NT.REVIVAL])
         return ratingsValid && !interferingEvent
     }
 }

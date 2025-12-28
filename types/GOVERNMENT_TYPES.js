@@ -18,7 +18,7 @@ class GovernmentType {
     }
 }
 
-const GOVERNMENT_TYPES = {
+const GT = {
     DEMOCRACY: new GovernmentType('Democracy', COLORS.LightBlue), //the boring, stable default
     ARISTOCRACY: new GovernmentType('Aristocracy', COLORS.Purple),
 
@@ -33,13 +33,13 @@ const GOVERNMENT_TYPES = {
 
     PUPPET_STATE: new GovernmentType('Puppet State', COLORS.LightGray),
 }
-const GOVERNMENT_TYPES_ALL = Object.values(GOVERNMENT_TYPES)
+const GT_ALL = Object.values(GT)
 
 for (const pairing of [
-    [GOVERNMENT_TYPES.DEMOCRACY, GOVERNMENT_TYPES.ARISTOCRACY],
-    [GOVERNMENT_TYPES.COMMUNISM, GOVERNMENT_TYPES.CORPORATISM],
-    [GOVERNMENT_TYPES.THEOCRACY, GOVERNMENT_TYPES.TECHNOCRACY],
-    [GOVERNMENT_TYPES.POLICE_STATE, GOVERNMENT_TYPES.ANARCHY],
+    [GT.DEMOCRACY, GT.ARISTOCRACY],
+    [GT.COMMUNISM, GT.CORPORATISM],
+    [GT.THEOCRACY, GT.TECHNOCRACY],
+    [GT.POLICE_STATE, GT.ANARCHY],
 ]) {
     pairing[0].opposingType = pairing[1]
     pairing[1].opposingType = pairing[0]

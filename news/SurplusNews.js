@@ -3,7 +3,7 @@ class SurplusNews extends News {
         super(
             `${coloredName(planet)}'s miners have hit the motherlode! A surplus of goods floods the market!`,
             `${coloredName(planet)}'s resource-rich economy returns to normal.`,
-            NEWS_TYPES.SURPLUS, planet
+            NT.SURPLUS, planet
         )
 
         this.startEffects = [
@@ -33,7 +33,7 @@ class SurplusNews extends News {
         //we needed to be resource scarce to be looking for them so hard
         const ratingsValid = planet.settlement.market.baseCargo.average/MARKET_AVERAGE_CARGO_PER_TYPE < CL.LOW
         //more for flavor than anything, irl you could find goodies at any time
-        const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.SURPLUS, NEWS_TYPES.DEPRESSION, NEWS_TYPES.SCARCITY])
+        const interferingEvent = News.planetHasAnyNews(planet, [NT.SURPLUS, NT.DEPRESSION, NT.SCARCITY])
         return ratingsValid && !interferingEvent
     }
 }

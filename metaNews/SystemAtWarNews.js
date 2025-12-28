@@ -7,7 +7,7 @@ class SystemAtWarNews extends News {
         super(
             ''+colorSpan(`${gs.system.name} ERUPTS INTO TOTAL WAR!`, COLORS.Red, true),
             ''+colorSpan(`${gs.system.name}'S TOTAL WAR ENDS!`, COLORS.Green, true),
-            META_NEWS_TYPES.SYSTEM_AT_WAR
+            META_NT.SYSTEM_AT_WAR
         )
 
         this.startEffects = [
@@ -40,7 +40,7 @@ class SystemAtWarNews extends News {
                 onApply: ()=>{
                     console.log('tearing down world war')
                     //end all endable wars in the system
-                    const warNews = gs.system.news.filter(n=>(n.newsType == NEWS_TYPES.WAR && !n.ended))
+                    const warNews = gs.system.news.filter(n=>(n.newsType == NT.WAR && !n.ended))
                     for (const wn of warNews) {
                         wn.endAsap = true
                         if (wn.shouldEnd()) wn.end()
@@ -61,7 +61,7 @@ class SystemAtWarNews extends News {
         //should be able to start at least 3 more wars
         const possibleWars = SystemAtWarNews.getWarsToSpread(3)
         const preconditionsValid = warCount >= 3 && possibleWars.length >= 3
-        const interferingNews = News.hasNews(META_NEWS_TYPES.SYSTEM_AT_WAR)
+        const interferingNews = News.hasNews(META_NT.SYSTEM_AT_WAR)
         return preconditionsValid && !interferingNews
 
     }

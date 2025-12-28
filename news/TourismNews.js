@@ -3,7 +3,7 @@ class TourismNews extends News {
         super(
             `${planet.name} turns one of its moons into a resort to attract tourists from across the system!`,
             `${coloredName(planet)} completes its lunar resort, attracting a rush of lucrative tourism!`,
-            NEWS_TYPES.TOURISM, planet
+            NT.TOURISM, planet
         )
         this.startEffects = [
             new NewsEffect({
@@ -32,10 +32,10 @@ class TourismNews extends News {
         //more likely to try this out if we need money
         const ratingsValid = planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS < CL.LOW
         const interferingEvent = 
-            News.planetHasAnyNews(planet, [NEWS_TYPES.TOURISM, ...NEWS_TYPES_ECONOMY_PREVENTING]) ||
-            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_ECONOMY_PREVENTING) ||
-            News.planetHasAnyNews(planet, NEWS_TYPES_DANGEROUS) ||
-            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_DANGEROUS)
+            News.planetHasAnyNews(planet, [NT.TOURISM, ...NT_ECONOMY_PREVENTING]) ||
+            News.planetHasAnyNewsTargeting(planet, NT_ECONOMY_PREVENTING) ||
+            News.planetHasAnyNews(planet, NT_DANGEROUS) ||
+            News.planetHasAnyNewsTargeting(planet, NT_DANGEROUS)
         return ratingsValid && !interferingEvent
     }
 }

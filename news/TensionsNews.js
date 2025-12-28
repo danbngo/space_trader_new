@@ -3,7 +3,7 @@ class TensionsNews extends News {
         super(
             `Tensions rise between ${coloredName(planet)} and ${coloredName(targetPlanet)}!`,
             `Tensions cease between ${coloredName(planet)} and ${coloredName(targetPlanet)}!`,
-            NEWS_TYPES.TENSIONS, planet, targetPlanet
+            NT.TENSIONS, planet, targetPlanet
         )
 
         this.startEffects = [
@@ -36,7 +36,7 @@ class TensionsNews extends News {
     isValid() {
         const {planet, targetPlanet} = this
         //cant have same government type or be a puppet
-        const governmentsValid = planet.culture.governmentType != GOVERNMENT_TYPES.PUPPET_STATE && targetPlanet.culture.governmentType != GOVERNMENT_TYPES.PUPPET_STATE
+        const governmentsValid = planet.culture.governmentType != GT.PUPPET_STATE && targetPlanet.culture.governmentType != GT.PUPPET_STATE
         const governmentsValid2 = planet.culture.governmentType != targetPlanet.culture.governmentType
 
         //there generally won't be beef if the power disparity is too large
@@ -44,7 +44,7 @@ class TensionsNews extends News {
         const powerValid = powerRatio < CL.VERY_HIGH && powerRatio > CL.VERY_LOW
 
         const relationshipValid = planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.NEUTRAL && targetPlanet.culture.relationships.get(planet) == RELATIONSHIP_TYPES.NEUTRAL
-        const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.TENSIONS, ...NEWS_TYPES_COOPERATIVE])
+        const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.TENSIONS, ...NT_COOPERATIVE])
         return powerValid && governmentsValid && governmentsValid2 && relationshipValid && !interferingEvent
     }
 

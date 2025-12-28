@@ -7,7 +7,7 @@ class SystemWidePlague extends News {
         super(
             ''+colorSpan(`${gs.system.name} ERUPTS INTO A SYSTEM-WIDE PLAGUE!`, COLORS.Red, true),
             ''+colorSpan(`${gs.system.name}'S SYSTEM-WIDE PLAGUE ENDS!`, COLORS.Green, true),
-            META_NEWS_TYPES.SYSTEM_WIDE_PLAGUE
+            META_NT.SYSTEM_WIDE_PLAGUE
         )
 
         this.startEffects = [
@@ -36,7 +36,7 @@ class SystemWidePlague extends News {
             new NewsEffect({
                 onApply: ()=>{
                     //end all endable plagues in the system
-                    const plagueNews = gs.system.news.filter(n=>(n.newsType == NEWS_TYPES.PLAGUE && !n.ended))
+                    const plagueNews = gs.system.news.filter(n=>(n.newsType == NT.PLAGUE && !n.ended))
                     for (const pn of plagueNews) {
                         pn.endAsap = true
                         if (pn.shouldEnd()) pn.end()
@@ -48,9 +48,9 @@ class SystemWidePlague extends News {
 
     isValid() {
         //at least 1 planets should be infected simultaneously
-        const plagueNews = News.getNews(NEWS_TYPES.PLAGUE)
+        const plagueNews = News.getNews(NT.PLAGUE)
         const preconditionsValid = plagueNews.length >= 1
-        const interferingNews = News.hasNews(META_NEWS_TYPES.SYSTEM_WIDE_PLAGUE)
+        const interferingNews = News.hasNews(META_NT.SYSTEM_WIDE_PLAGUE)
         //should be able to spread to at least 3 more
         const possiblePlagues = SystemWidePlague.getPlaguesToSpread(3)
         return preconditionsValid && !interferingNews && (possiblePlagues.length >=3)

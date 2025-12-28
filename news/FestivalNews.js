@@ -3,7 +3,7 @@ class FestivalNews extends News {
         super(
             `${coloredName(planet)} announces an extravagant festival open to all visitors, diverting resources to celebrate!`,
             `${coloredName(planet)}'s festival concludes, leaving the planet with enhanced prestige!`,
-            NEWS_TYPES.FESTIVAL, planet
+            NT.FESTIVAL, planet
         )
 
         this.startEffects = [
@@ -33,7 +33,7 @@ class FestivalNews extends News {
         const {planet} = this
         //need high credits to afford it, low prestige to want it
         const ratingsValid = planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS > CL.SLIGHTLY_HIGH && planet.culture.prestige < CL.MEDIUM
-        const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.FESTIVAL, ...NEWS_TYPES_ECONOMY_PREVENTING, ...NEWS_TYPES_DANGEROUS])
+        const interferingEvent = News.planetHasAnyNews(planet, [NT.FESTIVAL, ...NT_ECONOMY_PREVENTING, ...NT_DANGEROUS])
         return ratingsValid && !interferingEvent
     }
 }

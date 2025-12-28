@@ -3,7 +3,7 @@ class ExplorationNews extends News {
         super(
             `${coloredName(planet)} launches an exploration initiative to survey and claim small bodies across the system!`,
             `${coloredName(planet)}'s exploration mission succeeds, claiming new territories!`,
-            NEWS_TYPES.EXPLORATION, planet
+            NT.EXPLORATION, planet
         )
 
         this.startEffects = [
@@ -31,8 +31,8 @@ class ExplorationNews extends News {
         const ratingsValid = planet.settlement.guild.baseNumOfficers > CL.MEDIUM && planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS > CL.MEDIUM
         //basically don't do it if anything bad is happening
         const interferingEvent = 
-            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_ECONOMY_PREVENTING) ||
-            News.planetHasAnyNews(planet, [NEWS_TYPES.EXPLORATION, ...NEWS_TYPES_ECONOMY_PREVENTING]) 
+            News.planetHasAnyNewsTargeting(planet, NT_ECONOMY_PREVENTING) ||
+            News.planetHasAnyNews(planet, [NT.EXPLORATION, ...NT_ECONOMY_PREVENTING]) 
         return ratingsValid && !interferingEvent
     }
 }

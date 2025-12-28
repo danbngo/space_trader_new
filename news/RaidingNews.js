@@ -3,7 +3,7 @@ class RaidingNews extends News {
         super(
             `${coloredName(planet)} launches raids on ${coloredName(targetPlanet)}! Plundered goods flood their markets!`,
             `${coloredName(planet)} ceases its raiding operations against ${coloredName(targetPlanet)}!`,
-            NEWS_TYPES.RAIDING, planet, targetPlanet
+            NT.RAIDING, planet, targetPlanet
         )
 
         this.startEffects = [
@@ -60,7 +60,7 @@ class RaidingNews extends News {
         const relationships = [planet.culture.relationships.get(targetPlanet), targetPlanet.culture.relationships.get(planet)]
         const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.TENSE || rel == RELATIONSHIP_TYPES.WAR)
         // Planet must not already have this event
-        const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.RAIDING])
+        const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.RAIDING])
         return ratingsValid && relationshipsValid && !interferingEvent
     }
 }

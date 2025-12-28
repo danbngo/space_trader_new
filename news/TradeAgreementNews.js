@@ -3,7 +3,7 @@ class TradeAgreementNews extends News {
         super(
             `${coloredName(planet)} and ${coloredName(targetPlanet)} sign an expansive trade agreement, benefitting both planets!`,
             `${coloredName(planet)} and ${coloredName(targetPlanet)}'s trade agreement has lapsed!`,
-            NEWS_TYPES.TRADE_AGREEMENT, planet, targetPlanet
+            NT.TRADE_AGREEMENT, planet, targetPlanet
         )
 
         this.startEffects = [
@@ -49,7 +49,7 @@ class TradeAgreementNews extends News {
         //dont trade with opposing governments
         const govTypesValid = planet.culture.governmentType.opposingType !== targetPlanet.culture.governmentType && targetPlanet.culture.governmentType.opposingType !== planet.culture.governmentType
         //trade is only blocked if you're actively hostile to each other. 
-        const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.TRADE_AGREEMENT, ...NEWS_TYPES_COOPERATION_PREVENTING])
+        const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.TRADE_AGREEMENT, ...NT_COOPERATION_PREVENTING])
         return govTypesValid && relationshipsValid && !interferingEvent
     }
 }

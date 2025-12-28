@@ -3,7 +3,7 @@ class MilitaryBuildupNews extends News {
         super(
             `${coloredName(planet)} begins a massive military buildup!`,
             `${coloredName(planet)}'s military buildup is complete! They host a grand military parade!`,
-            NEWS_TYPES.MILITARY_BUILDUP, planet
+            NT.MILITARY_BUILDUP, planet
         )
         this.startEffects = [
             new NewsEffect({
@@ -45,9 +45,9 @@ class MilitaryBuildupNews extends News {
             }
         }
         //planet must not already be in anarchy or puppet state
-        const validGov = planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY && planet.culture.governmentType != GOVERNMENT_TYPES.PUPPET_STATE
+        const validGov = planet.culture.governmentType != GT.ANARCHY && planet.culture.governmentType != GT.PUPPET_STATE
         //removed most requirements for this, even juntas do this on a whim
-        const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.MILITARY_BUILDUP]) 
+        const interferingEvent = News.planetHasAnyNews(planet, [NT.MILITARY_BUILDUP]) 
         return ratingsValid && validGov && !interferingEvent
     }
 }

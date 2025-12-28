@@ -3,7 +3,7 @@ class EnslavementNews extends News {
         super(
             `${coloredName(planet)} begins enslaving populations from ${coloredName(targetPlanet)}! Forced labor crews arrive in chains!`,
             `${coloredName(planet)} officially ends its slavery programs against ${coloredName(targetPlanet)}.`,
-            NEWS_TYPES.ENSLAVEMENT, planet, targetPlanet
+            NT.ENSLAVEMENT, planet, targetPlanet
         )
 
         this.startEffects = [
@@ -57,7 +57,7 @@ class EnslavementNews extends News {
         const relationships = [planet.culture.relationships.get(targetPlanet), targetPlanet.culture.relationships.get(planet)]
         const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.TENSE || rel == RELATIONSHIP_TYPES.WAR)
         // Must not already have this event between these planets
-        const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.ENSLAVEMENT])
+        const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.ENSLAVEMENT])
         return ratingsValid && targetValid && militaryValid && relationshipsValid && !interferingEvent
     }
 }

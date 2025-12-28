@@ -3,7 +3,7 @@ class OrganizedCrimeNews extends News {
         super(
             `${coloredName(planet)} is infiltrated by organized crime syndicates, corrupting the planet!`,
             `${coloredName(planet)} conducts high profile arrests and declares victory over the syndicates!`,
-            NEWS_TYPES.ORGANIZED_CRIME, planet
+            NT.ORGANIZED_CRIME, planet
         )
 
         this.startEffects = [
@@ -35,7 +35,7 @@ class OrganizedCrimeNews extends News {
         const {planet} = this
         //more likely when black market prices are high (profitable for criminals)
         const ratingsValid = planet.settlement.blackMarket.inflation > CL.HIGH
-        const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.ORGANIZED_CRIME, ...NEWS_TYPES_CRIME_PREVENTING])
+        const interferingEvent = News.planetHasAnyNews(planet, [NT.ORGANIZED_CRIME, ...NT_CRIME_PREVENTING])
         return ratingsValid && !interferingEvent
     }
 }

@@ -3,7 +3,7 @@ class CivilStrifeNews extends News {
         super(
             `${coloredName(planet)}'s people are rioting in the streets against their oppressive government!'`,
             `${coloredName(planet)}'s rioting is quelled!`,
-            NEWS_TYPES.CIVIL_STRIFE, planet
+            NT.CIVIL_STRIFE, planet
         )
 
         this.startEffects = [
@@ -36,7 +36,7 @@ class CivilStrifeNews extends News {
         //more likely if security is too high
         const ratingsValid = planet.culture.security > CL.HIGH
         //planet must not already be in anarchy or puppet state
-        const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.CIVIL_STRIFE, NEWS_TYPES.CIVIL_WAR, NEWS_TYPES.REVOLUTION])
+        const interferingEvent = News.planetHasAnyNews(planet, [NT.CIVIL_STRIFE, NT.CIVIL_WAR, NT.REVOLUTION])
         return ratingsValid && !interferingEvent
     }
 }

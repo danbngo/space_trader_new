@@ -3,7 +3,7 @@ class ScientificBreakthroughNews extends News {
         super(
             `${coloredName(planet)} begins work on a major scientific project!`,
             `${coloredName(planet)} completes their scientific project, unlocking a major new technology!`,
-            NEWS_TYPES.SCIENTIFIC_BREAKTHROUGH, planet
+            NT.SCIENTIFIC_BREAKTHROUGH, planet
         )
 
         this.startEffects = [
@@ -32,7 +32,7 @@ class ScientificBreakthroughNews extends News {
         //needs money. wont bother if we're already at the top
         const ratingsValid = planet.settlement.market.baseCredits/MARKET_AVERAGE_CREDITS > CL.MEDIUM && planet.culture.shipQuality < CL.EXTREMELY_HIGH
         //hard times dont block it, may actually accelerate technological progress
-        const interferingEvent = News.hasNews(NEWS_TYPES.SCIENTIFIC_BREAKTHROUGH, planet)
+        const interferingEvent = News.hasNews(NT.SCIENTIFIC_BREAKTHROUGH, planet)
         return ratingsValid && !interferingEvent
     }
 }

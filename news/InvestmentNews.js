@@ -3,7 +3,7 @@ class InvestmentNews extends News {
         super(
             `${coloredName(planet)} sends a massive economic investment to ${coloredName(targetPlanet)}!`,
             `${coloredName(planet)}'s economic investment in ${coloredName(targetPlanet)} is complete!`,
-            NEWS_TYPES.INVESTMENT, planet, targetPlanet
+            NT.INVESTMENT, planet, targetPlanet
         )
 
         this.startEffects = [
@@ -46,7 +46,7 @@ class InvestmentNews extends News {
         const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.NEUTRAL || rel == RELATIONSHIP_TYPES.ALLY)
         //removed most of the requirements for this, can we not have like a marshall plan??
         const interferingEvent = 
-            News.hasNews(NEWS_TYPES.INVESTMENT, planet, targetPlanet)
+            News.hasNews(NT.INVESTMENT, planet, targetPlanet)
         return transferValid && ratingsValid && relationshipsValid && !interferingEvent
     }
 }

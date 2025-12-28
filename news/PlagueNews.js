@@ -3,7 +3,7 @@ class PlagueNews extends News {
         super(
             `${coloredName(planet)} is struck by a vicious plague! The population is being decimated!`,
             `${coloredName(planet)} develops a cure for their plague!`,
-            NEWS_TYPES.PLAGUE, planet
+            NT.PLAGUE, planet
         )
 
         this.startEffects = [
@@ -33,7 +33,7 @@ class PlagueNews extends News {
         const ratingsValid = planet.culture.population > CL.MEDIUM
 
         const interferingEvent = //can happy anytime, anywhere!
-            News.hasNews(NEWS_TYPES.PLAGUE, planet)
+            News.hasNews(NT.PLAGUE, planet)
 
         return ratingsValid && !interferingEvent
     }

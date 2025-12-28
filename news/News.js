@@ -10,7 +10,7 @@ class News {
      * @param {Planet} planet - The planet where the event originates.
      * @param {Planet|null} targetPlanet - The target planet affected by the event (if any).
      */
-    constructor(startedName = '', endedName = '', newsType = NEWS_TYPES_ALL[0], planet = new Planet(), targetPlanet = null) {
+    constructor(startedName = '', endedName = '', newsType = NT_ALL[0], planet = new Planet(), targetPlanet = null) {
         //console.log('instantiating News with:',{startedName, endedName, newsType, planet, targetPlanet});
         /** @type {string} */
         this.startedName = String(colorSpan(startedName, newsType.color));
@@ -113,11 +113,11 @@ class News {
         })
     }
 
-    static getNewsTargeting = (newsType = NEWS_TYPES_ALL[0], targetPlanet = new Planet(), originPlanet = null) => {
+    static getNewsTargeting = (newsType = NT_ALL[0], targetPlanet = new Planet(), originPlanet = null) => {
         return this.getNews(newsType, originPlanet, targetPlanet)
     }
 
-    static hasNews(newsType = NEWS_TYPES_ALL[0], planet = null, targetPlanet = null) {
+    static hasNews(newsType = NT_ALL[0], planet = null, targetPlanet = null) {
         return this.getNews(newsType, planet, targetPlanet).length > 0
     }
 
@@ -145,11 +145,11 @@ class News {
             if (this.hasNewsTargeting(nt, planet)) return true
         }
     }
-    static hasNewsTargeting(newsType = NEWS_TYPES_ALL[0], targetPlanet = new Planet(), originPlanet = null) {
+    static hasNewsTargeting(newsType = NT_ALL[0], targetPlanet = new Planet(), originPlanet = null) {
         return this.getNewsTargeting(newsType, targetPlanet, originPlanet).length > 0
     }
 
-    static hasNewsBidirectional(planetA = new Planet(), planetB = new Planet(), newsType = NEWS_TYPES_ALL[0]) {
+    static hasNewsBidirectional(planetA = new Planet(), planetB = new Planet(), newsType = NT_ALL[0]) {
         return this.hasNews(newsType, planetA, planetB) || this.hasNews(newsType, planetB, planetA)
     }
     static hasAnyNewsBidirectional(planetA = new Planet(), planetB = new Planet(), newsTypes = []) {
@@ -164,7 +164,7 @@ class News {
         //console.log('ceasing all hostilities involving:',targetPlanet.name)
         const newsToEnd = gs.system.news.filter(n=>(
             (n.planet === targetPlanet || n.targetPlanet === targetPlanet) &&
-            NEWS_TYPES_MARTIAL.includes(n.newsType) &&
+            NT_MARTIAL.includes(n.newsType) &&
             !n.ended
         ))
         //console.log('found news items to end:',newsToEnd)
@@ -179,7 +179,7 @@ class News {
         //console.log('ceasing all foreign activity involving:',planet.name)
         const newsToEnd = gs.system.news.filter(n=>(
             (n.planet === planet) &&
-            (NEWS_TYPES_COOPERATION_PREVENTING.includes(n.newsType) || NEWS_TYPES_COOPERATIVE.includes(n.newsType))
+            (NT_COOPERATION_PREVENTING.includes(n.newsType) || NT_COOPERATIVE.includes(n.newsType))
             && !n.ended
         ))
         //console.log('found news items to end:',newsToEnd)

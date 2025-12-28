@@ -3,7 +3,7 @@ class DepressionNews extends News {
         super(
             `${coloredName(planet)} enters a Depression!`,
             `${coloredName(planet)} is stumbling out of its Depression!`,
-            NEWS_TYPES.DEPRESSION, planet
+            NT.DEPRESSION, planet
         )
 
         this.startEffects = [
@@ -39,8 +39,8 @@ class DepressionNews extends News {
         //more likely to happen when credit is REALLY high
         const ratingsValid = (planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS) > CL.HIGH && planet.culture.economy < CL.HIGH
         const interferingEvent =
-            News.planetHasAnyNews(planet, [NEWS_TYPES.DEPRESSION, ...NEWS_TYPES_ECONOMY_BOOSTING]) || 
-            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_ECONOMY_BOOSTING)
+            News.planetHasAnyNews(planet, [NT.DEPRESSION, ...NT_ECONOMY_BOOSTING]) || 
+            News.planetHasAnyNewsTargeting(planet, NT_ECONOMY_BOOSTING)
         return ratingsValid && !interferingEvent
     }
 }

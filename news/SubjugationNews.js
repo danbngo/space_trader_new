@@ -3,7 +3,7 @@ class SubjugationNews extends News {
         super(
             `${coloredName(planet)} conquers and occupies ${coloredName(targetPlanet)}!`,
             `${coloredName(targetPlanet)} regains independence from ${coloredName(planet)}, bringing the occupation to an end!`,
-            NEWS_TYPES.SUBJUGATION, planet, targetPlanet
+            NT.SUBJUGATION, planet, targetPlanet
         )
 
         this.startEffects = [
@@ -20,7 +20,7 @@ class SubjugationNews extends News {
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
-                newGovernmentType: GOVERNMENT_TYPES.PUPPET_STATE,
+                newGovernmentType: GT.PUPPET_STATE,
                 newRelationship: RELATIONSHIP_TYPES.SUBJECT,
                 territory: CL.VERY_LOW,
                 military: CL.EXTREMELY_LOW,
@@ -58,7 +58,7 @@ class SubjugationNews extends News {
         //cant be anarchic or puppet state
         //planet must be at war with the target
         const relationshipValid = planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR
-        const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.SUBJUGATION, ...NEWS_TYPES_COOPERATIVE])
+        const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.SUBJUGATION, ...NT_COOPERATIVE])
         return ratingsValid && relationshipValid && !interferingEvent
     }
 

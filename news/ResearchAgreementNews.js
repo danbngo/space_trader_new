@@ -3,7 +3,7 @@ class ResearchAgreementNews extends News {
         super(
             `${coloredName(planet)} and ${coloredName(targetPlanet)} announce a joint research project!`,
             `${coloredName(planet)} and ${coloredName(targetPlanet)} conclude their joint research project!`,
-            NEWS_TYPES.RESEARCH_AGREEMENT, planet, targetPlanet
+            NT.RESEARCH_AGREEMENT, planet, targetPlanet
         )
 
         this.startEffects = [
@@ -42,7 +42,7 @@ class ResearchAgreementNews extends News {
         const developmentValid = Math.abs(planet.culture.officerQuality - targetPlanet.culture.officerQuality) < 0.5
         //removed most requirements for this
         const interferingEvent =
-            News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.RESEARCH_AGREEMENT, ...NEWS_TYPES_COOPERATION_PREVENTING])
+            News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.RESEARCH_AGREEMENT, ...NT_COOPERATION_PREVENTING])
         return relationshipsValid && !interferingEvent && developmentValid
     }
 }

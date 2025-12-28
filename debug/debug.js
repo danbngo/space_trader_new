@@ -36,11 +36,11 @@ function assessPlanets() {
             activeNewsTotalsPerType[n.newsType.name] = activeCount + 1
         }
     }
-    for (const nt of NEWS_TYPES_ALL) {
+    for (const nt of NT_ALL) {
         if (!newsTotalsPerType[nt.name]) newsTotalsPerType[nt.name] = 0
         if (!activeNewsTotalsPerType[nt.name]) activeNewsTotalsPerType[nt.name] = 0
     }
-    for (const nt of META_NEWS_TYPES_ALL) {
+    for (const nt of META_NT_ALL) {
         if (!newsTotalsPerType[nt.name]) newsTotalsPerType[nt.name] = 0
     }
     for (const [newsTypeName, count] of Object.entries(newsTotalsPerType)) {

@@ -3,7 +3,7 @@ class AddictionNews extends News {
         super(
             `${coloredName(planet)} is suffering an addiction crisis! Synthetic drugs are ravaging the population!`,
             `${coloredName(planet)}'s addiction crisis begins to mellow out!`,
-            NEWS_TYPES.ADDICTION, planet
+            NT.ADDICTION, planet
         )
 
         this.startEffects = [
@@ -33,7 +33,7 @@ class AddictionNews extends News {
         const {planet} = this
         //more likely if high drug availability
         const ratingsValid = (planet.settlement.blackMarket.baseCargo.getAmount(CARGO_TYPES.DRUGS) / MARKET_AVERAGE_CARGO_PER_TYPE) > CL.HIGH
-        const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.ADDICTION, ...NEWS_TYPES_CRIME_PREVENTING])
+        const interferingEvent = News.planetHasAnyNews(planet, [NT.ADDICTION, ...NT_CRIME_PREVENTING])
         return ratingsValid && !interferingEvent
     }
 }

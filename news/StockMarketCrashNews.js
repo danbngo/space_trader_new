@@ -3,7 +3,7 @@ class StockMarketCrashNews extends News {
         super(
             `The stock market on ${coloredName(planet)} crashes catastrophically! Financial institutions reel from massive losses!`,
             `${coloredName(planet)}'s financial markets stabilize from their crash.`,
-            NEWS_TYPES.STOCK_MARKET_CRASH, planet
+            NT.STOCK_MARKET_CRASH, planet
         )
 
         this.startEffects = [
@@ -31,7 +31,7 @@ class StockMarketCrashNews extends News {
         // More likely when credit is very high (bubble about to burst)
         const ratingsValid = 
             (planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS) > 1.5 
-        const interferingEvent = News.hasNews(NEWS_TYPES.STOCK_MARKET_CRASH, planet)
+        const interferingEvent = News.hasNews(NT.STOCK_MARKET_CRASH, planet)
         return ratingsValid && !interferingEvent
     }
 }

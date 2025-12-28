@@ -3,7 +3,7 @@ class EnvironmentalismNews extends News {
         super(
             `${coloredName(planet)}'s people are de-industrializing to save their planet's natural beauty!`,
             `${coloredName(planet)} has de-industrialized, giving their planet room to breathe again!`,
-            NEWS_TYPES.ENVIRONMENTALISM, planet
+            NT.ENVIRONMENTALISM, planet
         )
 
         this.startEffects = [
@@ -29,7 +29,7 @@ class EnvironmentalismNews extends News {
         const {planet} = this
         //happens when industry is getting out of hand
         const ratingsValid = planet.culture.industry >= CL.HIGH
-        const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.ENVIRONMENTALISM, ...NEWS_TYPES_ECONOMY_PREVENTING])
+        const interferingEvent = News.planetHasAnyNews(planet, [NT.ENVIRONMENTALISM, ...NT_ECONOMY_PREVENTING])
         return ratingsValid && !interferingEvent
     }
 }

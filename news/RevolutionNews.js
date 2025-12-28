@@ -1,12 +1,12 @@
 class RevolutionNews extends News {
     constructor(planet = new Planet()) {
-        const newGovernmentType = rndMember(GOVERNMENT_TYPES_ALL.filter(g => g !== planet.culture.governmentType && g !== GOVERNMENT_TYPES.PUPPET_STATE));
+        const newGovernmentType = rndMember(GT_ALL.filter(g => g !== planet.culture.governmentType && g !== GT.PUPPET_STATE));
         
         super(
-            planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY ? `${coloredName(planet)}'s people have deposed the government and begin a glorious revolution!` :
+            planet.culture.governmentType != GT.ANARCHY ? `${coloredName(planet)}'s people have deposed the government and begin a glorious revolution!` :
             `${coloredName(planet)}'s people clamor for a government to take the reigns and end the anarchy they live in!`,
             `${coloredName(planet)} stabilizes under new government: ${coloredName(newGovernmentType)}!`,
-            NEWS_TYPES.REVOLUTION, planet
+            NT.REVOLUTION, planet
         )
 
         const courthouseBuilding = this.planet.settlement.courthouse;
@@ -14,7 +14,7 @@ class RevolutionNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                newGovernmentType: GOVERNMENT_TYPES.ANARCHY ? null : GOVERNMENT_TYPES.ANARCHY,
+                newGovernmentType: GT.ANARCHY ? null : GT.ANARCHY,
                 military: CL.VERY_LOW,
                 security: CL.VERY_LOW,
                 crime: CL.VERY_HIGH,
@@ -47,8 +47,8 @@ class RevolutionNews extends News {
         const ratingsValid = planet.culture.security < CL.MEDIUM || planet.culture.military < CL.MEDIUM || planet.culture.prestige < CL.MEDIUM || planet.culture.crime > CL.MEDIUM || planet.culture.security < CL.MEDIUM || planet.culture.economy < CL.MEDIUM
         //planet must not be puppet state (anarcy is fine otherwise how do we get back out of it)
         const interferingEvent =
-            News.planetHasAnyNews(planet, [NEWS_TYPES.REVOLUTION, NEWS_TYPES.WAR]) || News.hasNewsTargeting(NEWS_TYPES.WAR, planet) ||
-            News.planetHasAnyNews(planet, NEWS_TYPES_CRIME_PREVENTING)
+            News.planetHasAnyNews(planet, [NT.REVOLUTION, NT.WAR]) || News.hasNewsTargeting(NT.WAR, planet) ||
+            News.planetHasAnyNews(planet, NT_CRIME_PREVENTING)
         return ratingsValid && !interferingEvent
     }
 }

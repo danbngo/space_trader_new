@@ -3,7 +3,7 @@ class AllianceNews extends News {
         super(
             `Alliance formed between ${coloredName(planet)} and ${coloredName(targetPlanet)}!`,
             `Alliance dissolved between ${coloredName(planet)} and ${coloredName(targetPlanet)}!`,
-            NEWS_TYPES.ALLIANCE, planet, targetPlanet
+            NT.ALLIANCE, planet, targetPlanet
         )
 
         this.startEffects = [
@@ -66,8 +66,8 @@ class AllianceNews extends News {
         const alliedToOpposingGovtValid = true //was a bit too harsh earlier
         //most of the below shouldnt be possible based on above checked but just in case
         const interferingEvent = 
-            News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.ALLIANCE, ...NEWS_TYPES_COOPERATION_PREVENTING]) || 
-            News.hasNews(NEWS_TYPES.PLAGUE, planet) || News.hasNews(NEWS_TYPES.PLAGUE, targetPlanet)
+            News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.ALLIANCE, ...NT_COOPERATION_PREVENTING]) || 
+            News.hasNews(NT.PLAGUE, planet) || News.hasNews(NT.PLAGUE, targetPlanet)
         return opposingGovernmentsValid && relationshipsValid && alliedToOpposingGovtValid && !interferingEvent
     }
 }

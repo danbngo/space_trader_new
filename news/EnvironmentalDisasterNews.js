@@ -3,7 +3,7 @@ class EnvironmentalDisasterNews extends News {
         super(
             `${coloredName(planet)}'s polluting has led to environmental disaster! Cleanup efforts are underway!`,
             `${coloredName(planet)} has cleaned up their environmental disaster, but lasting damage to the planet remains!`,
-            NEWS_TYPES.ENVIRONMENTAL_DISASTER, planet
+            NT.ENVIRONMENTAL_DISASTER, planet
         )
 
         this.startEffects = [
@@ -34,7 +34,7 @@ class EnvironmentalDisasterNews extends News {
         const {planet} = this
         //happens when industry is getting out of hand
         const ratingsValid = planet.culture.industry >= CL.HIGH
-        const interferingEvent = News.hasNews(NEWS_TYPES.ENVIRONMENTAL_DISASTER, planet)
+        const interferingEvent = News.hasNews(NT.ENVIRONMENTAL_DISASTER, planet)
         return ratingsValid && !interferingEvent
     }
 }

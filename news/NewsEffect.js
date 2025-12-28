@@ -182,8 +182,8 @@ class NewsEffect {
             }
             //THEN reset all relationships
             if (relationsReset) {
-                const eventsToEnd = News.planetGetAnyNewsTargeting(planet, [NEWS_TYPES.SUBJUGATION, ...NEWS_TYPES_COOPERATION_PREVENTING]) || []
-                eventsToEnd.concat(News.planetGetAnyNews(planet, [NEWS_TYPES.SUBJUGATION, ...NEWS_TYPES_COOPERATION_PREVENTING]) || [])
+                const eventsToEnd = News.planetGetAnyNewsTargeting(planet, [NT.SUBJUGATION, ...NT_COOPERATION_PREVENTING]) || []
+                eventsToEnd.concat(News.planetGetAnyNews(planet, [NT.SUBJUGATION, ...NT_COOPERATION_PREVENTING]) || [])
                 for (const ev of eventsToEnd) {
                     ev.endAsap = true
                     if (ev.shouldEnd()) ev.end()

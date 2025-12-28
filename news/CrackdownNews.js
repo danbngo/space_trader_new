@@ -3,7 +3,7 @@ class CrackdownNews extends News {
         super(
             `Government cracks down on crime on ${coloredName(planet)}!`,
             `The anti-crime crackdown on ${coloredName(planet)} ends.`,
-            NEWS_TYPES.CRACKDOWN, planet
+            NT.CRACKDOWN, planet
         )
 
         this.startEffects = [
@@ -32,11 +32,11 @@ class CrackdownNews extends News {
     isValid() {
         const {planet} = this
         //wouldnt happen in an anarchy, just sayin
-        const govValid = planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY
+        const govValid = planet.culture.governmentType != GT.ANARCHY
         //wont happen if crime is already low AND black market amount/price is low
         const crimeValid = (planet.culture.crime > CL.HIGH || planet.settlement.blackMarket.inflation > CL.HIGH || planet.settlement.blackMarket.baseCargo.average / MARKET_AVERAGE_CARGO_PER_TYPE > CL.HIGH)
         const securityValid = planet.culture.security < CL.HIGH
-        const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.CRACKDOWN, ...NEWS_TYPES_CRIME_PREVENTING])
+        const interferingEvent = News.planetHasAnyNews(planet, [NT.CRACKDOWN, ...NT_CRIME_PREVENTING])
         return govValid && crimeValid && securityValid && !interferingEvent
     }
 }

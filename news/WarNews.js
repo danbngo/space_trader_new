@@ -3,7 +3,7 @@ class WarNews extends News {
         super(
             `${coloredName(planet)} declares war on ${coloredName(targetPlanet)}!`,
             `Peace treaty signed between ${coloredName(planet)} and ${coloredName(targetPlanet)}!`,
-            NEWS_TYPES.WAR, planet, targetPlanet
+            NT.WAR, planet, targetPlanet
         )
 
         this.startEffects = [
@@ -52,9 +52,9 @@ class WarNews extends News {
             console.log('2 new diplomatic status:', planet.culture.relationships.get(targetPlanet))
             console.log('2 target new diplomatic status:', targetPlanet.culture.relationships.get(planet))
             //if there are no more wars remaining, and there was a world war, end the world war
-            const numWarsRemaining = gs.system.news.filter(n=>(n.newsType == NEWS_TYPES.WAR && !n.ended)).length
+            const numWarsRemaining = gs.system.news.filter(n=>(n.newsType == NT.WAR && !n.ended)).length
             if (numWarsRemaining == 0) {
-                const systemAtWarNews = gs.system.news.find(n=>(n.newsType == META_NEWS_TYPES.SYSTEM_AT_WAR && !n.ended))
+                const systemAtWarNews = gs.system.news.find(n=>(n.newsType == META_NT.SYSTEM_AT_WAR && !n.ended))
                 if (systemAtWarNews) {
                     console.log('cleaning up world war prematurely')
                     systemAtWarNews.endAsap = true
@@ -72,13 +72,13 @@ class WarNews extends News {
         const governmentsValid = (planet.culture.governmentType !== targetPlanet.culture.governmentType)
         //must not be anarchic or a puppet state
         //target cant be a puppet state
-        const fairTargetValid = (targetPlanet.culture.governmentType !== GOVERNMENT_TYPES.PUPPET_STATE)
+        const fairTargetValid = (targetPlanet.culture.governmentType !== GT.PUPPET_STATE)
         //planets must be hostile
         const relationships = [planet.culture.relationships.get(targetPlanet), targetPlanet.culture.relationships.get(planet)]
         const relationshipValid = relationships.every(r => r === RELATIONSHIP_TYPES.TENSE)
         const interferingEvent = 
-            News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.WAR, ...NEWS_TYPES_COOPERATIVE]) ||
-            News.planetHasAnyNews(planet, NEWS_TYPES_CRIME_PREVENTING)
+            News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.WAR, ...NT_COOPERATIVE]) ||
+            News.planetHasAnyNews(planet, NT_CRIME_PREVENTING)
         return prestigeValid && governmentsValid && fairTargetValid &&relationshipValid && !interferingEvent
     }
 }

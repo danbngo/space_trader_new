@@ -3,7 +3,7 @@ class ForcedLaborNews extends News {
         super(
             `${coloredName(planet)} implements brutal forced labor programs! Citizens are pressed into industrial work camps!`,
             `${coloredName(planet)}'s forced labor camps are finally dismantled!`,
-            NEWS_TYPES.FORCED_LABOR, planet
+            NT.FORCED_LABOR, planet
         )
 
         this.startEffects = [
@@ -34,9 +34,9 @@ class ForcedLaborNews extends News {
         const ratingsValid = planet.culture.industry < CL.LOW
         // Authoritarian governments, police states, and communist states would do this
         // Not democracies or anarchies
-        const govCheck = planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY
+        const govCheck = planet.culture.governmentType != GT.ANARCHY
         // Planet must not already have this event
-        const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.FORCED_LABOR])
+        const interferingEvent = News.planetHasAnyNews(planet, [NT.FORCED_LABOR])
         return ratingsValid && govCheck && !interferingEvent
     }
 }

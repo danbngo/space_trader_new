@@ -3,7 +3,7 @@ class IsolationismNews extends News {
         super(
             `${coloredName(planet)} retreats into isolationism to take care of its own!`,
             `${coloredName(planet)} ends its isolationism!`,
-            NEWS_TYPES.ISOLATIONISM, planet
+            NT.ISOLATIONISM, planet
         )
 
         this.startEffects = [
@@ -41,11 +41,11 @@ class IsolationismNews extends News {
         //more likely after population collapse and internal dissent
         const ratingsValid = planet.culture.population < CL.SLIGHTLY_HIGH && planet.culture.security < CL.SLIGHTLY_LOW
         //must not be a puppet state or anarchic
-        const governmentValid = (planet.culture.governmentType != GOVERNMENT_TYPES.PUPPET_STATE) && (planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY)
+        const governmentValid = (planet.culture.governmentType != GT.PUPPET_STATE) && (planet.culture.governmentType != GT.ANARCHY)
         //must not be at engaged in or targeted by any hostile acts
         const interferingEvent =
-            News.planetHasAnyNews(planet, NEWS_TYPES_DANGEROUS) ||
-            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_DANGEROUS) 
+            News.planetHasAnyNews(planet, NT_DANGEROUS) ||
+            News.planetHasAnyNewsTargeting(planet, NT_DANGEROUS) 
         return ratingsValid && governmentValid && !interferingEvent
     }
 }

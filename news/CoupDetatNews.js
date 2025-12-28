@@ -1,14 +1,14 @@
 class CoupDetatNews extends News {
     constructor(planet = new Planet(), targetPlanet = new Planet()) {
         // Select a random government type for the coup (not puppet state or previous type)
-        const availableGovTypes = GOVERNMENT_TYPES_ALL.filter(
-            gov => gov !== GOVERNMENT_TYPES.PUPPET_STATE && gov !== targetPlanet.culture.governmentType
+        const availableGovTypes = GT_ALL.filter(
+            gov => gov !== GT.PUPPET_STATE && gov !== targetPlanet.culture.governmentType
         )
         const newGovernmentType = availableGovTypes[Math.floor(Math.random() * availableGovTypes.length)]
         super(
             `${coloredName(planet)} orchestrates a coup d'état in ${coloredName(targetPlanet)}, toppling their government!`,
             `${coloredName(planet)}'s coup in ${coloredName(targetPlanet)} succeeds! A new ${coloredName(newGovernmentType)} government is established!`,
-            NEWS_TYPES.COUP_DETAT, planet, targetPlanet
+            NT.COUP_DETAT, planet, targetPlanet
         )
 
         const courthouseBuilding = targetPlanet.settlement.courthouse;
@@ -23,7 +23,7 @@ class CoupDetatNews extends News {
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                newGovernmentType: GOVERNMENT_TYPES.ANARCHY ? null : GOVERNMENT_TYPES.ANARCHY,
+                newGovernmentType: GT.ANARCHY ? null : GT.ANARCHY,
                 military: CL.VERY_LOW,
                 security: CL.VERY_LOW,
                 crime: CL.VERY_HIGH,
@@ -60,7 +60,7 @@ class CoupDetatNews extends News {
         const govValid = planet.culture.governmentType.opposingType === targetPlanet.culture.governmentType
         // Must be TENSE beforehand
         const relationshipValid = planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.TENSE && targetPlanet.culture.relationships.get(planet) == RELATIONSHIP_TYPES.TENSE
-        const interferingEvent = News.planetHasAnyNews(targetPlanet, [NEWS_TYPES.COUP, ...NEWS_TYPES_CRIME_PREVENTING])
+        const interferingEvent = News.planetHasAnyNews(targetPlanet, [NT.COUP, ...NT_CRIME_PREVENTING])
         return ratingsValid && govValid && relationshipValid && !interferingEvent
     }
 

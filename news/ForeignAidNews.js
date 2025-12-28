@@ -3,7 +3,7 @@ class ForeignAidNews extends News {
         super(
             `${coloredName(planet)}'s plight inspires other planets to send it foreign aid!`,
             `${coloredName(planet)}'s foreign aid finally dries up!`,
-            NEWS_TYPES.FOREIGN_AID, planet
+            NT.FOREIGN_AID, planet
         )
 
         this.startEffects = [
@@ -38,7 +38,7 @@ class ForeignAidNews extends News {
         const economyValid = planet.culture.economy < CL.LOW && planet.culture.industry < CL.LOW && planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS < CL.LOW
         const prestigeValid = planet.culture.prestige > CL.LOW
         const interferingEvent =
-            News.planetHasAnyNews(planet, [NEWS_TYPES.FOREIGN_AID, ...NEWS_TYPES_ECONOMY_BOOSTING])
+            News.planetHasAnyNews(planet, [NT.FOREIGN_AID, ...NT_ECONOMY_BOOSTING])
         return economyValid && prestigeValid && !interferingEvent
     }
 }

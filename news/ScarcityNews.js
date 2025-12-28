@@ -3,7 +3,7 @@ class ScarcityNews extends News {
         super(
             `${coloredName(planet)}'s overconsumption has led to famine and scarcity!`,
             `${coloredName(planet)}'s great famine ends!`,
-            NEWS_TYPES.SCARCITY, planet
+            NT.SCARCITY, planet
         )
 
         this.startEffects = [
@@ -35,7 +35,7 @@ class ScarcityNews extends News {
         const {planet} = this
         //more likely if high pop and high industry
         const ratingsValid = planet.culture.population > CL.HIGH || planet.culture.industry >= CL.HIGH
-        const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.SCARCITY, ...NEWS_TYPES_ECONOMY_BOOSTING])
+        const interferingEvent = News.planetHasAnyNews(planet, [NT.SCARCITY, ...NT_ECONOMY_BOOSTING])
         return ratingsValid && !interferingEvent
     }
 }

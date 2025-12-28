@@ -3,7 +3,7 @@ class ArmsDealNews extends News {
         super(
             `${coloredName(planet)} sends a major arms shipment to ${coloredName(targetPlanet)}!`,
             `${coloredName(planet)}'s arms deal with ${coloredName(targetPlanet)} is complete!`,
-            NEWS_TYPES.ARMS_DEAL, planet, targetPlanet
+            NT.ARMS_DEAL, planet, targetPlanet
         )
 
         this.startEffects = [
@@ -47,7 +47,7 @@ class ArmsDealNews extends News {
         const relationships = [planet.culture.relationships.get(targetPlanet), targetPlanet.culture.relationships.get(planet)]
         const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.NEUTRAL || rel == RELATIONSHIP_TYPES.ALLY)
         const interferingEvent = 
-            News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.ARMS_DEAL, ...NEWS_TYPES_COOPERATION_PREVENTING])
+            News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.ARMS_DEAL, ...NT_COOPERATION_PREVENTING])
         return transferValid && ratingsValid && relationshipsValid && !interferingEvent
     }
 }

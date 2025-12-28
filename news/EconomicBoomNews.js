@@ -3,7 +3,7 @@ class EconomicBoomNews extends News {
         super(
             `${coloredName(planet)} experiences an economic boom! Its citizens are living in a gilded age!`,
             `${coloredName(planet)}'s booming economy normalizes.`,
-            NEWS_TYPES.ECONOMIC_BOOM, planet
+            NT.ECONOMIC_BOOM, planet
         )
 
         this.startEffects = [
@@ -34,8 +34,8 @@ class EconomicBoomNews extends News {
         const ratingsValid = planet.culture.economy < CL.VERY_HIGH && planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS < CL.VERY_HIGH
         //basically just a bonus for not being in a war or anything stupid
         const interferingEvent = 
-            News.planetHasAnyNews(planet, [NEWS_TYPES.ECONOMIC_BOOM, ...NEWS_TYPES_ECONOMY_PREVENTING]) ||
-            News.planetHasAnyNewsTargeting(planet, [...NEWS_TYPES_DANGEROUS, ...NEWS_TYPES_ECONOMY_PREVENTING])
+            News.planetHasAnyNews(planet, [NT.ECONOMIC_BOOM, ...NT_ECONOMY_PREVENTING]) ||
+            News.planetHasAnyNewsTargeting(planet, [...NT_DANGEROUS, ...NT_ECONOMY_PREVENTING])
         return ratingsValid && !interferingEvent
     }
 }

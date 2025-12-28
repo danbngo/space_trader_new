@@ -3,7 +3,7 @@ class ImperialismNews extends News {
         super(
             `${coloredName(planet)} carries out imperialist expansion, seizing territory from ${coloredName(targetPlanet)}!`,
             `${coloredName(planet)}'s imperialist expansion against ${coloredName(targetPlanet)} finally grinds to a halt!`,
-            NEWS_TYPES.IMPERIALISM, planet, targetPlanet
+            NT.IMPERIALISM, planet, targetPlanet
         )
 
         this.startEffects = [
@@ -48,7 +48,7 @@ class ImperialismNews extends News {
         const relationships = [planet.culture.relationships.get(targetPlanet), targetPlanet.culture.relationships.get(planet)]
         const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.TENSE || rel == RELATIONSHIP_TYPES.WAR)
         const interferingEvent =
-            News.hasAnyNewsBidirectional(planet, targetPlanet, [NEWS_TYPES.IMPERIALISM])
+            News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.IMPERIALISM])
         return ratingsValid && militaryValid && relationshipsValid && !interferingEvent
     }
 }

@@ -3,7 +3,7 @@ class GenocideNews extends News {
         super(
             `${coloredName(planet)} begins purging its society of 'undesirable' elements! The other planets condemn this vile act!'`,
             `${coloredName(planet)}'s purge of its own people finally comes to an end!`,
-            NEWS_TYPES.GENOCIDE, planet
+            NT.GENOCIDE, planet
         )
 
         this.startEffects = [
@@ -35,9 +35,9 @@ class GenocideNews extends News {
         //more likely if security is very low (except in a police state)
         const ratingsValid = planet.culture.military > CL.MEDIUM && planet.culture.security < CL.VERY_LOW
         //cant be anarchy
-        const govCheck = planet.culture.governmentType != GOVERNMENT_TYPES.ANARCHY
+        const govCheck = planet.culture.governmentType != GT.ANARCHY
         //planet must not already be in anarchy or puppet state
-        const interferingEvent = News.planetHasAnyNews(planet, [NEWS_TYPES.GENOCIDE])
+        const interferingEvent = News.planetHasAnyNews(planet, [NT.GENOCIDE])
         return (ratingsValid) && govCheck && !interferingEvent
     }
 }

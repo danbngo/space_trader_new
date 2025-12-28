@@ -3,7 +3,7 @@ class DisarmamentNews extends News {
         super(
             `${coloredName(planet)} seeks system-wide peace and begins a period of disarmament!`,
             `${coloredName(planet)}'s disarmament period comes to an end!`,
-            NEWS_TYPES.DISARMAMENT, planet
+            NT.DISARMAMENT, planet
         )
 
         this.startEffects = [
@@ -34,8 +34,8 @@ class DisarmamentNews extends News {
         //unlikely if planet has a low military already
         const ratingsValid = (planet.culture.military > CL.HIGH) || (planet.settlement.shipyard.baseNumShips > CL.HIGH)
         const interferingEvent =
-            News.planetHasAnyNewsTargeting(planet, NEWS_TYPES_MARTIAL) ||
-            News.planetHasAnyNews(planet, NEWS_TYPES_MARTIAL)
+            News.planetHasAnyNewsTargeting(planet, NT_MARTIAL) ||
+            News.planetHasAnyNews(planet, NT_MARTIAL)
         return ratingsValid && !interferingEvent
     }
 }

@@ -3,7 +3,7 @@ class BombardmentNews extends News {
         super(
             `${coloredName(planet)} commences orbital bombardment of ${coloredName(targetPlanet)}!`,
             `${coloredName(planet)}'s orbital bombardment of ${coloredName(targetPlanet)} has forced their surrender!`,
-            NEWS_TYPES.BOMBARDMENT, planet, targetPlanet
+            NT.BOMBARDMENT, planet, targetPlanet
         )
 
         const buildingsToDisable = [];
@@ -62,8 +62,8 @@ class BombardmentNews extends News {
         const ratingsValid = planet.culture.military > targetPlanet.culture.military * 1.5
         const relationshipValid = planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR
         const interferingEvent = 
-            News.hasNews(NEWS_TYPES.BOMBARDMENT, planet, targetPlanet) || 
-            News.hasAnyNewsBidirectional(planet, targetPlanet, NEWS_TYPES_COOPERATIVE)
+            News.hasNews(NT.BOMBARDMENT, planet, targetPlanet) || 
+            News.hasAnyNewsBidirectional(planet, targetPlanet, NT_COOPERATIVE)
         return ratingsValid && relationshipValid && !interferingEvent
     }
 }
