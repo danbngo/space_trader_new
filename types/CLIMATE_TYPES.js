@@ -16,7 +16,7 @@ class ClimateValue {
         this.name = name
         this.value = value
         this.score = ClimateValue.scoreClimateValue(value)
-        this.coloredName = statColorSpan(this.name, this.score, true)
+        this.coloredName = statColorSpan(this.name, this.score)
     }
     
     static scoreClimateValue(value = 1.0) {

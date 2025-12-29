@@ -109,14 +109,14 @@ function showMarketMenu(market = new Market()) {
         children: [
             isDocked 
                 ? (blackMarket ? 'You slip into the shadows of the black market.<br/>' : 'Welcome to the market.<br/>') 
-                : colorSpan(`You must dock to use the ${blackMarket ? 'black market' : 'market'}.`, COLORS.Yellow, true) + '<br/>',
+                : colorSpan(`You must dock to use the ${blackMarket ? 'black market' : 'market'}.`, COLORS.Yellow) + '<br/>',
             createMarketCargoTable(blackMarket, fleet.cargo, market.cargo, buyPrices, sellPrices, onSelectCargoType),
             `Your Cargo Space: ${fleet.cargo.total}/${fleet.totalCargoSpace} | Your Credits: ${gs.credits}`,
             `Market Credits: ${market.credits}`
-            +` | Buy Fee: ${statColorSpan(roundToPlaces(100*market.baseRake, 2), 2/(1+market.baseRake),true)}%`
-            +` | Sell Fee: ${statColorSpan(roundToPlaces(100*market.baseRake/(market.baseRake+1), 2), 2/(market.baseRake+1),true)}%`,
-            (gs.fleet.totalSkills.getAmount(SKILLS.Barter) > 0) ? `Fee After Barter | ${statColorSpan(roundToPlaces(100*(1+market.rake) - 100, 2), 2/(1+market.rake),true)}% Buy`
-            +` | ${statColorSpan(roundToPlaces(100*market.rake/(market.rake+1), 2), 2/(market.rake+1),true)}% Sell` : '',
+            +` | Buy Fee: ${statColorSpan(roundToPlaces(100*market.baseRake, 2), 2/(1+market.baseRake))}%`
+            +` | Sell Fee: ${statColorSpan(roundToPlaces(100*market.baseRake/(market.baseRake+1), 2), 2/(market.baseRake+1))}%`,
+            (gs.fleet.totalSkills.getAmount(SKILLS.Barter) > 0) ? `Fee After Barter | ${statColorSpan(roundToPlaces(100*(1+market.rake) - 100, 2), 2/(1+market.rake))}% Buy`
+            +` | ${statColorSpan(roundToPlaces(100*market.rake/(market.rake+1), 2), 2/(market.rake+1))}% Sell` : '',
         ]
     })
 

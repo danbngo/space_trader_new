@@ -5,8 +5,8 @@ class SystemWidePlague extends News {
 
     constructor() {
         super(
-            ''+colorSpan(`${gs.system.name} ERUPTS INTO A SYSTEM-WIDE PLAGUE!`, COLORS.Red, true),
-            ''+colorSpan(`${gs.system.name}'S SYSTEM-WIDE PLAGUE ENDS!`, COLORS.Green, true),
+            ''+colorSpan(`${gs.system.name} ERUPTS INTO A SYSTEM-WIDE PLAGUE!`, COLORS.Red),
+            ''+colorSpan(`${gs.system.name}'S SYSTEM-WIDE PLAGUE ENDS!`, COLORS.Green),
             META_NT.SYSTEM_WIDE_PLAGUE
         )
 
@@ -26,7 +26,7 @@ class SystemWidePlague extends News {
                     const numPlaguesToStart = calcOccurrencesPerTimespan(SystemWidePlague.AVERAGE_ADDITIONAL_PLAGUES_PER_YEAR, elapsedYears)
                     if (numPlaguesToStart < 1) return
                     const plagues = SystemWidePlague.getPlaguesToSpread(numPlaguesToStart)
-                    if (plagues.length > 0) SimpleNews.add(''+colorSpan(`${gs.system.name}'S SYSTEM-WIDE PLAGUE SPREADS!`, COLORS.Red, true))
+                    if (plagues.length > 0) SimpleNews.add(''+colorSpan(`${gs.system.name}'S SYSTEM-WIDE PLAGUE SPREADS!`, COLORS.Red))
                     for (const p of plagues) p.start()
                 }
             })

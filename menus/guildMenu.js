@@ -71,13 +71,13 @@ function showGuildMenu(guild = new Guild()) {
         planet,
         `${coloredName(planet)} - Guild`,
         ce({children:[
-            isDocked ? 'Welcome to the guild.<br/>' : colorSpan('You must dock to use the guild.', COLORS.Yellow, true) + '<br/>',
+            isDocked ? 'Welcome to the guild.<br/>' : colorSpan('You must dock to use the guild.', COLORS.Yellow) + '<br/>',
             createHireOfficerMenu(guild.officers, guild, (officer)=>onSelectGuildOfficer(officer)),
             `Your # officers: ${fleet.officers.length}/${captain.maxSubordinates} | Your credits: ${gs.credits}`,
             //`Guild credits: ${guild.credits}`,
             `Local Officer Level: ${roundToPlaces(100*guild.planet.culture.officerQuality, 2)}%`,
-            `Hire Fee: ${statColorSpan(roundToPlaces(100*guild.baseRake, 2), 2/(1+guild.baseRake),true)}%`,
-            (gs.fleet.totalSkills.getAmount(SKILLS.Barter) > 0) ? `Fee After Barter | ${statColorSpan(roundToPlaces(100*(1+guild.rake) - 100, 2), 2/(1+guild.rake),true)}% Hire` : '',
+            `Hire Fee: ${statColorSpan(roundToPlaces(100*guild.baseRake, 2), 2/(1+guild.baseRake))}%`,
+            (gs.fleet.totalSkills.getAmount(SKILLS.Barter) > 0) ? `Fee After Barter | ${statColorSpan(roundToPlaces(100*(1+guild.rake) - 100, 2), 2/(1+guild.rake))}% Hire` : '',
         ]}),
         [
             ["Back", () => showPlanetMenu(planet)],

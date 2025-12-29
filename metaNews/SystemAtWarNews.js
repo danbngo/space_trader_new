@@ -5,8 +5,8 @@ class SystemAtWarNews extends News {
 
     constructor() {
         super(
-            ''+colorSpan(`${gs.system.name} ERUPTS INTO TOTAL WAR!`, COLORS.Red, true),
-            ''+colorSpan(`${gs.system.name}'S TOTAL WAR ENDS!`, COLORS.Green, true),
+            ''+colorSpan(`${gs.system.name} ERUPTS INTO TOTAL WAR!`, COLORS.Red),
+            ''+colorSpan(`${gs.system.name}'S TOTAL WAR ENDS!`, COLORS.Green),
             META_NT.SYSTEM_AT_WAR
         )
 
@@ -14,7 +14,7 @@ class SystemAtWarNews extends News {
             new NewsEffect({
                 onApply: ()=>{
                     console.log('starting world war')
-                    const wars = SystemAtWarNews.getWarsToSpread(rng(SystemAtWarNews.MAX_INITIAL_WARS, SystemAtWarNews.MIN_INITIAL_WARS, true))
+                    const wars = SystemAtWarNews.getWarsToSpread(rng(SystemAtWarNews.MAX_INITIAL_WARS, SystemAtWarNews.MIN_INITIAL_WARS))
                     if (wars.length == 0) throw new Error('should not have been able to trigger system at war if no startable wars!')
                     for (const w of wars) w.start()
                 }
@@ -28,7 +28,7 @@ class SystemAtWarNews extends News {
                     const numWarsToStart = calcOccurrencesPerTimespan(SystemAtWarNews.AVERAGE_ADDITIONAL_WARS_PER_YEAR, elapsedYears)
                     if (numWarsToStart < 1) return
                     const wars = SystemAtWarNews.getWarsToSpread(numWarsToStart)
-                    if (wars.length > 0) SimpleNews.add(''+colorSpan(`${gs.system.name}'S TOTAL WAR SPREADS!`, COLORS.Red, true))
+                    if (wars.length > 0) SimpleNews.add(''+colorSpan(`${gs.system.name}'S TOTAL WAR SPREADS!`, COLORS.Red))
                     for (const w of wars) w.start()
                 }
             })

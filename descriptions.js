@@ -31,11 +31,11 @@ function coloredName(obj = new SpaceObject()) {
     if (obj instanceof Effect) name = obj.effectType.name
     if (obj instanceof Fleet) return obj.planet ? `${coloredIanName(obj.planet)} ${obj.name}` : obj.name
 
-    return `${colorSpan(name, obj.color ? obj.color : '', true)}`
+    return `${colorSpan(name, obj.color ? obj.color : '')}`
 }
 
 function coloredIanName(obj = new Planet()) {
-    return `${colorSpan(obj.ianName, obj.color, true)}`
+    return `${colorSpan(obj.ianName, obj.color)}`
 }
 
 function describeDate(year = 0, minutesEnabled = false, hoursEnabled = false) {
@@ -104,13 +104,13 @@ const dnc = describeNumChange
 function describePopulation(populationRating = 0) {
     const popCountB = Math.pow(10,populationRating)-1
     const popCount = popCountB * 1*1000*1000*1000 //in billions
-    return `${statColorSpan(describeLargeNumber(popCount), populationRating, true)}`
+    return `${statColorSpan(describeLargeNumber(popCount), populationRating)}`
 }
 
 function describeTerritory(territoryRating = 0) {
-    return `${statColorSpan(roundToPlaces(territoryRating,2), territoryRating, true)} AU`
+    return `${statColorSpan(roundToPlaces(territoryRating,2), territoryRating)} AU`
 }
 
 function describeRating(rating = 0, invertColor = false) {
-    return `${statColorSpan(roundToPlaces(rating,2), invertColor ? 1/rating : rating, true)}x`
+    return `${statColorSpan(roundToPlaces(rating,2), invertColor ? 1/rating : rating)}x`
 }

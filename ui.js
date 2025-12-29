@@ -149,9 +149,8 @@ function showMap(map) {
 /**
  * @param {any} text
  * @param {number} ratio
- * @param {boolean} asHtmlText
  */
-function statColorSpan(text = '', ratio = 1.0, asHtmlText = false) {
+function statColorSpan(text = '', ratio = 1.0) {
     // clamp ratio so interpolation works cleanly
     const r = Math.max(0, Math.min(ratio, 4.0));
     // helper: linear interpolation between two hex colors
@@ -183,32 +182,23 @@ function statColorSpan(text = '', ratio = 1.0, asHtmlText = false) {
             break;
         }
     }
-    return colorSpan(text, color, asHtmlText)
+    return colorSpan(text, color)
 }
 
 /** 
  * @function colorSpan
  * @param {string} text
  * @param {string | Array<number>} color
- * @param {boolean} asHtmlText
  * @returns {string | HTMLElement}
  */
-function colorSpan(text = '', color = '', asHtmlText = true) {
+function colorSpan(text = '', color = '') {
     if (Array.isArray(color)) {
         // convert color array to rgba string
         color = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${color.length > 3 ? color[3] : 1})`;
     }
 
-    if (asHtmlText) {
-        // return HTML string instead of DOM element
-        return `<span style="color: ${color}">${text}</span>`;
-    }
-
-    // return DOM element normally
-    const span = document.createElement("span");
-    span.style.color = color;
-    span.textContent = text;
-    return span;
+    // return HTML string instead of DOM element
+    return `<span style="color: ${color}">${text}</span>`;
 }
 
 

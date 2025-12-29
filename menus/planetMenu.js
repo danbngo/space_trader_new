@@ -8,18 +8,18 @@ function showPlanetMenu(planet = new Planet()) {
 
     let msg = isDocked ?
         `You have arrived at ${coloredName(planet)}.<br/>`
-        : ''+colorSpan(`You are scanning ${coloredName(planet)}.<br/>`, COLORS.Yellow, true)
+        : ''+colorSpan(`You are scanning ${coloredName(planet)}.<br/>`, COLORS.Yellow)
 
         if (isDocked) {
         console.log('1')
         const damagedShips = gs.fleet.ships.filter(s=>s.isDamaged())
         console.log('2:',damagedShips,gs.fleet.ships)
-        if (damagedShips.length > 0) msg += colorSpan(`Your ships receive complementary repairs courtesy of the dock's nanite swarm.<br/>`, COLORS.LightGreen, true)
+        if (damagedShips.length > 0) msg += colorSpan(`Your ships receive complementary repairs courtesy of the dock's nanite swarm.<br/>`, COLORS.LightGreen)
         for (const s of damagedShips) s.repairHull()
     }
 
     const options = []
-    options.push(["News", () => showNewsTimelineMenu(planet, () => showPlanetMenu(planet), true)]);
+    options.push(["News", () => showNewsTimelineMenu(planet, () => showPlanetMenu(planet))]);
     options.push([`Overview`, () => showPlanetSocietyMenu(planet)]);
     options.push(ce({tag:'br'}));
     if (settlement.shipyard) {
@@ -63,7 +63,7 @@ function showPlanetSocietyMenu(planet = new Planet()) {
     msg += `Security: ${describeRating(security)}<br/>`
     msg += `Economy: ${describeRating(economy)}<br/>`
     msg += `Industry: ${describeRating(industry)}<br/>`
-    msg += `Crime: ${describeRating(crime, true)}<br/>`
+    msg += `Crime: ${describeRating(crime)}<br/>`
     msg += `Technology: ${describeRating(culture.shipQuality)}<br/>`
     msg += `Education: ${describeRating(culture.officerQuality)}<br/>`
     
@@ -72,29 +72,29 @@ function showPlanetSocietyMenu(planet = new Planet()) {
         if (settlement.shipyard) {
             const shipyardShips = settlement.shipyard.baseNumShips
             const shipyardNormalized = shipyardShips / SHIPYARD_AVERAGE_NUM_SHIPS
-            msg += `Navy: ${statColorSpan(roundToPlaces(shipyardNormalized, 2) + 'x', shipyardNormalized, true)}<br/>`
+            msg += `Navy: ${statColorSpan(roundToPlaces(shipyardNormalized, 2) + 'x', shipyardNormalized)}<br/>`
         }
         if (settlement.guild) {
             const guildOfficers = settlement.guild.baseNumOfficers
             const guildNormalized = guildOfficers / GUILD_AVERAGE_NUM_OFFICERS
-            msg += `Army: ${statColorSpan(roundToPlaces(guildNormalized, 2) + 'x', guildNormalized, true)}<br/>`
+            msg += `Army: ${statColorSpan(roundToPlaces(guildNormalized, 2) + 'x', guildNormalized)}<br/>`
         }
         if (settlement.bank) {
             const bankCredits = settlement.bank.baseCredits
             const bankNormalized = bankCredits / BANK_AVERAGE_CREDITS
-            msg += `Wealth: ${statColorSpan(describeLargeNumber(bankCredits), bankNormalized, true)}<br/>`
+            msg += `Wealth: ${statColorSpan(describeLargeNumber(bankCredits), bankNormalized)}<br/>`
         }
         if (settlement.market) {
             const marketCargoAvg = settlement.market.baseCargo.average
             const marketCargoNormalized = marketCargoAvg / MARKET_AVERAGE_CARGO_PER_TYPE
-            msg += `Goods: ${statColorSpan(roundToPlaces(marketCargoAvg, 1), marketCargoNormalized, true)} per type<br/>`
-            msg += `Inflation: ${statColorSpan(roundToPlaces(settlement.market.inflation, 2) + 'x', settlement.market.inflation, true)}<br/>`
+            msg += `Goods: ${statColorSpan(roundToPlaces(marketCargoAvg, 1), marketCargoNormalized)} per type<br/>`
+            msg += `Inflation: ${statColorSpan(roundToPlaces(settlement.market.inflation, 2) + 'x', settlement.market.inflation)}<br/>`
         }
         if (settlement.blackMarket) {
             const blackMarketCargoAvg = settlement.blackMarket.baseCargo.average
             const blackMarketCargoNormalized = blackMarketCargoAvg / MARKET_AVERAGE_CARGO_PER_TYPE
-            msg += `Illegal Goods: ${statColorSpan(roundToPlaces(blackMarketCargoAvg, 1), blackMarketCargoNormalized, true)} per type<br/>`
-            msg += `Illegal Inflation: ${statColorSpan(roundToPlaces(settlement.blackMarket.inflation, 2) + 'x', settlement.blackMarket.inflation, true)}<br/>`
+            msg += `Illegal Goods: ${statColorSpan(roundToPlaces(blackMarketCargoAvg, 1), blackMarketCargoNormalized)} per type<br/>`
+            msg += `Illegal Inflation: ${statColorSpan(roundToPlaces(settlement.blackMarket.inflation, 2) + 'x', settlement.blackMarket.inflation)}<br/>`
         }
     }
     

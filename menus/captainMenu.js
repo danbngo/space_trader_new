@@ -31,7 +31,7 @@ function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
         ['Skill', 'Level', 'Cost to Upgrade'],
         ...SKILLS_ALL.map(sk => [
             sk,
-            statColorSpan(skills.getAmount(sk), skills.getAmount(sk)*SKILLS_ALL.length/5/SKILL_POINTS_PER_LEVEL, true),
+            statColorSpan(skills.getAmount(sk), skills.getAmount(sk)*SKILLS_ALL.length/5/SKILL_POINTS_PER_LEVEL),
             captain.calcSkillPointsToUpgrade(sk)
         ])
     ]
@@ -43,7 +43,7 @@ function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
         ce({children:[
             `Name: ${name} | Credits ${credits}`,
             `Level: ${level} | Exp.: ${expPoints} | To Next Lvl: ${expToNextLevel}`,
-            `Skill Points: ${colorSpan(String(skillPoints), skillPoints > 0 ? COLORS.Green : '', true)}`,
+            `Skill Points: ${colorSpan(String(skillPoints), skillPoints > 0 ? COLORS.Green : '')}`,
             skillTable,
         ]}),
         [
@@ -69,16 +69,16 @@ function showCaptainReputationMenu() {
         // Data rows for each planet
         ...gs.system.planets.map(planet => [
             coloredName(planet),
-            `${statColorSpan(captain.bounty.getAmount(planet), 1000/(1000+captain.bounty.getAmount(planet)), true)} CR`,
-            statColorSpan(captain.fame.getAmount(planet), 1 + captain.fame.getAmount(planet)/50, true),
-            statColorSpan(captain.infamy.getAmount(planet), 1 / (1 + captain.infamy.getAmount(planet)/50), true),
+            `${statColorSpan(captain.bounty.getAmount(planet), 1000/(1000+captain.bounty.getAmount(planet)))} CR`,
+            statColorSpan(captain.fame.getAmount(planet), 1 + captain.fame.getAmount(planet)/50),
+            statColorSpan(captain.infamy.getAmount(planet), 1 / (1 + captain.infamy.getAmount(planet)/50)),
         ]),
         // Total row
         [
             '<b>Total</b>',
-            `${statColorSpan(captain.bounty.total, 1000/(1000+captain.bounty.total/(.001+gs.system.planets.length)), true)} CR`, //hacky, fix this later
-            statColorSpan(captain.fame.total, 1 + captain.fame.total/50, true),
-            statColorSpan(captain.infamy.total, 1 / (1 + captain.infamy.total/50), true),
+            `${statColorSpan(captain.bounty.total, 1000/(1000+captain.bounty.total/(.001+gs.system.planets.length)))} CR`, //hacky, fix this later
+            statColorSpan(captain.fame.total, 1 + captain.fame.total/50),
+            statColorSpan(captain.infamy.total, 1 / (1 + captain.infamy.total/50)),
         ]
     ]
 
@@ -164,7 +164,7 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
         ['Skill', 'Level', 'Cost to Upgrade'],
         ...SKILLS_ALL.map(sk => [
             sk,
-            statColorSpan(skills.getAmount(sk), skills.getAmount(sk)*SKILLS_ALL.length/5/SKILL_POINTS_PER_LEVEL, true),
+            statColorSpan(skills.getAmount(sk), skills.getAmount(sk)*SKILLS_ALL.length/5/SKILL_POINTS_PER_LEVEL),
             captain.calcSkillPointsToUpgrade(sk)
         ])
     ]
@@ -175,7 +175,7 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
         `Create Captain`,
         ce({children:[
             `Name: ${name}`,
-            `Skill Points: ${statColorSpan(skillPoints, skillPoints > 0 ? 4 : 1, true)}`,
+            `Skill Points: ${statColorSpan(skillPoints, skillPoints > 0 ? 4 : 1)}`,
             skillTable,
         ]}),
         [

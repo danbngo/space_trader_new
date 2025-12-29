@@ -252,11 +252,11 @@ class News {
             if (relationship == RELATIONSHIP_TYPES.NEUTRAL) {
                 const n = new TensionsNews(otherPlanet, targetPlanet)
                 //skip political considerations as this is about raw power/survival
-                if (n.isValid(true)) possibleHostileNews.push(n)
+                if (n.isValid()) possibleHostileNews.push(n)
             } else if (relationship == RELATIONSHIP_TYPES.TENSE) {
                 const n = new WarNews(otherPlanet, targetPlanet)
                 //skip political considerations as this is about raw power/survival
-                if (n.isValid(true)) possibleWarNews.push(n)
+                if (n.isValid()) possibleWarNews.push(n)
             }
         }
         const news = [...possibleHostileNews, ...possibleWarNews]

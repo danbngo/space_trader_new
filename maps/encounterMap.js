@@ -99,7 +99,7 @@ class EncounterMap extends BaseMap {
         let msg = encounter.encounterType.name
         if (encounter.combatEnabled) {
             msg += ` - Turn: ${encounter.activeTurnFleet === encounter.playerFleet ?
-                colorSpan('Player', COLORS.LightGray, true) : colorSpan('Enemy', COLORS.LightRed, true)}`
+                colorSpan('Player', COLORS.LightGray) : colorSpan('Enemy', COLORS.LightRed)}`
         }
         ce({
             parent:this.infoBar,
@@ -360,17 +360,17 @@ class EncounterMap extends BaseMap {
             if (obj.statusEffects.size > 0) {
                 const statusEffectSpans = obj.statusEffects.keys.map(effect=>{
                     const turnsRemaining = obj.statusEffects.getAmount(effect)
-                    if (turnsRemaining > 0) return colorSpan(`${effect.name}${turnsRemaining > 0 ? ` (${turnsRemaining})` : ''}`, effect.color, true)
+                    if (turnsRemaining > 0) return colorSpan(`${effect.name}${turnsRemaining > 0 ? ` (${turnsRemaining})` : ''}`, effect.color)
                     return ''
                 })
                 ce({parent:container, innerHTML: statusEffectSpans.join('<br/>')})
             }
-            ce({parent:container, innerHTML: `Hull: ${statColorSpan(`${hull[0]}/${hull[1]}`, hull[0]/hull[1], true)}`})
-            if (obj.shields[1] > 0) ce({parent:container, innerHTML: `Shields: ${statColorSpan(`${shields[0]}/${shields[1]}`, shields[0]/shields[1], true)}`})
-            if (obj.lasers > 0) ce({parent:container, innerHTML: `Lasers: ${statColorSpan(obj.lasers, obj.lasers/AVERAGE_SHIP_LASERS, true)}`})
-            if (obj.engine) ce({parent:container,  innerHTML: `Engine: ${statColorSpan(obj.engine, obj.engine/AVERAGE_SHIP_ENGINE, true)}`})
-            if (obj.radars) ce({parent:container, innerHTML: `Radars: ${statColorSpan(obj.radars, obj.radars/AVERAGE_SHIP_RADARS, true)}`})
-            ce({parent:container, innerHTML: `Actions: ${statColorSpan(obj.actionsRemaining, obj.actionsRemaining/2, true)}`})
+            ce({parent:container, innerHTML: `Hull: ${statColorSpan(`${hull[0]}/${hull[1]}`, hull[0]/hull[1])}`})
+            if (obj.shields[1] > 0) ce({parent:container, innerHTML: `Shields: ${statColorSpan(`${shields[0]}/${shields[1]}`, shields[0]/shields[1])}`})
+            if (obj.lasers > 0) ce({parent:container, innerHTML: `Lasers: ${statColorSpan(obj.lasers, obj.lasers/AVERAGE_SHIP_LASERS)}`})
+            if (obj.engine) ce({parent:container,  innerHTML: `Engine: ${statColorSpan(obj.engine, obj.engine/AVERAGE_SHIP_ENGINE)}`})
+            if (obj.radars) ce({parent:container, innerHTML: `Radars: ${statColorSpan(obj.radars, obj.radars/AVERAGE_SHIP_RADARS)}`})
+            ce({parent:container, innerHTML: `Actions: ${statColorSpan(obj.actionsRemaining, obj.actionsRemaining/2)}`})
             ce({parent:container, innerHTML: obj.disabled ? `(Disabled)` : obj.escaped ? '(Escaped)' : ''})
             if (showActions) {
                 ce({parent:container, tag:'button', innerHTML:'Shoot', disabled: !canAct || !obj.canShoot, onClick: ()=>this.moveHandlerMap.get(MOVE_TYPES.Laser).startTargeting(obj)})

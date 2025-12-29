@@ -363,10 +363,10 @@ class NewsEffect {
 
 
             for (const building of buildingsDisabled) {
-                msg += `${colorSpan(`- ${building.buildingType.name} destroyed`, COLORS.Red, true)}<br/>`
+                msg += `${colorSpan(`- ${building.buildingType.name} destroyed`, COLORS.Red)}<br/>`
             }
             for (const building of buildingsEnabled) {
-                msg += `${colorSpan(`- ${building.buildingType.name} built`, COLORS.Green, true)}<br/>`
+                msg += `${colorSpan(`- ${building.buildingType.name} built`, COLORS.Green)}<br/>`
             }
 
             for (const [cargoType, modifier] of cargoPriceModifiers.entries()) {

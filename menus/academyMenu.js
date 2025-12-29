@@ -44,7 +44,7 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0])
             return [
                 skill,
                 currentLevel,
-                statColorSpan(cost, statRatio, true) + ' CR'
+                ''+statColorSpan(cost, statRatio) + ' CR'
             ]
         })
     ]
@@ -53,10 +53,10 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0])
 
     let infoContainer = ce({
         children: [
-            `<br/>${isDocked ? 'Welcome to the academy. Select a skill to train:' : colorSpan('You must dock to use the academy.', COLORS.Yellow, true)}`,
+            `<br/>${isDocked ? 'Welcome to the academy. Select a skill to train:' : colorSpan('You must dock to use the academy.', COLORS.Yellow)}`,
             skillTable,
             `Your CR: ${gs.credits}<br/>`,
-            `Training Fee: ${statColorSpan(roundToPlaces(100*academy.rake, 2), 1/(1+academy.rake), true)}%<br/>`,
+            `Training Fee: ${statColorSpan(roundToPlaces(100*academy.rake, 2), 1/(1+academy.rake))}%<br/>`,
         ]
     })
 
