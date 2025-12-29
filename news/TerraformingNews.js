@@ -45,7 +45,7 @@ class TerraformingNews extends News {
     determineEnding() {
         const {planet} = this
         // Higher industry and officer quality = more likely to succeed
-        const successProbability = (planet.culture.industry + planet.settlement.guild.officerQualityMod) / 2
+        const successProbability = (planet.culture.industry + planet.culture.officerQuality) / 2
         this.failed = Math.random() > successProbability
     }
 

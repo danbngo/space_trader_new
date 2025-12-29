@@ -111,7 +111,7 @@ class News {
         this.endedYear = gs.year
         
         // Determine the ending state (failed, cancelled, or normal)
-        this.determineEnding()
+        //this.determineEnding()
         
         // Select which effects to apply based on the ending state
         let effectsToApply = this.endEffects

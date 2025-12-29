@@ -28,6 +28,13 @@ function assessPlanets() {
     const newsTotalPercentsPerType = {}
     const activeNewsTotalsPerType = {}
     const activeNewsTotalPercentsPerType = {}
+    const failedNewsTotalsPerType = {}
+    const cancelledNewsTotalsPerType = {}
+    const succeededNewsTotalsPerType = {}
+    const succeededNewsTotalPercentsPerType = {}
+    const failedNewsTotalPercentsPerType = {}
+    const cancelledNewsTotalPercentsPerType = {}
+
     for (const n of gs.system.news) {
         const count = newsTotalsPerType[n.newsType.name] || 0
         newsTotalsPerType[n.newsType.name] = count + 1
@@ -35,13 +42,32 @@ function assessPlanets() {
             const activeCount = activeNewsTotalsPerType[n.newsType.name] || 0
             activeNewsTotalsPerType[n.newsType.name] = activeCount + 1
         }
+        if (n.ended) {
+            if (n.failed) {
+                const failedCount = failedNewsTotalsPerType[n.newsType.name] || 0
+                failedNewsTotalsPerType[n.newsType.name] = failedCount + 1
+            } else if (n.cancelled) {
+                const cancelledCount = cancelledNewsTotalsPerType[n.newsType.name] || 0
+                cancelledNewsTotalsPerType[n.newsType.name] = cancelledCount + 1
+            } else {
+                const succeededCount = succeededNewsTotalsPerType[n.newsType.name] || 0
+                succeededNewsTotalsPerType[n.newsType.name] = succeededCount + 1
+            }
+        }
     }
     for (const nt of NT_ALL) {
         if (!newsTotalsPerType[nt.name]) newsTotalsPerType[nt.name] = 0
         if (!activeNewsTotalsPerType[nt.name]) activeNewsTotalsPerType[nt.name] = 0
+        if (!succeededNewsTotalsPerType[nt.name]) succeededNewsTotalsPerType[nt.name] = 0
+        if (!failedNewsTotalsPerType[nt.name]) failedNewsTotalsPerType[nt.name] = 0
+        if (!cancelledNewsTotalsPerType[nt.name]) cancelledNewsTotalsPerType[nt.name] = 0
     }
     for (const nt of META_NT_ALL) {
         if (!newsTotalsPerType[nt.name]) newsTotalsPerType[nt.name] = 0
+        if (!activeNewsTotalsPerType[nt.name]) activeNewsTotalsPerType[nt.name] = 0
+        if (!succeededNewsTotalsPerType[nt.name]) succeededNewsTotalsPerType[nt.name] = 0
+        if (!failedNewsTotalsPerType[nt.name]) failedNewsTotalsPerType[nt.name] = 0
+        if (!cancelledNewsTotalsPerType[nt.name]) cancelledNewsTotalsPerType[nt.name] = 0
     }
     for (const [newsTypeName, count] of Object.entries(newsTotalsPerType)) {
         const percent = (count / totalNews) * 100
@@ -51,14 +77,39 @@ function assessPlanets() {
         const percent = (count / activeNews) * 100
         activeNewsTotalPercentsPerType[newsTypeName] = percent.toFixed(2) + '%'
     }
+    for (const [newsTypeName, count] of Object.entries(succeededNewsTotalsPerType)) {
+        const percent = (count / totalNews) * 100
+        succeededNewsTotalPercentsPerType[newsTypeName] = percent.toFixed(2) + '%'
+    }
+    for (const [newsTypeName, count] of Object.entries(failedNewsTotalsPerType)) {
+        const percent = (count / totalNews) * 100
+        failedNewsTotalPercentsPerType[newsTypeName] = percent.toFixed(2) + '%'
+    }
+    for (const [newsTypeName, count] of Object.entries(cancelledNewsTotalsPerType)) {
+        const percent = (count / totalNews) * 100
+        cancelledNewsTotalPercentsPerType[newsTypeName] = percent.toFixed(2) + '%'
+    }
     console.log('-----News Totals Per Type:------', newsTotalsPerType)
     console.log('Total News Events Ever:', totalNews)
+    console.log('Total News Events (Failed Only):', gs.system.news.filter(n=>n.ended && n.failed).length)
+    console.log('Total News Events (Cancelled Only):', gs.system.news.filter(n=>n.ended && n.cancelled).length)
+    console.log('Total News Events (Succeeded Only):', gs.system.news.filter(n=>n.ended && !n.failed && !n.cancelled).length)
+    console.log('Total News Events (Still Active):', activeNews)
     console.log('Total News Types as % of total:')
     console.log(newsTotalPercentsPerType)
     console.log('Active News Events:', activeNews)
     console.log('Active News Totals Per Type:------', activeNewsTotalsPerType)
     console.log('Active News Types as % of active total:')
     console.log(activeNewsTotalPercentsPerType)
+    console.log('Succeeded News Totals Per Type:------', succeededNewsTotalsPerType)
+    console.log('Succeeded News Types as % of total:')
+    console.log(succeededNewsTotalPercentsPerType)
+    console.log('Failed News Totals Per Type:------', failedNewsTotalsPerType)
+    console.log('Failed News Types as % of total:')
+    console.log(failedNewsTotalPercentsPerType)
+    console.log('Cancelled News Totals Per Type:------', cancelledNewsTotalsPerType)
+    console.log('Cancelled News Types as % of total:')
+    console.log(cancelledNewsTotalPercentsPerType)
 
     console.log('-----Average Planet Stats:------')
 

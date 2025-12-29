@@ -62,7 +62,7 @@ class LudditismNews extends News {
         for (const p of gs.system.planets) {
             if (p !== planet) {
                 const rel = p.culture.relationships.get(planet)
-                if (rel === RELATIONSHIP_TYPES.TENSE || rel === RELATIONSHIP_TYPES.HOSTILE || rel === RELATIONSHIP_TYPES.WAR) {
+                if (rel === RELATIONSHIP_TYPES.TENSE || rel === RELATIONSHIP_TYPES.TENSE || rel === RELATIONSHIP_TYPES.WAR) {
                     threatsDetected = true
                     break
                 }

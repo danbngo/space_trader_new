@@ -49,7 +49,7 @@ class ExplorationNews extends News {
     determineEnding() {
         const {planet} = this
         // Higher prestige and officer quality = more likely to succeed
-        const successProbability = (planet.culture.prestige + planet.settlement.guild.officerQualityMod) / 2
+        const successProbability = (planet.culture.prestige + planet.culture.officerQuality) / 2
         this.failed = Math.random() > successProbability
     }
 

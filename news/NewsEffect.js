@@ -146,7 +146,7 @@ class NewsEffect {
         this.forceWithdrawal = forceWithdrawal;
         /** @type {Map<CargoType, number>} */
         this.cargoPriceModifiers = cargoPriceModifiers;
-        /** @type {function(number): void} */
+        /** @type {function(): void} */
         this.onApply = onApply //use sparingly!
         this.fired = false;
     }
@@ -240,7 +240,7 @@ class NewsEffect {
             if (blackMarketCargoAmounts !== 1.0) settlement.blackMarket.normalize()
         }
 
-        if (this.onApply) this.onApply(elapsedYears);
+        if (this.onApply) this.onApply();
     }
 
     getInverse() {
@@ -274,6 +274,39 @@ class NewsEffect {
             relationsReset: false, //this cant be undone.
         });
         return inverseEffect
+    }
+
+    clone() {
+        return new NewsEffect({
+            planet: this.planet,
+            targetPlanet: this.targetPlanet,
+            newGovernmentType: this.newGovernmentType,
+            newRelationship: this.newRelationship,
+            marketPrices: this.marketPrices,
+            marketCargoAmounts: this.marketCargoAmounts,
+            blackMarketPrices: this.blackMarketPrices,
+            blackMarketCargoAmounts: this.blackMarketCargoAmounts,
+            military: this.military,
+            industry: this.industry,
+            economy: this.economy,
+            security: this.security,
+            crime: this.crime,
+            prestige: this.prestige,
+            population: this.population,
+            territory: this.territory,
+            shipQuality: this.shipQuality,
+            officerQuality: this.officerQuality,
+            buildingsDisabled: [...this.buildingsDisabled],
+            buildingsEnabled: [...this.buildingsEnabled],
+            shipyardNumShips: this.shipyardNumShips,
+            guildNumOfficers: this.guildNumOfficers,
+            cargoPriceModifiers: new Map(this.cargoPriceModifiers),
+            credits: this.credits,
+            relationsReset: this.relationsReset,
+            forcePeace: this.forcePeace,
+            forceWithdrawal: this.forceWithdrawal,
+            onApply: this.onApply,
+        });
     }
 
     describe() {

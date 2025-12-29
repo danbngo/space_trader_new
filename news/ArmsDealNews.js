@@ -82,8 +82,8 @@ class ArmsDealNews extends News {
         // Check if relationship deteriorated
         const rel1 = planet.culture.relationships.get(targetPlanet)
         const rel2 = targetPlanet.culture.relationships.get(planet)
-        if (rel1 === RELATIONSHIP_TYPES.TENSE || rel1 === RELATIONSHIP_TYPES.HOSTILE || rel1 === RELATIONSHIP_TYPES.WAR ||
-            rel2 === RELATIONSHIP_TYPES.TENSE || rel2 === RELATIONSHIP_TYPES.HOSTILE || rel2 === RELATIONSHIP_TYPES.WAR) {
+        if (rel1 === RELATIONSHIP_TYPES.TENSE || rel1 === RELATIONSHIP_TYPES.WAR ||
+            rel2 === RELATIONSHIP_TYPES.TENSE || rel2 === RELATIONSHIP_TYPES.WAR) {
             this.cancelled = true
             return
         }
