@@ -2,8 +2,8 @@ class AddictionNews extends News {
     constructor(planet = new Planet()) {
         super(
             `${coloredName(planet)} is suffering an addiction crisis! Synthetic drugs are ravaging the population!`,
-            `${coloredName(planet)}'s addiction crisis begins to mellow out!`,
-            `${coloredName(planet)}'s addiction crisis spirals out of control!`,
+            `${coloredName(planet)}'s addiction crisis was successfully mitigated by the government!`,
+            `${coloredName(planet)}'s addiction crisis has become terminal with no end in sight!`,
             '',
             NT.ADDICTION, planet
         )
@@ -17,7 +17,7 @@ class AddictionNews extends News {
                 economy: CL.LOW,
                 blackMarketCargoAmounts: CL.VERY_LOW,
                 blackMarketPrices: CL.VERY_HIGH,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.MEDICINE, CL.VERY_HIGH], [CARGO_TYPES.DRUGS, 3]]), //this is the only thing that normalizes after
+                cargoPriceModifiers: new Map([[CARGO_TYPES.MEDICINE, CL.VERY_HIGH], [CARGO_TYPES.DRUGS, CL.EXTREMELY_HIGH]]), //this is the only thing that normalizes after
             })
         ]
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
@@ -30,17 +30,16 @@ class AddictionNews extends News {
             crime: News.clHalfRegression(this.endEffects[0].crime),
         })
 
-        this.failEndEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                population: CL.NO_REGRESSION,
-                security: CL.NO_REGRESSION,
-                crime: CL.NO_REGRESSION,
-                economy: CL.NO_REGRESSION,
-                prestige: CL.VERY_LOW,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.DRUGS, CL.NO_REGRESSION]]),
-            })
-        ]
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+
+        Object.assign(this.endEffects[0], {
+            population: CL.NO_REGRESSION,
+            security: CL.NO_REGRESSION,
+            crime: CL.NO_REGRESSION,
+            economy: CL.NO_REGRESSION,
+            blackMarketPrices: CL.NO_REGRESSION,
+            
+        })
     }
 
     determineEnding() {

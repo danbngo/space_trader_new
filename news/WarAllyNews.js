@@ -1,23 +1,16 @@
 class WarAllyNews extends News {
-    constructor(planet = new Planet(), targetPlanet = new Planet(), allyPlanet = new Planet()) {
+    constructor(planet = new Planet(), targetPlanet = new Planet()) {
         super(
             `${coloredName(planet)} begins diplomatic efforts to convince its allies to join the fight against ${coloredName(targetPlanet)}!`,
-            `${coloredName(planet)}'s diplomatic efforts lead to ${coloredName(allyPlanet)} joining the fight against ${coloredName(targetPlanet)}!`,
-            `${coloredName(planet)}'s diplomatic efforts fail to secure ${coloredName(allyPlanet)}'s commitment!`,
+            `${coloredName(planet)}'s diplomatic efforts lead to its allies joining the fight against ${coloredName(targetPlanet)}!`,
+            `${coloredName(planet)}'s diplomatic efforts fail to secure its allies' commitment in the fight against ${coloredName(targetPlanet)}!`,
             `Peace between ${coloredName(planet)} and ${coloredName(targetPlanet)} renders alliance negotiations moot!`,
             NT.WAR_ALLY, planet, targetPlanet
         )
         
-        this.allyPlanet = allyPlanet
-
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                targetPlanet: this.targetPlanet,
-                prestige: CL.LOW, // cost of diplomacy
-            }),
-            new NewsEffect({
-                planet: this.allyPlanet,
                 targetPlanet: this.targetPlanet,
             }),
         ]
@@ -26,10 +19,6 @@ class WarAllyNews extends News {
         // Original instigator: prestige cost is permanent
         Object.assign(this.endEffects[0], {
             prestige: CL.NO_REGRESSION,
-        })
-        // Ally and target declare war
-        Object.assign(this.endEffects[1], {
-            newRelationship: RELATIONSHIP_TYPES.WAR,
         })
 
         // Failed: diplomatic effort rebuffed, no ally joins

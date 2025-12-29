@@ -18,8 +18,9 @@ class Culture {
      * @param {number} security - Rating affecting police and bounty hunter presence.
      * @param {number} crime - Rating affecting pirate and smuggler activity and black market cargo.
      * @param {number} prestige - Effects how planets interact with each other.
+     * @param {Policies} policies - The active policies for this culture.
      */
-    constructor(planet = new Planet(), governmentType = GT_ALL[0], cargoPriceModifiers = new CountsMap(), shipQuality = 1.0, officerQuality = 1.0, territory = 1, population = 1, military = 1, industry = 1, economy = 1, security = 1, crime = 1, prestige = 1) {
+    constructor(planet = new Planet(), governmentType = GT_ALL[0], cargoPriceModifiers = new CountsMap(), shipQuality = 1.0, officerQuality = 1.0, territory = 1, population = 1, military = 1, industry = 1, economy = 1, security = 1, crime = 1, prestige = 1, policies = new Policies()) {
         /** @type {CountsMap} */
         this.cargoPriceModifiers = cargoPriceModifiers
         /** @type {number} */
@@ -46,6 +47,8 @@ class Culture {
         this.governmentType = governmentType;
         /** @type {Planet} */
         this.planet = planet;
+        /** @type {Policies} */
+        this.policies = policies;
         /** @type {Map<Planet, RelationshipType>} */
         this.relationships = new Map()
     }

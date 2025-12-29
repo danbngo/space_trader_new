@@ -17,7 +17,7 @@ class PlagueNews extends News {
                 guildNumOfficers: CL.VERY_LOW,
                 marketPrices: CL.SLIGHTLY_HIGH,
                 marketCargoAmounts: CL.SLIGHTLY_LOW,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.MEDICINE, 3]]),
+                cargoPriceModifiers: new Map([[CARGO_TYPES.MEDICINE, CL.EXTREMELY_HIGH]]),
             })
         ]
 

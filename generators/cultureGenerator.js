@@ -21,5 +21,28 @@ function generateCulture(planet = new Planet()) {
         cargoPriceModifiers.setAmount(ct, rng(MARKET_MAX_CARGO_PRICE_MODIFIER, MARKET_MIN_CARGO_PRICE_MODIFIER, false))
     }
 
-    return new Culture(planet, governmentType, cargoPriceModifiers, shipQuality, officerQuality, territory, population, military, industry, economy, security, crime, prestige)
+    // Generate random policies that are valid for this government type
+    const validEconomicPolicies = ECONOMIC_POLICIES.filter(p => !p.forbiddenGovs.includes(governmentType))
+    const validLaborPolicies = LABOR_POLICIES.filter(p => !p.forbiddenGovs.includes(governmentType))
+    const validSocialPolicies = SOCIAL_POLICIES.filter(p => !p.forbiddenGovs.includes(governmentType))
+    const validForeignPolicies = FOREIGN_POLICIES.filter(p => !p.forbiddenGovs.includes(governmentType))
+
+    // Weight selection towards favorite policies for this government
+    const selectPolicy = (validPolicies) => {
+        const favoritePolicies = validPolicies.filter(p => p.favoriteGovs.includes(governmentType))
+        // 60% chance to pick a favorite if available, otherwise pick randomly from all valid
+        if (favoritePolicies.length > 0 && Math.random() < 0.6) {
+            return rndMember(favoritePolicies)
+        }
+        return rndMember(validPolicies)
+    }
+
+    const policies = new Policies(
+        selectPolicy(validEconomicPolicies),
+        selectPolicy(validLaborPolicies),
+        selectPolicy(validSocialPolicies),
+        selectPolicy(validForeignPolicies)
+    )
+
+    return new Culture(planet, governmentType, cargoPriceModifiers, shipQuality, officerQuality, territory, population, military, industry, economy, security, crime, prestige, policies)
 }

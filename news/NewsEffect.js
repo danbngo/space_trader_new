@@ -276,6 +276,31 @@ class NewsEffect {
         return inverseEffect
     }
 
+    getHalfRegression() {
+        const inversion = this.getInverse()
+        //apply News.clHalfRegression to every numeric value
+        Object.assign(inversion, {
+            marketPrices: News.clHalfRegression(inversion.marketPrices),
+            marketCargoAmounts: News.clHalfRegression(inversion.marketCargoAmounts),
+            blackMarketPrices: News.clHalfRegression(inversion.blackMarketPrices),
+            blackMarketCargoAmounts: News.clHalfRegression(inversion.blackMarketCargoAmounts),
+            military: News.clHalfRegression(inversion.military),
+            industry: News.clHalfRegression(inversion.industry),
+            economy: News.clHalfRegression(inversion.economy),
+            security: News.clHalfRegression(inversion.security),
+            crime: News.clHalfRegression(inversion.crime),
+            prestige: News.clHalfRegression(inversion.prestige),
+            population: News.clHalfRegression(inversion.population),
+            territory: News.clHalfRegression(inversion.territory),
+            shipQuality: News.clHalfRegression(inversion.shipQuality),
+            officerQuality: News.clHalfRegression(inversion.officerQuality),
+            shipyardNumShips: News.clHalfRegression(inversion.shipyardNumShips),
+            guildNumOfficers: News.clHalfRegression(inversion.guildNumOfficers),
+            credits: News.clHalfRegression(inversion.credits),
+        })
+        return inversion            
+    }
+
     clone() {
         return new NewsEffect({
             planet: this.planet,

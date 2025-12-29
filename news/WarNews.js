@@ -19,7 +19,7 @@ class WarNews extends News {
                 shipyardNumShips: CL.LOW,
                 marketCargoAmounts: CL.LOW,
                 //prestige: CL.SLIGHTLY_LOW, //the aggressor loses some prestige
-                cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, 2], [CARGO_TYPES.ANTIMATTER, 3]]),
+                cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, 2], [CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_HIGH]]),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
@@ -30,7 +30,7 @@ class WarNews extends News {
                 economy: CL.LOW,
                 shipyardNumShips: CL.LOW,
                 marketCargoAmounts: CL.LOW,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, 2], [CARGO_TYPES.ANTIMATTER, 3]]),
+                cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, 2], [CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_HIGH]]),
             })
         ]
 
