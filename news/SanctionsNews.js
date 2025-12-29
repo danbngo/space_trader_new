@@ -83,7 +83,7 @@ class SanctionsNews extends News {
     isValid() {
         const {planet, targetPlanet} = this
         //we need a strong economy to pull it off
-        const ratingsValid = planet.culture.economy > CL.HIGH && planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS >= CL.HIGH
+        const ratingsValid = planet.culture.economy > CL.HIGH && planet.settlement.wealth >= CL.HIGH
         //aggressor must be hostile towards victim
         const aggressorRelationship = planet.culture.relationships.get(targetPlanet)
         const relationshipsValid = aggressorRelationship == RELATIONSHIP_TYPES.TENSE

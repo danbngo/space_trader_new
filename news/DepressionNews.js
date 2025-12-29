@@ -59,7 +59,7 @@ class DepressionNews extends News {
     isValid() {
         const {planet} = this
         //more likely to happen when credit is REALLY high
-        const ratingsValid = (planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS) > CL.HIGH && planet.culture.economy < CL.HIGH
+        const ratingsValid = (planet.settlement.wealth) > CL.HIGH && planet.culture.economy < CL.HIGH
         const interferingEvent =
             News.planetHasAnyNews(planet, [NT.DEPRESSION, ...NT_ECONOMY_BOOSTING]) || 
             News.planetHasAnyNewsTargeting(planet, NT_ECONOMY_BOOSTING)

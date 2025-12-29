@@ -55,7 +55,7 @@ class ExplorationNews extends News {
 
     isValid() {
         const {planet} = this
-        const ratingsValid = planet.settlement.guild.baseNumOfficers > CL.MEDIUM && planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS > CL.MEDIUM
+        const ratingsValid = planet.army > CL.MEDIUM && planet.settlement.wealth > CL.MEDIUM
         //basically don't do it if anything bad is happening
         const interferingEvent = 
             News.planetHasAnyNewsTargeting(planet, NT_ECONOMY_PREVENTING) ||

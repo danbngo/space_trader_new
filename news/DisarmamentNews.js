@@ -61,7 +61,7 @@ class DisarmamentNews extends News {
     isValid() {
         const {planet} = this
         //unlikely if planet has a low military already
-        const ratingsValid = (planet.culture.military > CL.HIGH) && (planet.settlement.shipyard.baseNumShips > CL.HIGH)
+        const ratingsValid = (planet.culture.military > CL.HIGH) && (planet.navy > CL.HIGH)
         const interferingEvent =
             News.planetHasAnyNewsTargeting(planet, NT_MARTIAL) ||
             News.planetHasAnyNews(planet, NT_MARTIAL)

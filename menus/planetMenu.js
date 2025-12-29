@@ -81,9 +81,8 @@ function showPlanetSocietyMenu(planet = new Planet()) {
             msg += `Army: ${statColorSpan(roundToPlaces(guildNormalized, 2) + 'x', guildNormalized)}<br/>`
         }
         if (settlement.bank) {
-            const bankCredits = settlement.bank.baseCredits
-            const bankNormalized = bankCredits / BANK_AVERAGE_CREDITS
-            msg += `Wealth: ${statColorSpan(describeLargeNumber(bankCredits), bankNormalized)}<br/>`
+            const wealth = settlement.wealth
+            msg += `Wealth: ${statColorSpan(describeLargeNumber(settlement.bank.baseCredits)+'CR', wealth)}<br/>`
         }
         if (settlement.market) {
             const marketCargoAvg = settlement.market.baseCargo.average

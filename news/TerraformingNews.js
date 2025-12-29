@@ -52,9 +52,9 @@ class TerraformingNews extends News {
     isValid() {
         const {planet} = this
         // Need sufficient ships, officers, and credits to undertake terraforming
-        const ratingsValid = planet.settlement.shipyard.baseNumShips > CL.MEDIUM && 
-                            planet.settlement.guild.baseNumOfficers > CL.MEDIUM && 
-                            planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS > CL.MEDIUM
+        const ratingsValid = planet.navy > CL.MEDIUM && 
+                            planet.army > CL.MEDIUM && 
+                            planet.settlement.wealth > CL.MEDIUM
         // Planet must not already have this event
         const interferingEvent = News.planetHasAnyNews(planet, [NT.TERRAFORMING, ...NT_ECONOMY_PREVENTING])
         return ratingsValid && !interferingEvent

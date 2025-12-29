@@ -86,7 +86,7 @@ class InvestmentNews extends News {
     isValid() {
         const {planet, targetPlanet} = this
         //need to have sufficient economy of our own
-        const ratingsValid = planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS >= CL.SLIGHTLY_HIGH || planet.settlement.market.baseCargo.average/MARKET_AVERAGE_CARGO_PER_TYPE > CL.SLIGHTLY_HIGH
+        const ratingsValid = planet.settlement.wealth >= CL.SLIGHTLY_HIGH || planet.settlement.market.baseCargo.average/MARKET_AVERAGE_CARGO_PER_TYPE > CL.SLIGHTLY_HIGH
         //our economy should be larger than theirs
         const transferValid = planet.culture.economy > targetPlanet.culture.economy && planet.settlement.bank.baseCredits > targetPlanet.settlement.bank.baseCredits && planet.settlement.market.baseCargo.average > targetPlanet.settlement.market.baseCargo.average
         //both planets must be neutral or allies

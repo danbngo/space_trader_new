@@ -45,15 +45,15 @@ class Planet extends OrbitingObject {
         return baseName
     }
 
-    get navyPower() {
+    get navy() {
         return this.culture.military * this.settlement.shipyard.baseNumShips * this.culture.shipQuality
     }
 
-    get armyPower() {
+    get army() {
         return this.culture.military * this.settlement.guild.baseNumOfficers * this.culture.officerQuality
     }
 
     get militaryPower() {
-        return this.navyPower + this.armyPower
+        return this.navy + this.army
     }
 }

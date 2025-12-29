@@ -52,7 +52,7 @@ class FestivalNews extends News {
     isValid() {
         const {planet} = this
         //need high credits to afford it, low prestige to want it
-        const ratingsValid = planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS > CL.SLIGHTLY_HIGH && planet.culture.prestige < CL.MEDIUM
+        const ratingsValid = planet.settlement.wealth > CL.SLIGHTLY_HIGH && planet.culture.prestige < CL.MEDIUM
         const interferingEvent = News.planetHasAnyNews(planet, [NT.FESTIVAL, ...NT_ECONOMY_PREVENTING, ...NT_DANGEROUS])
         return ratingsValid && !interferingEvent
     }

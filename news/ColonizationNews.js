@@ -54,7 +54,7 @@ class ColonizationNews extends News {
 
     isValid() {
         const {planet} = this
-        const ratingsValid = planet.culture.population > CL.MEDIUM && (planet.settlement.shipyard.baseNumShips > CL.MEDIUM)
+        const ratingsValid = planet.culture.population > CL.MEDIUM && (planet.navy > CL.MEDIUM)
         //basically dont do it if ANYTHING bad is happening
         const interferingEvent = 
             News.planetHasAnyNewsTargeting(planet, NT_ECONOMY_PREVENTING) ||

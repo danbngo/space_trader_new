@@ -53,7 +53,7 @@ class EconomicBoomNews extends News {
     isValid() {
         const {planet} = this
         //cant already having a booming economy
-        const ratingsValid = planet.culture.economy < CL.VERY_HIGH && planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS < CL.VERY_HIGH
+        const ratingsValid = planet.culture.economy < CL.VERY_HIGH && planet.settlement.wealth < CL.VERY_HIGH
         //basically just a bonus for not being in a war or anything stupid
         const interferingEvent = 
             News.planetHasAnyNews(planet, [NT.ECONOMIC_BOOM, ...NT_ECONOMY_PREVENTING]) ||

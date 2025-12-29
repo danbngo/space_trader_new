@@ -103,7 +103,7 @@ class WarSubjugationNews extends News {
     isValid() {
         const {planet, targetPlanet} = this
         //our army must be both large and  significantly better than theirs in every way
-        const ratingsValid = (planet.armyPower/targetPlanet.armyPower > CL.HIGH) && (planet.navyPower/targetPlanet.navyPower > CL.HIGH)
+        const ratingsValid = (planet.army/targetPlanet.army > CL.HIGH) && (planet.navy/targetPlanet.navy > CL.HIGH)
         //planet must be at war with the target
         const relationshipValid = planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR
         const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.SUBJUGATION, ...NT_COOPERATIVE])

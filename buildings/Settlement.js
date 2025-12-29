@@ -35,4 +35,20 @@ class Settlement {
     get buildings() {
         return [this.shipyard, this.market, this.blackMarket, this.guild, this.bank, this.courthouse, this.academy]
     }
+
+    get wealth() {
+        return this.bank.baseCredits/BANK_AVERAGE_CREDITS
+    }
+
+    get goods() {
+        const marketCargoAvg = this.market.baseCargo.average
+        const marketCargoNormalized = marketCargoAvg / MARKET_AVERAGE_CARGO_PER_TYPE
+        return marketCargoNormalized
+    }
+
+    get illegalGoods() {
+        const blackMarketCargoAvg = this.blackMarket.baseCargo.average
+        const blackMarketCargoNormalized = blackMarketCargoAvg / MARKET_AVERAGE_CARGO_PER_TYPE
+        return blackMarketCargoNormalized
+    }
 }

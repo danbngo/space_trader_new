@@ -88,7 +88,7 @@ class WarBombardmentNews extends News {
     isValid() {
         const {planet, targetPlanet} = this
         //our military must be significantly stronger than theirs and navy must be MUCH stronger
-        const navyAdvantage = planet.culture.military > targetPlanet.culture.military * CL.HIGH && planet.navyPower > targetPlanet.navyPower * CL.VERY_HIGH
+        const navyAdvantage = planet.culture.military > targetPlanet.culture.military * CL.HIGH && planet.navy > targetPlanet.navy * CL.VERY_HIGH
         
         const relationshipValid = planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR
         const interferingEvent = 

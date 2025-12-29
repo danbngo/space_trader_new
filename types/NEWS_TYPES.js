@@ -42,7 +42,7 @@ class NewsType {
 const NT = {
     ADDICTION: new NewsType('Addiction', NF.HEALTH_HAZARD, 1, 3, 8, 1, [], [], [GT.POLICE_STATE]),
     ALLIANCE: new NewsType('Alliance', NF.PEACE, 1, 10, 40, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.DEMOCRACY], []), //two neutral planets become allies
-    ARMS_DEAL: new NewsType('Arms Deal', NF.MILITARY, 1, 3, 8, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.CORPORATISM], []), //one planet sends military equipment to another
+    ARMS_DEAL: new NewsType('Arms Deal', NF.MILITARY, 1, 2, 5, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.CORPORATISM], []), //one planet sends military equipment to another
     CIVIL_STRIFE: new NewsType('Civil Strife', NF.UNREST, 1, 3, 8, 1, [GT.POLICE_STATE], [], []),
     CIVIL_WAR: new NewsType('Civil War', NF.WAR, 1, 3, 15, 1, [GT.ANARCHY, GT.POLICE_STATE, GT.PUPPET_STATE], [], []),
     COALITION: new NewsType('Coalition', NF.POLITICS, 1, 10, 30, 300, [GT.PUPPET_STATE], [], []),

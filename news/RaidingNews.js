@@ -103,7 +103,7 @@ class RaidingNews extends News {
     isValid() {
         const {planet, targetPlanet} = this
         // More likely if military is high and goods are low
-        const ratingsValid = planet.culture.military > 1.25 && (planet.settlement.market.baseCargo.average/MARKET_AVERAGE_CARGO_PER_TYPE < 0.5 || planet.settlement.blackMarket.baseCargo.average/MARKET_AVERAGE_CARGO_PER_TYPE < 0.5)
+        const ratingsValid = planet.culture.military > 1.25 && (planet.settlement.market.baseCargo.average/MARKET_AVERAGE_CARGO_PER_TYPE < 0.5 || planet.settlement.illegalGoods < 0.5)
         // Both parties must be at least TENSE (TENSE or WAR)
         const relationships = [planet.culture.relationships.get(targetPlanet), targetPlanet.culture.relationships.get(planet)]
         const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.TENSE || rel == RELATIONSHIP_TYPES.WAR)

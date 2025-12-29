@@ -49,7 +49,7 @@ class TourismNews extends News {
     isValid() {
         const {planet} = this
         //more likely to try this out if we need money
-        const ratingsValid = planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS < CL.LOW
+        const ratingsValid = planet.settlement.wealth < CL.LOW
         const interferingEvent = 
             News.planetHasAnyNews(planet, [NT.TOURISM, ...NT_ECONOMY_PREVENTING]) ||
             News.planetHasAnyNewsTargeting(planet, NT_ECONOMY_PREVENTING) ||

@@ -32,7 +32,7 @@ class StockMarketCrashNews extends News {
         const {planet} = this
         // More likely when credit is very high (bubble about to burst)
         const ratingsValid = 
-            (planet.settlement.bank.baseCredits/BANK_AVERAGE_CREDITS) > 1.5 
+            (planet.settlement.wealth) > 1.5 
         const interferingEvent = News.hasNews(NT.STOCK_MARKET_CRASH, planet)
         return ratingsValid && !interferingEvent
     }

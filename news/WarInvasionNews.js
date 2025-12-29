@@ -79,7 +79,7 @@ class WarInvasionNews extends News {
         // Must have an ongoing war event
         const hasWar = News.hasNews(NT.WAR, planet, targetPlanet)
         // Attacker must have ship  AND ground advantage to launch invasion
-        const militaryValid = (planet.navyPower > targetPlanet.navyPower) && (planet.armyPower > targetPlanet.armyPower)
+        const militaryValid = (planet.navy > targetPlanet.navy) && (planet.army > targetPlanet.army)
         // Can't have invasion already
         const interferingEvent = News.hasNews(NT.WAR_INVASION, planet, targetPlanet)
         return relationshipValid && hasWar && militaryValid && !interferingEvent
