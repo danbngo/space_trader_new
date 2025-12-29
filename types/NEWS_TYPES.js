@@ -40,7 +40,7 @@ class NewsType {
 }
 
 const NT = {
-    ADDICTION: new NewsType('Addiction', NF.CRIME, 1, 3, 8, 1, [], [], [GT.POLICE_STATE]),
+    ADDICTION: new NewsType('Addiction', NF.HEALTH_HAZARD, 1, 3, 8, 1, [], [], [GT.POLICE_STATE]),
     ALLIANCE: new NewsType('Alliance', NF.PEACE, 1, 10, 40, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.DEMOCRACY], []), //two neutral planets become allies
     ARMS_DEAL: new NewsType('Arms Deal', NF.MILITARY, 1, 3, 8, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.CORPORATISM], []), //one planet sends military equipment to another
     CIVIL_STRIFE: new NewsType('Civil Strife', NF.UNREST, 1, 3, 8, 1, [GT.POLICE_STATE], [], []),
@@ -49,19 +49,19 @@ const NT = {
     COLONIZATION: new NewsType('Colonization', NF.EXPLORATION, 1, 7, 15, 1, [GT.PUPPET_STATE], [GT.ARISTOCRACY, GT.TECHNOCRACY], []),
     CONSCRIPTION: new NewsType('Conscription', NF.MILITARY, 1, 3, 8, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.POLICE_STATE, GT.ARISTOCRACY], []),
     CONSTRUCTION: new NewsType('Construction', NF.PROJECT, 1, 3, 8, 1, [], [GT.CORPORATISM, GT.TECHNOCRACY], []),
-    COUP_DETAT: new NewsType('Coup d\'Etat', NF.POLITICS, 1, 2, 5, 1, [GT.ANARCHY, GT.PUPPET_STATE], [], []),
+    COUP_DETAT: new NewsType('Coup d\'Etat', NF.ESPIONAGE, 1, 2, 5, 1, [GT.ANARCHY, GT.PUPPET_STATE], [], []),
     CRACKDOWN: new NewsType('Crackdown', NF.CRIME, 1, 3, 8, 1, [GT.ANARCHY], [GT.POLICE_STATE], []),
     CRIME_WAVE: new NewsType('Crime Wave', NF.CRIME, 1, 3, 8, 1, [GT.POLICE_STATE], [GT.ANARCHY], []),
     DEPRESSION: new NewsType('Depression', NF.ECONOMY, 1, 7, 15, 1, [], [GT.DEMOCRACY, GT.CORPORATISM], []),
     DISARMAMENT: new NewsType('Disarmament', NF.PEACE, 1, 5, 10, 1, [GT.POLICE_STATE], [], []),
     ECONOMIC_BOOM: new NewsType('Economic Boom', NF.ECONOMY, 1, 5, 10, 1, [], [GT.CORPORATISM], []),
     EMBARGO: new NewsType('Embargo', NF.ECONOMY, 1, 3, 30, 1, [GT.ANARCHY, GT.PUPPET_STATE, GT.CORPORATISM], [], []),
-    ENSLAVEMENT: new NewsType('Enslavement', NF.UNREST, 1, 10, 30, 1, [GT.ANARCHY, GT.PUPPET_STATE, GT.DEMOCRACY], [GT.POLICE_STATE, GT.ARISTOCRACY], []),
-    ENVIRONMENTAL_DISASTER: new NewsType('Environmental Disaster', NF.UNREST, 1, 2, 6, 1, [], [], []),
+    ENSLAVEMENT: new NewsType('Enslavement', NF.OPPRESSION, 1, 10, 30, 1, [GT.ANARCHY, GT.PUPPET_STATE, GT.DEMOCRACY], [GT.POLICE_STATE, GT.ARISTOCRACY], []),
+    ENVIRONMENTAL_DISASTER: new NewsType('Environmental Disaster', NF.HEALTH_HAZARD, 1, 2, 6, 1, [], [], []),
     ENVIRONMENTALISM: new NewsType('Environmentalism', NF.CULTURE, 1, 5, 15, 1, [GT.CORPORATISM], [GT.DEMOCRACY, GT.THEOCRACY], []),
     EXPLORATION: new NewsType('Exploration', NF.EXPLORATION, 1, 5, 15, 1, [], [GT.TECHNOCRACY], []),
     FESTIVAL: new NewsType('Festival', NF.CULTURE, 1, 2, 5, 1, [GT.POLICE_STATE], [], []),
-    FORCED_LABOR: new NewsType('Forced Labor', NF.UNREST, 1, 10, 30, 1, [GT.DEMOCRACY, GT.ANARCHY], [GT.POLICE_STATE, GT.COMMUNISM, GT.CORPORATISM], []),
+    FORCED_LABOR: new NewsType('Forced Labor', NF.OPPRESSION, 1, 10, 30, 1, [GT.DEMOCRACY, GT.ANARCHY], [GT.POLICE_STATE, GT.COMMUNISM, GT.CORPORATISM], []),
     FOREIGN_AID: new NewsType('Foreign Aid', NF.ECONOMY, 1, 3, 8, 1, [], [GT.DEMOCRACY, GT.THEOCRACY], []),
     GENOCIDE: new NewsType('Genocide', NF.WAR, 1, 5, 15, 1, [GT.ANARCHY, GT.DEMOCRACY], [GT.POLICE_STATE, GT.ARISTOCRACY], []),
     IMMIGRATION: new NewsType('Immigration', NF.CULTURE, 1, 5, 10, 1, [], [GT.DEMOCRACY, GT.CORPORATISM], [GT.POLICE_STATE, GT.COMMUNISM]),
@@ -70,12 +70,12 @@ const NT = {
     ISOLATIONISM: new NewsType('Isolationism', NF.POLITICS, 1, 5, 15, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.POLICE_STATE, GT.THEOCRACY, GT.COMMUNISM], []),
     LUDDITISM: new NewsType('Ludditism', NF.UNREST, 1, 3, 8, 1, [GT.TECHNOCRACY, GT.CORPORATISM], [GT.THEOCRACY], []),
     MILITARY_BUILDUP: new NewsType('Military Buildup', NF.MILITARY, 1, 5, 10, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.POLICE_STATE, GT.ARISTOCRACY], []),
-    OLIGARCHY: new NewsType('Oligarchy', NF.POLITICS, 1, 5, 15, 1, [GT.COMMUNISM], [GT.CORPORATISM], []),
+    OLIGARCHY: new NewsType('Oligarchy', NF.ESPIONAGE, 1, 5, 15, 1, [GT.COMMUNISM], [GT.CORPORATISM], []),
     ORGANIZED_CRIME: new NewsType('Organized Crime', NF.CRIME, 1, 3, 8, 1, [GT.POLICE_STATE], [GT.ANARCHY, GT.CORPORATISM], []),
-    PLAGUE: new NewsType('Plague', NF.UNREST, 1, 2, 6, 1, [], [], []),
+    PLAGUE: new NewsType('Plague', NF.HEALTH_HAZARD, 1, 2, 6, 1, [], [], []),
     RAIDING: new NewsType('Raiding', NF.MILITARY, 1, 15, 30, 1, [GT.DEMOCRACY, GT.PUPPET_STATE], [GT.ANARCHY, GT.ARISTOCRACY, GT.THEOCRACY], []),
     RESEARCH_AGREEMENT: new NewsType('Research Agreement', NF.SCIENCE, 1, 2, 8, 1, [], [GT.TECHNOCRACY, GT.DEMOCRACY], []),
-    REVIVAL: new NewsType('Religious Revival', NF.CULTURE, 1, 10, 20, 1, [GT.TECHNOCRACY], [GT.THEOCRACY], []),
+    REVIVAL: new NewsType('Religious Revival', NF.RELIGION, 1, 10, 20, 1, [GT.TECHNOCRACY], [GT.THEOCRACY], []),
     REVOLUTION: new NewsType('Revolution', NF.POLITICS, 1, 3, 8, 1, [GT.PUPPET_STATE], [], []),
     SANCTIONS: new NewsType('Sanctions', NF.ECONOMY, 1, 3, 15, 1, [GT.ANARCHY, GT.PUPPET_STATE, GT.CORPORATISM], [GT.DEMOCRACY], []),
     SCARCITY: new NewsType('Scarcity', NF.ECONOMY, 1, 3, 8, 1, [], [], []),
@@ -112,6 +112,6 @@ const NT_CRIME_PREVENTING = [NT.CRACKDOWN, NT.REVOLUTION, NT.CIVIL_WAR, NT.COUP_
 
 const META_NT = {
     SYSTEM_AT_WAR: new NewsType('System at War', NF.WAR, 1, 10, 30, 1000),
-    SYSTEM_WIDE_PLAGUE: new NewsType('System Wide Plague', NF.UNREST, 1, 5, 15, 1000),
+    SYSTEM_WIDE_PLAGUE: new NewsType('System Wide Plague', NF.HEALTH_HAZARD, 1, 5, 15, 1000),
 }
 const META_NT_ALL = Object.values(META_NT)

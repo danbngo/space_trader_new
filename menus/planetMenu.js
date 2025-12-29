@@ -20,7 +20,8 @@ function showPlanetMenu(planet = new Planet()) {
 
     const options = []
     options.push(["News", () => showNewsTimelineMenu(planet, () => showPlanetMenu(planet), true)]);
-    options.push([`Society`, () => showPlanetSocietyMenu(planet)]);
+    options.push([`Overview`, () => showPlanetSocietyMenu(planet)]);
+    options.push(ce({tag:'br'}));
     if (settlement.shipyard) {
         options.push(["Shipyard", () => showShipyardBuyMenu(settlement.shipyard)]);
     }
@@ -42,6 +43,7 @@ function showPlanetMenu(planet = new Planet()) {
     if (settlement.academy) {
         options.push(["Academy", () => showAcademyMenu(settlement.academy)]);
     }
+    options.push(ce({tag:'br'}));
     options.push([isDocked ? "Depart" : "Stop Scanning", () => closeModal()]);
     showPlanetModal(planet, `${coloredName(planet)}`, msg, options, 'planet_menu', (nextPlanet) => showPlanetMenu(nextPlanet));
 }

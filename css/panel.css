@@ -11,6 +11,37 @@
     font-size: 1em;
     line-height: 1.4;
     min-width: 350px;
+    position: relative;
+}
+
+.panel-close-button {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 32px;
+    height: 32px;
+    background-color: rgba(0,0,0,0.33);
+    color: #0ff;
+    border: 1px solid #0ff;
+    padding: 8px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-family: "Google Sans Code", monospace;
+    font-size: 16px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    padding: 0;
+    line-height: 1;
+}
+
+.panel-close-button:hover {
+    background: #00ffff22;
+    border: 1px solid #0ff;
+    box-shadow: 0 0 6px #0ff;
 }
 
 
@@ -27,8 +58,4 @@
 
 
 .panel-buttons {
-    margin-top: 15px;
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
 }

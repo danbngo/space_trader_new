@@ -16,22 +16,26 @@ function showPlanetModal(planet = new Planet(), title = '', msg = '', options = 
                 tag: 'button',
                 innerHTML: '◀',
                 onClick: () => onNavigate(prevPlanet),
-                style: 'margin-right: 10px; cursor: pointer;'
+                style: {
+                    marginLeft: '10px', marginRight: '10px', marginTop: '0px'
+                }
             }),
             ce({
                 tag: 'div',
-                style: {minWidth: '150px', flex: '1 1 auto', textAlign: 'center'},
-                children: [coloredName(planet)]
+                style: {minWidth: '300px', textAlign: 'center'},
+                children: [title]
             }),
             ce({
                 tag: 'button',
                 innerHTML: '▶',
                 onClick: () => onNavigate(nextPlanet),
-                style: 'margin-left: 10px; cursor: pointer;'
+                style: {
+                    marginLeft: '10px', marginRight: '10px', marginTop: '0px'
+                }
             })
         ]
     });
 
-    const modal = showModal(titleEl, msg, options, modalId);
+    const modal = showModal(titleEl, msg, options, modalId, ()=>closeModal());
     modal.firstChild.style.minWidth = '90vw'
 }

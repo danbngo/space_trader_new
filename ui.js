@@ -20,9 +20,10 @@ function refreshPanelButtons (panelId = '', buttons) {
     const buttonsEl = panel.querySelector(".panel-buttons")
     removeChildren(buttonsEl)
     if (buttons) buttons.forEach((btnData) => {
+        console.log('btnData:',btnData)
         if (!btnData) return
-        if (btnData == '<br/>' || btnData == '<br>') {
-            buttonsEl.appendChild(ce({tag:'br'}))
+        if (btnData instanceof HTMLElement) {
+            buttonsEl.appendChild(btnData)
             return
         }
         const [label, handler, disabled, classNames] = btnData
@@ -48,17 +49,32 @@ function refreshPanelButtons (panelId = '', buttons) {
  * @param {any} text 
  * @param {any[]} buttons 
  * @param {string} id 
+ * @param {Function} onClosePanel - Optional callback when close button is clicked
  * @returns 
  */
-function createPanel(title = '', text = '', buttons = [], id = '') {
+function createPanel(title = '', text = '', buttons = [], id = '', onClosePanel = null) {
+    const panelChildren = [
+        ce({classNames:['panel-title'], children: [title]}),
+        ce({classNames:['panel-content'], children: [text]}),
+        ce({classNames:['panel-buttons']})
+    ];
+    
+    // Add close button if onClosePanel is provided
+    if (onClosePanel) {
+        panelChildren.unshift(
+            ce({
+                tag: 'button',
+                classNames: ['panel-close-button'],
+                innerHTML: '✕',
+                onClick: onClosePanel
+            })
+        );
+    }
+    
     const panel = ce({
         id,
         classNames: ['panel'],
-        children: [
-            ce({classNames:['panel-title'], children: [title]}),
-            ce({classNames:['panel-content'], children: [text]}),
-            ce({classNames:['panel-buttons']})
-        ]
+        children: panelChildren
     })
     refreshPanelButtons(panel, buttons)
     return panel;
@@ -279,13 +295,13 @@ let currentModal = ce()
  * @param {any[]} buttons
  * @param {string} id
 */
-function showModal(title = '', text = '', buttons = [['Continue', ()=>{}, false]], id = '') {
+function showModal(title = '', text = '', buttons = [['Continue', ()=>{}, false]], id = '', onClosePanel = null) {
     if (currentMap) currentMap.refresh()
     // Close existing modal if open
     if (currentModal) closeModal();
     // Create overlay
     currentModal = ce({parent:UI_CONTAINER, classNames:['modal-overlay'], children:[
-        createPanel(title, text, buttons, id)
+        createPanel(title, text, buttons, id, onClosePanel)
     ]})
     return currentModal
 }

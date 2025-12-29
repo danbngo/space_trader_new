@@ -9,6 +9,8 @@ button {
     transition: 0.2s;
     font-family: "Google Sans Code", monospace;
     pointer-events: auto;
+    margin-top: 15px;
+    margin-right: 15px;
 }
 
 button:not(:disabled):hover {
