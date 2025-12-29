@@ -32,7 +32,7 @@ class SystemWidePlague extends News {
             })
         ]
 
-        this.endEffects = [
+        this.completeEffects = [
             new NewsEffect({
                 onApply: ()=>{
                     //end all endable plagues in the system

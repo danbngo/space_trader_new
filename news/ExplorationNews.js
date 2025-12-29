@@ -21,12 +21,12 @@ class ExplorationNews extends News {
         ]
 
         //exploration pays off with territory and prestige
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
-        Object.assign(this.endEffects[0], {
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
+        Object.assign(this.completeEffects[0], {
             guildNumOfficers: CL.NO_REGRESSION, //officers don't auto return
             officerQuality: CL.NO_REGRESSION,
-            credits: News.clHalfRegression(this.endEffects[0].credits),
-            marketCargoAmounts: News.clHalfRegression(this.endEffects[0].marketCargoAmounts),
+            credits: News.clHalfRegression(this.completeEffects[0].credits),
+            marketCargoAmounts: News.clHalfRegression(this.completeEffects[0].marketCargoAmounts),
             //economy: CL.SLIGHTLY_HIGH,
             //industry: CL.SLIGHTLY_HIGH,
             shipQuality: CL.NO_REGRESSION,
@@ -34,7 +34,7 @@ class ExplorationNews extends News {
             prestige: CL.SLIGHTLY_HIGH,
         })
 
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 guildNumOfficers: CL.NO_REGRESSION,

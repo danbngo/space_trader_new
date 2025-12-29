@@ -22,15 +22,15 @@ class CivilStrifeNews extends News {
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, CL.VERY_HIGH]]),
             })
         ]
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         //some lingering security and prestige decrease and destroyed goods
 
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 military: CL.NO_REGRESSION,
-                security: News.clHalfRegression(this.endEffects[0].security),
-                crime: News.clHalfRegression(this.endEffects[0].crime),
+                security: News.clHalfRegression(this.completeEffects[0].security),
+                crime: News.clHalfRegression(this.completeEffects[0].crime),
                 prestige: CL.NO_REGRESSION,
             })
         ]

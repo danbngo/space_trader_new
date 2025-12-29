@@ -21,20 +21,20 @@ class ForeignAidNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
 
-        Object.assign(this.endEffects[0], {
-            marketPrices: News.clHalfRegression(this.endEffects[0].marketPrices),
-            marketCargoAmounts: News.clHalfRegression(this.endEffects[0].marketCargoAmounts),
-            economy: News.clHalfRegression(this.endEffects[0].economy),
-            credits: News.clHalfRegression(this.endEffects[0].credits),
-            industry: News.clHalfRegression(this.endEffects[0].industry),
-            shipyardNumShips: News.clHalfRegression(this.endEffects[0].shipyardNumShips),
+        Object.assign(this.completeEffects[0], {
+            marketPrices: News.clHalfRegression(this.completeEffects[0].marketPrices),
+            marketCargoAmounts: News.clHalfRegression(this.completeEffects[0].marketCargoAmounts),
+            economy: News.clHalfRegression(this.completeEffects[0].economy),
+            credits: News.clHalfRegression(this.completeEffects[0].credits),
+            industry: News.clHalfRegression(this.completeEffects[0].industry),
+            shipyardNumShips: News.clHalfRegression(this.completeEffects[0].shipyardNumShips),
             prestige: CL.NO_REGRESSION //not the best for your reputation
         })
 
         // Failed: aid wasted through corruption
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 economy: CL.NO_REGRESSION, // no economic gain

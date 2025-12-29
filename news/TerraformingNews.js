@@ -18,9 +18,9 @@ class TerraformingNews extends News {
                 cargoPriceModifiers: new Map([[CARGO_TYPES.METAL, CL.VERY_HIGH], [CARGO_TYPES.NANITES, CL.VERY_HIGH]]),
             })
         ]
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         // Ships and officers stay deployed, territory and industry gains are permanent
-        Object.assign(this.endEffects[0], {
+        Object.assign(this.completeEffects[0], {
             shipyardNumShips: CL.NO_REGRESSION, // ships stay stationed there
             guildNumOfficers: CL.NO_REGRESSION, // officers stay stationed there
             officerQuality: CL.NO_REGRESSION, // officers maintain quality
@@ -29,7 +29,7 @@ class TerraformingNews extends News {
             territory: CL.SLIGHTLY_HIGH, // permanent territory gain
         })
 
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 shipyardNumShips: CL.NO_REGRESSION,

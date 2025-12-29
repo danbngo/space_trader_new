@@ -18,10 +18,10 @@ class RevivalNews extends News {
                 //relationsReset: true
             })
         ]
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
 
         //dont revert ratings, but raise birthrates
-        Object.assign(this.endEffects[0], {
+        Object.assign(this.completeEffects[0], {
             population: CL.HIGH,
             officerQuality: CL.NO_REGRESSION,
         })

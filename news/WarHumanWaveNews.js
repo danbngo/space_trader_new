@@ -21,21 +21,21 @@ class WarHumanWaveNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         // Attacker: massive permanent losses
-        Object.assign(this.endEffects[0], {
+        Object.assign(this.completeEffects[0], {
             population: CL.NO_REGRESSION, // dead don't return
             guildNumOfficers: CL.NO_REGRESSION,
             prestige: CL.NO_REGRESSION,
         })
         // Defender: permanent losses
-        Object.assign(this.endEffects[1], {
+        Object.assign(this.completeEffects[1], {
             guildNumOfficers: CL.LOW, // officers killed defending
             military: CL.SLIGHTLY_LOW, // ground forces worn down
         })
 
         // Cancelled: peace declared mid-offensive, troops pull back
-        this.cancelEndEffects = [
+        this.cancelEffects = [
             new NewsEffect({
                 planet: this.planet,
                 population: News.clHalfRegression(CL.VERY_LOW), // some casualties already taken

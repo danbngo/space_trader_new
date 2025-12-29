@@ -28,15 +28,15 @@ class EmbargoNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         //dont fully recover economy
-        Object.assign(this.endEffects[0], {
-            prestige: News.clHalfRegression(this.endEffects[0].prestige),
-            economy: News.clHalfRegression(this.endEffects[0].economy),
+        Object.assign(this.completeEffects[0], {
+            prestige: News.clHalfRegression(this.completeEffects[0].prestige),
+            economy: News.clHalfRegression(this.completeEffects[0].economy),
         })
 
         // Cancelled: relations improve, embargo lifted early
-        this.cancelEndEffects = [
+        this.cancelEffects = [
             new NewsEffect({
                 planet: this.planet,
                 military: News.clHalfRegression(CL.LOW),

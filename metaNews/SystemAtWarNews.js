@@ -35,7 +35,7 @@ class SystemAtWarNews extends News {
         ]
 
 
-        this.endEffects = [
+        this.completeEffects = [
             new NewsEffect({
                 onApply: ()=>{
                     console.log('tearing down world war')

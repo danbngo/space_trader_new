@@ -25,22 +25,22 @@ class WarScorchedEarthNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         // Attacker: permanent self-inflicted damage
-        Object.assign(this.endEffects[0], {
+        Object.assign(this.completeEffects[0], {
             territory: CL.NO_REGRESSION, // destroyed territory stays destroyed
-            industry: News.clHalfRegression(this.endEffects[0].industry),
-            marketCargoAmounts: News.clHalfRegression(this.endEffects[0].marketCargoAmounts),
+            industry: News.clHalfRegression(this.completeEffects[0].industry),
+            marketCargoAmounts: News.clHalfRegression(this.completeEffects[0].marketCargoAmounts),
         })
         // Defender: permanent losses from hostile terrain
-        Object.assign(this.endEffects[1], {
+        Object.assign(this.completeEffects[1], {
             shipyardNumShips: CL.NO_REGRESSION,
             shipQuality: CL.NO_REGRESSION,
             guildNumOfficers: CL.NO_REGRESSION,
         })
 
         // Cancelled: peace before full destruction, partial damage
-        this.cancelEndEffects = [
+        this.cancelEffects = [
             new NewsEffect({
                 planet: this.planet,
                 territory: News.clHalfRegression(CL.LOW),

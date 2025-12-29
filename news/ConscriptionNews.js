@@ -16,7 +16,7 @@ class ConscriptionNews extends News {
                 industry: CL.LOW,
             })
         ]
-        this.endEffects = [
+        this.completeEffects = [
             new NewsEffect({
                 planet: this.planet,
                 military: CL.VERY_HIGH,
@@ -25,8 +25,8 @@ class ConscriptionNews extends News {
         ]
         
         // Failed: riots force abandonment, no military gain
-        this.failEndEffects = this.startEffects.map(fx=> fx.getInverse())
-        Object.assign(this.failEndEffects[0], {
+        this.failEffects = this.startEffects.map(fx=> fx.getInverse())
+        Object.assign(this.failEffects[0], {
             prestige: CL.LOW,
             security: CL.LOW,
             crime: CL.HIGH,

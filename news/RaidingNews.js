@@ -32,30 +32,30 @@ class RaidingNews extends News {
                 prestige: CL.LOW,
             })
         ]
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         // Raider: market goods normalize back, but economy gains, military loss, and prestige damage linger
-        Object.assign(this.endEffects[0], {
+        Object.assign(this.completeEffects[0], {
             //prestige: CL.NO_REGRESSION,
-            economy: News.clHalfRegression(this.endEffects[0].economy),
-            military: News.clHalfRegression(this.endEffects[0].military),
-            marketPrices: News.clHalfRegression(this.endEffects[0].marketPrices),
-            blackMarketPrices: News.clHalfRegression(this.endEffects[0].blackMarketPrices),
+            economy: News.clHalfRegression(this.completeEffects[0].economy),
+            military: News.clHalfRegression(this.completeEffects[0].military),
+            marketPrices: News.clHalfRegression(this.completeEffects[0].marketPrices),
+            blackMarketPrices: News.clHalfRegression(this.completeEffects[0].blackMarketPrices),
             prestige: CL.NO_REGRESSION,
             territory: CL.NO_REGRESSION,
             marketCargoAmounts: CL.NO_REGRESSION,
             blackMarketCargoAmounts: CL.NO_REGRESSION,
         })
         // Victim: permanent loss to market goods and prestige
-        Object.assign(this.endEffects[1], {
+        Object.assign(this.completeEffects[1], {
             marketCargoAmounts: CL.NO_REGRESSION, // goods stolen don't come back
             blackMarketCargoAmounts: CL.NO_REGRESSION,
             prestige: CL.NO_REGRESSION, // permanent prestige loss from being raided
-            credits: News.clHalfRegression(this.endEffects[1].credits),
-            security: News.clHalfRegression(this.endEffects[1].security),
+            credits: News.clHalfRegression(this.completeEffects[1].credits),
+            security: News.clHalfRegression(this.completeEffects[1].security),
         })
 
         // Failed: raiders repelled, heavy losses
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 military: CL.VERY_LOW, // raiders destroyed
@@ -70,7 +70,7 @@ class RaidingNews extends News {
         ]
 
         // Cancelled: peace ends raids early
-        this.cancelEndEffects = [
+        this.cancelEffects = [
             new NewsEffect({
                 planet: this.planet,
                 marketCargoAmounts: News.clHalfRegression(CL.VERY_HIGH),

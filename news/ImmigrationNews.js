@@ -24,20 +24,20 @@ class ImmigrationNews extends News {
             }),
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         // Source: population loss is permanent
-        Object.assign(this.endEffects[0], {
+        Object.assign(this.completeEffects[0], {
             population: CL.NO_REGRESSION, // people don't come back
-            economy: News.clHalfRegression(this.endEffects[0].economy),
+            economy: News.clHalfRegression(this.completeEffects[0].economy),
         })
         // Target: population boost lingers
-        Object.assign(this.endEffects[1], {
+        Object.assign(this.completeEffects[1], {
             population: CL.NO_REGRESSION, // population gain is permanent
-            economy: News.clHalfRegression(this.endEffects[0].economy),
+            economy: News.clHalfRegression(this.completeEffects[0].economy),
         })
 
         // Failed: economic collapse, immigrants return
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 population: News.clHalfRegression(CL.HIGH), // some stayed
@@ -51,7 +51,7 @@ class ImmigrationNews extends News {
         ]
 
         // Cancelled: borders closed early
-        this.cancelEndEffects = [
+        this.cancelEffects = [
             new NewsEffect({
                 planet: this.planet,
                 population: News.clHalfRegression(CL.HIGH),

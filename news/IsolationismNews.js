@@ -26,19 +26,19 @@ class IsolationismNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         //some lingering price increases and deflation
-        Object.assign(this.endEffects[0], {
+        Object.assign(this.completeEffects[0], {
             population: CL.SLIGHTLY_HIGH,
             security: CL.SLIGHTLY_HIGH,
-            territory: News.clHalfRegression(this.endEffects[0].territory), //territory is zero sum, so this will eventually lead to no one having any
-            officerQuality: News.clHalfRegression(this.endEffects[0].officerQuality), //lose some knowledge
-            shipQuality: News.clHalfRegression(this.endEffects[0].shipQuality), //lose some knowledge
+            territory: News.clHalfRegression(this.completeEffects[0].territory), //territory is zero sum, so this will eventually lead to no one having any
+            officerQuality: News.clHalfRegression(this.completeEffects[0].officerQuality), //lose some knowledge
+            shipQuality: News.clHalfRegression(this.completeEffects[0].shipQuality), //lose some knowledge
             prestige: CL.NO_REGRESSION,
         })
 
         // Failed: forced to abandon due to external threats
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 economy: CL.NO_REGRESSION, // economic isolation damage persists

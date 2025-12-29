@@ -22,17 +22,17 @@ class EnvironmentalDisasterNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         //market, economy, industry, population do not fully bounce back
-        Object.assign(this.endEffects[0], {
-            marketPrices: News.clHalfRegression(this.endEffects[0].marketPrices),
-            marketCargoAmounts: News.clHalfRegression(this.endEffects[0].marketCargoAmounts),
-            industry: News.clHalfRegression(this.endEffects[0].industry),
-            population: News.clHalfRegression(this.endEffects[0].population),
+        Object.assign(this.completeEffects[0], {
+            marketPrices: News.clHalfRegression(this.completeEffects[0].marketPrices),
+            marketCargoAmounts: News.clHalfRegression(this.completeEffects[0].marketCargoAmounts),
+            industry: News.clHalfRegression(this.completeEffects[0].industry),
+            population: News.clHalfRegression(this.completeEffects[0].population),
         })
 
         // Failed: cleanup fails, permanent environmental collapse
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 industry: CL.NO_REGRESSION, // permanent damage

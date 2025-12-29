@@ -18,9 +18,9 @@ class TourismNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
-        Object.assign(this.endEffects[0], {
-            industry: News.clHalfRegression(this.endEffects[0].industry), //industry doesnt fully recover
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
+        Object.assign(this.completeEffects[0], {
+            industry: News.clHalfRegression(this.completeEffects[0].industry), //industry doesnt fully recover
             credits: 1.5/(0.7),
             economy: CL.SLIGHTLY_HIGH,
             crime: CL.SLIGHTLY_HIGH,
@@ -29,7 +29,7 @@ class TourismNews extends News {
         })
 
         // Failed: resort attracts no tourists, investment wasted
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 credits: CL.NO_REGRESSION, // money lost

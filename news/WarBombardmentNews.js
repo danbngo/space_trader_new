@@ -42,8 +42,8 @@ class WarBombardmentNews extends News {
         ]
 
         //dont automatically recover. lets add recovery events elsewhere
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
-        Object.assign(this.endEffects[1], {
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
+        Object.assign(this.completeEffects[1], {
             population: CL.NO_REGRESSION,
             military: CL.NO_REGRESSION,
             industry: CL.NO_REGRESSION,
@@ -57,21 +57,21 @@ class WarBombardmentNews extends News {
             forcePeace: true,
         })
 
-        this.cancelEndEffects = [
+        this.cancelEffects = [
             new NewsEffect({
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
                 prestige: CL.NO_REGRESSION,
-                military: News.clHalfRegression(this.endEffects[0].military),
+                military: News.clHalfRegression(this.completeEffects[0].military),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
-                population: News.clHalfRegression(this.endEffects[1].population),
-                military: News.clHalfRegression(this.endEffects[1].military),
-                industry: News.clHalfRegression(this.endEffects[1].industry),
-                economy: News.clHalfRegression(this.endEffects[1].economy),
-                security: News.clHalfRegression(this.endEffects[1].security),
+                population: News.clHalfRegression(this.completeEffects[1].population),
+                military: News.clHalfRegression(this.completeEffects[1].military),
+                industry: News.clHalfRegression(this.completeEffects[1].industry),
+                economy: News.clHalfRegression(this.completeEffects[1].economy),
+                security: News.clHalfRegression(this.completeEffects[1].security),
                 forcePeace: true,
             })
         ]

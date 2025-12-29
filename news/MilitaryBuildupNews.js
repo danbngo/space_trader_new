@@ -19,8 +19,8 @@ class MilitaryBuildupNews extends News {
         ]
 
         //military effect is permanent
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
-        Object.assign(this.endEffects[0], {
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
+        Object.assign(this.completeEffects[0], {
                 military: CL.EXTREMELY_HIGH,
                 prestige: CL.SLIGHTLY_HIGH,
                 officerQuality: CL.HIGH,
@@ -31,7 +31,7 @@ class MilitaryBuildupNews extends News {
         })
 
         // Failed: buildup collapses, no military gain
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 credits: CL.NO_REGRESSION, // money wasted

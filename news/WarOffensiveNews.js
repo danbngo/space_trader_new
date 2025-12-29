@@ -25,20 +25,20 @@ class WarOffensiveNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         // Victor: minor permanent losses, prestige gain persists
-        Object.assign(this.endEffects[0], {
-            shipyardNumShips: News.clHalfRegression(this.endEffects[0].shipyardNumShips),
-            guildNumOfficers: News.clHalfRegression(this.endEffects[0].guildNumOfficers),
+        Object.assign(this.completeEffects[0], {
+            shipyardNumShips: News.clHalfRegression(this.completeEffects[0].shipyardNumShips),
+            guildNumOfficers: News.clHalfRegression(this.completeEffects[0].guildNumOfficers),
         })
         // Loser: major permanent losses
-        Object.assign(this.endEffects[1], {
+        Object.assign(this.completeEffects[1], {
             shipyardNumShips: CL.NO_REGRESSION,
             guildNumOfficers: CL.NO_REGRESSION,
             military: CL.SLIGHTLY_LOW,
         })
 
-        this.cancelEndEffects = this.endEffects.map(effect => {
+        this.cancelEffects = this.completeEffects.map(effect => {
             const e = effect.clone()
             e.shipyardNumShips = News.clHalfRegression(effect.shipyardNumShips)
             e.guildNumOfficers = News.clHalfRegression(effect.guildNumOfficers)

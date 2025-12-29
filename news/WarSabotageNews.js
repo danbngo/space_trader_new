@@ -25,32 +25,32 @@ class WarSabotageNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         // Attacker: agents lost permanently
-        Object.assign(this.endEffects[0], {
+        Object.assign(this.completeEffects[0], {
             security: CL.NO_REGRESSION, // security apparatus damaged
             guildNumOfficers: CL.NO_REGRESSION, // agents don't return
             officerQuality: CL.NO_REGRESSION,
         })
         // Defender: permanent damage from sabotage
-        Object.assign(this.endEffects[1], {
+        Object.assign(this.completeEffects[1], {
             military: CL.NO_REGRESSION,
-            industry: News.clHalfRegression(this.endEffects[1].industry),
+            industry: News.clHalfRegression(this.completeEffects[1].industry),
         })
 
-        this.cancelEndEffects = [
+        this.cancelEffects = [
             new NewsEffect({
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
-                security: News.clHalfRegression(this.endEffects[0].security),
-                guildNumOfficers: News.clHalfRegression(this.endEffects[0].guildNumOfficers),
-                officerQuality: News.clHalfRegression(this.endEffects[0].officerQuality),
+                security: News.clHalfRegression(this.completeEffects[0].security),
+                guildNumOfficers: News.clHalfRegression(this.completeEffects[0].guildNumOfficers),
+                officerQuality: News.clHalfRegression(this.completeEffects[0].officerQuality),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
-                military: News.clHalfRegression(this.endEffects[1].military),
-                industry: News.clHalfRegression(this.endEffects[1].industry),
+                military: News.clHalfRegression(this.completeEffects[1].military),
+                industry: News.clHalfRegression(this.completeEffects[1].industry),
             })
         ]
     }

@@ -23,21 +23,21 @@ class InvestmentNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
 
-        Object.assign(this.endEffects[0], {
-            credits: News.clHalfRegression(this.endEffects[0].credits),
-            marketCargoAmounts: News.clHalfRegression(this.endEffects[0].marketCargoAmounts),
+        Object.assign(this.completeEffects[0], {
+            credits: News.clHalfRegression(this.completeEffects[0].credits),
+            marketCargoAmounts: News.clHalfRegression(this.completeEffects[0].marketCargoAmounts),
             prestige: CL.SLIGHTLY_HIGH,
         })
-        Object.assign(this.endEffects[1], {
+        Object.assign(this.completeEffects[1], {
             industry: CL.VERY_HIGH,
             economy: CL.SLIGHTLY_HIGH,
             shipyardNumShips: CL.SLIGHTLY_HIGH,
         })
 
         // Failed: investment collapses, money lost
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 credits: CL.NO_REGRESSION, // money lost
@@ -51,7 +51,7 @@ class InvestmentNews extends News {
         ]
 
         // Cancelled: investment withdrawn early
-        this.cancelEndEffects = [
+        this.cancelEffects = [
             new NewsEffect({
                 planet: this.planet,
                 credits: News.clHalfRegression(CL.LOW),

@@ -35,14 +35,14 @@ class News {
         /** @type {NewsEffect[]} */
         this.startEffects = [];
         /** @type {NewsEffect[]} */
-        this.endEffects = [];
+        this.completeEffects = [];
         /** @type {NewsEffect[]} */
         /** @type {NewsEffect[]} */
         this.ongoingEffects = []
         /** @type {NewsEffect[]} */
-        this.failEndEffects = [];
+        this.failEffects = [];
         /** @type {NewsEffect[]} */
-        this.cancelEndEffects = [];
+        this.cancelEffects = [];
         /** @type {boolean} */
         this.started = false;
         /** @type {boolean} */
@@ -62,8 +62,8 @@ class News {
      * @param {number} magnitude - The magnitude of the effect (default 1.0).
      * @returns {number} Half-regression value.
      */
-    static clHalfRegression(magnitude=1.0) {
-        return (1+magnitude)/2
+    static clHalfRegression(magnitude=1.0, fromStartEffect = false) {
+        return fromStartEffect ? 1/((1+magnitude)/2) : (1+magnitude)/2
     }
     /**
      * Checks if this news event is valid to start.
@@ -145,11 +145,11 @@ class News {
         //this.determineOutcome()
         
         // Select which effects to apply based on the ending state
-        let effectsToApply = this.endEffects
-        if (this.failed && this.failEndEffects.length > 0) {
-            effectsToApply = this.failEndEffects
-        } else if (this.cancelled && this.cancelEndEffects.length > 0) {
-            effectsToApply = this.cancelEndEffects
+        let effectsToApply = this.completeEffects
+        if (this.failed && this.failEffects.length > 0) {
+            effectsToApply = this.failEffects
+        } else if (this.cancelled && this.cancelEffects.length > 0) {
+            effectsToApply = this.cancelEffects
         }
         
         if (effectsToApply.length == 0) return; //no end effects to apply, dont update feeds

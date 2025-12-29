@@ -17,17 +17,17 @@ class EnvironmentalismNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         //market, economy, industry do not fully bounce back
-        Object.assign(this.endEffects[0], {
+        Object.assign(this.completeEffects[0], {
             population: CL.SLIGHTLY_HIGH,
-            shipyardNumShips: News.clHalfRegression(this.endEffects[0].shipyardNumShips),
-            industry: News.clHalfRegression(this.endEffects[0].industry),
+            shipyardNumShips: News.clHalfRegression(this.completeEffects[0].shipyardNumShips),
+            industry: News.clHalfRegression(this.completeEffects[0].industry),
             prestige: CL.SLIGHTLY_HIGH,
         })
 
         // Failed: movement collapses, industry rebounds but damage to environment
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 industry: News.clHalfRegression(CL.EXTREMELY_LOW), // partial de-industrialization

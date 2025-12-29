@@ -18,15 +18,15 @@ class OligarchyNews extends News {
                 credits: CL.LOW,
             })
         ]
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         // Commerce and prestige damage are permanent (oligarchs still control economy)
-        Object.assign(this.endEffects[0], {
-            //prestige: News.clHalfRegression(this.endEffects[0].prestige),
-            economy: News.clHalfRegression(this.endEffects[0].economy),
+        Object.assign(this.completeEffects[0], {
+            //prestige: News.clHalfRegression(this.completeEffects[0].prestige),
+            economy: News.clHalfRegression(this.completeEffects[0].economy),
         })
 
         // Failed: oligarchs entrench permanently
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 economy: CL.NO_REGRESSION, // permanent economic damage

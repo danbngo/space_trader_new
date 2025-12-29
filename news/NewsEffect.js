@@ -173,7 +173,7 @@ class NewsEffect {
             culture.prestige *= prestige;
             culture.population *= population;
             culture.territory *= territory;
-            //FIRST end any wars to let their endEffects run
+            //FIRST end any wars to let their completeEffects run
             if (forcePeace) {
                 News.forcePeace(planet)
             }

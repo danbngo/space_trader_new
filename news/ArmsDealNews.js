@@ -15,16 +15,16 @@ class ArmsDealNews extends News {
             }),
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
 
-        Object.assign(this.endEffects[0], {
+        Object.assign(this.completeEffects[0], {
             credits: CL.LOW,
             military: CL.HIGH, //gain some knowledge, new sytems etc.
             shipyardNumShips: CL.HIGH,
             blackMarketCargoAmounts: CL.HIGH,
             blackMarketPrices: CL.LOW,
         })
-        Object.assign(this.endEffects[1], {
+        Object.assign(this.completeEffects[1], {
             credits: CL.HIGH,
             shipyardNumShips: CL.LOW,
             blackMarketCargoAmounts: CL.LOW,
@@ -32,10 +32,10 @@ class ArmsDealNews extends News {
         })
 
         // Failed: seller refuses to sell
-        this.failEndEffects = []
+        this.failEffects = []
 
         // Cancelled: deal cancelled midway
-        this.cancelEndEffects = []
+        this.cancelEffects = []
     }
 
     determineOutcome() {

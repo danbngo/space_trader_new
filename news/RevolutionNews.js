@@ -30,19 +30,19 @@ class RevolutionNews extends News {
         ]
 
         //dont revert the government type back afterwards
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
 
         //government related ratings randomize a bit after a revolution
-        Object.assign(this.endEffects[0], {
+        Object.assign(this.completeEffects[0], {
             newGovernmentType,
-            military: (rng(0.5,1.5,false) + this.endEffects[0].military)/2,
-            security: (rng(0.5,1.5,false)  + this.endEffects[0].security)/2,
-            industry: (rng(0.5,1.5,false)  + this.endEffects[0].industry)/2,
-            credits: (rng(0.5,1.5,false)  + this.endEffects[0].credits)/2,
-            prestige: (rng(0.5,1.5,false)  + this.endEffects[0].prestige)/2,
+            military: (rng(0.5,1.5,false) + this.completeEffects[0].military)/2,
+            security: (rng(0.5,1.5,false)  + this.completeEffects[0].security)/2,
+            industry: (rng(0.5,1.5,false)  + this.completeEffects[0].industry)/2,
+            credits: (rng(0.5,1.5,false)  + this.completeEffects[0].credits)/2,
+            prestige: (rng(0.5,1.5,false)  + this.completeEffects[0].prestige)/2,
         })
 
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 newGovernmentType: GT.ANARCHY,

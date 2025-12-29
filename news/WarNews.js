@@ -34,20 +34,20 @@ class WarNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
-        /*Object.assign(this.endEffects[0], {
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
+        /*Object.assign(this.completeEffects[0], {
             prestige: CL.NO_REGRESSION, //being a warmonger = bad
         })*/
 
 
-        this.endEffects[0].onApply = ()=>{
+        this.completeEffects[0].onApply = ()=>{
             //dont revert relationships if one was vassalized
             if (planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR) planet.culture.relationships.set(targetPlanet, RELATIONSHIP_TYPES.NEUTRAL)
             console.log('1 war ended between', planet.name, 'and', targetPlanet.name)
             console.log('1 new diplomatic status:', planet.culture.relationships.get(targetPlanet))
             console.log('1 target new diplomatic status:', targetPlanet.culture.relationships.get(planet))
         }
-        this.endEffects[1].onApply = ()=>{
+        this.completeEffects[1].onApply = ()=>{
             //dont revert relationships if one was vassalized
             if (targetPlanet.culture.relationships.get(planet) == RELATIONSHIP_TYPES.WAR) targetPlanet.culture.relationships.set(planet, RELATIONSHIP_TYPES.NEUTRAL)
             console.log('2 war ended between', planet.name, 'and', targetPlanet.name)
@@ -65,7 +65,7 @@ class WarNews extends News {
             }
         }
 
-        this.cancelEndEffects = this.endEffects.map(effect => effect.clone())
+        this.cancelEffects = this.completeEffects.map(effect => effect.clone())
     }
 
     determineOutcome() {

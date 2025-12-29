@@ -21,14 +21,14 @@ class PlagueNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         //population does not fully bounce back
-        Object.assign(this.endEffects[0], {
-            population: News.clHalfRegression(this.endEffects[0].population),
-            guildNumOfficers: News.clHalfRegression(this.endEffects[0].guildNumOfficers),
+        Object.assign(this.completeEffects[0], {
+            population: News.clHalfRegression(this.completeEffects[0].population),
+            guildNumOfficers: News.clHalfRegression(this.completeEffects[0].guildNumOfficers),
         })
 
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 population: CL.NO_REGRESSION,

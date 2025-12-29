@@ -24,23 +24,23 @@ class ImperialismNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
 
         //aggressor gains territory, some lingering drops
-        Object.assign(this.endEffects[0], {
+        Object.assign(this.completeEffects[0], {
             territory: CL.HIGH,
-            prestige: News.clHalfRegression(this.endEffects[0].prestige),
-            security: News.clHalfRegression(this.endEffects[0].security),
-            military: News.clHalfRegression(this.endEffects[0].military),
+            prestige: News.clHalfRegression(this.completeEffects[0].prestige),
+            security: News.clHalfRegression(this.completeEffects[0].security),
+            military: News.clHalfRegression(this.completeEffects[0].military),
         })
         //victim recovers partially
-        Object.assign(this.endEffects[1], {
+        Object.assign(this.completeEffects[1], {
             territory: CL.LOW,
             prestige: CL.NO_REGRESSION,
         })
 
         // Failed: expansion repelled, aggressor humiliated
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 military: CL.NO_REGRESSION, // losses remain
@@ -55,7 +55,7 @@ class ImperialismNews extends News {
         ]
 
         // Cancelled: peace forces withdrawal
-        this.cancelEndEffects = [
+        this.cancelEffects = [
             new NewsEffect({
                 planet: this.planet,
                 military: News.clHalfRegression(CL.LOW),

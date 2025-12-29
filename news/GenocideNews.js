@@ -19,9 +19,9 @@ class GenocideNews extends News {
                 crime: CL.LOW
             })
         ]
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         //some lingering security and prestige decrease and destroyed goods
-        Object.assign(this.endEffects[0], {
+        Object.assign(this.completeEffects[0], {
             population: CL.NO_REGRESSION,
             prestige: CL.NO_REGRESSION,
             military: CL.NO_REGRESSION,

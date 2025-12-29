@@ -23,19 +23,19 @@ class DepressionNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
 
         //some lingering price rate, cargo, commercial, and credit rate decreases
-        Object.assign(this.endEffects[0], {
-            credits: News.clHalfRegression(this.endEffects[0].credits),
-            marketCargoAmounts: News.clHalfRegression(this.endEffects[0].marketCargoAmounts),
-            marketPrices: News.clHalfRegression(this.endEffects[0].marketPrices),
-            economy: News.clHalfRegression(this.endEffects[0].economy),
-            blackMarketPrices: (1 + this.endEffects[0].blackMarketPrices)/2,
-            //blackMarketCargoAmounts: (1 + this.endEffects[0].blackMarketCargoAmounts)/2,
+        Object.assign(this.completeEffects[0], {
+            credits: News.clHalfRegression(this.completeEffects[0].credits),
+            marketCargoAmounts: News.clHalfRegression(this.completeEffects[0].marketCargoAmounts),
+            marketPrices: News.clHalfRegression(this.completeEffects[0].marketPrices),
+            economy: News.clHalfRegression(this.completeEffects[0].economy),
+            blackMarketPrices: (1 + this.completeEffects[0].blackMarketPrices)/2,
+            //blackMarketCargoAmounts: (1 + this.completeEffects[0].blackMarketCargoAmounts)/2,
         })
 
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 marketPrices: CL.NO_REGRESSION,

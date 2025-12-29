@@ -6,22 +6,21 @@ class CoupDetatNews extends News {
         )
         const newGovernmentType = availableGovTypes[Math.floor(Math.random() * availableGovTypes.length)]
         super(
-            `${coloredName(planet)} orchestrates a coup d'état in ${coloredName(targetPlanet)}, toppling their government!`,
+            `${coloredName(planet)} orchestrates a coup attempt in ${coloredName(targetPlanet)}! Guerillas invade the capital!`,
             `${coloredName(planet)}'s coup in ${coloredName(targetPlanet)} succeeds! A new ${newGovernmentType.name} government is established!`,
             `${coloredName(planet)}'s coup attempt in ${coloredName(targetPlanet)} is crushed by loyalist forces!`,
             ``,
             NT.COUP_DETAT, planet, targetPlanet
         )
 
-        const courthouseBuilding = targetPlanet.settlement.courthouse;
-
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
-                newRelationship: RELATIONSHIP_TYPES.NEUTRAL,
-                prestige: CL.LOW,
+                //newRelationship: RELATIONSHIP_TYPES.NEUTRAL,
+                prestige: CL.SLIGHTLY_LOW,
                 credits: CL.LOW, // funding the coup is expensive
+                blackMarketCargoAmounts: CL.LOW, //gotta arm them
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
@@ -33,42 +32,39 @@ class CoupDetatNews extends News {
                 industry: CL.LOW,
                 prestige: CL.LOW,
                 //credits: CL.VERY_LOW,
-                buildingsDisabled: courthouseBuilding ? [courthouseBuilding] : [],
-                cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, CL.VERY_HIGH]]),
+                cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, CL.ASTRONOMICAL]]),
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         // Instigator: prestige boost persists
-        Object.assign(this.endEffects[0], {
+        Object.assign(this.completeEffects[0], {
             prestige: CL.NO_REGRESSION,
             credits: CL.NO_REGRESSION,
+            blackMarketCargoAmounts: CL.NO_REGRESSION,
         })
         // Target: government stabilizes but some damage lingers
-        Object.assign(this.endEffects[1], {
-            military: (rng(0.5,1.5,false) + this.endEffects[0].military)/2,
-            security: (rng(0.5,1.5,false)  + this.endEffects[0].security)/2,
-            industry: (rng(0.5,1.5,false)  + this.endEffects[0].industry)/2,
-            credits: (rng(0.5,1.5,false)  + this.endEffects[0].credits)/2,
-            prestige: (rng(0.5,1.5,false)  + this.endEffects[0].prestige)/2,
+        Object.assign(this.completeEffects[1], {
+            military: (rng(0.5,1.5,false) + this.completeEffects[0].military)/2,
+            security: (rng(0.5,1.5,false)  + this.completeEffects[0].security)/2,
+            industry: (rng(0.5,1.5,false)  + this.completeEffects[0].industry)/2,
+            credits: (rng(0.5,1.5,false)  + this.completeEffects[0].credits)/2,
+            prestige: (rng(0.5,1.5,false)  + this.completeEffects[0].prestige)/2,
             forcePeace: true,
             newRelationship: RELATIONSHIP_TYPES.NEUTRAL,
+            newGovernmentType
         })
 
         // Failed: coup crushed, instigator embarrassed
-        this.failEndEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                prestige: CL.VERY_LOW, // international humiliation
-                credits: CL.NO_REGRESSION, // wasted funds
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                military: News.clHalfRegression(CL.VERY_LOW), // fought off coup
-                security: CL.HIGH, // crackdown on insurgents
-                prestige: CL.HIGH, // survived coup attempt
-            })
-        ]
+        this.failEffects = this.startEffects.map(fx => fx.getInverse())
+        Object.assign(this.failEffects[0], {
+            prestige: CL.LOW, // international humiliation
+            credits: CL.NO_REGRESSION, // wasted funds
+            blackMarketCargoAmounts: CL.NO_REGRESSION,
+        })
+        Object.assign(this.failEffects[1], {
+            prestige: CL.HIGH/CL.LOW //also reverse the effect from the start effect
+        })
     }
 
     determineOutcome() {
@@ -77,12 +73,13 @@ class CoupDetatNews extends News {
         const resistanceProbability = (targetPlanet.culture.security + targetPlanet.culture.military) / 2
         const failProbability = resistanceProbability * 0.4
         this.failed = Math.random() < failProbability
+        this.rollOutcome((planet.culture.security+planet.settlement.illegalGoods)/(targetPlanet.culture.security + targetPlanet.culture.military), CL.HIGH)
     }
 
     isValid() {
         const {planet, targetPlanet} = this
         // Aggressor must have high prestige, target must have lowER prestige
-        const ratingsValid = (planet.culture.prestige > CL.HIGH) && (planet.culture.prestige > (targetPlanet.culture.prestige * CL.HIGH))
+        const ratingsValid = (planet.culture.prestige > CL.HIGH) && (planet.settlement.illegalGoods > CL.MEDIUM) && (planet.culture.prestige > targetPlanet.culture.prestige)
         // Target must have opposing government type - nevermind, CIA flouts this all the time
         //const govValid = planet.culture.governmentType.opposingType == targetPlanet.culture.governmentType
         // Must be at least TENSE beforehand

@@ -37,12 +37,12 @@ class AllianceNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         //this is the only relationship that cannot be dissolved mid-event
-        for (const fx of this.endEffects) fx.newRelationship = RELATIONSHIP_TYPES.NEUTRAL
+        for (const fx of this.completeEffects) fx.newRelationship = RELATIONSHIP_TYPES.NEUTRAL
 
         // Cancelled: relationship soured before alliance solidified
-        this.cancelEndEffects = [
+        this.cancelEffects = [
             new NewsEffect({
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,

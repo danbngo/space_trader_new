@@ -21,14 +21,15 @@ class ColonizationNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getHalfRegression())
-        Object.assign(this.endEffects[0], {
+        this.completeEffects = this.startEffects.map(effect => effect.getHalfRegression())
+        Object.assign(this.completeEffects[0], {
             economy: CL.HIGH,
             industry: CL.HIGH,
             territory: CL.HIGH,
+            cargoPriceModifiers: NewsEffect.getInvertedCargoPriceModifiers(this.startEffects[0].cargoPriceModifiers),
         })
 
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 cargoPriceModifiers: NewsEffect.getInvertedCargoPriceModifiers(this.startEffects[0].cargoPriceModifiers),

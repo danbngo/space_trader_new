@@ -21,19 +21,19 @@ class OrganizedCrimeNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         //some lingering corruption after
-        Object.assign(this.endEffects[0], {
-            economy: News.clHalfRegression(this.endEffects[0].economy),
-            credits: News.clHalfRegression(this.endEffects[0].credits),
-            industry: News.clHalfRegression(this.endEffects[0].industry),
-            security: News.clHalfRegression(this.endEffects[0].security),
-            crime: News.clHalfRegression(this.endEffects[0].crime),
-            blackMarketCargoAmounts: News.clHalfRegression(this.endEffects[0].blackMarketCargoAmounts),
+        Object.assign(this.completeEffects[0], {
+            economy: News.clHalfRegression(this.completeEffects[0].economy),
+            credits: News.clHalfRegression(this.completeEffects[0].credits),
+            industry: News.clHalfRegression(this.completeEffects[0].industry),
+            security: News.clHalfRegression(this.completeEffects[0].security),
+            crime: News.clHalfRegression(this.completeEffects[0].crime),
+            blackMarketCargoAmounts: News.clHalfRegression(this.completeEffects[0].blackMarketCargoAmounts),
         })
 
         // Failed: syndicates win, permanent corruption
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 economy: CL.NO_REGRESSION, // permanent economic damage

@@ -27,14 +27,14 @@ class TensionsNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
-        for (const fx of this.endEffects) {
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
+        for (const fx of this.completeEffects) {
             fx.onApply = ()=>{
                 if (planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.TENSE) planet.culture.relationships.set(targetPlanet, RELATIONSHIP_TYPES.NEUTRAL)
             }
         }
 
-        this.cancelEndEffects = this.endEffects.map(effect => effect.clone())
+        this.cancelEffects = this.completeEffects.map(effect => effect.clone())
     }
 
     determineOutcome() {

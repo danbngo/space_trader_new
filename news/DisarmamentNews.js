@@ -20,8 +20,8 @@ class DisarmamentNews extends News {
         ]
 
         //system becomes more crowded over time...
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
-        Object.assign(this.endEffects[0], {
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
+        Object.assign(this.completeEffects[0], {
             military: CL.NO_REGRESSION, 
             territory: CL.NO_REGRESSION,
             shipyardNumShips: CL.NO_REGRESSION,
@@ -31,7 +31,7 @@ class DisarmamentNews extends News {
         })
 
         // Failed: forced to rearm, economic benefits lost
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 military: CL.NO_REGRESSION, // stayed weak

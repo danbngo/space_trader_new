@@ -26,18 +26,18 @@ class SanctionsNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         //some lingering damage after
-        Object.assign(this.endEffects[0], {
-            economy: News.clHalfRegression(this.endEffects[0].economy),
-            credits: News.clHalfRegression(this.endEffects[0].credits),
+        Object.assign(this.completeEffects[0], {
+            economy: News.clHalfRegression(this.completeEffects[0].economy),
+            credits: News.clHalfRegression(this.completeEffects[0].credits),
         })
-        Object.assign(this.endEffects[1], {
-            economy: News.clHalfRegression(this.endEffects[1].economy),
+        Object.assign(this.completeEffects[1], {
+            economy: News.clHalfRegression(this.completeEffects[1].economy),
         })
 
         // Failed: sanctions backfire, hurt sanctioner more
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 economy: CL.VERY_LOW, // domestic economic crisis
@@ -51,7 +51,7 @@ class SanctionsNews extends News {
         ]
 
         // Cancelled: relations improve, sanctions dropped
-        this.cancelEndEffects = [
+        this.cancelEffects = [
             new NewsEffect({
                 planet: this.planet,
                 marketCargoAmounts: News.clHalfRegression(CL.LOW),

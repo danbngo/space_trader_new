@@ -30,11 +30,11 @@ class CivilWarNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
-        Object.assign(this.endEffects[0], {newGovernmentType})
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
+        Object.assign(this.completeEffects[0], {newGovernmentType})
 
-        this.failEndEffects = this.startEffects.map(effect => effect.getHalfRegression())
-        Object.assign(this.failEndEffects[0], {
+        this.failEffects = this.startEffects.map(effect => effect.getHalfRegression())
+        Object.assign(this.failEffects[0], {
             buildingsDisabled,
             newGovernmentType,
         })

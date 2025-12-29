@@ -19,17 +19,17 @@ class ForcedLaborNews extends News {
                 //marketPrices: CL.LOW,
             })
         ]
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         // Industrial gains are permanent, economy damage and prestige loss are permanent
-        Object.assign(this.endEffects[0], {
-            industry: News.clHalfRegression(this.endEffects[0].industry),
-            population: News.clHalfRegression(this.endEffects[0].population),
-            marketCargoAmounts: News.clHalfRegression(this.endEffects[0].marketCargoAmounts),
+        Object.assign(this.completeEffects[0], {
+            industry: News.clHalfRegression(this.completeEffects[0].industry),
+            population: News.clHalfRegression(this.completeEffects[0].population),
+            marketCargoAmounts: News.clHalfRegression(this.completeEffects[0].marketCargoAmounts),
             prestige: CL.NO_REGRESSION, // permanent prestige loss
         })
 
         // Failed: revolts shut down camps, no industrial gain
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 population: CL.VERY_LOW, // mass casualties in revolts

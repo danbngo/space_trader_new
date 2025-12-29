@@ -23,15 +23,15 @@ class WarSurrenderNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         // Victor: gains from peace treaty
-        Object.assign(this.endEffects[0], {
+        Object.assign(this.completeEffects[0], {
             prestige: CL.HIGH,
             territory: CL.SLIGHTLY_HIGH,
             credits: CL.HIGH, // war indemnity
         })
         // Loser: permanent losses from surrender
-        Object.assign(this.endEffects[1], {
+        Object.assign(this.completeEffects[1], {
             territory: CL.LOW, // territorial concessions
             credits: CL.LOW, // war indemnity paid
             military: CL.LOW, // forced demilitarization
@@ -40,7 +40,7 @@ class WarSurrenderNews extends News {
         })
 
         // Cancelled: negotiations break down, war continues
-        this.cancelEndEffects = [
+        this.cancelEffects = [
             new NewsEffect({
                 planet: this.planet,
                 // Victor just wastes time

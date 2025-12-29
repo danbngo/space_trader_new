@@ -31,19 +31,19 @@ class TradeAgreementNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         //some lingering benefits after
-        Object.assign(this.endEffects[0], {
-            economy: News.clHalfRegression(this.endEffects[0].economy),
-            credits: News.clHalfRegression(this.endEffects[0].credits),
+        Object.assign(this.completeEffects[0], {
+            economy: News.clHalfRegression(this.completeEffects[0].economy),
+            credits: News.clHalfRegression(this.completeEffects[0].credits),
         })
-        Object.assign(this.endEffects[1], {
-            economy: News.clHalfRegression(this.endEffects[1].economy),
-            credits: News.clHalfRegression(this.endEffects[1].credits),
+        Object.assign(this.completeEffects[1], {
+            economy: News.clHalfRegression(this.completeEffects[1].economy),
+            credits: News.clHalfRegression(this.completeEffects[1].credits),
         })
 
         // Failed: economic collapse ruins trade benefits
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 economy: CL.LOW, // economic disruption
@@ -57,7 +57,7 @@ class TradeAgreementNews extends News {
         ]
 
         // Cancelled: tensions suspend trade early
-        this.cancelEndEffects = [
+        this.cancelEffects = [
             new NewsEffect({
                 planet: this.planet,
                 marketCargoAmounts: News.clHalfRegression(CL.HIGH),

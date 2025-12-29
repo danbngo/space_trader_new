@@ -25,23 +25,23 @@ class LudditismNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         //population growth and prestige boost from simpler lifestyle
-        Object.assign(this.endEffects[0], {
+        Object.assign(this.completeEffects[0], {
             population: CL.HIGH,
             prestige: CL.SLIGHTLY_HIGH,
-            shipQuality: News.clHalfRegression(this.endEffects[0].shipQuality), //tech knowledge lost
-            officerQuality: News.clHalfRegression(this.endEffects[0].officerQuality), //tech knowledge lost
-            military: News.clHalfRegression(this.endEffects[0].military),
-            economy: News.clHalfRegression(this.endEffects[0].economy),
-            industry: News.clHalfRegression(this.endEffects[0].industry),
-            crime: News.clHalfRegression(this.endEffects[0].crime),
+            shipQuality: News.clHalfRegression(this.completeEffects[0].shipQuality), //tech knowledge lost
+            officerQuality: News.clHalfRegression(this.completeEffects[0].officerQuality), //tech knowledge lost
+            military: News.clHalfRegression(this.completeEffects[0].military),
+            economy: News.clHalfRegression(this.completeEffects[0].economy),
+            industry: News.clHalfRegression(this.completeEffects[0].industry),
+            crime: News.clHalfRegression(this.completeEffects[0].crime),
             blackMarketCargoAmounts: CL.LOW,
             blackMarketPrices: CL.LOW,
         })
 
         // Failed: movement collapses, no benefits
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 shipQuality: CL.NO_REGRESSION, // tech degradation remains

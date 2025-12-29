@@ -18,10 +18,10 @@ class ScientificBreakthroughNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         //actual knowledge gained cannot be lost
-        Object.assign(this.endEffects[0], {
-            credits: News.clHalfRegression(this.endEffects[0].credits),
+        Object.assign(this.completeEffects[0], {
+            credits: News.clHalfRegression(this.completeEffects[0].credits),
             shipQuality: CL.HIGH,
             prestige: CL.SLIGHTLY_HIGH,
             officerQuality: CL.SLIGHTLY_HIGH,
@@ -29,7 +29,7 @@ class ScientificBreakthroughNews extends News {
         })
 
         // Failed: research yields nothing, resources wasted
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 credits: CL.NO_REGRESSION, // money wasted

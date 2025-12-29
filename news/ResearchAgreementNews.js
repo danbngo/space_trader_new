@@ -21,21 +21,21 @@ class ResearchAgreementNews extends News {
             }),      
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         //actual knowledge gained cannot be lost
-        Object.assign(this.endEffects[0], {
+        Object.assign(this.completeEffects[0], {
             shipQuality: CL.SLIGHTLY_HIGH,
             officerQuality: CL.HIGH,
             military: CL.SLIGHTLY_HIGH,
         })
-        Object.assign(this.endEffects[1], {
+        Object.assign(this.completeEffects[1], {
             shipQuality: CL.SLIGHTLY_HIGH,
             officerQuality: CL.HIGH,
             military: CL.SLIGHTLY_HIGH,
         })
 
         // Failed: research yields nothing, wasted resources
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 credits: CL.NO_REGRESSION, // money wasted
@@ -47,7 +47,7 @@ class ResearchAgreementNews extends News {
         ]
 
         // Cancelled: tensions end collaboration early
-        this.cancelEndEffects = [
+        this.cancelEffects = [
             new NewsEffect({
                 planet: this.planet,
                 credits: News.clHalfRegression(CL.LOW),

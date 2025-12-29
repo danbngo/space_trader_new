@@ -20,17 +20,17 @@ class CrackdownNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         //some lingering crime decrease
-        Object.assign(this.endEffects[0], {
+        Object.assign(this.completeEffects[0], {
             prestige: CL.NO_REGRESSION,
-            security: News.clHalfRegression(this.endEffects[0].security),
-            crime: News.clHalfRegression(this.endEffects[0].crime),
-            //blackMarketPrices: News.clHalfRegression(this.endEffects[0].blackMarketPrices),
-            blackMarketCargoAmounts: News.clHalfRegression(this.endEffects[0].blackMarketCargoAmounts),
+            security: News.clHalfRegression(this.completeEffects[0].security),
+            crime: News.clHalfRegression(this.completeEffects[0].crime),
+            //blackMarketPrices: News.clHalfRegression(this.completeEffects[0].blackMarketPrices),
+            blackMarketCargoAmounts: News.clHalfRegression(this.completeEffects[0].blackMarketCargoAmounts),
         })
 
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 security: CL.LOW,

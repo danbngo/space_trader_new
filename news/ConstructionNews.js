@@ -1,20 +1,14 @@
 class ConstructionNews extends News {
     constructor(planet = new Planet()) {
         super(
-            `${coloredName(planet)} begins a grand infrastructure building project!`,
-            `${coloredName(planet)} completes its grand infrastructure building project!`,
-            `${coloredName(planet)}'s construction project fails! Resources wasted!`,
+            `${coloredName(planet)} begins a grand revitalization project to overhaul its infrastructure!`,
+            `${coloredName(planet)} completes its grand revitalization project, vastly improving its infrastructure!`,
+            `${coloredName(planet)}'s construction project devolves into an unfinished boondoggle through waste and mismanagement!`,
             '',
             NT.CONSTRUCTION, planet
         )
 
-        const buildingsToEnable = [];
-        const numBuildings = Math.floor(Math.random() * 3) + 1; // 1-3 buildings
-        const buildingsDisabled = planet.settlement.buildings.filter(b => !b.enabled);
-        for (let i = 0; i < Math.min(numBuildings, buildingsDisabled.length); i++) {
-            const building = rndMember(buildingsDisabled.filter(b => !b.enabled && !buildingsToEnable.includes(b)));
-            if (building) buildingsToEnable.push(building);
-        }
+        const buildingsEnabled = rndMembers(News.calcRepairableBuildings(planet), rng(3,1), true);
 
         this.startEffects = [
             new NewsEffect({
@@ -22,46 +16,39 @@ class ConstructionNews extends News {
                 economy: CL.SLIGHTLY_LOW,
                 marketCargoAmounts: CL.LOW,
                 marketPrices: CL.HIGH,
-                shipyardNumShips: CL.HIGH,
+                credits: CL.LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.METAL, CL.EXTREMELY_HIGH], [CARGO_TYPES.NANITES, CL.ASTRONOMICAL]]),
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
-        Object.assign(this.endEffects[0], {
-            marketCargoAmounts: CL.NO_REGRESSION,
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
+        Object.assign(this.completeEffects[0], {
+            credits: News.clHalfRegression(this.completeEffects[0].credits),
+            economy: CL.HIGH,
             industry: CL.HIGH,
-            economy: CL.SLIGHTLY_HIGH,
-            buildingsEnabled: buildingsToEnable,
+            buildingsEnabled
         })
 
-        this.failEndEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                economy: CL.NO_REGRESSION,
-                marketCargoAmounts: CL.NO_REGRESSION,
-                prestige: CL.LOW,
-                buildingsEnabled: [],
-                cargoPriceModifiers: new Map([[CARGO_TYPES.METAL, CL.NO_REGRESSION], [CARGO_TYPES.NANITES, CL.NO_REGRESSION]]),
-            })
-        ]
+        this.failEffects = this.startEffects.map(effect => effect.getHalfRegression())
+        Object.assign(this.failEffects[0], {
+            cargoPriceModifiers: NewsEffect.getInvertedCargoPriceModifiers(this.startEffects[0].cargoPriceModifiers)
+        })
     }
 
     determineOutcome() {
         const {planet} = this
-        // Higher industry and economy = more likely to succeed
-        const successProbability = (planet.culture.industry + planet.culture.economy) / 2
-        this.failed = Math.random() > successProbability
+        // Higher economy = more likely to succeed
+        this.rollOutcome(planet.culture.economy, CL.LOW)
     }
 
     isValid() {
         const {planet} = this
-        //must be missing at least one building OR industry is low
-        const buildingsValid = planet.settlement.buildings.filter(b => !b.enabled).length > 0
-        const industryValid = planet.culture.industry < CL.LOW && planet.settlement.market.cargo.average/MARKET_AVERAGE_CARGO_PER_TYPE > CL.MEDIUM
+        //must be missing at least one building OR industry is low and credits are high
+        const buildingsValid = News.calcRepairableBuildings(planet).length > 0
+        const ratingsValid = planet.culture.industry < CL.LOW && (planet.settlement.goods > CL.SLIGHTLY_HIGH || planet.settlement.wealth > CL.SLIGHTLY_HIGH)
         const interferingEvent =
             News.planetHasAnyNewsTargeting(planet, NT_DANGEROUS) ||
             News.planetHasAnyNews(planet, [NT.CONSTRUCTION, ...NT_ECONOMY_PREVENTING])
-        return (buildingsValid || industryValid) && !interferingEvent
+        return (buildingsValid || ratingsValid) && !interferingEvent
     }
 }

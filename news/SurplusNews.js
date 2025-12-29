@@ -20,17 +20,17 @@ class SurplusNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         //goods remain high After
-        Object.assign(this.endEffects[0], {
-            industry: News.clHalfRegression(this.endEffects[0].industry),
-            //economy: News.clHalfRegression(this.endEffects[0].economy),
-            marketCargoAmounts: News.clHalfRegression(this.endEffects[0].marketCargoAmounts),
-            credits: News.clHalfRegression(this.endEffects[0].credits),
+        Object.assign(this.completeEffects[0], {
+            industry: News.clHalfRegression(this.completeEffects[0].industry),
+            //economy: News.clHalfRegression(this.completeEffects[0].economy),
+            marketCargoAmounts: News.clHalfRegression(this.completeEffects[0].marketCargoAmounts),
+            credits: News.clHalfRegression(this.completeEffects[0].credits),
         })
 
         // Failed: boom goes bust, reserves exhausted
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 industry: CL.LOW, // extraction infrastructure damaged

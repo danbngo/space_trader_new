@@ -26,40 +26,40 @@ class WarInvasionNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         // Attacker: permanent officer losses from invasion
-        Object.assign(this.endEffects[0], {
+        Object.assign(this.completeEffects[0], {
             guildNumOfficers: CL.NO_REGRESSION,
             shipyardNumShips: CL.NO_REGRESSION,
             officerQuality: CL.NO_REGRESSION,
         })
         // Defender: even heavier permanent losses
-        Object.assign(this.endEffects[1], {
+        Object.assign(this.completeEffects[1], {
             guildNumOfficers: CL.SLIGHTLY_LOW, // defenders advantage?
             shipyardNumShips: CL.SLIGHTLY_LOW,
             officerQuality: CL.SLIGHTLY_LOW,
-            security: News.clHalfRegression(this.endEffects[1].security),
-            economy: News.clHalfRegression(this.endEffects[1].economy),
-            industry: News.clHalfRegression(this.endEffects[1].industry),
-            population: News.clHalfRegression(this.endEffects[1].population),
+            security: News.clHalfRegression(this.completeEffects[1].security),
+            economy: News.clHalfRegression(this.completeEffects[1].economy),
+            industry: News.clHalfRegression(this.completeEffects[1].industry),
+            population: News.clHalfRegression(this.completeEffects[1].population),
             military: CL.LOW,
         })
 
-        this.cancelEndEffects = [
+        this.cancelEffects = [
             new NewsEffect({
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
-                guildNumOfficers: News.clHalfRegression(this.endEffects[0].guildNumOfficers),
-                shipyardNumShips: News.clHalfRegression(this.endEffects[0].shipyardNumShips),
-                officerQuality: News.clHalfRegression(this.endEffects[0].officerQuality),
+                guildNumOfficers: News.clHalfRegression(this.completeEffects[0].guildNumOfficers),
+                shipyardNumShips: News.clHalfRegression(this.completeEffects[0].shipyardNumShips),
+                officerQuality: News.clHalfRegression(this.completeEffects[0].officerQuality),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
-                security: News.clHalfRegression(this.endEffects[1].security),
-                economy: News.clHalfRegression(this.endEffects[1].economy),
-                industry: News.clHalfRegression(this.endEffects[1].industry),
-                population: News.clHalfRegression(this.endEffects[1].population),
+                security: News.clHalfRegression(this.completeEffects[1].security),
+                economy: News.clHalfRegression(this.completeEffects[1].economy),
+                industry: News.clHalfRegression(this.completeEffects[1].industry),
+                population: News.clHalfRegression(this.completeEffects[1].population),
             })
         ]
     }

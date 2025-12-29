@@ -15,13 +15,13 @@ class CoalitionNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
-        Object.assign(this.endEffects[0], {
-            prestige: News.clHalfRegression(this.endEffects[0].prestige),
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
+        Object.assign(this.completeEffects[0], {
+            prestige: News.clHalfRegression(this.completeEffects[0].prestige),
         })
 
         // Failed: coalition persists, permanent diplomatic damage
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 prestige: CL.NO_REGRESSION,

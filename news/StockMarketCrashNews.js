@@ -19,12 +19,12 @@ class StockMarketCrashNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         // Economy damage and credit scarcity are partially permanent
-        Object.assign(this.endEffects[0], {
-            credits: News.clHalfRegression(this.endEffects[0].credits),
-            industry: News.clHalfRegression(this.endEffects[0].industry),
-            economy: News.clHalfRegression(this.endEffects[0].economy),
+        Object.assign(this.completeEffects[0], {
+            credits: News.clHalfRegression(this.completeEffects[0].credits),
+            industry: News.clHalfRegression(this.completeEffects[0].industry),
+            economy: News.clHalfRegression(this.completeEffects[0].economy),
         })
     }
 

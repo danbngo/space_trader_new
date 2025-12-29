@@ -36,24 +36,24 @@ class WarSubjugationNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         //subjugating others has some lingering effects on territory, military, prestige
-        Object.assign(this.endEffects[0], {
-            territory: News.clHalfRegression(this.endEffects[0].territory),
-            military: News.clHalfRegression(this.endEffects[0].military),
-            prestige: News.clHalfRegression(this.endEffects[0].prestige),
+        Object.assign(this.completeEffects[0], {
+            territory: News.clHalfRegression(this.completeEffects[0].territory),
+            military: News.clHalfRegression(this.completeEffects[0].military),
+            prestige: News.clHalfRegression(this.completeEffects[0].prestige),
             newRelationship: RELATIONSHIP_TYPES.NEUTRAL,
         })
         //being subjugated has some lingering ill effects on territory, military, prestige
-        Object.assign(this.endEffects[1], {
-            territory: News.clHalfRegression(this.endEffects[1].territory),
-            military: News.clHalfRegression(this.endEffects[1].military),
-            prestige: News.clHalfRegression(this.endEffects[0].prestige),
+        Object.assign(this.completeEffects[1], {
+            territory: News.clHalfRegression(this.completeEffects[1].territory),
+            military: News.clHalfRegression(this.completeEffects[1].military),
+            prestige: News.clHalfRegression(this.completeEffects[0].prestige),
             newRelationship: RELATIONSHIP_TYPES.NEUTRAL,
         })
 
         // Failed: occupation repelled, attacker loses forces
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 military: CL.LOW, // failed invasion losses
@@ -68,7 +68,7 @@ class WarSubjugationNews extends News {
         ]
 
         // Cancelled: peace forces withdrawal
-        this.cancelEndEffects = [
+        this.cancelEffects = [
             new NewsEffect({
                 planet: this.planet,
                 territory: News.clHalfRegression(CL.VERY_HIGH),

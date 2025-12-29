@@ -21,18 +21,18 @@ class FestivalNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         //economy recovers, prestige is boosted
-        Object.assign(this.endEffects[0], {
-            credits: News.clHalfRegression(this.endEffects[0].credits),
-            marketCargoAmounts: News.clHalfRegression(this.endEffects[0].marketCargoAmounts),
-            crime: News.clHalfRegression(this.endEffects[0].crime),
-            //blackMarketPrices: News.clHalfRegression(this.endEffects[0].blackMarketPrices),
+        Object.assign(this.completeEffects[0], {
+            credits: News.clHalfRegression(this.completeEffects[0].credits),
+            marketCargoAmounts: News.clHalfRegression(this.completeEffects[0].marketCargoAmounts),
+            crime: News.clHalfRegression(this.completeEffects[0].crime),
+            //blackMarketPrices: News.clHalfRegression(this.completeEffects[0].blackMarketPrices),
             prestige: CL.SLIGHTLY_HIGH,
         })
 
         // Failed: festival disaster, no prestige gain
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 credits: CL.NO_REGRESSION, // money wasted

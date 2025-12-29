@@ -26,27 +26,27 @@ class EnslavementNews extends News {
                 guildNumOfficers: CL.LOW,
             })
         ]
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         // Enslaver: economy and population gains are permanent, prestige loss lingers
-        Object.assign(this.endEffects[0], {
-            security: News.clHalfRegression(this.endEffects[0].security),
-            prestige: News.clHalfRegression(this.endEffects[0].prestige),
+        Object.assign(this.completeEffects[0], {
+            security: News.clHalfRegression(this.completeEffects[0].security),
+            prestige: News.clHalfRegression(this.completeEffects[0].prestige),
             population: CL.NO_REGRESSION,
-            economy: News.clHalfRegression(this.endEffects[0].economy),
-            industry: News.clHalfRegression(this.endEffects[0].industry),
+            economy: News.clHalfRegression(this.completeEffects[0].economy),
+            industry: News.clHalfRegression(this.completeEffects[0].industry),
         })
         // Victim: permanent population loss, prestige loss
-        Object.assign(this.endEffects[1], {
+        Object.assign(this.completeEffects[1], {
             population: CL.NO_REGRESSION, // stolen population doesn't return
             guildNumOfficers: CL.NO_REGRESSION,
             //prestige: CL.NO_REGRESSION, // permanent shame
-            economy: News.clHalfRegression(this.endEffects[1].economy),
-            industry: News.clHalfRegression(this.endEffects[1].industry),
-            security: News.clHalfRegression(this.endEffects[1].security),
+            economy: News.clHalfRegression(this.completeEffects[1].economy),
+            industry: News.clHalfRegression(this.completeEffects[1].industry),
+            security: News.clHalfRegression(this.completeEffects[1].security),
         })
 
         // Failed: slave revolts
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 population: CL.LOW, // casualties in revolts
@@ -63,7 +63,7 @@ class EnslavementNews extends News {
         ]
 
         // Cancelled: peace forces liberation
-        this.cancelEndEffects = [
+        this.cancelEffects = [
             new NewsEffect({
                 planet: this.planet,
                 population: News.clHalfRegression(CL.VERY_HIGH),

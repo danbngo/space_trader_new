@@ -15,14 +15,14 @@ class WarAllyNews extends News {
             }),
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         // Original instigator: prestige cost is permanent
-        Object.assign(this.endEffects[0], {
+        Object.assign(this.completeEffects[0], {
             prestige: CL.NO_REGRESSION,
         })
 
         // Failed: diplomatic effort rebuffed, no ally joins
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 prestige: CL.LOW, // diplomatic failure
@@ -30,7 +30,7 @@ class WarAllyNews extends News {
         ]
 
         // Cancelled: peace declared before ally commits
-        this.cancelEndEffects = [
+        this.cancelEffects = [
             new NewsEffect({
                 planet: this.planet,
                 prestige: News.clHalfRegression(CL.LOW), // partial prestige recovery

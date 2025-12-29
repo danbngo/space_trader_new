@@ -24,16 +24,16 @@ class ScarcityNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         //population does not fully bounce back
-        Object.assign(this.endEffects[0], {
-            population: News.clHalfRegression(this.endEffects[0].population),
-            industry: News.clHalfRegression(this.endEffects[0].industry),
-            economy: News.clHalfRegression(this.endEffects[0].economy),
+        Object.assign(this.completeEffects[0], {
+            population: News.clHalfRegression(this.completeEffects[0].population),
+            industry: News.clHalfRegression(this.completeEffects[0].industry),
+            economy: News.clHalfRegression(this.completeEffects[0].economy),
         })
 
         // Failed: famine becomes catastrophic
-        this.failEndEffects = [
+        this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 population: CL.NO_REGRESSION, // massive die-off

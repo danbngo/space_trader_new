@@ -20,7 +20,7 @@ class AddictionNews extends News {
                 cargoPriceModifiers: new Map([[CARGO_TYPES.MEDICINE, CL.VERY_HIGH], [CARGO_TYPES.DRUGS, CL.EXTREMELY_HIGH]]), //this is the only thing that normalizes after
             })
         ]
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
 
         this.failEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.failEffects[0], {
