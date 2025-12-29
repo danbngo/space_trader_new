@@ -130,4 +130,3 @@ const CL = Object.freeze({
     NO_REGRESSION: 1,
     MEDIUM: 1
 })
-

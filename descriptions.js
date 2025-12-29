@@ -58,21 +58,31 @@ function describeDate(year = 0, minutesEnabled = false, hoursEnabled = false) {
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         
-    function getOrdinal(n) {
+    /*function getOrdinal(n) {
         if (n % 10 === 1 && n % 100 !== 11) return `${n}st`;
         if (n % 10 === 2 && n % 100 !== 12) return `${n}nd`;
         if (n % 10 === 3 && n % 100 !== 13) return `${n}rd`;
         return `${n}th`;
-    }
+    }*/
     
     // Format time
     let hours = date.getUTCHours();
     const minutes = date.getUTCMinutes().toString().padStart(2, "0");
-    const ampm = hoursEnabled ? (hours >= 12 ? "PM" : "AM") : '';
+    const ampm = hours >= 12 ? "PM" : "AM";
     hours = hours % 12 === 0 ? 12 : hours % 12;
     const hourStr = hours.toString().padStart(2, "0");
     
-    return `${hoursEnabled ? hourStr : ''}${minutesEnabled ? ':'+minutes : ''}${ampm} ${months[date.getUTCMonth()]} ${getOrdinal(date.getUTCDate())} ${wholeYear}`;
+    // Build time prefix with consistent width (8 chars: "HH:MM AM " or empty)
+    const timePrefix = hoursEnabled 
+        ? `${hourStr}${minutesEnabled ? ':' + minutes : ':00'} ${ampm} `
+        : '';
+    
+    // Pad day ordinal to consistent width (4 chars: " 1st", "31st")
+    const day = date.getUTCDate();
+    //const ordinal = getOrdinal(day).padStart(4, ' ');
+    const ordinal = day.toString().padStart(2, '0');
+    
+    return `${timePrefix}${months[date.getUTCMonth()]} ${ordinal} ${wholeYear}`;
 }
  
 //can display K, M, B, Tr

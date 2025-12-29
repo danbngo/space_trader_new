@@ -4,19 +4,19 @@ DONE:
 -do a rewrite so some events are not triggered by some polity types
 
 DONE BY AI, NEEDS TO BE CHECKED:
-
-NEXT UP:
 -should be able to surrender in a war
 -battle in a war that swings it for one side?
 -bitter stalemate battle in a war
 -sneak attack when tense
-
 -we could alter most of the news to be probability based and do a roll at the start, but better yet at the end (gives player time to influence outcomes)
 -policies system - stuff like isolationism can slot in here
-- rakes are other big factors that events could modify. global rake = corruption?
 -we need some events to be cancellable
+
+NEXT UP:
+-more events need to destroy buildings
+
+- rakes are other big factors that events could modify. global rake = corruption?
 -folderize encounters, remove the luck concept, make it so modal cant be closed after opening
--implement a scienceRating and explorers, scientists fleets etc.
 -make the AI for calcBestLaserCoords better - simulate up to 10 moves in advance and if any lead to a situation where we can shoot the enemy, favor them.
 -make spinning or being rammed animated - use new shipactions and/or anim handlers (not just pseudo)
 -in general, add some modules that do things other than grant new moves-regen, etc.

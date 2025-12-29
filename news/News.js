@@ -13,13 +13,13 @@ class News {
     constructor(startedName = '', endedName = '', failedName = '', cancelledName = '', newsType = NT_ALL[0], planet = new Planet(), targetPlanet = null) {
         //console.log('instantiating News with:',{startedName, endedName, newsType, planet, targetPlanet});
         /** @type {string} */
-        this.startedName = String(colorSpan(startedName, newsType.color));
+        this.startedName = String(colorSpan(newsType.newsFlavor.symbol + ' ' + startedName, newsType.newsFlavor.color));
         /** @type {string} */
-        this.endedName = String(colorSpan(endedName, newsType.color));
+        this.endedName = String(colorSpan(newsType.newsFlavor.symbol + ' ' + endedName, newsType.newsFlavor.color));
         /** @type {string} */
-        this.failedName = String(colorSpan(failedName, COLORS.Gray));
+        this.failedName = String(colorSpan(newsType.newsFlavor.symbol + ' ' + failedName, newsType.newsFlavor.color));
         /** @type {string} */
-        this.cancelledName = String(colorSpan(cancelledName, COLORS.Gray));
+        this.cancelledName = String(colorSpan(newsType.newsFlavor.symbol + ' ' + cancelledName, newsType.newsFlavor.color));
         /** @type {NewsType} */
         this.newsType = newsType;
         /** @type {number} */

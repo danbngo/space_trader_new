@@ -19,9 +19,9 @@ function showPlanetMenu(planet = new Planet()) {
         msg += `What would you like to do?<br/>`
     }
 
-    const options = [[`Society`, () => showPlanetOverviewMenu(planet)]];
-    options.push(["Climate", () => showPlanetClimateMenu(planet)]);
+    const options = []
     options.push(["News", () => showNewsTimelineMenu(planet, () => showPlanetMenu(planet), true)]);
+    options.push([`Society`, () => showPlanetSocietyMenu(planet)]);
     if (settlement.shipyard) {
         options.push(["Shipyard", () => showShipyardBuyMenu(settlement.shipyard)]);
     }
@@ -51,7 +51,7 @@ function showPlanetMenu(planet = new Planet()) {
  * Displays detailed information about a planet's culture and statistics.
  * @param {Planet} planet - The planet to display information for.
  */
-function showPlanetOverviewMenu(planet = new Planet()) {
+function showPlanetSocietyMenu(planet = new Planet()) {
     const {culture, settlement} = planet
     const {territory, population, military, security, economy, industry, crime} = culture
     let msg = ''
@@ -64,36 +64,44 @@ function showPlanetOverviewMenu(planet = new Planet()) {
     msg += `Economy: ${describeRating(economy)}<br/>`
     msg += `Industry: ${describeRating(industry)}<br/>`
     msg += `Crime: ${describeRating(crime, true)}<br/>`
-    msg += `Ship Quality: ${describeRating(culture.shipQuality)}<br/>`
-    msg += `Officer Quality: ${describeRating(culture.officerQuality)}<br/>`
+    msg += `Technology: ${describeRating(culture.shipQuality)}<br/>`
+    msg += `Education: ${describeRating(culture.officerQuality)}<br/>`
     
     // Market and settlement info
     if (settlement) {
         if (settlement.shipyard) {
             const shipyardShips = settlement.shipyard.baseNumShips
             const shipyardNormalized = shipyardShips / SHIPYARD_AVERAGE_NUM_SHIPS
-            msg += `# Ships: ${statColorSpan(roundToPlaces(shipyardNormalized, 2) + 'x', shipyardNormalized, true)}<br/>`
+            msg += `Navy: ${statColorSpan(roundToPlaces(shipyardNormalized, 2) + 'x', shipyardNormalized, true)}<br/>`
         }
         if (settlement.guild) {
             const guildOfficers = settlement.guild.baseNumOfficers
             const guildNormalized = guildOfficers / GUILD_AVERAGE_NUM_OFFICERS
-            msg += `# Officers: ${statColorSpan(roundToPlaces(guildNormalized, 2) + 'x', guildNormalized, true)}<br/>`
+            msg += `Army: ${statColorSpan(roundToPlaces(guildNormalized, 2) + 'x', guildNormalized, true)}<br/>`
+        }
+        if (settlement.bank) {
+            const bankCredits = settlement.bank.baseCredits
+            const bankNormalized = bankCredits / BANK_AVERAGE_CREDITS
+            msg += `Wealth: ${statColorSpan(describeLargeNumber(bankCredits), bankNormalized, true)}<br/>`
         }
         if (settlement.market) {
-            const marketCargoAvg = settlement.market.cargo.average
+            const marketCargoAvg = settlement.market.baseCargo.average
             const marketCargoNormalized = marketCargoAvg / MARKET_AVERAGE_CARGO_PER_TYPE
-            msg += `Market Cargo: ${statColorSpan(roundToPlaces(marketCargoAvg, 1), marketCargoNormalized, true)} per type<br/>`
-            msg += `Market Prices: ${statColorSpan(roundToPlaces(settlement.market.inflation, 2) + 'x', settlement.market.inflation, true)}<br/>`
+            msg += `Goods: ${statColorSpan(roundToPlaces(marketCargoAvg, 1), marketCargoNormalized, true)} per type<br/>`
+            msg += `Inflation: ${statColorSpan(roundToPlaces(settlement.market.inflation, 2) + 'x', settlement.market.inflation, true)}<br/>`
         }
         if (settlement.blackMarket) {
-            const blackMarketCargoAvg = settlement.blackMarket.cargo.average
+            const blackMarketCargoAvg = settlement.blackMarket.baseCargo.average
             const blackMarketCargoNormalized = blackMarketCargoAvg / MARKET_AVERAGE_CARGO_PER_TYPE
-            msg += `Black Market Cargo: ${statColorSpan(roundToPlaces(blackMarketCargoAvg, 1), blackMarketCargoNormalized, true)} per type<br/>`
-            msg += `Black Market Prices: ${statColorSpan(roundToPlaces(settlement.blackMarket.inflation, 2) + 'x', settlement.blackMarket.inflation, true)}<br/>`
+            msg += `Illegal Goods: ${statColorSpan(roundToPlaces(blackMarketCargoAvg, 1), blackMarketCargoNormalized, true)} per type<br/>`
+            msg += `Illegal Inflation: ${statColorSpan(roundToPlaces(settlement.blackMarket.inflation, 2) + 'x', settlement.blackMarket.inflation, true)}<br/>`
         }
     }
     
-    showModal(`${coloredName(planet)} - Overview`, msg, [["Back", () => showPlanetMenu(planet)]]);
+    showModal(`${coloredName(planet)} - Society`, msg, [
+        ["Climate", () => showPlanetClimateMenu(planet)],
+        ["Back", () => showPlanetMenu(planet)]
+    ]);
 }
 
 /**
@@ -123,6 +131,9 @@ function showPlanetClimateMenu(planet = new Planet()) {
     msg += `Geological Activity: ${climate.geologicalActivity.coloredName}<br/>`
     msg += `Magnetosphere: ${climate.magnetosphere.coloredName}<br/>`
     msg += `Radiation Level: ${climate.radiationLevel.coloredName}<br/>`
-    showModal(`${coloredName(planet)} - Climate`, msg, [["Back", () => showPlanetMenu(planet)]]);
+    showModal(`${coloredName(planet)} - Climate`, msg, [
+        ["Society", () => showPlanetSocietyMenu(planet)],
+        ["Back", () => showPlanetMenu(planet)]
+    ]);
 }
 
