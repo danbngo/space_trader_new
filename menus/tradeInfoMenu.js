@@ -71,6 +71,7 @@ function showTradeInfoSellMenu(ct = CARGO_TYPES_ALL[0]) {
         options.push([`${coloredName(cto)}: ${amt}`, ()=>showTradeInfoSellMenu(cto), (ct == cto)])
     }
     options.push(
+        ce({tag:'br'}),
         ["Buy Info", () => showTradeInfoBuyMenu(ct)],
         ["Close", () => closeModal()],
     )
@@ -97,6 +98,7 @@ function showTradeInfoBuyMenu(ct = CARGO_TYPES_ALL[0]) {
         options.push([`${coloredName(cto)}`, ()=>showTradeInfoBuyMenu(cto), (ct == cto)])
     }
     options.push(
+        ce({tag:'br'}),
         ["Sell Info", () => showTradeInfoSellMenu(ct)],
         ["Close", () => closeModal()],
     )

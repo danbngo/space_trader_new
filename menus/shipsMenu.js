@@ -36,7 +36,7 @@ function showShipsMenu(ships = [...gs.fleet.ships]) {
 
     function showDumpShipModal(ship = new Ship()) {
         showModal(`Dump ${coloredName(ship)}`, 
-            `Are you sure you want to dump ${coloredName(ship)}?`,
+            `Dump ${coloredName(ship)}?`,
             [
                 ["Dump", () => dumpShip(ship)],
                 ["Cancel", () => reloadMenu()],

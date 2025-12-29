@@ -19,9 +19,6 @@ function showPlanetMenu(planet = new Planet()) {
     }
 
     const options = []
-    options.push(["News", () => showNewsTimelineMenu(planet, () => showPlanetMenu(planet))]);
-    options.push([`Overview`, () => showPlanetSocietyMenu(planet)]);
-    options.push(ce({tag:'br'}));
     if (settlement.shipyard) {
         options.push(["Shipyard", () => showShipyardBuyMenu(settlement.shipyard)]);
     }
@@ -44,6 +41,8 @@ function showPlanetMenu(planet = new Planet()) {
         options.push(["Academy", () => showAcademyMenu(settlement.academy)]);
     }
     options.push(ce({tag:'br'}));
+    options.push(["News", () => showNewsTimelineMenu(planet, () => showPlanetMenu(planet))]);
+    options.push([`Overview`, () => showPlanetSocietyMenu(planet)]);
     options.push([isDocked ? "Depart" : "Stop Scanning", () => closeModal()]);
     showPlanetModal(planet, `${coloredName(planet)}`, msg, options, 'planet_menu', (nextPlanet) => showPlanetMenu(nextPlanet));
 }
@@ -55,10 +54,12 @@ function showPlanetSocietyMenu(planet = new Planet()) {
     const {culture, settlement} = planet
     const {territory, population, military, security, economy, industry, crime} = culture
     let msg = ''
+    msg += `<u>Overview</u><br/>`
     msg += `Government: ${coloredName(culture.governmentType)}<br/>`
     msg += `Population: ${describePopulation(population)}<br/>`
     msg += `Territory: ${describeTerritory(territory)}<br/>`
     msg += `<br/>`
+    msg += `<u>Ratings</u><br/>`
     msg += `Military: ${describeRating(military)}<br/>`
     msg += `Security: ${describeRating(security)}<br/>`
     msg += `Economy: ${describeRating(economy)}<br/>`

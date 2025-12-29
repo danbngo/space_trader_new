@@ -33,7 +33,7 @@ function showOfficersMenu(officers = gs.fleet.officers) {
 
     function showFireOfficerModal(officer = new Officer()) {
         showModal(`Fire ${officer.name}`, 
-            `Are you sure you want to fire ${officer.name}?`,
+            `Fire ${officer.name}?`,
             [
                 ["Fire", () => fireOfficer(officer)],
                 ["Cancel", () => reloadMenu()],

@@ -48,7 +48,7 @@ function showGuildMenu(guild = new Guild()) {
         const hirePrice = guild.calcHirePrice(officer)
         showModal(
             `Hire ${officer.name}?`,
-            `Are you sure you want to hire ${officer.name} for ${hirePrice} credits?`,
+            `Hire ${officer.name} for ${hirePrice} credits?`,
             [
                 ['Hire', () => hireOfficer(officer)],
                 ['Cancel', () => rebuildMenu()],

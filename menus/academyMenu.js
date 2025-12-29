@@ -18,12 +18,26 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0])
         }
     }
 
+    function showUpgradeConfirmation(skill = SKILLS_ALL[0]) {
+        const cost = academy.calcSkillUpgradeCost(gs.captain, skill)
+        const currentLevel = gs.captain.skills.getAmount(skill)
+        
+        showModal(
+            `Train ${skill}?`,
+            `Train <b>${skill}</b> from level ${currentLevel} to ${currentLevel + 1} for <b>${cost} CR</b>?<br/><br/>Your CR after training: ${gs.credits - cost}`,
+            [
+                ['Train', () => upgradeSkill(skill)],
+                ['Cancel', () => reloadMenu(skill)]
+            ]
+        )
+    }
+
     function onSelectSkill(skill = SKILLS_ALL[0]) {
         const cost = academy.calcSkillUpgradeCost(gs.captain, skill)
         const canAfford = gs.credits >= cost && isDocked
         
         const buttons = [
-            ['Upgrade', () => upgradeSkill(skill), !canAfford],
+            ...(isDocked ? [['Upgrade', () => showUpgradeConfirmation(skill), !canAfford]] : []),
             ['Back', () => showPlanetMenu(planet)]
         ]
         refreshPanelButtons('academy_panel', buttons)

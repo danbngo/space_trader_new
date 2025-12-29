@@ -27,8 +27,9 @@ function refreshPanelButtons (panelId = '', buttons) {
             return
         }
         const [label, handler, disabled, classNames] = btnData
-        const btn = document.createElement('button');
-        btn.textContent = label;
+        const btn = document.createElement('div');
+        btn.classList.add('gameButton');
+        btn.innerHTML = label;
         // @ts-ignore
         btn.onclick = handler;
         if (classNames) {
@@ -39,7 +40,7 @@ function refreshPanelButtons (panelId = '', buttons) {
             }
         }
         buttonsEl.appendChild(btn);
-        if (disabled) {console.log('gonna disable a btn:',btn); btn.disabled = true}
+        if (disabled) {console.log('gonna disable a btn:',btn); btn.classList.add('disabled')}
     });
 }
 

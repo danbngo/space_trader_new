@@ -117,7 +117,7 @@ function showShipyardBuyMenu(shipyard = new Shipyard()) {
         const buyPrice = shipyard.calcBuyPrice(ship)
         showModal(
             `Buy ${coloredName(ship)}?`,
-            `Are you sure you want to buy the ${coloredName(ship)} for ${buyPrice} credits?`,
+            `Buy the ${coloredName(ship)} for ${buyPrice} credits?`,
             [
                 ['Buy', () => buyShip(ship), !isDocked],
                 ['Cancel', () => rebuildMenu()],
@@ -196,7 +196,7 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
             `Sell ${coloredName(ship)}?`,
             ce({children:[
                 !shipyardCanAfford ? `${colorSpan('Warning', COLORS.Yellow)}: Your ${coloredName(ship)} is worth ${salePrice}CR but the shipyard only has ${shipyard.credits} credits!` : ``,
-                `Are you sure you want to sell your ${coloredName(ship)} for ${Math.min(salePrice, shipyard.credits)} credits?`,
+                `Sell ${coloredName(ship)} for ${Math.min(salePrice, shipyard.credits)} credits?`,
                 `Sale Price: ${finalSale}CR ${officersShare ? `(-${officersShare}CR for officers)` : ''}`,
                 `CR After Sale: ${gs.credits+finalSale}CR`,
             ]}),

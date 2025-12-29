@@ -1,4 +1,8 @@
-button {
+.gameButton {
+    display: inline-block;
+}
+
+button, .gameButton {
     /*background: black;*/
     background-color: rgba(0,0,0,0.33);
     color: #0ff;
@@ -13,13 +17,13 @@ button {
     margin-right: 15px;
 }
 
-button:not(:disabled):hover {
+button:not(:disabled):hover, .gameButton:not(:disabled):hover {
     background: #00ffff22;
     border: 1px solid #0ff;
     box-shadow: 0 0 6px #0ff;
 }
 
-button:disabled {
+button:disabled, .gameButton:disabled {
     color: #888;
     border: 1px solid #888;
     box-shadow: none;
@@ -27,7 +31,7 @@ button:disabled {
 }
 
 /* Highlighted button - stands out for important actions */
-button.highlighted {
+button.highlighted, .gameButton.highlighted {
     background: linear-gradient(135deg, rgba(255,215,0,0.3), rgba(255,165,0,0.3));
     border: 2px solid #ffa500;
     color: #ffd700;
@@ -35,7 +39,7 @@ button.highlighted {
     animation: pulse-glow 2s ease-in-out infinite;
 }
 
-button.highlighted:not(:disabled):hover {
+button.highlighted:not(:disabled):hover, .gameButton.highlighted:not(:disabled):hover {
     background: linear-gradient(135deg, rgba(255,215,0,0.5), rgba(255,165,0,0.5));
     border: 2px solid #ffd700;
     box-shadow: 0 0 16px rgba(255,165,0,0.8);
