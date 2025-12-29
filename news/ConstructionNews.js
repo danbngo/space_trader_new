@@ -14,8 +14,8 @@ class ConstructionNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 economy: CL.SLIGHTLY_LOW,
-                marketCargoAmounts: CL.LOW,
-                marketPrices: CL.HIGH,
+                stockpile: CL.LOW,
+                inflation: CL.HIGH,
                 credits: CL.LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.METAL, CL.EXTREMELY_HIGH], [CARGO_TYPES.NANITES, CL.ASTRONOMICAL]]),
             })
@@ -38,14 +38,14 @@ class ConstructionNews extends News {
     determineOutcome() {
         const {planet} = this
         // Higher economy = more likely to succeed
-        this.rollOutcome(planet.culture.economy, CL.LOW)
+        this.rollOutcome(planet.civilization.economy, CL.LOW)
     }
 
     isValid() {
         const {planet} = this
         //must be missing at least one building OR industry is low and credits are high
         const buildingsValid = News.calcRepairableBuildings(planet).length > 0
-        const ratingsValid = planet.culture.industry < CL.LOW && (planet.settlement.goods > CL.SLIGHTLY_HIGH || planet.settlement.wealth > CL.SLIGHTLY_HIGH)
+        const ratingsValid = planet.civilization.industry < CL.LOW && (planet.settlement.stockpile > CL.SLIGHTLY_HIGH || planet.settlement.wealth > CL.SLIGHTLY_HIGH)
         const interferingEvent =
             News.planetHasAnyNewsTargeting(planet, NT_DANGEROUS) ||
             News.planetHasAnyNews(planet, [NT.CONSTRUCTION, ...NT_ECONOMY_PREVENTING])

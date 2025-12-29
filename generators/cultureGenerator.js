@@ -1,9 +1,9 @@
 /**
- * Generates a culture for a planet with randomized attributes.
- * @param {Planet} planet - The planet to generate culture for.
- * @returns {Culture} The generated culture.
+ * Generates a civilization for a planet with randomized attributes.
+ * @param {Planet} planet - The planet to generate civilization for.
+ * @returns {Civilization} The generated civilization.
  */
-function generateCulture(planet = new Planet()) {
+function generateCivilization(planet = new Planet()) {
     const governmentType = rndMember(GT_ALL.filter(gt => gt != GT.PUPPET_STATE))
     const shipQuality = rng(4,1,false)/2
     const officerQuality = rng(4,1,false)/2
@@ -13,7 +13,7 @@ function generateCulture(planet = new Planet()) {
     const security = rng(8,1,false)/4
     const economy = rng(8,1,false)/4
     const industry = rng(8,1,false)/4
-    const crime = rng(8,1,false)/4
+    const culture = rng(8,1,false)/4
     const prestige = rng(8,1,false)/4
 
     const cargoPriceModifiers = new CountsMap()
@@ -44,5 +44,5 @@ function generateCulture(planet = new Planet()) {
         selectPolicy(validForeignPolicies)
     )
 
-    return new Culture(planet, governmentType, cargoPriceModifiers, shipQuality, officerQuality, territory, population, military, industry, economy, security, crime, prestige, policies)
+    return new Civilization(planet, governmentType, cargoPriceModifiers, shipQuality, officerQuality, territory, population, military, industry, economy, security, culture, prestige, policies)
 }

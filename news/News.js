@@ -1,5 +1,5 @@
 /**
- * Represents a news event that affects planets and cultures over time.
+ * Represents a news event that affects planets and civilizations over time.
  * @class News
  */
 class News {
@@ -58,7 +58,7 @@ class News {
     }
 
     /**
-     * Calculates a half-regression value for culture level changes.
+     * Calculates a half-regression value for civilization level changes.
      * @param {number} magnitude - The magnitude of the effect (default 1.0).
      * @returns {number} Half-regression value.
      */
@@ -367,7 +367,7 @@ class News {
         const possibleWarNews = []
         for (const otherPlanet of gs.system.planets) {
             if (otherPlanet == targetPlanet) continue
-            const relationship = otherPlanet.culture.relationships.get(targetPlanet)
+            const relationship = otherPlanet.civilization.relationships.get(targetPlanet)
             if (relationship == RELATIONSHIP_TYPES.NEUTRAL) {
                 const n = new TensionsNews(otherPlanet, targetPlanet)
                 //skip political considerations as this is about raw power/survival

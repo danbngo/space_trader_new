@@ -1,5 +1,5 @@
 /**
- * Represents a type of policy for a planet's culture.
+ * Represents a type of policy for a planet's civilization.
  * @class PolicyType
  */
 class PolicyType {

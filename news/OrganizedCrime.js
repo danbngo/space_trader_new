@@ -16,8 +16,8 @@ class OrganizedCrimeNews extends News {
                 industry: CL.LOW,
                 security: CL.LOW,
                 crime: CL.VERY_HIGH,
-                blackMarketPrices: CL.LOW,
-                blackMarketCargoAmounts: CL.VERY_HIGH,
+                corruption: CL.LOW,
+                crime: CL.VERY_HIGH,
             })
         ]
 
@@ -29,7 +29,7 @@ class OrganizedCrimeNews extends News {
             industry: News.clHalfRegression(this.completeEffects[0].industry),
             security: News.clHalfRegression(this.completeEffects[0].security),
             crime: News.clHalfRegression(this.completeEffects[0].crime),
-            blackMarketCargoAmounts: News.clHalfRegression(this.completeEffects[0].blackMarketCargoAmounts),
+            crime: News.clHalfRegression(this.completeEffects[0].crime),
         })
 
         // Failed: syndicates win, permanent corruption
@@ -48,7 +48,7 @@ class OrganizedCrimeNews extends News {
     determineOutcome() {
         const {planet} = this
         // Crime crackdown fails if security too low
-        const failProbability = (1 - planet.culture.security) * 0.45
+        const failProbability = (1 - planet.civilization.security) * 0.45
         this.failed = Math.random() < failProbability
     }
 

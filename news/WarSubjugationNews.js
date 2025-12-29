@@ -16,7 +16,7 @@ class WarSubjugationNews extends News {
                 territory: CL.VERY_HIGH,
                 military: CL.SLIGHTLY_LOW,
                 economy: CL.HIGH,
-                marketCargoAmounts: CL.HIGH,
+                stockpile: CL.HIGH,
                 prestige: CL.VERY_HIGH,
             }),
             new NewsEffect({
@@ -28,7 +28,7 @@ class WarSubjugationNews extends News {
                 military: CL.EXTREMELY_LOW,
                 security: CL.VERY_LOW,
                 economy: CL.LOW,
-                marketCargoAmounts: CL.LOW,
+                stockpile: CL.LOW,
                 prestige: CL.VERY_LOW,
                 relationsReset: true,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_LOW]]),
@@ -57,7 +57,7 @@ class WarSubjugationNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 military: CL.LOW, // failed invasion losses
-                shipyardNumShips: CL.LOW,
+                technology: CL.LOW,
                 prestige: CL.LOW, // humiliation
             }),
             new NewsEffect({
@@ -90,7 +90,7 @@ class WarSubjugationNews extends News {
     determineOutcome() {
         const {planet, targetPlanet} = this
         // Check if war still ongoing
-        const stillAtWar = planet.culture.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
+        const stillAtWar = planet.civilization.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
         if (!stillAtWar) {
             this.cancelled = true
             return
@@ -105,7 +105,7 @@ class WarSubjugationNews extends News {
         //our army must be both large and  significantly better than theirs in every way
         const ratingsValid = (planet.army/targetPlanet.army > CL.HIGH) && (planet.navy/targetPlanet.navy > CL.HIGH)
         //planet must be at war with the target
-        const relationshipValid = planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR
+        const relationshipValid = planet.civilization.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR
         const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.SUBJUGATION, ...NT_COOPERATIVE])
         return ratingsValid && relationshipValid && !interferingEvent
     }

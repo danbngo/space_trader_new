@@ -20,10 +20,10 @@ class EmbargoNews extends News {
                 targetPlanet: this.planet,
                 prestige: CL.SLIGHTLY_LOW,
                 economy: CL.VERY_LOW,
-                marketPrices: CL.VERY_HIGH,
-                marketCargoAmounts: CL.LOW,
-                blackMarketPrices: CL.HIGH,
-                blackMarketCargoAmounts: CL.LOW,
+                inflation: CL.VERY_HIGH,
+                stockpile: CL.LOW,
+                corruption: CL.HIGH,
+                crime: CL.LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WATER, CL.VERY_HIGH], [CARGO_TYPES.METAL, CL.VERY_HIGH]]),
             })
         ]
@@ -45,8 +45,8 @@ class EmbargoNews extends News {
             new NewsEffect({
                 planet: this.targetPlanet,
                 economy: News.clHalfRegression(CL.VERY_LOW),
-                marketPrices: News.clHalfRegression(CL.VERY_HIGH),
-                marketCargoAmounts: News.clHalfRegression(CL.LOW),
+                inflation: News.clHalfRegression(CL.VERY_HIGH),
+                stockpile: News.clHalfRegression(CL.LOW),
             })
         ]
     }
@@ -54,7 +54,7 @@ class EmbargoNews extends News {
     determineOutcome() {
         const {planet, targetPlanet} = this
         // Check if relationship improved to neutral
-        const rel = planet.culture.relationships.get(targetPlanet)
+        const rel = planet.civilization.relationships.get(targetPlanet)
         if (rel === RELATIONSHIP_TYPES.NEUTRAL || rel === RELATIONSHIP_TYPES.ALLY) {
             this.cancelled = true
         }
@@ -63,10 +63,10 @@ class EmbargoNews extends News {
     isValid() {
         const {planet, targetPlanet} = this
         //need to have enough ships for it
-        const ratingsValid = planet.culture.military > CL.MEDIUM
+        const ratingsValid = planet.civilization.military > CL.MEDIUM
         //cant be anarchic or puppet state
         //planet must already be hostile to the target planet
-        const relationshipValid = planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.TENSE || planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR
+        const relationshipValid = planet.civilization.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.TENSE || planet.civilization.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR
         const interferingEvent = 
             News.hasNews(NT.EMBARGO, planet, targetPlanet) || 
             News.hasAnyNewsBidirectional(planet, targetPlanet, NT_COOPERATIVE)

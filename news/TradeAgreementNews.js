@@ -12,9 +12,9 @@ class TradeAgreementNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
-                marketCargoAmounts: CL.HIGH,
+                stockpile: CL.HIGH,
                 economy: CL.SLIGHTLY_HIGH,
-                guildNumOfficers: CL.HIGH,
+                education: CL.HIGH,
                 officerQuality: CL.SLIGHTLY_HIGH,
                 shipQuality: CL.SLIGHTLY_HIGH,
                 credits: CL.HIGH,
@@ -22,9 +22,9 @@ class TradeAgreementNews extends News {
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
-                marketCargoAmounts: CL.HIGH,
+                stockpile: CL.HIGH,
                 economy: CL.SLIGHTLY_HIGH,
-                guildNumOfficers: CL.HIGH,
+                education: CL.HIGH,
                 officerQuality: CL.SLIGHTLY_HIGH,
                 shipQuality: CL.SLIGHTLY_HIGH,
                 credits: CL.HIGH,
@@ -60,13 +60,13 @@ class TradeAgreementNews extends News {
         this.cancelEffects = [
             new NewsEffect({
                 planet: this.planet,
-                marketCargoAmounts: News.clHalfRegression(CL.HIGH),
+                stockpile: News.clHalfRegression(CL.HIGH),
                 economy: News.clHalfRegression(CL.SLIGHTLY_HIGH),
                 credits: News.clHalfRegression(CL.HIGH),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                marketCargoAmounts: News.clHalfRegression(CL.HIGH),
+                stockpile: News.clHalfRegression(CL.HIGH),
                 economy: News.clHalfRegression(CL.SLIGHTLY_HIGH),
                 credits: News.clHalfRegression(CL.HIGH),
             })
@@ -76,25 +76,25 @@ class TradeAgreementNews extends News {
     determineOutcome() {
         const {planet, targetPlanet} = this
         // Check for hostile relationships
-        const rel1 = planet.culture.relationships.get(targetPlanet)
-        const rel2 = targetPlanet.culture.relationships.get(planet)
+        const rel1 = planet.civilization.relationships.get(targetPlanet)
+        const rel2 = targetPlanet.civilization.relationships.get(planet)
         if (rel1 === RELATIONSHIP_TYPES.TENSE || rel1 === RELATIONSHIP_TYPES.WAR ||
             rel2 === RELATIONSHIP_TYPES.TENSE || rel2 === RELATIONSHIP_TYPES.WAR) {
             this.cancelled = true
             return
         }
         // Check for economic collapse
-        const economyCheck = (planet.culture.economy < CL.LOW) || (targetPlanet.culture.economy < CL.LOW)
+        const economyCheck = (planet.civilization.economy < CL.LOW) || (targetPlanet.civilization.economy < CL.LOW)
         this.failed = economyCheck
     }
 
     isValid() {
         const {planet, targetPlanet} = this
         //planets must be neutral or allied towards each other
-        const relationships = [planet.culture.relationships.get(targetPlanet), targetPlanet.culture.relationships.get(planet)]
+        const relationships = [planet.civilization.relationships.get(targetPlanet), targetPlanet.civilization.relationships.get(planet)]
         const relationshipsValid = relationships.every(r => r == RELATIONSHIP_TYPES.NEUTRAL || r == RELATIONSHIP_TYPES.ALLY)
         //dont trade with opposing governments
-        const govTypesValid = planet.culture.governmentType.opposingType !== targetPlanet.culture.governmentType && targetPlanet.culture.governmentType.opposingType !== planet.culture.governmentType
+        const govTypesValid = planet.civilization.governmentType.opposingType !== targetPlanet.civilization.governmentType && targetPlanet.civilization.governmentType.opposingType !== planet.civilization.governmentType
         //trade is only blocked if you're actively hostile to each other. 
         const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.TRADE_AGREEMENT, ...NT_COOPERATION_PREVENTING])
         return govTypesValid && relationshipsValid && !interferingEvent

@@ -22,12 +22,12 @@ function startNewGame() {
     gs.system = SOLAR_SYSTEM
 
     for (const planet of gs.system.planets) {
-        //dont modify order, settlement depends on culture
-        planet.culture = generateCulture(planet)
+        //dont modify order, settlement depends on civilization
+        planet.civilization = generateCivilization(planet)
         planet.settlement = generateSettlement(planet)
         //begin as neutral
         for (const p of gs.system.planets) { 
-            planet.culture.relationships.set(p, RELATIONSHIP_TYPES.NEUTRAL)
+            planet.civilization.relationships.set(p, RELATIONSHIP_TYPES.NEUTRAL)
         }
     }
 

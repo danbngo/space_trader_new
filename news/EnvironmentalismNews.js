@@ -12,7 +12,7 @@ class EnvironmentalismNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 industry: CL.EXTREMELY_LOW,
-                shipyardNumShips: CL.VERY_LOW,
+                technology: CL.VERY_LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.NANITES, CL.EXTREMELY_LOW], [CARGO_TYPES.METAL, CL.EXTREMELY_LOW]]),
             })
         ]
@@ -21,7 +21,7 @@ class EnvironmentalismNews extends News {
         //market, economy, industry do not fully bounce back
         Object.assign(this.completeEffects[0], {
             population: CL.SLIGHTLY_HIGH,
-            shipyardNumShips: News.clHalfRegression(this.completeEffects[0].shipyardNumShips),
+            technology: News.clHalfRegression(this.completeEffects[0].technology),
             industry: News.clHalfRegression(this.completeEffects[0].industry),
             prestige: CL.SLIGHTLY_HIGH,
         })
@@ -40,14 +40,14 @@ class EnvironmentalismNews extends News {
     determineOutcome() {
         const {planet} = this
         // Movement fails if economy becomes too weak to sustain
-        const failProbability = (1 - planet.culture.economy) * 0.35
+        const failProbability = (1 - planet.civilization.economy) * 0.35
         this.failed = Math.random() < failProbability
     }
 
     isValid() {
         const {planet} = this
         //happens when industry is getting out of hand
-        const ratingsValid = planet.culture.industry >= CL.HIGH
+        const ratingsValid = planet.civilization.industry >= CL.HIGH
         const interferingEvent = News.planetHasAnyNews(planet, [NT.ENVIRONMENTALISM, ...NT_ECONOMY_PREVENTING])
         return ratingsValid && !interferingEvent
     }

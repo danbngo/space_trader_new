@@ -19,8 +19,8 @@ function generateOfficerName(planet = new Planet()) {
  * @returns {Officer} The generated officer.
  */
 function generateOfficer(planet = new Planet()) {
-    const {culture} = planet
-    const {officerQuality} = culture
+    const {civilization} = planet
+    const {officerQuality} = civilization
     const level = rng(10*officerQuality, 1)
     const fame = rng(level, -level)
     const infamy = rng(level, -level)

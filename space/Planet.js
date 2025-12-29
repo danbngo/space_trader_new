@@ -12,17 +12,17 @@ class Planet extends OrbitingObject {
      * @param {Orbit} orbit - The orbit of the planet.
      * @param {PlanetType} planetType - The type of the planet.
      * @param {Settlement} settlement - The settlement on the planet.
-     * @param {Culture} culture - The culture of the planet.
+     * @param {Civilization} civilization - The civilization of the planet.
      * @param {Climate} climate - The climate of the planet.
      */
-    constructor(name = "Unnamed", color = COLORS.White, radius = 0, x = 0, y = 0, orbit = null, planetType = PLANET_TYPES_ALL[0], settlement = null, culture = null, climate = null) {
+    constructor(name = "Unnamed", color = COLORS.White, radius = 0, x = 0, y = 0, orbit = null, planetType = PLANET_TYPES_ALL[0], settlement = null, civilization = null, climate = null) {
         super(name, color, radius, x, y, orbit);
         /** @type {PlanetType} */
         this.planetType = planetType
         /** @type {Settlement} */
         this.settlement = settlement
-        /** @type {Culture} */
-        this.culture = culture
+        /** @type {Civilization} */
+        this.civilization = civilization
         /** @type {Climate} */
         this.climate = climate || new Climate()
     }
@@ -46,14 +46,15 @@ class Planet extends OrbitingObject {
     }
 
     get navy() {
-        return this.culture.military * this.settlement.shipyard.baseNumShips * this.culture.shipQuality
+        return this.civilization.military * this.settlement.shipyard.baseNumShips * this.civilization.shipQuality
     }
 
     get army() {
-        return this.culture.military * this.settlement.guild.baseNumOfficers * this.culture.officerQuality
+        return this.civilization.military * this.settlement.guild.baseNumOfficers * this.civilization.officerQuality
     }
 
     get militaryPower() {
         return this.navy + this.army
     }
+
 }

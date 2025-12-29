@@ -1,26 +1,26 @@
 
 /**
- * Represents the culture of a planet, including government type, cargo price modifiers, and various quality and rating attributes.
- * @class Culture
+ * Represents the civilization of a planet, including government type, cargo price modifiers, and various quality and rating attributes.
+ * @class Civilization
  */
-class Culture {
+class Civilization {
     /**
-     * @param {Planet} planet - The planet this culture belongs to.
-     * @param {GovernmentType} governmentType - The type of government of the culture.
-     * @param {CountsMap} cargoPriceModifiers - Modifiers for cargo prices specific to this culture.
-     * @param {number} shipQuality - Quality rating of ships produced by this culture.
-     * @param {number} officerQuality - Quality rating of officers from this culture.
-     * @param {number} territory - The territorial reach of the culture in Astronomical Units (AUs).
+     * @param {Planet} planet - The planet this civilization belongs to.
+     * @param {GovernmentType} governmentType - The type of government of the civilization.
+     * @param {CountsMap} cargoPriceModifiers - Modifiers for cargo prices specific to this civilization.
+     * @param {number} shipQuality - Quality rating of ships produced by this civilization.
+     * @param {number} officerQuality - Quality rating of officers from this civilization.
+     * @param {number} territory - The territorial reach of the civilization in Astronomical Units (AUs).
      * @param {number} population - The population factor affecting fleet sizes and officer availability.
      * @param {number} military - Rating affecting war fleets, bounty hunters, and bank credits.
      * @param {number} industry - Rating affecting merchants, miners, and ship availability.
      * @param {number} economy - Rating affecting merchants, smugglers, and market cargo availability.
      * @param {number} security - Rating affecting police and bounty hunter presence.
-     * @param {number} crime - Rating affecting pirate and smuggler activity and black market cargo.
+     * @param {number} culture - 
      * @param {number} prestige - Effects how planets interact with each other.
-     * @param {Policies} policies - The active policies for this culture.
+     * @param {Policies} policies - The active policies for this civilization.
      */
-    constructor(planet = new Planet(), governmentType = GT_ALL[0], cargoPriceModifiers = new CountsMap(), shipQuality = 1.0, officerQuality = 1.0, territory = 1, population = 1, military = 1, industry = 1, economy = 1, security = 1, crime = 1, prestige = 1, policies = new Policies()) {
+    constructor(planet = new Planet(), governmentType = GT_ALL[0], cargoPriceModifiers = new CountsMap(), shipQuality = 1.0, officerQuality = 1.0, territory = 1, population = 1, military = 1, industry = 1, economy = 1, security = 1, culture = 1, prestige = 1, policies = new Policies()) {
         /** @type {CountsMap} */
         this.cargoPriceModifiers = cargoPriceModifiers
         /** @type {number} */
@@ -28,7 +28,7 @@ class Culture {
         /** @type {number} */
         this.officerQuality = officerQuality;
         /** @type {number} */
-        this.territory = territory; //AUs, recall that neptune is 30. encounters for this culture can be found further from its planet
+        this.territory = territory; //AUs, recall that neptune is 30. encounters for this civilization can be found further from its planet
         /** @type {number} */
         this.population = population; //fleets are larger, more officers available
         /** @type {number} */
@@ -40,7 +40,7 @@ class Culture {
         /** @type {number} */
         this.security = security; //more police and bounty hunters
         /** @type {number} */
-        this.crime = crime; //more pirates and smugglers, more cargo in black market
+        this.culture = culture; 
         /** @type {number} */
         this.prestige = prestige
         /** @type {GovernmentType} */

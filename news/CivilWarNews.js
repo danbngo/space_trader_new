@@ -9,7 +9,7 @@ class CivilWarNews extends News {
         )
 
         const buildingsDisabled = rndMembers(News.calcDestroyableBuildings(this.planet), rng(3, 1), true)
-        const newGovernmentType = Math.random() > .5 ? this.planet.culture.governmentType : rndMember(GT_ALL.filter(g => g !== GT.PUPPET_STATE))
+        const newGovernmentType = Math.random() > .5 ? this.planet.civilization.governmentType : rndMember(GT_ALL.filter(g => g !== GT.PUPPET_STATE))
 
         this.startEffects = [
             new NewsEffect({
@@ -18,12 +18,12 @@ class CivilWarNews extends News {
                 territory: CL.SLIGHTLY_LOW,
                 military: CL.VERY_LOW,
                 security: CL.VERY_LOW,
-                crime: CL.VERY_HIGH,
                 //population: CL.LOW,
                 economy: CL.LOW,
                 industry: CL.LOW,
-                marketCargoAmounts: CL.LOW,
-                marketPrices: CL.HIGH,
+                stockpile: CL.LOW,
+                inflation: CL.HIGH,
+                corruption: CL.HIGH,
                 credits: CL.LOW,
                 prestige: CL.LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, CL.ASTRONOMICAL], [CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_HIGH]]),
@@ -42,12 +42,12 @@ class CivilWarNews extends News {
 
     determineOutcome() {
         const {planet} = this
-        this.rollOutcome(0.5*(planet.culture.security+planet.culture.prestige)/planet.culture.population, CL.HIGH)
+        this.rollOutcome(0.5*(planet.civilization.security+planet.civilization.culture)/planet.civilization.population, CL.HIGH)
     }
     isValid() {
         const {planet} = this
         //usually happens when military or security is large
-        const ratingsValid = planet.culture.military > CL.VERY_HIGH || planet.culture.security > CL.VERY_HIGH
+        const ratingsValid = planet.civilization.military > CL.VERY_HIGH || planet.civilization.security > CL.VERY_HIGH
         //cant be having any of: construction, economic boom, revolution
         const interferingEvent =
             News.planetHasAnyNews(planet, [NT.CIVIL_WAR, NT.ECONOMIC_BOOM, NT.REVOLUTION]) ||

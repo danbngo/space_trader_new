@@ -1,5 +1,5 @@
 /**
- * Represents a type of government for a planet's culture.
+ * Represents a type of government for a planet's civilization.
  * @class GovernmentType
  */
 class GovernmentType {

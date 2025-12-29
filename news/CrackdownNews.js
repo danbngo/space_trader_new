@@ -2,8 +2,8 @@ class CrackdownNews extends News {
     constructor(planet = new Planet()) {
         super(
             `Government cracks down on crime on ${coloredName(planet)}!`,
-            `The anti-crime crackdown on ${coloredName(planet)} ends.`,
-            `${coloredName(planet)}'s crackdown fails! Crime is emboldened!`,
+            `The anti-crime crackdown on ${coloredName(planet)} ends with a series of high profile arrests!`,
+            `${coloredName(planet)}'s crackdown fails as the syndicates corrupt the very agencies tasked with enforcement!`,
             '',
             NT.CRACKDOWN, planet
         )
@@ -11,50 +11,40 @@ class CrackdownNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                security: CL.VERY_HIGH,
-                crime: CL.EXTREMELY_LOW,
-                blackMarketCargoAmounts: CL.VERY_LOW,
-                blackMarketPrices: CL.VERY_HIGH,
-                prestige: CL.SLIGHTLY_LOW, //other planets look unfavorably on this
-                cargoPriceModifiers: new Map([[CARGO_TYPES.DRUGS, CL.EXTREMELY_HIGH]]),
+                security: CL.SLIGHTLY_HIGH,
+                culture: CL.LOW,
+                crime: CL.SLIGHTLY_LOW,
+                corruption: CL.SLIGHTLY_LOW,
+                cargoPriceModifiers: new Map([[CARGO_TYPES.DRUGS, CL.HIGH], [CARGO_TYPES.WEAPONS, CL.HIGH]]),
             })
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         //some lingering crime decrease
         Object.assign(this.completeEffects[0], {
-            prestige: CL.NO_REGRESSION,
-            security: News.clHalfRegression(this.completeEffects[0].security),
-            crime: News.clHalfRegression(this.completeEffects[0].crime),
-            //blackMarketPrices: News.clHalfRegression(this.completeEffects[0].blackMarketPrices),
-            blackMarketCargoAmounts: News.clHalfRegression(this.completeEffects[0].blackMarketCargoAmounts),
+            security: CL.HIGH/CL.SLIGHTLY_HIGH,
+            crime: CL.LOW/CL.SLIGHTLY_LOW,
+            corruption: CL.LOW/CL.SLIGHTLY_LOW,
         })
 
-        this.failEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                security: CL.LOW,
-                crime: CL.HIGH,
-                prestige: CL.VERY_LOW,
-                blackMarketCargoAmounts: CL.HIGH,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.DRUGS, CL.NO_REGRESSION]]),
-            })
-        ]
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        Object.assign(this.failEffects[0], {
+            security: CL.SLIGHTLY_LOW/CL.SLIGHTLY_HIGH,
+            crime: CL.HIGH/CL.SLIGHTLY_LOW,
+            corruption: CL.HIGH/CL.SLIGHTLY_LOW,
+            prestige: CL.SLIGHTLY_LOW
+        })
     }
 
     determineOutcome() {
         const {planet} = this
-        // Higher security and military = more likely crackdown succeeds
-        const successProbability = (planet.culture.security + planet.culture.military) / 2
-        this.failed = Math.random() > successProbability
+        this.rollOutcome(planet.civilization.security*planet.civilization.culture/planet.settlement.cryme, CL.LOW) //this usually suceeds
     }
 
     isValid() {
         const {planet} = this
-        //wouldnt happen in an anarchy, just sayin
-        //wont happen if crime is already low AND black market amount/price is low
-        const crimeValid = (planet.culture.crime > CL.HIGH || planet.settlement.blackMarket.inflation > CL.HIGH || planet.settlement.illegalGoods > CL.HIGH)
-        const securityValid = planet.culture.security < CL.HIGH
+        const crimeValid = (planet.settlement.corruption > CL.HIGH || planet.settlement.cryme > CL.HIGH)
+        const securityValid = planet.civilization.security < CL.HIGH
         const interferingEvent = News.planetHasAnyNews(planet, [NT.CRACKDOWN, ...NT_CRIME_PREVENTING])
         return crimeValid && securityValid && !interferingEvent
     }

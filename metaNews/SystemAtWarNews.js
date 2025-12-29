@@ -54,7 +54,7 @@ class SystemAtWarNews extends News {
         //at least 3 planets should be at war simultaneously
         const {planets} = gs.system
         const warCount = planets.reduce((count, planet) => {
-            const hostilePlanets = Array.from(planet.culture.relationships.entries()).filter(([targetPlanet, relationship]) => relationship == RELATIONSHIP_TYPES.WAR)
+            const hostilePlanets = Array.from(planet.civilization.relationships.entries()).filter(([targetPlanet, relationship]) => relationship == RELATIONSHIP_TYPES.WAR)
             if (hostilePlanets.length >= 1) return count + 1
             return count
         }, 0)
@@ -73,7 +73,7 @@ class SystemAtWarNews extends News {
         const warsToStart = []
         for (const planet of planetsRandom1) {
             for (const targetPlanet of planetsRandom2) {
-                if (planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.TENSE) {
+                if (planet.civilization.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.TENSE) {
                     const news = new WarNews(planet, targetPlanet)
                     if (!news.isValid()) continue
                     //news.setDuration(1000) //dont expire naturally

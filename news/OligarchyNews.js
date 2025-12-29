@@ -41,14 +41,14 @@ class OligarchyNews extends News {
     determineOutcome() {
         const {planet} = this
         // Oligarchy becomes permanent if security too weak to resist
-        const failProbability = (1 - planet.culture.security) * 0.4
+        const failProbability = (1 - planet.civilization.security) * 0.4
         this.failed = Math.random() < failProbability
     }
 
     isValid() {
         const {planet} = this
         // More likely if economy is high 
-        const ratingsValid = (planet.culture.economy > CL.HIGH)
+        const ratingsValid = (planet.civilization.economy > CL.HIGH)
         // Planet must not already have this event
         const interferingEvent = News.planetHasAnyNews(planet, [NT.OLIGARCHY])
         return ratingsValid && !interferingEvent

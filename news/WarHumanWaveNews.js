@@ -13,7 +13,7 @@ class WarHumanWaveNews extends News {
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
                 population: CL.VERY_LOW, // massive casualties
-                guildNumOfficers: CL.LOW, // officers leading charges
+                education: CL.LOW, // officers leading charges
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
@@ -25,12 +25,12 @@ class WarHumanWaveNews extends News {
         // Attacker: massive permanent losses
         Object.assign(this.completeEffects[0], {
             population: CL.NO_REGRESSION, // dead don't return
-            guildNumOfficers: CL.NO_REGRESSION,
+            education: CL.NO_REGRESSION,
             prestige: CL.NO_REGRESSION,
         })
         // Defender: permanent losses
         Object.assign(this.completeEffects[1], {
-            guildNumOfficers: CL.LOW, // officers killed defending
+            education: CL.LOW, // officers killed defending
             military: CL.SLIGHTLY_LOW, // ground forces worn down
         })
 
@@ -39,11 +39,11 @@ class WarHumanWaveNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 population: News.clHalfRegression(CL.VERY_LOW), // some casualties already taken
-                guildNumOfficers: News.clHalfRegression(CL.LOW),
+                education: News.clHalfRegression(CL.LOW),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                guildNumOfficers: News.clHalfRegression(CL.LOW),
+                education: News.clHalfRegression(CL.LOW),
                 military: News.clHalfRegression(CL.SLIGHTLY_LOW),
             })
         ]
@@ -52,7 +52,7 @@ class WarHumanWaveNews extends News {
     determineOutcome() {
         const {planet, targetPlanet} = this
         // Check if war still ongoing
-        const stillAtWar = planet.culture.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
+        const stillAtWar = planet.civilization.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
         if (!stillAtWar) {
             this.cancelled = true
         }
@@ -61,11 +61,11 @@ class WarHumanWaveNews extends News {
     isValid() {
         const {planet, targetPlanet} = this
         // Must be at war
-        const relationshipValid = planet.culture.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
+        const relationshipValid = planet.civilization.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
         // Must have an ongoing war event
         const hasWar = News.hasNews(NT.WAR, planet, targetPlanet)
         // Requires high population to sacrifice
-        const populationValid = planet.culture.population > CL.HIGH
+        const populationValid = planet.civilization.population > CL.HIGH
         // we need to be desperate
         const militaryValid = planet.militaryPower/targetPlanet.militaryPower < CL.LOW
         // Can't have human wave already

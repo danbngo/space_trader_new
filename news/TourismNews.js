@@ -10,8 +10,8 @@ class TourismNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                marketPrices: CL.VERY_HIGH,
-                marketCargoAmounts: CL.LOW,
+                inflation: CL.VERY_HIGH,
+                stockpile: CL.LOW,
                 industry: CL.LOW,
                 credits: CL.LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.METAL, 2], [CARGO_TYPES.NANITES, 2]]),
@@ -24,8 +24,8 @@ class TourismNews extends News {
             credits: 1.5/(0.7),
             economy: CL.SLIGHTLY_HIGH,
             crime: CL.SLIGHTLY_HIGH,
-            blackMarketCargoAmounts: CL.VERY_HIGH,
-            blackMarketPrices: CL.VERY_HIGH,
+            crime: CL.VERY_HIGH,
+            corruption: CL.VERY_HIGH,
         })
 
         // Failed: resort attracts no tourists, investment wasted
@@ -42,7 +42,7 @@ class TourismNews extends News {
     determineOutcome() {
         const {planet} = this
         // Tourism fails if planet has low prestige or poor economy during construction
-        const failProbability = (1 - planet.culture.prestige) * (1 - planet.culture.economy) * 0.3
+        const failProbability = (1 - planet.civilization.prestige) * (1 - planet.civilization.economy) * 0.3
         this.failed = Math.random() < failProbability
     }
 

@@ -31,8 +31,8 @@ class WarBombardmentNews extends News {
                 industry: CL.LOW,
                 economy: CL.LOW,
                 security: CL.LOW,
-                marketCargoAmounts: CL.LOW,
-                marketPrices: CL.EXTREMELY_HIGH,
+                stockpile: CL.LOW,
+                inflation: CL.EXTREMELY_HIGH,
                 shipQuality: CL.LOW, //back to the stone age!
                 officerQuality: CL.LOW,
                 prestige: CL.VERY_LOW,
@@ -49,7 +49,7 @@ class WarBombardmentNews extends News {
             industry: CL.NO_REGRESSION,
             economy: CL.NO_REGRESSION,
             security: CL.NO_REGRESSION,
-            marketCargoAmounts: CL.NO_REGRESSION,
+            stockpile: CL.NO_REGRESSION,
             shipQuality: CL.NO_REGRESSION,
             officerQuality: CL.NO_REGRESSION,
             prestige: CL.NO_REGRESSION,
@@ -80,17 +80,17 @@ class WarBombardmentNews extends News {
     determineOutcome() {
         const {planet, targetPlanet} = this
         // Check if peace was forced (relationships changed during bombardment)
-        const currentRel1 = planet.culture.relationships.get(targetPlanet)
-        const currentRel2 = targetPlanet.culture.relationships.get(planet)
+        const currentRel1 = planet.civilization.relationships.get(targetPlanet)
+        const currentRel2 = targetPlanet.civilization.relationships.get(planet)
         this.cancelled = (currentRel1 !== RELATIONSHIP_TYPES.WAR || currentRel2 !== RELATIONSHIP_TYPES.WAR)
     }
 
     isValid() {
         const {planet, targetPlanet} = this
         //our military must be significantly stronger than theirs and navy must be MUCH stronger
-        const navyAdvantage = planet.culture.military > targetPlanet.culture.military * CL.HIGH && planet.navy > targetPlanet.navy * CL.VERY_HIGH
+        const navyAdvantage = planet.civilization.military > targetPlanet.civilization.military * CL.HIGH && planet.navy > targetPlanet.navy * CL.VERY_HIGH
         
-        const relationshipValid = planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR
+        const relationshipValid = planet.civilization.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR
         const interferingEvent = 
             News.hasNews(NT.BOMBARDMENT, planet, targetPlanet) || 
             News.hasAnyNewsBidirectional(planet, targetPlanet, NT_COOPERATIVE)

@@ -13,8 +13,8 @@ class RevivalNews extends News {
                 planet: this.planet,
                 officerQuality: CL.LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.HOLOCUBES, CL.VERY_HIGH], [CARGO_TYPES.ISOTOPES, CL.EXTREMELY_LOW]]),
-                blackMarketCargoAmounts: CL.LOW,
-                blackMarketPrices: CL.LOW,
+                crime: CL.LOW,
+                corruption: CL.LOW,
                 //relationsReset: true
             })
         ]
@@ -30,7 +30,7 @@ class RevivalNews extends News {
     isValid() {
         const {planet} = this
         //cant become even dumber if we're already low
-        const ratingsValid = planet.culture.officerQuality > CL.LOW
+        const ratingsValid = planet.civilization.officerQuality > CL.LOW
         //planet must not already be in anarchy or puppet state
         const interferingEvent =
             News.planetHasAnyNews(planet, [NT.REVIVAL])

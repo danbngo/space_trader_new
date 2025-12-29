@@ -93,10 +93,10 @@ function checkForPlanetEncounters(elapsedDays = 1) {
     })
     
     for (const planet of sortedPlanetsByProximity) {
-        if (!planet.culture) continue
+        if (!planet.civilization) continue
         
         const distance = calcDistance(fleet.x, fleet.y, planet.x, planet.y)
-        const territory = planet.culture.territory
+        const territory = planet.civilization.territory
         
         // Calculate proximity factor using 1/(1+d/t) formula
         // At planet (d=0): factor = 1.0
@@ -104,10 +104,11 @@ function checkForPlanetEncounters(elapsedDays = 1) {
         // Beyond edge: factor approaches 0 but never reaches it
         const proximityFactor = 1 / (1 + distance / territory)
         
-        // Base encounter chance influenced by culture properties
-        const {military, security, crime, economy, industry} = planet.culture
+        // Base encounter chance influenced by civilization properties
+        const {military, security, culture, economy, industry} = planet.civilization
+        const {crime} = planet.settlement
         
-        // Build weighted encounter type array based on culture
+        // Build weighted encounter type array based on civilization
         const encounterWeights = []
         
         // Police (influenced by government and security)
@@ -132,8 +133,8 @@ function checkForPlanetEncounters(elapsedDays = 1) {
         const totalWeight = encounterWeights.reduce((sum, e) => sum + e.weight, 0)
         if (totalWeight <= 0) continue
         
-        // Adjust base chance by culture activity level
-        const activityLevel = (military + security + crime + economy + industry) / 5
+        // Adjust base chance by civilization activity level
+        const activityLevel = (military + security + culture + economy + industry + crime) / 6
         if (!calcOccurrencesPerTimespan(PLANET_ENCOUNTER_CHANCE_PER_DAY, elapsedDays * activityLevel * proximityFactor)) continue
         
         // Select encounter type using weighted random

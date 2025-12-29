@@ -13,10 +13,9 @@ class AddictionNews extends News {
                 planet: this.planet,
                 population: CL.LOW,
                 security: CL.LOW,
-                crime: CL.HIGH,
                 economy: CL.LOW,
-                blackMarketCargoAmounts: CL.VERY_LOW,
-                blackMarketPrices: CL.VERY_HIGH,
+                crime: CL.HIGH,
+                corruption: CL.HIGH,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.MEDICINE, CL.VERY_HIGH], [CARGO_TYPES.DRUGS, CL.EXTREMELY_HIGH]]), //this is the only thing that normalizes after
             })
         ]
@@ -30,14 +29,14 @@ class AddictionNews extends News {
 
     determineOutcome() {
         const {planet} = this
-        // Higher security and lower crime helps mitigate
-        this.rollOutcome(planet.culture.security/planet.culture.crime, CL.MEDIUM)
+        // Higher security and culture helps mitigate
+        this.rollOutcome(planet.civilization.security*planet.civilization.culture, CL.MEDIUM)
     }
 
     isValid() {
         const {planet} = this
         //more likely if high drug availability
-        const ratingsValid = (planet.settlement.illegalGoods) > CL.HIGH
+        const ratingsValid = (planet.settlement.cryme) > CL.HIGH
         const interferingEvent = News.planetHasAnyNews(planet, [NT.ADDICTION, ...NT_CRIME_PREVENTING])
         return ratingsValid && !interferingEvent
     }

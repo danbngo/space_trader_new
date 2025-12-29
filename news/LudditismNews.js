@@ -36,8 +36,8 @@ class LudditismNews extends News {
             economy: News.clHalfRegression(this.completeEffects[0].economy),
             industry: News.clHalfRegression(this.completeEffects[0].industry),
             crime: News.clHalfRegression(this.completeEffects[0].crime),
-            blackMarketCargoAmounts: CL.LOW,
-            blackMarketPrices: CL.LOW,
+            crime: CL.LOW,
+            corruption: CL.LOW,
         })
 
         // Failed: movement collapses, no benefits
@@ -61,21 +61,21 @@ class LudditismNews extends News {
         let threatsDetected = false
         for (const p of gs.system.planets) {
             if (p !== planet) {
-                const rel = p.culture.relationships.get(planet)
+                const rel = p.civilization.relationships.get(planet)
                 if (rel === RELATIONSHIP_TYPES.TENSE || rel === RELATIONSHIP_TYPES.TENSE || rel === RELATIONSHIP_TYPES.WAR) {
                     threatsDetected = true
                     break
                 }
             }
         }
-        const failProbability = threatsDetected ? 0.5 : ((1 - planet.culture.economy) * 0.25)
+        const failProbability = threatsDetected ? 0.5 : ((1 - planet.civilization.economy) * 0.25)
         this.failed = Math.random() < failProbability
     }
 
     isValid() {
         const {planet} = this
         //more likely if high tech and population pressure
-        const ratingsValid = planet.culture.shipQuality > CL.HIGH && planet.culture.industry > CL.MEDIUM
+        const ratingsValid = planet.civilization.shipQuality > CL.HIGH && planet.civilization.industry > CL.MEDIUM
         //must not be at engaged in or targeted by any hostile acts
         const interferingEvent =
             News.planetHasAnyNews(planet, [NT.LUDDITISM, ...NT_DANGEROUS]) ||

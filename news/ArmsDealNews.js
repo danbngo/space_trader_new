@@ -20,15 +20,15 @@ class ArmsDealNews extends News {
         Object.assign(this.completeEffects[0], {
             credits: CL.LOW,
             military: CL.HIGH, //gain some knowledge, new sytems etc.
-            shipyardNumShips: CL.HIGH,
-            blackMarketCargoAmounts: CL.HIGH,
-            blackMarketPrices: CL.LOW,
+            technology: CL.HIGH,
+            crime: CL.HIGH,
+            corruption: CL.LOW,
         })
         Object.assign(this.completeEffects[1], {
             credits: CL.HIGH,
-            shipyardNumShips: CL.LOW,
-            blackMarketCargoAmounts: CL.LOW,
-            blackMarketPrices: CL.HIGH,
+            technology: CL.LOW,
+            crime: CL.LOW,
+            corruption: CL.HIGH,
         })
 
         // Failed: seller refuses to sell
@@ -41,8 +41,8 @@ class ArmsDealNews extends News {
     determineOutcome() {
         const {planet, targetPlanet} = this
         // Check if relationship deteriorated
-        const rel1 = planet.culture.relationships.get(targetPlanet)
-        const rel2 = targetPlanet.culture.relationships.get(planet)
+        const rel1 = planet.civilization.relationships.get(targetPlanet)
+        const rel2 = targetPlanet.civilization.relationships.get(planet)
         if (rel1 === RELATIONSHIP_TYPES.TENSE || rel1 === RELATIONSHIP_TYPES.WAR ||
             rel2 === RELATIONSHIP_TYPES.TENSE || rel2 === RELATIONSHIP_TYPES.WAR) {
             this.cancelled = true
@@ -50,17 +50,17 @@ class ArmsDealNews extends News {
         }
         // Fail if targetPlanet refuses to sell - based on planet's low prestige/credits
         // Lower prestige and credits increase the chance seller refuses
-        this.rollOutcome(planet.culture.prestige*planet.settlement.wealth, CL.MEDIUM)
+        this.rollOutcome(planet.civilization.prestige*planet.settlement.wealth, CL.MEDIUM)
     }
 
     isValid() {
         const {planet, targetPlanet} = this
         //targetPlanet (seller) needs to have sufficient military to sell
-        const ratingsValid = (targetPlanet.culture.military >= CL.HIGH || targetPlanet.navy > CL.HIGH) && targetPlanet.settlement.illegalGoods > CL.MEDIUM
+        const ratingsValid = (targetPlanet.civilization.military >= CL.HIGH || targetPlanet.navy > CL.HIGH) && targetPlanet.settlement.cryme > CL.MEDIUM
         //seller's military should be larger than purchaser's
-        const transferValid = targetPlanet.culture.military > planet.culture.military && targetPlanet.navy > planet.navy
+        const transferValid = targetPlanet.civilization.military > planet.civilization.military && targetPlanet.navy > planet.navy
         //both planets must be neutral or allies
-        const relationships = [planet.culture.relationships.get(targetPlanet), targetPlanet.culture.relationships.get(planet)]
+        const relationships = [planet.civilization.relationships.get(targetPlanet), targetPlanet.civilization.relationships.get(planet)]
         const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.NEUTRAL || rel == RELATIONSHIP_TYPES.ALLY)
         const interferingEvent = 
             News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.ARMS_DEAL, ...NT_COOPERATION_PREVENTING])

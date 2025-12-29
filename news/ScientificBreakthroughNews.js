@@ -13,7 +13,7 @@ class ScientificBreakthroughNews extends News {
                 planet: this.planet,
                 industry: CL.LOW,
                 credits: CL.LOW,
-                marketCargoAmounts: CL.SLIGHTLY_LOW,
+                stockpile: CL.SLIGHTLY_LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.ISOTOPES, 2]]),
             })
         ]
@@ -41,14 +41,14 @@ class ScientificBreakthroughNews extends News {
     determineOutcome() {
         const {planet} = this
         // Research fails based on officer quality and economy
-        const successProbability = (planet.culture.officerQuality * 0.6) + (planet.culture.economy * 0.3) + 0.1
+        const successProbability = (planet.civilization.officerQuality * 0.6) + (planet.civilization.economy * 0.3) + 0.1
         this.failed = Math.random() > successProbability
     }
 
     isValid() {
         const {planet} = this
         //needs money. wont bother if we're already at the top
-        const ratingsValid = planet.settlement.market.baseCredits/MARKET_AVERAGE_CREDITS > CL.MEDIUM && planet.culture.shipQuality < CL.EXTREMELY_HIGH
+        const ratingsValid = planet.settlement.market.baseCredits/MARKET_AVERAGE_CREDITS > CL.MEDIUM && planet.civilization.shipQuality < CL.EXTREMELY_HIGH
         //hard times dont block it, may actually accelerate technological progress
         const interferingEvent = News.hasNews(NT.SCIENTIFIC_BREAKTHROUGH, planet)
         return ratingsValid && !interferingEvent

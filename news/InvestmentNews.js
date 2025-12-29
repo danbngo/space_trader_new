@@ -13,12 +13,12 @@ class InvestmentNews extends News {
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
                 credits: CL.LOW,
-                marketCargoAmounts: CL.VERY_LOW,
-                shipyardNumShips: CL.VERY_LOW,
+                stockpile: CL.VERY_LOW,
+                technology: CL.VERY_LOW,
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                marketCargoAmounts: CL.VERY_HIGH,
+                stockpile: CL.VERY_HIGH,
                 credits: CL.HIGH,
             })
         ]
@@ -27,13 +27,13 @@ class InvestmentNews extends News {
 
         Object.assign(this.completeEffects[0], {
             credits: News.clHalfRegression(this.completeEffects[0].credits),
-            marketCargoAmounts: News.clHalfRegression(this.completeEffects[0].marketCargoAmounts),
+            stockpile: News.clHalfRegression(this.completeEffects[0].stockpile),
             prestige: CL.SLIGHTLY_HIGH,
         })
         Object.assign(this.completeEffects[1], {
             industry: CL.VERY_HIGH,
             economy: CL.SLIGHTLY_HIGH,
-            shipyardNumShips: CL.SLIGHTLY_HIGH,
+            technology: CL.SLIGHTLY_HIGH,
         })
 
         // Failed: investment collapses, money lost
@@ -55,12 +55,12 @@ class InvestmentNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 credits: News.clHalfRegression(CL.LOW),
-                marketCargoAmounts: News.clHalfRegression(CL.VERY_LOW),
+                stockpile: News.clHalfRegression(CL.VERY_LOW),
                 prestige: News.clHalfRegression(CL.SLIGHTLY_HIGH),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                marketCargoAmounts: News.clHalfRegression(CL.VERY_HIGH),
+                stockpile: News.clHalfRegression(CL.VERY_HIGH),
                 credits: News.clHalfRegression(CL.HIGH),
                 industry: News.clHalfRegression(CL.VERY_HIGH),
                 economy: News.clHalfRegression(CL.SLIGHTLY_HIGH),
@@ -71,15 +71,15 @@ class InvestmentNews extends News {
     determineOutcome() {
         const {planet, targetPlanet} = this
         // Check if relationship deteriorated
-        const rel1 = planet.culture.relationships.get(targetPlanet)
-        const rel2 = targetPlanet.culture.relationships.get(planet)
+        const rel1 = planet.civilization.relationships.get(targetPlanet)
+        const rel2 = targetPlanet.civilization.relationships.get(planet)
         if (rel1 === RELATIONSHIP_TYPES.TENSE || rel1 === RELATIONSHIP_TYPES.WAR ||
             rel2 === RELATIONSHIP_TYPES.TENSE || rel2 === RELATIONSHIP_TYPES.WAR) {
             this.cancelled = true
             return
         }
         // Investment fails if target has poor governance
-        const failProbability = (1 - targetPlanet.culture.economy) * (1 - targetPlanet.culture.security) * 0.35
+        const failProbability = (1 - targetPlanet.civilization.economy) * (1 - targetPlanet.civilization.security) * 0.35
         this.failed = Math.random() < failProbability
     }
 
@@ -88,9 +88,9 @@ class InvestmentNews extends News {
         //need to have sufficient economy of our own
         const ratingsValid = planet.settlement.wealth >= CL.SLIGHTLY_HIGH || planet.settlement.market.baseCargo.average/MARKET_AVERAGE_CARGO_PER_TYPE > CL.SLIGHTLY_HIGH
         //our economy should be larger than theirs
-        const transferValid = planet.culture.economy > targetPlanet.culture.economy && planet.settlement.bank.baseCredits > targetPlanet.settlement.bank.baseCredits && planet.settlement.market.baseCargo.average > targetPlanet.settlement.market.baseCargo.average
+        const transferValid = planet.civilization.economy > targetPlanet.civilization.economy && planet.settlement.bank.baseCredits > targetPlanet.settlement.bank.baseCredits && planet.settlement.market.baseCargo.average > targetPlanet.settlement.market.baseCargo.average
         //both planets must be neutral or allies
-        const relationships = [planet.culture.relationships.get(targetPlanet), targetPlanet.culture.relationships.get(planet)]
+        const relationships = [planet.civilization.relationships.get(targetPlanet), targetPlanet.civilization.relationships.get(planet)]
         const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.NEUTRAL || rel == RELATIONSHIP_TYPES.ALLY)
         //removed most of the requirements for this, can we not have like a marshall plan??
         const interferingEvent = 

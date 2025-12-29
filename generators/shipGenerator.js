@@ -5,7 +5,7 @@
  * @returns {Ship} The generated ship.
  */
 function generateShip(planet = new Planet(), shipType = rndMember(SHIP_TYPES_ALL)) {
-    const shipQuality = planet ? planet.culture.shipQuality : 1
+    const shipQuality = planet ? planet.civilization.shipQuality : 1
 
     let maxHull =    Math.ceil(AVERAGE_SHIP_HULL*rng(2, 0.5, false)*shipType.hull*shipQuality) 
     let maxShields = Math.ceil(AVERAGE_SHIP_SHIELDS*rng(2, 0.5, false)*shipType.shields*shipQuality)

@@ -14,8 +14,8 @@ class DisarmamentNews extends News {
                 military: CL.VERY_LOW,
                 territory: CL.SLIGHTLY_LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_LOW], [CARGO_TYPES.WEAPONS, CL.EXTREMELY_LOW]]),
-                blackMarketCargoAmounts: CL.SLIGHTLY_LOW,
-                shipyardNumShips: CL.VERY_LOW,
+                crime: CL.SLIGHTLY_LOW,
+                technology: CL.VERY_LOW,
             })
         ]
 
@@ -24,7 +24,7 @@ class DisarmamentNews extends News {
         Object.assign(this.completeEffects[0], {
             military: CL.NO_REGRESSION, 
             territory: CL.NO_REGRESSION,
-            shipyardNumShips: CL.NO_REGRESSION,
+            technology: CL.NO_REGRESSION,
             economy: CL.SLIGHTLY_HIGH, //small bonuses to the economy
             industry: CL.SLIGHTLY_HIGH,
             prestige: CL.SLIGHTLY_HIGH,
@@ -35,7 +35,7 @@ class DisarmamentNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 military: CL.NO_REGRESSION, // stayed weak
-                shipyardNumShips: CL.NO_REGRESSION,
+                technology: CL.NO_REGRESSION,
                 territory: CL.NO_REGRESSION,
                 prestige: CL.LOW, // seen as weak
             })
@@ -48,7 +48,7 @@ class DisarmamentNews extends News {
         let tensionsDetected = false
         for (const p of gs.system.planets) {
             if (p !== planet) {
-                const rel = p.culture.relationships.get(planet)
+                const rel = p.civilization.relationships.get(planet)
                 if (rel === RELATIONSHIP_TYPES.TENSE || rel === RELATIONSHIP_TYPES.WAR) {
                     tensionsDetected = true
                     break
@@ -61,7 +61,7 @@ class DisarmamentNews extends News {
     isValid() {
         const {planet} = this
         //unlikely if planet has a low military already
-        const ratingsValid = (planet.culture.military > CL.HIGH) && (planet.navy > CL.HIGH)
+        const ratingsValid = (planet.civilization.military > CL.HIGH) && (planet.navy > CL.HIGH)
         const interferingEvent =
             News.planetHasAnyNewsTargeting(planet, NT_MARTIAL) ||
             News.planetHasAnyNews(planet, NT_MARTIAL)

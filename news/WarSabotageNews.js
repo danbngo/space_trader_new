@@ -13,7 +13,7 @@ class WarSabotageNews extends News {
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
                 security: CL.LOW, // agents deployed
-                guildNumOfficers: CL.LOW, // agents/spies
+                education: CL.LOW, // agents/spies
                 officerQuality: CL.SLIGHTLY_LOW,
             }),
             new NewsEffect({
@@ -21,7 +21,7 @@ class WarSabotageNews extends News {
                 targetPlanet: this.planet,
                 military: CL.LOW, // sabotaged military infrastructure
                 industry: CL.LOW, // factories bombed
-                shipyardNumShips: CL.SLIGHTLY_LOW,
+                technology: CL.SLIGHTLY_LOW,
             })
         ]
 
@@ -29,7 +29,7 @@ class WarSabotageNews extends News {
         // Attacker: agents lost permanently
         Object.assign(this.completeEffects[0], {
             security: CL.NO_REGRESSION, // security apparatus damaged
-            guildNumOfficers: CL.NO_REGRESSION, // agents don't return
+            education: CL.NO_REGRESSION, // agents don't return
             officerQuality: CL.NO_REGRESSION,
         })
         // Defender: permanent damage from sabotage
@@ -43,7 +43,7 @@ class WarSabotageNews extends News {
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
                 security: News.clHalfRegression(this.completeEffects[0].security),
-                guildNumOfficers: News.clHalfRegression(this.completeEffects[0].guildNumOfficers),
+                education: News.clHalfRegression(this.completeEffects[0].education),
                 officerQuality: News.clHalfRegression(this.completeEffects[0].officerQuality),
             }),
             new NewsEffect({
@@ -58,19 +58,19 @@ class WarSabotageNews extends News {
     determineOutcome() {
         const {planet, targetPlanet} = this
         // Check if peace was forced during sabotage
-        const currentRel1 = planet.culture.relationships.get(targetPlanet)
-        const currentRel2 = targetPlanet.culture.relationships.get(planet)
+        const currentRel1 = planet.civilization.relationships.get(targetPlanet)
+        const currentRel2 = targetPlanet.civilization.relationships.get(planet)
         this.cancelled = (currentRel1 !== RELATIONSHIP_TYPES.WAR || currentRel2 !== RELATIONSHIP_TYPES.WAR)
     }
 
     isValid() {
         const {planet, targetPlanet} = this
         // Must be at war
-        const relationshipValid = planet.culture.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
+        const relationshipValid = planet.civilization.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
         // Must have an ongoing war event
         const hasWar = News.hasNews(NT.WAR, planet, targetPlanet)
         // Requires high security to conduct sabotage
-        const securityValid = (planet.culture.security > CL.MEDIUM) && (planet.culture.security/targetPlanet.culture.security > CL.HIGH)
+        const securityValid = (planet.civilization.security > CL.MEDIUM) && (planet.civilization.security/targetPlanet.civilization.security > CL.HIGH)
         // Can't have sabotage already
         const interferingEvent = News.hasNews(NT.WAR_SABOTAGE, planet, targetPlanet)
         return relationshipValid && hasWar && securityValid && !interferingEvent

@@ -14,8 +14,8 @@ class StockMarketCrashNews extends News {
                 industry: CL.VERY_LOW,
                 economy: CL.VERY_LOW,
                 credits: CL.EXTREMELY_LOW,
-                marketCargoAmounts: CL.LOW,
-                marketPrices: CL.HIGH,
+                stockpile: CL.LOW,
+                inflation: CL.HIGH,
             })
         ]
 

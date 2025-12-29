@@ -66,15 +66,15 @@ class ResearchAgreementNews extends News {
     determineOutcome() {
         const {planet, targetPlanet} = this
         // Check if relationship deteriorated
-        const rel1 = planet.culture.relationships.get(targetPlanet)
-        const rel2 = targetPlanet.culture.relationships.get(planet)
+        const rel1 = planet.civilization.relationships.get(targetPlanet)
+        const rel2 = targetPlanet.civilization.relationships.get(planet)
         if (rel1 === RELATIONSHIP_TYPES.TENSE || rel1 === RELATIONSHIP_TYPES.WAR ||
             rel2 === RELATIONSHIP_TYPES.TENSE || rel2 === RELATIONSHIP_TYPES.WAR) {
             this.cancelled = true
             return
         }
         // Research fails based on combined officer quality
-        const avgQuality = (planet.culture.officerQuality + targetPlanet.culture.officerQuality) / 2
+        const avgQuality = (planet.civilization.officerQuality + targetPlanet.civilization.officerQuality) / 2
         const successProbability = avgQuality * 0.7 + 0.2
         this.failed = Math.random() > successProbability
     }
@@ -82,10 +82,10 @@ class ResearchAgreementNews extends News {
     isValid() {
         const {planet, targetPlanet} = this
         //planets must be neutral or allied towards each other
-        const relationships = [planet.culture.relationships.get(targetPlanet), targetPlanet.culture.relationships.get(planet)]
+        const relationships = [planet.civilization.relationships.get(targetPlanet), targetPlanet.civilization.relationships.get(planet)]
         const relationshipsValid = relationships.every(r => r == RELATIONSHIP_TYPES.NEUTRAL || r == RELATIONSHIP_TYPES.ALLY)
         //planets must have similar level of development
-        const developmentValid = Math.abs(planet.culture.officerQuality - targetPlanet.culture.officerQuality) < 0.5
+        const developmentValid = Math.abs(planet.civilization.officerQuality - targetPlanet.civilization.officerQuality) < 0.5
         //removed most requirements for this
         const interferingEvent =
             News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.RESEARCH_AGREEMENT, ...NT_COOPERATION_PREVENTING])

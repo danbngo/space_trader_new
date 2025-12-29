@@ -12,10 +12,10 @@ class ColonizationNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 population: CL.LOW,
-                marketPrices: CL.HIGH,
-                shipyardNumShips: CL.VERY_LOW,
+                inflation: CL.HIGH,
+                technology: CL.VERY_LOW,
                 shipQuality: CL.LOW,
-                marketCargoAmounts: CL.LOW,
+                stockpile: CL.LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.METAL, CL.VERY_HIGH], [CARGO_TYPES.ISOTOPES, CL.EXTREMELY_HIGH]]),
                 credits: CL.LOW,
             })
@@ -40,12 +40,12 @@ class ColonizationNews extends News {
     determineOutcome() {
         const {planet} = this
         //better navy and economy (logistics) helps
-        this.rollOutcome((planet.navy*planet.culture.economy), CL.SLIGHTLY_LOW)
+        this.rollOutcome((planet.navy*planet.civilization.economy), CL.SLIGHTLY_LOW)
     }
 
     isValid() {
         const {planet} = this
-        const ratingsValid = planet.culture.population > CL.MEDIUM && (planet.navy > CL.MEDIUM)
+        const ratingsValid = planet.civilization.population > CL.MEDIUM && (planet.navy > CL.MEDIUM)
         //basically dont do it if ANYTHING bad is happening
         const interferingEvent = 
             News.planetHasAnyNewsTargeting(planet, NT_ECONOMY_PREVENTING) ||

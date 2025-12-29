@@ -47,15 +47,15 @@ function showPlanetMenu(planet = new Planet()) {
     showPlanetModal(planet, `${coloredName(planet)}`, msg, options, 'planet_menu', (nextPlanet) => showPlanetMenu(nextPlanet));
 }
 /**
- * Displays detailed information about a planet's culture and statistics.
+ * Displays detailed information about a planet's civilization and statistics.
  * @param {Planet} planet - The planet to display information for.
  */
 function showPlanetSocietyMenu(planet = new Planet()) {
-    const {culture, settlement} = planet
-    const {territory, population, military, security, economy, industry, crime} = culture
+    const {civilization, settlement} = planet
+    const {territory, population, military, security, economy, industry, culture} = civilization
     let msg = ''
     msg += `<u>Overview</u><br/>`
-    msg += `Government: ${coloredName(culture.governmentType)}<br/>`
+    msg += `Government: ${coloredName(civilization.governmentType)}<br/>`
     msg += `Population: ${describePopulation(population)}<br/>`
     msg += `Territory: ${describeTerritory(territory)}<br/>`
     msg += `<br/>`
@@ -64,9 +64,9 @@ function showPlanetSocietyMenu(planet = new Planet()) {
     msg += `Security: ${describeRating(security)}<br/>`
     msg += `Economy: ${describeRating(economy)}<br/>`
     msg += `Industry: ${describeRating(industry)}<br/>`
-    msg += `Crime: ${describeRating(crime)}<br/>`
-    msg += `Technology: ${describeRating(culture.shipQuality)}<br/>`
-    msg += `Education: ${describeRating(culture.officerQuality)}<br/>`
+    msg += `Culture: ${describeRating(culture)}<br/>`
+    msg += `Technology: ${describeRating(civilization.shipQuality)}<br/>`
+    msg += `Education: ${describeRating(civilization.officerQuality)}<br/>`
     
     // Market and settlement info
     if (settlement) {

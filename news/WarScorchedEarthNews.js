@@ -14,14 +14,14 @@ class WarScorchedEarthNews extends News {
                 targetPlanet: this.targetPlanet,
                 territory: CL.LOW, // destroyed own territory
                 industry: CL.LOW, // factories demolished
-                marketCargoAmounts: CL.LOW, // supplies destroyed
+                stockpile: CL.LOW, // supplies destroyed
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
-                shipyardNumShips: CL.LOW, // losses from traps/ambushes
+                technology: CL.LOW, // losses from traps/ambushes
                 shipQuality: CL.LOW, // damaged ships
-                guildNumOfficers: CL.SLIGHTLY_LOW, // losses in hostile territory
+                education: CL.SLIGHTLY_LOW, // losses in hostile territory
             })
         ]
 
@@ -30,13 +30,13 @@ class WarScorchedEarthNews extends News {
         Object.assign(this.completeEffects[0], {
             territory: CL.NO_REGRESSION, // destroyed territory stays destroyed
             industry: News.clHalfRegression(this.completeEffects[0].industry),
-            marketCargoAmounts: News.clHalfRegression(this.completeEffects[0].marketCargoAmounts),
+            stockpile: News.clHalfRegression(this.completeEffects[0].stockpile),
         })
         // Defender: permanent losses from hostile terrain
         Object.assign(this.completeEffects[1], {
-            shipyardNumShips: CL.NO_REGRESSION,
+            technology: CL.NO_REGRESSION,
             shipQuality: CL.NO_REGRESSION,
-            guildNumOfficers: CL.NO_REGRESSION,
+            education: CL.NO_REGRESSION,
         })
 
         // Cancelled: peace before full destruction, partial damage
@@ -45,13 +45,13 @@ class WarScorchedEarthNews extends News {
                 planet: this.planet,
                 territory: News.clHalfRegression(CL.LOW),
                 industry: News.clHalfRegression(CL.LOW),
-                marketCargoAmounts: News.clHalfRegression(CL.LOW),
+                stockpile: News.clHalfRegression(CL.LOW),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                shipyardNumShips: News.clHalfRegression(CL.LOW),
+                technology: News.clHalfRegression(CL.LOW),
                 shipQuality: News.clHalfRegression(CL.LOW),
-                guildNumOfficers: News.clHalfRegression(CL.SLIGHTLY_LOW),
+                education: News.clHalfRegression(CL.SLIGHTLY_LOW),
             })
         ]
     }
@@ -59,7 +59,7 @@ class WarScorchedEarthNews extends News {
     determineOutcome() {
         const {planet, targetPlanet} = this
         // Check if war still ongoing
-        const stillAtWar = planet.culture.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
+        const stillAtWar = planet.civilization.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
         if (!stillAtWar) {
             this.cancelled = true
         }
@@ -68,11 +68,11 @@ class WarScorchedEarthNews extends News {
     isValid() {
         const {planet, targetPlanet} = this
         // Must be at war
-        const relationshipValid = planet.culture.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
+        const relationshipValid = planet.civilization.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
         // Must have an ongoing war event
         const hasWar = News.hasNews(NT.WAR, planet, targetPlanet)
         // Requires high territory to sacrifice
-        const territoryValid = planet.culture.territory > CL.HIGH
+        const territoryValid = planet.civilization.territory > CL.HIGH
         // we need to be desperate
         const militaryValid = planet.militaryPower/targetPlanet.militaryPower < CL.SLIGHTLY_LOW
         // Can't have scorched earth already

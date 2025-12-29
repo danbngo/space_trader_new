@@ -30,7 +30,7 @@ class TensionsNews extends News {
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         for (const fx of this.completeEffects) {
             fx.onApply = ()=>{
-                if (planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.TENSE) planet.culture.relationships.set(targetPlanet, RELATIONSHIP_TYPES.NEUTRAL)
+                if (planet.civilization.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.TENSE) planet.civilization.relationships.set(targetPlanet, RELATIONSHIP_TYPES.NEUTRAL)
             }
         }
 
@@ -40,8 +40,8 @@ class TensionsNews extends News {
     determineOutcome() {
         const {planet, targetPlanet} = this
         // Check if relationships improved (became allies) or escalated to war
-        const currentRel1 = planet.culture.relationships.get(targetPlanet)
-        const currentRel2 = targetPlanet.culture.relationships.get(planet)
+        const currentRel1 = planet.civilization.relationships.get(targetPlanet)
+        const currentRel2 = targetPlanet.civilization.relationships.get(planet)
         this.cancelled = (currentRel1 === RELATIONSHIP_TYPES.ALLY || currentRel2 === RELATIONSHIP_TYPES.ALLY || 
                          currentRel1 === RELATIONSHIP_TYPES.WAR || currentRel2 === RELATIONSHIP_TYPES.WAR)
     }
@@ -49,13 +49,13 @@ class TensionsNews extends News {
     isValid(ignorePolitics = false) {
         const {planet, targetPlanet} = this
         //cant have same government type or be a puppet
-        const governmentsValid = planet.culture.governmentType != targetPlanet.culture.governmentType
+        const governmentsValid = planet.civilization.governmentType != targetPlanet.civilization.governmentType
 
         //there generally won't be beef if the power disparity is too large
-        const powerRatio = planet.culture.military / targetPlanet.culture.military
+        const powerRatio = planet.civilization.military / targetPlanet.civilization.military
         const powerValid = powerRatio < CL.VERY_HIGH && powerRatio > CL.VERY_LOW
 
-        const relationshipValid = planet.culture.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.NEUTRAL && targetPlanet.culture.relationships.get(planet) == RELATIONSHIP_TYPES.NEUTRAL
+        const relationshipValid = planet.civilization.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.NEUTRAL && targetPlanet.civilization.relationships.get(planet) == RELATIONSHIP_TYPES.NEUTRAL
         const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.TENSIONS, ...NT_COOPERATIVE])
         return (powerValid) && (governmentsValid) && relationshipValid && !interferingEvent
     }
@@ -63,7 +63,7 @@ class TensionsNews extends News {
     isValidEnd() {
         const {planet, targetPlanet} = this
         //can only end if planets are not actively at war
-        const relationshipsValid = planet.culture.relationships.get(targetPlanet) != RELATIONSHIP_TYPES.WAR && targetPlanet.culture.relationships.get(planet) != RELATIONSHIP_TYPES.WAR
+        const relationshipsValid = planet.civilization.relationships.get(targetPlanet) != RELATIONSHIP_TYPES.WAR && targetPlanet.civilization.relationships.get(planet) != RELATIONSHIP_TYPES.WAR
         return relationshipsValid
     }
 }

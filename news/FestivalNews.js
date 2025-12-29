@@ -14,9 +14,9 @@ class FestivalNews extends News {
                 credits: CL.LOW,
                 economy: CL.LOW,
                 industry: CL.LOW,
-                marketCargoAmounts: CL.LOW,
+                stockpile: CL.LOW,
                 crime: CL.HIGH,
-                blackMarketPrices: CL.HIGH,
+                corruption: CL.HIGH,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.HOLOCUBES, CL.VERY_HIGH], [CARGO_TYPES.DRUGS, CL.ASTRONOMICAL]]),
             })
         ]
@@ -25,9 +25,9 @@ class FestivalNews extends News {
         //economy recovers, prestige is boosted
         Object.assign(this.completeEffects[0], {
             credits: News.clHalfRegression(this.completeEffects[0].credits),
-            marketCargoAmounts: News.clHalfRegression(this.completeEffects[0].marketCargoAmounts),
+            stockpile: News.clHalfRegression(this.completeEffects[0].stockpile),
             crime: News.clHalfRegression(this.completeEffects[0].crime),
-            //blackMarketPrices: News.clHalfRegression(this.completeEffects[0].blackMarketPrices),
+            //corruption: News.clHalfRegression(this.completeEffects[0].corruption),
             prestige: CL.SLIGHTLY_HIGH,
         })
 
@@ -46,14 +46,14 @@ class FestivalNews extends News {
     determineOutcome() {
         const {planet} = this
         // Festival fails if security too low (riots, crime)
-        const failProbability = (1 - planet.culture.security) * 0.3
+        const failProbability = (1 - planet.civilization.security) * 0.3
         this.failed = Math.random() < failProbability
     }
 
     isValid() {
         const {planet} = this
         //need high credits to afford it, low prestige to want it
-        const ratingsValid = planet.settlement.wealth > CL.SLIGHTLY_HIGH && planet.culture.prestige < CL.MEDIUM
+        const ratingsValid = planet.settlement.wealth > CL.SLIGHTLY_HIGH && planet.civilization.prestige < CL.MEDIUM
         const interferingEvent = News.planetHasAnyNews(planet, [NT.FESTIVAL, ...NT_ECONOMY_PREVENTING, ...NT_DANGEROUS])
         return ratingsValid && !interferingEvent
     }

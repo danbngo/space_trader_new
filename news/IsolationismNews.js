@@ -13,10 +13,10 @@ class IsolationismNews extends News {
                 planet: this.planet,
                 territory: CL.LOW,
                 economy: CL.LOW,
-                marketPrices: CL.LOW,
-                marketCargoAmounts: CL.LOW,
-                blackMarketCargoAmounts: CL.LOW,
-                blackMarketPrices: CL.LOW,
+                inflation: CL.LOW,
+                stockpile: CL.LOW,
+                crime: CL.LOW,
+                corruption: CL.LOW,
                 credits: CL.LOW,
                 officerQuality: CL.SLIGHTLY_LOW,
                 shipQuality: CL.SLIGHTLY_LOW,
@@ -56,7 +56,7 @@ class IsolationismNews extends News {
         let threatsDetected = false
         for (const p of gs.system.planets) {
             if (p !== planet) {
-                const rel = p.culture.relationships.get(planet)
+                const rel = p.civilization.relationships.get(planet)
                 if (rel === RELATIONSHIP_TYPES.TENSE || rel === RELATIONSHIP_TYPES.WAR) {
                     threatsDetected = true
                     break
@@ -69,7 +69,7 @@ class IsolationismNews extends News {
     isValid() {
         const {planet} = this
         //more likely after population collapse or being stretched thin
-        const ratingsValid = planet.culture.population < CL.SLIGHTLY_HIGH && planet.culture.territory > CL.HIGH
+        const ratingsValid = planet.civilization.population < CL.SLIGHTLY_HIGH && planet.civilization.territory > CL.HIGH
         //must not be a puppet state or anarchic
         const interferingEvent =
             News.planetHasAnyNews(planet, NT_DANGEROUS) ||

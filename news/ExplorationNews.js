@@ -11,11 +11,11 @@ class ExplorationNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                guildNumOfficers: CL.LOW,
+                education: CL.LOW,
                 officerQuality: CL.LOW,
-                marketCargoAmounts: CL.SLIGHTLY_LOW,
+                stockpile: CL.SLIGHTLY_LOW,
                 shipQuality: CL.LOW,
-                shipyardNumShips: CL.SLIGHTLY_LOW,
+                technology: CL.SLIGHTLY_LOW,
                 credits: CL.LOW,
             })
         ]
@@ -23,10 +23,10 @@ class ExplorationNews extends News {
         //exploration pays off with territory and prestige
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.completeEffects[0], {
-            guildNumOfficers: CL.NO_REGRESSION, //officers don't auto return
+            education: CL.NO_REGRESSION, //officers don't auto return
             officerQuality: CL.NO_REGRESSION,
             credits: News.clHalfRegression(this.completeEffects[0].credits),
-            marketCargoAmounts: News.clHalfRegression(this.completeEffects[0].marketCargoAmounts),
+            stockpile: News.clHalfRegression(this.completeEffects[0].stockpile),
             //economy: CL.SLIGHTLY_HIGH,
             //industry: CL.SLIGHTLY_HIGH,
             shipQuality: CL.NO_REGRESSION,
@@ -37,7 +37,7 @@ class ExplorationNews extends News {
         this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
-                guildNumOfficers: CL.NO_REGRESSION,
+                education: CL.NO_REGRESSION,
                 officerQuality: CL.NO_REGRESSION,
                 shipQuality: CL.NO_REGRESSION,
                 prestige: CL.LOW,
@@ -49,7 +49,7 @@ class ExplorationNews extends News {
     determineOutcome() {
         const {planet} = this
         // Higher prestige and officer quality = more likely to succeed
-        const successProbability = (planet.culture.prestige + planet.culture.officerQuality) / 2
+        const successProbability = (planet.civilization.prestige + planet.civilization.officerQuality) / 2
         this.failed = Math.random() > successProbability
     }
 

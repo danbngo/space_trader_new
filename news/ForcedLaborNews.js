@@ -15,8 +15,8 @@ class ForcedLaborNews extends News {
                 economy: CL.SLIGHTLY_LOW,
                 population: CL.LOW,
                 prestige: CL.LOW,
-                marketCargoAmounts: CL.HIGH,
-                //marketPrices: CL.LOW,
+                stockpile: CL.HIGH,
+                //inflation: CL.LOW,
             })
         ]
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
@@ -24,7 +24,7 @@ class ForcedLaborNews extends News {
         Object.assign(this.completeEffects[0], {
             industry: News.clHalfRegression(this.completeEffects[0].industry),
             population: News.clHalfRegression(this.completeEffects[0].population),
-            marketCargoAmounts: News.clHalfRegression(this.completeEffects[0].marketCargoAmounts),
+            stockpile: News.clHalfRegression(this.completeEffects[0].stockpile),
             prestige: CL.NO_REGRESSION, // permanent prestige loss
         })
 
@@ -44,14 +44,14 @@ class ForcedLaborNews extends News {
     determineOutcome() {
         const {planet} = this
         // Forced labor fails if security too low (revolts succeed)
-        const revoltProbability = (1 - planet.culture.security) * 0.4
+        const revoltProbability = (1 - planet.civilization.security) * 0.4
         this.failed = Math.random() < revoltProbability
     }
 
     isValid() {
         const {planet} = this
         // More likely if industry is low (trying to industrialize)
-        const ratingsValid = planet.culture.industry < CL.LOW
+        const ratingsValid = planet.civilization.industry < CL.LOW
         // Authoritarian governments, police states, and communist states would do this
         const interferingEvent = News.planetHasAnyNews(planet, [NT.FORCED_LABOR])
         return ratingsValid && !interferingEvent

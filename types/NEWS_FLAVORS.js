@@ -11,7 +11,7 @@ const NF = Object.freeze({
     POLITICS: new NewsFlavor('Politics', '🏛️', COLORS.Blue),
     MILITARY: new NewsFlavor('Military', '⚔️', COLORS.Red),
     SCIENCE: new NewsFlavor('Science', '🔬', COLORS.Green),
-    CULTURE: new NewsFlavor('Culture', '🎭', COLORS.Purple),
+    CULTURE: new NewsFlavor('Civilization', '🎭', COLORS.Purple),
     UNREST: new NewsFlavor('Unrest', '✊', COLORS.Orange),
     PEACE: new NewsFlavor('Peace', '🕊️', COLORS.LightBlue),
     WAR: new NewsFlavor('War', '💥', COLORS.DarkRed),

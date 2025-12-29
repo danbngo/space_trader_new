@@ -12,16 +12,16 @@ class SanctionsNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
-                marketCargoAmounts: CL.LOW,
+                stockpile: CL.LOW,
                 economy: CL.LOW,
                 credits: CL.SLIGHTLY_LOW,
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
-                marketCargoAmounts: CL.VERY_LOW,
+                stockpile: CL.VERY_LOW,
                 economy: CL.VERY_LOW,
-                guildNumOfficers: CL.LOW,
+                education: CL.LOW,
                 credits: CL.LOW,
             })
         ]
@@ -54,13 +54,13 @@ class SanctionsNews extends News {
         this.cancelEffects = [
             new NewsEffect({
                 planet: this.planet,
-                marketCargoAmounts: News.clHalfRegression(CL.LOW),
+                stockpile: News.clHalfRegression(CL.LOW),
                 economy: News.clHalfRegression(CL.LOW),
                 credits: News.clHalfRegression(CL.SLIGHTLY_LOW),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                marketCargoAmounts: News.clHalfRegression(CL.VERY_LOW),
+                stockpile: News.clHalfRegression(CL.VERY_LOW),
                 economy: News.clHalfRegression(CL.VERY_LOW),
                 credits: News.clHalfRegression(CL.LOW),
             })
@@ -70,22 +70,22 @@ class SanctionsNews extends News {
     determineOutcome() {
         const {planet, targetPlanet} = this
         // Check if relationship improved
-        const rel = planet.culture.relationships.get(targetPlanet)
+        const rel = planet.civilization.relationships.get(targetPlanet)
         if (rel === RELATIONSHIP_TYPES.NEUTRAL || rel === RELATIONSHIP_TYPES.ALLY) {
             this.cancelled = true
             return
         }
         // Sanctions fail if sanctioner's economy weakens too much
-        const failProbability = 1 - planet.culture.economy
+        const failProbability = 1 - planet.civilization.economy
         this.failed = Math.random() < failProbability * 0.3
     }
 
     isValid() {
         const {planet, targetPlanet} = this
         //we need a strong economy to pull it off
-        const ratingsValid = planet.culture.economy > CL.HIGH && planet.settlement.wealth >= CL.HIGH
+        const ratingsValid = planet.civilization.economy > CL.HIGH && planet.settlement.wealth >= CL.HIGH
         //aggressor must be hostile towards victim
-        const aggressorRelationship = planet.culture.relationships.get(targetPlanet)
+        const aggressorRelationship = planet.civilization.relationships.get(targetPlanet)
         const relationshipsValid = aggressorRelationship == RELATIONSHIP_TYPES.TENSE
         //blocked if already at war or other hostile actions
         const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.SANCTIONS, ...NT_COOPERATIVE])

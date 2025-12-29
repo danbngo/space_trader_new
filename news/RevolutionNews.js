@@ -1,9 +1,9 @@
 class RevolutionNews extends News {
     constructor(planet = new Planet()) {
-        const newGovernmentType = rndMember(GT_ALL.filter(g => g !== planet.culture.governmentType && g !== GT.PUPPET_STATE));
+        const newGovernmentType = rndMember(GT_ALL.filter(g => g !== planet.civilization.governmentType && g !== GT.PUPPET_STATE));
         
         super(
-            planet.culture.governmentType != GT.ANARCHY ? `${coloredName(planet)}'s people have deposed the government and begin a glorious revolution!` :
+            planet.civilization.governmentType != GT.ANARCHY ? `${coloredName(planet)}'s people have deposed the government and begin a glorious revolution!` :
             `${coloredName(planet)}'s people clamor for a government to take the reigns and end the anarchy they live in!`,
             `${coloredName(planet)} stabilizes under new government: ${coloredName(newGovernmentType)}!`,
             `${coloredName(planet)}'s revolution fails! Chaos reigns!`,
@@ -61,14 +61,14 @@ class RevolutionNews extends News {
     determineOutcome() {
         const {planet} = this
         // Higher military and prestige = more likely to succeed
-        const successProbability = (planet.culture.military + planet.culture.prestige) / 2
+        const successProbability = (planet.civilization.military + planet.civilization.prestige) / 2
         this.failed = Math.random() > successProbability
     }
 
     isValid() {
         const {planet} = this
         //a generally robust economy/govt less prone to this
-        const ratingsValid = planet.culture.security < CL.MEDIUM || planet.culture.military < CL.MEDIUM || planet.culture.prestige < CL.MEDIUM || planet.culture.crime > CL.MEDIUM || planet.culture.security < CL.MEDIUM || planet.culture.economy < CL.MEDIUM
+        const ratingsValid = planet.civilization.security < CL.MEDIUM || planet.civilization.military < CL.MEDIUM || planet.civilization.prestige < CL.MEDIUM || planet.civilization.crime > CL.MEDIUM || planet.civilization.security < CL.MEDIUM || planet.civilization.economy < CL.MEDIUM
         //planet must not be puppet state (anarcy is fine otherwise how do we get back out of it)
         const interferingEvent =
             News.planetHasAnyNews(planet, [NT.REVOLUTION, NT.WAR]) || News.hasNewsTargeting(NT.WAR, planet) ||

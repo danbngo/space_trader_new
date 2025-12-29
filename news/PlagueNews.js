@@ -14,9 +14,9 @@ class PlagueNews extends News {
                 population: CL.VERY_LOW,
                 economy: CL.VERY_LOW,
                 industry: CL.VERY_LOW,
-                guildNumOfficers: CL.VERY_LOW,
-                marketPrices: CL.SLIGHTLY_HIGH,
-                marketCargoAmounts: CL.SLIGHTLY_LOW,
+                education: CL.VERY_LOW,
+                inflation: CL.SLIGHTLY_HIGH,
+                stockpile: CL.SLIGHTLY_LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.MEDICINE, CL.EXTREMELY_HIGH]]),
             })
         ]
@@ -25,7 +25,7 @@ class PlagueNews extends News {
         //population does not fully bounce back
         Object.assign(this.completeEffects[0], {
             population: News.clHalfRegression(this.completeEffects[0].population),
-            guildNumOfficers: News.clHalfRegression(this.completeEffects[0].guildNumOfficers),
+            education: News.clHalfRegression(this.completeEffects[0].education),
         })
 
         this.failEffects = [
@@ -34,7 +34,7 @@ class PlagueNews extends News {
                 population: CL.NO_REGRESSION,
                 economy: CL.NO_REGRESSION,
                 industry: CL.NO_REGRESSION,
-                guildNumOfficers: CL.NO_REGRESSION,
+                education: CL.NO_REGRESSION,
                 prestige: CL.VERY_LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.MEDICINE, CL.NO_REGRESSION]]),
             })
@@ -44,14 +44,14 @@ class PlagueNews extends News {
     determineOutcome() {
         const {planet} = this
         // Higher economy/industry = better medical infrastructure
-        const cureProbability = (planet.culture.economy + planet.culture.industry) / 2
+        const cureProbability = (planet.civilization.economy + planet.civilization.industry) / 2
         this.failed = Math.random() > cureProbability
     }
 
     isValid() {
         const {planet} = this
         //happens when population is getting out of hand
-        const ratingsValid = planet.culture.population > CL.MEDIUM
+        const ratingsValid = planet.civilization.population > CL.MEDIUM
 
         const interferingEvent = //can happy anytime, anywhere!
             News.hasNews(NT.PLAGUE, planet)

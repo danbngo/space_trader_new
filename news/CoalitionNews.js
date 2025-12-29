@@ -40,13 +40,13 @@ class CoalitionNews extends News {
         // prestige, reducing military/territory gets you out of this
         const possibleBadNews = News.calcRelationshipWorseningNews(planet)[0]
         if (possibleBadNews.length < 3) return
-        this.rollOutcome(planet.culture.prestige/planet.culture.territory/planet.culture.military, CL.HIGH)
+        this.rollOutcome(planet.civilization.prestige/planet.civilization.territory/planet.civilization.military, CL.HIGH)
     }
 
     isValid() {
         const {planet} = this
         //more likely if REALLY REALLY high territory and military
-        const ratingsValid = planet.culture.territory > CL.VERY_HIGH && (planet.culture.military > CL.VERY_HIGH || planet.navy > CL.VERY_HIGH || planet.army > CL.VERY_HIGH)
+        const ratingsValid = planet.civilization.territory > CL.VERY_HIGH && (planet.civilization.military > CL.VERY_HIGH || planet.navy > CL.VERY_HIGH || planet.army > CL.VERY_HIGH)
         const interferingEvent =
             News.planetHasAnyNews(planet, [NT.COALITION])
         const [badNews] = News.calcRelationshipWorseningNews(planet)

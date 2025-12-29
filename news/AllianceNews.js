@@ -14,8 +14,8 @@ class AllianceNews extends News {
                 targetPlanet: this.targetPlanet,
                 newRelationship: RELATIONSHIP_TYPES.ALLY,
                 territory: CL.HIGH,
-                marketCargoAmounts: CL.SLIGHTLY_HIGH,
-                guildNumOfficers: CL.HIGH,
+                stockpile: CL.SLIGHTLY_HIGH,
+                education: CL.HIGH,
                 security: CL.SLIGHTLY_HIGH,
                 economy: CL.SLIGHTLY_HIGH,
                 officerQuality: CL.SLIGHTLY_HIGH,
@@ -27,8 +27,8 @@ class AllianceNews extends News {
                 targetPlanet: this.planet,
                 newRelationship: RELATIONSHIP_TYPES.ALLY,
                 territory: CL.HIGH,
-                marketCargoAmounts: CL.SLIGHTLY_HIGH,
-                guildNumOfficers: CL.HIGH,
+                stockpile: CL.SLIGHTLY_HIGH,
+                education: CL.HIGH,
                 security: CL.SLIGHTLY_HIGH,
                 economy: CL.SLIGHTLY_HIGH,
                 officerQuality: CL.SLIGHTLY_HIGH,
@@ -47,14 +47,14 @@ class AllianceNews extends News {
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
                 territory: News.clHalfRegression(CL.HIGH),
-                marketCargoAmounts: News.clHalfRegression(CL.SLIGHTLY_HIGH),
+                stockpile: News.clHalfRegression(CL.SLIGHTLY_HIGH),
                 prestige: CL.LOW, // diplomatic failure
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
                 territory: News.clHalfRegression(CL.HIGH),
-                marketCargoAmounts: News.clHalfRegression(CL.SLIGHTLY_HIGH),
+                stockpile: News.clHalfRegression(CL.SLIGHTLY_HIGH),
                 prestige: CL.LOW,
             })
         ]
@@ -63,8 +63,8 @@ class AllianceNews extends News {
     determineOutcome() {
         const {planet, targetPlanet} = this
         // Check if relationships are still friendly
-        const rel1 = planet.culture.relationships.get(targetPlanet)
-        const rel2 = targetPlanet.culture.relationships.get(planet)
+        const rel1 = planet.civilization.relationships.get(targetPlanet)
+        const rel2 = targetPlanet.civilization.relationships.get(planet)
         if (rel1 === RELATIONSHIP_TYPES.TENSE || rel1 === RELATIONSHIP_TYPES.WAR ||
             rel2 === RELATIONSHIP_TYPES.TENSE || rel2 === RELATIONSHIP_TYPES.WAR) {
             this.cancelled = true
@@ -74,7 +74,7 @@ class AllianceNews extends News {
     getAllies(planet = new Planet()) {
         const allies = []
         for (const p of gs.system.planets) {
-            const rel = planet.culture.relationships.get(p)
+            const rel = planet.civilization.relationships.get(p)
             if (rel == RELATIONSHIP_TYPES.ALLY) {
                 allies.push(p)
             }
@@ -85,15 +85,15 @@ class AllianceNews extends News {
     isValid() {
         const {planet, targetPlanet} = this
         //both planets must be currently neutral towards each other
-        const relationships = [planet.culture.relationships.get(targetPlanet), targetPlanet.culture.relationships.get(planet)]
+        const relationships = [planet.civilization.relationships.get(targetPlanet), targetPlanet.civilization.relationships.get(planet)]
         const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.NEUTRAL)
         //never ally with an opposing govt OR someone who is allied to one!!!
         const opposingGovernmentsValid = 
-            (planet.culture.governmentType.opposingType !== targetPlanet.culture.governmentType)
-            && (targetPlanet.culture.governmentType.opposingType !== planet.culture.governmentType)
+            (planet.civilization.governmentType.opposingType !== targetPlanet.civilization.governmentType)
+            && (targetPlanet.civilization.governmentType.opposingType !== planet.civilization.governmentType)
         /*const alliedToOpposingGovtValid = 
-            !(this.getAllies(targetPlanet).some(ally => ally.culture.governmentType === planet.culture.governmentType.opposingType))
-            && !(this.getAllies(planet).some(ally => ally.culture.governmentType === targetPlanet.culture.governmentType.opposingType))*/
+            !(this.getAllies(targetPlanet).some(ally => ally.civilization.governmentType === planet.civilization.governmentType.opposingType))
+            && !(this.getAllies(planet).some(ally => ally.civilization.governmentType === targetPlanet.civilization.governmentType.opposingType))*/
         const alliedToOpposingGovtValid = true //was a bit too harsh earlier
         //most of the below shouldnt be possible based on above checked but just in case
         const interferingEvent = 

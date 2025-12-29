@@ -13,38 +13,42 @@ class CivilStrifeNews extends News {
                 planet: this.planet,
                 military: CL.SLIGHTLY_LOW,
                 security: CL.VERY_LOW,
-                crime: CL.HIGH,
                 economy: CL.LOW,
                 industry: CL.VERY_LOW,
                 credits: CL.LOW,
-                marketCargoAmounts: CL.LOW,
+                stockpile: CL.LOW,
                 prestige: CL.SLIGHTLY_LOW,
+                crime: CL.HIGH,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, CL.VERY_HIGH]]),
             })
         ]
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
+        Object.assign(this.completeEffects[0], {
+            culture: CL.HIGH
+        })
         //some lingering security and prestige decrease and destroyed goods
 
         this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
                 military: CL.NO_REGRESSION,
-                security: News.clHalfRegression(this.completeEffects[0].security),
-                crime: News.clHalfRegression(this.completeEffects[0].crime),
-                prestige: CL.NO_REGRESSION,
+                security: CL.LOW/CL.VERY_LOW,
+                crime: CL.SLIGHTLY_HIGH/CL.HIGH,
+                prestige: CL.LOW/CL.SLIGHTLY_LOW,
+                culture: CL.LOW,
             })
         ]
     }
 
     determineOutcome() {
         const {planet} = this
-        this.rollOutcome(planet.culture.military*planet.culture.security, CL.MEDIUM)
+        this.rollOutcome(planet.civilization.military*planet.civilization.security, CL.MEDIUM)
     }
 
     isValid() {
         const {planet} = this
         //more likely if security is too high
-        const ratingsValid = planet.culture.security > CL.HIGH
+        const ratingsValid = planet.civilization.security > CL.HIGH
         //planet must not already be in anarchy or puppet state
         const interferingEvent = News.planetHasAnyNews(planet, [NT.CIVIL_STRIFE, NT.CIVIL_WAR, NT.REVOLUTION])
         return ratingsValid && !interferingEvent

@@ -20,7 +20,7 @@ class ConscriptionNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 military: CL.VERY_HIGH,
-                guildNumOfficers: CL.VERY_HIGH
+                education: CL.VERY_HIGH
             })
         ]
         
@@ -36,13 +36,13 @@ class ConscriptionNews extends News {
     determineOutcome() {
         const {planet} = this
         // Conscription fails if population revolts (low security, high population)
-        this.rollOutcome(planet.culture.security*planet.culture.prestige, CL.LOW)
+        this.rollOutcome(planet.civilization.security*planet.civilization.prestige, CL.LOW)
     }
 
     isValid() {
         const {planet} = this
         // More likely if military is low or security is low (militarizing society)
-        const ratingsValid = planet.culture.military < CL.LOW && planet.culture.population > CL.MEDIUM
+        const ratingsValid = planet.civilization.military < CL.LOW && planet.civilization.population > CL.MEDIUM
         const interferingEvent = News.planetHasAnyNews(planet, [NT.CONSCRIPTION])
         return ratingsValid && !interferingEvent
     }

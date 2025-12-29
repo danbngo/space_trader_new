@@ -32,7 +32,7 @@ class Market extends Building {
     calcCargoBuyPrices() {
         const prices = new CountsMap()
         for (const cargoType of CARGO_TYPES_ALL) {
-            const price = Math.round(cargoType.value * this.planet.culture.cargoPriceModifiers.getAmount(cargoType) * (1+this.rake) * this.inflation)
+            const price = Math.round(cargoType.value * this.planet.civilization.cargoPriceModifiers.getAmount(cargoType) * (1+this.rake) * this.inflation)
             prices.setAmount(cargoType, price)
         }
         return prices
@@ -41,7 +41,7 @@ class Market extends Building {
     calcCargoSellPrices() {
         const prices = new CountsMap()
             for (const cargoType of CARGO_TYPES_ALL) {
-            const price = Math.round(cargoType.value * this.planet.culture.cargoPriceModifiers.getAmount(cargoType) / (1+this.rake) * this.inflation)
+            const price = Math.round(cargoType.value * this.planet.civilization.cargoPriceModifiers.getAmount(cargoType) / (1+this.rake) * this.inflation)
             prices.setAmount(cargoType, price)
         }
         return prices
