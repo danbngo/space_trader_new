@@ -58,7 +58,7 @@ class RevolutionNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet} = this
         // Higher military and prestige = more likely to succeed
         const successProbability = (planet.culture.military + planet.culture.prestige) / 2

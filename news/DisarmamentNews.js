@@ -42,7 +42,7 @@ class DisarmamentNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet} = this
         // Disarmament fails if tensions arise
         let tensionsDetected = false

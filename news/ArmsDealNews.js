@@ -38,7 +38,7 @@ class ArmsDealNews extends News {
         this.cancelEndEffects = []
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet, targetPlanet} = this
         // Check if relationship deteriorated
         const rel1 = planet.culture.relationships.get(targetPlanet)
@@ -50,10 +50,7 @@ class ArmsDealNews extends News {
         }
         // Fail if targetPlanet refuses to sell - based on planet's low prestige/credits
         // Lower prestige and credits increase the chance seller refuses
-        const prestigeFactor = planet.culture.prestige
-        const creditsFactor = planet.settlement.bank.baseCredits/
-        const refusalProbability = (prestigeFactor * 0.15 + creditsFactor * 0.15) * Math.random()
-        this.failed = refusalProbability > 0.15
+        this.rollOutcome(planet.culture.prestige*planet.settlement.wealth, CL.MEDIUM)
     }
 
     isValid() {

@@ -38,7 +38,7 @@ class WarAllyNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet, targetPlanet, allyPlanet} = this
         // Check if war still ongoing
         const stillAtWar = planet.culture.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR

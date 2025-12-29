@@ -38,7 +38,7 @@ class OligarchyNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet} = this
         // Oligarchy becomes permanent if security too weak to resist
         const failProbability = (1 - planet.culture.security) * 0.4

@@ -68,7 +68,7 @@ class InvestmentNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet, targetPlanet} = this
         // Check if relationship deteriorated
         const rel1 = planet.culture.relationships.get(targetPlanet)

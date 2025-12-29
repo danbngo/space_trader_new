@@ -71,7 +71,7 @@ class CoupDetatNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet, targetPlanet} = this
         // Coup fails if target has high security or military
         const resistanceProbability = (targetPlanet.culture.security + targetPlanet.culture.military) / 2

@@ -39,7 +39,7 @@ class TourismNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet} = this
         // Tourism fails if planet has low prestige or poor economy during construction
         const failProbability = (1 - planet.culture.prestige) * (1 - planet.culture.economy) * 0.3

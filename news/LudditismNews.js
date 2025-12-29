@@ -55,7 +55,7 @@ class LudditismNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet} = this
         // Movement fails if external pressures (economy/military threats)
         let threatsDetected = false

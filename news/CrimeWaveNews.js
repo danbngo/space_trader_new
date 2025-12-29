@@ -40,7 +40,7 @@ class CrimeWaveNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet} = this
         // Higher security and military = more likely to stop crime
         const stopProbability = (planet.culture.security + planet.culture.military) / 2

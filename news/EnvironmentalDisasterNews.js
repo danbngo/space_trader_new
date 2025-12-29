@@ -44,7 +44,7 @@ class EnvironmentalDisasterNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet} = this
         // Cleanup fails if economy/industry too weak to recover
         const failProbability = (1 - planet.culture.economy) * (1 - planet.culture.industry) * 0.35

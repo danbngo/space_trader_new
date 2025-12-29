@@ -53,7 +53,7 @@ class WarSurrenderNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet, targetPlanet} = this
         // Check if war still ongoing
         const stillAtWar = planet.culture.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR

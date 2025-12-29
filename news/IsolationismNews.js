@@ -50,7 +50,7 @@ class IsolationismNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet} = this
         // Isolationism fails if external threats emerge
         let threatsDetected = false
@@ -71,11 +71,9 @@ class IsolationismNews extends News {
         //more likely after population collapse or being stretched thin
         const ratingsValid = planet.culture.population < CL.SLIGHTLY_HIGH && planet.culture.territory > CL.HIGH
         //must not be a puppet state or anarchic
-        const governmentValid = (planet.culture.governmentType != GT.PUPPET_STATE) && (planet.culture.governmentType != GT.ANARCHY)
-        //must not be at engaged in or targeted by any hostile acts
         const interferingEvent =
             News.planetHasAnyNews(planet, NT_DANGEROUS) ||
             News.planetHasAnyNewsTargeting(planet, NT_DANGEROUS) 
-        return ratingsValid && governmentValid && !interferingEvent
+        return ratingsValid && !interferingEvent
     }
 }

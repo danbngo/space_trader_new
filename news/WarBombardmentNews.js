@@ -77,7 +77,7 @@ class WarBombardmentNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet, targetPlanet} = this
         // Check if peace was forced (relationships changed during bombardment)
         const currentRel1 = planet.culture.relationships.get(targetPlanet)

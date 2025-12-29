@@ -51,7 +51,7 @@ class EmbargoNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet, targetPlanet} = this
         // Check if relationship improved to neutral
         const rel = planet.culture.relationships.get(targetPlanet)

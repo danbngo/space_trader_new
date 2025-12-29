@@ -68,7 +68,7 @@ class WarNews extends News {
         this.cancelEndEffects = this.endEffects.map(effect => effect.clone())
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet, targetPlanet} = this
         // Check if peace was forced (relationships changed during war)
         const currentRel1 = planet.culture.relationships.get(targetPlanet)

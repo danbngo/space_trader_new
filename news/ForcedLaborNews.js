@@ -41,7 +41,7 @@ class ForcedLaborNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet} = this
         // Forced labor fails if security too low (revolts succeed)
         const revoltProbability = (1 - planet.culture.security) * 0.4
@@ -53,10 +53,7 @@ class ForcedLaborNews extends News {
         // More likely if industry is low (trying to industrialize)
         const ratingsValid = planet.culture.industry < CL.LOW
         // Authoritarian governments, police states, and communist states would do this
-        // Not democracies or anarchies
-        const govCheck = planet.culture.governmentType != GT.ANARCHY
-        // Planet must not already have this event
         const interferingEvent = News.planetHasAnyNews(planet, [NT.FORCED_LABOR])
-        return ratingsValid && govCheck && !interferingEvent
+        return ratingsValid && !interferingEvent
     }
 }

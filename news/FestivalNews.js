@@ -17,6 +17,7 @@ class FestivalNews extends News {
                 marketCargoAmounts: CL.LOW,
                 crime: CL.HIGH,
                 blackMarketPrices: CL.HIGH,
+                cargoPriceModifiers: new Map([[CARGO_TYPES.HOLOCUBES, CL.VERY_HIGH], [CARGO_TYPES.DRUGS, CL.ASTRONOMICAL]]),
             })
         ]
 
@@ -42,7 +43,7 @@ class FestivalNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet} = this
         // Festival fails if security too low (riots, crime)
         const failProbability = (1 - planet.culture.security) * 0.3

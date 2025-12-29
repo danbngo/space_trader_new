@@ -10,9 +10,9 @@ class ConstructionNews extends News {
 
         const buildingsToEnable = [];
         const numBuildings = Math.floor(Math.random() * 3) + 1; // 1-3 buildings
-        const disabledBuildings = planet.settlement.buildings.filter(b => !b.enabled);
-        for (let i = 0; i < Math.min(numBuildings, disabledBuildings.length); i++) {
-            const building = rndMember(disabledBuildings.filter(b => !b.enabled && !buildingsToEnable.includes(b)));
+        const buildingsDisabled = planet.settlement.buildings.filter(b => !b.enabled);
+        for (let i = 0; i < Math.min(numBuildings, buildingsDisabled.length); i++) {
+            const building = rndMember(buildingsDisabled.filter(b => !b.enabled && !buildingsToEnable.includes(b)));
             if (building) buildingsToEnable.push(building);
         }
 
@@ -47,7 +47,7 @@ class ConstructionNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet} = this
         // Higher industry and economy = more likely to succeed
         const successProbability = (planet.culture.industry + planet.culture.economy) / 2

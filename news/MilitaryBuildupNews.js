@@ -42,7 +42,7 @@ class MilitaryBuildupNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet} = this
         // Buildup fails if economy collapses during the process
         const failProbability = (1 - planet.culture.economy) * 0.35

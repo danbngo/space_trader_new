@@ -37,7 +37,7 @@ class TensionsNews extends News {
         this.cancelEndEffects = this.endEffects.map(effect => effect.clone())
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet, targetPlanet} = this
         // Check if relationships improved (became allies) or escalated to war
         const currentRel1 = planet.culture.relationships.get(targetPlanet)

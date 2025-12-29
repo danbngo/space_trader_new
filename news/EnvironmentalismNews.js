@@ -37,7 +37,7 @@ class EnvironmentalismNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet} = this
         // Movement fails if economy becomes too weak to sustain
         const failProbability = (1 - planet.culture.economy) * 0.35

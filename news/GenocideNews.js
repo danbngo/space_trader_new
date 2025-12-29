@@ -36,10 +36,8 @@ class GenocideNews extends News {
         const {planet} = this
         //more likely if security is very low (except in a police state)
         const ratingsValid = planet.culture.military > CL.MEDIUM && planet.culture.security < CL.VERY_LOW
-        //cant be anarchy
-        const govCheck = planet.culture.governmentType != GT.ANARCHY
         //planet must not already be in anarchy or puppet state
         const interferingEvent = News.planetHasAnyNews(planet, [NT.GENOCIDE])
-        return (ratingsValid) && govCheck && !interferingEvent
+        return (ratingsValid) && !interferingEvent
     }
 }

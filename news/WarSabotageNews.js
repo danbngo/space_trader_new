@@ -55,7 +55,7 @@ class WarSabotageNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet, targetPlanet} = this
         // Check if peace was forced during sabotage
         const currentRel1 = planet.culture.relationships.get(targetPlanet)

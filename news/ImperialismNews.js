@@ -70,7 +70,7 @@ class ImperialismNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet, targetPlanet} = this
         // Check if peace declared
         const rel = planet.culture.relationships.get(targetPlanet)

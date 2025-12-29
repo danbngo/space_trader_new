@@ -42,7 +42,7 @@ class CrackdownNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet} = this
         // Higher security and military = more likely crackdown succeeds
         const successProbability = (planet.culture.security + planet.culture.military) / 2
@@ -52,11 +52,10 @@ class CrackdownNews extends News {
     isValid() {
         const {planet} = this
         //wouldnt happen in an anarchy, just sayin
-        const govValid = planet.culture.governmentType != GT.ANARCHY
         //wont happen if crime is already low AND black market amount/price is low
         const crimeValid = (planet.culture.crime > CL.HIGH || planet.settlement.blackMarket.inflation > CL.HIGH || planet.settlement.illegalGoods > CL.HIGH)
         const securityValid = planet.culture.security < CL.HIGH
         const interferingEvent = News.planetHasAnyNews(planet, [NT.CRACKDOWN, ...NT_CRIME_PREVENTING])
-        return govValid && crimeValid && securityValid && !interferingEvent
+        return crimeValid && securityValid && !interferingEvent
     }
 }

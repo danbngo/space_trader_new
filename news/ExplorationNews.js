@@ -46,7 +46,7 @@ class ExplorationNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet} = this
         // Higher prestige and officer quality = more likely to succeed
         const successProbability = (planet.culture.prestige + planet.culture.officerQuality) / 2

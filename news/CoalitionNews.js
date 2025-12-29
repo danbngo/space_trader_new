@@ -1,8 +1,8 @@
 class CoalitionNews extends News {
     constructor(planet = new Planet()) {
         super(
-            `${coloredName(planet)}'s dominance on the solar stage is sparking tensions with other planets!`,
-            `The anti-${coloredName(planet)} coalition begins to fracture!`,
+            `The military and territorial dominance of ${coloredName(planet)} is sparking tensions with other planets!`,
+            `${coloredName(planet)} is able to assuage other planets' concerns and prevent a coalition from rising against it!`,
             `The anti-${coloredName(planet)} coalition solidifies into lasting hostility!`,
             ``,
             NT.COALITION, planet
@@ -12,19 +12,11 @@ class CoalitionNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 prestige: CL.LOW,
-                onApply: ()=>{
-                    const [badNews] = News.calcRelationshipWorseningNews(planet)
-                    const numToWorsen = rng(5,3)
-                    const rNews = rndMembers(badNews, numToWorsen)
-                    for (const n of rNews) n.start()
-                }
             })
         ]
 
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
-        //population growth and prestige boost from simpler lifestyle
         Object.assign(this.endEffects[0], {
-            population: CL.HIGH,
             prestige: News.clHalfRegression(this.endEffects[0].prestige),
         })
 
@@ -32,23 +24,29 @@ class CoalitionNews extends News {
         this.failEndEffects = [
             new NewsEffect({
                 planet: this.planet,
-                prestige: CL.NO_REGRESSION, // lasting damage
-                // Relationships already worsened, no further effect needed
+                prestige: CL.NO_REGRESSION,
+                onApply: ()=>{
+                    const badNews = News.calcRelationshipWorseningNews(planet)[0]
+                    for (const bn of badNews) {
+                        if (bn.isValid()) bn.start()
+                    }
+                }
             })
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet} = this
-        // Coalition persists if planet maintains very high prestige (threat remains)
-        const failProbability = planet.culture.prestige > CL.VERY_HIGH ? 0.4 : 0.1
-        this.failed = Math.random() < failProbability
+        // prestige, reducing military/territory gets you out of this
+        const possibleBadNews = News.calcRelationshipWorseningNews(planet)[0]
+        if (possibleBadNews.length < 3) return
+        this.rollOutcome(planet.culture.prestige/planet.culture.territory/planet.culture.military, CL.HIGH)
     }
 
     isValid() {
         const {planet} = this
-        //more likely if really high prestige
-        const ratingsValid = planet.culture.prestige > CL.VERY_HIGH
+        //more likely if REALLY REALLY high territory and military
+        const ratingsValid = planet.culture.territory > CL.VERY_HIGH && (planet.culture.military > CL.VERY_HIGH || planet.navy > CL.VERY_HIGH || planet.army > CL.VERY_HIGH)
         const interferingEvent =
             News.planetHasAnyNews(planet, [NT.COALITION])
         const [badNews] = News.calcRelationshipWorseningNews(planet)

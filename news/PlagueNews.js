@@ -41,7 +41,7 @@ class PlagueNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet} = this
         // Higher economy/industry = better medical infrastructure
         const cureProbability = (planet.culture.economy + planet.culture.industry) / 2

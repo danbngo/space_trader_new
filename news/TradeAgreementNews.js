@@ -73,7 +73,7 @@ class TradeAgreementNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet, targetPlanet} = this
         // Check for hostile relationships
         const rel1 = planet.culture.relationships.get(targetPlanet)

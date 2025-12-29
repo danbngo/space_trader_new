@@ -46,7 +46,7 @@ class ForeignAidNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet} = this
         // Aid fails if governance is too weak (low security means corruption)
         const failProbability = (1 - planet.culture.security) * 0.4

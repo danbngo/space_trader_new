@@ -67,7 +67,7 @@ class SanctionsNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet, targetPlanet} = this
         // Check if relationship improved
         const rel = planet.culture.relationships.get(targetPlanet)

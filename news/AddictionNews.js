@@ -28,11 +28,10 @@ class AddictionNews extends News {
         })
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet} = this
-        // Higher security and economy = more likely to overcome addiction
-        const overcomeProbability = (planet.culture.security + planet.culture.economy) / 2
-        this.failed = Math.random() > overcomeProbability
+        // Higher security and lower crime helps mitigate
+        this.rollOutcome(planet.culture.security/planet.culture.crime, CL.MEDIUM)
     }
 
     isValid() {

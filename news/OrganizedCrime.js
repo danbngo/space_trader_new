@@ -45,7 +45,7 @@ class OrganizedCrimeNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet} = this
         // Crime crackdown fails if security too low
         const failProbability = (1 - planet.culture.security) * 0.45

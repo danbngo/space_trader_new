@@ -45,7 +45,7 @@ class ScarcityNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet} = this
         // Scarcity becomes catastrophic if economy/industry collapse further
         const failProbability = (1 - planet.culture.economy) * (1 - planet.culture.industry) * 0.3

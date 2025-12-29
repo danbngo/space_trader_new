@@ -38,7 +38,7 @@ class ScientificBreakthroughNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet} = this
         // Research fails based on officer quality and economy
         const successProbability = (planet.culture.officerQuality * 0.6) + (planet.culture.economy * 0.3) + 0.1

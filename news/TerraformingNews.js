@@ -42,7 +42,7 @@ class TerraformingNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet} = this
         // Higher industry and officer quality = more likely to succeed
         const successProbability = (planet.culture.industry + planet.culture.officerQuality) / 2

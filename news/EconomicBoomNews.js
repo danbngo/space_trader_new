@@ -43,7 +43,7 @@ class EconomicBoomNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet} = this
         // Higher industry and economy = more sustainable boom
         const sustainProbability = (planet.culture.industry + planet.culture.economy) / 2

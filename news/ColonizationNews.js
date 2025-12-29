@@ -3,7 +3,7 @@ class ColonizationNews extends News {
         super(
             `${coloredName(planet)} begins building a fleet to colonize resource-rich asteroids in the central belt!`,
             `${coloredName(planet)}'s colony ships have finished building settlements on resource laden asteroids!`,
-            `${coloredName(planet)}'s colonization effort fails! Ships lost!`,
+            `${coloredName(planet)}'s colonization effort fails! Pirates raid their ships and hazards, scarcity and disease afflict their colonies!`,
             '',
             NT.COLONIZATION, planet
         )
@@ -21,12 +21,8 @@ class ColonizationNews extends News {
             })
         ]
 
-        this.endEffects = this.startEffects.map(effect => effect.getInverse())
+        this.endEffects = this.startEffects.map(effect => effect.getHalfRegression())
         Object.assign(this.endEffects[0], {
-            population: CL.NO_REGRESSION, //pop doesnt auto recover
-            shipyardNumShips: CL.NO_REGRESSION,
-            shipQuality: CL.NO_REGRESSION,
-            marketCargoAmounts: News.clHalfRegression(this.endEffects[0].marketCargoAmounts),
             economy: CL.HIGH,
             industry: CL.HIGH,
             territory: CL.HIGH,
@@ -35,21 +31,15 @@ class ColonizationNews extends News {
         this.failEndEffects = [
             new NewsEffect({
                 planet: this.planet,
-                population: CL.NO_REGRESSION,
-                shipyardNumShips: CL.NO_REGRESSION,
-                shipQuality: CL.NO_REGRESSION,
-                prestige: CL.LOW,
-                credits: CL.NO_REGRESSION,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.METAL, CL.NO_REGRESSION], [CARGO_TYPES.ISOTOPES, CL.NO_REGRESSION]]),
+                cargoPriceModifiers: NewsEffect.getInvertedCargoPriceModifiers(this.startEffects[0].cargoPriceModifiers),
             })
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet} = this
-        // Higher industry and territory = more likely to succeed
-        const successProbability = (planet.culture.industry + planet.culture.territory) / 2
-        this.failed = Math.random() > successProbability
+        //better navy and economy (logistics) helps
+        this.rollOutcome((planet.navy*planet.culture.economy), CL.SLIGHTLY_LOW)
     }
 
     isValid() {

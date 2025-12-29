@@ -49,7 +49,7 @@ class DepressionNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet} = this
         // Higher industry and prestige = more likely to recover
         const recoveryProbability = (planet.culture.industry + planet.culture.prestige) / 2

@@ -40,7 +40,7 @@ class SurplusNews extends News {
         ]
     }
 
-    determineEnding() {
+    determineOutcome() {
         const {planet} = this
         // Surplus fails (goes bust) with small probability
         this.failed = Math.random() < 0.15
