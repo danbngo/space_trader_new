@@ -48,7 +48,7 @@ const NT = {
     COALITION: new NewsType('Coalition', NF.POLITICS, 1, 10, 30, 300, [GT.PUPPET_STATE], [], []),
     COLONIZATION: new NewsType('Colonization', NF.EXPLORATION, 1, 7, 15, 1, [GT.PUPPET_STATE], [GT.ARISTOCRACY, GT.TECHNOCRACY], []),
     CONSCRIPTION: new NewsType('Conscription', NF.MILITARY, 1, 3, 8, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.POLICE_STATE, GT.ARISTOCRACY], []),
-    CONSTRUCTION: new NewsType('Construction', NF.PROJECT, 1, 3, 8, 1, [], [GT.CORPORATISM, GT.TECHNOCRACY], []),
+    CONSTRUCTION: new NewsType('Construction', NF.LABOR, 1, 3, 8, 1, [], [GT.CORPORATISM, GT.TECHNOCRACY], []),
     COUP_DETAT: new NewsType('Coup d\'Etat', NF.ESPIONAGE, 1, 2, 5, 1, [GT.ANARCHY, GT.PUPPET_STATE], [], []),
     CRACKDOWN: new NewsType('Crackdown', NF.CRIME, 1, 3, 8, 1, [GT.ANARCHY], [GT.POLICE_STATE], []),
     CRIME_WAVE: new NewsType('Crime Wave', NF.CRIME, 1, 3, 8, 1, [GT.POLICE_STATE], [GT.ANARCHY], []),
@@ -62,7 +62,7 @@ const NT = {
     EXPLORATION: new NewsType('Exploration', NF.EXPLORATION, 1, 5, 15, 1, [], [GT.TECHNOCRACY], []),
     FESTIVAL: new NewsType('Festival', NF.CULTURE, 1, 2, 5, 1, [GT.POLICE_STATE], [], []),
     FORCED_LABOR: new NewsType('Forced Labor', NF.OPPRESSION, 1, 10, 30, 1, [GT.DEMOCRACY, GT.ANARCHY], [GT.POLICE_STATE, GT.COMMUNISM, GT.CORPORATISM], []),
-    FOREIGN_AID: new NewsType('Foreign Aid', NF.ECONOMY, 1, 3, 8, 1, [], [GT.DEMOCRACY, GT.THEOCRACY], []),
+    FOREIGN_AID: new NewsType('Foreign Aid', NF.PEACE, 1, 3, 8, 1, [], [GT.DEMOCRACY, GT.THEOCRACY], []),
     GENOCIDE: new NewsType('Genocide', NF.WAR, 1, 5, 15, 1, [GT.ANARCHY, GT.DEMOCRACY], [GT.POLICE_STATE, GT.ARISTOCRACY], []),
     IMMIGRATION: new NewsType('Immigration', NF.CULTURE, 1, 5, 10, 1, [], [GT.DEMOCRACY, GT.CORPORATISM], [GT.POLICE_STATE, GT.COMMUNISM]),
     IMPERIALISM: new NewsType('Imperialism', NF.POLITICS, 1, 10, 30, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.ARISTOCRACY, GT.POLICE_STATE, GT.THEOCRACY], []),
@@ -78,12 +78,12 @@ const NT = {
     REVIVAL: new NewsType('Religious Revival', NF.RELIGION, 1, 10, 20, 1, [GT.TECHNOCRACY], [GT.THEOCRACY], []),
     REVOLUTION: new NewsType('Revolution', NF.POLITICS, 1, 3, 8, 1, [GT.PUPPET_STATE], [], []),
     SANCTIONS: new NewsType('Sanctions', NF.ECONOMY, 1, 3, 15, 1, [GT.ANARCHY, GT.PUPPET_STATE, GT.CORPORATISM], [GT.DEMOCRACY], []),
-    SCARCITY: new NewsType('Scarcity', NF.ECONOMY, 1, 3, 8, 1, [], [], []),
+    SCARCITY: new NewsType('Scarcity', NF.HEALTH_HAZARD, 1, 3, 8, 1, [], [], []),
     SCIENTIFIC_BREAKTHROUGH: new NewsType('Scientific Breakthrough', NF.SCIENCE, 1, 1, 4, 1, [], [GT.TECHNOCRACY], []),
     STOCK_MARKET_CRASH: new NewsType('Stock Market Crash', NF.ECONOMY, 1, 3, 8, 1, [GT.COMMUNISM], [GT.CORPORATISM], []),
-    SURPLUS: new NewsType('Surplus', NF.ECONOMY, 1, 3, 8, 1, [], [], []), 
+    SURPLUS: new NewsType('Surplus', NF.LABOR, 1, 3, 8, 1, [], [], []), 
     TENSIONS: new NewsType('Tensions', NF.UNREST, 1, 5, 40, 1, [GT.PUPPET_STATE, GT.ANARCHY], [], []), //two neutral planets have relations changed to hostile
-    TERRAFORMING: new NewsType('Terraforming', NF.PROJECT, 1, 5, 40, 1, [], [GT.TECHNOCRACY, GT.CORPORATISM], []), //two neutral planets have relations changed to hostile
+    TERRAFORMING: new NewsType('Terraforming', NF.LABOR, 1, 5, 40, 1, [], [GT.TECHNOCRACY, GT.CORPORATISM], []), //two neutral planets have relations changed to hostile
     TOURISM: new NewsType('Tourism', NF.CULTURE, 1, 3, 8, 1, [], [GT.DEMOCRACY, GT.CORPORATISM], []),
     TRADE_AGREEMENT: new NewsType('Trade Agreement', NF.ECONOMY, 1, 10, 20, 1, [], [GT.CORPORATISM, GT.DEMOCRACY], []), //two neutral or allied planets have improved trade relations
     WAR_ALLY: new NewsType('War Ally', NF.WAR, 1, 3, 15, 150, [], [GT.ARISTOCRACY, GT.DEMOCRACY], []),

@@ -57,7 +57,7 @@ class WarSubjugationNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 military: CL.LOW, // failed invasion losses
-                technology: CL.LOW,
+                ships: CL.LOW,
                 prestige: CL.LOW, // humiliation
             }),
             new NewsEffect({

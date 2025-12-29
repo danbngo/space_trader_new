@@ -5,8 +5,8 @@
  */
 function generateCivilization(planet = new Planet()) {
     const governmentType = rndMember(GT_ALL.filter(gt => gt != GT.PUPPET_STATE))
-    const shipQuality = rng(4,1,false)/2
-    const officerQuality = rng(4,1,false)/2
+    const technology = rng(4,1,false)/2
+    const education = rng(4,1,false)/2
     const population = rng(8,1,false)/4
     const territory = rng(8,1,false)/4
     const military = rng(8,1,false)/4
@@ -44,5 +44,5 @@ function generateCivilization(planet = new Planet()) {
         selectPolicy(validForeignPolicies)
     )
 
-    return new Civilization(planet, governmentType, cargoPriceModifiers, shipQuality, officerQuality, territory, population, military, industry, economy, security, culture, prestige, policies)
+    return new Civilization(planet, governmentType, cargoPriceModifiers, technology, education, territory, population, military, industry, economy, security, culture, prestige, policies)
 }

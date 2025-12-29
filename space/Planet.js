@@ -46,11 +46,11 @@ class Planet extends OrbitingObject {
     }
 
     get navy() {
-        return this.civilization.military * this.settlement.shipyard.baseNumShips * this.civilization.shipQuality
+        return this.civilization.military * this.settlement.shipyard.baseNumShips * this.civilization.technology
     }
 
     get army() {
-        return this.civilization.military * this.settlement.guild.baseNumOfficers * this.civilization.officerQuality
+        return this.civilization.military * this.settlement.guild.baseNumOfficers * this.civilization.education
     }
 
     get militaryPower() {

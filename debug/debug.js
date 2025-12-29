@@ -129,8 +129,8 @@ function assessPlanets() {
     const totalGuildNumOfficers = gs.system.planets.reduce((sum,planet)=>sum+planet.settlement.guild.baseNumOfficers,0)
     const totalShipyardNumShips = gs.system.planets.reduce((sum,planet)=>sum+planet.settlement.shipyard.baseNumShips,0)
     const totalShipyardNumModules = gs.system.planets.reduce((sum,planet)=>sum+planet.settlement.shipyard.baseNumModules,0)
-    const totalShipQuality = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.shipQuality,0)
-    const totalOfficerQuality = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.officerQuality,0)
+    const totalShipQuality = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.technology,0)
+    const totalOfficerQuality = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.education,0)
     const totalCargoPriceModifier = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.cargoPriceModifiers.average,0)
 
     const averagePopulation = totalPopulation / gs.system.planets.length

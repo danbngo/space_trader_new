@@ -23,8 +23,8 @@ class MilitaryBuildupNews extends News {
         Object.assign(this.completeEffects[0], {
                 military: CL.EXTREMELY_HIGH,
                 prestige: CL.SLIGHTLY_HIGH,
-                officerQuality: CL.HIGH,
                 education: CL.HIGH,
+                labor: CL.HIGH,
                 credits: CL.NO_REGRESSION, //so is wasting money
                 economy: CL.NO_REGRESSION,
                 industry: CL.NO_REGRESSION,

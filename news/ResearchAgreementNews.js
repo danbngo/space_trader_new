@@ -24,13 +24,13 @@ class ResearchAgreementNews extends News {
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         //actual knowledge gained cannot be lost
         Object.assign(this.completeEffects[0], {
-            shipQuality: CL.SLIGHTLY_HIGH,
-            officerQuality: CL.HIGH,
+            technology: CL.SLIGHTLY_HIGH,
+            education: CL.HIGH,
             military: CL.SLIGHTLY_HIGH,
         })
         Object.assign(this.completeEffects[1], {
-            shipQuality: CL.SLIGHTLY_HIGH,
-            officerQuality: CL.HIGH,
+            technology: CL.SLIGHTLY_HIGH,
+            education: CL.HIGH,
             military: CL.SLIGHTLY_HIGH,
         })
 
@@ -51,14 +51,14 @@ class ResearchAgreementNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 credits: News.clHalfRegression(CL.LOW),
-                shipQuality: CL.SLIGHTLY_HIGH, // partial gains
-                officerQuality: News.clHalfRegression(CL.HIGH),
+                technology: CL.SLIGHTLY_HIGH, // partial gains
+                education: News.clHalfRegression(CL.HIGH),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 credits: News.clHalfRegression(CL.LOW),
-                shipQuality: CL.SLIGHTLY_HIGH,
-                officerQuality: News.clHalfRegression(CL.HIGH),
+                technology: CL.SLIGHTLY_HIGH,
+                education: News.clHalfRegression(CL.HIGH),
             })
         ]
     }
@@ -74,7 +74,7 @@ class ResearchAgreementNews extends News {
             return
         }
         // Research fails based on combined officer quality
-        const avgQuality = (planet.civilization.officerQuality + targetPlanet.civilization.officerQuality) / 2
+        const avgQuality = (planet.civilization.education + targetPlanet.civilization.education) / 2
         const successProbability = avgQuality * 0.7 + 0.2
         this.failed = Math.random() > successProbability
     }
@@ -85,7 +85,7 @@ class ResearchAgreementNews extends News {
         const relationships = [planet.civilization.relationships.get(targetPlanet), targetPlanet.civilization.relationships.get(planet)]
         const relationshipsValid = relationships.every(r => r == RELATIONSHIP_TYPES.NEUTRAL || r == RELATIONSHIP_TYPES.ALLY)
         //planets must have similar level of development
-        const developmentValid = Math.abs(planet.civilization.officerQuality - targetPlanet.civilization.officerQuality) < 0.5
+        const developmentValid = Math.abs(planet.civilization.education - targetPlanet.civilization.education) < 0.5
         //removed most requirements for this
         const interferingEvent =
             News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.RESEARCH_AGREEMENT, ...NT_COOPERATION_PREVENTING])

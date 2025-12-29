@@ -21,7 +21,7 @@ class SanctionsNews extends News {
                 targetPlanet: this.planet,
                 stockpile: CL.VERY_LOW,
                 economy: CL.VERY_LOW,
-                education: CL.LOW,
+                labor: CL.LOW,
                 credits: CL.LOW,
             })
         ]

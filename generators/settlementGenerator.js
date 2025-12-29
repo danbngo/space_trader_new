@@ -24,8 +24,8 @@ function generateSettlement(planet = new Planet()) {
  * @returns {ShipModule} The generated ship module.
  */
 function generateShipModule(planet = new Planet(), moduleType = rndMember(SHIP_MODULE_TYPES_ALL)) {
-    const shipQuality = planet ? planet.civilization.shipQuality : 1
-    const quality = rng(2, 0.5, false)*shipQuality
+    const technology = planet ? planet.civilization.technology : 1
+    const quality = rng(2, 0.5, false)*technology
     return new ShipModule(moduleType, quality)
 }
 

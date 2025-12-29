@@ -20,8 +20,8 @@ function generateOfficerName(planet = new Planet()) {
  */
 function generateOfficer(planet = new Planet()) {
     const {civilization} = planet
-    const {officerQuality} = civilization
-    const level = rng(10*officerQuality, 1)
+    const {education} = civilization
+    const level = rng(10*education, 1)
     const fame = rng(level, -level)
     const infamy = rng(level, -level)
     const bounty = 0

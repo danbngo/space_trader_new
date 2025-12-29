@@ -1,7 +1,7 @@
 class LudditismNews extends News {
     constructor(planet = new Planet()) {
         super(
-            `${coloredName(planet)} embraces a return-to-soil movement, rejecting advanced technology for a simpler life!`,
+            `${coloredName(planet)} embraces a return-to-soil movement, rejecting advanced ships for a simpler life!`,
             `${coloredName(planet)}'s people have completed their transition to a more pastoral life!`,
             `${coloredName(planet)}'s luddite movement collapses as technological needs overwhelm ideology!`,
             ``,
@@ -11,11 +11,11 @@ class LudditismNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                shipQuality: CL.VERY_LOW,
+                technology: CL.VERY_LOW,
                 military: CL.SLIGHTLY_LOW,
                 economy: CL.SLIGHTLY_LOW,
                 industry: CL.SLIGHTLY_LOW,
-                officerQuality: CL.SLIGHTLY_LOW,
+                education: CL.SLIGHTLY_LOW,
                 crime: CL.SLIGHTLY_LOW,
                 cargoPriceModifiers: new Map([
                     [CARGO_TYPES.NANITES, CL.EXTREMELY_LOW],
@@ -30,8 +30,8 @@ class LudditismNews extends News {
         Object.assign(this.completeEffects[0], {
             population: CL.HIGH,
             prestige: CL.SLIGHTLY_HIGH,
-            shipQuality: News.clHalfRegression(this.completeEffects[0].shipQuality), //tech knowledge lost
-            officerQuality: News.clHalfRegression(this.completeEffects[0].officerQuality), //tech knowledge lost
+            technology: News.clHalfRegression(this.completeEffects[0].technology), //tech knowledge lost
+            education: News.clHalfRegression(this.completeEffects[0].education), //tech knowledge lost
             military: News.clHalfRegression(this.completeEffects[0].military),
             economy: News.clHalfRegression(this.completeEffects[0].economy),
             industry: News.clHalfRegression(this.completeEffects[0].industry),
@@ -44,8 +44,8 @@ class LudditismNews extends News {
         this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
-                shipQuality: CL.NO_REGRESSION, // tech degradation remains
-                officerQuality: CL.NO_REGRESSION,
+                technology: CL.NO_REGRESSION, // tech degradation remains
+                education: CL.NO_REGRESSION,
                 military: CL.NO_REGRESSION,
                 economy: CL.NO_REGRESSION,
                 industry: CL.NO_REGRESSION,
@@ -75,7 +75,7 @@ class LudditismNews extends News {
     isValid() {
         const {planet} = this
         //more likely if high tech and population pressure
-        const ratingsValid = planet.civilization.shipQuality > CL.HIGH && planet.civilization.industry > CL.MEDIUM
+        const ratingsValid = planet.civilization.technology > CL.HIGH && planet.civilization.industry > CL.MEDIUM
         //must not be at engaged in or targeted by any hostile acts
         const interferingEvent =
             News.planetHasAnyNews(planet, [NT.LUDDITISM, ...NT_DANGEROUS]) ||

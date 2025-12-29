@@ -20,7 +20,7 @@ class ConscriptionNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 military: CL.VERY_HIGH,
-                education: CL.VERY_HIGH
+                labor: CL.VERY_HIGH
             })
         ]
         

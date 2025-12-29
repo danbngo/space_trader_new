@@ -14,7 +14,7 @@ class InvestmentNews extends News {
                 targetPlanet: this.targetPlanet,
                 credits: CL.LOW,
                 stockpile: CL.VERY_LOW,
-                technology: CL.VERY_LOW,
+                ships: CL.VERY_LOW,
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
@@ -33,7 +33,7 @@ class InvestmentNews extends News {
         Object.assign(this.completeEffects[1], {
             industry: CL.VERY_HIGH,
             economy: CL.SLIGHTLY_HIGH,
-            technology: CL.SLIGHTLY_HIGH,
+            ships: CL.SLIGHTLY_HIGH,
         })
 
         // Failed: investment collapses, money lost

@@ -14,7 +14,7 @@ class GenocideNews extends News {
                 population: CL.LOW,
                 military: CL.LOW,
                 economy: CL.LOW,
-                officerQuality: CL.LOW,
+                education: CL.LOW,
                 prestige: CL.LOW,
                 crime: CL.LOW
             })
@@ -26,7 +26,7 @@ class GenocideNews extends News {
             prestige: CL.NO_REGRESSION,
             military: CL.NO_REGRESSION,
             economy: CL.NO_REGRESSION,
-            officerQuality: CL.NO_REGRESSION,
+            education: CL.NO_REGRESSION,
             crime: CL.NO_REGRESSION,
             security: CL.VERY_HIGH,
         })

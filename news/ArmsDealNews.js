@@ -20,15 +20,15 @@ class ArmsDealNews extends News {
         Object.assign(this.completeEffects[0], {
             credits: CL.LOW,
             military: CL.HIGH, //gain some knowledge, new sytems etc.
-            technology: CL.HIGH,
+            ships: CL.HIGH,
             crime: CL.HIGH,
             corruption: CL.LOW,
         })
         Object.assign(this.completeEffects[1], {
             credits: CL.HIGH,
-            technology: CL.LOW,
+            ships: CL.LOW,
             crime: CL.LOW,
-            corruption: CL.HIGH,
+            corruption: CL.LOW,
         })
 
         // Failed: seller refuses to sell

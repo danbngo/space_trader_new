@@ -15,7 +15,7 @@ class DisarmamentNews extends News {
                 territory: CL.SLIGHTLY_LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_LOW], [CARGO_TYPES.WEAPONS, CL.EXTREMELY_LOW]]),
                 crime: CL.SLIGHTLY_LOW,
-                technology: CL.VERY_LOW,
+                ships: CL.VERY_LOW,
             })
         ]
 
@@ -24,7 +24,7 @@ class DisarmamentNews extends News {
         Object.assign(this.completeEffects[0], {
             military: CL.NO_REGRESSION, 
             territory: CL.NO_REGRESSION,
-            technology: CL.NO_REGRESSION,
+            ships: CL.NO_REGRESSION,
             economy: CL.SLIGHTLY_HIGH, //small bonuses to the economy
             industry: CL.SLIGHTLY_HIGH,
             prestige: CL.SLIGHTLY_HIGH,
@@ -35,7 +35,7 @@ class DisarmamentNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 military: CL.NO_REGRESSION, // stayed weak
-                technology: CL.NO_REGRESSION,
+                ships: CL.NO_REGRESSION,
                 territory: CL.NO_REGRESSION,
                 prestige: CL.LOW, // seen as weak
             })

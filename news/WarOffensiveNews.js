@@ -13,35 +13,35 @@ class WarOffensiveNews extends News {
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
                 military: CL.SLIGHTLY_LOW,
-                technology: CL.LOW,
-                education: CL.SLIGHTLY_LOW,
+                ships: CL.LOW,
+                labor: CL.SLIGHTLY_LOW,
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
                 military: CL.SLIGHTLY_LOW,
-                technology: CL.LOW,
-                education: CL.SLIGHTLY_LOW,
+                ships: CL.LOW,
+                labor: CL.SLIGHTLY_LOW,
             })
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         // Victor: minor permanent losses, prestige gain persists
         Object.assign(this.completeEffects[0], {
-            technology: News.clHalfRegression(this.completeEffects[0].technology),
-            education: News.clHalfRegression(this.completeEffects[0].education),
+            ships: News.clHalfRegression(this.completeEffects[0].ships),
+            labor: News.clHalfRegression(this.completeEffects[0].labor),
         })
         // Loser: major permanent losses
         Object.assign(this.completeEffects[1], {
-            technology: CL.NO_REGRESSION,
-            education: CL.NO_REGRESSION,
+            ships: CL.NO_REGRESSION,
+            labor: CL.NO_REGRESSION,
             military: CL.SLIGHTLY_LOW,
         })
 
         this.cancelEffects = this.completeEffects.map(effect => {
             const e = effect.clone()
-            e.technology = News.clHalfRegression(effect.technology)
-            e.education = News.clHalfRegression(effect.education)
+            e.ships = News.clHalfRegression(effect.ships)
+            e.labor = News.clHalfRegression(effect.labor)
             return e
         })
     }
@@ -61,7 +61,7 @@ class WarOffensiveNews extends News {
         // Must have an ongoing war event
         const hasWar = News.hasNews(NT.WAR, planet, targetPlanet)
         // Our officers must be better than theirs
-        const advantage = planet.civilization.officerQuality/targetPlanet.civilization.officerQuality >= CL.SLIGHTLY_HIGH
+        const advantage = planet.civilization.education/targetPlanet.civilization.education >= CL.SLIGHTLY_HIGH
         // Can't have victory already
         const interferingEvent = News.hasNews(NT.WAR_OFFENSIVE, planet, targetPlanet)
         return relationshipValid && hasWar && advantage && !interferingEvent

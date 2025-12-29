@@ -33,8 +33,8 @@ class WarBombardmentNews extends News {
                 security: CL.LOW,
                 stockpile: CL.LOW,
                 inflation: CL.EXTREMELY_HIGH,
-                shipQuality: CL.LOW, //back to the stone age!
-                officerQuality: CL.LOW,
+                technology: CL.LOW, //back to the stone age!
+                education: CL.LOW,
                 prestige: CL.VERY_LOW,
                 buildingsDisabled: buildingsToDisable,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WATER, 2], [CARGO_TYPES.MEDICINE, 2], [CARGO_TYPES.HOLOCUBES, 0.5]]), //this is the only thing that normalizes after
@@ -50,8 +50,8 @@ class WarBombardmentNews extends News {
             economy: CL.NO_REGRESSION,
             security: CL.NO_REGRESSION,
             stockpile: CL.NO_REGRESSION,
-            shipQuality: CL.NO_REGRESSION,
-            officerQuality: CL.NO_REGRESSION,
+            technology: CL.NO_REGRESSION,
+            education: CL.NO_REGRESSION,
             prestige: CL.NO_REGRESSION,
             buildingsEnabled: [],
             forcePeace: true,

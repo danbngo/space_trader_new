@@ -11,7 +11,7 @@ class RevivalNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                officerQuality: CL.LOW,
+                education: CL.LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.HOLOCUBES, CL.VERY_HIGH], [CARGO_TYPES.ISOTOPES, CL.EXTREMELY_LOW]]),
                 crime: CL.LOW,
                 corruption: CL.LOW,
@@ -23,14 +23,14 @@ class RevivalNews extends News {
         //dont revert ratings, but raise birthrates
         Object.assign(this.completeEffects[0], {
             population: CL.HIGH,
-            officerQuality: CL.NO_REGRESSION,
+            education: CL.NO_REGRESSION,
         })
     }
 
     isValid() {
         const {planet} = this
         //cant become even dumber if we're already low
-        const ratingsValid = planet.civilization.officerQuality > CL.LOW
+        const ratingsValid = planet.civilization.education > CL.LOW
         //planet must not already be in anarchy or puppet state
         const interferingEvent =
             News.planetHasAnyNews(planet, [NT.REVIVAL])

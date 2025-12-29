@@ -11,19 +11,19 @@ class TerraformingNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
+                labor: CL.LOW,
                 education: CL.LOW,
-                officerQuality: CL.LOW,
                 credits: CL.LOW,
-                technology: CL.SLIGHTLY_LOW,
+                ships: CL.SLIGHTLY_LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.METAL, CL.VERY_HIGH], [CARGO_TYPES.NANITES, CL.VERY_HIGH]]),
             })
         ]
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         // Ships and officers stay deployed, territory and industry gains are permanent
         Object.assign(this.completeEffects[0], {
-            technology: CL.NO_REGRESSION, // ships stay stationed there
-            education: CL.NO_REGRESSION, // officers stay stationed there
-            officerQuality: CL.NO_REGRESSION, // officers maintain quality
+            ships: CL.NO_REGRESSION, // ships stay stationed there
+            labor: CL.NO_REGRESSION, // officers stay stationed there
+            education: CL.NO_REGRESSION, // officers maintain quality
             industry: CL.SLIGHTLY_HIGH, // permanent industry boost
             economy: CL.SLIGHTLY_HIGH, // permanent economy boost
             territory: CL.SLIGHTLY_HIGH, // permanent territory gain
@@ -32,9 +32,9 @@ class TerraformingNews extends News {
         this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
-                technology: CL.NO_REGRESSION,
+                ships: CL.NO_REGRESSION,
+                labor: CL.NO_REGRESSION,
                 education: CL.NO_REGRESSION,
-                officerQuality: CL.NO_REGRESSION,
                 credits: CL.NO_REGRESSION,
                 prestige: CL.LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.METAL, CL.NO_REGRESSION], [CARGO_TYPES.NANITES, CL.NO_REGRESSION]]),
@@ -45,7 +45,7 @@ class TerraformingNews extends News {
     determineOutcome() {
         const {planet} = this
         // Higher industry and officer quality = more likely to succeed
-        const successProbability = (planet.civilization.industry + planet.civilization.officerQuality) / 2
+        const successProbability = (planet.civilization.industry + planet.civilization.education) / 2
         this.failed = Math.random() > successProbability
     }
 

@@ -14,9 +14,9 @@ class TradeAgreementNews extends News {
                 targetPlanet: this.targetPlanet,
                 stockpile: CL.HIGH,
                 economy: CL.SLIGHTLY_HIGH,
-                education: CL.HIGH,
-                officerQuality: CL.SLIGHTLY_HIGH,
-                shipQuality: CL.SLIGHTLY_HIGH,
+                labor: CL.HIGH,
+                education: CL.SLIGHTLY_HIGH,
+                technology: CL.SLIGHTLY_HIGH,
                 credits: CL.HIGH,
             }),
             new NewsEffect({
@@ -24,9 +24,9 @@ class TradeAgreementNews extends News {
                 targetPlanet: this.planet,
                 stockpile: CL.HIGH,
                 economy: CL.SLIGHTLY_HIGH,
-                education: CL.HIGH,
-                officerQuality: CL.SLIGHTLY_HIGH,
-                shipQuality: CL.SLIGHTLY_HIGH,
+                labor: CL.HIGH,
+                education: CL.SLIGHTLY_HIGH,
+                technology: CL.SLIGHTLY_HIGH,
                 credits: CL.HIGH,
             })
         ]

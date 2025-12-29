@@ -8,8 +8,8 @@ class Civilization {
      * @param {Planet} planet - The planet this civilization belongs to.
      * @param {GovernmentType} governmentType - The type of government of the civilization.
      * @param {CountsMap} cargoPriceModifiers - Modifiers for cargo prices specific to this civilization.
-     * @param {number} shipQuality - Quality rating of ships produced by this civilization.
-     * @param {number} officerQuality - Quality rating of officers from this civilization.
+     * @param {number} technology - Quality rating of ships produced by this civilization.
+     * @param {number} education - Quality rating of officers from this civilization.
      * @param {number} territory - The territorial reach of the civilization in Astronomical Units (AUs).
      * @param {number} population - The population factor affecting fleet sizes and officer availability.
      * @param {number} military - Rating affecting war fleets, bounty hunters, and bank credits.
@@ -20,13 +20,13 @@ class Civilization {
      * @param {number} prestige - Effects how planets interact with each other.
      * @param {Policies} policies - The active policies for this civilization.
      */
-    constructor(planet = new Planet(), governmentType = GT_ALL[0], cargoPriceModifiers = new CountsMap(), shipQuality = 1.0, officerQuality = 1.0, territory = 1, population = 1, military = 1, industry = 1, economy = 1, security = 1, culture = 1, prestige = 1, policies = new Policies()) {
+    constructor(planet = new Planet(), governmentType = GT_ALL[0], cargoPriceModifiers = new CountsMap(), technology = 1.0, education = 1.0, territory = 1, population = 1, military = 1, industry = 1, economy = 1, security = 1, culture = 1, prestige = 1, policies = new Policies()) {
         /** @type {CountsMap} */
         this.cargoPriceModifiers = cargoPriceModifiers
         /** @type {number} */
-        this.shipQuality = shipQuality;
+        this.technology = technology;
         /** @type {number} */
-        this.officerQuality = officerQuality;
+        this.education = education;
         /** @type {number} */
         this.territory = territory; //AUs, recall that neptune is 30. encounters for this civilization can be found further from its planet
         /** @type {number} */

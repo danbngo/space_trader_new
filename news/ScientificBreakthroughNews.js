@@ -2,7 +2,7 @@ class ScientificBreakthroughNews extends News {
     constructor(planet = new Planet()) {
         super(
             `${coloredName(planet)} begins work on a major scientific project!`,
-            `${coloredName(planet)} completes their scientific project, unlocking a major new technology!`,
+            `${coloredName(planet)} completes their scientific project, unlocking a major new ships!`,
             `${coloredName(planet)}'s scientific project fails to yield results!`,
             ``,
             NT.SCIENTIFIC_BREAKTHROUGH, planet
@@ -22,9 +22,9 @@ class ScientificBreakthroughNews extends News {
         //actual knowledge gained cannot be lost
         Object.assign(this.completeEffects[0], {
             credits: News.clHalfRegression(this.completeEffects[0].credits),
-            shipQuality: CL.HIGH,
+            technology: CL.HIGH,
             prestige: CL.SLIGHTLY_HIGH,
-            officerQuality: CL.SLIGHTLY_HIGH,
+            education: CL.SLIGHTLY_HIGH,
             military: CL.SLIGHTLY_HIGH,
         })
 
@@ -41,14 +41,14 @@ class ScientificBreakthroughNews extends News {
     determineOutcome() {
         const {planet} = this
         // Research fails based on officer quality and economy
-        const successProbability = (planet.civilization.officerQuality * 0.6) + (planet.civilization.economy * 0.3) + 0.1
+        const successProbability = (planet.civilization.education * 0.6) + (planet.civilization.economy * 0.3) + 0.1
         this.failed = Math.random() > successProbability
     }
 
     isValid() {
         const {planet} = this
         //needs money. wont bother if we're already at the top
-        const ratingsValid = planet.settlement.market.baseCredits/MARKET_AVERAGE_CREDITS > CL.MEDIUM && planet.civilization.shipQuality < CL.EXTREMELY_HIGH
+        const ratingsValid = planet.settlement.market.baseCredits/MARKET_AVERAGE_CREDITS > CL.MEDIUM && planet.civilization.technology < CL.EXTREMELY_HIGH
         //hard times dont block it, may actually accelerate technological progress
         const interferingEvent = News.hasNews(NT.SCIENTIFIC_BREAKTHROUGH, planet)
         return ratingsValid && !interferingEvent

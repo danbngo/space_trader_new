@@ -1,9 +1,9 @@
 class DepressionNews extends News {
     constructor(planet = new Planet()) {
         super(
-            `${coloredName(planet)} enters a Depression!`,
-            `${coloredName(planet)} is stumbling out of its Depression!`,
-            `${coloredName(planet)}'s Depression deepens! Economic collapse imminent!`,
+            `${coloredName(planet)}'s tenuous economy plunges into a Great Depression!`,
+            `${coloredName(planet)} proactively mitigates its Depression, putting the populace to work!`,
+            `${coloredName(planet)}'s economy is recovering sluggishly after allowing the Depression to reign unchecked!`,
             '',
             NT.DEPRESSION, planet
         )
@@ -17,9 +17,8 @@ class DepressionNews extends News {
                 industry: CL.VERY_LOW,
                 credits: CL.EXTREMELY_LOW,
                 crime: CL.HIGH,
-                education: CL.HIGH,
+                labor: CL.HIGH, //more ppl available
                 //crime: 0.7, -recession-proof industry
-                corruption: CL.SLIGHTLY_LOW,
             })
         ]
 

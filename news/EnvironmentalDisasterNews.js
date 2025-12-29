@@ -17,7 +17,7 @@ class EnvironmentalDisasterNews extends News {
                 industry: CL.VERY_LOW,
                 population: CL.SLIGHTLY_LOW,
                 credits: CL.LOW,
-                technology: CL.LOW,
+                ships: CL.LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WATER, CL.VERY_HIGH], [CARGO_TYPES.MEDICINE, CL.VERY_HIGH]]),
             })
         ]

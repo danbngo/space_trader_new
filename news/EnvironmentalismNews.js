@@ -12,7 +12,7 @@ class EnvironmentalismNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 industry: CL.EXTREMELY_LOW,
-                technology: CL.VERY_LOW,
+                ships: CL.VERY_LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.NANITES, CL.EXTREMELY_LOW], [CARGO_TYPES.METAL, CL.EXTREMELY_LOW]]),
             })
         ]
@@ -21,7 +21,7 @@ class EnvironmentalismNews extends News {
         //market, economy, industry do not fully bounce back
         Object.assign(this.completeEffects[0], {
             population: CL.SLIGHTLY_HIGH,
-            technology: News.clHalfRegression(this.completeEffects[0].technology),
+            ships: News.clHalfRegression(this.completeEffects[0].ships),
             industry: News.clHalfRegression(this.completeEffects[0].industry),
             prestige: CL.SLIGHTLY_HIGH,
         })

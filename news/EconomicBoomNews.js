@@ -18,7 +18,7 @@ class EconomicBoomNews extends News {
                 economy: CL.EXTREMELY_HIGH,
                 industry: CL.VERY_HIGH,
                 credits: CL.EXTREMELY_HIGH,
-                technology: CL.VERY_HIGH,
+                ships: CL.VERY_HIGH,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.HOLOCUBES, CL.EXTREMELY_HIGH]]),
             })
         ]

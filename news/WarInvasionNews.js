@@ -12,9 +12,9 @@ class WarInvasionNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
-                education: CL.LOW,
-                technology: CL.SLIGHTLY_LOW,
-                officerQuality: CL.SLIGHTLY_LOW, //meat grinder
+                labor: CL.LOW,
+                ships: CL.SLIGHTLY_LOW,
+                education: CL.SLIGHTLY_LOW, //meat grinder
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
@@ -29,15 +29,15 @@ class WarInvasionNews extends News {
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         // Attacker: permanent officer losses from invasion
         Object.assign(this.completeEffects[0], {
+            labor: CL.NO_REGRESSION,
+            ships: CL.NO_REGRESSION,
             education: CL.NO_REGRESSION,
-            technology: CL.NO_REGRESSION,
-            officerQuality: CL.NO_REGRESSION,
         })
         // Defender: even heavier permanent losses
         Object.assign(this.completeEffects[1], {
-            education: CL.SLIGHTLY_LOW, // defenders advantage?
-            technology: CL.SLIGHTLY_LOW,
-            officerQuality: CL.SLIGHTLY_LOW,
+            labor: CL.SLIGHTLY_LOW, // defenders advantage?
+            ships: CL.SLIGHTLY_LOW,
+            education: CL.SLIGHTLY_LOW,
             security: News.clHalfRegression(this.completeEffects[1].security),
             economy: News.clHalfRegression(this.completeEffects[1].economy),
             industry: News.clHalfRegression(this.completeEffects[1].industry),
@@ -49,9 +49,9 @@ class WarInvasionNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
+                labor: News.clHalfRegression(this.completeEffects[0].labor),
+                ships: News.clHalfRegression(this.completeEffects[0].ships),
                 education: News.clHalfRegression(this.completeEffects[0].education),
-                technology: News.clHalfRegression(this.completeEffects[0].technology),
-                officerQuality: News.clHalfRegression(this.completeEffects[0].officerQuality),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,

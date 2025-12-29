@@ -18,8 +18,8 @@ class IsolationismNews extends News {
                 crime: CL.LOW,
                 corruption: CL.LOW,
                 credits: CL.LOW,
-                officerQuality: CL.SLIGHTLY_LOW,
-                shipQuality: CL.SLIGHTLY_LOW,
+                education: CL.SLIGHTLY_LOW,
+                technology: CL.SLIGHTLY_LOW,
                 prestige: CL.SLIGHTLY_LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_LOW]]),
                 forceWithdrawal: true,
@@ -32,8 +32,8 @@ class IsolationismNews extends News {
             population: CL.SLIGHTLY_HIGH,
             security: CL.SLIGHTLY_HIGH,
             territory: News.clHalfRegression(this.completeEffects[0].territory), //territory is zero sum, so this will eventually lead to no one having any
-            officerQuality: News.clHalfRegression(this.completeEffects[0].officerQuality), //lose some knowledge
-            shipQuality: News.clHalfRegression(this.completeEffects[0].shipQuality), //lose some knowledge
+            education: News.clHalfRegression(this.completeEffects[0].education), //lose some knowledge
+            technology: News.clHalfRegression(this.completeEffects[0].technology), //lose some knowledge
             prestige: CL.NO_REGRESSION,
         })
 
@@ -43,8 +43,8 @@ class IsolationismNews extends News {
                 planet: this.planet,
                 economy: CL.NO_REGRESSION, // economic isolation damage persists
                 credits: CL.NO_REGRESSION,
-                officerQuality: CL.NO_REGRESSION, // knowledge loss is permanent
-                shipQuality: CL.NO_REGRESSION,
+                education: CL.NO_REGRESSION, // knowledge loss is permanent
+                technology: CL.NO_REGRESSION,
                 prestige: CL.LOW, // failed policy
             })
         ]

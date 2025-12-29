@@ -19,9 +19,9 @@ class WarScorchedEarthNews extends News {
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
-                technology: CL.LOW, // losses from traps/ambushes
-                shipQuality: CL.LOW, // damaged ships
-                education: CL.SLIGHTLY_LOW, // losses in hostile territory
+                ships: CL.LOW, // losses from traps/ambushes
+                technology: CL.LOW, // damaged ships
+                labor: CL.SLIGHTLY_LOW, // losses in hostile territory
             })
         ]
 
@@ -34,9 +34,9 @@ class WarScorchedEarthNews extends News {
         })
         // Defender: permanent losses from hostile terrain
         Object.assign(this.completeEffects[1], {
+            ships: CL.NO_REGRESSION,
             technology: CL.NO_REGRESSION,
-            shipQuality: CL.NO_REGRESSION,
-            education: CL.NO_REGRESSION,
+            labor: CL.NO_REGRESSION,
         })
 
         // Cancelled: peace before full destruction, partial damage
@@ -49,9 +49,9 @@ class WarScorchedEarthNews extends News {
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
+                ships: News.clHalfRegression(CL.LOW),
                 technology: News.clHalfRegression(CL.LOW),
-                shipQuality: News.clHalfRegression(CL.LOW),
-                education: News.clHalfRegression(CL.SLIGHTLY_LOW),
+                labor: News.clHalfRegression(CL.SLIGHTLY_LOW),
             })
         ]
     }

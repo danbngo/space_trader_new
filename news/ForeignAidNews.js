@@ -16,7 +16,7 @@ class ForeignAidNews extends News {
                 economy: CL.SLIGHTLY_HIGH,
                 industry: CL.SLIGHTLY_HIGH,
                 credits: CL.HIGH,
-                technology: CL.SLIGHTLY_HIGH,
+                ships: CL.SLIGHTLY_HIGH,
                 prestige: CL.SLIGHTLY_LOW,
             })
         ]
@@ -29,7 +29,7 @@ class ForeignAidNews extends News {
             economy: News.clHalfRegression(this.completeEffects[0].economy),
             credits: News.clHalfRegression(this.completeEffects[0].credits),
             industry: News.clHalfRegression(this.completeEffects[0].industry),
-            technology: News.clHalfRegression(this.completeEffects[0].technology),
+            ships: News.clHalfRegression(this.completeEffects[0].ships),
             prestige: CL.NO_REGRESSION //not the best for your reputation
         })
 

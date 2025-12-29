@@ -16,7 +16,7 @@ class WarNews extends News {
                 military: CL.SLIGHTLY_HIGH,
                 security: CL.SLIGHTLY_HIGH,
                 economy: CL.LOW,
-                technology: CL.LOW,
+                ships: CL.LOW,
                 stockpile: CL.LOW,
                 //prestige: CL.SLIGHTLY_LOW, //the aggressor loses some prestige
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, 2], [CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_HIGH]]),
@@ -28,7 +28,7 @@ class WarNews extends News {
                 military: CL.SLIGHTLY_HIGH,
                 security: CL.SLIGHTLY_HIGH,
                 economy: CL.LOW,
-                technology: CL.LOW,
+                ships: CL.LOW,
                 stockpile: CL.LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, 2], [CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_HIGH]]),
             })

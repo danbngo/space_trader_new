@@ -22,12 +22,12 @@ class NewsEffect {
      * @param {number} [params.prestige] - Multiplier for prestige rating.
      * @param {number} [params.population] - Multiplier for population.
      * @param {number} [params.territory] - Multiplier for territory.
-     * @param {number} [params.shipQuality] - Multiplier for ship quality.
-     * @param {number} [params.officerQuality] - Multiplier for officer quality.
+     * @param {number} [params.technology] - Multiplier for ship quality.
+     * @param {number} [params.education] - Multiplier for officer quality.
      * @param {Building[]} [params.buildingsDisabled] - Buildings to disable.
      * @param {Building[]} [params.buildingsEnabled] - Buildings to enable.
-     * @param {number} [params.technology] - Multiplier for shipyard inventory.
-     * @param {number} [params.education] - Multiplier for guild officer availability.
+     * @param {number} [params.ships] - Multiplier for shipyard inventory.
+     * @param {number} [params.labor] - Multiplier for guild officer availability.
      * @param {Map<CargoType, number>} [params.cargoPriceModifiers] - Cargo-specific price modifiers.
      * @param {number} [params.credits] - Multiplier for building credits.
      * @param {boolean} [params.relationsReset] - Whether to reset all relationships to neutral.
@@ -63,18 +63,18 @@ class NewsEffect {
         territory = 1.0,
 
         // tech changes
-        shipQuality = 1.0,
-        officerQuality = 1.0,
+        technology = 1.0,
+        education = 1.0,
         
         // Building changes
         buildingsDisabled = [],
         buildingsEnabled = [],
         
         // Shipyard changes
-        technology = 1.0,
+        ships = 1.0,
         
         // Guild changes
-        education = 1.0,
+        labor = 1.0,
 
         //Market and black market changes
         cargoPriceModifiers = new Map(),
@@ -129,15 +129,15 @@ class NewsEffect {
         /** @type {Building[]} */
         this.buildingsEnabled = buildingsEnabled;
         /** @type {number} */
-        this.education = education;
+        this.labor = labor;
         /** @type {number} */
-        this.technology = technology;
+        this.ships = ships;
         /** @type {number} */
         this.credits = credits;
         /** @type {number} */
-        this.shipQuality = shipQuality;
+        this.technology = technology;
         /** @type {number} */
-        this.officerQuality = officerQuality;
+        this.education = education;
         /** @type {boolean} */
         this.relationsReset = relationsReset;
         /** @type {boolean} */
@@ -155,16 +155,16 @@ class NewsEffect {
         const {planet, targetPlanet, military, newGovernmentType, newRelationship, credits, 
             crime, corruption, buildingsDisabled, buildingsEnabled, territory,
             population, culture, inflation, security, economy, 
-            education, industry, technology, stockpile, fired,
-            shipQuality, officerQuality, relationsReset, forcePeace, forceWithdrawal, prestige, cargoPriceModifiers} = this;
+            labor, industry, ships, stockpile, fired,
+            technology, education, relationsReset, forcePeace, forceWithdrawal, prestige, cargoPriceModifiers} = this;
 
         this.fired = true;
 
         if (planet && planet.civilization) {
             const {civilization} = planet
             civilization.governmentType = newGovernmentType || civilization.governmentType;
-            civilization.shipQuality *= shipQuality;
-            civilization.officerQuality *= officerQuality;
+            civilization.technology *= technology;
+            civilization.education *= education;
             civilization.military *= military;
             civilization.industry *= industry;
             civilization.economy *= economy;
@@ -221,17 +221,17 @@ class NewsEffect {
                     }
                 }
             }
-            if (education !== 1.0) {
-                settlement.guild.baseNumOfficers = Math.max(1, rndRound(settlement.guild.baseNumOfficers * education))
+            if (labor !== 1.0) {
+                settlement.guild.baseNumOfficers = Math.max(1, rndRound(settlement.guild.baseNumOfficers * labor))
                 settlement.guild.normalize();
             }
-            if (technology !== 1.0) {
-                settlement.shipyard.baseNumShips = Math.max(1, rndRound(settlement.shipyard.baseNumShips * technology));
-                settlement.shipyard.baseNumModules = Math.max(1, rndRound(settlement.shipyard.baseNumModules * technology));
+            if (ships !== 1.0) {
+                settlement.shipyard.baseNumShips = Math.max(1, rndRound(settlement.shipyard.baseNumShips * ships));
+                settlement.shipyard.baseNumModules = Math.max(1, rndRound(settlement.shipyard.baseNumModules * ships));
                 settlement.shipyard.normalize();
             }
             if (inflation !== 1.0) settlement.market.inflation *= inflation;
-            if (corruption !== 1.0) settlement.blackMarket.inflation *= corruption;
+            if (corruption !== 1.0) settlement.blackMarket.inflation *= 1/corruption; //corruption works IN REVERSE on prices
             for (const ct of CARGO_TYPES_ALL) {
                 if (stockpile !== 1.0) settlement.market.baseCargo.setAmount(ct, Math.max(1, rndRound(settlement.market.baseCargo.getAmount(ct) * stockpile)));
                 if (crime !== 1.0) settlement.blackMarket.baseCargo.setAmount(ct, Math.max(1, rndRound(settlement.blackMarket.baseCargo.getAmount(ct) * crime)));
@@ -265,10 +265,10 @@ class NewsEffect {
             prestige: 1 / this.prestige,
             population: 1 / this.population,
             territory: 1 / this.territory,
-            shipQuality: 1 / this.shipQuality,
-            officerQuality: 1 / this.officerQuality,
-            education: 1/this.education,
-            technology: 1/this.technology,
+            technology: 1 / this.technology,
+            education: 1 / this.education,
+            labor: 1/this.labor,
+            ships: 1/this.ships,
             credits: 1 / this.credits,
             cargoPriceModifiers: NewsEffect.getInvertedCargoPriceModifiers(this.cargoPriceModifiers),
             relationsReset: false, //this cant be undone.
@@ -296,10 +296,10 @@ class NewsEffect {
             prestige: News.clHalfRegression(inversion.prestige),
             population: News.clHalfRegression(inversion.population),
             territory: News.clHalfRegression(inversion.territory),
-            shipQuality: News.clHalfRegression(inversion.shipQuality),
-            officerQuality: News.clHalfRegression(inversion.officerQuality),
             technology: News.clHalfRegression(inversion.technology),
             education: News.clHalfRegression(inversion.education),
+            ships: News.clHalfRegression(inversion.ships),
+            labor: News.clHalfRegression(inversion.labor),
             credits: News.clHalfRegression(inversion.credits),
         })
         return inversion            
@@ -323,12 +323,12 @@ class NewsEffect {
             prestige: this.prestige,
             population: this.population,
             territory: this.territory,
-            shipQuality: this.shipQuality,
-            officerQuality: this.officerQuality,
-            buildingsDisabled: [...this.buildingsDisabled],
-            buildingsEnabled: [...this.buildingsEnabled],
             technology: this.technology,
             education: this.education,
+            buildingsDisabled: [...this.buildingsDisabled],
+            buildingsEnabled: [...this.buildingsEnabled],
+            ships: this.ships,
+            labor: this.labor,
             cargoPriceModifiers: new Map(this.cargoPriceModifiers),
             credits: this.credits,
             relationsReset: this.relationsReset,
@@ -346,8 +346,8 @@ class NewsEffect {
         const {planet, targetPlanet, military, newGovernmentType, newRelationship, credits, 
             crime, corruption, buildingsDisabled, buildingsEnabled, territory,
             population, culture, inflation, security, economy, 
-            education, industry, technology, stockpile,
-            shipQuality, officerQuality, relationsReset, prestige, cargoPriceModifiers, forcePeace} = this;
+            labor, industry, ships, stockpile,
+            technology, education, relationsReset, prestige, cargoPriceModifiers, forcePeace} = this;
         
         let msg = ''
         
@@ -381,8 +381,8 @@ class NewsEffect {
             if (economy !== 1.0) msg += dscr('- Economic', civilization.economy, civilization.economy*economy)
             if (security !== 1.0) msg += dscr('- Security', civilization.security, civilization.security*security)
             if (culture !== 1.0) msg += dscr('- Crime', civilization.culture, civilization.culture*culture, true)
-            if (shipQuality !== 1.0) msg += dscr('- Ships', civilization.shipQuality, civilization.shipQuality*shipQuality)
-            if (officerQuality !== 1.0) msg += dscr('- Officers', civilization.officerQuality, civilization.officerQuality*officerQuality)
+            if (technology !== 1.0) msg += dscr('- Ships', civilization.technology, civilization.technology*technology)
+            if (education !== 1.0) msg += dscr('- Officers', civilization.education, civilization.education*education)
 
         }
 
@@ -391,11 +391,11 @@ class NewsEffect {
             if (credits !== 1.0) {
                 msg += `- Bank Credits: ${settlement.bank.baseCredits} ➜ ${settlement.bank.baseCredits*credits}.<br/>`
             }
-            if (education) {
-                msg += `- Guild Officers: ${settlement.guild.baseNumOfficers} ➜ ${Math.round(settlement.guild.baseNumOfficers * education)}.<br/>`
+            if (labor) {
+                msg += `- Guild Officers: ${settlement.guild.baseNumOfficers} ➜ ${Math.round(settlement.guild.baseNumOfficers * labor)}.<br/>`
             }
-            if (technology) {
-                msg += `- Shipyard Ships: ${settlement.shipyard.baseNumShips} ➜ ${Math.round(settlement.shipyard.baseNumShips * technology)}.<br/>`
+            if (ships) {
+                msg += `- Shipyard Ships: ${settlement.shipyard.baseNumShips} ➜ ${Math.round(settlement.shipyard.baseNumShips * ships)}.<br/>`
             }
             if (stockpile) {
                 msg += `- Market Units Per Cargo Type: ${settlement.market.baseCargo.average} ➜ ${settlement.market.baseCargo.average * stockpile}.<br/>`

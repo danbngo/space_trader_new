@@ -145,7 +145,7 @@ function showShipyardBuyMenu(shipyard = new Shipyard()) {
             createBuyShipMenu(shipyard.ships, shipyard, (ship)=>onSelectShipyardShip(ship)),
             `Your # ships: ${fleet.ships.length}/${fleet.numPilots} | Your credits: ${gs.credits}`,
             //`Shipyard credits: ${shipyard.credits}`,
-            `Local Ship Quality: ${roundToPlaces(100*shipyard.planet.civilization.shipQuality, 2)}%`,
+            `Local Ship Quality: ${roundToPlaces(100*shipyard.planet.civilization.technology, 2)}%`,
             `Buy Fee: ${statColorSpan(roundToPlaces(100*shipyard.baseRake, 2), 2/(1+shipyard.baseRake))}%`,
             (gs.fleet.totalSkills.getAmount(SKILLS.Barter) > 0) ? `Fee After Barter | ${statColorSpan(roundToPlaces(100*(1+shipyard.rake) - 100, 2), 2/(1+shipyard.rake))}% Buy` : '',
         ]}),

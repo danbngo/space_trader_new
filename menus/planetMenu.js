@@ -65,8 +65,8 @@ function showPlanetSocietyMenu(planet = new Planet()) {
     msg += `Economy: ${describeRating(economy)}<br/>`
     msg += `Industry: ${describeRating(industry)}<br/>`
     msg += `Culture: ${describeRating(culture)}<br/>`
-    msg += `Technology: ${describeRating(civilization.shipQuality)}<br/>`
-    msg += `Education: ${describeRating(civilization.officerQuality)}<br/>`
+    msg += `Technology: ${describeRating(civilization.technology)}<br/>`
+    msg += `Education: ${describeRating(civilization.education)}<br/>`
     
     // Market and settlement info
     if (settlement) {
@@ -97,6 +97,15 @@ function showPlanetSocietyMenu(planet = new Planet()) {
             msg += `Illegal Inflation: ${statColorSpan(roundToPlaces(settlement.blackMarket.inflation, 2) + 'x', settlement.blackMarket.inflation)}<br/>`
         }
     }
+    
+    // Policies
+    msg += `<br/>`
+    msg += `<u>Policies</u><br/>`
+    const policies = civilization.policies
+    msg += `${policies.economic.flavor.symbol} ${colorSpan(policies.economic.name, policies.economic.color)}<br/>`
+    msg += `${policies.labor.flavor.symbol} ${colorSpan(policies.labor.name, policies.labor.color)}<br/>`
+    msg += `${policies.social.flavor.symbol} ${colorSpan(policies.social.name, policies.social.color)}<br/>`
+    msg += `${policies.foreign.flavor.symbol} ${colorSpan(policies.foreign.name, policies.foreign.color)}<br/>`
     
     showPlanetModal(planet, `${coloredName(planet)} - Society`, msg, [
         ["Climate", () => showPlanetClimateMenu(planet)],

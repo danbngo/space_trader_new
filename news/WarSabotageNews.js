@@ -13,15 +13,15 @@ class WarSabotageNews extends News {
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
                 security: CL.LOW, // agents deployed
-                education: CL.LOW, // agents/spies
-                officerQuality: CL.SLIGHTLY_LOW,
+                labor: CL.LOW, // agents/spies
+                education: CL.SLIGHTLY_LOW,
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
                 military: CL.LOW, // sabotaged military infrastructure
                 industry: CL.LOW, // factories bombed
-                technology: CL.SLIGHTLY_LOW,
+                ships: CL.SLIGHTLY_LOW,
             })
         ]
 
@@ -29,8 +29,8 @@ class WarSabotageNews extends News {
         // Attacker: agents lost permanently
         Object.assign(this.completeEffects[0], {
             security: CL.NO_REGRESSION, // security apparatus damaged
-            education: CL.NO_REGRESSION, // agents don't return
-            officerQuality: CL.NO_REGRESSION,
+            labor: CL.NO_REGRESSION, // agents don't return
+            education: CL.NO_REGRESSION,
         })
         // Defender: permanent damage from sabotage
         Object.assign(this.completeEffects[1], {
@@ -43,8 +43,8 @@ class WarSabotageNews extends News {
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
                 security: News.clHalfRegression(this.completeEffects[0].security),
+                labor: News.clHalfRegression(this.completeEffects[0].labor),
                 education: News.clHalfRegression(this.completeEffects[0].education),
-                officerQuality: News.clHalfRegression(this.completeEffects[0].officerQuality),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,

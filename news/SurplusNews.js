@@ -16,7 +16,7 @@ class SurplusNews extends News {
                 economy: CL.HIGH,
                 industry: CL.HIGH,
                 credits: CL.HIGH,
-                technology: CL.VERY_HIGH,
+                ships: CL.VERY_HIGH,
             })
         ]
 
