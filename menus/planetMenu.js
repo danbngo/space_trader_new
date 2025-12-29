@@ -20,6 +20,7 @@ function showPlanetMenu(planet = new Planet()) {
     }
 
     const options = [[`Overview`, () => showPlanetOverviewMenu(planet)]];
+    options.push(["Climate", () => showPlanetClimateMenu(planet)]);
     options.push(["News", () => showNewsTimelineMenu(planet, () => showPlanetMenu(planet))]);
     if (settlement.shipyard) {
         options.push(["Shipyard", () => showShipyardBuyMenu(settlement.shipyard)]);
@@ -65,4 +66,64 @@ function showPlanetOverviewMenu(planet = new Planet()) {
     msg += `Ships: ${describeRating(culture.shipQuality)}<br/>`
     msg += `Officers: ${describeRating(culture.officerQuality)}<br/>`
     showModal(`${coloredName(planet)} - Overview`, msg, [["Back", () => showPlanetMenu(planet)]]);
+}
+
+/**
+ * Displays detailed climate and physical information about a planet.
+ * @param {Planet} planet - The planet to display climate information for.
+ */
+function showPlanetClimateMenu(planet = new Planet()) {
+    const {climate} = planet
+    let msg = ''
+    
+    // Physical properties
+    msg += `<b>Physical Properties</b><br/>`
+    msg += `Radius: ${roundToPlaces(planet.radius, 2)} Earth radii<br/>`
+    msg += `Type: ${coloredName(planet.planetType)}<br/>`
+    msg += `<br/>`
+    
+    // Climate properties
+    msg += `<b>Climate Data</b><br/>`
+    
+    const getEnumName = (enumObj, value) => {
+        const key = Object.keys(enumObj).find(k => enumObj[k] === value)
+        return key ? key.replace(/_/g, ' ').toLowerCase() : 'unknown'
+    }
+    
+    if (climate.temperature !== TEMPERATURE.NONE) {
+        const tempName = getEnumName(TEMPERATURE, climate.temperature)
+        msg += `Temperature: ${statColorSpan(tempName, climate.temperature)}<br/>`
+    } else {
+        msg += `Temperature: ${colorSpan('no data', COLORS.Gray, true)}<br/>`
+    }
+    
+    if (climate.atmosphericPressure !== ATMOSPHERIC_PRESSURE.NONE) {
+        const pressureName = getEnumName(ATMOSPHERIC_PRESSURE, climate.atmosphericPressure)
+        msg += `Atmosphere: ${statColorSpan(pressureName, climate.atmosphericPressure)}<br/>`
+    } else {
+        msg += `Atmosphere: ${colorSpan('none', COLORS.Gray, true)}<br/>`
+    }
+    
+    if (climate.gravity !== GRAVITY.NONE) {
+        const gravityName = getEnumName(GRAVITY, climate.gravity)
+        msg += `Gravity: ${statColorSpan(gravityName, climate.gravity)}<br/>`
+    } else {
+        msg += `Gravity: ${colorSpan('no data', COLORS.Gray, true)}<br/>`
+    }
+    
+    if (climate.oceanCoverage !== OCEAN_COVERAGE.NONE) {
+        const oceanName = getEnumName(OCEAN_COVERAGE, climate.oceanCoverage)
+        msg += `Ocean Coverage: ${statColorSpan(oceanName, climate.oceanCoverage)}<br/>`
+    } else {
+        msg += `Ocean Coverage: ${colorSpan('none', COLORS.Gray, true)}<br/>`
+    }
+    
+    if (climate.geologicalActivity !== GEOLOGICAL_ACTIVITY.NONE) {
+        const geoName = getEnumName(GEOLOGICAL_ACTIVITY, climate.geologicalActivity)
+        msg += `Geological Activity: ${statColorSpan(geoName, climate.geologicalActivity)}<br/>`
+    } else {
+        msg += `Geological Activity: ${colorSpan('none', COLORS.Gray, true)}<br/>`
+    }
+    
+    showModal(`${coloredName(planet)} - Climate`, msg, [["Back", () => showPlanetMenu(planet)]]);
 }

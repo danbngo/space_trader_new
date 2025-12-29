@@ -2,14 +2,22 @@ console.log("Generating solar system...");
 
 const SOL = new Star("Sol", hexToRgba('#ffff44'), 109, 0, 0);
 
-const MERCURY = new Planet("Mercury", hexToRgba('#aaaaaa'), 0.383, 0, 0, new Orbit(0.39), PLANET_TYPES.TERRESTRIAL);
-const VENUS = new Planet("Venus", hexToRgba('#e5c07b'), 0.949, 0, 0, new Orbit(0.72), PLANET_TYPES.GAS_DWARF);
-const EARTH = new Planet("Earth", hexToRgba('#4a90e2'), 1.0, 0, 0, new Orbit(1.0), PLANET_TYPES.EARTHLIKE);
-const MARS = new Planet("Mars", hexToRgba('#b22222'), 0.532, 0, 0, new Orbit(1.52), PLANET_TYPES.TERRESTRIAL);
-const JUPITER = new Planet("Jupiter", hexToRgba('#d2b48c'), 11.21, 0, 0, new Orbit(5.2), PLANET_TYPES.GAS_GIANT);
-const SATURN = new Planet("Saturn", hexToRgba('#f5deb3'), 9.45, 0, 0, new Orbit(9.58), PLANET_TYPES.GAS_GIANT);
-const URANUS = new Planet("Uranus", hexToRgba('#afeeee'), 4.01, 0, 0, new Orbit(19.2), PLANET_TYPES.ICE_GIANT);
-const NEPTUNE = new Planet("Neptune", hexToRgba('#4169e1'), 3.88, 0, 0, new Orbit(30.05), PLANET_TYPES.ICE_GIANT);
+const MERCURY = new Planet("Mercury", hexToRgba('#aaaaaa'), 0.383, 0, 0, new Orbit(0.39), PLANET_TYPES.TERRESTRIAL, null, null, 
+    new Climate(TEMPERATURE.INFERNAL, ATMOSPHERIC_PRESSURE.NONE, GRAVITY.LOW, OCEAN_COVERAGE.NONE, GEOLOGICAL_ACTIVITY.DORMANT));
+const VENUS = new Planet("Venus", hexToRgba('#e5c07b'), 0.949, 0, 0, new Orbit(0.72), PLANET_TYPES.GAS_DWARF, null, null,
+    new Climate(TEMPERATURE.MOLTEN, ATMOSPHERIC_PRESSURE.CRUSHING, GRAVITY.SLIGHTLY_LOW, OCEAN_COVERAGE.NONE, GEOLOGICAL_ACTIVITY.VOLCANIC));
+const EARTH = new Planet("Earth", hexToRgba('#4a90e2'), 1.0, 0, 0, new Orbit(1.0), PLANET_TYPES.EARTHLIKE, null, null,
+    new Climate(TEMPERATURE.TEMPERATE, ATMOSPHERIC_PRESSURE.MEDIUM, GRAVITY.STANDARD, OCEAN_COVERAGE.OCEANIC, GEOLOGICAL_ACTIVITY.ACTIVE));
+const MARS = new Planet("Mars", hexToRgba('#b22222'), 0.532, 0, 0, new Orbit(1.52), PLANET_TYPES.TERRESTRIAL, null, null,
+    new Climate(TEMPERATURE.COLD, ATMOSPHERIC_PRESSURE.EXTREMELY_LOW, GRAVITY.LOW, OCEAN_COVERAGE.NONE, GEOLOGICAL_ACTIVITY.MINIMAL));
+const JUPITER = new Planet("Jupiter", hexToRgba('#d2b48c'), 11.21, 0, 0, new Orbit(5.2), PLANET_TYPES.GAS_GIANT, null, null,
+    new Climate(TEMPERATURE.FRIGID, ATMOSPHERIC_PRESSURE.CRUSHING, GRAVITY.EXTREMELY_HIGH, OCEAN_COVERAGE.NONE, GEOLOGICAL_ACTIVITY.CATACLYSMIC));
+const SATURN = new Planet("Saturn", hexToRgba('#f5deb3'), 9.45, 0, 0, new Orbit(9.58), PLANET_TYPES.GAS_GIANT, null, null,
+    new Climate(TEMPERATURE.FRIGID, ATMOSPHERIC_PRESSURE.CRUSHING, GRAVITY.VERY_HIGH, OCEAN_COVERAGE.NONE, GEOLOGICAL_ACTIVITY.HIGHLY_ACTIVE));
+const URANUS = new Planet("Uranus", hexToRgba('#afeeee'), 4.01, 0, 0, new Orbit(19.2), PLANET_TYPES.ICE_GIANT, null, null,
+    new Climate(TEMPERATURE.FROZEN, ATMOSPHERIC_PRESSURE.VERY_HIGH, GRAVITY.SLIGHTLY_HIGH, OCEAN_COVERAGE.NONE, GEOLOGICAL_ACTIVITY.LOW));
+const NEPTUNE = new Planet("Neptune", hexToRgba('#4169e1'), 3.88, 0, 0, new Orbit(30.05), PLANET_TYPES.ICE_GIANT, null, null,
+    new Climate(TEMPERATURE.FROZEN, ATMOSPHERIC_PRESSURE.VERY_HIGH, GRAVITY.SLIGHTLY_HIGH, OCEAN_COVERAGE.NONE, GEOLOGICAL_ACTIVITY.ACTIVE));
 const PLANETS = [MERCURY, VENUS, EARTH, MARS, JUPITER, SATURN, URANUS, NEPTUNE]
 
 SOL.addChildren(PLANETS)

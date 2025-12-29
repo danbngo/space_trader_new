@@ -13,8 +13,9 @@ class Planet extends OrbitingObject {
      * @param {PLANET_TYPES} planetType - The type of the planet.
      * @param {Settlement} settlement - The settlement on the planet.
      * @param {Culture} culture - The culture of the planet.
+     * @param {Climate} climate - The climate of the planet.
      */
-    constructor(name = "Unnamed", color = COLORS.White, radius = 0, x = 0, y = 0, orbit = null, planetType = PLANET_TYPES_ALL[0], settlement = null, culture = null) {
+    constructor(name = "Unnamed", color = COLORS.White, radius = 0, x = 0, y = 0, orbit = null, planetType = PLANET_TYPES_ALL[0], settlement = null, culture = null, climate = null) {
         super(name, color, radius, x, y, orbit);
         /** @type {PLANET_TYPES} */
         this.planetType = planetType
@@ -22,6 +23,8 @@ class Planet extends OrbitingObject {
         this.settlement = settlement
         /** @type {Culture} */
         this.culture = culture
+        /** @type {Climate} */
+        this.climate = climate || new Climate()
     }
 
     get ianName() {

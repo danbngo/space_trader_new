@@ -270,10 +270,14 @@ class NewsEffect {
             guildNumOfficers: 1/this.guildNumOfficers,
             shipyardNumShips: 1/this.shipyardNumShips,
             credits: 1 / this.credits,
-            cargoPriceModifiers: new Map(Array.from(this.cargoPriceModifiers.entries()).map(([ct, mod]) => [ct, 1/mod])),
+            cargoPriceModifiers: NewsEffect.getInvertedCargoPriceModifiers(this.cargoPriceModifiers),
             relationsReset: false, //this cant be undone.
         });
         return inverseEffect
+    }
+
+    static getInvertedCargoPriceModifiers(cargoPriceModifiers = new Map()) {
+        return new Map(Array.from(cargoPriceModifiers.entries()).map(([ct, mod]) => [ct, 1/mod]))
     }
 
     getHalfRegression() {

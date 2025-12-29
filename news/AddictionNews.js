@@ -21,24 +21,10 @@ class AddictionNews extends News {
             })
         ]
         this.endEffects = this.startEffects.map(effect => effect.getInverse())
-        //some lingering security and prestige decrease and destroyed goods
-        Object.assign(this.endEffects[0], {
-            security: News.clHalfRegression(this.endEffects[0].security),
-            population: News.clHalfRegression(this.endEffects[0].population),
-            blackMarketPrices: News.clHalfRegression(this.endEffects[0].blackMarketPrices),
-            blackMarketCargoAmounts: News.clHalfRegression(this.endEffects[0].blackMarketCargoAmounts),
-            crime: News.clHalfRegression(this.endEffects[0].crime),
-        })
 
         this.failEffects = this.startEffects.map(effect => effect.getInverse())
-
-        Object.assign(this.endEffects[0], {
-            population: CL.NO_REGRESSION,
-            security: CL.NO_REGRESSION,
-            crime: CL.NO_REGRESSION,
-            economy: CL.NO_REGRESSION,
-            blackMarketPrices: CL.NO_REGRESSION,
-            
+        Object.assign(this.failEffects[0], {
+            cargoPriceModifiers: NewsEffect.getInvertedCargoPriceModifiers(this.startEffects[0].cargoPriceModifiers)            
         })
     }
 
