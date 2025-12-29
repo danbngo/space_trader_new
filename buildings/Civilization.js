@@ -5,51 +5,77 @@
  */
 class Civilization {
     /**
-     * @param {Planet} planet - The planet this civilization belongs to.
-     * @param {GovernmentType} governmentType - The type of government of the civilization.
-     * @param {CountsMap} cargoPriceModifiers - Modifiers for cargo prices specific to this civilization.
-     * @param {number} technology - Quality rating of ships produced by this civilization.
-     * @param {number} education - Quality rating of officers from this civilization.
-     * @param {number} territory - The territorial reach of the civilization in Astronomical Units (AUs).
-     * @param {number} population - The population factor affecting fleet sizes and officer availability.
-     * @param {number} military - Rating affecting war fleets, bounty hunters, and bank credits.
-     * @param {number} industry - Rating affecting merchants, miners, and ship availability.
-     * @param {number} economy - Rating affecting merchants, smugglers, and market cargo availability.
-     * @param {number} security - Rating affecting police and bounty hunter presence.
-     * @param {number} culture - 
-     * @param {number} prestige - Effects how planets interact with each other.
-     * @param {Policies} policies - The active policies for this civilization.
+     * @param {Object} params - The effect parameters.
+     * @param {Planet} [params.planet] - The planet this civilization belongs to.
+     * @param {GovernmentType} [params.governmentType] - The type of government of the civilization.
+     * @param {CountsMap} [params.cargoPriceModifiers] - Modifiers for cargo prices specific to this civilization.
+     * @param {number} [params.technology] - Quality rating of ships produced by this civilization.
+     * @param {number} [params.education] - Quality rating of officers from this civilization.
+     * @param {number} [params.territory] - The territorial reach of the civilization in Astronomical Units (AUs).
+     * @param {number} [params.population] - The population factor affecting fleet sizes and officer availability.
+     * @param {number} [params.military] - Rating affecting war fleets, bounty hunters, and bank credits.
+     * @param {number} [params.industry] - Rating affecting merchants, miners, and ship availability.
+     * @param {number} [params.economy] - Rating affecting merchants, smugglers, and market cargo availability.
+     * @param {number} [params.security] - Rating affecting police and bounty hunter presence.
+     * @param {number} [params.culture] - More tourists
+     * @param {number} [params.prestige] - Effects how planets interact with each other.
+     * @param {Policies} [params.policies] - The active policies for this civilization.
+     * @param {number} [params.army] - More guild officers and army patrols
+     * @param {number} [params.navy] - More shipyard ships
+     * @param {number} [params.corruption] - Higher corruption means LOWER black market prices.
+     * @param {number} [params.crime] - Higher crime means more crime events and black market activity.
+     * @param {number} [params.wealth] - Overall wealth of the civilization.
+     * @param {number} [params.reserves] - Higher reserves means more goods in markets, but lower prices
+     * @param {number} [params.inflation] - Higher costs for everything but also higher sales prices in market
+     * 
      */
-    constructor(planet = new Planet(), governmentType = GT_ALL[0], cargoPriceModifiers = new CountsMap(), technology = 1.0, education = 1.0, territory = 1, population = 1, military = 1, industry = 1, economy = 1, security = 1, culture = 1, prestige = 1, policies = new Policies()) {
+    constructor({
+        planet = new Planet(), governmentType = GT_ALL[0], cargoPriceModifiers = new CountsMap(),
+        technology = 1.0, education = 1.0, territory = 1, population = 1, industry = 1,
+        economy = 1, security = 1, culture = 1, prestige = 1, policies = new Policies(),
+        navy = 1, army = 1, corruption = 1, crime = 1, wealth = 1, reserves = 1, inflation = 1
+    } = {}) {
+        /** @type {Planet} */
+        this.planet = planet;
+        /** @type {GovernmentType} */
+        this.governmentType = governmentType; //many effects!
+        /** @type {Policies} */
+        this.policies = policies; //many effects!
+        /** @type {Map<Planet, RelationshipType>} */
+        this.relationships = new Map()
         /** @type {CountsMap} */
         this.cargoPriceModifiers = cargoPriceModifiers
         /** @type {number} */
-        this.technology = technology;
-        /** @type {number} */
-        this.education = education;
-        /** @type {number} */
         this.territory = territory; //AUs, recall that neptune is 30. encounters for this civilization can be found further from its planet
         /** @type {number} */
-        this.population = population; //fleets are larger, more officers available
+        this.population = population; //more officers available
         /** @type {number} */
-        this.military = military; //more war fleets and bounty hunters, more credits at bank
+        this.industry = industry; //more miners
         /** @type {number} */
-        this.industry = industry; //more merchants and miners, more ships available
-        /** @type {number} */
-        this.economy = economy; //more merchants and smugglers, more cargo available in market
+        this.economy = economy; //more merchants
         /** @type {number} */
         this.security = security; //more police and bounty hunters
         /** @type {number} */
-        this.culture = culture; 
+        this.culture = culture; //more tourists
         /** @type {number} */
-        this.prestige = prestige
-        /** @type {GovernmentType} */
-        this.governmentType = governmentType;
-        /** @type {Planet} */
-        this.planet = planet;
-        /** @type {Policies} */
-        this.policies = policies;
-        /** @type {Map<Planet, RelationshipType>} */
-        this.relationships = new Map()
+        this.prestige = prestige; //effects how planets interact with each other
+        /** @type {number} */
+        this.technology = technology; //ship quality
+        /** @type {number} */
+        this.education = education; //officer quality, academy can train higher/cheaper
+        /** @type {number} */
+        this.army = army; //more guild officers
+        /** @type {number} */
+        this.navy = navy; //more shipyard ships, larger army patrols
+        /** @type {number} */
+        this.corruption = corruption; //higher rakes, LOWER black market prices
+        /** @type {number} */
+        this.crime = crime; //more cargo in black market
+        /** @type {number} */
+        this.wealth = wealth; //higher credits in stores
+        /** @type {number} */
+        this.reserves = reserves; //more goods in markets
+        /** @type {number} */
+        this.inflation = inflation; //higher prices everywhere
     }
 }

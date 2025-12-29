@@ -9,10 +9,9 @@ class Shipyard extends Building {
      * @param {Ship[]} ships - The ships available for purchase.
      * @param {ShipModule[]} modules - The modules available for purchase.
      * @param {number} credits - The credits available at this shipyard.
-     * @param {number} baseRake - The base commission percentage.
      */
-    constructor(planet = new Planet(), ships = [], modules = [], credits = 0, baseRake = 1) {
-        super(planet, BUILDING_TYPES.SHIPYARD, baseRake, credits)
+    constructor(planet = new Planet(), ships = [], modules = [], credits = 0) {
+        super(planet, BUILDING_TYPES.SHIPYARD, credits)
         /** @type {Ship[]} */
         this.ships = ships; // Ship[]
         /** @type {ShipModule[]} */
@@ -60,12 +59,12 @@ class Shipyard extends Building {
     }
 
     calcBuyPrice(ship = new Ship()) {
-        return Math.round(ship.value * (1+this.rake))
+        return Math.round(ship.value * (1+this.planet.civilization.corruption))
     }
     calcSellPrice(ship = new Ship()) {
-        return Math.round(ship.value / (1+this.rake))
+        return Math.round(ship.value / (1+this.planet.civilization.corruption))
     }
     calcBuyModulePrice(module = new ShipModule()) {
-        return Math.round(module.moduleType.value * module.quality * (1+this.rake))
+        return Math.round(module.moduleType.value * module.quality * (1+this.planet.civilization.corruption))
     }
 }

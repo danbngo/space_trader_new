@@ -9,12 +9,16 @@ function generateCivilization(planet = new Planet()) {
     const education = rng(4,1,false)/2
     const population = rng(8,1,false)/4
     const territory = rng(8,1,false)/4
-    const military = rng(8,1,false)/4
+    const army = rng(8,1,false)/4
+    const navy = rng(8,1,false)/4
     const security = rng(8,1,false)/4
     const economy = rng(8,1,false)/4
     const industry = rng(8,1,false)/4
     const culture = rng(8,1,false)/4
     const prestige = rng(8,1,false)/4
+    const crime = rng(8,1,false)/4
+    const corruption = rng(8,1,false)/4
+
 
     const cargoPriceModifiers = new CountsMap()
     for (const ct of CARGO_TYPES_ALL) {
@@ -44,5 +48,8 @@ function generateCivilization(planet = new Planet()) {
         selectPolicy(validForeignPolicies)
     )
 
-    return new Civilization(planet, governmentType, cargoPriceModifiers, technology, education, territory, population, military, industry, economy, security, culture, prestige, policies)
+    return new Civilization({
+        planet, governmentType, cargoPriceModifiers, technology, education, territory, population,
+         army, navy, industry, economy, security, culture, prestige, corruption, crime, policies
+    })
 }

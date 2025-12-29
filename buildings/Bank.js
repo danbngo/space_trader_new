@@ -9,20 +9,19 @@ class Bank extends Building {
     /**
      * @param {Planet} planet - The planet this bank is on.
      * @param {number} credits - The credits available at this bank.
-     * @param {number} baseRake - The base commission percentage.
      */
-    constructor(planet = new Planet(), credits = 0, baseRake = 1) {
-        super(planet, BUILDING_TYPES.BANK, baseRake, credits)
+    constructor(planet = new Planet(), credits = 0) {
+        super(planet, BUILDING_TYPES.BANK, credits)
     }
     calcDepositPenalty(depositAmount = 0) {
-        return Math.ceil( depositAmount * Math.pow(0.01, 1/(1+this.rake)) )
+        return Math.ceil( depositAmount * Math.pow(0.01, 1/(1+this.planet.civilization.corruption)) )
     }
     calcWithdrawalPenalty(withdrawalAmount = 0) {
-        return Math.ceil( withdrawalAmount * Math.pow(0.01, 1/(1+this.rake)) )
+        return Math.ceil( withdrawalAmount * Math.pow(0.01, 1/(1+this.planet.civilization.corruption)) )
     }
     calcLoanInterest(loanAmount = 1, loanDuration = 1) {
         console.log('calculating loan interest:', loanAmount, loanDuration)
-        return Math.ceil( loanAmount * Math.pow(0.01*loanDuration, 1/(1+this.rake)) )
+        return Math.ceil( loanAmount * Math.pow(0.01*loanDuration, 1/(1+this.planet.civilization.corruption)) )
     }
     calcLoanMaxAmount(officer = new Officer()) {
         let maxLoanAmount = Math.pow(officer.level, 1.5) * 5000

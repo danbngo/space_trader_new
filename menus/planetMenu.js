@@ -51,57 +51,34 @@ function showPlanetMenu(planet = new Planet()) {
  * @param {Planet} planet - The planet to display information for.
  */
 function showPlanetSocietyMenu(planet = new Planet()) {
-    const {civilization, settlement} = planet
-    const {territory, population, military, security, economy, industry, culture} = civilization
+    const {civilization} = planet
+    const {governmentType, technology, education, territory, population, army, navy, security, economy, industry, culture, corruption, crime, wealth, reserves, inflation, policies} = civilization
     let msg = ''
     msg += `<u>Overview</u><br/>`
-    msg += `Government: ${coloredName(civilization.governmentType)}<br/>`
+    msg += `Government: ${coloredName(governmentType)}<br/>`
     msg += `Population: ${describePopulation(population)}<br/>`
     msg += `Territory: ${describeTerritory(territory)}<br/>`
     msg += `<br/>`
     msg += `<u>Ratings</u><br/>`
-    msg += `Military: ${describeRating(military)}<br/>`
     msg += `Security: ${describeRating(security)}<br/>`
     msg += `Economy: ${describeRating(economy)}<br/>`
     msg += `Industry: ${describeRating(industry)}<br/>`
     msg += `Culture: ${describeRating(culture)}<br/>`
-    msg += `Technology: ${describeRating(civilization.technology)}<br/>`
-    msg += `Education: ${describeRating(civilization.education)}<br/>`
-    
-    // Market and settlement info
-    if (settlement) {
-        if (settlement.shipyard) {
-            const shipyardShips = settlement.shipyard.baseNumShips
-            const shipyardNormalized = shipyardShips / SHIPYARD_AVERAGE_NUM_SHIPS
-            msg += `Navy: ${statColorSpan(roundToPlaces(shipyardNormalized, 2) + 'x', shipyardNormalized)}<br/>`
-        }
-        if (settlement.guild) {
-            const guildOfficers = settlement.guild.baseNumOfficers
-            const guildNormalized = guildOfficers / GUILD_AVERAGE_NUM_OFFICERS
-            msg += `Army: ${statColorSpan(roundToPlaces(guildNormalized, 2) + 'x', guildNormalized)}<br/>`
-        }
-        if (settlement.bank) {
-            const wealth = settlement.wealth
-            msg += `Wealth: ${statColorSpan(describeLargeNumber(settlement.bank.baseCredits)+'CR', wealth)}<br/>`
-        }
-        if (settlement.market) {
-            const marketCargoAvg = settlement.market.baseCargo.average
-            const marketCargoNormalized = marketCargoAvg / MARKET_AVERAGE_CARGO_PER_TYPE
-            msg += `Goods: ${statColorSpan(roundToPlaces(marketCargoAvg, 1), marketCargoNormalized)} per type<br/>`
-            msg += `Inflation: ${statColorSpan(roundToPlaces(settlement.market.inflation, 2) + 'x', settlement.market.inflation)}<br/>`
-        }
-        if (settlement.blackMarket) {
-            const blackMarketCargoAvg = settlement.blackMarket.baseCargo.average
-            const blackMarketCargoNormalized = blackMarketCargoAvg / MARKET_AVERAGE_CARGO_PER_TYPE
-            msg += `Illegal Goods: ${statColorSpan(roundToPlaces(blackMarketCargoAvg, 1), blackMarketCargoNormalized)} per type<br/>`
-            msg += `Illegal Inflation: ${statColorSpan(roundToPlaces(settlement.blackMarket.inflation, 2) + 'x', settlement.blackMarket.inflation)}<br/>`
-        }
-    }
+    msg += `Technology: ${describeRating(technology)}<br/>`
+    msg += `Education: ${describeRating(education)}<br/>`
+    msg += `Corruption: ${describeRating(corruption)}<br/>`
+    msg += `Crime: ${describeRating(crime)}<br/>`
+    msg += `<br/>`
+    msg += `<u>Resources</u><br/>`
+    msg += `Navy: ${describeRating(navy)}<br/>`
+    msg += `Army: ${describeRating(army)}<br/>`
+    msg += `Wealth: ${describeRating(wealth)}<br/>`
+    msg += `Reserves: ${describeRating(reserves)}<br/>`
+    msg += `Inflation: ${describeRating(inflation)}<br/>`
     
     // Policies
     msg += `<br/>`
     msg += `<u>Policies</u><br/>`
-    const policies = civilization.policies
     msg += `${policies.economic.flavor.symbol} ${colorSpan(policies.economic.name, policies.economic.color)}<br/>`
     msg += `${policies.labor.flavor.symbol} ${colorSpan(policies.labor.name, policies.labor.color)}<br/>`
     msg += `${policies.social.flavor.symbol} ${colorSpan(policies.social.name, policies.social.color)}<br/>`
@@ -119,6 +96,7 @@ function showPlanetSocietyMenu(planet = new Planet()) {
  */
 function showPlanetClimateMenu(planet = new Planet()) {
     const {climate} = planet
+    const {temperature, atmosphericPressure, gravity, oceanCoverage, geologicalActivity, magnetosphere, radiationLevel} = climate
     let msg = ''
     
     // Physical properties
@@ -133,13 +111,13 @@ function showPlanetClimateMenu(planet = new Planet()) {
     
     // Climate properties
     msg += `<u>Climate Data</u><br/>`
-    msg += `Temperature: ${climate.temperature.coloredName}<br/>`
-    msg += `Atmosphere: ${climate.atmosphericPressure.coloredName}<br/>`
-    msg += `Gravity: ${climate.gravity.coloredName}<br/>`
-    msg += `Ocean Coverage: ${climate.oceanCoverage.coloredName}<br/>`
-    msg += `Geological Activity: ${climate.geologicalActivity.coloredName}<br/>`
-    msg += `Magnetosphere: ${climate.magnetosphere.coloredName}<br/>`
-    msg += `Radiation Level: ${climate.radiationLevel.coloredName}<br/>`
+    msg += `Temperature: ${temperature.coloredName}<br/>`
+    msg += `Atmosphere: ${atmosphericPressure.coloredName}<br/>`
+    msg += `Gravity: ${gravity.coloredName}<br/>`
+    msg += `Ocean Coverage: ${oceanCoverage.coloredName}<br/>`
+    msg += `Geological Activity: ${geologicalActivity.coloredName}<br/>`
+    msg += `Magnetosphere: ${magnetosphere.coloredName}<br/>`
+    msg += `Radiation Level: ${radiationLevel.coloredName}<br/>`
     showPlanetModal(planet, `${coloredName(planet)} - Climate`, msg, [
         ["Society", () => showPlanetSocietyMenu(planet)],
         ["Back", () => showPlanetMenu(planet)]
