@@ -8,7 +8,7 @@ function showPlanetMenu(planet = new Planet()) {
 
     let msg = isDocked ?
         `You have arrived at ${coloredName(planet)}.<br/>`
-        : `You are scanning ${coloredName(planet)}.<br/>`
+        : ''+colorSpan(`You are scanning ${coloredName(planet)}.<br/>`, COLORS.Yellow, true)
 
         if (isDocked) {
         console.log('1')
@@ -16,7 +16,6 @@ function showPlanetMenu(planet = new Planet()) {
         console.log('2:',damagedShips,gs.fleet.ships)
         if (damagedShips.length > 0) msg += colorSpan(`Your ships receive complementary repairs courtesy of the dock's nanite swarm.<br/>`, COLORS.LightGreen, true)
         for (const s of damagedShips) s.repairHull()
-        msg += `What would you like to do?<br/>`
     }
 
     const options = []
@@ -44,8 +43,7 @@ function showPlanetMenu(planet = new Planet()) {
         options.push(["Academy", () => showAcademyMenu(settlement.academy)]);
     }
     options.push([isDocked ? "Depart" : "Stop Scanning", () => closeModal()]);
-
-    showModal(coloredName(planet), msg, options);
+    showPlanetModal(planet, `${coloredName(planet)}`, msg, options, 'planet_menu', (nextPlanet) => showPlanetMenu(nextPlanet));
 }
 /**
  * Displays detailed information about a planet's culture and statistics.
@@ -98,10 +96,10 @@ function showPlanetSocietyMenu(planet = new Planet()) {
         }
     }
     
-    showModal(`${coloredName(planet)} - Society`, msg, [
+    showPlanetModal(planet, `${coloredName(planet)} - Society`, msg, [
         ["Climate", () => showPlanetClimateMenu(planet)],
         ["Back", () => showPlanetMenu(planet)]
-    ]);
+    ], 'planet_society', (nextPlanet) => showPlanetSocietyMenu(nextPlanet));
 }
 
 /**
@@ -131,9 +129,8 @@ function showPlanetClimateMenu(planet = new Planet()) {
     msg += `Geological Activity: ${climate.geologicalActivity.coloredName}<br/>`
     msg += `Magnetosphere: ${climate.magnetosphere.coloredName}<br/>`
     msg += `Radiation Level: ${climate.radiationLevel.coloredName}<br/>`
-    showModal(`${coloredName(planet)} - Climate`, msg, [
+    showPlanetModal(planet, `${coloredName(planet)} - Climate`, msg, [
         ["Society", () => showPlanetSocietyMenu(planet)],
         ["Back", () => showPlanetMenu(planet)]
-    ]);
+    ], 'planet_climate', (nextPlanet) => showPlanetClimateMenu(nextPlanet));
 }
-

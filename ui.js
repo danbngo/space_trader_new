@@ -21,6 +21,10 @@ function refreshPanelButtons (panelId = '', buttons) {
     removeChildren(buttonsEl)
     if (buttons) buttons.forEach((btnData) => {
         if (!btnData) return
+        if (btnData == '<br/>' || btnData == '<br>') {
+            buttonsEl.appendChild(ce({tag:'br'}))
+            return
+        }
         const [label, handler, disabled, classNames] = btnData
         const btn = document.createElement('button');
         btn.textContent = label;
@@ -40,7 +44,7 @@ function refreshPanelButtons (panelId = '', buttons) {
 
 /**
  * 
- * @param {string} title 
+ * @param {string|HTMLElement} title 
  * @param {any} text 
  * @param {any[]} buttons 
  * @param {string} id 
@@ -51,7 +55,7 @@ function createPanel(title = '', text = '', buttons = [], id = '') {
         id,
         classNames: ['panel'],
         children: [
-            ce({classNames:['panel-title'], innerHTML: title}),
+            ce({classNames:['panel-title'], children: [title]}),
             ce({classNames:['panel-content'], children: [text]}),
             ce({classNames:['panel-buttons']})
         ]
@@ -270,7 +274,7 @@ function createTable(rows = [ce()], onSelectRow = (index = 0)=>{}, firstSelected
 let currentModal = ce()
 
 /**
- * @param {string} title
+ * @param {string | HTMLElement} title
  * @param {string | HTMLElement | Element} text
  * @param {any[]} buttons
  * @param {string} id

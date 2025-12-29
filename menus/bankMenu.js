@@ -164,6 +164,7 @@ function showBankMenu(bank = new Bank()) {
 
     let infoContainer = ce({
         children: [
+            isDocked ? 'Welcome to the bank.<br/>' : colorSpan('You must dock to use the bank.', COLORS.Yellow, true) + '<br/>',
             `<u>Your loans</u>`,
             createBankLoansTable(gs.loans, onSelectLoan),
             `Your CR: ${gs.credits} | Your Balance: ${Bank.playerBalance}<br/>`,
@@ -172,14 +173,16 @@ function showBankMenu(bank = new Bank()) {
         ]
     })
 
-    showModal(
+    showPlanetModal(
+        planet,
         `${coloredName(planet)} - Bank`,
         infoContainer,
         [
             ...baseButtons,
             ['Back', ()=>showPlanetMenu(planet)]
         ],
-        'bank_panel'
+        'bank_panel',
+        (nextPlanet) => nextPlanet.settlement?.bank ? showBankMenu(nextPlanet.settlement.bank) : showPlanetMenu(nextPlanet)
     );
 
 }

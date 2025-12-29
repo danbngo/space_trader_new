@@ -102,7 +102,9 @@ function describeNumChange(delta = 0) {
 const dnc = describeNumChange
 
 function describePopulation(populationRating = 0) {
-    return `${statColorSpan(describeLargeNumber(Math.pow(1000,1+populationRating)), populationRating, true)}`
+    const popCountB = Math.pow(10,populationRating)-1
+    const popCount = popCountB * 1*1000*1000*1000 //in billions
+    return `${statColorSpan(describeLargeNumber(popCount), populationRating, true)}`
 }
 
 function describeTerritory(territoryRating = 0) {

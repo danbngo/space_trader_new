@@ -53,14 +53,15 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0])
 
     let infoContainer = ce({
         children: [
-            `<br/>${isDocked ? 'Select a skill to train:' : 'You must dock to use the academy.'}`,
+            `<br/>${isDocked ? 'Welcome to the academy. Select a skill to train:' : colorSpan('You must dock to use the academy.', COLORS.Yellow, true)}`,
             skillTable,
             `Your CR: ${gs.credits}<br/>`,
             `Training Fee: ${statColorSpan(roundToPlaces(100*academy.rake, 2), 1/(1+academy.rake), true)}%<br/>`,
         ]
     })
 
-    showModal(
+    showPlanetModal(
+        planet,
         `${coloredName(planet)} - Academy`,
         ce({
             children:[
@@ -70,7 +71,8 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0])
         [
             ['Back', ()=>showPlanetMenu(planet)]
         ],
-        'academy_panel'
+        'academy_panel',
+        (nextPlanet) => nextPlanet.settlement?.academy ? showAcademyMenu(nextPlanet.settlement.academy) : showPlanetMenu(nextPlanet)
     );
 
     if (selectedSkill) {

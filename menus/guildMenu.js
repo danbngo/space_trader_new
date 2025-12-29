@@ -67,10 +67,11 @@ function showGuildMenu(guild = new Guild()) {
         refreshPanelButtons('guild_hire_panel', buttons)
     }
 
-    showModal(
+    showPlanetModal(
+        planet,
         `${coloredName(planet)} - Guild`,
         ce({children:[
-            `Guild officers`,
+            isDocked ? 'Welcome to the guild.<br/>' : colorSpan('You must dock to use the guild.', COLORS.Yellow, true) + '<br/>',
             createHireOfficerMenu(guild.officers, guild, (officer)=>onSelectGuildOfficer(officer)),
             `Your # officers: ${fleet.officers.length}/${captain.maxSubordinates} | Your credits: ${gs.credits}`,
             //`Guild credits: ${guild.credits}`,
@@ -82,5 +83,6 @@ function showGuildMenu(guild = new Guild()) {
             ["Back", () => showPlanetMenu(planet)],
         ],
         `guild_hire_panel`,
+        (nextPlanet) => nextPlanet.settlement?.guild ? showGuildMenu(nextPlanet.settlement.guild) : showPlanetMenu(nextPlanet)
     );
 }

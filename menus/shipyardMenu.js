@@ -137,10 +137,11 @@ function showShipyardBuyMenu(shipyard = new Shipyard()) {
         refreshPanelButtons('shipyard_buy_panel', buttons)
     }
 
-    showModal(
+    showPlanetModal(
+        planet,
         `${coloredName(planet)} - Shipyard`,
         ce({children:[
-            `<b>Shipyard ships</b>`,
+            isDocked ? 'Welcome to the shipyard.<br/>' : colorSpan('You must dock to use the shipyard.', COLORS.Yellow, true) + '<br/>',
             createBuyShipMenu(shipyard.ships, shipyard, (ship)=>onSelectShipyardShip(ship)),
             `Your # ships: ${fleet.ships.length}/${fleet.numPilots} | Your credits: ${gs.credits}`,
             //`Shipyard credits: ${shipyard.credits}`,
@@ -154,6 +155,7 @@ function showShipyardBuyMenu(shipyard = new Shipyard()) {
             ["Back", () => leave()],
         ],
         `shipyard_buy_panel`,
+        (nextPlanet) => nextPlanet.settlement?.shipyard ? showShipyardBuyMenu(nextPlanet.settlement.shipyard) : showPlanetMenu(nextPlanet)
     );
 }
 
@@ -205,9 +207,11 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
         )
     }
 
-    showModal(
+    showPlanetModal(
+        planet,
         `${coloredName(planet)} - Shipyard`,
         ce({children:[
+            isDocked ? 'Welcome to the shipyard.<br/>' : colorSpan('You must dock to use the shipyard.', COLORS.Yellow, true) + '<br/>',
             `<b>Your ships</b>`,
             createSellShipMenu(fleet.ships, shipyard, (ship)=>onSelectPlayerShip(ship)),
             `Your # ships: ${fleet.ships.length}/${fleet.numPilots}` + (fleet.ships.length < 2 ? colorSpan(` (You can't sell your last ship!)`, COLORS.Yellow) : ''),
@@ -222,6 +226,7 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
             ["Back", () => leave()]
         ],
         `shipyard_sell_panel`,
+        (nextPlanet) => nextPlanet.settlement?.shipyard ? showShipyardSellMenu(nextPlanet.settlement.shipyard) : showPlanetMenu(nextPlanet)
     );
 }
 
@@ -250,9 +255,11 @@ function showShipyardBuyModulesMenu(shipyard = new Shipyard()) {
         refreshPanelButtons('shipyard_modules_panel', buttons)
     }
 
-    showModal(
-        `${coloredName(planet)} - Shipyard Modules`,
+    showPlanetModal(
+        planet,
+        `${coloredName(planet)} - Shipyard`,
         ce({children:[
+            isDocked ? 'Welcome to the shipyard.<br/>' : colorSpan('You must dock to use the shipyard.', COLORS.Yellow, true) + '<br/>',
             `<b>Available Modules</b>`,
             createBuyModuleMenu(shipyard.modules, shipyard, (module)=>onSelectModule(module)),
             `Your credits: ${gs.credits} | Your Ships With Open Slots: ${fleet.ships.filter(s => s.unusedModuleSlots > 0).length} / ${fleet.ships.length}`,
@@ -265,6 +272,7 @@ function showShipyardBuyModulesMenu(shipyard = new Shipyard()) {
             ["Back", () => leave()],
         ],
         `shipyard_modules_panel`,
+        (nextPlanet) => nextPlanet.settlement?.shipyard ? showShipyardBuyModulesMenu(nextPlanet.settlement.shipyard) : showPlanetMenu(nextPlanet)
     );
 }
 

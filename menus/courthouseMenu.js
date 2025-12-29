@@ -57,13 +57,15 @@ function showCourthouseMenu(courthouse = new Courthouse()) {
 
     let infoContainer = ce({
         children: [
+            isDocked ? 'Welcome to the courthouse.<br/>' : colorSpan('You must dock to use the courthouse.', COLORS.Yellow, true) + '<br/>',
             `Your CR: ${gs.credits} | Your Bounty (${coloredName(planet)}): ${planetBounty}<br/>`,
             `Your Total Bounty (All Planets): ${gs.captain.bounty.total}<br/>`,
             `Courthouse Pay Bounty Penalty: ${roundToPlaces(courthouse.calcPayBountyPenalty(100),2)}%<br/>`,
         ]
     })
 
-    showModal(
+    showPlanetModal(
+        planet,
         `${coloredName(planet)} - Courthouse`,
         ce({
             children:[
@@ -75,7 +77,8 @@ function showCourthouseMenu(courthouse = new Courthouse()) {
             ...baseButtons,
             ['Back', ()=>showPlanetMenu(planet)]
         ],
-        'courthouse_panel'
+        'courthouse_panel',
+        (nextPlanet) => nextPlanet.settlement?.courthouse ? showCourthouseMenu(nextPlanet.settlement.courthouse) : showPlanetMenu(nextPlanet)
     );
 
 }

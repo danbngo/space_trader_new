@@ -107,6 +107,9 @@ function showMarketMenu(market = new Market()) {
 
     let infoContainer = ce({
         children: [
+            isDocked 
+                ? (blackMarket ? 'You slip into the shadows of the black market.<br/>' : 'Welcome to the market.<br/>') 
+                : colorSpan(`You must dock to use the ${blackMarket ? 'black market' : 'market'}.`, COLORS.Yellow, true) + '<br/>',
             createMarketCargoTable(blackMarket, fleet.cargo, market.cargo, buyPrices, sellPrices, onSelectCargoType),
             `Your Cargo Space: ${fleet.cargo.total}/${fleet.totalCargoSpace} | Your Credits: ${gs.credits}`,
             `Market Credits: ${market.credits}`
@@ -117,10 +120,15 @@ function showMarketMenu(market = new Market()) {
         ]
     })
 
-    showModal(
+    showPlanetModal(
+        planet,
         `${coloredName(planet)} - ${blackMarket ? 'Black Market' : 'Market'}`,
         infoContainer,
         [['Back', ()=>showPlanetMenu(planet)]],
-        'market_panel'
+        'market_panel',
+        (nextPlanet) => {
+            const nextMarket = blackMarket ? nextPlanet.settlement?.blackMarket : nextPlanet.settlement?.market;
+            return nextMarket ? showMarketMenu(nextMarket) : showPlanetMenu(nextPlanet);
+        }
     );
 }
