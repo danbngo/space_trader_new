@@ -10,14 +10,14 @@ class Planet extends OrbitingObject {
      * @param {number} x - The x-coordinate of the planet.
      * @param {number} y - The y-coordinate of the planet.
      * @param {Orbit} orbit - The orbit of the planet.
-     * @param {PLANET_TYPES} planetType - The type of the planet.
+     * @param {PlanetType} planetType - The type of the planet.
      * @param {Settlement} settlement - The settlement on the planet.
      * @param {Culture} culture - The culture of the planet.
      * @param {Climate} climate - The climate of the planet.
      */
     constructor(name = "Unnamed", color = COLORS.White, radius = 0, x = 0, y = 0, orbit = null, planetType = PLANET_TYPES_ALL[0], settlement = null, culture = null, climate = null) {
         super(name, color, radius, x, y, orbit);
-        /** @type {PLANET_TYPES} */
+        /** @type {PlanetType} */
         this.planetType = planetType
         /** @type {Settlement} */
         this.settlement = settlement

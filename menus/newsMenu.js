@@ -3,7 +3,7 @@
  * @param {Planet|null} planet - The planet to show news for, or null for all news.
  * @param {Function|null} backFunction - Custom back button handler.
  */
-function showNewsTimelineMenu(planet = null, backFunction = null) {
+function showNewsTimelineMenu(planet = null, backFunction = null, activeOnly = true) {
     // If no planet specified, show all news
         console.log('0a')
 
@@ -13,8 +13,12 @@ function showNewsTimelineMenu(planet = null, backFunction = null) {
 
         console.log('0b')
 
+    // Filter by activeOnly if requested
+    const filteredNews = activeOnly 
+        ? relevantNews.filter(news => !news.ended)
+        : relevantNews
 
-    if (!planet) relevantNews.push(...gs.system.simpleNews)
+    if (!planet) filteredNews.push(...gs.system.simpleNews)
 
         console.log('1')
     
@@ -22,7 +26,7 @@ function showNewsTimelineMenu(planet = null, backFunction = null) {
     const defaultBack = planet ? () => showPlanetMenu(planet) : () => showStarMap()
     const backBtn = backFunction || defaultBack
     
-    if (relevantNews.length === 0) {
+    if (filteredNews.length === 0) {
         const msg = planet ? `No recent news about ${coloredName(planet)}.` : 'No recent news.'
         showModal(title, msg, [["Back", backBtn]])
         return
@@ -30,12 +34,12 @@ function showNewsTimelineMenu(planet = null, backFunction = null) {
     
         console.log('2')
     // Sort by year (most recent first)
-    relevantNews.sort((a, b) => b.startYear - a.startYear)
+    filteredNews.sort((a, b) => b.startYear - a.startYear)
 
         console.log('3')
     /**@type {Array<[number, string, number]>} */
     const newsLines = []
-    for (const news of relevantNews) {
+    for (const news of filteredNews) {
         if (news.started && news.startYear && news.startDescription) newsLines.push([news.startYear, news.startDescription, news.newsType ? news.newsType.displayPriority : 0])
         if (news.ended && news.endedYear && news.endDescription) newsLines.push([news.endedYear, news.endDescription, news.newsType ? news.newsType.displayPriority : 0])
     }
@@ -46,7 +50,12 @@ function showNewsTimelineMenu(planet = null, backFunction = null) {
     const msg = newsLines.map(line => line[1]).join('<br/>')
 
     console.log('5')
+    
+    const buttons = []
+    const toggleLabel = activeOnly ? "Show Historical" : "Show Active Only"
+    buttons.push([toggleLabel, () => showNewsTimelineMenu(planet, backFunction, !activeOnly)])
+    buttons.push(["Back", backBtn])
    
-    showModal(title, msg, [["Back", backBtn]])
+    showModal(title, msg, buttons)
 }
 

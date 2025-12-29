@@ -2,7 +2,6 @@
 /** @typedef {'Attack'|'Escape'|'Asteroid'} CombatStrategyType */
 /** @typedef {'FilledCircle'|'EmptyCircle'|'FilledTriangle'|'EmptyTriangle'|'Text'|'Line'|'FilledOval'|'EmptyOval'|'FilledRectangle'} ShapeType */
 /** @typedef {'Pilot'|'Stealth'|'Barter'|'Engineer'|'Salvage'} SkillType */
-/** @typedef {'Earthlike'|'Terrestrial'|'Gas Giant'|'Gas Dwarf'|'Ice Giant'|'Ice Dwarf'} PlanetTypeValue */
 /** @typedef {'Move'|'Laser'|'Ram'|'Recharge'|'Wait'|'Blink'|'Booster'|'Cloak'|'Warhead'|'EMPPulse'|'Magnetize'|'SmokeBomb'} MoveType */
 /** @typedef {'FaceOff'|'Storm'} FormationType */
 /** @typedef {'Ship'|'Asteroid'} AIType */
@@ -49,18 +48,6 @@ const SKILLS = Object.freeze({
 })
 
 const SKILLS_ALL = Object.values(SKILLS)
-
-/** @enum {PlanetTypeValue} */
-const PLANET_TYPES = Object.freeze({
-  EARTHLIKE: "Earthlike",
-  TERRESTRIAL: "Terrestrial",
-  GAS_GIANT: "Gas Giant",
-  GAS_DWARF: "Gas Dwarf",
-  ICE_GIANT: "Ice Giant",
-  ICE_DWARF: "Ice Dwarf",
-});
-
-const PLANET_TYPES_ALL = Object.values(PLANET_TYPES)
 
 /**
  * Color values as RGBA tuples
@@ -142,75 +129,5 @@ const CL = Object.freeze({
     ASTRONOMICAL: 32/8,
     NO_REGRESSION: 1,
     MEDIUM: 1
-})
-
-const ATMOSPHERIC_PRESSURE = Object.freeze({
-    NONE: 0,
-    EXTREMELY_LOW: 8/16,
-    VERY_LOW: 8/12,
-    LOW: 8/10,
-    SLIGHTLY_LOW: 8/9,
-    MEDIUM: 1,
-    SLIGHTLY_HIGH: 9/8,
-    HIGH: 10/8,
-    VERY_HIGH: 12/8,
-    EXTREMELY_HIGH: 16/8,
-    CRUSHING: 32/8,
-})
-
-const TEMPERATURE = Object.freeze({
-    NONE: 0,
-    FROZEN: 8/16,
-    FRIGID: 8/12,
-    COLD: 8/10,
-    COOL: 8/9,
-    TEMPERATE: 1,
-    WARM: 9/8,
-    HOT: 10/8,
-    SCORCHING: 12/8,
-    INFERNAL: 16/8,
-    MOLTEN: 32/8,
-})
-
-const GRAVITY = Object.freeze({
-    NONE: 0,
-    EXTREMELY_LOW: 8/16,
-    VERY_LOW: 8/12,
-    LOW: 8/10,
-    SLIGHTLY_LOW: 8/9,
-    STANDARD: 1,
-    SLIGHTLY_HIGH: 9/8,
-    HIGH: 10/8,
-    VERY_HIGH: 12/8,
-    EXTREMELY_HIGH: 16/8,
-    CRUSHING: 32/8,
-})
-
-const OCEAN_COVERAGE = Object.freeze({
-    NONE: 0,
-    TRACE: 8/16,
-    MINIMAL: 8/12,
-    LOW: 8/10,
-    MODERATE: 8/9,
-    MEDIUM: 1,
-    EXTENSIVE: 9/8,
-    VAST: 10/8,
-    OCEANIC: 12/8,
-    GLOBAL_OCEAN: 16/8,
-    SUBMERGED: 32/8,
-})
-
-const GEOLOGICAL_ACTIVITY = Object.freeze({
-    NONE: 0,
-    DORMANT: 8/16,
-    MINIMAL: 8/12,
-    LOW: 8/10,
-    SLIGHT: 8/9,
-    MODERATE: 1,
-    ACTIVE: 9/8,
-    HIGHLY_ACTIVE: 10/8,
-    VOLCANIC: 12/8,
-    CATACLYSMIC: 16/8,
-    HELLSCAPE: 32/8,
 })
 

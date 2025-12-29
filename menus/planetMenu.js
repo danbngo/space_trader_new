@@ -19,9 +19,9 @@ function showPlanetMenu(planet = new Planet()) {
         msg += `What would you like to do?<br/>`
     }
 
-    const options = [[`Overview`, () => showPlanetOverviewMenu(planet)]];
+    const options = [[`Society`, () => showPlanetOverviewMenu(planet)]];
     options.push(["Climate", () => showPlanetClimateMenu(planet)]);
-    options.push(["News", () => showNewsTimelineMenu(planet, () => showPlanetMenu(planet))]);
+    options.push(["News", () => showNewsTimelineMenu(planet, () => showPlanetMenu(planet), true)]);
     if (settlement.shipyard) {
         options.push(["Shipyard", () => showShipyardBuyMenu(settlement.shipyard)]);
     }
@@ -52,19 +52,47 @@ function showPlanetMenu(planet = new Planet()) {
  * @param {Planet} planet - The planet to display information for.
  */
 function showPlanetOverviewMenu(planet = new Planet()) {
-    const {culture} = planet
+    const {culture, settlement} = planet
     const {territory, population, military, security, economy, industry, crime} = culture
     let msg = ''
+    msg += `Government: ${coloredName(culture.governmentType)}<br/>`
     msg += `Population: ${describePopulation(population)}<br/>`
     msg += `Territory: ${describeTerritory(territory)}<br/>`
-    msg += `GovernmentType: ${coloredName(culture.governmentType)}<br/>`
+    msg += `<br/>`
     msg += `Military: ${describeRating(military)}<br/>`
     msg += `Security: ${describeRating(security)}<br/>`
     msg += `Economy: ${describeRating(economy)}<br/>`
     msg += `Industry: ${describeRating(industry)}<br/>`
     msg += `Crime: ${describeRating(crime, true)}<br/>`
-    msg += `Ships: ${describeRating(culture.shipQuality)}<br/>`
-    msg += `Officers: ${describeRating(culture.officerQuality)}<br/>`
+    msg += `Ship Quality: ${describeRating(culture.shipQuality)}<br/>`
+    msg += `Officer Quality: ${describeRating(culture.officerQuality)}<br/>`
+    
+    // Market and settlement info
+    if (settlement) {
+        if (settlement.shipyard) {
+            const shipyardShips = settlement.shipyard.baseNumShips
+            const shipyardNormalized = shipyardShips / SHIPYARD_AVERAGE_NUM_SHIPS
+            msg += `# Ships: ${statColorSpan(roundToPlaces(shipyardNormalized, 2) + 'x', shipyardNormalized, true)}<br/>`
+        }
+        if (settlement.guild) {
+            const guildOfficers = settlement.guild.baseNumOfficers
+            const guildNormalized = guildOfficers / GUILD_AVERAGE_NUM_OFFICERS
+            msg += `# Officers: ${statColorSpan(roundToPlaces(guildNormalized, 2) + 'x', guildNormalized, true)}<br/>`
+        }
+        if (settlement.market) {
+            const marketCargoAvg = settlement.market.cargo.average
+            const marketCargoNormalized = marketCargoAvg / MARKET_AVERAGE_CARGO_PER_TYPE
+            msg += `Market Cargo: ${statColorSpan(roundToPlaces(marketCargoAvg, 1), marketCargoNormalized, true)} per type<br/>`
+            msg += `Market Prices: ${statColorSpan(roundToPlaces(settlement.market.inflation, 2) + 'x', settlement.market.inflation, true)}<br/>`
+        }
+        if (settlement.blackMarket) {
+            const blackMarketCargoAvg = settlement.blackMarket.cargo.average
+            const blackMarketCargoNormalized = blackMarketCargoAvg / MARKET_AVERAGE_CARGO_PER_TYPE
+            msg += `Black Market Cargo: ${statColorSpan(roundToPlaces(blackMarketCargoAvg, 1), blackMarketCargoNormalized, true)} per type<br/>`
+            msg += `Black Market Prices: ${statColorSpan(roundToPlaces(settlement.blackMarket.inflation, 2) + 'x', settlement.blackMarket.inflation, true)}<br/>`
+        }
+    }
+    
     showModal(`${coloredName(planet)} - Overview`, msg, [["Back", () => showPlanetMenu(planet)]]);
 }
 
@@ -77,53 +105,24 @@ function showPlanetClimateMenu(planet = new Planet()) {
     let msg = ''
     
     // Physical properties
-    msg += `<b>Physical Properties</b><br/>`
-    msg += `Radius: ${roundToPlaces(planet.radius, 2)} Earth radii<br/>`
+    msg += `<u>Physical Properties</u><br/>`
     msg += `Type: ${coloredName(planet.planetType)}<br/>`
+    msg += `Radius: ${roundToPlaces(planet.radius, 2)} Earth radii<br/>`
+    if (planet.orbit) {
+        msg += `Orbital Distance: ${roundToPlaces(planet.orbit.radius, 2)} AU<br/>`
+        msg += `Orbital Period: ${roundToPlaces(planet.orbit.calcPeriod(), 2)} years<br/>`
+    }
     msg += `<br/>`
     
     // Climate properties
-    msg += `<b>Climate Data</b><br/>`
-    
-    const getEnumName = (enumObj, value) => {
-        const key = Object.keys(enumObj).find(k => enumObj[k] === value)
-        return key ? key.replace(/_/g, ' ').toLowerCase() : 'unknown'
-    }
-    
-    if (climate.temperature !== TEMPERATURE.NONE) {
-        const tempName = getEnumName(TEMPERATURE, climate.temperature)
-        msg += `Temperature: ${statColorSpan(tempName, climate.temperature)}<br/>`
-    } else {
-        msg += `Temperature: ${colorSpan('no data', COLORS.Gray, true)}<br/>`
-    }
-    
-    if (climate.atmosphericPressure !== ATMOSPHERIC_PRESSURE.NONE) {
-        const pressureName = getEnumName(ATMOSPHERIC_PRESSURE, climate.atmosphericPressure)
-        msg += `Atmosphere: ${statColorSpan(pressureName, climate.atmosphericPressure)}<br/>`
-    } else {
-        msg += `Atmosphere: ${colorSpan('none', COLORS.Gray, true)}<br/>`
-    }
-    
-    if (climate.gravity !== GRAVITY.NONE) {
-        const gravityName = getEnumName(GRAVITY, climate.gravity)
-        msg += `Gravity: ${statColorSpan(gravityName, climate.gravity)}<br/>`
-    } else {
-        msg += `Gravity: ${colorSpan('no data', COLORS.Gray, true)}<br/>`
-    }
-    
-    if (climate.oceanCoverage !== OCEAN_COVERAGE.NONE) {
-        const oceanName = getEnumName(OCEAN_COVERAGE, climate.oceanCoverage)
-        msg += `Ocean Coverage: ${statColorSpan(oceanName, climate.oceanCoverage)}<br/>`
-    } else {
-        msg += `Ocean Coverage: ${colorSpan('none', COLORS.Gray, true)}<br/>`
-    }
-    
-    if (climate.geologicalActivity !== GEOLOGICAL_ACTIVITY.NONE) {
-        const geoName = getEnumName(GEOLOGICAL_ACTIVITY, climate.geologicalActivity)
-        msg += `Geological Activity: ${statColorSpan(geoName, climate.geologicalActivity)}<br/>`
-    } else {
-        msg += `Geological Activity: ${colorSpan('none', COLORS.Gray, true)}<br/>`
-    }
-    
+    msg += `<u>Climate Data</u><br/>`
+    msg += `Temperature: ${climate.temperature.coloredName}<br/>`
+    msg += `Atmosphere: ${climate.atmosphericPressure.coloredName}<br/>`
+    msg += `Gravity: ${climate.gravity.coloredName}<br/>`
+    msg += `Ocean Coverage: ${climate.oceanCoverage.coloredName}<br/>`
+    msg += `Geological Activity: ${climate.geologicalActivity.coloredName}<br/>`
+    msg += `Magnetosphere: ${climate.magnetosphere.coloredName}<br/>`
+    msg += `Radiation Level: ${climate.radiationLevel.coloredName}<br/>`
     showModal(`${coloredName(planet)} - Climate`, msg, [["Back", () => showPlanetMenu(planet)]]);
 }
+

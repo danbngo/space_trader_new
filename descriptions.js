@@ -22,7 +22,7 @@ function describeTimespan(years = 0) {
 /**
  * @function coloredName
  * @description Returns the name of a SpaceObject (Planet, Ship, Effect, etc.) wrapped in a colored span based on its color property.
- * @param {SpaceObject | Ship | Fleet | CargoType | ShipModuleType | GovernmentType | RelationshipType} obj - The SpaceObject whose name is to be colored.
+ * @param {SpaceObject | Ship | Fleet | CargoType | ShipModuleType | GovernmentType | RelationshipType | PlanetType } obj - The SpaceObject whose name is to be colored.
  * @returns {string} - The colored name as an HTML string.
  */
 function coloredName(obj = new SpaceObject()) {
@@ -92,11 +92,11 @@ function describeNumChange(delta = 0) {
 const dnc = describeNumChange
 
 function describePopulation(populationRating = 0) {
-    return `${statColorSpan(describeLargeNumber(Math.pow(1000,1+populationRating)), populationRating, true)}<br/>`
+    return `${statColorSpan(describeLargeNumber(Math.pow(1000,1+populationRating)), populationRating, true)}`
 }
 
 function describeTerritory(territoryRating = 0) {
-    return `${statColorSpan(roundToPlaces(territoryRating,2), territoryRating, true)} AU<br/>`
+    return `${statColorSpan(roundToPlaces(territoryRating,2), territoryRating, true)} AU`
 }
 
 function describeRating(rating = 0, invertColor = false) {

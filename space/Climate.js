@@ -1,29 +1,37 @@
 // Climate class defines planetary environmental conditions
 class Climate {
     /**
-     * @param {number} temperature - The temperature level (from TEMPERATURE enum)
-     * @param {number} atmosphericPressure - The atmospheric pressure (from ATMOSPHERIC_PRESSURE enum)
-     * @param {number} gravity - The gravity level (from GRAVITY enum)
-     * @param {number} oceanCoverage - The ocean coverage level (from OCEAN_COVERAGE enum)
-     * @param {number} geologicalActivity - The geological activity level (from GEOLOGICAL_ACTIVITY enum)
+     * @param {Temperature} temperature - The temperature level (from TEMPERATURES)
+     * @param {AtmosphericPressure} atmosphericPressure - The atmospheric pressure (from ATMOSPHERIC_PRESSURES)
+     * @param {Gravity} gravity - The gravity level (from GRAVITIES)
+     * @param {OceanCoverage} oceanCoverage - The ocean coverage level (from OCEAN_COVERAGES)
+     * @param {GeologicalActivity} geologicalActivity - The geological activity level (from GEOLOGICAL_ACTIVITIES)
+     * @param {Magnetosphere} magnetosphere - The magnetosphere strength (from MAGNETOSPHERES)
+     * @param {RadiationLevel} radiationLevel - The radiation level (from RADIATION_LEVELS)
      */
     constructor(
-        temperature = TEMPERATURE.NONE,
-        atmosphericPressure = ATMOSPHERIC_PRESSURE.NONE,
-        gravity = GRAVITY.NONE,
-        oceanCoverage = OCEAN_COVERAGE.NONE,
-        geologicalActivity = GEOLOGICAL_ACTIVITY.NONE
+        temperature = TEMPERATURES.NONE,
+        atmosphericPressure = ATMOSPHERIC_PRESSURES.NONE,
+        gravity = GRAVITIES.NONE,
+        oceanCoverage = OCEAN_COVERAGES.NONE,
+        geologicalActivity = GEOLOGICAL_ACTIVITIES.NONE,
+        magnetosphere = MAGNETOSPHERES.NONE,
+        radiationLevel = RADIATION_LEVELS.NONE
     ) {
-        /** @type {number} */
+        /** @type {Temperature} */
         this.temperature = temperature
-        /** @type {number} */
+        /** @type {AtmosphericPressure} */
         this.atmosphericPressure = atmosphericPressure
-        /** @type {number} */
+        /** @type {Gravity} */
         this.gravity = gravity
-        /** @type {number} */
+        /** @type {OceanCoverage} */
         this.oceanCoverage = oceanCoverage
-        /** @type {number} */
+        /** @type {GeologicalActivity} */
         this.geologicalActivity = geologicalActivity
+        /** @type {Magnetosphere} */
+        this.magnetosphere = magnetosphere
+        /** @type {RadiationLevel} */
+        this.radiationLevel = radiationLevel
     }
 
     /**
@@ -33,29 +41,32 @@ class Climate {
     getDescription() {
         const parts = []
         
-        if (this.temperature !== TEMPERATURE.NONE) {
-            const tempKey = Object.keys(TEMPERATURE).find(key => TEMPERATURE[key] === this.temperature)
-            parts.push(`Temperature: ${tempKey.replace(/_/g, ' ').toLowerCase()}`)
+        if (this.temperature !== TEMPERATURES.NONE) {
+            parts.push(`Temperature: ${this.temperature.name.toLowerCase()}`)
         }
         
-        if (this.atmosphericPressure !== ATMOSPHERIC_PRESSURE.NONE) {
-            const pressureKey = Object.keys(ATMOSPHERIC_PRESSURE).find(key => ATMOSPHERIC_PRESSURE[key] === this.atmosphericPressure)
-            parts.push(`Atmosphere: ${pressureKey.replace(/_/g, ' ').toLowerCase()}`)
+        if (this.atmosphericPressure !== ATMOSPHERIC_PRESSURES.NONE) {
+            parts.push(`Atmosphere: ${this.atmosphericPressure.name.toLowerCase()}`)
         }
         
-        if (this.gravity !== GRAVITY.NONE) {
-            const gravityKey = Object.keys(GRAVITY).find(key => GRAVITY[key] === this.gravity)
-            parts.push(`Gravity: ${gravityKey.replace(/_/g, ' ').toLowerCase()}`)
+        if (this.gravity !== GRAVITIES.NONE) {
+            parts.push(`Gravity: ${this.gravity.name.toLowerCase()}`)
         }
         
-        if (this.oceanCoverage !== OCEAN_COVERAGE.NONE) {
-            const oceanKey = Object.keys(OCEAN_COVERAGE).find(key => OCEAN_COVERAGE[key] === this.oceanCoverage)
-            parts.push(`Ocean: ${oceanKey.replace(/_/g, ' ').toLowerCase()}`)
+        if (this.oceanCoverage !== OCEAN_COVERAGES.NONE) {
+            parts.push(`Ocean: ${this.oceanCoverage.name.toLowerCase()}`)
         }
         
-        if (this.geologicalActivity !== GEOLOGICAL_ACTIVITY.NONE) {
-            const geoKey = Object.keys(GEOLOGICAL_ACTIVITY).find(key => GEOLOGICAL_ACTIVITY[key] === this.geologicalActivity)
-            parts.push(`Geology: ${geoKey.replace(/_/g, ' ').toLowerCase()}`)
+        if (this.geologicalActivity !== GEOLOGICAL_ACTIVITIES.NONE) {
+            parts.push(`Geology: ${this.geologicalActivity.name.toLowerCase()}`)
+        }
+        
+        if (this.magnetosphere !== MAGNETOSPHERES.NONE) {
+            parts.push(`Magnetosphere: ${this.magnetosphere.name.toLowerCase()}`)
+        }
+        
+        if (this.radiationLevel !== RADIATION_LEVELS.NONE) {
+            parts.push(`Radiation: ${this.radiationLevel.name.toLowerCase()}`)
         }
         
         return parts.length > 0 ? parts.join(', ') : 'No significant climate data'
