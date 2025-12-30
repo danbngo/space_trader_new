@@ -49,22 +49,16 @@ class SlaversEncounter extends FleetEncounter {
         else if (gs.captain.fame.getAmount(FACTION_TYPES.SLAVERS.name) > 0) {
             // Neutral - they ignore you
             showModal('Ignored', `The ${coloredName(enemyFleet)} note your presence but choose to ignore you.`,
-                [{text: 'Continue', onclick: ()=>this.endEncounter()}]
+                ['Continue', ()=>this.endEncounter()]
             )
         }
 
         // Hostile - demand surrender
-        const panel = createPanel(ce({children: [
-            `The ${coloredName(enemyFleet)} hail you.<br/>
-            Your ships and crew belong to us now. Surrender immediately or be destroyed!`
-        ]}))
-
-        const buttons = [
-            {text: 'Surrender', onclick: ()=>this.encounterPlayerDidSurrender()},
-            {text: 'Refuse', onclick: ()=>closeModal()},
-        ]
-
-        showPanel(panel, buttons)
+        showModal('Demand Surrender', `The ${coloredName(enemyFleet)} hail you.<br/>Your ships and crew belong to us now. Surrender immediately or be destroyed!`,
+            [
+                ['Surrender', ()=>this.showPlayerDidSurrenderModal()],
+                ['Refuse', ()=>closeModal()],
+            ])
     }
 
     /**

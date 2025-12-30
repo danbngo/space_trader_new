@@ -522,7 +522,7 @@ class EncounterMap extends BaseMap {
     checkEncounterOver() {
         console.log('checking encounter over')
         if (this.encounter.result) {
-            endCombat()
+            this.encounter.endCombat()
             return true
             //this.refresh()
         }

@@ -42,6 +42,10 @@ function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
         ? captain.implants.map(i => colorSpan(i.implantType.name, i.implantType.color) + ` (${roundToPlaces(i.quality*100, 1)}%)`).join(', ')
         : colorSpan('(None)', COLORS.Gray)
 
+    const perksText = captain.perks.length > 0
+        ? captain.perks.map(p => colorSpan(p.name, p.color)).join(', ')
+        : colorSpan('(None)', COLORS.Gray)
+
     showModal(
         `Captain Overview`,
         ce({children:[
@@ -50,7 +54,8 @@ function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
             `Skill Points: ${colorSpan(String(skillPoints), skillPoints > 0 ? COLORS.Green : '')}`,
             skillTable,
             ce({style: 'margin-top: 20px;', children: [
-                ce({children: [`<b>Cybernetic Implants:</b><br/>`, implantsText]})
+                ce({children: [`<b>Cybernetic Implants:</b><br/>`, implantsText]}),
+                ce({children: [`<br/><b>Perks:</b><br/>`, perksText]})
             ]})
         ]}),
         [

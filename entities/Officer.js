@@ -37,6 +37,8 @@ class Officer {
         this.implants = [];
         /** @type {Map<Planet, RankType>} */
         this.ranks = new Map();
+        /** @type {PerkType[]} */
+        this.perks = [];
         /** @type {number} */
         this.age = 25; // Default age
     }
