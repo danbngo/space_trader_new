@@ -14,7 +14,7 @@ class ScientificBreakthroughNews extends News {
                 industry: CL.LOW,
                 wealth: CL.LOW,
                 reserves: CL.SLIGHTLY_LOW,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.ISOTOPES, 2]]),
+                cargoPriceMultipliers: new Map([[CARGO_TYPES.ISOTOPES, 2]]),
             })
         ]
 

@@ -14,7 +14,7 @@ class TourismNews extends News {
                 reserves: CL.LOW,
                 industry: CL.LOW,
                 wealth: CL.LOW,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.METAL, 2], [CARGO_TYPES.NANITES, 2]]),
+                cargoPriceMultipliers: new Map([[CARGO_TYPES.METAL, 2], [CARGO_TYPES.NANITES, 2]]),
             })
         ]
 

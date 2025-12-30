@@ -19,7 +19,7 @@ class ScarcityNews extends News {
                 crime: CL.HIGH,
                 corruption: CL.HIGH,
                 navy: CL.VERY_LOW,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.WATER, CL.ASTRONOMICAL]]),
+                cargoPriceMultipliers: new Map([[CARGO_TYPES.WATER, CL.ASTRONOMICAL]]),
             })
         ]
 

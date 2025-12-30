@@ -39,7 +39,7 @@ class WarBombardmentNews extends News {
                 education: CL.LOW,
                 prestige: CL.VERY_LOW,
                 buildingsDisabled: buildingsToDisable,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.WATER, 2], [CARGO_TYPES.MEDICINE, 2], [CARGO_TYPES.HOLOCUBES, 0.5]]), //this is the only thing that normalizes after
+                cargoPriceMultipliers: new Map([[CARGO_TYPES.WATER, 2], [CARGO_TYPES.MEDICINE, 2], [CARGO_TYPES.HOLOCUBES, 0.5]]), //this is the only thing that normalizes after
             })
         ]
 

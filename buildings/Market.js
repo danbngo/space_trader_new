@@ -33,7 +33,7 @@ class Market extends Building {
         const baseCargo = new CountsMap()
         for (const cargoType of CARGO_TYPES_ALL) {
             //simple supply and demand - as price goes up, availability goes down
-            const baseAmount = Math.round(MARKET_AVERAGE_CARGO_PER_TYPE/this.planet.civilization.cargoPriceModifiers.getAmount(cargoType))
+            const baseAmount = Math.round(MARKET_AVERAGE_CARGO_PER_TYPE/this.planet.civilization.cargoPriceMultipliers.getAmount(cargoType))
             const amount = this.blackMarket ? baseAmount * this.planet.civilization.crime : baseAmount * this.planet.civilization.reserves
             baseCargo.setAmount(cargoType, amount)
         }
@@ -44,13 +44,13 @@ class Market extends Building {
     calcCargoBuyPrices() {
         const prices = new CountsMap()
         for (const cargoType of CARGO_TYPES_ALL) {
-            const basePrice = cargoType.value * this.planet.civilization.cargoPriceModifiers.getAmount(cargoType)
+            const basePrice = cargoType.value * this.planet.civilization.cargoPriceMultipliers.getAmount(cargoType)
             let price = 
                 this.blackMarket ? Math.round(basePrice * (1+this.planet.civilization.corruption) * this.planet.civilization.inflation / this.planet.civilization.crime)
                 : Math.round(basePrice * (1+this.planet.civilization.corruption) * this.planet.civilization.inflation / this.planet.civilization.reserves)
             // Apply taxes only to regular market
             if (!this.blackMarket) {
-                price = Math.round(price * (1 + this.planet.civilization.taxes))
+                price = Math.round(price * (1 + this.planet.civilization.taxRate))
             }
             prices.setAmount(cargoType, price)
         }
@@ -60,13 +60,13 @@ class Market extends Building {
     calcCargoSellPrices() {
         const prices = new CountsMap()
             for (const cargoType of CARGO_TYPES_ALL) {
-            const basePrice = cargoType.value * this.planet.civilization.cargoPriceModifiers.getAmount(cargoType)
+            const basePrice = cargoType.value * this.planet.civilization.cargoPriceMultipliers.getAmount(cargoType)
             let price = 
                 this.blackMarket ? Math.round(basePrice / (1+this.planet.civilization.corruption) * this.planet.civilization.inflation / this.planet.civilization.crime)
                 : Math.round(basePrice / (1+this.planet.civilization.corruption) * this.planet.civilization.inflation / this.planet.civilization.reserves)
             // Apply taxes only to regular market
             if (!this.blackMarket) {
-                price = Math.round(price * (1 - this.planet.civilization.taxes))
+                price = Math.round(price * (1 - this.planet.civilization.taxRate))
             }
             prices.setAmount(cargoType, price)
         }

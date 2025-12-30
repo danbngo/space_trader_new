@@ -17,7 +17,7 @@ class ConstructionNews extends News {
                 reserves: CL.LOW,
                 inflation: CL.HIGH,
                 wealth: CL.LOW,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.METAL, CL.EXTREMELY_HIGH], [CARGO_TYPES.NANITES, CL.ASTRONOMICAL]]),
+                cargoPriceMultipliers: new Map([[CARGO_TYPES.METAL, CL.EXTREMELY_HIGH], [CARGO_TYPES.NANITES, CL.ASTRONOMICAL]]),
             })
         ]
 
@@ -31,7 +31,7 @@ class ConstructionNews extends News {
 
         this.failEffects = this.startEffects.map(effect => effect.getHalfRegression())
         Object.assign(this.failEffects[0], {
-            cargoPriceModifiers: NewsEffect.getInvertedCargoPriceModifiers(this.startEffects[0].cargoPriceModifiers)
+            cargoPriceMultipliers: NewsEffect.getInvertedCargoPriceMultipliers(this.startEffects[0].cargoPriceMultipliers)
         })
     }
 

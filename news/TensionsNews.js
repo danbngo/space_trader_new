@@ -16,7 +16,7 @@ class TensionsNews extends News {
                 army: CL.SLIGHTLY_HIGH,
                 navy: CL.SLIGHTLY_HIGH,
                 economy: CL.SLIGHTLY_LOW,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.ANTIMATTER, CL.VERY_HIGH]]),
+                cargoPriceMultipliers: new Map([[CARGO_TYPES.ANTIMATTER, CL.VERY_HIGH]]),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
@@ -25,7 +25,7 @@ class TensionsNews extends News {
                 army: CL.SLIGHTLY_HIGH,
                 navy: CL.SLIGHTLY_HIGH,
                 economy: CL.SLIGHTLY_LOW,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.ANTIMATTER, CL.VERY_HIGH]]),
+                cargoPriceMultipliers: new Map([[CARGO_TYPES.ANTIMATTER, CL.VERY_HIGH]]),
             })
         ]
 

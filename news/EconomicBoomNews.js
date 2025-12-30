@@ -19,7 +19,7 @@ class EconomicBoomNews extends News {
                 industry: CL.VERY_HIGH,
                 wealth: CL.EXTREMELY_HIGH,
                 navy: CL.VERY_HIGH,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.HOLOCUBES, CL.EXTREMELY_HIGH]]),
+                cargoPriceMultipliers: new Map([[CARGO_TYPES.HOLOCUBES, CL.EXTREMELY_HIGH]]),
             })
         ]
 
@@ -38,7 +38,7 @@ class EconomicBoomNews extends News {
                 economy: CL.LOW,
                 industry: CL.LOW,
                 wealth: CL.VERY_LOW,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.HOLOCUBES, CL.NO_REGRESSION]]),
+                cargoPriceMultipliers: new Map([[CARGO_TYPES.HOLOCUBES, CL.NO_REGRESSION]]),
             })
         ]
     }

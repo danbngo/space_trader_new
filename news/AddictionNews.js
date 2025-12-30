@@ -11,19 +11,24 @@ class AddictionNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                population: CL.LOW,
-                security: CL.LOW,
-                economy: CL.LOW,
-                crime: CL.HIGH,
-                corruption: CL.HIGH,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.MEDICINE, CL.VERY_HIGH], [CARGO_TYPES.DRUGS, CL.EXTREMELY_HIGH]]), //this is the only thing that normalizes after
+                civilizationMultipliers: new Civilization({
+                    security: CL.LOW,
+                    economy: CL.LOW,
+                    crime: CL.HIGH,
+                    corruption: CL.HIGH,
+                    cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.MEDICINE, CL.VERY_HIGH], [CARGO_TYPES.DRUGS, CL.EXTREMELY_HIGH]])),
+                })
             })
         ]
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
 
         this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        Object.assign(this.failEffects[0], {
-            cargoPriceModifiers: NewsEffect.getInvertedCargoPriceModifiers(this.startEffects[0].cargoPriceModifiers)            
+        Object.assign(this.failEffects[0].civilizationMultipliers, {
+            population: CL.SLIGHTLY_LOW,
+            security: CL.NO_REGRESSION,
+            economy: CL.NO_REGRESSION,
+            crime: CL.NO_REGRESSION,
+            corruption: CL.NO_REGRESSION,
         })
     }
 

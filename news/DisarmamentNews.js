@@ -14,7 +14,7 @@ class DisarmamentNews extends News {
                 army: CL.VERY_LOW,
                 navy: CL.VERY_LOW,
                 territory: CL.SLIGHTLY_LOW,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_LOW], [CARGO_TYPES.WEAPONS, CL.EXTREMELY_LOW]]),
+                cargoPriceMultipliers: new Map([[CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_LOW], [CARGO_TYPES.WEAPONS, CL.EXTREMELY_LOW]]),
                 crime: CL.SLIGHTLY_LOW,
             })
         ]

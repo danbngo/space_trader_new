@@ -15,7 +15,7 @@ class CrackdownNews extends News {
                 culture: CL.LOW,
                 crime: CL.SLIGHTLY_LOW,
                 corruption: CL.SLIGHTLY_LOW,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.DRUGS, CL.HIGH], [CARGO_TYPES.WEAPONS, CL.HIGH]]),
+                cargoPriceMultipliers: new Map([[CARGO_TYPES.DRUGS, CL.HIGH], [CARGO_TYPES.WEAPONS, CL.HIGH]]),
             })
         ]
 

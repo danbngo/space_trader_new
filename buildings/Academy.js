@@ -19,7 +19,7 @@ class Academy extends Building {
     calcSkillUpgradeCost(officer = new Officer(), skill = SKILLS_ALL[0]) {
         // Base cost scales exponentially with current skill level
         const baseCost = 250 * officer.calcSkillPointsToUpgrade(skill, false)
-        const skillModifier = this.planet.civilization.skillPriceModifiers.getAmount(skill) || 1
+        const skillModifier = this.planet.civilization.skillPriceMultipliers.getAmount(skill) || 1
         return Math.ceil(baseCost * skillModifier * (1 + this.planet.civilization.corruption) * this.planet.civilization.inflation)
     }
     calcCanUpgradeSkill(officer = new Officer(), targetLevel = 1) {
@@ -31,7 +31,7 @@ class Academy extends Building {
         if (this.isTavern) {
             return basePrice
         }
-        return Math.round(basePrice * (1 + this.planet.civilization.taxes))
+        return Math.round(basePrice * (1 + this.planet.civilization.taxRate))
     }
     get baseNumOfficers() {
         return GUILD_AVERAGE_NUM_OFFICERS * (this.isTavern ? this.planet.civilization.crime : this.planet.civilization.army)

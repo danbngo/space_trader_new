@@ -28,7 +28,7 @@ class CivilWarNews extends News {
                 corruption: CL.SLIGHTLY_HIGH,
                 wealth: CL.LOW,
                 prestige: CL.LOW,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, CL.ASTRONOMICAL], [CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_HIGH]]),
+                cargoPriceMultipliers: new Map([[CARGO_TYPES.WEAPONS, CL.ASTRONOMICAL], [CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_HIGH]]),
             })
         ]
 

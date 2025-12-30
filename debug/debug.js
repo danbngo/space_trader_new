@@ -129,8 +129,8 @@ function assessPlanets() {
     const totalWealth = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.wealth,0)
     const totalInflation = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.inflation,0)
     const totalReserves = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.reserves,0)
-    const totalCargoPriceModifier = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.cargoPriceModifiers.average,0)
-    const totalSkillPriceModifier = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.skillPriceModifiers.average,0)
+    const totalCargoPriceModifier = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.cargoPriceMultipliers.average,0)
+    const totalSkillPriceModifier = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.skillPriceMultipliers.average,0)
 
     const averageInflation = totalInflation / gs.system.planets.length
     const averageTechnology = totalTechnology / gs.system.planets.length

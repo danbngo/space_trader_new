@@ -21,7 +21,7 @@ class IsolationismNews extends News {
                 education: CL.SLIGHTLY_LOW,
                 technology: CL.SLIGHTLY_LOW,
                 prestige: CL.SLIGHTLY_LOW,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_LOW]]),
+                cargoPriceMultipliers: new Map([[CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_LOW]]),
                 forceWithdrawal: true,
             })
         ]

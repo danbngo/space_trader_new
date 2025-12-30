@@ -12,7 +12,7 @@ class RevivalNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 education: CL.LOW,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.HOLOCUBES, CL.VERY_HIGH], [CARGO_TYPES.ISOTOPES, CL.EXTREMELY_LOW]]),
+                cargoPriceMultipliers: new Map([[CARGO_TYPES.HOLOCUBES, CL.VERY_HIGH], [CARGO_TYPES.ISOTOPES, CL.EXTREMELY_LOW]]),
                 crime: CL.LOW,
                 corruption: CL.LOW,
                 //relationsReset: true

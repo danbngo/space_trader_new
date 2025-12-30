@@ -101,4 +101,8 @@ class Policies {
         /** @type {PolicyType} */
         this.foreign = foreign
     }
+
+    clone() {
+        return new Policies(this.economic, this.labor, this.social, this.foreign)
+    }
 }

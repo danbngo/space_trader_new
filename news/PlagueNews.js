@@ -17,7 +17,7 @@ class PlagueNews extends News {
                 education: CL.VERY_LOW,
                 inflation: CL.SLIGHTLY_HIGH,
                 reserves: CL.SLIGHTLY_LOW,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.MEDICINE, CL.EXTREMELY_HIGH]]),
+                cargoPriceMultipliers: new Map([[CARGO_TYPES.MEDICINE, CL.EXTREMELY_HIGH]]),
             })
         ]
 
@@ -36,7 +36,7 @@ class PlagueNews extends News {
                 industry: CL.NO_REGRESSION,
                 education: CL.NO_REGRESSION,
                 prestige: CL.VERY_LOW,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.MEDICINE, CL.NO_REGRESSION]]),
+                cargoPriceMultipliers: new Map([[CARGO_TYPES.MEDICINE, CL.NO_REGRESSION]]),
             })
         ]
     }

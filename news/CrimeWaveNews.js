@@ -14,7 +14,7 @@ class CrimeWaveNews extends News {
                 security: CL.LOW,
                 crime: CL.VERY_HIGH,
                 corruption: CL.HIGH,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, CL.EXTREMELY_LOW], [CARGO_TYPES.DRUGS, CL.EXTREMELY_LOW]]),
+                cargoPriceMultipliers: new Map([[CARGO_TYPES.WEAPONS, CL.EXTREMELY_LOW], [CARGO_TYPES.DRUGS, CL.EXTREMELY_LOW]]),
             })
         ]
 
@@ -22,7 +22,7 @@ class CrimeWaveNews extends News {
             new NewsEffect({
                 planet:this.planet,
                 security: CL.HIGH/CL.LOW,
-                cargoPriceModifiers: NewsEffect.getInvertedCargoPriceModifiers(this.startEffects[0].cargoPriceModifiers),
+                cargoPriceMultipliers: NewsEffect.getInvertedCargoPriceMultipliers(this.startEffects[0].cargoPriceMultipliers),
             })
         ]
 

@@ -24,7 +24,7 @@ class EmbargoNews extends News {
                 reserves: CL.LOW,
                 corruption: CL.HIGH,
                 crime: CL.LOW,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.WATER, CL.VERY_HIGH], [CARGO_TYPES.METAL, CL.VERY_HIGH]]),
+                cargoPriceMultipliers: new Map([[CARGO_TYPES.WATER, CL.VERY_HIGH], [CARGO_TYPES.METAL, CL.VERY_HIGH]]),
             })
         ]
 

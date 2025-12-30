@@ -10,7 +10,7 @@ class NewsEffect {
      * @param {Planet|null} [params.targetPlanet] - The target planet for relationship changes.
      * @param {GovernmentType|null} [params.newGovernmentType] - New government type to change to.
      * @param {RelationshipType|null} [params.newRelationship] - New relationship with target planet.
-     * @param {Civilization} [params.civilizationMultipliers] - Modifiers applied to all the planet's civ scores
+     * @param {Civilization} [params.civilizationMultipliers] - Multipliers applied to all the planet's civ scores
      * @param {Building[]} [params.buildingsDisabled] - Buildings to disable.
      * @param {Building[]} [params.buildingsEnabled] - Buildings to enable.
      * @param {boolean} [params.relationsReset] - Whether to reset all relationships to neutral.
@@ -26,7 +26,7 @@ class NewsEffect {
         // Relationship changes
         newRelationship = null,
         
-        civilizationMultipliers = new Civilization(),
+        civilizationMultipliers = null,
         
         // Building changes
         buildingsDisabled = [],
@@ -67,7 +67,7 @@ class NewsEffect {
         this.civilizationMultipliers = civilizationMultipliers;
     }
 
-    apply(elapsedYears = 0) {
+    apply() {
         const {planet, targetPlanet, newGovernmentType, newRelationship, 
             buildingsDisabled, buildingsEnabled, relationsReset, forcePeace, forceWithdrawal, onApply,
             civilizationMultipliers} = this;
@@ -77,7 +77,9 @@ class NewsEffect {
             const {civilization} = planet
             civilization.governmentType = newGovernmentType || civilization.governmentType;
 
-            civilization.multiply(civilizationMultipliers);
+            if (civilizationMultipliers) {
+                civilization.multiply(civilizationMultipliers);
+            }
            
             //FIRST end any wars to let their completeEffects run
             if (forcePeace) {
@@ -155,7 +157,7 @@ class NewsEffect {
         
         if (planet && planet.civilization) {
             const {civilization} = planet
-            const {reserves, army, navy, crime, corruption, territory, population, culture, inflation, security, economy, industry, wealth, technology, education, prestige, cargoPriceModifiers, } = this.civilizationMultipliers
+            const {reserves, army, navy, crime, corruption, territory, population, culture, inflation, security, economy, industry, wealth, technology, education, prestige, cargoPriceMultipliers, } = this.civilizationMultipliers
             if (newGovernmentType) msg += `- GovernmentType: ${coloredName(civilization.governmentType)} ➜ ${coloredName(newGovernmentType)}.<br/>`
             if (relationsReset) msg += `- All relationships reset to neutral.<br/>`
             if (forcePeace) msg += `- All hostilities towards this planet have ceased.<br/>`
@@ -172,8 +174,8 @@ class NewsEffect {
                 msg += `${colorSpan(`- ${building.buildingType.name} built`, COLORS.Green)}<br/>`
             }
 
-            for (const [cargoType, modifier] of cargoPriceModifiers.counts) {
-                msg += `- Demand for ${cargoType.name}: ${civilization.cargoPriceModifiers.getAmount(cargoType)}x ➜ ${civilization.cargoPriceModifiers.getAmount(cargoType)*modifier}x.<br/>`
+            for (const [cargoType, modifier] of cargoPriceMultipliers.counts) {
+                msg += `- Demand for ${cargoType.name}: ${civilization.cargoPriceMultipliers.getAmount(cargoType)}x ➜ ${civilization.cargoPriceMultipliers.getAmount(cargoType)*modifier}x.<br/>`
             }
 
             if (population !== 1.0) msg += `- Population: ${describePopulation(civilization.population)} ➜ ${describePopulation(civilization.population*population)}.<br/>`

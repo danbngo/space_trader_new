@@ -19,7 +19,7 @@ class CivilStrifeNews extends News {
                 reserves: CL.LOW,
                 prestige: CL.SLIGHTLY_LOW,
                 crime: CL.HIGH,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, CL.VERY_HIGH]]),
+                cargoPriceMultipliers: new Map([[CARGO_TYPES.WEAPONS, CL.VERY_HIGH]]),
             })
         ]
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())

@@ -21,11 +21,11 @@ function generateCivilization(planet = new Planet()) {
     const wealth = rng(8,1,false)/4
     const reserves = rng(8,1,false)/4
     const inflation = rng(8,1,false)/4
-    const taxes = rng(MAX_TAX_RATE, 0, false)
+    const taxes = rng(8,1,false)/4
 
-    const cargoPriceModifiers = new CountsMap()
+    const cargoPriceMultipliers = new CountsMap()
     for (const ct of CARGO_TYPES_ALL) {
-        cargoPriceModifiers.setAmount(ct, rng(MARKET_MAX_CARGO_PRICE_MODIFIER, MARKET_MIN_CARGO_PRICE_MODIFIER, false))
+        cargoPriceMultipliers.setAmount(ct, rng(MARKET_MAX_CARGO_PRICE_MODIFIER, MARKET_MIN_CARGO_PRICE_MODIFIER, false))
     }
 
     // Generate random policies that are valid for this government type
@@ -52,7 +52,7 @@ function generateCivilization(planet = new Planet()) {
     )
 
     return new Civilization({
-        planet, governmentType, cargoPriceModifiers, technology, education, territory, population,
+        planet, governmentType, cargoPriceMultipliers, technology, education, territory, population,
          army, navy, industry, economy, security, culture, prestige, corruption, crime, policies,
          wealth, reserves, inflation, taxes
     })

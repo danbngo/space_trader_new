@@ -14,7 +14,7 @@ class TerraformingNews extends News {
                 education: CL.LOW,
                 wealth: CL.LOW,
                 navy: CL.SLIGHTLY_LOW,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.METAL, CL.VERY_HIGH], [CARGO_TYPES.NANITES, CL.VERY_HIGH]]),
+                cargoPriceMultipliers: new Map([[CARGO_TYPES.METAL, CL.VERY_HIGH], [CARGO_TYPES.NANITES, CL.VERY_HIGH]]),
             })
         ]
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
@@ -34,7 +34,7 @@ class TerraformingNews extends News {
                 education: CL.NO_REGRESSION,
                 wealth: CL.NO_REGRESSION,
                 prestige: CL.LOW,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.METAL, CL.NO_REGRESSION], [CARGO_TYPES.NANITES, CL.NO_REGRESSION]]),
+                cargoPriceMultipliers: new Map([[CARGO_TYPES.METAL, CL.NO_REGRESSION], [CARGO_TYPES.NANITES, CL.NO_REGRESSION]]),
             })
         ]
     }

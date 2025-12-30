@@ -16,7 +16,7 @@ class ColonizationNews extends News {
                 navy: CL.VERY_LOW, // ships sent to colonize
                 technology: CL.LOW,
                 reserves: CL.LOW,
-                cargoPriceModifiers: new Map([[CARGO_TYPES.METAL, CL.VERY_HIGH], [CARGO_TYPES.ISOTOPES, CL.EXTREMELY_HIGH]]),
+                cargoPriceMultipliers: new Map([[CARGO_TYPES.METAL, CL.VERY_HIGH], [CARGO_TYPES.ISOTOPES, CL.EXTREMELY_HIGH]]),
                 wealth: CL.LOW, // funding colonization
             })
         ]
@@ -26,13 +26,13 @@ class ColonizationNews extends News {
             economy: CL.HIGH,
             industry: CL.HIGH,
             territory: CL.HIGH,
-            cargoPriceModifiers: NewsEffect.getInvertedCargoPriceModifiers(this.startEffects[0].cargoPriceModifiers),
+            cargoPriceMultipliers: NewsEffect.getInvertedCargoPriceMultipliers(this.startEffects[0].cargoPriceMultipliers),
         })
 
         this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
-                cargoPriceModifiers: NewsEffect.getInvertedCargoPriceModifiers(this.startEffects[0].cargoPriceModifiers),
+                cargoPriceMultipliers: NewsEffect.getInvertedCargoPriceMultipliers(this.startEffects[0].cargoPriceMultipliers),
             })
         ]
     }
