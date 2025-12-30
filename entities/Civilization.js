@@ -29,13 +29,15 @@ class Civilization {
      * @param {number} [params.reserves] - Higher reserves means more goods in markets, but lower prices
      * @param {number} [params.inflation] - Higher costs for everything but also higher sales prices in market
      * @param {number} [params.taxes] - Tax rate applied to most transactions (0 to MAX_TAX_RATE).
+     * @param {CountsMap} [params.religions] - Religious representation on this planet (Religion -> adherent population ratio).
      * 
      */
     constructor({
         planet = null, governmentType = null, cargoPriceMultipliers = new CountsMap(), skillPriceMultipliers = new CountsMap(),
         technology = 1.0, education = 1.0, territory = 1, population = 1, industry = 1,
         economy = 1, security = 1, culture = 1, prestige = 1, policies = new Policies(),
-        navy = 1, army = 1, corruption = 1, crime = 1, wealth = 1, reserves = 1, inflation = 1, taxes = 1
+        navy = 1, army = 1, corruption = 1, crime = 1, wealth = 1, reserves = 1, inflation = 1, taxes = 1,
+        religions = new CountsMap()
     } = {}) {
         /** @type {Planet} */
         this.planet = planet;
@@ -49,6 +51,8 @@ class Civilization {
         this.cargoPriceMultipliers = cargoPriceMultipliers
         /** @type {CountsMap} */
         this.skillPriceMultipliers = skillPriceMultipliers
+        /** @type {CountsMap} */
+        this.religions = religions
         /** @type {number} */
         this.territory = territory; //AUs, recall that neptune is 30. encounters for this civilization can be found further from its planet
         /** @type {number} */
@@ -140,6 +144,7 @@ class Civilization {
             policies: this.policies.clone(),
             cargoPriceMultipliers: this.cargoPriceMultipliers.clone(),
             skillPriceMultipliers: this.skillPriceMultipliers.clone(),
+            religions: this.religions.clone(),
             governmentType: this.governmentType,
         })
         for (const cr of CIVILIZATION_RATINGS_ALL) {

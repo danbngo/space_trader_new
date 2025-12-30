@@ -1,16 +1,46 @@
 /**
+ * Creates an HTML table displaying available officers for hire at academy/tavern.
+ * @param {Officer[]} officers - Array of officers available for hire.
+ * @param {Academy} academy - The academy building.
+ * @param {(officer: Officer) => void} onSelectOfficer - Callback when an officer is selected.
+ * @returns {HTMLTableElement|string} The table element or "(None)" if no officers.
+ */
+function createAcademyHireOfficerMenu(officers = [new Officer()], academy = new Academy(), onSelectOfficer = (officer = new Officer())=>{}) {
+    if (officers.length == 0) return `(None)`
+    const rows = [
+        ['Name', 'Age', 'Level', 'CR Share', ...SKILLS_ALL, 'Implants', 'Hire Price']
+    ]
+    for (const officer of officers) {
+        const hirePrice = academy.calcHirePrice(officer)
+        const implantCount = officer.implants.length
+        rows.push([
+            officer.name,
+            officer.age,
+            statColorSpan(officer.level, officer.level/5),
+            statColorSpan(officer.crShare*100+'%', 5/officer.level),
+            ...SKILLS_ALL.map(sk=>statColorSpan(officer.skills.getAmount(sk), officer.skills.getAmount(sk)*SKILLS_ALL.length/5/SKILL_POINTS_PER_LEVEL)),
+            implantCount > 0 ? colorSpan(''+implantCount, COLORS.Cyan) : colorSpan('-', COLORS.Gray),
+            statColorSpan(hirePrice, officer.value/hirePrice)
+        ])
+    }
+    return createTable(rows, (rowIndex = 0)=>onSelectOfficer(officers[rowIndex]))
+}
+
+/**
  * Displays the academy menu where the player can upgrade captain skills.
  * @param {Academy} academy - The academy building to interact with.
  * @param {SkillType} selectedSkill - The currently selected skill to highlight (member of SKILLS_ALL).
+ * @param {boolean} showHiring - Whether to show the hiring tab instead of training.
  */
-function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0]) {
+function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0], showHiring = false) {
     const {planet} = academy
-    const reloadMenu = (skill = selectedSkill) => showAcademyMenu(academy, skill)
+    const reloadMenu = (skill = selectedSkill, hiring = showHiring) => showAcademyMenu(academy, skill, hiring)
     const isDocked = gs.location == planet
     
     const buildingName = academy.isTavern ? 'Tavern' : 'Academy'
     const trainVerb = academy.isTavern ? 'Practice' : 'Train'
     const welcomeMsg = academy.isTavern ? 'Welcome to the tavern. Select a skill to practice:' : 'Welcome to the academy. Select a skill to train:'
+    const hireMsg = academy.isTavern ? 'Available mercenaries for hire:' : 'Available officers for hire:'
 
     function upgradeSkill(skill = SKILLS_ALL[0]) {
         const cost = academy.calcSkillUpgradeCost(gs.captain, skill)
@@ -46,7 +76,49 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0])
         
         const buttons = [
             ...(isDocked ? [['Upgrade', () => showUpgradeConfirmation(skill), !canTrain]] : []),
+            ['Hire Officers', () => reloadMenu(skill, true)],
             ['Back', () => showPlanetMenu(planet)]
+        ]
+        refreshPanelButtons('academy_panel', buttons)
+    }
+
+    function hireOfficer(officer = new Officer()) {
+        const hirePrice = academy.calcHirePrice(officer)
+        gs.credits -= hirePrice
+        gs.fleet.addOfficer(officer)
+        safeRemove(academy.officers, officer)
+        reloadMenu(selectedSkill, true)
+    }
+
+    function showHireOfficerModal(officer = new Officer()) {
+        const hirePrice = academy.calcHirePrice(officer)
+        const implantsText = officer.implants.length > 0 
+            ? '<br/><b>Cybernetic Implants:</b><br/>' + officer.implants.map(i => colorSpan(i.implantType.name, i.implantType.color) + ` (${roundToPlaces(i.quality*100, 1)}%)`).join(', ')
+            : ''
+        const fameText = officer.fame.total > 0 
+            ? `<br/><b>Fame:</b> ${officer.fame.total} (${coloredName(officer.fame.keys[0])})`
+            : ''
+        const infamyText = officer.infamy.total > 0 
+            ? `<br/><b>Infamy:</b> ${officer.infamy.total} (${coloredName(officer.infamy.keys[0])})`
+            : ''
+        
+        showModal(
+            `Hire ${officer.name}?`,
+            `Hire ${officer.name} for ${hirePrice} credits?<br/><br/><b>Level:</b> ${officer.level}<br/><b>Skills:</b> ${SKILLS_ALL.map(sk => `${sk}: ${officer.skills.getAmount(sk)}`).join(', ')}${implantsText}${fameText}${infamyText}`,
+            [
+                ['Hire', () => hireOfficer(officer)],
+                ['Cancel', () => reloadMenu(selectedSkill, true)],
+            ],
+        )
+    }
+
+    function onSelectOfficer(officer = new Officer()) {
+        const hirePrice = academy.calcHirePrice(officer)
+        const canHire = isDocked && gs.credits >= hirePrice && gs.fleet.officers.length < gs.captain.maxSubordinates
+        const buttons = [
+            ...(canHire ? [['Hire', ()=>showHireOfficerModal(officer)]] : []),
+            ['Train Skills', () => reloadMenu(selectedSkill, false)],
+            ['Back', () => showPlanetMenu(planet)],
         ]
         refreshPanelButtons('academy_panel', buttons)
     }
@@ -76,7 +148,7 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0])
 
     const skillTable = createTable(skillTableRows, (rowIndex) => onSelectSkill(SKILLS_ALL[rowIndex]), selectedSkill ? SKILLS_ALL.indexOf(selectedSkill) + 1 : null)
 
-    let infoContainer = ce({
+    let trainingContainer = ce({
         children: [
             `<br/>${isDocked ? welcomeMsg : colorSpan(academy.isTavern ? 'You must dock to use the tavern.' : 'You must dock to use the academy.', COLORS.Yellow)}`,
             skillTable,
@@ -85,25 +157,36 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0])
         ]
     })
 
+    let hiringContainer = ce({
+        children: [
+            `<br/>${isDocked ? hireMsg : colorSpan(academy.isTavern ? 'You must dock to use the tavern.' : 'You must dock to use the academy.', COLORS.Yellow)}<br/>`,
+            createAcademyHireOfficerMenu(academy.officers, academy, (officer)=>onSelectOfficer(officer)),
+            `Your # officers: ${gs.fleet.officers.length}/${gs.captain.maxSubordinates} | Your credits: ${gs.credits}<br/>`,
+            `Local Officer Level: ${roundToPlaces(100*academy.planet.c.education, 2)}%<br/>`,
+            `Hire Fee: ${academy.isTavern ? colorSpan('None', COLORS.Green) : statColorSpan(roundToPlaces(100*planet.c.taxRate, 2), 2/(1+planet.c.taxRate))+'%'}<br/>`,
+        ]
+    })
+
     showPlanetModal(
         planet,
         `${coloredName(planet)} - ${buildingName}`,
         ce({
             children:[
-                infoContainer,
+                showHiring ? hiringContainer : trainingContainer,
             ]
         }),
         [
+            [showHiring ? 'Train Skills' : 'Hire Officers', ()=>reloadMenu(selectedSkill, !showHiring)],
             ['Back', ()=>showPlanetMenu(planet)]
         ],
         'academy_panel',
         (nextPlanet) => {
             const nextAcademy = academy.isTavern ? nextPlanet.settlement?.tavern : nextPlanet.settlement?.academy
-            return nextAcademy ? showAcademyMenu(nextAcademy) : showPlanetMenu(nextPlanet)
+            return nextAcademy ? showAcademyMenu(nextAcademy, selectedSkill, showHiring) : showPlanetMenu(nextPlanet)
         }
     );
 
-    if (selectedSkill) {
+    if (selectedSkill && !showHiring) {
         onSelectSkill(selectedSkill);
     }
 }

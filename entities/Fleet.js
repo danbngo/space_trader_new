@@ -33,6 +33,8 @@ class Fleet extends SpaceObject {
         this.route = null //could be Route class
         /** @type {FactionType} */
         this.faction = null;
+        /** @type {FleetAI} */
+        this.fleetAI = null;
     }
 
     dock(planet) {

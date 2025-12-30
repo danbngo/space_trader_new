@@ -7,9 +7,10 @@ class Academy extends Building {
     /**
      * @param {Planet} planet - The planet this academy is on.
      * @param {boolean} isTavern - Whether this is a tavern (less formal training establishment).
+     * @param {Moon} moon - The moon this building is on (null if on planet surface).
      */
-    constructor(planet = new Planet(), isTavern = false) {
-        super(planet, BUILDING_TYPES.ACADEMY)
+    constructor(planet = new Planet(), isTavern = false, moon = null) {
+        super(planet, BUILDING_TYPES.ACADEMY, moon)
         /** @type {boolean} */
         this.isTavern = isTavern;
         /** @type {Officer[]} */
@@ -46,7 +47,9 @@ class Academy extends Building {
             this.officers.splice(0, officerDiffFromBase)
         } else if (officerDiffFromBase < 0) {
             for (let i = 0; i < -officerDiffFromBase; i++) {
-                this.officers.push(generateOfficer(this.planet))
+                // Tavern officers: cyber implants (0-3), fame + infamy
+                // Academy officers: no implants, no reputation
+                this.officers.push(generateOfficer(this.planet, this.isTavern, this.isTavern ? 'both' : null))
             }
         }
     }

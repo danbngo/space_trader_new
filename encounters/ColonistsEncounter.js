@@ -24,29 +24,28 @@ class ColonistsEncounter extends NeutralsEncounter {
      * @override
      */
     onStart() {
-        if (this.luck[0] * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > this.fleet.totalRadar) {
+        if (Math.random() * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > this.fleet.totalRadar) {
             showModal(coloredName(this.fleet), 'Your long range sensors detect a colonist fleet before they detect you.<br/>You manage to approach them stealthily.', [
                 ['View', ()=>closeModal()],
                 ['Bypass', ()=>this.endEncounter()],
                 ['Hail', ()=>{
-                    this.luck[0] = 0
                     this.onStart()
                 }],
-                ['Sneak Attack', ()=>this.showPlayerAttackFleetModal(-1, 1, false, true)],
+                ['Sneak Attack', ()=>this.showPlayerAttackNeutralsModal(true)],
             ])
         }
-        else if (this.luck[1] * gs.captain.calcInfamyForPlanet(this.planet) > 200) {
+        else if (Math.random() * gs.captain.calcInfamyForPlanet(this.planet) > 200) {
             showModal(coloredName(this.fleet), 'The colonists have heard of your fearsome deeds and start fleeing immediately!', [
                 ['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackFleetModal(-1, 1, false, true)],
+                ['Attack', ()=>this.showPlayerAttackNeutralsModal()],
             ])
         }
         else {
             showModal(coloredName(this.fleet), 'The colonists send a friendly greeting and wave as they continue on their journey.', [
                 ['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackFleetModal(-1, 1, false, true)],
+                ['Attack', ()=>this.showPlayerAttackNeutralsModal()],
             ])
         }
     }

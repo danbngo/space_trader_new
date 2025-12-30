@@ -78,9 +78,11 @@ const META_NEWS_TYPE_CLASSES_ARRAY = Object.freeze(META_NEWS_TYPE_CLASSES.map(pa
  * @returns {News|null} The generated news event or null if unable to generate.
  */
 function generateNews(attemptsRemaining = 100, weights = []) {//only needs to be computed once) {
-    const planets = PLANETS
+    // Exclude dwarf planets - they are small outposts that don't trigger major news events
+    const planets = PLANETS.filter(p => !isDwarfPlanet(p))
+    if (planets.length === 0) return null // No valid planets
     const planet = rndMember(planets)
-    const targetPlanet = rndMember(PLANETS.filter(p=>(p !== planet)))
+    const targetPlanet = rndMember(planets.filter(p=>(p !== planet)))
     
     // Use weighted selection based on news type weights, with 3x multiplier for favorite govs
     if (weights.length == 0) weights = NEWS_TYPE_CLASSES.map(([newsType, cls]) => {

@@ -16,9 +16,11 @@ function generateOfficerName(planet = new Planet()) {
 /**
  * Generates an officer with skills based on planet quality.
  * @param {Planet} planet - The planet the officer is from.
+ * @param {boolean} withImplants - Whether to generate cyber implants (for tavern hires).
+ * @param {string|null} reputationType - 'fame' for guild officers, 'both' for tavern officers, null for none.
  * @returns {Officer} The generated officer.
  */
-function generateOfficer(planet = new Planet()) {
+function generateOfficer(planet = new Planet(), withImplants = false, reputationType = null) {
     const {civilization} = planet
     const {education} = civilization
     const level = rng(10*education, 1)
@@ -42,6 +44,39 @@ function generateOfficer(planet = new Planet()) {
     
     // Assign CITIZEN rank to planet of origin
     officer.ranks.set(planet, RANK_TYPES.CITIZEN)
+
+    // Add cyber implants if from tavern (0-3 random implants)
+    if (withImplants && CYBER_IMPLANT_TYPES_ALL) {
+        const numImplants = rng(3, 0)
+        const availableImplants = [...CYBER_IMPLANT_TYPES_ALL]
+        for (let i = 0; i < numImplants && availableImplants.length > 0; i++) {
+            const implantIndex = rng(availableImplants.length - 1, 0)
+            const implantType = availableImplants[implantIndex]
+            const quality = rng(1, 0.5, false)
+            officer.implants.push(new CyberImplant(implantType, quality))
+            // Remove to avoid duplicates
+            availableImplants.splice(implantIndex, 1)
+        }
+    }
+
+    // Add reputation for home planet (capped at 50 * level)
+    if (reputationType) {
+        const maxReputation = 50 * officer.level
+        
+        if (reputationType === 'fame' || reputationType === 'both') {
+            const fame = rng(maxReputation, 0)
+            if (fame > 0) {
+                officer.fame.increment(planet, fame)
+            }
+        }
+        
+        if (reputationType === 'both') {
+            const infamy = rng(maxReputation, 0)
+            if (infamy > 0) {
+                officer.infamy.increment(planet, infamy)
+            }
+        }
+    }
 
     return officer
 }

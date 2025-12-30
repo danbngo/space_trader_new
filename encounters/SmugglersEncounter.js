@@ -4,25 +4,24 @@
  */
 class SmugglersEncounter extends MercantileEncounter {
     onStart() {
-        if (this.luck[0] * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > this.fleet.totalRadar) {
+        if (Math.random() * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > this.fleet.totalRadar) {
             showModal(coloredName(this.fleet), 'Your long range sensors detect a smuggler fleet before they detect you.<br/>You manage to approach them stealthily.', [
                 ['View', ()=>closeModal()],
                 ['Bypass', ()=>this.endEncounter()],
                 ['Hail', ()=>{
-                    this.luck[0] = 0
                     this.onStart()
                 }],
                 ['Sneak Attack', ()=>this.showPlayerAttackFleetModal(1, 0, false, true)],
             ])
         }
-        else if (this.luck[1] * gs.captain.calcFameForPlanet(this.planet) > 100) {
+        else if (Math.random() * gs.captain.calcFameForPlanet(this.planet) > 100) {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} have heard of your hostility towards the criminal community and quickly flee!`, [
                 ['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],
                 ['Attack', ()=>this.showPlayerAttackFleetModal(1, 0, false, true)],
             ])
         }
-        else if (this.luck[2] > .5) {
+        else if (Math.random() > .5) {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} broadcast a rather seedy invitation to peruse their illicit wares.`, [
                 ['View', ()=>closeModal()],
                 ['Trade', ()=>this.showTradeOfferModal(false)],

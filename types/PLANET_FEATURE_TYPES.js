@@ -62,6 +62,8 @@ const PLANET_FEATURE_TYPES = Object.freeze({
     METHANE_ATMOSPHERE: new PlanetFeatureType("Methane Atmosphere", "Atmosphere dominated by methane", COLORS.Orange),
     NITROGEN_ATMOSPHERE: new PlanetFeatureType("Nitrogen Atmosphere", "Thick nitrogen atmosphere", COLORS.Blue),
     WATER_ICE_SURFACE: new PlanetFeatureType("Water Ice Surface", "Surface covered in frozen water", COLORS.White),
+
+    ICE_GEYSERS: new PlanetFeatureType("Ice Geysers", "Cryovolcanic geysers ejecting water ice and vapor", COLORS.LightBlue),
 });
 
 const PLANET_FEATURE_TYPES_ALL = Object.values(PLANET_FEATURE_TYPES);

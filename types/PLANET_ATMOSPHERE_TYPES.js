@@ -24,11 +24,13 @@ class PlanetAtmosphereType {
 const PLANET_ATMOSPHERE_TYPES = Object.freeze({
     NONE: new PlanetAtmosphereType("No Atmosphere", "Airless body with no significant atmosphere", COLORS.Gray),
     OXYGEN_NITROGEN: new PlanetAtmosphereType("Oxygen-Nitrogen", "Breathable atmosphere dominated by nitrogen and oxygen", COLORS.LightBlue),
-    CARBON_DIOXIDE: new PlanetAtmosphereType("Carbon Dioxide", "Dense CO₂ atmosphere, often with greenhouse heating", COLORS.Orange),
+    CARBONACEOUS_DIOXIDE: new PlanetAtmosphereType("Carbon Dioxide", "Dense CO₂ atmosphere, often with greenhouse heating", COLORS.Orange),
     HYDROGEN_HELIUM: new PlanetAtmosphereType("Hydrogen-Helium", "Primordial atmosphere of light gases typical of gas giants", COLORS.Yellow),
     METHANE: new PlanetAtmosphereType("Methane", "Methane-rich atmosphere giving a blue-green appearance", COLORS.Cyan),
     NITROGEN: new PlanetAtmosphereType("Nitrogen", "Nitrogen-dominated atmosphere", COLORS.Blue),
     SULFURIC_ACID: new PlanetAtmosphereType("Sulfuric Acid Clouds", "Thick clouds of sulfuric acid droplets", COLORS.Yellow),
+    SULFUR_DIOXIDE: new PlanetAtmosphereType("Sulfur Dioxide", "TBA", COLORS.Yellow),
+    OXYGEN: new PlanetAtmosphereType("Oxygen", "TBA", COLORS.White),
     AMMONIA: new PlanetAtmosphereType("Ammonia", "Ammonia-rich atmosphere with distinctive clouds", COLORS.LightOrange),
     WATER_VAPOR: new PlanetAtmosphereType("Water Vapor", "Steam atmosphere from extreme heat", COLORS.White),
 });

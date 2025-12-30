@@ -4,43 +4,42 @@
  */
 class PoliceEncounter extends AuthoritiesEncounter {
     onStart() {
-        if (this.luck[0] * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > this.fleet.totalRadar) {
+        if (Math.random() * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > this.fleet.totalRadar) {
             showModal(coloredName(this.fleet), `Your long range sensors detect a ${coloredName(this.fleet)} fleet before they detect you.<br/>You manage to approach the ${coloredName(this.fleet)} stealthily.`, [
                 ['View', ()=>closeModal()],
                 ['Bypass', ()=>this.endEncounter()],
                 ['Hail', ()=>{
-                    this.luck[0] = 0
                     this.onStart()
                 }],
-                ['Sneak Attack', ()=>this.showPlayerAttackFleetModal(-2, 2, false, false)],
+                ['Sneak Attack', ()=>this.showPlayerAttackFleetModal(-5, 2, true)],
             ])
         }
-        else if (this.luck[1]*gs.captain.calcReputationForPlanet(this.planet) > 200) {
+        else if (Math.random()*gs.captain.calcReputationForPlanet(this.planet) > 200) {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} greet you respectfully, having heard of your good deeds.<br/>They don't even trouble you with the routine inspection.`, [
                 ['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackFleetModal(-2, 2, false, false)],
+                ['Attack', ()=>this.showPlayerAttackFleetModal(-5, 2, false)],
             ])
         }
-        if (this.luck[2]*gs.captain.calcInfamyForPlanet(this.planet) > 50 && gs.captain.calcBountyForPlanet(this.planet) > 0) {
+        if (Math.random()*gs.captain.calcInfamyForPlanet(this.planet) > 50 && gs.captain.calcBountyForPlanet(this.planet) > 0) {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} activate their sirens the instant you pass by!<br/>It seems your bad reputation has preceded you.`, [
                 ['View', ()=>closeModal()],
                 ['Surrender', ()=>this.onSurrender()],
-                ['Resist', ()=>this.showPlayerRefuseSurrenderModal(-2, 2)],
+                ['Resist', ()=>this.showPlayerRefuseSurrenderModal(-5, 2)],
             ])
         }
-        else if (this.luck[3] < 0.5) {
+        else if (Math.random() < 0.5) {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} ships pull alongside your fleet and order you to submit to a routine inspection.`, [
                 ['View', ()=>closeModal()],
                 ['Accept', ()=>this.showPlayerPoliceInspectionModal()],
-                ['Resist', ()=>this.showPlayerRefuseSurrenderModal(-2, 2)],
+                ['Resist', ()=>this.showPlayerRefuseSurrenderModal(-5, 2)],
             ])
         }
         else {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} ships speed past your fleet, perhaps responding to some other incident.`, [
                 ['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackFleetModal(-2, 2, false, false)],
+                ['Attack', ()=>this.showPlayerAttackFleetModal(-5, 2, false)],
             ])
         }
     }

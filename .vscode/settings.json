@@ -1,0 +1,4 @@
+{
+    "github.copilot.chat.maxTokens": 1600000,
+    "github.copilot.chat.maxTurns": 5000
+}

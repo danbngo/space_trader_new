@@ -4,36 +4,35 @@
  */
 class PiratesEncounter extends FleetEncounter {
     onStart() {
-        if (this.luck[0] * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > this.fleet.totalRadar) {
+        if (Math.random() * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > this.fleet.totalRadar) {
             showModal(coloredName(this.fleet), `Your long range sensors detect a ${coloredName(this.fleet)} fleet before they detect you.<br/>You manage to approach the ${coloredName(this.fleet)} stealthily.`, [
                 ['View', ()=>closeModal()],
                 ['Bypass', ()=>this.endEncounter()],
                 ['Hail', ()=>{
-                    this.luck[0] = 0
                     this.onStart()
                 }],
-                ['Sneak Attack', ()=>this.showPlayerAttackFleetModal(1, 0, false, false)],
+                ['Sneak Attack', ()=>this.showPlayerAttackFleetModal(5, 0, true)],
             ])
         }
-        else if (this.luck[1] * gs.captain.calcReputationForPlanet(this.planet) > 200) {
+        else if (Math.random() * gs.captain.calcReputationForPlanet(this.planet) > 200) {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} are in awe of your fearsome exploits! They broadcast a merry jig and salute you while you pass.`, [
                 ['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackFleetModal(1, 0, false, true)],
+                ['Attack', ()=>this.showPlayerAttackFleetModal(5, 0)],
             ])
         }
-        else if (this.luck[2] < 0.5) {
+        else if (Math.random() < 0.5) {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} fire warning shots at your ship!<br/>They demand you surrender and prepare to be boarded!`, [
                 ['View', ()=>closeModal()],
                 ['Surrender', ()=>this.onSurrender()],
-                ['Resist', ()=>this.showPlayerRefuseSurrenderModal(1, 0)],
+                ['Resist', ()=>this.showPlayerRefuseSurrenderModal(5, 0)],
             ])
         }
         else {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} broadcast insults and jeers at your fleet, but let you pass regardless.`, [
                 ['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackFleetModal(1, 0, false, false)],
+                ['Attack', ()=>this.showPlayerAttackFleetModal(5, 0)],
             ])
         }
     }

@@ -83,4 +83,19 @@ class NeutralsEncounter extends FleetEncounter {
             }]
         ])
     }
+
+    showPlayerAttackNeutralsModal(sneakAttack = false) {
+        this.showPlayerAttackFleetModal(-1, -1, sneakAttack, ()=>{
+                let combatAdvantage = gs.fleet.combatRating / gs.encounter.fleet.combatRating
+                //combat advantage should vary from 0.5 its original amount to 2x based on the player's infamy
+                combatAdvantage *= 2 - (75/(50 + gs.captain.calcInfamyForPlanet(gs.encounter.fleet.planet))) //approaches 2x as infamy increases
+                if (combatAdvantage * Math.random() > 1.5) {
+                    this.showNeutralsBribePlayerModal(gs.encounter.fleet.captain.credits)
+                }
+                else {
+                    this.startCombat(true)
+                }
+            }
+        )
+    }
 }

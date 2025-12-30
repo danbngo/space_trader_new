@@ -7,9 +7,10 @@ class Market extends Building {
     /**
      * @param {Planet} planet - The planet this market is on.
      * @param {boolean} blackMarket - Whether this is a black market (illegal goods).
+     * @param {Moon} moon - The moon this building is on (null if on planet surface).
      */
-    constructor(planet = new Planet(), blackMarket = false) {
-        super(planet, BUILDING_TYPES.MARKET)
+    constructor(planet = new Planet(), blackMarket = false, moon = null) {
+        super(planet, BUILDING_TYPES.MARKET, moon)
         /** @type {boolean} */
         this.blackMarket = blackMarket;
         /** @type {CountsMap} */

@@ -10,6 +10,19 @@ function showPlanetMenu(planet = new Planet()) {
         `You have arrived at ${coloredName(planet)}.<br/>`
         : ''+colorSpan(`You are scanning ${coloredName(planet)}.<br/>`, COLORS.Yellow)
 
+    // Check if planet is closed
+    if (planet.closed) {
+        msg += colorSpan(`⚠ ${planet.name} is currently inaccessible!<br/>`, COLORS.Orange)
+    }
+
+    // Check for closed moons
+    const planetMoons = planet.children ? planet.children.filter(child => child instanceof Moon) : []
+    for (const moon of planetMoons) {
+        if (moon.closed) {
+            msg += colorSpan(`⚠ ${moon.name} is currently inaccessible!<br/>`, COLORS.Orange)
+        }
+    }
+
         if (isDocked) {
         console.log('1')
         const damagedShips = gs.fleet.ships.filter(s=>s.isDamaged())
@@ -57,8 +70,28 @@ function showPlanetMenu(planet = new Planet()) {
     options.push(ce({tag:'br'}));
     options.push(["News", () => showNewsTimelineMenu(planet, () => showPlanetMenu(planet))]);
     options.push([`Overview`, () => showPlanetSocietyMenu(planet)]);
+    if (planet.children && planet.children.length > 0) {
+        options.push(["Moons", () => showMoonsMenu(planet)]);
+    }
     options.push([isDocked ? "Depart" : "Stop Scanning", () => closeModal()]);
     showPlanetModal(planet, `${coloredName(planet)}`, msg, options, 'planet_menu', (nextPlanet) => showPlanetMenu(nextPlanet));
+}
+
+/**
+ * Displays a menu listing all moons of a planet.
+ * @param {Planet} planet - The planet whose moons to display.
+ */
+function showMoonsMenu(planet = new Planet()) {
+    let msg = `${coloredName(planet)} has ${planet.children.length} major moon${planet.children.length > 1 ? 's' : ''}:<br/><br/>`
+    
+    const options = []
+    for (const moon of planet.children) {
+        options.push([moon.name, () => showPlanetMenu(moon)])
+    }
+    options.push(ce({tag:'br'}))
+    options.push(["Back", () => showPlanetMenu(planet)])
+    
+    showModal(`${coloredName(planet)} - Moons`, msg, options)
 }
 /**
  * Displays detailed information about a planet's civilization and statistics.

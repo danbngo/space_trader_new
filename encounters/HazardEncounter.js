@@ -114,5 +114,53 @@ class HazardEncounter extends Encounter {
         }
     }
 
+    //simulates the player auto-mining hazards with minimal risk
+    autoMineHazard() {
+        const {playerShips, enemyShips, enemyFleet} = this
+        
+        // Calculate light damage (10-20% of what manual mining would cause)
+        const maxDamage = enemyShips.reduce((sum, ship)=>sum + ship.hull[1]*ship.engine*0.001, 0);
+        const damage = rng(maxDamage * 0.2, maxDamage * 0.1, true)
+        console.log('autoMineHazard - gs.fleet.flagship hull before:', gs.fleet.flagship.hull[0], gs.fleet.flagship.hull[1]);
+        this.damageRandomly(playerShips, damage)
+        
+        // Calculate moderate loot (30-50% of what's available)
+        const totalCargoSpace = enemyShips.reduce((sum, ship)=>sum + ship.cargoSpace, 0)
+        const cargoRatio = rng(0.5, 0.3, false)
+        const maxLootAmt = Math.ceil(enemyFleet.cargo.total * cargoRatio)
+        const baseLootAmt = Math.ceil(maxLootAmt * 0.7) // 70% of max
+        const lootAmt = Math.floor(weightedAvg([baseLootAmt, maxLootAmt], [50, gs.fleet.totalSkills.getAmount(SKILLS.Salvage)]))
+        const loot = enemyFleet.cargo.randomSubset(lootAmt)
+        
+        // Award reduced experience
+        const expGained = Math.round(AVERAGE_EXP_FROM_MINING * 0.5)
+        
+        const disabledShips = playerShips.filter(s=>s.disabled)
+        const survivedShips = playerShips.filter(s=>!s.disabled)
+        for (const s of survivedShips) s.escaped = true
+        
+        console.log(`autoMineHazard`, {maxDamage, damage, lootAmt, disabledShips, playerShips});
+        console.log('autoMineHazard - gs.fleet.flagship hull after:', gs.fleet.flagship.hull[0], gs.fleet.flagship.hull[1]);
+        
+        let msg = `Your automated mining systems harvest the ${coloredName(enemyFleet)}.<br/>`
+        msg += gs.captain.grantExperience(expGained)
+        
+        if (disabledShips.length > 0) {
+            msg += `${disabledShips.length} of your ships were damaged during automated operations.<br/>`
+            msg += this.loseCargoFromDisabledShips(disabledShips)
+        }
+        
+        msg += this.conductRepairs()
+        
+        if (lootAmt > 0) {
+            msg += `Your automated systems recovered ${baseLootAmt} units of usable material.<br/>`
+            if (lootAmt > baseLootAmt) msg += `Your salvaging skills helped recover an additional ${lootAmt - baseLootAmt} units.<br/>`
+        }
+        
+        showModal(this.encounterType.name, msg, [
+            lootAmt > 0 ? ['Loot', ()=>showLootMenu(loot)] : ['Continue', ()=>this.endEncounter()]
+        ])
+    }
+
 
 }

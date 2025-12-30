@@ -6,9 +6,10 @@
 class Guild extends Building {
     /**
      * @param {Planet} planet - The planet this guild is on.
+     * @param {Moon} moon - The moon this building is on (null if on planet surface).
      */
-    constructor(planet = new Planet()) {
-        super(planet, BUILDING_TYPES.GUILD)
+    constructor(planet = new Planet(), moon = null) {
+        super(planet, BUILDING_TYPES.GUILD, moon)
         /** @type {Officer[]} */
         this.officers = []; // Officer[]
         /** @type {Contract[]} */
@@ -36,7 +37,8 @@ class Guild extends Building {
             this.officers.splice(0, officerDiffFromBase)
         } else if (officerDiffFromBase < 0) {
             for (let i = 0; i < -officerDiffFromBase; i++) {
-                this.officers.push(generateOfficer(this.planet))
+                // Guild officers have fame for their home planet
+                this.officers.push(generateOfficer(this.planet, false, 'fame'))
             }
         }
         

@@ -6,9 +6,10 @@
 class Shipyard extends Building {
     /**
      * @param {Planet} planet - The planet this shipyard is on.
+     * @param {Moon} moon - The moon this building is on (null if on planet surface).
      */
-    constructor(planet = new Planet()) {
-        super(planet, BUILDING_TYPES.SHIPYARD)
+    constructor(planet = new Planet(), moon = null) {
+        super(planet, BUILDING_TYPES.SHIPYARD, moon)
         /** @type {Ship[]} */
         this.ships = []; // Ship[]
         /** @type {ShipModule[]} */

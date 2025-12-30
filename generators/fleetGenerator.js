@@ -51,6 +51,18 @@ function generateFleet(fleetType = rndMember(FLEET_TYPES_ALL), planet = new Plan
     else if (fleetType === FLEET_TYPES.BOUNTY_HUNTERS) fleet.faction = FACTION_TYPES.BOUNTY_HUNTERS
     else if (fleetType === FLEET_TYPES.TOURISTS) fleet.faction = FACTION_TYPES.TOURISTS
 
+    // Assign AI to fleet
+    const fleetAIType = getFleetAITypeForFleetType(fleetType)
+    if (fleetAIType) {
+        // Pick a random destination planet (or null for miners who target asteroids)
+        let destinationPlanet = null
+        if (fleetType !== FLEET_TYPES.MINERS) {
+            const allPlanets = [...PLANETS, ...DWARF_PLANETS].filter(p => p !== planet)
+            destinationPlanet = allPlanets.length > 0 ? rndMember(allPlanets) : null
+        }
+        fleet.fleetAI = new fleetAIType.aiClass(fleet, planet, destinationPlanet)
+    }
+
     return fleet
 }
 

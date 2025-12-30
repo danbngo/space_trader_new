@@ -31,6 +31,8 @@ class Planet extends OrbitingObject {
         this.features = features
         /** @type {number} */
         this.dayLength = dayLength
+        /** @type {boolean} */
+        this.closed = false
     }
     get c() {
         return this.civilization

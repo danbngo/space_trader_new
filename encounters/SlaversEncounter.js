@@ -28,40 +28,29 @@ class SlaversEncounter extends FleetEncounter {
         console.log('SlaversEncounter.onStart')
         const {enemyFleet} = this
 
-        // Check if player avoided detection with stealth
-        if (chanceIn(500, gs.fleet.stealthLevel)) {
-            showModal('Evaded', ce({textContent: 
-                `You noticed the ${coloredName(enemyFleet)} on your scanners, ` +
-                `but your stealth systems prevented them from detecting you. ` +
-                `You slipped away before they could intercept you.`}),
-                [{text: 'Continue', onclick: ()=>closeModal()}]
-            )
-            // End encounter peacefully
-            for (const ship of this.playerShips) ship.escaped = true
-            return
+        if (Math.random() * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > this.fleet.totalRadar) {
+            showModal(coloredName(this.fleet), `Your long range sensors detect a ${coloredName(this.fleet)} fleet before they detect you.<br/>You manage to approach the ${coloredName(this.fleet)} stealthily.`, [
+                ['Bypass', ()=>this.endEncounter()],
+                ['Hail', ()=>{
+                    this.onStart()
+                }],
+                ['Sneak Attack', ()=>this.showPlayerAttackFleetModal(5, 0, true)],
+            ])
         }
-
-        // Check reputation with Slavers
-        const reputation = gs.captain.reputation.get(FACTION_TYPES.SLAVERS.name)
         
-        if (reputation > 20) {
+        else if (Math.random()*gs.captain.fame.getAmount(FACTION_TYPES.SLAVERS.name) > 250) {
             // Friendly - they let you pass
-            showModal('Recognized', ce({textContent: 
-                `The ${coloredName(enemyFleet)} recognize you as an ally. ` +
-                `They signal that you may pass freely.`}),
-                [{text: 'Continue', onclick: ()=>closeModal()}]
-            )
-            for (const ship of this.playerShips) ship.escaped = true
-            return
+            showModal('Recognized', `The ${coloredName(enemyFleet)} recognize you as an ally.<br/>They signal that you may pass freely.`,
+            [
+                ['Ignore', ()=>this.endEncounter()],
+                ['Attack', ()=>this.showPlayerAttackFleetModal(-5, 2, false)],
+            ])
         }
-        else if (reputation > 0) {
+        else if (gs.captain.fame.getAmount(FACTION_TYPES.SLAVERS.name) > 0) {
             // Neutral - they ignore you
-            showModal('Ignored', ce({textContent: 
-                `The ${coloredName(enemyFleet)} note your presence but choose to ignore you.`}),
-                [{text: 'Continue', onclick: ()=>closeModal()}]
+            showModal('Ignored', `The ${coloredName(enemyFleet)} note your presence but choose to ignore you.`,
+                [{text: 'Continue', onclick: ()=>this.endEncounter()}]
             )
-            for (const ship of this.playerShips) ship.escaped = true
-            return
         }
 
         // Hostile - demand surrender
@@ -71,8 +60,8 @@ class SlaversEncounter extends FleetEncounter {
         ]}))
 
         const buttons = [
-            {text: 'Surrender', onclick: ()=>encounterPlayerDidSurrender()},
-            {text: 'Refuse', onclick: ()=>hidePanel(panel)},
+            {text: 'Surrender', onclick: ()=>this.encounterPlayerDidSurrender()},
+            {text: 'Refuse', onclick: ()=>closeModal()},
         ]
 
         showPanel(panel, buttons)
@@ -104,7 +93,7 @@ class SlaversEncounter extends FleetEncounter {
      */
     onVictory() {
         console.log('SlaversEncounter.onVictory')
-        this.showPlayerDefeatedEnemyModal(2)
+        this.showPlayerDefeatedEnemyModal(3)
     }
 
     /**
@@ -181,22 +170,13 @@ class SlaversEncounter extends FleetEncounter {
             }
             
             if (capturedOfficers.length > 0) {
-                msg += ce({tag: 'br'})
-                msg += ce({tag: 'span', style: 'color: red; font-weight: bold;', 
-                    textContent: `The slavers capture ${capturedOfficers.length} of your officers!`})
-                msg += ce({tag: 'br'})
+                msg += ''+colorSpan(`The slavers capture ${capturedOfficers.length} of your officers!<br/>`, COLORS.Red)
                 for (const officer of capturedOfficers) {
-                    msg += `${officer.name} (${officer.role}) was taken into slavery.<br/>`
+                    msg += `${officer.name} was taken into slavery.<br/>`
                 }
             }
         }
 
-        // Grant infamy
-        const infamy = rng(5, 3)
-        gs.captain.grantInfamy(infamy)
-        gs.captain.reputation.add(enemyFleet.faction, infamy)
-        msg += `<br/>You gained ${infamy} infamy and ${infamy} reputation with ${enemyFleet.faction}.`
-        
         msg += this.conductRepairs()
         
         showModal(coloredName(enemyFleet), msg, [['Continue', ()=>this.endEncounter()]])

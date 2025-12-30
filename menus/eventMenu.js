@@ -7,6 +7,8 @@ function checkForEvents(elapsedYears = 1) {
     const elapsedDays = elapsedYears*365
     if (checkGameOver()) return
     checkForNews()
+    checkForFleetSpawning(elapsedDays)
+    tickNPCFleets(elapsedYears)
     if (checkForEncounter(elapsedDays)) return
     if (checkDebtCollections(elapsedDays)) return
     if (isNaN(gs.credits)) {
@@ -269,4 +271,114 @@ function calcPlayerScore() {
 
     const total = shipsScore + creditsScore + officerScore + fameScore + infamyScore + bountyScore + cargoScore;
     return { total, shipsScore, creditsScore, officerScore, fameScore, infamyScore, bountyScore, cargoScore };
+}
+
+/**
+ * Checks if planets should spawn new NPC fleets based on their civilization stats.
+ * @param {number} elapsedDays - Days that have elapsed.
+ */
+function checkForFleetSpawning(elapsedDays = 1) {
+    if (!gs.system || !gs.system.planets) return
+    
+    const allPlanets = [...gs.system.planets]
+    
+    for (const planet of allPlanets) {
+        if (!planet.civilization) continue
+        
+        const c = planet.civilization
+        
+        // Calculate max fleets based on industry (minimum 1 fleet for any civilization > 0.5)
+        const maxFleets = c.industry >= 0.5 ? Math.round(c.industry) : (Math.random() < c.industry ? 1 : 0)
+        if (maxFleets <= 0) continue
+        
+        // Count existing fleets from this planet
+        const existingFleets = gs.system.fleets.filter(f => f.fleetAI && f.fleetAI.homePlanet === planet)
+        if (existingFleets.length >= maxFleets) continue
+        
+        // Check policies that prevent certain fleet types
+        const hasIsolationism = c.policies.some(p => p === POLICY_TYPES.ISOLATIONISM)
+        
+        // Define spawn chances for each fleet type based on civilization stats
+        const spawnChances = []
+        
+        // Miners (influenced by industry)
+        spawnChances.push({ type: FLEET_TYPES.MINERS, weight: c.industry * 0.05 })
+        
+        // Merchants (influenced by economy, blocked by isolationism)
+        if (!hasIsolationism) {
+            spawnChances.push({ type: FLEET_TYPES.MERCHANTS, weight: c.economy * 0.05 })
+        }
+        
+        // Police (influenced by security and navy)
+        spawnChances.push({ type: FLEET_TYPES.POLICE, weight: (c.security + c.navy) * 0.03 })
+        
+        // Soldiers (influenced by army, blocked by isolationism)
+        if (!hasIsolationism) {
+            spawnChances.push({ type: FLEET_TYPES.SOLDIERS, weight: c.army * 0.02 })
+        }
+        
+        // Pirates (influenced by crime, reduced by security)
+        if (c.crime > c.security * 0.5) {
+            spawnChances.push({ type: FLEET_TYPES.PIRATES, weight: (c.crime / c.security) * 0.02 })
+        }
+        
+        // Smugglers (influenced by crime and corruption)
+        if (c.crime > 0.3 || c.corruption > 0.3) {
+            spawnChances.push({ type: FLEET_TYPES.SMUGGLERS, weight: (c.crime + c.corruption) * 0.025 })
+        }
+        
+        // Bounty Hunters (influenced by crime)
+        if (c.crime > 0.4) {
+            spawnChances.push({ type: FLEET_TYPES.BOUNTY_HUNTERS, weight: c.crime * 0.015 })
+        }
+        
+        // Tourists (influenced by culture)
+        spawnChances.push({ type: FLEET_TYPES.TOURISTS, weight: c.culture * 0.03 })
+        
+        // Colonists (influenced by population and expansion desire)
+        if (c.population > 0.5) {
+            spawnChances.push({ type: FLEET_TYPES.COLONISTS, weight: c.population * 0.01 })
+        }
+        
+        // Slavers (influenced by crime and corruption, only in highly corrupt systems)
+        if (c.crime > 0.7 && c.corruption > 0.5) {
+            spawnChances.push({ type: FLEET_TYPES.SLAVERS, weight: (c.crime + c.corruption) * 0.01 })
+        }
+        
+        // Roll for each potential fleet type
+        for (const { type, weight } of spawnChances) {
+            if (calcOccurrencesPerTimespan(weight, elapsedDays)) {
+                // Spawn the fleet
+                const fleet = generateFleet(type, planet)
+                fleet.color = planet.color
+                fleet.x = planet.x
+                fleet.y = planet.y
+                gs.system.fleets.push(fleet)
+                console.log(`✨ Spawned ${type.name} fleet from ${coloredName(planet)}`, fleet)
+            }
+        }
+    }
+}
+
+/**
+ * Ticks all NPC fleet AI to update their behavior.
+ * @param {number} elapsedYears - Years that have elapsed.
+ */
+function tickNPCFleets(elapsedYears = 1) {
+    if (!gs.system || !gs.system.fleets) return
+    
+    // Tick all fleet AI
+    for (let i = gs.system.fleets.length - 1; i >= 0; i--) {
+        const fleet = gs.system.fleets[i]
+        if (!fleet.fleetAI) continue
+        
+        fleet.fleetAI.tick(elapsedYears)
+        
+        // Remove fleets that have completed their missions
+        // (For now, just remove fleets that have arrived home - we can expand this later)
+        if (fleet.fleetAI.shouldRemove) {
+            console.log(`🗑️ Removing fleet ${fleet.name} (mission complete)`)
+            gs.system.fleets.splice(i, 1)
+        }
+    }
 }

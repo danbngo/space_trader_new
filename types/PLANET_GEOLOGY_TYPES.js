@@ -25,7 +25,7 @@ const PLANET_GEOLOGY_TYPES = Object.freeze({
     SILICATE_IRON: new PlanetGeologyType("Silicate-Iron", "Rocky crust with iron-nickel core, typical of terrestrial planets", COLORS.Brown),
     BASALTIC: new PlanetGeologyType("Basaltic", "Dark volcanic rock forming the crust", COLORS.DarkGray),
     GRANITE: new PlanetGeologyType("Granitic", "Continental crust of lighter granitic rock", COLORS.Gray),
-    CARBON: new PlanetGeologyType("Carbon-Rich", "Geology dominated by carbon compounds, possible diamond layers", COLORS.DarkGray),
+    CARBONACEOUS: new PlanetGeologyType("Carbon-Rich", "Geology dominated by carbon compounds, possible diamond layers", COLORS.DarkGray),
     WATER_ICE: new PlanetGeologyType("Water Ice", "Frozen water forming the primary surface material", COLORS.White),
     METHANE_ICE: new PlanetGeologyType("Methane Ice", "Frozen methane and other hydrocarbons", COLORS.LightOrange),
     NITROGEN_ICE: new PlanetGeologyType("Nitrogen Ice", "Frozen nitrogen forming surface features", COLORS.LightBlue),

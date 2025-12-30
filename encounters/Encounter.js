@@ -43,8 +43,6 @@ class Encounter {
         this.result = null //playerVictory, playerDefeat, playerSurrendered,
         /** @type {Fleet} */
         this.activeTurnFleet = this.playerFleet
-        /** @type {number[]} */
-        this.luck = [Math.random(),Math.random(),Math.random(),Math.random(),Math.random()] //used for initial encounter decisions
         /** @type {Effect[]} */
         this.effects = effects
 
@@ -606,7 +604,7 @@ class Encounter {
     }
 
 
-    showPlayerAttackFleetModal(fameMultiplier = 0, bountyMultiplier = 0, sneakAttack = false, allowBribe = false) {
+    showPlayerAttackFleetModal(fameMultiplier = 0, bountyMultiplier = 0, sneakAttack = false, onContinue = ()=>this.startCombat(true)) {
         console.log('showPlayerAttackFleetModal', { fameMultiplier, bountyMultiplier });
         const fleetName = coloredName(gs.encounter.fleet)
         const planet = gs.encounter.planet
@@ -636,16 +634,7 @@ class Encounter {
 
 
         showModal(fleetName, msg, [['Continue', ()=>{
-            if (allowBribe) {
-                let combatAdvantage = gs.fleet.combatRating / gs.encounter.fleet.combatRating
-                //combat advantage should vary from 0.5 its original amount to 2x based on the player's infamy
-                combatAdvantage *= 2 - (75/(50 + gs.captain.calcInfamyForPlanet(gs.encounter.fleet.planet))) //approaches 2x as infamy increases
-                if (combatAdvantage * Math.random() > 1.5) {
-                    this.showNeutralsBribePlayerModal(gs.encounter.fleet.captain.credits)
-                    return
-                }
-            }
-            this.startCombat(true)
+            onContinue()
         }]])
     }
 

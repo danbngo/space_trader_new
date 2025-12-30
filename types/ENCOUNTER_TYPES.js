@@ -50,6 +50,13 @@ const ENCOUNTER_TYPES = {
     SOLDIERS: new EncounterType('Soldiers', COLORS.LightGreen, 'You encountered: soldiers.', FLEET_TYPES.SOLDIERS, AI_TYPES.Ship, FORMATION_TYPES.FaceOff, SoldiersEncounter),
     BOUNTY_HUNTERS: new EncounterType('Bounty Hunters', COLORS.LightPurple, 'You encountered: bounty hunters.', FLEET_TYPES.BOUNTY_HUNTERS, AI_TYPES.Ship, FORMATION_TYPES.FaceOff, BountyHuntersEncounter),
     ABANDONED_SHIP: new EncounterType('Abandoned Ship', COLORS.Gray, 'You encountered: an abandoned ship.', FLEET_TYPES.ABANDONED_SHIP, AI_TYPES.Ship, FORMATION_TYPES.FaceOff, AbandonedShipEncounter),
+    ASTEROIDS_STORM: new EncounterType('Asteroid Storm', COLORS.LightGray, 'You encountered: an asteroid storm.', FLEET_TYPES.ASTEROIDS_STORM, AI_TYPES.Asteroid, FORMATION_TYPES.Storm, AsteroidsStormEncounter, 60),
+    ASTEROIDS_CALM: new EncounterType('Asteroid Field', COLORS.LightGray, 'You encountered: an asteroid field.', FLEET_TYPES.ASTEROIDS_CALM, AI_TYPES.Asteroid, FORMATION_TYPES.Storm, AsteroidsCalmEncounter, 60),
+    CRYOIDS_STORM: new EncounterType('Cryoid Storm', COLORS.LightBlue, 'You encountered: a cryoid storm.', FLEET_TYPES.CRYOIDS_STORM, AI_TYPES.Asteroid, FORMATION_TYPES.Storm, CryoidsStormEncounter, 60),
+    CRYOIDS_CALM: new EncounterType('Cryoid Field', COLORS.LightBlue, 'You encountered: a cryoid field.', FLEET_TYPES.CRYOIDS_CALM, AI_TYPES.Asteroid, FORMATION_TYPES.Storm, CryoidsCalmEncounter, 60),
+    PLASMOIDS_STORM: new EncounterType('Plasmoid Storm', COLORS.LightRed, 'You encountered: a plasmoid storm.', FLEET_TYPES.PLASMOIDS_STORM, AI_TYPES.Asteroid, FORMATION_TYPES.Storm, PlasmoidsStormEncounter, 60),
+    PLASMOIDS_CALM: new EncounterType('Plasmoid Field', COLORS.LightRed, 'You encountered: a plasmoid field.', FLEET_TYPES.PLASMOIDS_CALM, AI_TYPES.Asteroid, FORMATION_TYPES.Storm, PlasmoidsCalmEncounter, 60),
+    // Legacy names for backward compatibility
     ASTEROIDS: new EncounterType('Asteroids', COLORS.LightGray, 'You encountered: asteroids.', FLEET_TYPES.ASTEROIDS, AI_TYPES.Asteroid, FORMATION_TYPES.Storm, AsteroidsEncounter, 60),
     CRYOIDS: new EncounterType('Cryoids', COLORS.LightBlue, 'You encountered: cryoids.', FLEET_TYPES.CRYOIDS, AI_TYPES.Asteroid, FORMATION_TYPES.Storm, CryoidsEncounter, 60),
     PLASMOIDS: new EncounterType('Plasmoids', COLORS.LightRed, 'You encountered: plasmoids.', FLEET_TYPES.PLASMOIDS, AI_TYPES.Asteroid, FORMATION_TYPES.Storm, PlasmoidsEncounter, 60),

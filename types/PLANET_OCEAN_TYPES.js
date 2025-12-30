@@ -24,7 +24,7 @@ class PlanetOceanType {
 const PLANET_OCEAN_TYPES = Object.freeze({
     WATER: new PlanetOceanType("Water Oceans", "Liquid water covering portions of the surface", COLORS.Blue),
     SUBSURFACE_WATER: new PlanetOceanType("Subsurface Water Ocean", "Liquid water ocean hidden beneath ice crust", COLORS.DarkBlue),
-    LIQUID_METHANE: new PlanetOceanType("Liquid Methane", "Lakes and seas of liquid methane and ethane", COLORS.Orange),
+    HYDROCARBONACEOUS: new PlanetOceanType("Liquid Hydrocarbons", "Lakes and seas of liquid methane and ethane", COLORS.Orange),
     LIQUID_NITROGEN: new PlanetOceanType("Liquid Nitrogen", "Pools of liquid nitrogen at extremely low temperatures", COLORS.LightBlue),
     MOLTEN_LAVA: new PlanetOceanType("Molten Lava Seas", "Vast oceans of molten rock on the surface", COLORS.Red),
     SULFURIC_ACID: new PlanetOceanType("Sulfuric Acid", "Pools of concentrated sulfuric acid", COLORS.Yellow),

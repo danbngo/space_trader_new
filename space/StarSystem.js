@@ -17,8 +17,9 @@ class StarSystem extends SpaceObject {
      * @param {AsteroidBelt[]} asteroidBelts - The asteroid belts in the star system.
      * @param {Asteroid[]} asteroids - The asteroids in the star system.
      * @param {BackgroundStar[]} backgroundStars - The background stars for visual effect.
+     * @param {Religion[]} religions - The religions in the star system.
      */
-    constructor(name = "Unnamed", color = COLORS.White, radius = 0, x = 0, y = 0, barycenter = null, stars = [], planets = [], fleets = [], asteroidBelts = [], asteroids = [], backgroundStars = []) {
+    constructor(name = "Unnamed", color = COLORS.White, radius = 0, x = 0, y = 0, barycenter = null, stars = [], planets = [], fleets = [], asteroidBelts = [], asteroids = [], backgroundStars = [], religions = []) {
         console.log('instantiating star system w name:', name, 'stars:', stars, 'planets:', planets, 'fleets:', fleets);
         super(name, color, radius, x, y)
         /** @type {SpaceObject} */
@@ -41,6 +42,8 @@ class StarSystem extends SpaceObject {
         /** @type {string[]} */
         this.newsFeed = [] //strings that have more detailed data
         this.simpleNews = []
+        /** @type {Religion[]} */
+        this.religions = religions
     }
 
     /**
