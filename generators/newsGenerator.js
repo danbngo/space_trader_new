@@ -125,8 +125,12 @@ function generateMetaNews(newsTypesAttempted = []) {
  * Generates historical news events for a time period.
  * @param {number} startYear - The starting year for history generation.
  * @param {number} endYear - The ending year for history generation.
+ * @param {Object} progress - Progress tracking object with completePercentage property.
  */
-function addHistory(startYear = 3000, endYear = 3000) {
+async function addHistory(startYear = 3000, endYear = 3000, progress = {completePercentage: 0}) {
+    const totalYears = endYear - startYear
+    let currentYear = startYear
+    
     for (let y = startYear; y < endYear; y += 1/365) {
         gs.year = y
         if (Math.random() < NEWS_CHANCE_PER_DAY) {
@@ -140,5 +144,14 @@ function addHistory(startYear = 3000, endYear = 3000) {
             news.start()
         }*/
         News.processNews(1/365)
+        
+        // Update progress every year and yield control to browser
+        if (Math.floor(y) > currentYear) {
+            currentYear = Math.floor(y)
+            progress.completePercentage = ((y - startYear) / totalYears) * 100
+            // Yield control to allow UI updates
+            await new Promise(resolve => setTimeout(resolve, 0))
+        }
     }
+    progress.completePercentage = 100
 }

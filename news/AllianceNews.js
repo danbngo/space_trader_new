@@ -13,69 +13,49 @@ class AllianceNews extends News {
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
                 newRelationship: RELATIONSHIP_TYPES.ALLY,
-                security: CL.SLIGHTLY_HIGH,
-                economy: CL.SLIGHTLY_HIGH,
-                education: CL.SLIGHTLY_HIGH,
-                technology: CL.SLIGHTLY_HIGH,
-                prestige: CL.SLIGHTLY_HIGH,
+                civilizationMultipliers: new Civilization({
+                    security: CL.SLIGHTLY_HIGH,
+                    economy: CL.SLIGHTLY_HIGH,
+                    technology: CL.SLIGHTLY_HIGH,
+                    prestige: CL.SLIGHTLY_HIGH,
+                    army: CL.SLIGHTLY_HIGH,
+                    navy: CL.SLIGHTLY_HIGH
+                })
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
                 newRelationship: RELATIONSHIP_TYPES.ALLY,
-                territory: CL.HIGH,
-                reserves: CL.SLIGHTLY_HIGH,
-                economy: CL.HIGH, // workforce expansion through trade
-                security: CL.SLIGHTLY_HIGH,
-                education: CL.SLIGHTLY_HIGH,
-                technology: CL.SLIGHTLY_HIGH,
-                prestige: CL.SLIGHTLY_HIGH,
+                civilizationMultipliers: new Civilization({
+                    security: CL.SLIGHTLY_HIGH,
+                    economy: CL.SLIGHTLY_HIGH,
+                    technology: CL.SLIGHTLY_HIGH,
+                    prestige: CL.SLIGHTLY_HIGH,
+                    army: CL.SLIGHTLY_HIGH,
+                    navy: CL.SLIGHTLY_HIGH
+                })
             })
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         //this is the only relationship that cannot be dissolved mid-event
-        for (const fx of this.completeEffects) fx.newRelationship = RELATIONSHIP_TYPES.NEUTRAL
+        this.completeEffects[0].onApply = ()=>{
+            if (this.planet.civilization.relationships.get(this.targetPlanet) == RELATIONSHIP_TYPES.ALLY) {
+                this.planet.civilization.relationships.set(this.targetPlanet, RELATIONSHIP_TYPES.NEUTRAL)
+            }
+            if (this.targetPlanet.civilization.relationships.get(this.planet) == RELATIONSHIP_TYPES.ALLY) {
+                this.targetPlanet.civilization.relationships.set(this.planet, RELATIONSHIP_TYPES.NEUTRAL)
+            }
+        }
 
         // Cancelled: relationship soured before alliance solidified
-        this.cancelEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                targetPlanet: this.targetPlanet,
-                territory: News.clHalfRegression(CL.HIGH),
-                reserves: News.clHalfRegression(CL.SLIGHTLY_HIGH),
-                prestige: CL.LOW, // diplomatic failure
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                targetPlanet: this.planet,
-                territory: News.clHalfRegression(CL.HIGH),
-                reserves: News.clHalfRegression(CL.SLIGHTLY_HIGH),
-                prestige: CL.LOW,
-            })
-        ]
+        this.cancelEffects = []
     }
 
     determineOutcome() {
-        const {planet, targetPlanet} = this
-        // Check if relationships are still friendly
-        const rel1 = planet.civilization.relationships.get(targetPlanet)
-        const rel2 = targetPlanet.civilization.relationships.get(planet)
-        if (rel1 === RELATIONSHIP_TYPES.TENSE || rel1 === RELATIONSHIP_TYPES.WAR ||
-            rel2 === RELATIONSHIP_TYPES.TENSE || rel2 === RELATIONSHIP_TYPES.WAR) {
+        if (Civilization.areTenseOrAtWar(this.planet, this.targetPlanet)) {
             this.cancelled = true
         }
-    }
-
-    getAllies(planet = new Planet()) {
-        const allies = []
-        for (const p of gs.system.planets) {
-            const rel = planet.civilization.relationships.get(p)
-            if (rel == RELATIONSHIP_TYPES.ALLY) {
-                allies.push(p)
-            }
-        }
-        return allies
     }
 
     isValid() {

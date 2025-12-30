@@ -16,7 +16,7 @@ function showTitleScreen() {
 /**
  * Initializes and starts a new game with default settings.
  */
-function startNewGame() {
+async function startNewGame() {
     gs = new GameState()
     gs.year = GAME_START_YEAR
     gs.system = SOLAR_SYSTEM
@@ -33,8 +33,52 @@ function startNewGame() {
 
     gs.system.refreshPositions(gs.year)
 
-    //gs.system.news = generateHistory(GAME_START_YEAR - 10, GAME_START_YEAR)
-    addHistory(GAME_START_YEAR - 100, GAME_START_YEAR)
+    // Show loading modal with progress bar
+    const progressBarContainer = ce({
+        style: 'width: 400px; margin: 20px auto;'
+    })
+    const progressBarFill = ce({
+        id: 'history_progress_bar',
+        style: 'width: 0%; height: 30px; background-color: ' + rgbArrayToString(COLORS.Green) + '; transition: width 0.1s;'
+    })
+    const progressBarBg = ce({
+        style: 'width: 100%; height: 30px; background-color: ' + rgbArrayToString(COLORS.DarkGray) + '; border: 2px solid ' + rgbArrayToString(COLORS.White) + ';',
+        children: [progressBarFill]
+    })
+    const progressText = ce({
+        id: 'history_progress_text',
+        style: 'text-align: center; margin-top: 10px; color: ' + rgbArrayToString(COLORS.White) + ';',
+        children: ['Generating history: 0%']
+    })
+    progressBarContainer.appendChild(progressBarBg)
+    progressBarContainer.appendChild(progressText)
+    
+    showModal(
+        'Loading Game',
+        ce({children: [
+            'Generating 100 years of galactic history...',
+            progressBarContainer
+        ]}),
+        []
+    )
+    
+    // Wait a frame to ensure modal is displayed
+    await new Promise(resolve => setTimeout(resolve, 10))
+    
+    // Generate history with progress tracking
+    const progress = {completePercentage: 0}
+    const progressUpdateInterval = setInterval(() => {
+        const progressBar = document.getElementById('history_progress_bar')
+        const progressTextEl = document.getElementById('history_progress_text')
+        if (progressBar && progressTextEl) {
+            progressBar.style.width = progress.completePercentage + '%'
+            progressTextEl.textContent = 'Generating history: ' + Math.round(progress.completePercentage) + '%'
+        }
+    }, 50)
+    
+    await addHistory(GAME_START_YEAR - 100, GAME_START_YEAR, progress)
+    
+    clearInterval(progressUpdateInterval)
 
     // Create captain
     const captain = new Officer("Captain", STARTING_CREDITS);
