@@ -94,6 +94,73 @@ function checkForPlanetEncounters(elapsedDays = 1) {
         return distA - distB
     })
     
+    // Check for magnetosphere and ring hazards first
+    for (const planet of sortedPlanetsByProximity) {
+        const distance = calcDistance(fleet.x, fleet.y, planet.x, planet.y)
+        
+        // Check for ring encounters (very close to planet)
+        const hasRings = planet.features && (planet.features.includes(PLANET_FEATURE_TYPES.RING_SYSTEM) || planet.features.includes(PLANET_FEATURE_TYPES.FAINT_RINGS))
+        if (hasRings && distance < planet.radius * 2.5) {
+            // Chance to encounter asteroids in the rings
+            const ringDensity = planet.features.includes(PLANET_FEATURE_TYPES.RING_SYSTEM) ? 2.0 : 0.5
+            if (calcOccurrencesPerTimespan(ASTEROIDS_ENCOUNTER_CHANCE_PER_DAY * ringDensity, elapsedDays)) {
+                console.log(`🚨 RING ENCOUNTER TRIGGERED near ${planet.name}`);
+                if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
+                const encounterType = rndMember([ENCOUNTER_TYPES.ASTEROIDS_CALM, ENCOUNTER_TYPES.ASTEROIDS_STORM])
+                const encounter = generateEncounter(encounterType, planet, [EFFECT_TYPES.DEBRIS_CLOUD])
+                encounter.onStart()
+                return true
+            }
+        }
+        
+        // Check for magnetosphere encounters
+        if (planet.magnetosphereRadius > 0 && distance < planet.magnetosphereRadius) {
+            const magnetosphereStrength = planet.climate.magnetosphere.value
+            // Stronger magnetospheres = higher chance of magnetoid encounters
+            const magnetosphereChance = ASTEROIDS_ENCOUNTER_CHANCE_PER_DAY * 0.3 * magnetosphereStrength
+            if (calcOccurrencesPerTimespan(magnetosphereChance, elapsedDays)) {
+                console.log(`🚨 MAGNETOSPHERE ENCOUNTER TRIGGERED near ${planet.name} (strength: ${magnetosphereStrength})`);
+                if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
+                const encounterType = magnetosphereStrength > 1.2 ? ENCOUNTER_TYPES.MAGNETOIDS_STORM : ENCOUNTER_TYPES.MAGNETOIDS_CALM
+                const encounter = generateEncounter(encounterType, planet, [EFFECT_TYPES.ION_CLOUD, EFFECT_TYPES.PLASMA_TRAIL])
+                encounter.onStart()
+                return true
+            }
+        }
+    }
+    
+    // Check for sun encounters (plasmoids very close to sun, magnetoids in corona)
+    const sun = gs.system.stars[0]
+    if (sun) {
+        const distanceToSun = calcDistance(fleet.x, fleet.y, sun.x, sun.y)
+        
+        // Plasmoids only within sun's actual radius (extremely dangerous)
+        if (distanceToSun < sun.radius * 0.01) { // Sun radius is huge, so scale it down
+            const plasmoidChance = ASTEROIDS_ENCOUNTER_CHANCE_PER_DAY * 2.0
+            if (calcOccurrencesPerTimespan(plasmoidChance, elapsedDays)) {
+                console.log(`🚨 PLASMOID ENCOUNTER TRIGGERED near sun (distance: ${distanceToSun})`);
+                if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
+                const encounterType = Math.random() > 0.5 ? ENCOUNTER_TYPES.PLASMOIDS_STORM : ENCOUNTER_TYPES.PLASMOIDS_CALM
+                const encounter = generateEncounter(encounterType, null, [EFFECT_TYPES.ION_CLOUD, EFFECT_TYPES.PLASMA_TRAIL])
+                encounter.onStart()
+                return true
+            }
+        }
+        // Magnetoids in corona range (still dangerous but less so)
+        else if (distanceToSun < 0.1) { // Within corona orbit (0.1 AU)
+            const magnetoidChance = ASTEROIDS_ENCOUNTER_CHANCE_PER_DAY * 0.5
+            if (calcOccurrencesPerTimespan(magnetoidChance, elapsedDays)) {
+                console.log(`🚨 MAGNETOID ENCOUNTER TRIGGERED in corona (distance: ${distanceToSun})`);
+                if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
+                const encounterType = Math.random() > 0.5 ? ENCOUNTER_TYPES.MAGNETOIDS_STORM : ENCOUNTER_TYPES.MAGNETOIDS_CALM
+                const encounter = generateEncounter(encounterType, null, [EFFECT_TYPES.ION_CLOUD, EFFECT_TYPES.PLASMA_TRAIL])
+                encounter.onStart()
+                return true
+            }
+        }
+    }
+    
+    // Now check for civilization encounters
     for (const planet of sortedPlanetsByProximity) {
         if (!planet.civilization) continue
         

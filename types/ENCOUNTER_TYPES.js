@@ -56,10 +56,13 @@ const ENCOUNTER_TYPES = {
     CRYOIDS_CALM: new EncounterType('Cryoid Field', COLORS.LightBlue, 'You encountered: a cryoid field.', FLEET_TYPES.CRYOIDS_CALM, AI_TYPES.Asteroid, FORMATION_TYPES.Storm, CryoidsCalmEncounter, 60),
     PLASMOIDS_STORM: new EncounterType('Plasmoid Storm', COLORS.LightRed, 'You encountered: a plasmoid storm.', FLEET_TYPES.PLASMOIDS_STORM, AI_TYPES.Asteroid, FORMATION_TYPES.Storm, PlasmoidsStormEncounter, 60),
     PLASMOIDS_CALM: new EncounterType('Plasmoid Field', COLORS.LightRed, 'You encountered: a plasmoid field.', FLEET_TYPES.PLASMOIDS_CALM, AI_TYPES.Asteroid, FORMATION_TYPES.Storm, PlasmoidsCalmEncounter, 60),
+    MAGNETOIDS_STORM: new EncounterType('Magnetoid Storm', COLORS.LightPurple, 'You encountered: a magnetoid storm.', FLEET_TYPES.MAGNETOIDS_STORM, AI_TYPES.Asteroid, FORMATION_TYPES.Storm, MagnetoidsStormEncounter, 60),
+    MAGNETOIDS_CALM: new EncounterType('Magnetoid Field', COLORS.LightPurple, 'You encountered: a magnetoid field.', FLEET_TYPES.MAGNETOIDS_CALM, AI_TYPES.Asteroid, FORMATION_TYPES.Storm, MagnetoidsCalmEncounter, 60),
     // Legacy names for backward compatibility
     ASTEROIDS: new EncounterType('Asteroids', COLORS.LightGray, 'You encountered: asteroids.', FLEET_TYPES.ASTEROIDS, AI_TYPES.Asteroid, FORMATION_TYPES.Storm, AsteroidsEncounter, 60),
     CRYOIDS: new EncounterType('Cryoids', COLORS.LightBlue, 'You encountered: cryoids.', FLEET_TYPES.CRYOIDS, AI_TYPES.Asteroid, FORMATION_TYPES.Storm, CryoidsEncounter, 60),
     PLASMOIDS: new EncounterType('Plasmoids', COLORS.LightRed, 'You encountered: plasmoids.', FLEET_TYPES.PLASMOIDS, AI_TYPES.Asteroid, FORMATION_TYPES.Storm, PlasmoidsEncounter, 60),
+    MAGNETOIDS: new EncounterType('Magnetoids', COLORS.LightPurple, 'You encountered: magnetoids.', FLEET_TYPES.MAGNETOIDS, AI_TYPES.Asteroid, FORMATION_TYPES.Storm, MagnetoidsEncounter, 60),
 }
 const ENCOUNTER_TYPES_ALL = Object.values(ENCOUNTER_TYPES)
 

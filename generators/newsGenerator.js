@@ -20,7 +20,7 @@ const NEWS_TYPE_CLASSES = [
     [NT.DEPRESSION, DepressionNews],
     [NT.DISARMAMENT, DisarmamentNews],
     [NT.ECONOMIC_BOOM, EconomicBoomNews],
-    [NT.EMBARGO, EmbargoNews],
+    [NT.BLOCKADE, BlockadeNews],
     [NT.ENSLAVEMENT, EnslavementNews],
     [NT.ENVIRONMENTAL_DISASTER, EnvironmentalDisasterNews],
     [NT.ENVIRONMENTALISM, EnvironmentalismNews],

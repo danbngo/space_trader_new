@@ -17,7 +17,7 @@ class Planet extends OrbitingObject {
      * @param {PlanetFeatureType[]} features - Unique features of the planet.
      * @param {number} dayLength - The length of one day in Earth days.
      */
-    constructor(name = "Unnamed", color = COLORS.White, radius = 0, x = 0, y = 0, orbit = null, planetType = PLANET_TYPES_ALL[0], settlement = null, civilization = null, climate = null, features = [], dayLength = 1.0) {
+    constructor(name = "Unnamed", color = COLORS.White, radius = 0, x = 0, y = 0, orbit = null, planetType = PLANET_TYPES_ALL[0], settlement = null, civilization = null, climate = null, features = [], dayLength = 1.0, magnetosphereRadius = 0) {
         super(name, color, radius, x, y, orbit);
         /** @type {PlanetType} */
         this.planetType = planetType
@@ -33,6 +33,8 @@ class Planet extends OrbitingObject {
         this.dayLength = dayLength
         /** @type {boolean} */
         this.closed = false
+        /** @type {number} - Radius of magnetosphere in AU */
+        this.magnetosphereRadius = magnetosphereRadius
     }
     get c() {
         return this.civilization

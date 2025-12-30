@@ -72,6 +72,7 @@ const ASTEROID_SHIP_TYPES = {
     ASTEROID: new ShipType('Asteroid', SHAPES.FilledOval, 0.4, 0, 0, 5, 0.5, 1, [SHIP_MODULE_TYPES.MAGNETIZE], 0, 1),
     CRYOID: new ShipType('Cryoid', SHAPES.FilledOval, 0.6, 0, 0, 4, 0.5, 1, [SHIP_MODULE_TYPES.SMOKE_BOMB], 0, 1),
     PLASMOID: new ShipType('Plasmoid', SHAPES.FilledCircle, 0.5, 0.5, 0, 6, 0.5, 1, [SHIP_MODULE_TYPES.BOOSTER], 0, 1),
+    MAGNETOID: new ShipType('Magnetoid', SHAPES.FilledCircle, 0.4, 0.3, 0, 5, 0.5, 1, [SHIP_MODULE_TYPES.MAGNETIZE], 0, 1),
 }
 
 const ASTEROID_SHIP_TYPES_ALL = Object.values(ASTEROID_SHIP_TYPES)
@@ -91,5 +92,9 @@ ASTEROID_SHIP_TYPES.CRYOID.onDisabled = (died = new Ship(), encounter = new Enco
 }
 ASTEROID_SHIP_TYPES.PLASMOID.onDisabled = (died = new Ship(), encounter = new Encounter())=>{
     console.log('Plasmoid.onDisabled', { died, encounter });
+    if (Math.random() > .5) encounter.addEffect(new IonCloudEffect(died.x, died.y, Math.random()*Math.PI*4))
+}
+ASTEROID_SHIP_TYPES.MAGNETOID.onDisabled = (died = new Ship(), encounter = new Encounter())=>{
+    console.log('Magnetoid.onDisabled', { died, encounter });
     if (Math.random() > .5) encounter.addEffect(new IonCloudEffect(died.x, died.y, Math.random()*Math.PI*4))
 }
