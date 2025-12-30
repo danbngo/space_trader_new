@@ -15,7 +15,7 @@ class Palace extends Building {
     }
 
     get baseNumContracts() {
-        return Math.round(PALACE_AVERAGE_NUM_CONTRACTS * this.planet.c.government)
+        return Math.round(PALACE_AVERAGE_NUM_CONTRACTS * this.planet.c.culture/this.planet.c.corruption)
     }
 
     normalize(clearExisting = false) {

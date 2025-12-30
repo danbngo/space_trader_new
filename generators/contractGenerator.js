@@ -107,6 +107,59 @@ function generateContract(planet = new Planet()) {
     // Apply civilization modifiers to reward
     reward = Math.round(reward * civilization.wealth * (1 + civilization.inflation));
     
+    // Generate description based on contract type
+    let description = '';
+    switch (selectedType) {
+        case CONTRACT_TYPES.CARGO_DELIVERY:
+            description = `Deliver ${amount} units of ${cargoType.name} to ${targetPlanet.name}.`;
+            break;
+        case CONTRACT_TYPES.URGENT_DELIVERY:
+            description = `Urgent! Deliver ${amount} units of ${cargoType.name} to ${targetPlanet.name} immediately.`;
+            break;
+        case CONTRACT_TYPES.DELIVER_MISSIVE:
+            description = `Transport an important message to ${targetPlanet.name}.`;
+            break;
+        case CONTRACT_TYPES.PASSENGER_TRANSPORT:
+            description = `Transport ${amount} passenger${amount > 1 ? 's' : ''} to ${targetPlanet.name}.`;
+            break;
+        case CONTRACT_TYPES.DESTROY_PIRATES:
+            description = `Destroy ${amount} pirate ship${amount > 1 ? 's' : ''} threatening ${planet.name}.`;
+            break;
+        case CONTRACT_TYPES.BOUNTY_HUNT:
+            description = `Hunt down and destroy ${amount} wanted criminal${amount > 1 ? 's' : ''}.`;
+            break;
+        case CONTRACT_TYPES.ESCORT_CONVOY:
+            description = `Escort a convoy from ${planet.name} to ${targetPlanet.name}.`;
+            break;
+        case CONTRACT_TYPES.PATROL_SECTOR:
+            description = `Patrol the sector around ${planet.name} and report any threats.`;
+            break;
+        case CONTRACT_TYPES.SURVEY_MISSION:
+            description = `Survey the area near ${targetPlanet.name} and report findings.`;
+            break;
+        case CONTRACT_TYPES.RESCUE_OPERATION:
+            description = `Rescue stranded personnel near ${targetPlanet.name}.`;
+            break;
+        case CONTRACT_TYPES.TRADE_ROUTE:
+            description = `Establish a trade route by delivering ${amount} units of ${cargoType.name} to ${targetPlanet.name}.`;
+            break;
+        case CONTRACT_TYPES.SMUGGLING_RUN:
+            description = `Discreetly transport ${amount} units of ${cargoType.name} to ${targetPlanet.name}.`;
+            break;
+        case CONTRACT_TYPES.LETTER_OF_MARQUE:
+            description = `Obtain authorization to engage hostile ships on behalf of ${planet.name}.`;
+            break;
+        case CONTRACT_TYPES.MERCHANT_LICENSE:
+            description = `Secure a license to trade freely in ${planet.name} territory.`;
+            break;
+        case CONTRACT_TYPES.MINING_PERMIT:
+            description = `Obtain permission to mine resources in ${planet.name} territory.`;
+            break;
+        case CONTRACT_TYPES.DIPLOMATIC_PASS:
+            description = `Secure diplomatic clearance for travel to ${targetPlanet.name}.`;
+            break;
+    }
+    
     return new Contract(
         selectedType,
         planet,
@@ -114,6 +167,7 @@ function generateContract(planet = new Planet()) {
         expirationDate,
         cargoType,
         amount,
-        reward
+        reward,
+        description
     );
 }

@@ -26,12 +26,12 @@ class AddictionNews extends News {
         }))
 
         this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.failEffects[0].civilizationMultipliers.overwrite(new Civilization({
+        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
             population: CL.SLIGHTLY_LOW,
-            security: CL.NO_REGRESSION,
-            economy: CL.NO_REGRESSION,
-            crime: CL.NO_REGRESSION,
-            corruption: CL.NO_REGRESSION,
+            security: CL.LOW,
+            economy: CL.LOW,
+            crime: CL.HIGH,
+            corruption: CL.HIGH,
             culture: CL.SLIGHTLY_LOW,
         }))
     }

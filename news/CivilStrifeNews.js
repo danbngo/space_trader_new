@@ -26,24 +26,20 @@ class CivilStrifeNews extends News {
             })
         ]
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        Object.assign(this.completeEffects[0], {
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
             culture: CL.HIGH
-        })
+        }))
         //some lingering security and prestige decrease and destroyed goods
 
-        this.failEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    army: CL.NO_REGRESSION,
-                    security: CL.LOW/CL.VERY_LOW,
-                    crime: CL.SLIGHTLY_HIGH/CL.HIGH,
-                    prestige: CL.LOW/CL.SLIGHTLY_LOW,
-                    culture: CL.LOW,
-                    corruption: CL.SLIGHTLY_HIGH,
-                })
-            })
-        ]
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
+            army: CL.SLIGHTLY_LOW,
+            security: CL.LOW,
+            crime: CL.SLIGHTLY_HIGH,
+            prestige: CL.LOW,
+            culture: CL.LOW,
+            corruption: CL.SLIGHTLY_HIGH,
+        }))
     }
 
     determineOutcome() {

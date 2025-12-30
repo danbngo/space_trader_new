@@ -31,7 +31,7 @@ class ConscriptionNews extends News {
         
         // Failed: riots force abandonment, no military gain
         this.failEffects = this.startEffects.map(fx=> fx.getInverse())
-        this.failEffects[0].civilizationMultipliers.overwrite(new Civilization({
+        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
             prestige: CL.LOW,
             security: CL.LOW,
             crime: CL.HIGH,

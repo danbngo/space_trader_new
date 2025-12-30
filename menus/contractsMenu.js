@@ -13,15 +13,12 @@ function showContractsMenu() {
 
     // Build contracts table
     const tableRows = [
-        ['Type', 'Origin', 'Target', 'Cargo', 'Amount', 'Reward', 'Expires'],
+        ['Type', 'Description', 'Reward', 'Expires'],
         ...contracts.map(contract => [
             contract.contractType.name,
-            coloredName(contract.planet),
-            contract.targetPlanet ? coloredName(contract.targetPlanet) : '-',
-            contract.cargoType ? contract.cargoType.name : '-',
-            contract.amount || '-',
-            `${contract.reward}CR`,
-            contract.expirationDate ? `${describeDate(contract.expirationDate)}${contract.isExpired ? ' (EXPIRED)' : ''}` : 'No limit'
+            contract.description || 'No description',
+            colorSpan(`${contract.reward}CR`, COLORS.Yellow),
+            contract.expirationDate ? `${describeDate(contract.expirationDate)}${contract.isExpired ? colorSpan(' (EXPIRED)', COLORS.Red) : ''}` : 'No limit'
         ])
     ]
 
