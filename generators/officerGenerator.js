@@ -35,6 +35,16 @@ function generateOfficer(planet = new Planet()) {
     
     officer.skillPoints = Math.max(0, officer.skillPoints*rng(2,0.5,false))
     officer.autoImproveSkills()
+    
+    // Calculate age based on level (21-55 years old)
+    // Lower levels = younger, higher levels = older
+    const minAge = 21
+    const maxAge = 55
+    const levelFactor = Math.min(officer.level / 10, 1) // Normalize level to 0-1 range
+    officer.age = Math.round(minAge + (maxAge - minAge) * levelFactor)
+    
+    // Assign CITIZEN rank to planet of origin
+    officer.ranks.set(planet, RANK_TYPES.CITIZEN)
 
     return officer
 }

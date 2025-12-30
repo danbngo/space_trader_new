@@ -7,11 +7,12 @@
 function createOfficersTable(officers = [new Officer()], onSelectOfficer = (officer = new Officer())=>{}) {
     if (officers.length == 0) return `(None)`
     const rows = [
-        ['Name', 'Level', 'CR Share', ...SKILLS_ALL]
+        ['Name', 'Age', 'Level', 'CR Share', ...SKILLS_ALL]
     ]
     for (const officer of officers) {
         rows.push([
             officer.name,
+            ''+officer.age,
             ''+statColorSpan(officer.level, officer.level/5),
             ''+statColorSpan(officer.crShare*100+'%', 5/officer.level),
             ...SKILLS_ALL.map(sk=>''+statColorSpan(officer.skills.getAmount(sk), officer.skills.getAmount(sk)*SKILLS_ALL.length/5/SKILL_POINTS_PER_LEVEL)),
@@ -42,10 +43,29 @@ function showOfficersMenu(officers = gs.fleet.officers) {
     }
 
     function onSelectOfficer(officer = new Officer()) {
+        const implantsText = officer.implants.length > 0 
+            ? officer.implants.map(i => colorSpan(i.implantType.name, i.implantType.color) + ` (${roundToPlaces(i.quality*100, 1)}%)`).join(', ')
+            : colorSpan('(None)', COLORS.Gray)
+        
         const buttons = [
             ['Fire', ()=>showFireOfficerModal(officer), gs.fleet.numPilots <= gs.fleet.ships.length],
             ["Close", () => closeModal()],
         ]
+        
+        const infoPanel = ce({children: [
+            `<b>${officer.name}</b> (Level ${officer.level})<br/>`,
+            `<b>Skills:</b> `,
+            SKILLS_ALL.map(sk => `${sk}: ${officer.skills.getAmount(sk)}`).join(', '),
+            `<br/><br/><b>Cybernetic Implants:</b><br/>`,
+            implantsText,
+        ]})
+        
+        const modalContent = document.getElementById('officers_panel_content')
+        if (modalContent) {
+            modalContent.innerHTML = ''
+            modalContent.appendChild(infoPanel)
+        }
+        
         refreshPanelButtons('officers_panel', buttons)
     }
 
@@ -53,6 +73,7 @@ function showOfficersMenu(officers = gs.fleet.officers) {
         `Officer Roster`,
         ce({children:[
             createOfficersTable(officers, onSelectOfficer),
+            ce({id: 'officers_panel_content'}),
         ]}),
         [
             ["Close", () => closeModal()],

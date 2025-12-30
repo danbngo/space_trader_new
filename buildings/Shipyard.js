@@ -59,13 +59,16 @@ class Shipyard extends Building {
     }
 
     calcBuyPrice(ship = new Ship()) {
-        return Math.round(ship.value * (1+this.planet.civilization.corruption) * (1+this.planet.civilization.inflation) / this.planet.civilization.navy)
+        const basePrice = Math.round(ship.value * (1+this.planet.civilization.corruption) * (1+this.planet.civilization.inflation) / this.planet.civilization.navy)
+        return Math.round(basePrice * (1 + this.planet.civilization.taxes))
     }
     calcSellPrice(ship = new Ship()) {
-        return Math.round(ship.value / (1+this.planet.civilization.corruption) * (1+this.planet.civilization.inflation) / this.planet.civilization.navy)
+        const basePrice = Math.round(ship.value / (1+this.planet.civilization.corruption) * (1+this.planet.civilization.inflation) / this.planet.civilization.navy)
+        return Math.round(basePrice * (1 - this.planet.civilization.taxes))
     }
     calcBuyModulePrice(module = new ShipModule()) {
-        return Math.round(module.moduleType.value * module.quality * (1+this.planet.civilization.corruption))
+        const basePrice = Math.round(module.moduleType.value * module.quality * (1+this.planet.civilization.corruption))
+        return Math.round(basePrice * (1 + this.planet.civilization.taxes))
     }
 }
 

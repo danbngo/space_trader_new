@@ -10,12 +10,13 @@ function createHireOfficerMenu(officers = [new Officer()], guild = new Guild(), 
     if (officers.length == 0) return `(None)`
     /** @type {any[]} */
     const rows = [
-        ['Name', 'Level', 'CR Share', ...SKILLS_ALL, 'Hire Price']
+        ['Name', 'Age', 'Level', 'CR Share', ...SKILLS_ALL, 'Hire Price']
     ]
     for (const officer of officers) {
         const hirePrice = guild.calcHirePrice(officer)
         rows.push([
             officer.name,
+            officer.age,
             statColorSpan(officer.level, officer.level/5),
             statColorSpan(officer.crShare*100+'%', 5/officer.level),
             ...SKILLS_ALL.map(sk=>statColorSpan(officer.skills.getAmount(sk), officer.skills.getAmount(sk)*SKILLS_ALL.length/5/SKILL_POINTS_PER_LEVEL)),

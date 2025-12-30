@@ -36,6 +36,12 @@ class Officer {
         this.loans = []
         /** @type {Fleet} */
         this.fleet = null;
+        /** @type {CyberImplant[]} */
+        this.implants = [];
+        /** @type {Map<Planet, RankType>} */
+        this.ranks = new Map();
+        /** @type {number} */
+        this.age = 25; // Default age
     }
 
     grantExperience(amount = 0, autoLevelUp = (this !== gs.captain), autoImproveSkills = (this !== gs.captain)) {
@@ -45,7 +51,7 @@ class Officer {
             msg += `You gained ${amount} experience points.<br/>`;
         }
         if (this.canLevelUp) {
-            if (this == gs.captain) msg += colorSpan(`You leveled up to level ${this.level + 1}!<br/>`, COLORS.LightGreen, true);
+            if (this == gs.captain) msg += colorSpan(`You leveled up to level ${this.level + 1}!<br/>`, COLORS.LightGreen);
             while (autoLevelUp && this.canLevelUp) {
                 this.levelUp(autoImproveSkills);
             }
@@ -56,7 +62,7 @@ class Officer {
     grantInfamy(planet = new Planet(), amount = 1) {
         this.infamy.increment(planet, amount);
         if (this == gs.captain) {
-            return colorSpan(`You ${amount >= 0 ? 'gained' : 'lost'} ${Math.abs(amount)} infamy on ${coloredName(planet)}.<br/>`, amount >= 0 ? COLORS.LightRed : COLORS.LightGreen, true);
+            return colorSpan(`You ${amount >= 0 ? 'gained' : 'lost'} ${Math.abs(amount)} infamy on ${coloredName(planet)}.<br/>`, amount >= 0 ? COLORS.LightRed : COLORS.LightGreen);
         }
         return ''
     }
@@ -64,7 +70,7 @@ class Officer {
     grantFame(planet = new Planet(), amount = 1) {
         this.fame.increment(planet, amount);
         if (this == gs.captain) {
-            return colorSpan(`You ${amount >= 0 ? 'gained' : 'lost'} ${Math.abs(amount)} fame on ${coloredName(planet)}.<br/>`, amount >= 0 ? COLORS.LightGreen : COLORS.LightRed, true);
+            return colorSpan(`You ${amount >= 0 ? 'gained' : 'lost'} ${Math.abs(amount)} fame on ${coloredName(planet)}.<br/>`, amount >= 0 ? COLORS.LightGreen : COLORS.LightRed);
         }
         return ''
     }
@@ -88,7 +94,7 @@ class Officer {
     grantBounty(planet = new Planet(), amount = 1) {
         this.bounty.increment(planet, amount);
         if (this == gs.captain) {
-            return colorSpan(`You ${amount >= 0 ? 'gained' : 'lost'} ${Math.abs(amount)} bounty on ${coloredName(planet)}.<br/>`, amount >= 0 ? COLORS.LightRed : COLORS.LightGreen, true);
+            return colorSpan(`You ${amount >= 0 ? 'gained' : 'lost'} ${Math.abs(amount)} bounty on ${coloredName(planet)}.<br/>`, amount >= 0 ? COLORS.LightRed : COLORS.LightGreen);
         }
         return ''
     }

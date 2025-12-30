@@ -45,9 +45,13 @@ class Market extends Building {
         const prices = new CountsMap()
         for (const cargoType of CARGO_TYPES_ALL) {
             const basePrice = cargoType.value * this.planet.civilization.cargoPriceModifiers.getAmount(cargoType)
-            const price = 
+            let price = 
                 this.blackMarket ? Math.round(basePrice * (1+this.planet.civilization.corruption) * this.planet.civilization.inflation / this.planet.civilization.crime)
                 : Math.round(basePrice * (1+this.planet.civilization.corruption) * this.planet.civilization.inflation / this.planet.civilization.reserves)
+            // Apply taxes only to regular market
+            if (!this.blackMarket) {
+                price = Math.round(price * (1 + this.planet.civilization.taxes))
+            }
             prices.setAmount(cargoType, price)
         }
         return prices
@@ -57,9 +61,13 @@ class Market extends Building {
         const prices = new CountsMap()
             for (const cargoType of CARGO_TYPES_ALL) {
             const basePrice = cargoType.value * this.planet.civilization.cargoPriceModifiers.getAmount(cargoType)
-            const price = 
+            let price = 
                 this.blackMarket ? Math.round(basePrice / (1+this.planet.civilization.corruption) * this.planet.civilization.inflation / this.planet.civilization.crime)
                 : Math.round(basePrice / (1+this.planet.civilization.corruption) * this.planet.civilization.inflation / this.planet.civilization.reserves)
+            // Apply taxes only to regular market
+            if (!this.blackMarket) {
+                price = Math.round(price * (1 - this.planet.civilization.taxes))
+            }
             prices.setAmount(cargoType, price)
         }
         return prices

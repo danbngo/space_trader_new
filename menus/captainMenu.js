@@ -38,6 +38,10 @@ function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
 
     const skillTable = createTable(skillTableRows, (rowIndex) => onSelectSkill(SKILLS_ALL[rowIndex]), selectedSkill ? SKILLS_ALL.indexOf(selectedSkill) + 1 : null)
 
+    const implantsText = captain.implants.length > 0 
+        ? captain.implants.map(i => colorSpan(i.implantType.name, i.implantType.color) + ` (${roundToPlaces(i.quality*100, 1)}%)`).join(', ')
+        : colorSpan('(None)', COLORS.Gray)
+
     showModal(
         `Captain Overview`,
         ce({children:[
@@ -45,6 +49,9 @@ function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
             `Level: ${level} | Exp.: ${expPoints} | To Next Lvl: ${expToNextLevel}`,
             `Skill Points: ${colorSpan(String(skillPoints), skillPoints > 0 ? COLORS.Green : '')}`,
             skillTable,
+            ce({style: 'margin-top: 20px;', children: [
+                ce({children: [`<b>Cybernetic Implants:</b><br/>`, implantsText]})
+            ]})
         ]}),
         [
             ["Reputation", () => showCaptainReputationMenu()],
@@ -83,11 +90,30 @@ function showCaptainReputationMenu() {
     ]
 
     const reputationTable = createTable(tableRows)
+    
+    // Build ranks table
+    const ranksTableRows = [
+        // Header row
+        ['Planet', 'Rank'],
+        // Data rows for each planet
+        ...gs.system.planets.map(planet => {
+            const rank = captain.ranks.get(planet) || RANK_TYPES.NO_RANK
+            return [
+                coloredName(planet),
+                colorSpan(rank.name, rank.color)
+            ]
+        })
+    ]
+    
+    const ranksTable = createTable(ranksTableRows)
 
     showModal(
         `Captain Reputation`,
         ce({children: [
+            ce({children: ['<b>Reputation</b>']}),
             reputationTable,
+            ce({style: 'margin-top: 20px;', children: ['<b>Planetary Ranks</b>']}),
+            ranksTable,
         ]}),
         [
             ["Skills", () => showCaptainSkillsMenu(captain)],

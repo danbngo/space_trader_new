@@ -28,13 +28,14 @@ class Civilization {
      * @param {number} [params.wealth] - Overall wealth of the civilization.
      * @param {number} [params.reserves] - Higher reserves means more goods in markets, but lower prices
      * @param {number} [params.inflation] - Higher costs for everything but also higher sales prices in market
+     * @param {number} [params.taxes] - Tax rate applied to most transactions (0 to MAX_TAX_RATE).
      * 
      */
     constructor({
         planet = new Planet(), governmentType = GT_ALL[0], cargoPriceModifiers = new CountsMap(), skillPriceModifiers = new CountsMap(),
         technology = 1.0, education = 1.0, territory = 1, population = 1, industry = 1,
         economy = 1, security = 1, culture = 1, prestige = 1, policies = new Policies(),
-        navy = 1, army = 1, corruption = 1, crime = 1, wealth = 1, reserves = 1, inflation = 1
+        navy = 1, army = 1, corruption = 1, crime = 1, wealth = 1, reserves = 1, inflation = 1, taxes = 0
     } = {}) {
         /** @type {Planet} */
         this.planet = planet;
@@ -80,5 +81,7 @@ class Civilization {
         this.reserves = reserves; //more goods in markets
         /** @type {number} */
         this.inflation = inflation; //higher prices everywhere
+        /** @type {number} */
+        this.taxes = taxes; //tax rate applied to most transactions (0 to MAX_TAX_RATE)
     }
 }

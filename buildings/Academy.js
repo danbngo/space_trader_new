@@ -26,7 +26,12 @@ class Academy extends Building {
         return this.planet.civilization.education * officer.level >= targetLevel
     }
     calcHirePrice(officer = new Officer()) {
-        return Math.round(officer.value * (1+this.planet.civilization.corruption) * this.planet.civilization.inflation / (this.isTavern ? this.planet.civilization.crime : this.planet.civilization.army))
+        const basePrice = Math.round(officer.value * (1+this.planet.civilization.corruption) * this.planet.civilization.inflation / (this.isTavern ? this.planet.civilization.crime : this.planet.civilization.army))
+        // Taverns don't charge taxes (similar to black market)
+        if (this.isTavern) {
+            return basePrice
+        }
+        return Math.round(basePrice * (1 + this.planet.civilization.taxes))
     }
     get baseNumOfficers() {
         return GUILD_AVERAGE_NUM_OFFICERS * (this.isTavern ? this.planet.civilization.crime : this.planet.civilization.army)

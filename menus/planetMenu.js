@@ -43,6 +43,9 @@ function showPlanetMenu(planet = new Planet()) {
     if (settlement.tavern) {
         options.push(["Tavern", () => showAcademyMenu(settlement.tavern)]);
     }
+    if (settlement.cyberSurgeon) {
+        options.push(["Cyber Surgeon", () => showCyberSurgeonBuyMenu(settlement.cyberSurgeon)]);
+    }
     options.push(ce({tag:'br'}));
     options.push(["News", () => showNewsTimelineMenu(planet, () => showPlanetMenu(planet))]);
     options.push([`Overview`, () => showPlanetSocietyMenu(planet)]);

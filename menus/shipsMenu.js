@@ -45,10 +45,30 @@ function showShipsMenu(ships = [...gs.fleet.ships]) {
     }
 
     function onSelectShip(ship = new Ship()) {
+        const modulesText = ship.modules.length > 0 
+            ? ship.modules.map(m => colorSpan(m.moduleType.name, m.moduleType.color) + ` (${roundToPlaces(m.quality*100, 1)}%)`).join(', ')
+            : colorSpan('(None)', COLORS.Gray)
+        
         const buttons = [
             ['Dump', ()=>showDumpShipModal(ship), gs.fleet.ships.length < 2],
             ["Close", () => closeModal()],
         ]
+        
+        const infoPanel = ce({children: [
+            `<b>${ship.name}</b><br/>`,
+            `Hull: ${statColorSpan(`${ship.hull[0]}/${ship.hull[1]}`, ship.hull[0]/ship.hull[1])} | `,
+            `Shields: ${statColorSpan(`${ship.shields[0]}/${ship.shields[1]}`, ship.shields[0]/ship.shields[1])}<br/>`,
+            `Lasers: ${ship.lasers} | Engine: ${ship.engine} | Cargo: ${ship.cargoSpace}<br/>`,
+            `<br/><b>Installed Modules:</b><br/>`,
+            modulesText,
+        ]})
+        
+        const modalContent = document.getElementById('ships_panel_content')
+        if (modalContent) {
+            modalContent.innerHTML = ''
+            modalContent.appendChild(infoPanel)
+        }
+        
         refreshPanelButtons('ships_panel', buttons)
     }
 
@@ -56,6 +76,7 @@ function showShipsMenu(ships = [...gs.fleet.ships]) {
         `Ships Manifest`,
         ce({children:[
             createShipsListMenu(ships, onSelectShip),
+            ce({id: 'ships_panel_content'}),
         ]}),
         [
             ["Close", () => closeModal()],
