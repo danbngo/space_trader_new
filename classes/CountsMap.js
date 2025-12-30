@@ -129,4 +129,14 @@ class CountsMap {
         }
         return { counts: obj }
     }
+
+    calcInvertedMultipliers() {
+        const inverted = new CountsMap()
+        for (const [key, value] of this.counts) {
+            if (value !== 0) {
+                inverted.setAmount(key, 1 / value)
+            }
+        }
+        return inverted
+    }
 }

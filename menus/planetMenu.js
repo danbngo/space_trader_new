@@ -58,29 +58,18 @@ function showPlanetMenu(planet = new Planet()) {
  */
 function showPlanetSocietyMenu(planet = new Planet()) {
     const {civilization} = planet
-    const {governmentType, technology, education, territory, population, army, navy, security, economy, industry, culture, corruption, crime, wealth, reserves, inflation, policies} = civilization
+    const {governmentType, policies} = civilization
     let msg = ''
     msg += `<u>Overview</u><br/>`
     msg += `Government: ${coloredName(governmentType)}<br/>`
-    msg += `Population: ${describePopulation(population)}<br/>`
-    msg += `Territory: ${describeTerritory(territory)}<br/>`
-    msg += `<br/>`
-    msg += `<u>Ratings</u><br/>`
-    msg += `Security: ${describeRating(security)}<br/>`
-    msg += `Economy: ${describeRating(economy)}<br/>`
-    msg += `Industry: ${describeRating(industry)}<br/>`
-    msg += `Culture: ${describeRating(culture)}<br/>`
-    msg += `Technology: ${describeRating(technology)}<br/>`
-    msg += `Education: ${describeRating(education)}<br/>`
-    msg += `Corruption: ${describeRating(corruption)}<br/>`
-    msg += `Crime: ${describeRating(crime)}<br/>`
-    msg += `<br/>`
-    msg += `<u>Resources</u><br/>`
-    msg += `Navy: ${describeRating(navy)}<br/>`
-    msg += `Army: ${describeRating(army)}<br/>`
-    msg += `Wealth: ${describeRating(wealth)}<br/>`
-    msg += `Reserves: ${describeRating(reserves)}<br/>`
-    msg += `Inflation: ${describeRating(inflation)}<br/>`
+    // Loop through all civilization ratings dynamically
+    for (const rating of CIVILIZATION_RATINGS_ALL) {
+        const key = rating.name.toLowerCase()
+        const value = civilization[key]
+        if (value !== undefined) {
+            msg += `${rating.symbol} ${rating.name}: ${describeRating(value)}<br/>`
+        }
+    }
     
     // Policies
     msg += `<br/>`

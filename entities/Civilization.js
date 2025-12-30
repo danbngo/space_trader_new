@@ -84,4 +84,46 @@ class Civilization {
         /** @type {number} */
         this.taxes = taxes; //tax rate applied to most transactions (0 to MAX_TAX_RATE)
     }
+
+    //add(civModifiers = new Civilization()) {}
+    //subtract(civModifiers = new Civilization()) {}
+    multiply(civModifiers = new Civilization()) {
+        for (const cr of CIVILIZATION_RATINGS_ALL) {
+            //if (cr.id === 'cargoPriceModifiers' || cr.id === 'skillPriceModifiers') continue;
+            const modifier = civModifiers[cr.id];
+            if (modifier == null || modifier == undefined || isNaN(modifier) || modifier == 1) continue;
+            this[cr.id] *= civModifiers[cr.id];
+        }
+        for (const [ct, mod] of civModifiers.cargoPriceModifiers.counts) {
+            this.cargoPriceModifiers.multiply(ct, mod)
+        }
+        for (const [st, mod] of civModifiers.skillPriceModifiers.counts) {
+            this.skillPriceModifiers.multiply(st, mod)
+        }
+    }
+    
+    getInverse() {
+        const inverseEffect = new Civilization({
+            planet: this.planet,
+            cargoPriceModifiers: this.cargoPriceModifiers.calcInvertedMultipliers(),
+            skillPriceModifiers: this.skillPriceModifiers.calcInvertedMultipliers(),
+        });
+        for (const cr of CIVILIZATION_RATINGS_ALL) {
+            inverseEffect[cr.id] = 1 / this[cr.id];
+        }
+        return inverseEffect
+    }
+
+    clone() {
+        const clone = new Civilization({
+            planet: this.planet,
+            cargoPriceModifiers: this.cargoPriceModifiers.clone(),
+            skillPriceModifiers: this.skillPriceModifiers.clone(),
+            governmentType: this.governmentType,
+        })
+        for (const cr of CIVILIZATION_RATINGS_ALL) {
+            clone[cr.id] = this[cr.id];
+        }
+        return clone
+    }
 }
