@@ -11,39 +11,39 @@ class ScientificBreakthroughNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                industry: CL.LOW,
-                wealth: CL.LOW,
-                reserves: CL.SLIGHTLY_LOW,
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ISOTOPES, 2]])),
+                civilizationMultipliers: new Civilization({
+                    industry: CL.LOW,
+                    wealth: CL.LOW,
+                    reserves: CL.SLIGHTLY_LOW
+                }),
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ISOTOPES, 2]]))
             })
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        //actual knowledge gained cannot be lost
-        Object.assign(this.completeEffects[0], {
-            wealth: News.clHalfRegression(this.completeEffects[0].wealth),
+        // Actual knowledge gained cannot be lost
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
+            wealth: CL.SLIGHTLY_HIGH,
             technology: CL.HIGH,
             prestige: CL.SLIGHTLY_HIGH,
             education: CL.SLIGHTLY_HIGH,
-            army: CL.SLIGHTLY_HIGH,
-            navy: CL.SLIGHTLY_HIGH,
-        })
+            military: CL.SLIGHTLY_HIGH
+        }))
 
         // Failed: research yields nothing, resources wasted
-        this.failEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                wealth: CL.NO_REGRESSION, // money wasted
-                prestige: CL.LOW, // scientific embarrassment
-            })
-        ]
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
+            wealth: CL.NO_REGRESSION,  // Money wasted
+            prestige: CL.LOW  // Scientific embarrassment
+        }))
+
+        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
     }
 
     determineOutcome() {
         const {planet: p} = this
-        // Research fails based on officer quality and economy
-        const successProbability = (p.c.education * 0.6) + (p.c.economy * 0.3) + 0.1
-        this.failed = Math.random() > successProbability
+        // Research succeeds based on education quality and economy
+        this.rollOutcome(p.c.education * 0.6 + p.c.economy * 0.3 + 0.1)
     }
 
     isValid() {

@@ -1,49 +1,33 @@
 /**
  * @class BountyHuntersEncounter
- * @extends {Encounter}
+ * @extends {AuthoritiesEncounter}
  */
-class BountyHuntersEncounter extends Encounter {
+class BountyHuntersEncounter extends AuthoritiesEncounter {
     onStart() {
-        if (gs.encounter.luck[0] * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > gs.encounter.fleet.totalRadar) {
-            showModal(coloredName(gs.encounter.fleet), 'Your long range sensors detect a bounty hunters fleet before they detect you.<br/>You manage to approach them stealthily.', [
+        if (this.luck[0] * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > this.fleet.totalRadar) {
+            showModal(coloredName(this.fleet), 'Your long range sensors detect a bounty hunters fleet before they detect you.<br/>You manage to approach them stealthily.', [
                 ['View', ()=>closeModal()],
-                ['Bypass', ()=>endEncounter()],
+                ['Bypass', ()=>this.endEncounter()],
                 ['Hail', ()=>{
-                    gs.encounter.luck[0] = 0
-                    gs.encounter.onStart()
+                    this.luck[0] = 0
+                    this.onStart()
                 }],
-                ['Sneak Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, false)],
+                ['Sneak Attack', ()=>this.showPlayerAttackFleetModal(-1, 1, false, false)],
             ])
         }
-        else if (gs.encounter.luck[1] * gs.captain.calcBountyForPlanet(gs.encounter.planet) > 100) {
-            showModal(coloredName(gs.encounter.fleet), `The ${coloredName(gs.encounter.fleet)} have heard of you and the active bounty on your head.<br/>They coldly inform you that they're here to collect one way or another.`, [
+        else if (this.luck[1] * gs.captain.calcBountyForPlanet(this.planet) > 100) {
+            showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} have heard of you and the active bounty on your head.<br/>They coldly inform you that they're here to collect one way or another.`, [
                 ['View', ()=>closeModal()],
-                ['Surrender', ()=>gs.encounter.onSurrender()],
-                ['Resist', ()=>showPlayerRefuseSurrenderModal(-1, 1)],
+                ['Surrender', ()=>this.onSurrender()],
+                ['Resist', ()=>this.showPlayerRefuseSurrenderModal(-1, 1)],
             ])
         }
         else {
-            showModal(coloredName(gs.encounter.fleet), `The ${coloredName(gs.encounter.fleet)} glide past your fleet in eerie silence.`, [
+            showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} glide past your fleet in eerie silence.`, [
                 ['View', ()=>closeModal()],
-                ['Ignore', ()=>endEncounter()],
-                ['Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, false)],
+                ['Ignore', ()=>this.endEncounter()],
+                ['Attack', ()=>this.showPlayerAttackFleetModal(-1, 1, false, false)],
             ])
         }
-    }
-
-    onVictory() {
-        showPlayerDefeatedEnemyModal(-1)
-    }
-
-    onDefeat() {
-        showFineOrJailModal()
-    }
-
-    onEscape() {
-        showPlayerEscapedFromEnemyModal()
-    }
-
-    onSurrender() {
-        showPlayerDidSurrenderModal(-1)
     }
 }

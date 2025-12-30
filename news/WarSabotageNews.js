@@ -11,47 +11,43 @@ class WarSabotageNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                targetPlanet: this.targetPlanet,
-                security: CL.LOW, // agents deployed
-                education: CL.LOW, // agents/spies
+                civilizationMultipliers: new Civilization({
+                    security: CL.LOW,  // Agents deployed
+                    education: CL.LOW  // Agents/spies
+                })
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                targetPlanet: this.planet,
-                army: CL.LOW, // sabotaged military infrastructure
-                navy: CL.SLIGHTLY_LOW,
-                industry: CL.LOW, // factories bombed
+                civilizationMultipliers: new Civilization({
+                    military: CL.SLIGHTLY_LOW,  // Sabotaged military infrastructure
+                    industry: CL.LOW  // Factories bombed
+                })
             })
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         // Attacker: agents lost permanently
-        Object.assign(this.completeEffects[0], {
-            security: CL.NO_REGRESSION, // security apparatus damaged
-            education: CL.NO_REGRESSION, // agents don't return
-        })
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
+            security: CL.NO_REGRESSION,  // Security apparatus damaged
+            education: CL.NO_REGRESSION  // Agents don't return
+        }))
         // Defender: permanent damage from sabotage
-        Object.assign(this.completeEffects[1], {
-            army: CL.NO_REGRESSION,
-            navy: CL.NO_REGRESSION,
-            industry: News.clHalfRegression(this.completeEffects[1].industry),
-        })
+        this.completeEffects[1].civilizationMultipliers.multiply(new Civilization({
+            military: CL.NO_REGRESSION,
+            industry: CL.SLIGHTLY_HIGH
+        }))
 
-        this.cancelEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                targetPlanet: this.targetPlanet,
-                security: News.clHalfRegression(this.completeEffects[0].security),
-                education: News.clHalfRegression(this.completeEffects[0].education),
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                targetPlanet: this.planet,
-                army: News.clHalfRegression(this.completeEffects[1].army),
-                navy: News.clHalfRegression(this.completeEffects[1].navy),
-                industry: News.clHalfRegression(this.completeEffects[1].industry),
-            })
-        ]
+        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
+        this.cancelEffects[0].civilizationMultipliers.multiply(new Civilization({
+            security: CL.SLIGHTLY_HIGH,
+            education: CL.SLIGHTLY_HIGH
+        }))
+        this.cancelEffects[1].civilizationMultipliers.multiply(new Civilization({
+            military: CL.SLIGHTLY_HIGH,
+            industry: CL.SLIGHTLY_HIGH
+        }))
+
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
     }
 
     determineOutcome() {

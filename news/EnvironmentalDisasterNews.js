@@ -11,44 +11,39 @@ class EnvironmentalDisasterNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                inflation: CL.SLIGHTLY_HIGH,
-                reserves: CL.LOW,
-                economy: CL.SLIGHTLY_LOW,
-                industry: CL.VERY_LOW,
-                population: CL.SLIGHTLY_LOW,
-                wealth: CL.LOW,
-                navy: CL.LOW,
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WATER, CL.VERY_HIGH], [CARGO_TYPES.MEDICINE, CL.VERY_HIGH]])),
+                civilizationMultipliers: new Civilization({
+                    inflation: CL.SLIGHTLY_HIGH,
+                    reserves: CL.LOW,
+                    economy: CL.SLIGHTLY_LOW,
+                    industry: CL.VERY_LOW,
+                    population: CL.SLIGHTLY_LOW,
+                    wealth: CL.LOW,
+                    navy: CL.LOW,
+                    cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WATER, CL.VERY_HIGH], [CARGO_TYPES.MEDICINE, CL.VERY_HIGH]])),
+                })
             })
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        //market, economy, industry, population do not fully bounce back
-        Object.assign(this.completeEffects[0], {
-            inflation: News.clHalfRegression(this.completeEffects[0].inflation),
-            reserves: News.clHalfRegression(this.completeEffects[0].reserves),
-            industry: News.clHalfRegression(this.completeEffects[0].industry),
-            population: News.clHalfRegression(this.completeEffects[0].population),
-        })
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
+            inflation: CL.SLIGHTLY_HIGH,
+            reserves: CL.SLIGHTLY_LOW,
+            industry: CL.SLIGHTLY_LOW,
+            population: CL.SLIGHTLY_LOW,
+        }))
 
-        // Failed: cleanup fails, permanent environmental collapse
-        this.failEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                industry: CL.NO_REGRESSION, // permanent damage
-                population: CL.NO_REGRESSION,
-                economy: CL.NO_REGRESSION,
-                reserves: CL.NO_REGRESSION,
-                prestige: CL.VERY_LOW, // ecological disaster
-            })
-        ]
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
+            industry: CL.VERY_LOW,
+            population: CL.SLIGHTLY_LOW,
+            economy: CL.SLIGHTLY_LOW,
+            reserves: CL.LOW,
+            prestige: CL.VERY_LOW,
+        }))
     }
 
     determineOutcome() {
-        const {planet: p} = this
-        // Cleanup fails if economy/industry too weak to recover
-        const failProbability = (1 - p.c.economy) * (1 - p.c.industry) * 0.35
-        this.failed = Math.random() < failProbability
+        this.rollOutcome((this.planet.c.economy + this.planet.c.industry) / 2)
     }
 
     isValid() {

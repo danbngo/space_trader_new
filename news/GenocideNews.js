@@ -11,27 +11,35 @@ class GenocideNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                population: CL.LOW,
-                army: CL.LOW,
-                navy: CL.LOW,
-                economy: CL.LOW,
-                education: CL.LOW,
-                prestige: CL.LOW,
-                crime: CL.LOW
+                civilizationMultipliers: new Civilization({
+                    population: CL.LOW,
+                    army: CL.LOW,
+                    navy: CL.LOW,
+                    economy: CL.LOW,
+                    education: CL.LOW,
+                    prestige: CL.LOW,
+                    crime: CL.LOW
+                })
             })
         ]
+
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        //some lingering security and prestige decrease and destroyed goods
-        Object.assign(this.completeEffects[0], {
-            population: CL.NO_REGRESSION,
-            prestige: CL.NO_REGRESSION,
-            army: CL.NO_REGRESSION,
-            navy: CL.NO_REGRESSION,
-            economy: CL.NO_REGRESSION,
-            education: CL.NO_REGRESSION,
-            crime: CL.NO_REGRESSION,
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
+            population: CL.LOW,
+            prestige: CL.LOW,
+            army: CL.LOW,
+            navy: CL.LOW,
+            economy: CL.LOW,
+            education: CL.LOW,
+            crime: CL.LOW,
             security: CL.VERY_HIGH,
-        })
+        }))
+
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+    }
+
+    determineOutcome() {
+        // Genocide always completes, never fails
     }
 
     isValid() {

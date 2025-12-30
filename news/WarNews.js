@@ -13,52 +13,53 @@ class WarNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                targetPlanet: this.targetPlanet,
                 newRelationship: RELATIONSHIP_TYPES.WAR,
-                army: CL.SLIGHTLY_HIGH,
-                navy: CL.LOW,
-                security: CL.SLIGHTLY_HIGH,
-                economy: CL.LOW,
-                reserves: CL.LOW,
-                //prestige: CL.SLIGHTLY_LOW, //the aggressor loses some prestige
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, 2], [CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_HIGH]])),
+                civilizationMultipliers: new Civilization({
+                    military: CL.SLIGHTLY_HIGH,
+                    security: CL.SLIGHTLY_HIGH,
+                    economy: CL.LOW,
+                    reserves: CL.LOW
+                }),
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.WEAPONS, 2],
+                    [CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_HIGH]
+                ]))
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                targetPlanet: this.planet,
                 newRelationship: RELATIONSHIP_TYPES.WAR,
-                army: CL.SLIGHTLY_HIGH,
-                navy: CL.LOW,
-                security: CL.SLIGHTLY_HIGH,
-                economy: CL.LOW,
-                reserves: CL.LOW,
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, 2], [CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_HIGH]])),
+                civilizationMultipliers: new Civilization({
+                    military: CL.SLIGHTLY_HIGH,
+                    security: CL.SLIGHTLY_HIGH,
+                    economy: CL.LOW,
+                    reserves: CL.LOW
+                }),
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.WEAPONS, 2],
+                    [CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_HIGH]
+                ]))
             })
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        /*Object.assign(this.completeEffects[0], {
-            prestige: CL.NO_REGRESSION, //being a warmonger = bad
-        })*/
 
-
-        this.completeEffects[0].onApply = ()=>{
-            //dont revert relationships if one was vassalized
+        this.completeEffects[0].onApply = () => {
+            // Don't revert relationships if one was vassalized
             if (p.c.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR) p.c.relationships.set(targetPlanet, RELATIONSHIP_TYPES.NEUTRAL)
             console.log('1 war ended between', planet.name, 'and', tp.name)
             console.log('1 new diplomatic status:', p.c.relationships.get(targetPlanet))
             console.log('1 target new diplomatic status:', tp.c.relationships.get(planet))
         }
-        this.completeEffects[1].onApply = ()=>{
-            //dont revert relationships if one was vassalized
+        this.completeEffects[1].onApply = () => {
+            // Don't revert relationships if one was vassalized
             if (tp.c.relationships.get(planet) == RELATIONSHIP_TYPES.WAR) tp.c.relationships.set(planet, RELATIONSHIP_TYPES.NEUTRAL)
             console.log('2 war ended between', planet.name, 'and', tp.name)
             console.log('2 new diplomatic status:', p.c.relationships.get(targetPlanet))
             console.log('2 target new diplomatic status:', tp.c.relationships.get(planet))
-            //if there are no more wars remaining, and there was a world war, end the world war
-            const numWarsRemaining = gs.system.news.filter(n=>(n.newsType == NT.WAR && !n.ended)).length
+            // If there are no more wars remaining, and there was a world war, end the world war
+            const numWarsRemaining = gs.system.news.filter(n => (n.newsType == NT.WAR && !n.ended)).length
             if (numWarsRemaining == 0) {
-                const systemAtWarNews = gs.system.news.find(n=>(n.newsType == META_NT.SYSTEM_AT_WAR && !n.ended))
+                const systemAtWarNews = gs.system.news.find(n => (n.newsType == META_NT.SYSTEM_AT_WAR && !n.ended))
                 if (systemAtWarNews) {
                     console.log('cleaning up world war prematurely')
                     systemAtWarNews.endAsap = true
@@ -68,6 +69,7 @@ class WarNews extends News {
         }
 
         this.cancelEffects = this.completeEffects.map(effect => effect.clone())
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
     }
 
     determineOutcome() {

@@ -104,6 +104,33 @@ class Market extends Building {
         return 1.0
     }
 
+    calcClimateBasedPriceModifier(ct = CARGO_TYPES_ALL[0]) {
+        const planetType = this.planet.planetType
+        
+        // Climate-based price adjustments based on planet type
+        // Gas giants have abundant isotopes
+        if (planetType === PLANET_TYPES.GAS_GIANT || planetType === PLANET_TYPES.GAS_DWARF) {
+            if (ct === CARGO_TYPES.ISOTOPES) return 0.5  // 50% cheaper isotopes
+            if (ct === CARGO_TYPES.METAL) return 1.5     // 50% more expensive metals (scarce)
+            if (ct === CARGO_TYPES.WATER) return 1.3     // 30% more expensive water (scarce)
+        }
+        
+        // Ice giants have abundant water
+        if (planetType === PLANET_TYPES.ICE_GIANT || planetType === PLANET_TYPES.ICE_DWARF) {
+            if (ct === CARGO_TYPES.WATER) return 0.5     // 50% cheaper water
+            if (ct === CARGO_TYPES.METAL) return 1.4     // 40% more expensive metals (scarce)
+            if (ct === CARGO_TYPES.ISOTOPES) return 1.2  // 20% more expensive isotopes
+        }
+        
+        // Terrestrial/Earthlike planets have abundant metals
+        if (planetType === PLANET_TYPES.TERRESTRIAL || planetType === PLANET_TYPES.EARTHLIKE) {
+            if (ct === CARGO_TYPES.METAL) return 0.6     // 40% cheaper metals
+            if (ct === CARGO_TYPES.ISOTOPES) return 1.3  // 30% more expensive isotopes
+        }
+        
+        return 1.0  // No climate adjustment
+    }
+
     calcCargoPriceModifier(ct = CARGO_TYPES_ALL[0]) {
         const civ = this.planet.civilization
         
@@ -169,7 +196,8 @@ class Market extends Building {
     calcCargoBuyPrices() {
         const prices = new CountsMap()
         for (const cargoType of CARGO_TYPES_ALL) {
-            const basePrice = cargoType.value * this.planet.c.cargoPriceMultipliers.getAmount(cargoType) * this.calcCargoPriceModifier(cargoType)
+            const climateModifier = this.calcClimateBasedPriceModifier(cargoType)
+            const basePrice = cargoType.value * this.planet.c.cargoPriceMultipliers.getAmount(cargoType) * this.calcCargoPriceModifier(cargoType) * climateModifier
             let price = 
                 this.blackMarket ? Math.round(basePrice * (1+this.planet.c.corruption) * this.planet.c.inflation / this.planet.c.crime)
                 : Math.round(basePrice * (1+this.planet.c.corruption) * this.planet.c.inflation / this.planet.c.reserves)
@@ -185,7 +213,8 @@ class Market extends Building {
     calcCargoSellPrices() {
         const prices = new CountsMap()
             for (const cargoType of CARGO_TYPES_ALL) {
-            const basePrice = cargoType.value * this.planet.c.cargoPriceMultipliers.getAmount(cargoType)
+            const climateModifier = this.calcClimateBasedPriceModifier(cargoType)
+            const basePrice = cargoType.value * this.planet.c.cargoPriceMultipliers.getAmount(cargoType) * climateModifier
             let price = 
                 this.blackMarket ? Math.round(basePrice / (1+this.planet.c.corruption) * this.planet.c.inflation / this.planet.c.crime)
                 : Math.round(basePrice / (1+this.planet.c.corruption) * this.planet.c.inflation / this.planet.c.reserves)

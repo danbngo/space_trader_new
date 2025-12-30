@@ -11,73 +11,69 @@ class SanctionsNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                targetPlanet: this.targetPlanet,
-                reserves: CL.LOW,
-                economy: CL.LOW,
-                wealth: CL.SLIGHTLY_LOW,
+                civilizationMultipliers: new Civilization({
+                    reserves: CL.LOW,
+                    economy: CL.LOW,
+                    wealth: CL.SLIGHTLY_LOW
+                })
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                targetPlanet: this.planet,
-                reserves: CL.VERY_LOW,
-                economy: CL.VERY_LOW,
-                education: CL.LOW,
-                wealth: CL.LOW,
+                civilizationMultipliers: new Civilization({
+                    reserves: CL.VERY_LOW,
+                    economy: CL.VERY_LOW,
+                    education: CL.LOW,
+                    wealth: CL.LOW
+                })
             })
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        //some lingering damage after
-        Object.assign(this.completeEffects[0], {
-            economy: News.clHalfRegression(this.completeEffects[0].economy),
-            wealth: News.clHalfRegression(this.completeEffects[0].wealth),
-        })
-        Object.assign(this.completeEffects[1], {
-            economy: News.clHalfRegression(this.completeEffects[1].economy),
-        })
+        // Some lingering damage after
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
+            economy: CL.SLIGHTLY_LOW,
+            wealth: CL.SLIGHTLY_LOW
+        }))
+        this.completeEffects[1].civilizationMultipliers.multiply(new Civilization({
+            economy: CL.SLIGHTLY_LOW
+        }))
 
         // Failed: sanctions backfire, hurt sanctioner more
-        this.failEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                economy: CL.VERY_LOW, // domestic economic crisis
-                wealth: CL.LOW,
-                prestige: CL.LOW, // policy failure
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                economy: News.clHalfRegression(CL.VERY_LOW), // partial damage
-            })
-        ]
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
+            economy: CL.VERY_LOW,  // Domestic economic crisis
+            wealth: CL.LOW,
+            prestige: CL.LOW  // Policy failure
+        }))
+        this.failEffects[1].civilizationMultipliers.multiply(new Civilization({
+            economy: CL.SLIGHTLY_LOW  // Partial damage
+        }))
 
         // Cancelled: relations improve, sanctions dropped
-        this.cancelEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                reserves: News.clHalfRegression(CL.LOW),
-                economy: News.clHalfRegression(CL.LOW),
-                wealth: News.clHalfRegression(CL.SLIGHTLY_LOW),
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                reserves: News.clHalfRegression(CL.VERY_LOW),
-                economy: News.clHalfRegression(CL.VERY_LOW),
-                wealth: News.clHalfRegression(CL.LOW),
-            })
-        ]
+        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
+        this.cancelEffects[0].civilizationMultipliers.multiply(new Civilization({
+            reserves: CL.SLIGHTLY_HIGH,
+            economy: CL.SLIGHTLY_HIGH,
+            wealth: CL.SLIGHTLY_HIGH
+        }))
+        this.cancelEffects[1].civilizationMultipliers.multiply(new Civilization({
+            reserves: CL.SLIGHTLY_HIGH,
+            economy: CL.SLIGHTLY_HIGH,
+            wealth: CL.SLIGHTLY_HIGH
+        }))
+    }
+
+    shouldCancel() {
+        const {planet: p, targetPlanet: tp} = this
+        // Cancel if relationship improved
+        const rel = p.c.relationships.get(tp)
+        return rel === RELATIONSHIP_TYPES.NEUTRAL || rel === RELATIONSHIP_TYPES.ALLY
     }
 
     determineOutcome() {
         const {planet: p, targetPlanet: tp} = this
-        // Check if relationship improved
-        const rel = p.c.relationships.get(targetPlanet)
-        if (rel === RELATIONSHIP_TYPES.NEUTRAL || rel === RELATIONSHIP_TYPES.ALLY) {
-            this.cancelled = true
-            return
-        }
-        // Sanctions fail if sanctioner's economy weakens too much
-        const failProbability = 1 - p.c.economy
-        this.failed = Math.random() < failProbability * 0.3
+        // Sanctions succeed unless sanctioner's economy weakens too much
+        this.rollOutcome(p.c.economy * 0.7 + 0.3)
     }
 
     isValid() {

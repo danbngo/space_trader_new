@@ -11,32 +11,33 @@ class TensionsNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                targetPlanet: this.targetPlanet,
                 newRelationship: RELATIONSHIP_TYPES.TENSE,
-                army: CL.SLIGHTLY_HIGH,
-                navy: CL.SLIGHTLY_HIGH,
-                economy: CL.SLIGHTLY_LOW,
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.VERY_HIGH]])),
+                civilizationMultipliers: new Civilization({
+                    military: CL.SLIGHTLY_HIGH,
+                    economy: CL.SLIGHTLY_LOW
+                }),
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.VERY_HIGH]]))
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                targetPlanet: this.planet,
                 newRelationship: RELATIONSHIP_TYPES.TENSE,
-                army: CL.SLIGHTLY_HIGH,
-                navy: CL.SLIGHTLY_HIGH,
-                economy: CL.SLIGHTLY_LOW,
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.VERY_HIGH]])),
+                civilizationMultipliers: new Civilization({
+                    military: CL.SLIGHTLY_HIGH,
+                    economy: CL.SLIGHTLY_LOW
+                }),
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.VERY_HIGH]]))
             })
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         for (const fx of this.completeEffects) {
-            fx.onApply = ()=>{
+            fx.onApply = () => {
                 if (p.c.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.TENSE) p.c.relationships.set(targetPlanet, RELATIONSHIP_TYPES.NEUTRAL)
             }
         }
 
         this.cancelEffects = this.completeEffects.map(effect => effect.clone())
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
     }
 
     determineOutcome() {

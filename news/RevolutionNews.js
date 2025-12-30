@@ -17,55 +17,50 @@ class RevolutionNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 newGovernmentType: GT.ANARCHY ? null : GT.ANARCHY,
-                army: CL.VERY_LOW,
-                navy: CL.VERY_LOW,
-                security: CL.VERY_LOW,
-                crime: CL.VERY_HIGH,
-                economy: CL.LOW,
-                industry: CL.LOW,
-                //credits: CL.VERY_LOW,
+                civilizationMultipliers: new Civilization({
+                    military: CL.VERY_LOW,
+                    security: CL.VERY_LOW,
+                    crime: CL.VERY_HIGH,
+                    economy: CL.LOW,
+                    industry: CL.LOW
+                }),
                 buildingsDisabled: courthouseBuilding ? [courthouseBuilding] : [],
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.VERY_HIGH], [CARGO_TYPES.HOLOCUBES, CL.VERY_HIGH]])),
-                //relationsReset: true
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.VERY_HIGH], [CARGO_TYPES.HOLOCUBES, CL.VERY_HIGH]]))
             })
         ]
 
-        //dont revert the government type back afterwards
+        // Don't revert the government type back afterwards
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
+        // Government related ratings randomize a bit after a revolution
+        this.completeEffects[0].newGovernmentType = newGovernmentType
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
+            military: (rng(0.5, 1.5, false) + 1) / 2,
+            security: (rng(0.5, 1.5, false) + 1) / 2,
+            industry: (rng(0.5, 1.5, false) + 1) / 2,
+            wealth: (rng(0.5, 1.5, false) + 1) / 2,
+            prestige: (rng(0.5, 1.5, false) + 1) / 2
+        }))
 
-        //government related ratings randomize a bit after a revolution
-        Object.assign(this.completeEffects[0], {
-            newGovernmentType,
-            army: (rng(0.5,1.5,false) + this.completeEffects[0].army)/2,
-            navy: (rng(0.5,1.5,false) + this.completeEffects[0].navy)/2,
-            security: (rng(0.5,1.5,false)  + this.completeEffects[0].security)/2,
-            industry: (rng(0.5,1.5,false)  + this.completeEffects[0].industry)/2,
-            wealth: (rng(0.5,1.5,false)  + this.completeEffects[0].wealth)/2,
-            prestige: (rng(0.5,1.5,false)  + this.completeEffects[0].prestige)/2,
-        })
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        this.failEffects[0].newGovernmentType = GT.ANARCHY
+        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
+            military: CL.NO_REGRESSION,
+            security: CL.NO_REGRESSION,
+            crime: CL.NO_REGRESSION,
+            economy: CL.NO_REGRESSION,
+            industry: CL.NO_REGRESSION,
+            prestige: CL.VERY_LOW
+        }))
+        this.failEffects[0].buildingsEnabled = courthouseBuilding ? [] : []
+        this.failEffects[0].cargoPriceMultipliers = new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.NO_REGRESSION]]))
 
-        this.failEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                newGovernmentType: GT.ANARCHY,
-                army: CL.NO_REGRESSION,
-                navy: CL.NO_REGRESSION,
-                security: CL.NO_REGRESSION,
-                crime: CL.NO_REGRESSION,
-                economy: CL.NO_REGRESSION,
-                industry: CL.NO_REGRESSION,
-                prestige: CL.VERY_LOW,
-                buildingsEnabled: courthouseBuilding ? [] : [],
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.NO_REGRESSION]])),
-            })
-        ]
+        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
     }
 
     determineOutcome() {
         const {planet: p} = this
         // Higher military and prestige = more likely to succeed
-        const successProbability = (p.c.military + p.c.prestige) / 2
-        this.failed = Math.random() > successProbability
+        this.rollOutcome((p.c.military + p.c.prestige) / 2)
     }
 
     isValid() {

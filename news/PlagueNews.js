@@ -11,41 +11,48 @@ class PlagueNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                population: CL.VERY_LOW,
-                economy: CL.VERY_LOW,
-                industry: CL.VERY_LOW,
-                education: CL.VERY_LOW,
-                inflation: CL.SLIGHTLY_HIGH,
-                reserves: CL.SLIGHTLY_LOW,
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.MEDICINE, CL.EXTREMELY_HIGH]])),
+                civilizationMultipliers: new Civilization({
+                    population: CL.VERY_LOW,
+                    economy: CL.VERY_LOW,
+                    industry: CL.VERY_LOW,
+                    education: CL.VERY_LOW,
+                    inflation: CL.SLIGHTLY_HIGH,
+                    reserves: CL.SLIGHTLY_LOW
+                }),
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.MEDICINE, CL.EXTREMELY_HIGH]
+                ]))
             })
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        //population does not fully bounce back
-        Object.assign(this.completeEffects[0], {
-            population: News.clHalfRegression(this.completeEffects[0].population),
-            education: News.clHalfRegression(this.completeEffects[0].education),
-        })
+        // Population does not fully bounce back
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
+            population: CL.SLIGHTLY_LOW,
+            education: CL.SLIGHTLY_LOW
+        }))
 
-        this.failEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                population: CL.NO_REGRESSION,
-                economy: CL.NO_REGRESSION,
-                industry: CL.NO_REGRESSION,
-                education: CL.NO_REGRESSION,
-                prestige: CL.VERY_LOW,
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.MEDICINE, CL.NO_REGRESSION]])),
-            })
-        ]
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
+            population: CL.NO_REGRESSION,
+            economy: CL.NO_REGRESSION,
+            industry: CL.NO_REGRESSION,
+            education: CL.NO_REGRESSION,
+            prestige: CL.VERY_LOW
+        }))
+        // Medicine prices stay high
+        this.failEffects[0].cargoPriceMultipliers = new CountsMap(new Map([
+            [CARGO_TYPES.MEDICINE, CL.NO_REGRESSION]
+        ]))
+
+        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
     }
 
     determineOutcome() {
         const {planet: p} = this
         // Higher economy/industry = better medical infrastructure
         const cureProbability = (p.c.economy + p.c.industry) / 2
-        this.failed = Math.random() > cureProbability
+        this.rollOutcome(cureProbability)
     }
 
     isValid() {

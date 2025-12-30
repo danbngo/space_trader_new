@@ -12,84 +12,71 @@ class EnslavementNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
-                economy: CL.HIGH,
-                industry: CL.HIGH,
-                population: CL.VERY_HIGH,
-                security: CL.VERY_LOW,
-                prestige: CL.LOW,
+                civilizationMultipliers: new Civilization({
+                    economy: CL.HIGH,
+                    industry: CL.HIGH,
+                    population: CL.VERY_HIGH,
+                    security: CL.VERY_LOW,
+                    prestige: CL.LOW,
+                })
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
-                population: CL.LOW,
-                security: CL.LOW,
-                education: CL.LOW, // skilled workers taken
+                civilizationMultipliers: new Civilization({
+                    population: CL.LOW,
+                    security: CL.LOW,
+                    education: CL.LOW,
+                })
             })
         ]
+
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        // Enslaver: economy and population gains are permanent, prestige loss lingers
-        Object.assign(this.completeEffects[0], {
-            security: News.clHalfRegression(this.completeEffects[0].security),
-            prestige: News.clHalfRegression(this.completeEffects[0].prestige),
-            population: CL.NO_REGRESSION,
-            economy: News.clHalfRegression(this.completeEffects[0].economy),
-            industry: News.clHalfRegression(this.completeEffects[0].industry),
-        })
-        // Victim: permanent population loss, prestige loss
-        Object.assign(this.completeEffects[1], {
-            population: CL.NO_REGRESSION, // stolen population doesn't return
-            education: CL.NO_REGRESSION,
-            //prestige: CL.NO_REGRESSION, // permanent shame
-            economy: News.clHalfRegression(this.completeEffects[1].economy),
-            industry: News.clHalfRegression(this.completeEffects[1].industry),
-            security: News.clHalfRegression(this.completeEffects[1].security),
-        })
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
+            security: CL.SLIGHTLY_LOW,
+            prestige: CL.SLIGHTLY_LOW,
+            population: CL.VERY_HIGH, // keep population gains
+            economy: CL.SLIGHTLY_HIGH,
+            industry: CL.SLIGHTLY_HIGH,
+        }))
+        this.completeEffects[1].civilizationMultipliers.multiply(new Civilization({
+            population: CL.LOW, // permanent population loss
+            education: CL.LOW, // permanent education loss
+        }))
 
-        // Failed: slave revolts
-        this.failEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                population: CL.LOW, // casualties in revolts
-                security: CL.VERY_LOW, // civil unrest
-                economy: CL.LOW, // disruption
-                industry: CL.LOW,
-                prestige: CL.VERY_LOW, // humanitarian crisis
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                population: News.clHalfRegression(CL.LOW), // some freed slaves return
-                prestige: CL.HIGH, // liberation celebrated
-            })
-        ]
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
+            population: CL.LOW,
+            security: CL.VERY_LOW,
+            economy: CL.LOW,
+            industry: CL.LOW,
+            prestige: CL.VERY_LOW,
+        }))
+        this.failEffects[1].civilizationMultipliers.multiply(new Civilization({
+            population: CL.SLIGHTLY_LOW,
+            prestige: CL.HIGH,
+        }))
 
-        // Cancelled: peace forces liberation
-        this.cancelEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                population: News.clHalfRegression(CL.VERY_HIGH),
-                economy: News.clHalfRegression(CL.HIGH),
-                industry: News.clHalfRegression(CL.HIGH),
-                security: News.clHalfRegression(CL.VERY_LOW),
-                prestige: News.clHalfRegression(CL.LOW),
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                population: News.clHalfRegression(CL.LOW), // partial return
-            })
-        ]
+        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
+        this.cancelEffects[0].civilizationMultipliers.multiply(new Civilization({
+            population: CL.SLIGHTLY_HIGH,
+            economy: CL.SLIGHTLY_HIGH,
+            industry: CL.SLIGHTLY_HIGH,
+            security: CL.SLIGHTLY_LOW,
+            prestige: CL.SLIGHTLY_LOW,
+        }))
+        this.cancelEffects[1].civilizationMultipliers.multiply(new Civilization({
+            population: CL.SLIGHTLY_LOW,
+        }))
+    }
+
+    shouldCancel() {
+        const rel = this.planet.c.relationships.get(this.targetPlanet)
+        return rel === RELATIONSHIP_TYPES.NEUTRAL || rel === RELATIONSHIP_TYPES.ALLY
     }
 
     determineOutcome() {
-        const {planet: p, targetPlanet: tp} = this
-        // Check if peace declared
-        const rel = p.c.relationships.get(targetPlanet)
-        if (rel === RELATIONSHIP_TYPES.NEUTRAL || rel === RELATIONSHIP_TYPES.ALLY) {
-            this.cancelled = true
-            return
-        }
-        // Slavery fails if security too low (revolts)
-        const revoltProbability = (1 - p.c.security) * 0.45
-        this.failed = Math.random() < revoltProbability
+        this.rollOutcome(this.planet.c.security)
     }
 
     isValid() {

@@ -11,39 +11,47 @@ class TerraformingNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                education: CL.LOW,
-                wealth: CL.LOW,
-                navy: CL.SLIGHTLY_LOW,
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.METAL, CL.VERY_HIGH], [CARGO_TYPES.NANITES, CL.VERY_HIGH]])),
+                civilizationMultipliers: new Civilization({
+                    education: CL.LOW,
+                    wealth: CL.LOW,
+                    military: CL.SLIGHTLY_LOW
+                }),
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.METAL, CL.VERY_HIGH],
+                    [CARGO_TYPES.NANITES, CL.VERY_HIGH]
+                ]))
             })
         ]
+
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         // Ships and officers stay deployed, territory and industry gains are permanent
-        Object.assign(this.completeEffects[0], {
-            navy: CL.NO_REGRESSION, // ships stay stationed there
-            education: CL.NO_REGRESSION, // officers maintain quality
-            industry: CL.SLIGHTLY_HIGH, // permanent industry boost
-            economy: CL.SLIGHTLY_HIGH, // permanent economy boost
-            territory: CL.SLIGHTLY_HIGH, // permanent territory gain
-        })
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
+            military: CL.NO_REGRESSION,  // Ships stay stationed there
+            education: CL.NO_REGRESSION,  // Officers maintain quality
+            industry: CL.SLIGHTLY_HIGH,  // Permanent industry boost
+            economy: CL.SLIGHTLY_HIGH,  // Permanent economy boost
+            territory: CL.SLIGHTLY_HIGH  // Permanent territory gain
+        }))
 
-        this.failEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                navy: CL.NO_REGRESSION,
-                education: CL.NO_REGRESSION,
-                wealth: CL.NO_REGRESSION,
-                prestige: CL.LOW,
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.METAL, CL.NO_REGRESSION], [CARGO_TYPES.NANITES, CL.NO_REGRESSION]])),
-            })
-        ]
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
+            military: CL.NO_REGRESSION,
+            education: CL.NO_REGRESSION,
+            wealth: CL.NO_REGRESSION,
+            prestige: CL.LOW
+        }))
+        this.failEffects[0].cargoPriceMultipliers = new CountsMap(new Map([
+            [CARGO_TYPES.METAL, CL.NO_REGRESSION],
+            [CARGO_TYPES.NANITES, CL.NO_REGRESSION]
+        ]))
+
+        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
     }
 
     determineOutcome() {
         const {planet: p} = this
-        // Higher industry and officer quality = more likely to succeed
-        const successProbability = (p.c.industry + p.c.education) / 2
-        this.failed = Math.random() > successProbability
+        // Higher industry and education = more likely to succeed
+        this.rollOutcome((p.c.industry + p.c.education) / 2)
     }
 
     isValid() {

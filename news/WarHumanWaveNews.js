@@ -11,51 +11,52 @@ class WarHumanWaveNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                targetPlanet: this.targetPlanet,
-                population: CL.VERY_LOW, // massive casualties
-                education: CL.LOW, // officers leading charges
+                civilizationMultipliers: new Civilization({
+                    population: CL.VERY_LOW,  // Massive casualties
+                    education: CL.LOW  // Officers leading charges
+                })
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                targetPlanet: this.planet,
+                civilizationMultipliers: new Civilization({})
             })
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         // Attacker: massive permanent losses
-        Object.assign(this.completeEffects[0], {
-            population: CL.NO_REGRESSION, // dead don't return
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
+            population: CL.NO_REGRESSION,  // Dead don't return
             education: CL.NO_REGRESSION,
-            prestige: CL.NO_REGRESSION,
-        })
+            prestige: CL.NO_REGRESSION
+        }))
         // Defender: permanent losses
-        Object.assign(this.completeEffects[1], {
-            education: CL.LOW, // officers killed defending
-            army: CL.SLIGHTLY_LOW, // ground forces worn down
-        })
+        this.completeEffects[1].civilizationMultipliers.multiply(new Civilization({
+            education: CL.LOW,  // Officers killed defending
+            military: CL.SLIGHTLY_LOW  // Ground forces worn down
+        }))
 
         // Cancelled: peace declared mid-offensive, troops pull back
-        this.cancelEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                population: News.clHalfRegression(CL.VERY_LOW), // some casualties already taken
-                education: News.clHalfRegression(CL.LOW),
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                education: News.clHalfRegression(CL.LOW),
-                army: News.clHalfRegression(CL.SLIGHTLY_LOW),
-            })
-        ]
+        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
+        this.cancelEffects[0].civilizationMultipliers.multiply(new Civilization({
+            population: CL.SLIGHTLY_LOW,  // Some casualties already taken
+            education: CL.SLIGHTLY_HIGH
+        }))
+        this.cancelEffects[1].civilizationMultipliers.multiply(new Civilization({
+            education: CL.SLIGHTLY_HIGH,
+            military: CL.SLIGHTLY_HIGH
+        }))
+
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+    }
+
+    shouldCancel() {
+        const {planet: p, targetPlanet: tp} = this
+        // Cancel if war no longer ongoing
+        return p.c.relationships.get(tp) !== RELATIONSHIP_TYPES.WAR
     }
 
     determineOutcome() {
-        const {planet: p, targetPlanet: tp} = this
-        // Check if war still ongoing
-        const stillAtWar = p.c.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
-        if (!stillAtWar) {
-            this.cancelled = true
-        }
+        // Human wave attacks always complete (no rollOutcome needed)
     }
 
     isValid() {

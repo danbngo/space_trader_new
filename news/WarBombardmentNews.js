@@ -19,67 +19,65 @@ class WarBombardmentNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                targetPlanet: this.targetPlanet,
-                prestige: CL.HIGH, //this makes you scary...
-                army: CL.SLIGHTLY_LOW, //but expends some of your arsenal
-                navy: CL.SLIGHTLY_LOW,
+                civilizationMultipliers: new Civilization({
+                    prestige: CL.HIGH,  // This makes you scary...
+                    military: CL.SLIGHTLY_LOW  // But expends some of your arsenal
+                })
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                targetPlanet: this.planet,
-                population: CL.LOW,
-                army: CL.EXTREMELY_LOW,
-                navy: CL.EXTREMELY_LOW,
-                industry: CL.LOW,
-                economy: CL.LOW,
-                security: CL.LOW,
-                reserves: CL.LOW,
-                inflation: CL.EXTREMELY_HIGH,
-                technology: CL.LOW, //back to the stone age!
-                education: CL.LOW,
-                prestige: CL.VERY_LOW,
+                civilizationMultipliers: new Civilization({
+                    population: CL.LOW,
+                    military: CL.EXTREMELY_LOW,
+                    industry: CL.LOW,
+                    economy: CL.LOW,
+                    security: CL.LOW,
+                    reserves: CL.LOW,
+                    inflation: CL.EXTREMELY_HIGH,
+                    technology: CL.LOW,  // Back to the stone age!
+                    education: CL.LOW,
+                    prestige: CL.VERY_LOW
+                }),
                 buildingsDisabled: buildingsToDisable,
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WATER, 2], [CARGO_TYPES.MEDICINE, 2], [CARGO_TYPES.HOLOCUBES, 0.5]])), //this is the only thing that normalizes after
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.WATER, 2],
+                    [CARGO_TYPES.MEDICINE, 2],
+                    [CARGO_TYPES.HOLOCUBES, 0.5]
+                ]))
             })
         ]
 
-        //dont automatically recover. lets add recovery events elsewhere
+        // Don't automatically recover
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        Object.assign(this.completeEffects[1], {
+        this.completeEffects[1].civilizationMultipliers.multiply(new Civilization({
             population: CL.NO_REGRESSION,
-            army: CL.NO_REGRESSION,
-            navy: CL.NO_REGRESSION,
+            military: CL.NO_REGRESSION,
             industry: CL.NO_REGRESSION,
             economy: CL.NO_REGRESSION,
             security: CL.NO_REGRESSION,
             reserves: CL.NO_REGRESSION,
             technology: CL.NO_REGRESSION,
             education: CL.NO_REGRESSION,
-            prestige: CL.NO_REGRESSION,
-            buildingsEnabled: [],
-            forcePeace: true,
-        })
+            prestige: CL.NO_REGRESSION
+        }))
+        this.completeEffects[1].buildingsEnabled = []
+        this.completeEffects[1].forcePeace = true
 
-        this.cancelEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                targetPlanet: this.targetPlanet,
-                prestige: CL.NO_REGRESSION,
-                army: News.clHalfRegression(this.completeEffects[0].army),
-                navy: News.clHalfRegression(this.completeEffects[0].navy),
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                targetPlanet: this.planet,
-                population: News.clHalfRegression(this.completeEffects[1].population),
-                army: News.clHalfRegression(this.completeEffects[1].army),
-                navy: News.clHalfRegression(this.completeEffects[1].navy),
-                industry: News.clHalfRegression(this.completeEffects[1].industry),
-                economy: News.clHalfRegression(this.completeEffects[1].economy),
-                security: News.clHalfRegression(this.completeEffects[1].security),
-                forcePeace: true,
-            })
-        ]
+        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
+        this.cancelEffects[0].civilizationMultipliers.multiply(new Civilization({
+            prestige: CL.NO_REGRESSION,
+            military: CL.SLIGHTLY_HIGH
+        }))
+        this.cancelEffects[1].civilizationMultipliers.multiply(new Civilization({
+            population: CL.SLIGHTLY_HIGH,
+            military: CL.SLIGHTLY_HIGH,
+            industry: CL.SLIGHTLY_HIGH,
+            economy: CL.SLIGHTLY_HIGH,
+            security: CL.SLIGHTLY_HIGH
+        }))
+        this.cancelEffects[1].forcePeace = true
+
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
     }
 
     determineOutcome() {

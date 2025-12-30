@@ -1,57 +1,57 @@
 /**
  * @class SmugglersEncounter
- * @extends {Encounter}
+ * @extends {MercantileEncounter}
  */
-class SmugglersEncounter extends Encounter {
+class SmugglersEncounter extends MercantileEncounter {
     onStart() {
-        if (gs.encounter.luck[0] * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > gs.encounter.fleet.totalRadar) {
-            showModal(coloredName(gs.encounter.fleet), 'Your long range sensors detect a smuggler fleet before they detect you.<br/>You manage to approach them stealthily.', [
+        if (this.luck[0] * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > this.fleet.totalRadar) {
+            showModal(coloredName(this.fleet), 'Your long range sensors detect a smuggler fleet before they detect you.<br/>You manage to approach them stealthily.', [
                 ['View', ()=>closeModal()],
-                ['Bypass', ()=>endEncounter()],
+                ['Bypass', ()=>this.endEncounter()],
                 ['Hail', ()=>{
-                    gs.encounter.luck[0] = 0
-                    gs.encounter.onStart()
+                    this.luck[0] = 0
+                    this.onStart()
                 }],
-                ['Sneak Attack', ()=>showPlayerAttackFleetModal(1, 0, false, true)],
+                ['Sneak Attack', ()=>this.showPlayerAttackFleetModal(1, 0, false, true)],
             ])
         }
-        else if (gs.encounter.luck[1] * gs.captain.calcFameForPlanet(gs.encounter.planet) > 100) {
-            showModal(coloredName(gs.encounter.fleet), `The ${coloredName(gs.encounter.fleet)} have heard of your hostility towards the criminal community and quickly flee!`, [
+        else if (this.luck[1] * gs.captain.calcFameForPlanet(this.planet) > 100) {
+            showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} have heard of your hostility towards the criminal community and quickly flee!`, [
                 ['View', ()=>closeModal()],
-                ['Ignore', ()=>endEncounter()],
-                ['Attack', ()=>showPlayerAttackFleetModal(1, 0, false, true)],
+                ['Ignore', ()=>this.endEncounter()],
+                ['Attack', ()=>this.showPlayerAttackFleetModal(1, 0, false, true)],
             ])
         }
-        else if (gs.encounter.luck[2] > .5) {
-            showModal(coloredName(gs.encounter.fleet), `The ${coloredName(gs.encounter.fleet)} broadcast a rather seedy invitation to peruse their illicit wares.`, [
+        else if (this.luck[2] > .5) {
+            showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} broadcast a rather seedy invitation to peruse their illicit wares.`, [
                 ['View', ()=>closeModal()],
-                ['Trade', ()=>showTradeOfferModal(false)],
-                ['Ignore', ()=>endEncounter()],
-                ['Attack', ()=>showPlayerAttackFleetModal(1, 0, false, true)],
+                ['Trade', ()=>this.showTradeOfferModal(false)],
+                ['Ignore', ()=>this.endEncounter()],
+                ['Attack', ()=>this.showPlayerAttackFleetModal(1, 0, false, true)],
             ])
         }
         else {
-            showModal(coloredName(gs.encounter.fleet), `The ${coloredName(gs.encounter.fleet)} take no chances and start moving quickly away from you.`, [
+            showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} take no chances and start moving quickly away from you.`, [
                 ['View', ()=>closeModal()],
-                ['Ignore', ()=>endEncounter()],
-                ['Attack', ()=>showPlayerAttackFleetModal(1, 0, false, true)],
+                ['Ignore', ()=>this.endEncounter()],
+                ['Attack', ()=>this.showPlayerAttackFleetModal(1, 0, false, true)],
             ])
         }
     }
 
     onVictory() {
-        showPlayerDefeatedEnemyModal(1)
+        this.showPlayerDefeatedEnemyModal(1)
     }
 
     onDefeat() {
-        showPlayerDefeatedByNeutralsModal(1)
+        this.showPlayerDefeatedByNeutralsModal(1)
     }
 
     onEscape() {
-        showPlayerEscapedFromEnemyModal()
+        this.showPlayerEscapedFromEnemyModal()
     }
 
     onSurrender() {
-        gs.encounter.onDefeat()
+        this.onDefeat()
     }
 }

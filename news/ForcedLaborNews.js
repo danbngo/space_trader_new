@@ -11,41 +11,36 @@ class ForcedLaborNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                industry: CL.VERY_HIGH,
-                economy: CL.SLIGHTLY_LOW,
-                population: CL.LOW,
-                prestige: CL.LOW,
-                reserves: CL.HIGH,
-                //inflation: CL.LOW,
+                civilizationMultipliers: new Civilization({
+                    industry: CL.VERY_HIGH,
+                    economy: CL.SLIGHTLY_LOW,
+                    population: CL.LOW,
+                    prestige: CL.LOW,
+                    reserves: CL.HIGH,
+                })
             })
         ]
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        // Industrial gains are permanent, economy damage and prestige loss are permanent
-        Object.assign(this.completeEffects[0], {
-            industry: News.clHalfRegression(this.completeEffects[0].industry),
-            population: News.clHalfRegression(this.completeEffects[0].population),
-            reserves: News.clHalfRegression(this.completeEffects[0].reserves),
-            prestige: CL.NO_REGRESSION, // permanent prestige loss
-        })
 
-        // Failed: revolts shut down camps, no industrial gain
-        this.failEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                population: CL.VERY_LOW, // mass casualties in revolts
-                economy: CL.LOW, // disruption
-                prestige: CL.VERY_LOW, // humanitarian crisis
-                crime: CL.VERY_HIGH, // lawlessness from revolts
-                army: CL.LOW, // military stretched dealing with revolts
-            })
-        ]
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
+            industry: CL.SLIGHTLY_HIGH,
+            population: CL.SLIGHTLY_LOW,
+            reserves: CL.SLIGHTLY_HIGH,
+            prestige: CL.LOW,
+        }))
+
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
+            population: CL.VERY_LOW,
+            economy: CL.LOW,
+            prestige: CL.VERY_LOW,
+            crime: CL.VERY_HIGH,
+            army: CL.LOW,
+        }))
     }
 
     determineOutcome() {
-        const {planet: p} = this
-        // Forced labor fails if security too low (revolts succeed)
-        const revoltProbability = (1 - p.c.security) * 0.4
-        this.failed = Math.random() < revoltProbability
+        this.rollOutcome(this.planet.c.security)
     }
 
     isValid() {

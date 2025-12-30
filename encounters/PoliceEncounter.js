@@ -1,63 +1,78 @@
 /**
  * @class PoliceEncounter
- * @extends {Encounter}
+ * @extends {AuthoritiesEncounter}
  */
-class PoliceEncounter extends Encounter {
+class PoliceEncounter extends AuthoritiesEncounter {
     onStart() {
-        if (gs.encounter.luck[0] * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > gs.encounter.fleet.totalRadar) {
-            showModal(coloredName(gs.encounter.fleet), `Your long range sensors detect a ${coloredName(gs.encounter.fleet)} fleet before they detect you.<br/>You manage to approach the ${coloredName(gs.encounter.fleet)} stealthily.`, [
+        if (this.luck[0] * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > this.fleet.totalRadar) {
+            showModal(coloredName(this.fleet), `Your long range sensors detect a ${coloredName(this.fleet)} fleet before they detect you.<br/>You manage to approach the ${coloredName(this.fleet)} stealthily.`, [
                 ['View', ()=>closeModal()],
-                ['Bypass', ()=>endEncounter()],
+                ['Bypass', ()=>this.endEncounter()],
                 ['Hail', ()=>{
-                    gs.encounter.luck[0] = 0
-                    gs.encounter.onStart()
+                    this.luck[0] = 0
+                    this.onStart()
                 }],
-                ['Sneak Attack', ()=>showPlayerAttackFleetModal(-2, 2, false, false)],
+                ['Sneak Attack', ()=>this.showPlayerAttackFleetModal(-2, 2, false, false)],
             ])
         }
-        else if (gs.encounter.luck[1]*gs.captain.calcReputationForPlanet(gs.encounter.planet) > 200) {
-            showModal(coloredName(gs.encounter.fleet), `The ${coloredName(gs.encounter.fleet)} greet you respectfully, having heard of your good deeds.<br/>They don't even trouble you with the routine inspection.`, [
+        else if (this.luck[1]*gs.captain.calcReputationForPlanet(this.planet) > 200) {
+            showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} greet you respectfully, having heard of your good deeds.<br/>They don't even trouble you with the routine inspection.`, [
                 ['View', ()=>closeModal()],
-                ['Ignore', ()=>endEncounter()],
-                ['Attack', ()=>showPlayerAttackFleetModal(-2, 2, false, false)],
+                ['Ignore', ()=>this.endEncounter()],
+                ['Attack', ()=>this.showPlayerAttackFleetModal(-2, 2, false, false)],
             ])
         }
-        if (gs.encounter.luck[2]*gs.captain.calcInfamyForPlanet(gs.encounter.planet) > 50 && gs.captain.calcBountyForPlanet(gs.encounter.planet) > 0) {
-            showModal(coloredName(gs.encounter.fleet), `The ${coloredName(gs.encounter.fleet)} activate their sirens the instant you pass by!<br/>It seems your bad reputation has preceded you.`, [
+        if (this.luck[2]*gs.captain.calcInfamyForPlanet(this.planet) > 50 && gs.captain.calcBountyForPlanet(this.planet) > 0) {
+            showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} activate their sirens the instant you pass by!<br/>It seems your bad reputation has preceded you.`, [
                 ['View', ()=>closeModal()],
-                ['Surrender', ()=>gs.encounter.onSurrender()],
-                ['Resist', ()=>showPlayerRefuseSurrenderModal(-2, 2)],
+                ['Surrender', ()=>this.onSurrender()],
+                ['Resist', ()=>this.showPlayerRefuseSurrenderModal(-2, 2)],
             ])
         }
-        else if (gs.encounter.luck[3] < 0.5) {
-            showModal(coloredName(gs.encounter.fleet), `The ${coloredName(gs.encounter.fleet)} ships pull alongside your fleet and order you to submit to a routine inspection.`, [
+        else if (this.luck[3] < 0.5) {
+            showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} ships pull alongside your fleet and order you to submit to a routine inspection.`, [
                 ['View', ()=>closeModal()],
-                ['Accept', ()=>showPlayerPoliceInspectionModal()],
-                ['Resist', ()=>showPlayerRefuseSurrenderModal(-2, 2)],
+                ['Accept', ()=>this.showPlayerPoliceInspectionModal()],
+                ['Resist', ()=>this.showPlayerRefuseSurrenderModal(-2, 2)],
             ])
         }
         else {
-            showModal(coloredName(gs.encounter.fleet), `The ${coloredName(gs.encounter.fleet)} ships speed past your fleet, perhaps responding to some other incident.`, [
+            showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} ships speed past your fleet, perhaps responding to some other incident.`, [
                 ['View', ()=>closeModal()],
-                ['Ignore', ()=>endEncounter()],
-                ['Attack', ()=>showPlayerAttackFleetModal(-2, 2, false, false)],
+                ['Ignore', ()=>this.endEncounter()],
+                ['Attack', ()=>this.showPlayerAttackFleetModal(-2, 2, false, false)],
             ])
         }
     }
 
     onVictory() {
-        showPlayerDefeatedEnemyModal(-2)
+        this.showPlayerDefeatedEnemyModal(-2)
     }
 
     onDefeat() {
-        showPlayerDefeatedByPoliceModal()
-    }
-
-    onEscape() {
-        showPlayerEscapedFromEnemyModal()
+        this.showPlayerDefeatedByAuthoritiesModal()
     }
 
     onSurrender() {
-        showPlayerDidSurrenderModal(-1)
+        this.showPlayerDidSurrenderModal(-1)
     }
+
+    
+    showPlayerPoliceInspectionModal() {
+        console.log('showPlayerPoliceInspectionModal');
+        let msg = ''
+        const {enemyFleet} = this
+        const [fine, seized] = this.seizePlayerContraband()
+        if (fine == 0) {
+            msg += `The ${coloredName(enemyFleet)} inspect your cargo and find nothing illegal. They thank you for your cooperation and wish you a safe journey.<br/>`
+            showModal(coloredName(enemyFleet), msg, [['Continue', ()=>this.endEncounter()]])
+        }
+        else {
+            msg += `The ${coloredName(enemyFleet)} inspect your cargo and discover ${seized.total} units of contraband!<br/>`
+            msg += `All of your contraband is confiscated.<br/>`
+            showModal(coloredName(enemyFleet), msg, [['Continue', ()=> this.showFineOrJailModal(fine)]])
+        }
+    }
+   
+
 }

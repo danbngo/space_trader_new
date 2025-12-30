@@ -20,7 +20,7 @@ function generateEncounter(encounterType = rndMember(ENCOUNTER_TYPES_ALL), plane
     
     // Get the encounter class from the encounterType
     const EncounterClass = encounterType.encounterClass || Encounter
-    const encounter = new EncounterClass(gs, encounterType, planet, fleet, effects)
+    const encounter = new EncounterClass(encounterType, planet, fleet, effects)
     
     console.log('generated encounter:', { encounter, encounterType, planet, fleet, effects });
     return encounter

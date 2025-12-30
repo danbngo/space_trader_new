@@ -11,79 +11,78 @@ class TradeAgreementNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                targetPlanet: this.targetPlanet,
-                reserves: CL.HIGH,
-                economy: CL.SLIGHTLY_HIGH,
-                education: CL.HIGH,
-                technology: CL.SLIGHTLY_HIGH,
-                wealth: CL.HIGH,
+                civilizationMultipliers: new Civilization({
+                    reserves: CL.HIGH,
+                    economy: CL.SLIGHTLY_HIGH,
+                    education: CL.HIGH,
+                    technology: CL.SLIGHTLY_HIGH,
+                    wealth: CL.HIGH
+                })
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                targetPlanet: this.planet,
-                reserves: CL.HIGH,
-                economy: CL.SLIGHTLY_HIGH,
-                education: CL.HIGH,
-                technology: CL.SLIGHTLY_HIGH,
-                wealth: CL.HIGH,
+                civilizationMultipliers: new Civilization({
+                    reserves: CL.HIGH,
+                    economy: CL.SLIGHTLY_HIGH,
+                    education: CL.HIGH,
+                    technology: CL.SLIGHTLY_HIGH,
+                    wealth: CL.HIGH
+                })
             })
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        //some lingering benefits after
-        Object.assign(this.completeEffects[0], {
-            economy: News.clHalfRegression(this.completeEffects[0].economy),
-            wealth: News.clHalfRegression(this.completeEffects[0].wealth),
-        })
-        Object.assign(this.completeEffects[1], {
-            economy: News.clHalfRegression(this.completeEffects[1].economy),
-            wealth: News.clHalfRegression(this.completeEffects[1].wealth),
-        })
+        // Some lingering benefits after
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
+            economy: CL.SLIGHTLY_HIGH,
+            wealth: CL.SLIGHTLY_HIGH
+        }))
+        this.completeEffects[1].civilizationMultipliers.multiply(new Civilization({
+            economy: CL.SLIGHTLY_HIGH,
+            wealth: CL.SLIGHTLY_HIGH
+        }))
 
         // Failed: economic collapse ruins trade benefits
-        this.failEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                economy: CL.LOW, // economic disruption
-                wealth: CL.LOW,
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                economy: CL.LOW,
-                wealth: CL.LOW,
-            })
-        ]
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
+            economy: CL.LOW,  // Economic disruption
+            wealth: CL.LOW
+        }))
+        this.failEffects[1].civilizationMultipliers.multiply(new Civilization({
+            economy: CL.LOW,
+            wealth: CL.LOW
+        }))
 
         // Cancelled: tensions suspend trade early
-        this.cancelEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                reserves: News.clHalfRegression(CL.HIGH),
-                economy: News.clHalfRegression(CL.SLIGHTLY_HIGH),
-                wealth: News.clHalfRegression(CL.HIGH),
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                reserves: News.clHalfRegression(CL.HIGH),
-                economy: News.clHalfRegression(CL.SLIGHTLY_HIGH),
-                wealth: News.clHalfRegression(CL.HIGH),
-            })
-        ]
+        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
+        this.cancelEffects[0].civilizationMultipliers.multiply(new Civilization({
+            reserves: CL.SLIGHTLY_HIGH,
+            economy: CL.SLIGHTLY_HIGH,
+            wealth: CL.SLIGHTLY_HIGH
+        }))
+        this.cancelEffects[1].civilizationMultipliers.multiply(new Civilization({
+            reserves: CL.SLIGHTLY_HIGH,
+            economy: CL.SLIGHTLY_HIGH,
+            wealth: CL.SLIGHTLY_HIGH
+        }))
+    }
+
+    shouldCancel() {
+        const {planet: p, targetPlanet: tp} = this
+        // Cancel for hostile relationships
+        const rel1 = p.c.relationships.get(tp)
+        const rel2 = tp.c.relationships.get(p)
+        return rel1 === RELATIONSHIP_TYPES.TENSE || rel1 === RELATIONSHIP_TYPES.WAR ||
+               rel2 === RELATIONSHIP_TYPES.TENSE || rel2 === RELATIONSHIP_TYPES.WAR
     }
 
     determineOutcome() {
         const {planet: p, targetPlanet: tp} = this
-        // Check for hostile relationships
-        const rel1 = p.c.relationships.get(targetPlanet)
-        const rel2 = tp.c.relationships.get(planet)
-        if (rel1 === RELATIONSHIP_TYPES.TENSE || rel1 === RELATIONSHIP_TYPES.WAR ||
-            rel2 === RELATIONSHIP_TYPES.TENSE || rel2 === RELATIONSHIP_TYPES.WAR) {
-            this.cancelled = true
-            return
-        }
         // Check for economic collapse
         const economyCheck = (p.c.economy < CL.LOW) || (tp.c.economy < CL.LOW)
-        this.failed = economyCheck
+        if (economyCheck) {
+            this.failed = true
+        }
     }
 
     isValid() {

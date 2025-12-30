@@ -11,58 +11,60 @@ class WarScorchedEarthNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                targetPlanet: this.targetPlanet,
-                territory: CL.LOW, // destroyed own territory
-                industry: CL.LOW, // factories demolished
-                reserves: CL.LOW, // supplies destroyed
+                civilizationMultipliers: new Civilization({
+                    territory: CL.LOW,  // Destroyed own territory
+                    industry: CL.LOW,  // Factories demolished
+                    reserves: CL.LOW  // Supplies destroyed
+                })
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                targetPlanet: this.planet,
-                navy: CL.LOW, // losses from traps/ambushes
-                technology: CL.LOW, // damaged ships
-                education: CL.SLIGHTLY_LOW, // losses in hostile territory
+                civilizationMultipliers: new Civilization({
+                    military: CL.SLIGHTLY_LOW,  // Losses from traps/ambushes
+                    technology: CL.LOW,  // Damaged ships
+                    education: CL.SLIGHTLY_LOW  // Losses in hostile territory
+                })
             })
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         // Attacker: permanent self-inflicted damage
-        Object.assign(this.completeEffects[0], {
-            territory: CL.NO_REGRESSION, // destroyed territory stays destroyed
-            industry: News.clHalfRegression(this.completeEffects[0].industry),
-            reserves: News.clHalfRegression(this.completeEffects[0].reserves),
-        })
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
+            territory: CL.NO_REGRESSION,  // Destroyed territory stays destroyed
+            industry: CL.SLIGHTLY_HIGH,
+            reserves: CL.SLIGHTLY_HIGH
+        }))
         // Defender: permanent losses from hostile terrain
-        Object.assign(this.completeEffects[1], {
-            navy: CL.NO_REGRESSION,
+        this.completeEffects[1].civilizationMultipliers.multiply(new Civilization({
+            military: CL.NO_REGRESSION,
             technology: CL.NO_REGRESSION,
-            education: CL.NO_REGRESSION,
-        })
+            education: CL.NO_REGRESSION
+        }))
 
         // Cancelled: peace before full destruction, partial damage
-        this.cancelEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                territory: News.clHalfRegression(CL.LOW),
-                industry: News.clHalfRegression(CL.LOW),
-                reserves: News.clHalfRegression(CL.LOW),
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                navy: News.clHalfRegression(CL.LOW),
-                technology: News.clHalfRegression(CL.LOW),
-                education: News.clHalfRegression(CL.SLIGHTLY_LOW),
-            })
-        ]
+        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
+        this.cancelEffects[0].civilizationMultipliers.multiply(new Civilization({
+            territory: CL.SLIGHTLY_HIGH,
+            industry: CL.SLIGHTLY_HIGH,
+            reserves: CL.SLIGHTLY_HIGH
+        }))
+        this.cancelEffects[1].civilizationMultipliers.multiply(new Civilization({
+            military: CL.SLIGHTLY_HIGH,
+            technology: CL.SLIGHTLY_HIGH,
+            education: CL.SLIGHTLY_HIGH
+        }))
+
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+    }
+
+    shouldCancel() {
+        const {planet: p, targetPlanet: tp} = this
+        // Cancel if war no longer ongoing
+        return p.c.relationships.get(tp) !== RELATIONSHIP_TYPES.WAR
     }
 
     determineOutcome() {
-        const {planet: p, targetPlanet: tp} = this
-        // Check if war still ongoing
-        const stillAtWar = p.c.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
-        if (!stillAtWar) {
-            this.cancelled = true
-        }
+        // Scorched earth always completes (no rollOutcome needed)
     }
 
     isValid() {

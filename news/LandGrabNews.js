@@ -77,17 +77,18 @@ class LandGrabNews extends News {
         ]
     }
 
+    shouldCancel() {
+        const {planet: p, targetPlanet: tp} = this
+        // Cancel if peace declared
+        const rel = p.c.relationships.get(tp)
+        return rel === RELATIONSHIP_TYPES.NEUTRAL || rel === RELATIONSHIP_TYPES.ALLY
+    }
+
     determineOutcome() {
         const {planet: p, targetPlanet: tp} = this
-        // Check if peace declared
-        const rel = p.c.relationships.get(targetPlanet)
-        if (rel === RELATIONSHIP_TYPES.NEUTRAL || rel === RELATIONSHIP_TYPES.ALLY) {
-            this.cancelled = true
-            return
-        }
         // Expansion fails if target resists successfully
-        const resistanceProbability = (targetPlanet.militaryPower / planet.militaryPower) * 0.35
-        this.failed = Math.random() < resistanceProbability
+        const resistanceProbability = (tp.militaryPower / p.militaryPower) * 0.35
+        this.rollOutcome(1 - resistanceProbability)
     }
 
     isValid() {

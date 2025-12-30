@@ -1,49 +1,33 @@
 /**
  * @class MinersEncounter
- * @extends {Encounter}
+ * @extends {NeutralsEncounter}
  */
-class MinersEncounter extends Encounter {
+class MinersEncounter extends NeutralsEncounter {
     onStart() {
-        if (gs.encounter.luck[0] * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > gs.encounter.fleet.totalRadar) {
-            showModal(coloredName(gs.encounter.fleet), 'Your long range sensors detect a mining fleet before they detect you.<br/>You manage to approach them stealthily.', [
+        if (this.luck[0] * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > this.fleet.totalRadar) {
+            showModal(coloredName(this.fleet), 'Your long range sensors detect a mining fleet before they detect you.<br/>You manage to approach them stealthily.', [
                 ['View', ()=>closeModal()],
-                ['Bypass', ()=>endEncounter()],
+                ['Bypass', ()=>this.endEncounter()],
                 ['Hail', ()=>{
-                    gs.encounter.luck[0] = 0
-                    gs.encounter.onStart()
+                    this.luck[0] = 0
+                    this.onStart()
                 }],
-                ['Sneak Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, true)],
+                ['Sneak Attack', ()=>this.showPlayerAttackFleetModal(-1, 1, false, true)],
             ])
         }
-        else if (gs.encounter.luck[1] * gs.captain.calcInfamyForPlanet(gs.encounter.planet) > 200) {
-            showModal(coloredName(gs.encounter.fleet), 'The miners have heard of your fearsome deeds and start fleeing immediately!', [
+        else if (this.luck[1] * gs.captain.calcInfamyForPlanet(this.planet) > 200) {
+            showModal(coloredName(this.fleet), 'The miners have heard of your fearsome deeds and start fleeing immediately!', [
                 ['View', ()=>closeModal()],
-                ['Ignore', ()=>endEncounter()],
-                ['Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, true)],
+                ['Ignore', ()=>this.endEncounter()],
+                ['Attack', ()=>this.showPlayerAttackFleetModal(-1, 1, false, true)],
             ])
         }
         else {
-            showModal(coloredName(gs.encounter.fleet), 'The miners transmit a surly, perfunctory greeting, but otherwise ignore you.', [
+            showModal(coloredName(this.fleet), 'The miners transmit a surly, perfunctory greeting, but otherwise ignore you.', [
                 ['View', ()=>closeModal()],
-                ['Ignore', ()=>endEncounter()],
-                ['Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, true)],
+                ['Ignore', ()=>this.endEncounter()],
+                ['Attack', ()=>this.showPlayerAttackFleetModal(-1, 1, false, true)],
             ])
         }
-    }
-
-    onVictory() {
-        showPlayerDefeatedEnemyModal(-1)
-    }
-
-    onDefeat() {
-        showPlayerDefeatedByNeutralsModal(1)
-    }
-
-    onEscape() {
-        showPlayerEscapedFromEnemyModal()
-    }
-
-    onSurrender() {
-        gs.encounter.onDefeat()
     }
 }

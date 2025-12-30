@@ -11,44 +11,39 @@ class WarAllyNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                targetPlanet: this.targetPlanet,
-            }),
+                civilizationMultipliers: new Civilization({})
+            })
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         // Original instigator: prestige cost is permanent
-        Object.assign(this.completeEffects[0], {
-            prestige: CL.NO_REGRESSION,
-        })
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
+            prestige: CL.NO_REGRESSION
+        }))
 
         // Failed: diplomatic effort rebuffed, no ally joins
-        this.failEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                prestige: CL.LOW, // diplomatic failure
-            })
-        ]
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
+            prestige: CL.LOW  // Diplomatic failure
+        }))
 
         // Cancelled: peace declared before ally commits
-        this.cancelEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                prestige: News.clHalfRegression(CL.LOW), // partial prestige recovery
-            })
-        ]
+        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
+        this.cancelEffects[0].civilizationMultipliers.multiply(new Civilization({
+            prestige: CL.SLIGHTLY_LOW  // Partial prestige recovery
+        }))
+    }
+
+    shouldCancel() {
+        const {planet: p, targetPlanet: tp} = this
+        // Cancel if war no longer ongoing
+        return p.c.relationships.get(tp) !== RELATIONSHIP_TYPES.WAR
     }
 
     determineOutcome() {
-        const {planet, targetPlanet, allyPlanet} = this
-        // Check if war still ongoing
-        const stillAtWar = p.c.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
-        if (!stillAtWar) {
-            this.cancelled = true
-            return
-        }
-        // Success probability based on prestige and ally relationship
-        const successProbability = p.c.prestige * 0.7 + 0.2
-        this.failed = Math.random() > successProbability
+        const {planet: p} = this
+        // Success probability based on prestige
+        this.rollOutcome(p.c.prestige * 0.7 + 0.2)
     }
 
     isValid() {

@@ -11,44 +11,45 @@ class ScarcityNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                population: CL.LOW,
-                inflation: CL.EXTREMELY_HIGH,
-                reserves: CL.EXTREMELY_LOW,
-                industry: CL.LOW,
-                economy: CL.LOW,
-                crime: CL.HIGH,
-                corruption: CL.HIGH,
-                navy: CL.VERY_LOW,
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WATER, CL.ASTRONOMICAL]])),
+                civilizationMultipliers: new Civilization({
+                    population: CL.LOW,
+                    inflation: CL.EXTREMELY_HIGH,
+                    reserves: CL.EXTREMELY_LOW,
+                    industry: CL.LOW,
+                    economy: CL.LOW,
+                    crime: CL.HIGH,
+                    corruption: CL.HIGH,
+                    military: CL.VERY_LOW
+                }),
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WATER, CL.ASTRONOMICAL]]))
             })
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        //population does not fully bounce back
-        Object.assign(this.completeEffects[0], {
-            population: News.clHalfRegression(this.completeEffects[0].population),
-            industry: News.clHalfRegression(this.completeEffects[0].industry),
-            economy: News.clHalfRegression(this.completeEffects[0].economy),
-        })
+        // Population does not fully bounce back
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
+            population: CL.SLIGHTLY_LOW,
+            industry: CL.SLIGHTLY_LOW,
+            economy: CL.SLIGHTLY_LOW
+        }))
 
         // Failed: famine becomes catastrophic
-        this.failEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                population: CL.NO_REGRESSION, // massive die-off
-                industry: CL.NO_REGRESSION,
-                economy: CL.NO_REGRESSION,
-                crime: CL.NO_REGRESSION, // lawlessness persists
-                prestige: CL.VERY_LOW, // failed state
-            })
-        ]
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
+            population: CL.NO_REGRESSION,  // Massive die-off
+            industry: CL.NO_REGRESSION,
+            economy: CL.NO_REGRESSION,
+            crime: CL.NO_REGRESSION,  // Lawlessness persists
+            prestige: CL.VERY_LOW  // Failed state
+        }))
+
+        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
     }
 
     determineOutcome() {
         const {planet: p} = this
-        // Scarcity becomes catastrophic if economy/industry collapse further
-        const failProbability = (1 - p.c.economy) * (1 - p.c.industry) * 0.3
-        this.failed = Math.random() < failProbability
+        // Scarcity ends unless economy/industry collapse further
+        this.rollOutcome(1 - (1 - p.c.economy) * (1 - p.c.industry) * 0.3)
     }
 
     isValid() {

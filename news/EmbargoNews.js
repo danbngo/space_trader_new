@@ -12,52 +12,53 @@ class EmbargoNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
-                navy: CL.LOW, //blockade stretches fleet thin
-                prestige: CL.SLIGHTLY_HIGH,
+                civilizationMultipliers: new Civilization({
+                    navy: CL.LOW,
+                    prestige: CL.SLIGHTLY_HIGH,
+                })
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
-                prestige: CL.SLIGHTLY_LOW,
-                economy: CL.VERY_LOW,
-                inflation: CL.VERY_HIGH,
-                reserves: CL.LOW,
-                corruption: CL.HIGH,
-                crime: CL.LOW,
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WATER, CL.VERY_HIGH], [CARGO_TYPES.METAL, CL.VERY_HIGH]])),
+                civilizationMultipliers: new Civilization({
+                    prestige: CL.SLIGHTLY_LOW,
+                    economy: CL.VERY_LOW,
+                    inflation: CL.VERY_HIGH,
+                    reserves: CL.LOW,
+                    corruption: CL.HIGH,
+                    crime: CL.LOW,
+                    cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WATER, CL.VERY_HIGH], [CARGO_TYPES.METAL, CL.VERY_HIGH]])),
+                })
             })
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        //dont fully recover economy
-        Object.assign(this.completeEffects[0], {
-            prestige: News.clHalfRegression(this.completeEffects[0].prestige),
-            economy: News.clHalfRegression(this.completeEffects[0].economy),
-        })
+        this.completeEffects[1].civilizationMultipliers.multiply(new Civilization({
+            prestige: CL.SLIGHTLY_LOW,
+            economy: CL.SLIGHTLY_LOW,
+        }))
 
-        // Cancelled: relations improve, embargo lifted early
-        this.cancelEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                navy: News.clHalfRegression(CL.LOW),
-                prestige: News.clHalfRegression(CL.SLIGHTLY_HIGH),
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                economy: News.clHalfRegression(CL.VERY_LOW),
-                inflation: News.clHalfRegression(CL.VERY_HIGH),
-                reserves: News.clHalfRegression(CL.LOW),
-            })
-        ]
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        
+        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
+        this.cancelEffects[0].civilizationMultipliers.multiply(new Civilization({
+            navy: CL.SLIGHTLY_HIGH,
+            prestige: CL.SLIGHTLY_HIGH,
+        }))
+        this.cancelEffects[1].civilizationMultipliers.multiply(new Civilization({
+            economy: CL.SLIGHTLY_LOW,
+            inflation: CL.SLIGHTLY_HIGH,
+            reserves: CL.SLIGHTLY_LOW,
+        }))
+    }
+
+    shouldCancel() {
+        const rel = this.planet.c.relationships.get(this.targetPlanet)
+        return rel === RELATIONSHIP_TYPES.NEUTRAL || rel === RELATIONSHIP_TYPES.ALLY
     }
 
     determineOutcome() {
-        const {planet: p, targetPlanet: tp} = this
-        // Check if relationship improved to neutral
-        const rel = p.c.relationships.get(targetPlanet)
-        if (rel === RELATIONSHIP_TYPES.NEUTRAL || rel === RELATIONSHIP_TYPES.ALLY) {
-            this.cancelled = true
-        }
+        // Outcome is handled by shouldCancel()
     }
 
     isValid() {

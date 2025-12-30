@@ -11,46 +11,38 @@ class ForeignAidNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                inflation: CL.LOW,
-                reserves: CL.HIGH,
-                economy: CL.SLIGHTLY_HIGH,
-                industry: CL.SLIGHTLY_HIGH,
-                wealth: CL.HIGH,
-                navy: CL.SLIGHTLY_HIGH,
-                prestige: CL.SLIGHTLY_LOW,
+                civilizationMultipliers: new Civilization({
+                    inflation: CL.LOW,
+                    reserves: CL.HIGH,
+                    economy: CL.SLIGHTLY_HIGH,
+                    industry: CL.SLIGHTLY_HIGH,
+                    wealth: CL.HIGH,
+                    navy: CL.SLIGHTLY_HIGH,
+                    prestige: CL.SLIGHTLY_LOW,
+                })
             })
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
+            inflation: CL.SLIGHTLY_LOW,
+            reserves: CL.SLIGHTLY_HIGH,
+            economy: CL.SLIGHTLY_HIGH,
+            wealth: CL.SLIGHTLY_HIGH,
+            industry: CL.SLIGHTLY_HIGH,
+            navy: CL.SLIGHTLY_HIGH,
+            prestige: CL.SLIGHTLY_LOW,
+        }))
 
-        Object.assign(this.completeEffects[0], {
-            inflation: News.clHalfRegression(this.completeEffects[0].inflation),
-            reserves: News.clHalfRegression(this.completeEffects[0].reserves),
-            economy: News.clHalfRegression(this.completeEffects[0].economy),
-            wealth: News.clHalfRegression(this.completeEffects[0].wealth),
-            industry: News.clHalfRegression(this.completeEffects[0].industry),
-            navy: News.clHalfRegression(this.completeEffects[0].navy),
-            prestige: CL.NO_REGRESSION //not the best for your reputation
-        })
-
-        // Failed: aid wasted through corruption
-        this.failEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                economy: CL.NO_REGRESSION, // no economic gain
-                industry: CL.NO_REGRESSION,
-                wealth: CL.NO_REGRESSION,
-                prestige: CL.VERY_LOW, // international embarrassment
-                crime: CL.HIGH, // corruption spike
-            })
-        ]
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
+            prestige: CL.VERY_LOW,
+            crime: CL.HIGH,
+        }))
     }
 
     determineOutcome() {
-        const {planet: p} = this
-        // Aid fails if governance is too weak (low security means corruption)
-        const failProbability = (1 - p.c.security) * 0.4
-        this.failed = Math.random() < failProbability
+        this.rollOutcome(this.planet.c.security)
     }
 
     isValid() {

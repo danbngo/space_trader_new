@@ -11,43 +11,44 @@ class OrganizedCrimeNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                economy: CL.LOW,
-                wealth: CL.LOW,
-                industry: CL.LOW,
-                security: CL.LOW,
-                crime: CL.VERY_HIGH,
-                corruption: CL.VERY_HIGH,
+                civilizationMultipliers: new Civilization({
+                    economy: CL.LOW,
+                    wealth: CL.LOW,
+                    industry: CL.LOW,
+                    security: CL.LOW,
+                    crime: CL.VERY_HIGH,
+                    corruption: CL.VERY_HIGH
+                })
             })
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        //some lingering corruption after
-        Object.assign(this.completeEffects[0], {
-            economy: News.clHalfRegression(this.completeEffects[0].economy),
-            wealth: News.clHalfRegression(this.completeEffects[0].wealth),
-            industry: News.clHalfRegression(this.completeEffects[0].industry),
-            security: News.clHalfRegression(this.completeEffects[0].security),
-            crime: News.clHalfRegression(this.completeEffects[0].crime),
-        })
+        // Some lingering corruption after
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
+            economy: CL.SLIGHTLY_LOW,
+            wealth: CL.SLIGHTLY_LOW,
+            industry: CL.SLIGHTLY_LOW,
+            security: CL.SLIGHTLY_LOW,
+            crime: CL.SLIGHTLY_HIGH
+        }))
 
         // Failed: syndicates win, permanent corruption
-        this.failEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                economy: CL.NO_REGRESSION, // permanent economic damage
-                security: CL.NO_REGRESSION,
-                crime: CL.NO_REGRESSION, // crime entrenched
-                wealth: CL.NO_REGRESSION,
-                prestige: CL.LOW, // failed state
-            })
-        ]
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
+            economy: CL.NO_REGRESSION,  // Permanent economic damage
+            security: CL.NO_REGRESSION,
+            crime: CL.NO_REGRESSION,  // Crime entrenched
+            wealth: CL.NO_REGRESSION,
+            prestige: CL.LOW  // Failed state
+        }))
+
+        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
     }
 
     determineOutcome() {
         const {planet: p} = this
-        // Crime crackdown fails if security too low
-        const failProbability = (1 - p.c.security) * 0.45
-        this.failed = Math.random() < failProbability
+        // Crime crackdown succeeds if security high enough
+        this.rollOutcome(p.c.security * 0.55 + 0.45)
     }
 
     isValid() {

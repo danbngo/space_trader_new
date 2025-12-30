@@ -11,39 +11,43 @@ class WarOffensiveNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                targetPlanet: this.targetPlanet,
-                army: CL.SLIGHTLY_LOW,
-                navy: CL.LOW,
-                education: CL.SLIGHTLY_LOW,
+                civilizationMultipliers: new Civilization({
+                    military: CL.LOW,
+                    education: CL.SLIGHTLY_LOW
+                })
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                targetPlanet: this.planet,
-                army: CL.SLIGHTLY_LOW,
-                navy: CL.LOW,
-                education: CL.SLIGHTLY_LOW,
+                civilizationMultipliers: new Civilization({
+                    military: CL.SLIGHTLY_LOW,
+                    education: CL.SLIGHTLY_LOW
+                })
             })
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         // Victor: minor permanent losses, prestige gain persists
-        Object.assign(this.completeEffects[0], {
-            navy: News.clHalfRegression(this.completeEffects[0].navy),
-            education: News.clHalfRegression(this.completeEffects[0].education),
-        })
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
+            military: CL.SLIGHTLY_HIGH,
+            education: CL.SLIGHTLY_HIGH
+        }))
         // Loser: major permanent losses
-        Object.assign(this.completeEffects[1], {
-            navy: CL.NO_REGRESSION,
-            education: CL.NO_REGRESSION,
-            army: CL.SLIGHTLY_LOW,
-        })
+        this.completeEffects[1].civilizationMultipliers.multiply(new Civilization({
+            military: CL.SLIGHTLY_LOW,
+            education: CL.NO_REGRESSION
+        }))
 
-        this.cancelEffects = this.completeEffects.map(effect => {
-            const e = effect.clone()
-            e.navy = News.clHalfRegression(effect.navy)
-            e.education = News.clHalfRegression(effect.education)
-            return e
-        })
+        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
+        this.cancelEffects[0].civilizationMultipliers.multiply(new Civilization({
+            military: CL.SLIGHTLY_HIGH,
+            education: CL.SLIGHTLY_HIGH
+        }))
+        this.cancelEffects[1].civilizationMultipliers.multiply(new Civilization({
+            military: CL.SLIGHTLY_HIGH,
+            education: CL.SLIGHTLY_HIGH
+        }))
+
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
     }
 
     determineOutcome() {

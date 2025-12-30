@@ -313,4 +313,341 @@ class Encounter {
     onEndTurn() {
         // Override in subclass if needed
     }
+
+    /**
+     * Initializes and positions ships for the encounter based on formation type.
+     */
+    positionShips() {
+        console.log('Encounter.positionShips')
+        const {playerShips, enemyShips, ships, encounterType} = this
+        const {formationType} = encounterType
+        const maxSpawnDistance = this.mapRadius * ENCOUNTER_SHIP_MAX_SPAWN_DISTANCE_RATIO
+        const minSpawnDistance = maxSpawnDistance / 5
+
+        for (const ship of ships) {
+            ship.resetCombatVars()
+        }
+
+        // Position player ships based on formation
+        if (formationType == FORMATION_TYPES.PlayerEncircle) {
+            const angleStep = (Math.PI * 2) / playerShips.length
+            playerShips.forEach((ship, i) => {
+                const angle = angleStep * i
+                const [x, y] = rotatePoint(maxSpawnDistance, 0, 0, 0, angle)
+                Object.assign(ship, {x, y})
+            })
+        }
+        else if (formationType == FORMATION_TYPES.PlayerEncircled) {
+            for (const ship of playerShips) {
+                const [x, y] = rotatePoint(rng(minSpawnDistance/2, 0, false), 0, 0, 0, rng(Math.PI * 2, 0, false))
+                Object.assign(ship, {x, y})
+            }
+        }
+        else {
+            for (const ship of playerShips) {
+                const [x,y] = rotatePoint(rng(maxSpawnDistance, minSpawnDistance/2, false), 0, 0, 0, rng(Math.PI + Math.PI/4, Math.PI - Math.PI/4, false))
+                Object.assign(ship, {x, y})
+            }
+        }
+
+        // Position enemy ships
+        for (const ship of enemyShips) {
+            Object.assign(ship, {color: this.encounterType.enemyColor})
+        }
+
+        if (formationType == FORMATION_TYPES.PlayerEncircle) {
+            for (const ship of enemyShips) {
+                const [x, y] = rotatePoint(rng(minSpawnDistance/2, 0, false), 0, 0, 0, rng(Math.PI * 2, 0, false))
+                Object.assign(ship, {x, y})
+            }
+        }
+        else if (formationType == FORMATION_TYPES.PlayerEncircled) {
+            const angleStep = (Math.PI * 2) / enemyShips.length
+            enemyShips.forEach((ship, i) => {
+                const angle = angleStep * i
+                const [x, y] = rotatePoint(maxSpawnDistance, 0, 0, 0, angle)
+                Object.assign(ship, {x, y})
+            })
+        }
+        else if (formationType == FORMATION_TYPES.FaceOff) {
+            for (const ship of enemyShips) {
+                const [x,y] = rotatePoint(rng(maxSpawnDistance, minSpawnDistance, false), 0, 0, 0, rng(0 + Math.PI/4, 0 - Math.PI/4, false))
+                Object.assign(ship, {x, y})
+            }
+        }
+        else if (formationType == FORMATION_TYPES.Storm) {
+            for (const ship of enemyShips) {
+                let [x,y] = rotatePoint(rng(this.mapRadius*0.9, minSpawnDistance, false), 0, 0, 0, rng(0 + Math.PI*3/4, 0 - Math.PI*3/4, false))
+                x += rng(this.mapRadius*2, 0, false)
+                Object.assign(ship, {x, y})
+            }
+        }
+
+        // Set ship angles to face targets
+        for (const ship of playerShips) {
+            const randomTarget = rndMember(enemyShips)
+            if (randomTarget) {
+                const angle = new Path(ship.x, ship.y, randomTarget.x, randomTarget.y).angle
+                Object.assign(ship, {angle})
+            }
+        }
+        for (const ship of enemyShips) {
+            if (formationType == FORMATION_TYPES.Storm) {
+                const angle = rng(Math.PI + Math.PI/4, Math.PI - Math.PI/4, false)
+                Object.assign(ship, {angle})
+            }
+            else {
+                const randomTarget = rndMember(playerShips)
+                if (randomTarget) {
+                    const angle = new Path(ship.x, ship.y, randomTarget.x, randomTarget.y).angle
+                    Object.assign(ship, {angle})
+                }
+            }
+        }
+    }
+
+    /**
+     * Starts active combat.
+     * @param {boolean} playerHasInitiative - Whether the player acts first.
+     */
+    startCombat(playerHasInitiative = false) {
+        console.log('Encounter.startCombat', { playerHasInitiative })
+        this.combatEnabled = true
+        this.activeTurnFleet = playerHasInitiative ? gs.fleet : this.enemyFleet
+        closeModal()
+        if (currentMap && currentMap.togglePause) currentMap.togglePause(false)
+    }
+
+    /**
+     * Ends combat and triggers appropriate outcome.
+     */
+    endCombat() {
+        console.log('Encounter.endCombat')
+        const {result} = this
+        if (result == ENCOUNTER_RESULTS.Defeat) {
+            showModal(`Defeat`, `All your ships have been disabled!`, [['Continue', ()=>this.onDefeat()]])
+        }
+        else if (result == ENCOUNTER_RESULTS.Victory) {
+            showModal(`Victory`, `All enemy ships have fled or been disabled! You win!`, [['Continue', ()=>this.onVictory()]])
+        }
+        else if (result == ENCOUNTER_RESULTS.Escaped) {
+            showModal(`Escape`, `You fled from the battlefield!`, [['Continue', ()=>this.onEscape()]])
+        }
+    }
+
+    /**
+     * Calculates cargo lost from disabled ships.
+     * @param {Ship[]} disabledShips
+     * @returns {string} Message describing lost cargo
+     */
+    loseCargoFromDisabledShips(disabledShips = []) {
+        console.log('Encounter.loseCargoFromDisabledShips', { disabledShips })
+        const disabledShipsCargoCapacity = disabledShips.reduce((total, ship) => {
+            return total + ship.cargoSpace
+        }, 0)
+        const cargoRatio = disabledShipsCargoCapacity / gs.fleet.totalCargoSpace
+        const lostCargoAmt = Math.floor(gs.fleet.cargo.total * cargoRatio)
+        if (lostCargoAmt <= 0) return ''
+        let totalLostCargo = gs.fleet.cargo.randomSubset(lostCargoAmt)
+        gs.fleet.cargo.subtractAmounts(totalLostCargo)
+        const msg = `${lostCargoAmt} units of cargo drift into space from your disabled ships.<br/>`
+        return msg
+    }
+
+    /**
+     * Conducts repairs on damaged player ships.
+     * @returns {string} Message describing repairs
+     */
+    conductRepairs() {
+        let msg = ''
+        const hullDamage = this.calcPlayerHullDamages()
+        if (hullDamage <= 0) return ''
+
+        const repairRatio = weightedAvg([0, 1], [25*Math.random(), gs.fleet.totalSkills.getAmount(SKILLS.Engineer)])
+        const repairableShips = this.calcPlayerDamagedShips()
+        const nonRepairableShips = gs.fleet.ships.filter(s=>s.disabled)
+        const repairableHullDamage = this.calcPlayerRepairableHull()
+        const repairedAmt = Math.floor(repairRatio * repairableHullDamage)
+        msg += `Your ships suffered ${hullDamage} total hull damage.<br/>`
+        if (repairedAmt <= 0) return msg
+        if (nonRepairableShips.length > 0) msg += `Because ${nonRepairableShips.length} ships were disabled, only ${repairableHullDamage} is repairable.<br/>`
+        msg += `Your engineering skill lets you repair ${repairedAmt} points of hull damage across your fleet.<br/>`
+        this.repairRandomly(repairableShips, repairedAmt)
+        console.log('conductRepairs', { hullDamage, repairRatio, repairableHullDamage, repairedAmt, repairableShips, nonRepairableShips, msg })
+        return msg
+    }
+
+    /**
+     * Repairs random ships.
+     * @param {Ship[]} ships
+     * @param {number} repairedAmt
+     */
+    repairRandomly(ships = [], repairedAmt = 0) {
+        if (ships.length <= 0 || repairedAmt <= 0) return
+        for (let i=0; i<repairedAmt; i++) {
+            const damagedShips = ships.filter(s=>s.hull[0] < s.hull[1])
+            if (damagedShips.length <= 0) break
+            const ship = rndMember(damagedShips)
+            ship.repairHull(1)
+        }
+    }
+
+    /**
+     * Damages random ships.
+     * @param {Ship[]} ships
+     * @param {number} dmg
+     */
+    damageRandomly(ships = [], dmg = 0) {
+        if (ships.length <= 0 || dmg <= 0) return
+        for (let i=0; i<dmg; i++) {
+            const harmableShips = ships.filter(s=>s.hull[0] > 0)
+            if (harmableShips.length <= 0) break
+            const ship = rndMember(harmableShips)
+            ship.takeDamage(1, true)
+        }
+    }
+
+        /**
+     * Initializes and starts a space encounter, positioning ships and setting up combat.
+     * @param {Encounter} encounter - The encounter to start.
+     */
+    startEncounter(encounter = gs.encounter) {
+        console.log('startEncounter')
+        gs.encounter = encounter
+        encounter.positionShips()
+
+        showModal(coloredName(encounter.fleet), encounter.encounterType.description, [['Ok', ()=>{
+            showEncounterMap()
+            if (encounter.encounterType.aiType == AI_TYPES.Asteroid) encounter.onStart()
+        }]])
+    }
+    /**
+     * Ends the current encounter and returns to the star map.
+     */
+    endEncounter() {
+        console.log('endEncounter');
+        gs.encounter = undefined
+        showStarMap(gs.fleet)
+        //restore all shields
+        for (const s of gs.fleet.ships) s.restoreShields()
+        //pause and show modal if player has no working ships, cant move
+        if (gs.fleet.stranded) {
+            this.handlePlayerStranded()
+            return
+        }
+    }
+
+    handlePlayerStranded() {
+        console.log('handlePlayerStranded');
+        const [nearestPlanet, nearestDistance] = gs.system.calcNearestPlanet(gs.fleet)
+        const creditCost = 100 + rng(500*Math.sqrt(nearestDistance), 250*Math.sqrt(nearestDistance), true)
+        const canAfford = gs.credits >= creditCost
+        const noCredits = gs.credits <= 0
+        const dayCost = 1 + rng(1.5*nearestDistance, 0.75*nearestDistance, false)
+        gs.credits = Math.max(0, gs.credits - creditCost)
+        gs.year += dayCost/365
+
+        console.log('player is stranded:',nearestPlanet,nearestDistance,creditCost,dayCost)
+        gs.fleet.dock(nearestPlanet)
+
+        let msg = `You have no working ships remaining, so you have to call a tow ship.<br/>`
+        if (canAfford) msg += `The operator charges you a fee of ${creditCost}CR.<br/>`
+        else if (noCredits) msg += `The operator complains bitterly after realizing you have no credits, but tows you anyway.<br/>`
+        else msg += `The fee is ${creditCost}CR, but you only have ${gs.credits}CR.<br/>Grumbling, the operator confiscates your few remaining credits and tows you anyway.<br/>`
+        msg += `You spend ${describeTimespan(dayCost/365)} being dragged through space.<br/>`
+        currentMap.refresh()
+
+        showModal(`Stranded`, msg, [['Continue', ()=>showPlanetMenu(nearestPlanet)]])
+    }
+
+    showPlayerRefuseSurrenderModal(fameMultiplier = 0, bountyMultiplier = 0) {
+        console.log('showPlayerRefuseSurrenderModal', { fameMultiplier, bountyMultiplier });
+        const fleetName = coloredName(gs.encounter.fleet)
+        const planet = gs.encounter.planet
+        const faction = gs.encounter.fleet.faction
+        const bounty = 100 * bountyMultiplier
+        const fame = fameMultiplier > 0 ? 1 * fameMultiplier : 0
+        const infamy = fameMultiplier < 0 ? 1 * Math.abs(fameMultiplier) : 0
+        let msg = `You refuse to submit to the ${fleetName} demands, and the battle is joined!<br/>`
+        if (infamy > 0) {
+            msg += `Your defiance of the authorities causes you to gain ${infamy} infamy.<br/>`
+            if (planet) msg += gs.captain.grantInfamy(planet, infamy)
+            if (faction) msg += gs.captain.grantFactionInfamy(faction, infamy)
+        }
+        if (fame > 0) {
+            msg += `Your fearlessness causes you to gain ${fame} fame.<br/>`
+            if (planet) msg += gs.captain.grantFame(planet, fame)
+            if (faction) msg += gs.captain.grantFactionFame(faction, fame)
+        }
+        if (bounty > 0) {
+            msg += `You bounty has risen by ${bounty}CR.<br/>`
+            if (planet) msg += gs.captain.grantBounty(planet, bounty)
+        }
+        showModal(coloredName(gs.encounter.fleet), msg, [['Continue', ()=>this.startCombat(false)]])
+    }
+
+    showPlayerDidSurrenderModal( fameLossMultiplier = 1) {
+        console.log('showPlayerDidSurrenderModal', { fameLossMultiplier });
+        const fleetName = coloredName(gs.encounter.fleet)
+        const planet = gs.encounter.planet
+        const faction = gs.encounter.fleet.faction
+        const fameLoss = fameLossMultiplier < 0 ? 5 * fameLossMultiplier : 0
+        const infamyLoss = fameLossMultiplier < 0 ? 5 * fameLossMultiplier : 0
+
+        let msg = `There's no other choice. You power your ships down and broadcast the universal signal for surrender.<br/>`
+        if (fameLoss && planet) msg += gs.captain.grantFame(planet, fameLoss)
+        if (infamyLoss && planet) msg += gs.captain.grantInfamy(planet, infamyLoss)
+        if (faction) {
+            if (fameLoss) msg += gs.captain.grantFactionFame(faction, fameLoss)
+            if (infamyLoss) msg += gs.captain.grantFactionInfamy(faction, infamyLoss)
+        }
+
+        showModal(fleetName, msg, [['Continue', ()=>gs.encounter.onDefeat()]])
+    }
+
+
+    showPlayerAttackFleetModal(fameMultiplier = 0, bountyMultiplier = 0, sneakAttack = false, allowBribe = false) {
+        console.log('showPlayerAttackFleetModal', { fameMultiplier, bountyMultiplier });
+        const fleetName = coloredName(gs.encounter.fleet)
+        const planet = gs.encounter.planet
+        const faction = gs.encounter.fleet.faction
+        const fame = fameMultiplier > 0 ? 1 * fameMultiplier : 0
+        const infamy = fameMultiplier < 0 ? 1 * Math.abs(fameMultiplier) : 0
+        const bounty = 1000 * bountyMultiplier
+
+        if (sneakAttack) {
+            // Change formation to player encircling enemy
+            gs.encounter.encounterType.formationType = FORMATION_TYPES.PlayerEncircle
+            // Reposition ships for the new formation
+            gs.encounter.positionShips()
+            // Drop shields after repositioning
+            for (const ship of gs.encounter.ships) ship.shields[0] = 0
+        }
+
+        let msg = `You ${sneakAttack ? 'sneakily ' : ''}attack the ${fleetName}!<br/>`
+        if (sneakAttack) msg += `The ${fleetName} are caught with their shields down!<br/>`
+        if (infamy && planet) msg += gs.captain.grantInfamy(planet, infamy)
+        if (fame && planet) msg += gs.captain.grantFame(planet, fame)
+        if (bounty && planet) msg += gs.captain.grantBounty(planet, bounty)
+        if (faction) {
+            if (infamy) msg += gs.captain.grantFactionInfamy(faction, infamy)
+            if (fame) msg += gs.captain.grantFactionFame(faction, fame)
+        }
+
+
+        showModal(fleetName, msg, [['Continue', ()=>{
+            if (allowBribe) {
+                let combatAdvantage = gs.fleet.combatRating / gs.encounter.fleet.combatRating
+                //combat advantage should vary from 0.5 its original amount to 2x based on the player's infamy
+                combatAdvantage *= 2 - (75/(50 + gs.captain.calcInfamyForPlanet(gs.encounter.fleet.planet))) //approaches 2x as infamy increases
+                if (combatAdvantage * Math.random() > 1.5) {
+                    this.showNeutralsBribePlayerModal(gs.encounter.fleet.captain.credits)
+                    return
+                }
+            }
+            this.startCombat(true)
+        }]])
+    }
+
+
 }

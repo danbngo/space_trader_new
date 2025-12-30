@@ -1,57 +1,42 @@
 /**
  * @class MerchantsEncounter
- * @extends {Encounter}
+ * @extends {MercantileEncounter}
  */
-class MerchantsEncounter extends Encounter {
+class MerchantsEncounter extends MercantileEncounter {
     onStart() {
-        if (gs.encounter.luck[0] * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > gs.encounter.fleet.totalRadar) {
-            showModal(coloredName(gs.encounter.fleet), 'Your long range sensors detect a merchant fleet before they detect you.<br/>You manage to approach them stealthily.', [
+        if (this.luck[0] * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > this.fleet.totalRadar) {
+            showModal(coloredName(this.fleet), 'Your long range sensors detect a merchant fleet before they detect you.<br/>You manage to approach them stealthily.', [
                 ['View', ()=>closeModal()],
-                ['Bypass', ()=>endEncounter()],
+                ['Bypass', ()=>this.endEncounter()],
                 ['Hail', ()=>{
-                    gs.encounter.luck[0] = 0
-                    gs.encounter.onStart()
+                    this.luck[0] = 0
+                    this.onStart()
                 }],
-                ['Sneak Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, true)],
+                ['Sneak Attack', ()=>this.showPlayerAttackFleetModal(-1, 1, false, true)],
             ])
         }
-        else if (gs.encounter.luck[1] * gs.captain.calcInfamyForPlanet(gs.encounter.planet) > 100) {
-            showModal(coloredName(gs.encounter.fleet), `The ${coloredName(gs.encounter.fleet)} have heard of your fearsome deeds and start fleeing immediately!`, [
+        else if (this.luck[1] * gs.captain.calcInfamyForPlanet(this.planet) > 100) {
+            showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} have heard of your fearsome deeds and start fleeing immediately!`, [
                 ['View', ()=>closeModal()],
-                ['Ignore', ()=>endEncounter()],
-                ['Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, true)],
+                ['Ignore', ()=>this.endEncounter()],
+                ['Attack', ()=>this.showPlayerAttackFleetModal(-1, 1, false, true)],
             ])
         }
-        else if (gs.encounter.luck[2] > .5) {
-            showModal(coloredName(gs.encounter.fleet), `The ${coloredName(gs.encounter.fleet)} eagerly invite you to trade. They claim to have the best prices in the sector!`, [
+        else if (this.luck[2] > .5) {
+            showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} eagerly invite you to trade. They claim to have the best prices in the sector!`, [
                 ['View', ()=>closeModal()],
-                ['Trade', ()=>showTradeOfferModal()],
-                ['Ignore', ()=>endEncounter()],
-                ['Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, true)],
+                ['Trade', ()=>this.showTradeOfferModal()],
+                ['Ignore', ()=>this.endEncounter()],
+                ['Attack', ()=>this.showPlayerAttackFleetModal(-1, 1, false, true)],
             ])
         }
         else {
-            showModal(coloredName(gs.encounter.fleet), `The ${coloredName(gs.encounter.fleet)} ignore you nervously.`, [
+            showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} ignore you nervously.`, [
                 ['View', ()=>closeModal()],
-                ['Ignore', ()=>endEncounter()],
-                ['Attack', ()=>showPlayerAttackFleetModal(-1, 1, false, true)],
+                ['Ignore', ()=>this.endEncounter()],
+                ['Attack', ()=>this.showPlayerAttackFleetModal(-1, 1, false, true)],
             ])
         }
     }
 
-    onVictory() {
-        showPlayerDefeatedEnemyModal(-1)
-    }
-
-    onDefeat() {
-        showPlayerDefeatedByNeutralsModal(1)
-    }
-
-    onEscape() {
-        showPlayerEscapedFromEnemyModal()
-    }
-
-    onSurrender() {
-        gs.encounter.onDefeat()
-    }
 }

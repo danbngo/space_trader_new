@@ -78,9 +78,7 @@ class InvestmentNews extends News {
             this.cancelled = true
             return
         }
-        // Investment fails if target has poor governance
-        const failProbability = (1 - tp.c.economy) * (1 - tp.c.security) * 0.35
-        this.failed = Math.random() < failProbability
+        this.rollOutcome((tp.c.economy + tp.c.security) / 2)
     }
 
     isValid() {

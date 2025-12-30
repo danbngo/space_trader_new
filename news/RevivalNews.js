@@ -11,20 +11,27 @@ class RevivalNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                education: CL.LOW,
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.HOLOCUBES, CL.VERY_HIGH], [CARGO_TYPES.ISOTOPES, CL.EXTREMELY_LOW]])),
-                crime: CL.LOW,
-                corruption: CL.LOW,
-                //relationsReset: true
+                civilizationMultipliers: new Civilization({
+                    education: CL.LOW,
+                    crime: CL.LOW,
+                    corruption: CL.LOW
+                }),
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.HOLOCUBES, CL.VERY_HIGH],
+                    [CARGO_TYPES.ISOTOPES, CL.EXTREMELY_LOW]
+                ]))
             })
         ]
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
 
-        //dont revert ratings, but raise birthrates
-        Object.assign(this.completeEffects[0], {
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
+        // Don't revert ratings, but raise birthrates
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
             population: CL.HIGH,
-            education: CL.NO_REGRESSION,
-        })
+            education: CL.NO_REGRESSION
+        }))
+
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
     }
 
     isValid() {

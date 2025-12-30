@@ -46,20 +46,21 @@ class PolicyChangeNews extends News {
         // Base effects depend on policy category being changed
         const baseEffects = {
             planet: this.planet,
-            prestige: CL.LOW,
-            economy: CL.LOW,
+            civilizationMultipliers: new Civilization({
+                prestige: CL.LOW,\n                economy: CL.LOW
+            })
         }
 
         // Add some variation based on policy flavor
         if (newPolicy.flavor === NF.ECONOMY) {
-            baseEffects.inflation = CL.MEDIUM
+            baseEffects.civilizationMultipliers.inflation = CL.MEDIUM
         } else if (newPolicy.flavor === NF.LABOR) {
-            baseEffects.economy = CL.MEDIUM
+            baseEffects.civilizationMultipliers.economy = CL.MEDIUM
         } else if (newPolicy.flavor === NF.CULTURE) {
-            baseEffects.culture = CL.MEDIUM
-            baseEffects.crime = CL.MEDIUM
+            baseEffects.civilizationMultipliers.culture = CL.MEDIUM
+            baseEffects.civilizationMultipliers.crime = CL.MEDIUM
         } else if (newPolicy.flavor === NF.POLITICS) {
-            baseEffects.prestige = CL.MEDIUM
+            baseEffects.civilizationMultipliers.prestige = CL.MEDIUM
         }
 
         this.startEffects = [new NewsEffect(baseEffects)]
@@ -84,7 +85,13 @@ class PolicyChangeNews extends News {
         }
 
         // On failure, revert the economic/prestige hits but don't change policy
-        this.failEffects = this.startEffects.map(effect => effect.getHalfRegression())
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
+            prestige: CL.SLIGHTLY_LOW,
+            economy: CL.SLIGHTLY_LOW
+        }))
+
+        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
     }
 
     determineOutcome() {

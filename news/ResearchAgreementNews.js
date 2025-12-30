@@ -11,74 +11,70 @@ class ResearchAgreementNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                wealth: CL.LOW,
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ISOTOPES, 2]])),
+                civilizationMultipliers: new Civilization({
+                    wealth: CL.LOW
+                }),
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ISOTOPES, 2]]))
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                wealth: CL.LOW,
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ISOTOPES, 2]])),
-            }),
+                civilizationMultipliers: new Civilization({
+                    wealth: CL.LOW
+                }),
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ISOTOPES, 2]]))
+            })
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        //actual knowledge gained cannot be lost
-        Object.assign(this.completeEffects[0], {
+        // Actual knowledge gained cannot be lost
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
             technology: CL.SLIGHTLY_HIGH,
             education: CL.HIGH,
-            army: CL.SLIGHTLY_HIGH,
-            navy: CL.SLIGHTLY_HIGH,
-        })
-        Object.assign(this.completeEffects[1], {
+            military: CL.SLIGHTLY_HIGH
+        }))
+        this.completeEffects[1].civilizationMultipliers.multiply(new Civilization({
             technology: CL.SLIGHTLY_HIGH,
             education: CL.HIGH,
-            army: CL.SLIGHTLY_HIGH,
-            navy: CL.SLIGHTLY_HIGH,
-        })
+            military: CL.SLIGHTLY_HIGH
+        }))
 
         // Failed: research yields nothing, wasted resources
-        this.failEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                wealth: CL.NO_REGRESSION, // money wasted
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                wealth: CL.NO_REGRESSION,
-            })
-        ]
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
+            wealth: CL.NO_REGRESSION  // Money wasted
+        }))
+        this.failEffects[1].civilizationMultipliers.multiply(new Civilization({
+            wealth: CL.NO_REGRESSION
+        }))
 
         // Cancelled: tensions end collaboration early
-        this.cancelEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                wealth: News.clHalfRegression(CL.LOW),
-                technology: CL.SLIGHTLY_HIGH, // partial gains
-                education: News.clHalfRegression(CL.HIGH),
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                wealth: News.clHalfRegression(CL.LOW),
-                technology: CL.SLIGHTLY_HIGH,
-                education: News.clHalfRegression(CL.HIGH),
-            })
-        ]
+        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
+        this.cancelEffects[0].civilizationMultipliers.multiply(new Civilization({
+            wealth: CL.SLIGHTLY_HIGH,
+            technology: CL.SLIGHTLY_HIGH,  // Partial gains
+            education: CL.SLIGHTLY_HIGH
+        }))
+        this.cancelEffects[1].civilizationMultipliers.multiply(new Civilization({
+            wealth: CL.SLIGHTLY_HIGH,
+            technology: CL.SLIGHTLY_HIGH,
+            education: CL.SLIGHTLY_HIGH
+        }))
+    }
+
+    shouldCancel() {
+        const {planet: p, targetPlanet: tp} = this
+        // Cancel if relationship deteriorated
+        const rel1 = p.c.relationships.get(tp)
+        const rel2 = tp.c.relationships.get(p)
+        return rel1 === RELATIONSHIP_TYPES.TENSE || rel1 === RELATIONSHIP_TYPES.WAR ||
+               rel2 === RELATIONSHIP_TYPES.TENSE || rel2 === RELATIONSHIP_TYPES.WAR
     }
 
     determineOutcome() {
         const {planet: p, targetPlanet: tp} = this
-        // Check if relationship deteriorated
-        const rel1 = p.c.relationships.get(targetPlanet)
-        const rel2 = tp.c.relationships.get(planet)
-        if (rel1 === RELATIONSHIP_TYPES.TENSE || rel1 === RELATIONSHIP_TYPES.WAR ||
-            rel2 === RELATIONSHIP_TYPES.TENSE || rel2 === RELATIONSHIP_TYPES.WAR) {
-            this.cancelled = true
-            return
-        }
-        // Research fails based on combined officer quality
+        // Research succeeds based on combined education quality
         const avgQuality = (p.c.education + tp.c.education) / 2
-        const successProbability = avgQuality * 0.7 + 0.2
-        this.failed = Math.random() > successProbability
+        this.rollOutcome(avgQuality * 0.7 + 0.2)
     }
 
     isValid() {

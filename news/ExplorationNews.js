@@ -11,43 +11,37 @@ class ExplorationNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                education: CL.LOW,
-                reserves: CL.SLIGHTLY_LOW,
-                technology: CL.LOW,
-                navy: CL.SLIGHTLY_LOW,
-                wealth: CL.LOW,
+                civilizationMultipliers: new Civilization({
+                    education: CL.LOW,
+                    reserves: CL.SLIGHTLY_LOW,
+                    technology: CL.LOW,
+                    navy: CL.SLIGHTLY_LOW,
+                    wealth: CL.LOW,
+                })
             })
         ]
 
-        //exploration pays off with territory and prestige
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        Object.assign(this.completeEffects[0], {
-            education: CL.NO_REGRESSION,
-            wealth: News.clHalfRegression(this.completeEffects[0].wealth),
-            reserves: News.clHalfRegression(this.completeEffects[0].reserves),
-            //economy: CL.SLIGHTLY_HIGH,
-            //industry: CL.SLIGHTLY_HIGH,
-            technology: CL.NO_REGRESSION,
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
+            education: CL.LOW,
+            wealth: CL.SLIGHTLY_LOW,
+            reserves: CL.SLIGHTLY_LOW,
+            technology: CL.LOW,
             territory: CL.HIGH,
             prestige: CL.SLIGHTLY_HIGH,
-        })
+        }))
 
-        this.failEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                education: CL.NO_REGRESSION,
-                technology: CL.NO_REGRESSION,
-                prestige: CL.LOW,
-                wealth: CL.NO_REGRESSION,
-            })
-        ]
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
+            education: CL.LOW,
+            technology: CL.LOW,
+            prestige: CL.LOW,
+            wealth: CL.LOW,
+        }))
     }
 
     determineOutcome() {
-        const {planet: p} = this
-        // Higher prestige and officer quality = more likely to succeed
-        const successProbability = (p.c.prestige + p.c.education) / 2
-        this.failed = Math.random() > successProbability
+        this.rollOutcome((this.planet.c.prestige + this.planet.c.education) / 2)
     }
 
     isValid() {

@@ -12,72 +12,63 @@ class ImmigrationNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
-                population: CL.HIGH, // gaining population
-                economy: CL.SLIGHTLY_HIGH,
-                security: CL.LOW,
+                civilizationMultipliers: new Civilization({
+                    population: CL.HIGH,
+                    economy: CL.SLIGHTLY_HIGH,
+                    security: CL.LOW,
+                })
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
-                population: CL.LOW, // losing population
-                economy: CL.SLIGHTLY_LOW, //ppl wouldnt be leaving if there were jobs there
+                civilizationMultipliers: new Civilization({
+                    population: CL.LOW,
+                    economy: CL.SLIGHTLY_LOW,
+                })
             }),
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        // Source: population loss is permanent
-        Object.assign(this.completeEffects[0], {
-            population: CL.NO_REGRESSION, // people don't come back
-            economy: News.clHalfRegression(this.completeEffects[0].economy),
-        })
-        // Target: population boost lingers
-        Object.assign(this.completeEffects[1], {
-            population: CL.NO_REGRESSION, // population gain is permanent
-            economy: News.clHalfRegression(this.completeEffects[0].economy),
-        })
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
+            population: CL.HIGH,
+            economy: CL.SLIGHTLY_HIGH,
+        }))
+        this.completeEffects[1].civilizationMultipliers.multiply(new Civilization({
+            population: CL.LOW,
+            economy: CL.SLIGHTLY_LOW,
+        }))
 
-        // Failed: economic collapse, immigrants return
-        this.failEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                population: News.clHalfRegression(CL.HIGH), // some stayed
-                security: CL.NO_REGRESSION, // instability persists
-                economy: CL.LOW, // economic crisis
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                population: News.clHalfRegression(CL.LOW), // some returned
-            })
-        ]
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
+            population: CL.SLIGHTLY_HIGH,
+            security: CL.LOW,
+            economy: CL.LOW,
+        }))
+        this.failEffects[1].civilizationMultipliers.multiply(new Civilization({
+            population: CL.SLIGHTLY_LOW,
+        }))
 
-        // Cancelled: borders closed early
-        this.cancelEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                population: News.clHalfRegression(CL.HIGH),
-                economy: News.clHalfRegression(CL.SLIGHTLY_HIGH),
-                security: News.clHalfRegression(CL.LOW),
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                population: News.clHalfRegression(CL.LOW),
-            })
-        ]
+        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
+        this.cancelEffects[0].civilizationMultipliers.multiply(new Civilization({
+            population: CL.SLIGHTLY_HIGH,
+            economy: CL.SLIGHTLY_HIGH,
+            security: CL.SLIGHTLY_LOW,
+        }))
+        this.cancelEffects[1].civilizationMultipliers.multiply(new Civilization({
+            population: CL.SLIGHTLY_LOW,
+        }))
+    }
+
+    shouldCancel() {
+        const rel1 = this.planet.c.relationships.get(this.targetPlanet)
+        const rel2 = this.targetPlanet.c.relationships.get(this.planet)
+        return rel1 === RELATIONSHIP_TYPES.TENSE || rel1 === RELATIONSHIP_TYPES.WAR ||
+               rel2 === RELATIONSHIP_TYPES.TENSE || rel2 === RELATIONSHIP_TYPES.WAR
     }
 
     determineOutcome() {
-        const {planet: p, targetPlanet: tp} = this
-        // Check if relationship deteriorated
-        const rel1 = p.c.relationships.get(targetPlanet)
-        const rel2 = tp.c.relationships.get(planet)
-        if (rel1 === RELATIONSHIP_TYPES.TENSE || rel1 === RELATIONSHIP_TYPES.WAR ||
-            rel2 === RELATIONSHIP_TYPES.TENSE || rel2 === RELATIONSHIP_TYPES.WAR) {
-            this.cancelled = true
-            return
-        }
-        // Immigration fails if economy collapses
-        const failProbability = (1 - p.c.economy) * 0.3
-        this.failed = Math.random() < failProbability
+        this.rollOutcome(this.planet.c.economy)
+    }
     }
 
     isValid() {

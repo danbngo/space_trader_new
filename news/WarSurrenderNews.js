@@ -11,62 +11,56 @@ class WarSurrenderNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                targetPlanet: this.targetPlanet,
-                // Victor gets nothing during negotiation
+                civilizationMultipliers: new Civilization({})
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                targetPlanet: this.planet,
-                // Losing side begins negotiations, temporary instability
-                army: CL.LOW,
-                navy: CL.LOW,
-                prestige: CL.LOW,
+                civilizationMultipliers: new Civilization({
+                    military: CL.LOW,
+                    prestige: CL.LOW
+                })
             })
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         // Victor: gains from peace treaty
-        Object.assign(this.completeEffects[0], {
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
             prestige: CL.HIGH,
             territory: CL.SLIGHTLY_HIGH,
-            wealth: CL.HIGH, // war indemnity
-        })
+            wealth: CL.HIGH  // War indemnity
+        }))
         // Loser: permanent losses from surrender
-        Object.assign(this.completeEffects[1], {
-            territory: CL.LOW, // territorial concessions
-            wealth: CL.LOW, // war indemnity paid
-            army: CL.LOW, // forced demilitarization
-            navy: CL.LOW,
-            prestige: CL.LOW, // shame of defeat
-            forcePeace: true, // ends the war
-        })
+        this.completeEffects[1].civilizationMultipliers.multiply(new Civilization({
+            territory: CL.LOW,  // Territorial concessions
+            wealth: CL.LOW,  // War indemnity paid
+            military: CL.LOW,  // Forced demilitarization
+            prestige: CL.LOW  // Shame of defeat
+        }))
+        this.completeEffects[1].forcePeace = true  // Ends the war
 
         // Cancelled: negotiations break down, war continues
-        this.cancelEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                // Victor just wastes time
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                army: News.clHalfRegression(CL.LOW), // partial recovery
-                navy: News.clHalfRegression(CL.LOW),
-                prestige: News.clHalfRegression(CL.LOW),
-            })
-        ]
+        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
+        this.cancelEffects[1].civilizationMultipliers.multiply(new Civilization({
+            military: CL.SLIGHTLY_HIGH,  // Partial recovery
+            prestige: CL.SLIGHTLY_HIGH
+        }))
+
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+    }
+
+    shouldCancel() {
+        const {planet: p, targetPlanet: tp} = this
+        // Check if war still ongoing
+        const stillAtWar = p.c.relationships.get(tp) === RELATIONSHIP_TYPES.WAR
+        if (!stillAtWar) return true
+        
+        // Negotiations succeed unless target suddenly regains strength
+        const rejectProbability = (tp.militaryPower / p.militaryPower) * 0.2
+        return Math.random() < rejectProbability
     }
 
     determineOutcome() {
-        const {planet: p, targetPlanet: tp} = this
-        // Check if war still ongoing
-        const stillAtWar = p.c.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
-        if (!stillAtWar) {
-            this.cancelled = true
-            return
-        }
-        // Negotiations succeed unless target suddenly regains strength
-        const rejectProbability = (tp.militaryPower / planet.militaryPower) * 0.2
-        this.cancelled = Math.random() < rejectProbability
+        // Surrender negotiations always complete if not cancelled
     }
 
     isValid() {

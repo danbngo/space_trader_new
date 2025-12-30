@@ -11,37 +11,32 @@ class EnvironmentalismNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                industry: CL.EXTREMELY_LOW,
-                navy: CL.VERY_LOW,
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.NANITES, CL.EXTREMELY_LOW], [CARGO_TYPES.METAL, CL.EXTREMELY_LOW]])),
+                civilizationMultipliers: new Civilization({
+                    industry: CL.EXTREMELY_LOW,
+                    navy: CL.VERY_LOW,
+                    cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.NANITES, CL.EXTREMELY_LOW], [CARGO_TYPES.METAL, CL.EXTREMELY_LOW]])),
+                })
             })
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        //market, economy, industry do not fully bounce back
-        Object.assign(this.completeEffects[0], {
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
             population: CL.SLIGHTLY_HIGH,
-            navy: News.clHalfRegression(this.completeEffects[0].navy),
-            industry: News.clHalfRegression(this.completeEffects[0].industry),
+            navy: CL.SLIGHTLY_LOW,
+            industry: CL.SLIGHTLY_LOW,
             prestige: CL.SLIGHTLY_HIGH,
-        })
+        }))
 
-        // Failed: movement collapses, industry rebounds but damage to environment
-        this.failEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                industry: News.clHalfRegression(CL.EXTREMELY_LOW), // partial de-industrialization
-                economy: CL.LOW, // economic disruption
-                prestige: CL.LOW, // movement failure
-            })
-        ]
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
+            industry: CL.SLIGHTLY_LOW,
+            economy: CL.LOW,
+            prestige: CL.LOW,
+        }))
     }
 
     determineOutcome() {
-        const {planet: p} = this
-        // Movement fails if economy becomes too weak to sustain
-        const failProbability = (1 - p.c.economy) * 0.35
-        this.failed = Math.random() < failProbability
+        this.rollOutcome(this.planet.c.economy)
     }
 
     isValid() {

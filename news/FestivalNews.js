@@ -11,43 +11,37 @@ class FestivalNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                wealth: CL.LOW,
-                economy: CL.LOW,
-                industry: CL.LOW,
-                reserves: CL.LOW,
-                crime: CL.HIGH,
-                corruption: CL.HIGH,
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.HOLOCUBES, CL.VERY_HIGH], [CARGO_TYPES.DRUGS, CL.ASTRONOMICAL]])),
+                civilizationMultipliers: new Civilization({
+                    wealth: CL.LOW,
+                    economy: CL.LOW,
+                    industry: CL.LOW,
+                    reserves: CL.LOW,
+                    crime: CL.HIGH,
+                    corruption: CL.HIGH,
+                    cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.HOLOCUBES, CL.VERY_HIGH], [CARGO_TYPES.DRUGS, CL.ASTRONOMICAL]])),
+                })
             })
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        //economy recovers, prestige is boosted
-        Object.assign(this.completeEffects[0], {
-            wealth: News.clHalfRegression(this.completeEffects[0].wealth),
-            reserves: News.clHalfRegression(this.completeEffects[0].reserves),
-            crime: News.clHalfRegression(this.completeEffects[0].crime),
-            //corruption: News.clHalfRegression(this.completeEffects[0].corruption),
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
+            wealth: CL.SLIGHTLY_LOW,
+            reserves: CL.SLIGHTLY_LOW,
+            crime: CL.SLIGHTLY_HIGH,
             prestige: CL.SLIGHTLY_HIGH,
-        })
+        }))
 
-        // Failed: festival disaster, no prestige gain
-        this.failEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                wealth: CL.NO_REGRESSION, // money wasted
-                economy: CL.NO_REGRESSION,
-                crime: CL.NO_REGRESSION, // crime persists
-                prestige: CL.LOW, // embarrassment
-            })
-        ]
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
+            wealth: CL.LOW,
+            economy: CL.LOW,
+            crime: CL.HIGH,
+            prestige: CL.LOW,
+        }))
     }
 
     determineOutcome() {
-        const {planet: p} = this
-        // Festival fails if security too low (riots, crime)
-        const failProbability = (1 - p.c.security) * 0.3
-        this.failed = Math.random() < failProbability
+        this.rollOutcome(this.planet.c.security)
     }
 
     isValid() {

@@ -11,67 +11,69 @@ class LudditismNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                technology: CL.VERY_LOW,
-                army: CL.SLIGHTLY_LOW,
-                navy: CL.SLIGHTLY_LOW,
-                economy: CL.SLIGHTLY_LOW,
-                industry: CL.SLIGHTLY_LOW,
-                education: CL.SLIGHTLY_LOW,
-                crime: CL.SLIGHTLY_LOW,
+                civilizationMultipliers: new Civilization({
+                    technology: CL.VERY_LOW,
+                    military: CL.SLIGHTLY_LOW,
+                    economy: CL.SLIGHTLY_LOW,
+                    industry: CL.SLIGHTLY_LOW,
+                    education: CL.SLIGHTLY_LOW,
+                    crime: CL.SLIGHTLY_LOW
+                }),
                 cargoPriceMultipliers: new CountsMap(new Map([
                     [CARGO_TYPES.NANITES, CL.EXTREMELY_LOW],
                     [CARGO_TYPES.ISOTOPES, CL.EXTREMELY_LOW],
                     [CARGO_TYPES.HOLOCUBES, CL.VERY_LOW]
-                ]),
+                ]))
             })
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        //population growth and prestige boost from simpler lifestyle
-        Object.assign(this.completeEffects[0], {
+        // Population growth and prestige boost from simpler lifestyle
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
+            technology: CL.VERY_LOW,  // Tech knowledge lost
+            education: CL.SLIGHTLY_LOW,  // Tech knowledge lost
+            military: CL.SLIGHTLY_LOW,
+            economy: CL.SLIGHTLY_LOW,
+            industry: CL.SLIGHTLY_LOW,
             population: CL.HIGH,
             prestige: CL.SLIGHTLY_HIGH,
-            technology: News.clHalfRegression(this.completeEffects[0].technology), //tech knowledge lost
-            education: News.clHalfRegression(this.completeEffects[0].education), //tech knowledge lost
-            army: News.clHalfRegression(this.completeEffects[0].army),
-            navy: News.clHalfRegression(this.completeEffects[0].navy),
-            economy: News.clHalfRegression(this.completeEffects[0].economy),
-            industry: News.clHalfRegression(this.completeEffects[0].industry),
             crime: CL.LOW,
-            corruption: CL.LOW,
-        })
+            corruption: CL.LOW
+        }))
 
         // Failed: movement collapses, no benefits
-        this.failEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                technology: CL.NO_REGRESSION, // tech degradation remains
-                education: CL.NO_REGRESSION,
-                army: CL.NO_REGRESSION,
-                navy: CL.NO_REGRESSION,
-                economy: CL.NO_REGRESSION,
-                industry: CL.NO_REGRESSION,
-                population: News.clHalfRegression(CL.HIGH), // partial growth
-                prestige: CL.LOW, // movement failure
-            })
-        ]
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
+            technology: CL.NO_REGRESSION,  // Tech degradation remains
+            education: CL.NO_REGRESSION,
+            military: CL.NO_REGRESSION,
+            economy: CL.NO_REGRESSION,
+            industry: CL.NO_REGRESSION,
+            population: CL.SLIGHTLY_HIGH,  // Partial growth
+            prestige: CL.LOW  // Movement failure
+        }))
+
+        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
+    }
+
+    shouldCancel() {
+        // Cancel if external military threats emerge
+        for (const p of gs.system.planets) {
+            if (p !== this.planet) {
+                const rel = p.c.relationships.get(this.planet)
+                if (rel === RELATIONSHIP_TYPES.TENSE || rel === RELATIONSHIP_TYPES.WAR) {
+                    return true
+                }
+            }
+        }
+        return false
     }
 
     determineOutcome() {
         const {planet: p} = this
-        // Movement fails if external pressures (economy/military threats)
-        let threatsDetected = false
-        for (const p of gs.system.planets) {
-            if (p !== planet) {
-                const rel = p.c.relationships.get(planet)
-                if (rel === RELATIONSHIP_TYPES.TENSE || rel === RELATIONSHIP_TYPES.TENSE || rel === RELATIONSHIP_TYPES.WAR) {
-                    threatsDetected = true
-                    break
-                }
-            }
-        }
-        const failProbability = threatsDetected ? 0.5 : ((1 - p.c.economy) * 0.25)
-        this.failed = Math.random() < failProbability
+        // Movement succeeds unless economic pressures are too high
+        const successProbability = p.c.economy * 0.75 + 0.25
+        this.rollOutcome(successProbability)
     }
 
     isValid() {

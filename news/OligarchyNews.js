@@ -11,38 +11,39 @@ class OligarchyNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                economy: CL.SLIGHTLY_LOW,
-                prestige: CL.SLIGHTLY_LOW,
-                industry: CL.SLIGHTLY_LOW,
-                security: CL.LOW,
-                wealth: CL.LOW,
+                civilizationMultipliers: new Civilization({
+                    economy: CL.SLIGHTLY_LOW,
+                    prestige: CL.SLIGHTLY_LOW,
+                    industry: CL.SLIGHTLY_LOW,
+                    security: CL.LOW,
+                    wealth: CL.LOW
+                })
             })
         ]
+
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        // Commerce and prestige damage are permanent (oligarchs still control economy)
-        Object.assign(this.completeEffects[0], {
-            //prestige: News.clHalfRegression(this.completeEffects[0].prestige),
-            economy: News.clHalfRegression(this.completeEffects[0].economy),
-        })
+        // Economy damage is permanent (oligarchs still control economy)
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
+            economy: CL.SLIGHTLY_LOW
+        }))
 
         // Failed: oligarchs entrench permanently
-        this.failEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                economy: CL.NO_REGRESSION, // permanent economic damage
-                prestige: CL.NO_REGRESSION,
-                security: CL.NO_REGRESSION,
-                wealth: CL.NO_REGRESSION,
-                crime: CL.HIGH, // corruption entrenched
-            })
-        ]
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
+            economy: CL.NO_REGRESSION,  // Permanent economic damage
+            prestige: CL.NO_REGRESSION,
+            security: CL.NO_REGRESSION,
+            wealth: CL.NO_REGRESSION,
+            crime: CL.HIGH  // Corruption entrenched
+        }))
+
+        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
     }
 
     determineOutcome() {
         const {planet: p} = this
-        // Oligarchy becomes permanent if security too weak to resist
-        const failProbability = (1 - p.c.security) * 0.4
-        this.failed = Math.random() < failProbability
+        // Oligarchy overthrown if security strong enough to resist
+        this.rollOutcome(p.c.security * 0.6 + 0.4)
     }
 
     isValid() {
