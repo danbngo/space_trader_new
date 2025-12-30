@@ -70,14 +70,14 @@ class LudditismNews extends News {
                 }
             }
         }
-        const failProbability = threatsDetected ? 0.5 : ((1 - planet.c.economy) * 0.25)
+        const failProbability = threatsDetected ? 0.5 : ((1 - p.c.economy) * 0.25)
         this.failed = Math.random() < failProbability
     }
 
     isValid() {
         const {planet: p} = this
         //more likely if high tech and population pressure
-        const ratingsValid = planet.c.technology > CL.HIGH && planet.c.industry > CL.MEDIUM
+        const ratingsValid = p.c.technology > CL.HIGH && p.c.industry > CL.MEDIUM
         //must not be at engaged in or targeted by any hostile acts
         const interferingEvent =
             News.planetHasAnyNews(planet, [NT.LUDDITISM, ...NT_DANGEROUS]) ||

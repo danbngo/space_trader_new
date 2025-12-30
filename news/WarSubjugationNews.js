@@ -97,7 +97,7 @@ class WarSubjugationNews extends News {
     determineOutcome() {
         const {planet: p, targetPlanet: tp} = this
         // Check if war still ongoing
-        const stillAtWar = planet.c.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
+        const stillAtWar = p.c.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
         if (!stillAtWar) {
             this.cancelled = true
             return
@@ -110,9 +110,9 @@ class WarSubjugationNews extends News {
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         //our army must be both large and  significantly better than theirs in every way
-        const ratingsValid = (planet.c.army/targetPlanet.c.army > CL.HIGH) && (planet.c.navy/targetPlanet.c.navy > CL.HIGH)
+        const ratingsValid = (p.c.army/targetPlanet.c.army > CL.HIGH) && (p.c.navy/targetPlanet.c.navy > CL.HIGH)
         //planet must be at war with the target
-        const relationshipValid = planet.c.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR
+        const relationshipValid = p.c.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR
         const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.SUBJUGATION, ...NT_COOPERATIVE])
         return ratingsValid && relationshipValid && !interferingEvent
     }

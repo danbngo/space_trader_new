@@ -75,17 +75,17 @@ class CoupDetatNews extends News {
         const resistanceProbability = (targetPlanet.c.security + targetPlanet.c.military) / 2
         const failProbability = resistanceProbability * 0.4
         this.failed = Math.random() < failProbability
-        this.rollOutcome((planet.c.security+planet.settlement.cryme)/(targetPlanet.c.security + targetPlanet.c.military), CL.HIGH)
+        this.rollOutcome((p.c.security+planet.settlement.cryme)/(targetPlanet.c.security + targetPlanet.c.military), CL.HIGH)
     }
 
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         // Aggressor must have high prestige, target must have lowER prestige
-        const ratingsValid = (planet.c.prestige > CL.HIGH) && (planet.c.security > CL.MEDIUM) && (planet.c.security > targetPlanet.c.security)
+        const ratingsValid = (p.c.prestige > CL.HIGH) && (p.c.security > CL.MEDIUM) && (p.c.security > targetPlanet.c.security)
         // Target must have opposing government type - nevermind, CIA flouts this all the time
-        //const govValid = planet.c.governmentType.opposingType == targetPlanet.c.governmentType
+        //const govValid = p.c.governmentType.opposingType == targetPlanet.c.governmentType
         // Must be at least TENSE beforehand
-        const relationships = [planet.c.relationships.get(targetPlanet), targetPlanet.c.relationships.get(planet)]
+        const relationships = [p.c.relationships.get(targetPlanet), targetPlanet.c.relationships.get(planet)]
         const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.TENSE || rel == RELATIONSHIP_TYPES.WAR)
         const interferingEvent = News.planetHasAnyNews(targetPlanet, [NT.COUP_DETAT, ...NT_CRIME_PREVENTING])
         return ratingsValid && relationshipsValid && !interferingEvent

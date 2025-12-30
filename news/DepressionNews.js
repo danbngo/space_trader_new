@@ -51,14 +51,14 @@ class DepressionNews extends News {
     determineOutcome() {
         const {planet: p} = this
         // Higher industry and prestige = more likely to recover
-        const recoveryProbability = (planet.c.industry + planet.c.prestige) / 2
+        const recoveryProbability = (p.c.industry + p.c.prestige) / 2
         this.failed = Math.random() > recoveryProbability
     }
 
     isValid() {
         const {planet: p} = this
         //more likely to happen when credit is REALLY high
-        const ratingsValid = (planet.c.wealth) > CL.HIGH && planet.c.economy < CL.HIGH
+        const ratingsValid = (p.c.wealth) > CL.HIGH && p.c.economy < CL.HIGH
         const interferingEvent =
             News.planetHasAnyNews(planet, [NT.DEPRESSION, ...NT_ECONOMY_BOOSTING]) || 
             News.planetHasAnyNewsTargeting(planet, NT_ECONOMY_BOOSTING)

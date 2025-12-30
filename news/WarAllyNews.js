@@ -41,20 +41,20 @@ class WarAllyNews extends News {
     determineOutcome() {
         const {planet, targetPlanet, allyPlanet} = this
         // Check if war still ongoing
-        const stillAtWar = planet.c.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
+        const stillAtWar = p.c.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
         if (!stillAtWar) {
             this.cancelled = true
             return
         }
         // Success probability based on prestige and ally relationship
-        const successProbability = planet.c.prestige * 0.7 + 0.2
+        const successProbability = p.c.prestige * 0.7 + 0.2
         this.failed = Math.random() > successProbability
     }
 
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         // Must be at war
-        const relationshipValid = planet.c.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
+        const relationshipValid = p.c.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
         // Must have an ongoing war event
         const hasWar = News.hasNews(NT.WAR, planet, targetPlanet)
         
@@ -74,7 +74,7 @@ class WarAllyNews extends News {
         this.allyPlanet = rndMember(potentialAllies)
         
         // Must have high prestige to convince allies
-        const prestigeValid = planet.c.prestige > CL.HIGH
+        const prestigeValid = p.c.prestige > CL.HIGH
         // Can't have ally recruitment already
         const interferingEvent = News.hasNews(NT.WAR_ALLY, planet, targetPlanet)
         return relationshipValid && hasWar && prestigeValid && !interferingEvent

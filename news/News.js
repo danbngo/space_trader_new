@@ -119,6 +119,7 @@ class News {
 
     shouldCancel() {
         //implement in local news files
+        return false
     }
 
     /**
@@ -129,9 +130,7 @@ class News {
     ongo(elapsedYears) {
         if (!this.started) throw new Error('news must be started prior to ongoing!')
         if (this.ended) throw new Error('news has already ended but tried to ongo it!')
-        for (const fx of this.ongoingEffects) {
-            fx.apply(elapsedYears)
-        }
+        if (this.onTick) this.onTick(elapsedYears)
     }
 
     cancel() {

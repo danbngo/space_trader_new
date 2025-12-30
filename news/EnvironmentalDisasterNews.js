@@ -47,14 +47,14 @@ class EnvironmentalDisasterNews extends News {
     determineOutcome() {
         const {planet: p} = this
         // Cleanup fails if economy/industry too weak to recover
-        const failProbability = (1 - planet.c.economy) * (1 - planet.c.industry) * 0.35
+        const failProbability = (1 - p.c.economy) * (1 - p.c.industry) * 0.35
         this.failed = Math.random() < failProbability
     }
 
     isValid() {
         const {planet: p} = this
         //happens when industry is getting out of hand
-        const ratingsValid = planet.c.industry >= CL.HIGH
+        const ratingsValid = p.c.industry >= CL.HIGH
         const interferingEvent = News.hasNews(NT.ENVIRONMENTAL_DISASTER, planet)
         return ratingsValid && !interferingEvent
     }

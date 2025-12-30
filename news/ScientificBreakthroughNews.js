@@ -42,14 +42,14 @@ class ScientificBreakthroughNews extends News {
     determineOutcome() {
         const {planet: p} = this
         // Research fails based on officer quality and economy
-        const successProbability = (planet.c.education * 0.6) + (planet.c.economy * 0.3) + 0.1
+        const successProbability = (p.c.education * 0.6) + (p.c.economy * 0.3) + 0.1
         this.failed = Math.random() > successProbability
     }
 
     isValid() {
         const {planet: p} = this
         //needs money. wont bother if we're already at the top
-        const ratingsValid = planet.settlement.market.baseCredits/MARKET_AVERAGE_CREDITS > CL.MEDIUM && planet.c.technology < CL.EXTREMELY_HIGH
+        const ratingsValid = planet.settlement.market.baseCredits/MARKET_AVERAGE_CREDITS > CL.MEDIUM && p.c.technology < CL.EXTREMELY_HIGH
         //hard times dont block it, may actually accelerate technological progress
         const interferingEvent = News.hasNews(NT.SCIENTIFIC_BREAKTHROUGH, planet)
         return ratingsValid && !interferingEvent

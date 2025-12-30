@@ -1,9 +1,9 @@
 class RevolutionNews extends News {
     constructor(planet = new Planet()) {
-        const newGovernmentType = rndMember(GT_ALL.filter(g => g !== planet.c.governmentType && g !== GT.PUPPET_STATE));
+        const newGovernmentType = rndMember(GT_ALL.filter(g => g !== p.c.governmentType && g !== GT.PUPPET_STATE));
         
         super(
-            planet.c.governmentType != GT.ANARCHY ? `${coloredName(planet)}'s people have deposed the government and begin a glorious revolution!` :
+            p.c.governmentType != GT.ANARCHY ? `${coloredName(planet)}'s people have deposed the government and begin a glorious revolution!` :
             `${coloredName(planet)}'s people clamor for a government to take the reigns and end the anarchy they live in!`,
             `${coloredName(planet)} stabilizes under new government: ${coloredName(newGovernmentType)}!`,
             `${coloredName(planet)}'s revolution fails! Chaos reigns!`,
@@ -64,14 +64,14 @@ class RevolutionNews extends News {
     determineOutcome() {
         const {planet: p} = this
         // Higher military and prestige = more likely to succeed
-        const successProbability = (planet.c.military + planet.c.prestige) / 2
+        const successProbability = (p.c.military + p.c.prestige) / 2
         this.failed = Math.random() > successProbability
     }
 
     isValid() {
         const {planet: p} = this
         //a generally robust economy/govt less prone to this
-        const ratingsValid = planet.c.security < CL.MEDIUM || planet.c.military < CL.MEDIUM || planet.c.prestige < CL.MEDIUM || planet.c.crime > CL.MEDIUM || planet.c.security < CL.MEDIUM || planet.c.economy < CL.MEDIUM
+        const ratingsValid = p.c.security < CL.MEDIUM || p.c.military < CL.MEDIUM || p.c.prestige < CL.MEDIUM || p.c.crime > CL.MEDIUM || p.c.security < CL.MEDIUM || p.c.economy < CL.MEDIUM
         //planet must not be puppet state (anarcy is fine otherwise how do we get back out of it)
         const interferingEvent =
             News.planetHasAnyNews(planet, [NT.REVOLUTION, NT.WAR]) || News.hasNewsTargeting(NT.WAR, planet) ||

@@ -59,7 +59,7 @@ class WarSurrenderNews extends News {
     determineOutcome() {
         const {planet: p, targetPlanet: tp} = this
         // Check if war still ongoing
-        const stillAtWar = planet.c.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
+        const stillAtWar = p.c.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
         if (!stillAtWar) {
             this.cancelled = true
             return
@@ -72,7 +72,7 @@ class WarSurrenderNews extends News {
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         // Must be at war
-        const relationshipValid = planet.c.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
+        const relationshipValid = p.c.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
         // Must have an ongoing war event
         const hasWar = News.hasNews(NT.WAR, planet, targetPlanet)
         // Target should be significantly weaker (losing the war)

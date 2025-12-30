@@ -8,6 +8,7 @@ class Civilization {
      * @param {Object} params - The effect parameters.
      * @param {Planet} [params.planet] - The planet this civilization belongs to.
      * @param {GovernmentType} [params.governmentType] - The type of government of the civilization.
+     * @param {Policies} [params.policies] - The active policies for this civilization.
      * @param {CountsMap} [params.cargoPriceMultipliers] - Multipliers for cargo prices specific to this civilization.
      * @param {CountsMap} [params.skillPriceMultipliers] - Multipliers for cargo prices specific to this civilization.
      * @param {number} [params.technology] - Quality rating of ships produced by this civilization.
@@ -20,7 +21,6 @@ class Civilization {
      * @param {number} [params.security] - Rating affecting police and bounty hunter presence.
      * @param {number} [params.culture] - More tourists
      * @param {number} [params.prestige] - Effects how planets interact with each other.
-     * @param {Policies} [params.policies] - The active policies for this civilization.
      * @param {number} [params.army] - More guild officers and army patrols
      * @param {number} [params.navy] - More shipyard ships
      * @param {number} [params.corruption] - Higher corruption means LOWER black market prices.
@@ -116,6 +116,22 @@ class Civilization {
             inverseEffect[cr.id] = 1 / this[cr.id];
         }
         return inverseEffect
+    }
+
+    overwrite(withCiv = new Civilization()) {
+        if (withCiv.planet) this.planet = withCiv.planet
+        if (withCiv.governmentType) this.governmentType = withCiv.governmentType
+        if (withCiv.policies) this.policies = withCiv.policies.clone()
+        for (const cr of CIVILIZATION_RATINGS_ALL) {
+            if (withCiv[cr.id] !== undefined && withCiv[cr.id] !== null && withCiv[cr.id] !== 1.0)
+            this[cr.id] = withCiv[cr.id];
+        }
+        for (const [ct, mod] of withCiv.cargoPriceMultipliers.counts) {
+            this.cargoPriceMultipliers.counts.set(ct, mod)
+        }
+        for (const [st, mod] of withCiv.skillPriceMultipliers.counts) {
+            this.skillPriceMultipliers.counts.set(st, mod)
+        }
     }
 
     clone() {

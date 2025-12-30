@@ -42,16 +42,16 @@ class TerraformingNews extends News {
     determineOutcome() {
         const {planet: p} = this
         // Higher industry and officer quality = more likely to succeed
-        const successProbability = (planet.c.industry + planet.c.education) / 2
+        const successProbability = (p.c.industry + p.c.education) / 2
         this.failed = Math.random() > successProbability
     }
 
     isValid() {
         const {planet: p} = this
         // Need sufficient ships, officers, and credits to undertake terraforming
-        const ratingsValid = planet.c.navy > CL.MEDIUM && 
-                            planet.c.army > CL.MEDIUM && 
-                            planet.c.wealth > CL.MEDIUM
+        const ratingsValid = p.c.navy > CL.MEDIUM && 
+                            p.c.army > CL.MEDIUM && 
+                            p.c.wealth > CL.MEDIUM
         // Planet must not already have this event
         const interferingEvent = News.planetHasAnyNews(planet, [NT.TERRAFORMING, ...NT_ECONOMY_PREVENTING])
         return ratingsValid && !interferingEvent

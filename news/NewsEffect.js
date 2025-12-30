@@ -43,11 +43,11 @@ class NewsEffect {
         /** @type {Planet|null} */
         this.targetPlanet = targetPlanet;
         /** @type {GovernmentType} */
-        this.oldGovernmentType = planet && planet.civilization ? planet.c.governmentType : null;
+        this.oldGovernmentType = planet && planet.civilization ? p.c.governmentType : null;
         /** @type {GovernmentType|null} */
         this.newGovernmentType = newGovernmentType;
         /** @type {RelationshipType|null} */
-        this.oldRelationship = planet && planet.civilization ? planet.c.relationships.get(targetPlanet) || null : null;
+        this.oldRelationship = planet && planet.civilization ? p.c.relationships.get(targetPlanet) || null : null;
         /** @type {RelationshipType|null} */
         this.newRelationship = newRelationship;
         /** @type {Building[]} */

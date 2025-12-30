@@ -272,4 +272,46 @@ class Encounter {
         }
         return pseudoActions
     }
+
+    /**
+     * Called when the encounter starts. Override in subclasses.
+     */
+    onStart() {
+        // Override in subclass
+    }
+
+    /**
+     * Called when the player wins the encounter. Override in subclasses.
+     */
+    onVictory() {
+        // Override in subclass
+    }
+
+    /**
+     * Called when the player loses the encounter. Override in subclasses.
+     */
+    onDefeat() {
+        // Override in subclass
+    }
+
+    /**
+     * Called when the player escapes the encounter. Override in subclasses.
+     */
+    onEscape() {
+        // Override in subclass
+    }
+
+    /**
+     * Called when the player surrenders. Override in subclasses.
+     */
+    onSurrender() {
+        // Override in subclass
+    }
+
+    /**
+     * Called at the end of each turn. Override in subclasses if needed.
+     */
+    onEndTurn() {
+        // Override in subclass if needed
+    }
 }

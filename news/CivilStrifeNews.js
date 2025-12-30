@@ -56,7 +56,7 @@ class CivilStrifeNews extends News {
         //more likely if security is too high, prestige or culture are too low
         const ratingsValid = p.c.security > CL.HIGH || p.c.culture < CL.LOW || p.c.prestige < CL.LOW
         //planet must not already be in anarchy or puppet state
-        const interferingEvent = News.planetHasAnyNews(p, [NT.CIVIL_STRIFE, ...NT_GOVERNANCE_PREVENTING])
+        const interferingEvent = News.planetHasAnyNews(p, NT_GOVERNANCE_PREVENTING)
         return ratingsValid && !interferingEvent
     }
 }

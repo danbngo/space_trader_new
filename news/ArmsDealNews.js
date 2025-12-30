@@ -13,23 +13,24 @@ class ArmsDealNews extends News {
                 planet: this.planet,
                 civilizationMultipliers: new Civilization({
                     prestige: CL.SLIGHTLY_LOW,
+                    taxes: CL.SLIGHTLY_HIGH
                 })
             }),
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
 
-        Object.assign(this.completeEffects[0].civilizationMultipliers, {
+        this.completeEffects[0].civilizationMultipliers.overwrite(new Civilization({
             wealth: CL.LOW, // payment for arms
             army: CL.HIGH, // gain military knowledge
             navy: CL.HIGH, // gain new ships
             technology: CL.SLIGHTLY_HIGH,
-        })
-        Object.assign(this.completeEffects[1].civilizationMultipliers, {
+        }))
+        this.completeEffects[1].civilizationMultipliers.overwrite(new Civilization({
             wealth: CL.HIGH, // payment received
             navy: CL.LOW, // sold ships
             army: CL.LOW,
-        })
+        }))
 
         // Failed: seller refuses to sell
         this.failEffects = []
@@ -57,7 +58,7 @@ class ArmsDealNews extends News {
         //both planets must be neutral or allies
         const relationshipsValid = Civilization.areAlliesOrNeutral(p, tp)
         const interferingEvent = 
-            News.hasAnyNewsBidirectional(p, tp, [NT.ARMS_DEAL, ...NT_COOPERATION_PREVENTING])
+            News.hasAnyNewsBidirectional(p, tp, NT_COOPERATION_PREVENTING)
         return transferValid && ratingsValid && relationshipsValid && !interferingEvent
     }
 }

@@ -44,14 +44,14 @@ class PlagueNews extends News {
     determineOutcome() {
         const {planet: p} = this
         // Higher economy/industry = better medical infrastructure
-        const cureProbability = (planet.c.economy + planet.c.industry) / 2
+        const cureProbability = (p.c.economy + p.c.industry) / 2
         this.failed = Math.random() > cureProbability
     }
 
     isValid() {
         const {planet: p} = this
         //happens when population is getting out of hand
-        const ratingsValid = planet.c.population > CL.MEDIUM
+        const ratingsValid = p.c.population > CL.MEDIUM
 
         const interferingEvent = //can happy anytime, anywhere!
             News.hasNews(NT.PLAGUE, planet)

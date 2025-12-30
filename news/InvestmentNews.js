@@ -71,7 +71,7 @@ class InvestmentNews extends News {
     determineOutcome() {
         const {planet: p, targetPlanet: tp} = this
         // Check if relationship deteriorated
-        const rel1 = planet.c.relationships.get(targetPlanet)
+        const rel1 = p.c.relationships.get(targetPlanet)
         const rel2 = targetPlanet.c.relationships.get(planet)
         if (rel1 === RELATIONSHIP_TYPES.TENSE || rel1 === RELATIONSHIP_TYPES.WAR ||
             rel2 === RELATIONSHIP_TYPES.TENSE || rel2 === RELATIONSHIP_TYPES.WAR) {
@@ -86,11 +86,11 @@ class InvestmentNews extends News {
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         //need to have sufficient economy of our own
-        const ratingsValid = planet.c.wealth >= CL.SLIGHTLY_HIGH || planet.settlement.market.baseCargo.average/MARKET_AVERAGE_CARGO_PER_TYPE > CL.SLIGHTLY_HIGH
+        const ratingsValid = p.c.wealth >= CL.SLIGHTLY_HIGH || planet.settlement.market.baseCargo.average/MARKET_AVERAGE_CARGO_PER_TYPE > CL.SLIGHTLY_HIGH
         //our economy should be larger than theirs
-        const transferValid = planet.c.economy > targetPlanet.c.economy && planet.settlement.bank.baseCredits > targetPlanet.settlement.bank.baseCredits && planet.settlement.market.baseCargo.average > targetPlanet.settlement.market.baseCargo.average
+        const transferValid = p.c.economy > targetPlanet.c.economy && planet.settlement.bank.baseCredits > targetPlanet.settlement.bank.baseCredits && planet.settlement.market.baseCargo.average > targetPlanet.settlement.market.baseCargo.average
         //both planets must be neutral or allies
-        const relationships = [planet.c.relationships.get(targetPlanet), targetPlanet.c.relationships.get(planet)]
+        const relationships = [p.c.relationships.get(targetPlanet), targetPlanet.c.relationships.get(planet)]
         const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.NEUTRAL || rel == RELATIONSHIP_TYPES.ALLY)
         //removed most of the requirements for this, can we not have like a marshall plan??
         const interferingEvent = 

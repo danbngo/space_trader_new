@@ -23,13 +23,13 @@ class AddictionNews extends News {
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
 
         this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        Object.assign(this.failEffects[0].civilizationMultipliers, {
+        this.failEffects[0].civilizationMultipliers.overwrite(new Civilization({
             population: CL.SLIGHTLY_LOW,
             security: CL.NO_REGRESSION,
             economy: CL.NO_REGRESSION,
             crime: CL.NO_REGRESSION,
             corruption: CL.NO_REGRESSION,
-        })
+        }))
     }
 
     determineOutcome() {
@@ -42,7 +42,7 @@ class AddictionNews extends News {
         const {planet: p} = this
         //more likely if high drug availability
         const ratingsValid = (p.c.crime*p.c.corruption/p.c.security) > CL.HIGH
-        const interferingEvent = News.planetHasAnyNews(p, [NT.ADDICTION, ...NT_CRIME_PREVENTING])
+        const interferingEvent = News.planetHasAnyNews(p, NT_CRIME_PREVENTING)
         return ratingsValid && !interferingEvent
     }
 }

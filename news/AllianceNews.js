@@ -65,7 +65,7 @@ class AllianceNews extends News {
         const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.NEUTRAL)
         //never ally with an opposing govt OR someone who is allied to one!!!
         const opposingGovernmentsValid = !Civilization.areOpposingGovernments(p, tp)
-        const interferingEvent = News.hasAnyNewsBidirectional(p, tp, [NT.ALLIANCE, ...NT_COOPERATION_PREVENTING])
+        const interferingEvent = News.hasAnyNewsBidirectional(p, tp, NT_COOPERATION_PREVENTING)
         return opposingGovernmentsValid && relationshipsValid && !interferingEvent
     }
 }

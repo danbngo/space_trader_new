@@ -47,14 +47,14 @@ class ScarcityNews extends News {
     determineOutcome() {
         const {planet: p} = this
         // Scarcity becomes catastrophic if economy/industry collapse further
-        const failProbability = (1 - planet.c.economy) * (1 - planet.c.industry) * 0.3
+        const failProbability = (1 - p.c.economy) * (1 - p.c.industry) * 0.3
         this.failed = Math.random() < failProbability
     }
 
     isValid() {
         const {planet: p} = this
         //more likely if high pop and high industry
-        const ratingsValid = planet.c.population > CL.HIGH || planet.c.industry >= CL.HIGH
+        const ratingsValid = p.c.population > CL.HIGH || p.c.industry >= CL.HIGH
         const interferingEvent = News.planetHasAnyNews(planet, [NT.SCARCITY, ...NT_ECONOMY_BOOSTING])
         return ratingsValid && !interferingEvent
     }

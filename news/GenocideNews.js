@@ -37,7 +37,7 @@ class GenocideNews extends News {
     isValid() {
         const {planet: p} = this
         //more likely if security is very low (except in a police state)
-        const ratingsValid = planet.c.military > CL.MEDIUM && planet.c.security < CL.VERY_LOW
+        const ratingsValid = p.c.military > CL.MEDIUM && p.c.security < CL.VERY_LOW
         //planet must not already be in anarchy or puppet state
         const interferingEvent = News.planetHasAnyNews(planet, [NT.GENOCIDE])
         return (ratingsValid) && !interferingEvent

@@ -82,26 +82,26 @@ class EnslavementNews extends News {
     determineOutcome() {
         const {planet: p, targetPlanet: tp} = this
         // Check if peace declared
-        const rel = planet.c.relationships.get(targetPlanet)
+        const rel = p.c.relationships.get(targetPlanet)
         if (rel === RELATIONSHIP_TYPES.NEUTRAL || rel === RELATIONSHIP_TYPES.ALLY) {
             this.cancelled = true
             return
         }
         // Slavery fails if security too low (revolts)
-        const revoltProbability = (1 - planet.c.security) * 0.45
+        const revoltProbability = (1 - p.c.security) * 0.45
         this.failed = Math.random() < revoltProbability
     }
 
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         // More likely if economy/industry AND population is low (seeking economic boost)
-        const ratingsValid = (planet.c.economy < CL.LOW || planet.c.industry < CL.LOW) && planet.c.population < CL.MEDIUM
+        const ratingsValid = (p.c.economy < CL.LOW || p.c.industry < CL.LOW) && p.c.population < CL.MEDIUM
         // Target must have population to steal
         const targetValid = targetPlanet.c.population > CL.LOW
         // our military must be stronger than theirs
-        const militaryValid = planet.c.military > targetPlanet.c.military * CL.HIGH
+        const militaryValid = p.c.military > targetPlanet.c.military * CL.HIGH
         // Both parties must be at least TENSE (TENSE or WAR)
-        const relationships = [planet.c.relationships.get(targetPlanet), targetPlanet.c.relationships.get(planet)]
+        const relationships = [p.c.relationships.get(targetPlanet), targetPlanet.c.relationships.get(planet)]
         const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.TENSE || rel == RELATIONSHIP_TYPES.WAR)
         // Must not already have this event between these planets
         const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.ENSLAVEMENT])

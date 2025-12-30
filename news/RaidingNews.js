@@ -95,22 +95,22 @@ class RaidingNews extends News {
     determineOutcome() {
         const {planet: p, targetPlanet: tp} = this
         // Check if peace declared
-        const rel = planet.c.relationships.get(targetPlanet)
+        const rel = p.c.relationships.get(targetPlanet)
         if (rel === RELATIONSHIP_TYPES.NEUTRAL || rel === RELATIONSHIP_TYPES.ALLY) {
             this.cancelled = true
             return
         }
         // Raids fail if target has strong defense
-        const failProbability = (targetPlanet.c.military / planet.c.military) * 0.3
+        const failProbability = (targetPlanet.c.military / p.c.military) * 0.3
         this.failed = Math.random() < failProbability
     }
 
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         // More likely if military is high and goods are low
-        const ratingsValid = planet.c.military > 1.25 && (planet.settlement.market.baseCargo.average/MARKET_AVERAGE_CARGO_PER_TYPE < 0.5 || planet.settlement.cryme < 0.5)
+        const ratingsValid = p.c.military > 1.25 && (planet.settlement.market.baseCargo.average/MARKET_AVERAGE_CARGO_PER_TYPE < 0.5 || planet.settlement.cryme < 0.5)
         // Both parties must be at least TENSE (TENSE or WAR)
-        const relationships = [planet.c.relationships.get(targetPlanet), targetPlanet.c.relationships.get(planet)]
+        const relationships = [p.c.relationships.get(targetPlanet), targetPlanet.c.relationships.get(planet)]
         const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.TENSE || rel == RELATIONSHIP_TYPES.WAR)
         // Planet must not already have this event
         const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.RAIDING])

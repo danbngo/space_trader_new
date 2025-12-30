@@ -32,7 +32,6 @@ const NEWS_TYPE_CLASSES = [
     [NT.IMMIGRATION, ImmigrationNews],
     [NT.LAND_GRAB, LandGrabNews],
     [NT.INVESTMENT, InvestmentNews],
-    [NT.ISOLATIONISM, IsolationismNews],
     [NT.LUDDITISM, LudditismNews],
     [NT.MILITARY_BUILDUP, MilitaryBuildupNews],
     [NT.OLIGARCHY, OligarchyNews],
@@ -97,9 +96,11 @@ function generateNews(attemptsRemaining = 100, weights = []) {//only needs to be
     
     if (!newsType.forbiddenGovs.includes(planet.c.governmentType)) {
         if (!newsType.immuneGovs.includes(targetPlanet.c.governmentType)) {
-            /** @ts-ignore */
-            const news = new cls(planet, targetPlanet)
-            if (news.isValid()) return news
+            if (!News.hasNews(newsType, planet)) {
+                /** @ts-ignore */
+                const news = new cls(planet, targetPlanet)
+                if (news.isValid()) return news
+            }
         }
     }
     if (attemptsRemaining <= 0) return null
@@ -117,6 +118,7 @@ function generateMetaNews(newsTypesAttempted = []) {
     newsTypesAttempted.push(cls)
     // @ts-ignore
     const news = new cls()
+    //danmod we will eventually need to check if there's already meta news of this type ongoing, or maybe any meta news at all.
     if (!news.isValid()) return null
     return news
 }

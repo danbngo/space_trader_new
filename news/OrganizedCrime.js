@@ -46,7 +46,7 @@ class OrganizedCrimeNews extends News {
     determineOutcome() {
         const {planet: p} = this
         // Crime crackdown fails if security too low
-        const failProbability = (1 - planet.c.security) * 0.45
+        const failProbability = (1 - p.c.security) * 0.45
         this.failed = Math.random() < failProbability
     }
 

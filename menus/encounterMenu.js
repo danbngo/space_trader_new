@@ -55,7 +55,7 @@ function startEncounter(encounter = gs.encounter) {
 
     showModal(coloredName(encounter.fleet), encounter.encounterType.description, [['Ok', ()=>{
         showEncounterMap()
-        if (encounter.encounterType.aiType == AI_TYPES.Asteroid) encounter.encounterType.onStart()
+        if (encounter.encounterType.aiType == AI_TYPES.Asteroid) encounter.onStart()
     }]])
 }
 /**
@@ -92,13 +92,13 @@ function endCombat() {
     const {encounter} = gs
     const {result} = encounter
     if (result == ENCOUNTER_RESULTS.Defeat) {
-        showModal(`Defeat`, `All your ships have been disabled!`, [['Continue', ()=>encounter.encounterType.onDefeat()]])
+        showModal(`Defeat`, `All your ships have been disabled!`, [['Continue', ()=>encounter.onDefeat()]])
     }
     else if (result == ENCOUNTER_RESULTS.Victory) {
-        showModal(`Victory`, `All enemy ships have fled or been disabled! You win!`, [['Continue', ()=>encounter.encounterType.onVictory()]])
+        showModal(`Victory`, `All enemy ships have fled or been disabled! You win!`, [['Continue', ()=>encounter.onVictory()]])
     }
     else if (result == ENCOUNTER_RESULTS.Escaped) {
-        showModal(`Escape`, `You fled from the battlefield!`, [['Continue', ()=>encounter.encounterType.onEscape()]])
+        showModal(`Escape`, `You fled from the battlefield!`, [['Continue', ()=>encounter.onEscape()]])
     }
 }
 
@@ -142,13 +142,26 @@ function loseCargoFromDisabledShips(disabledShips = []) {
 function showPlayerRefuseSurrenderModal(fameMultiplier = 0, bountyMultiplier = 0) {
     console.log('showPlayerRefuseSurrenderModal', { fameMultiplier, bountyMultiplier });
     const fleetName = coloredName(gs.encounter.fleet)
+    const planet = gs.encounter.planet
+    const faction = gs.encounter.fleet.faction
     const bounty = 100 * bountyMultiplier
     const fame = fameMultiplier > 0 ? 1 * fameMultiplier : 0
     const infamy = fameMultiplier < 0 ? 1 * Math.abs(fameMultiplier) : 0
     let msg = `You refuse to submit to the ${fleetName} demands, and the battle is joined!<br/>`
-    if (infamy > 0) msg += `Your defiance of the authorities causes you to gain ${infamy} infamy.<br/>`
-    if (fame > 0) msg += `Your fearlessness causes you to gain ${fame} fame.<br/>`
-    if (bounty > 0) msg += `You bounty has risen by ${bounty}CR.<br/>`
+    if (infamy > 0) {
+        msg += `Your defiance of the authorities causes you to gain ${infamy} infamy.<br/>`
+        if (planet) msg += gs.captain.grantInfamy(planet, infamy)
+        if (faction) msg += gs.captain.grantFactionInfamy(faction, infamy)
+    }
+    if (fame > 0) {
+        msg += `Your fearlessness causes you to gain ${fame} fame.<br/>`
+        if (planet) msg += gs.captain.grantFame(planet, fame)
+        if (faction) msg += gs.captain.grantFactionFame(faction, fame)
+    }
+    if (bounty > 0) {
+        msg += `You bounty has risen by ${bounty}CR.<br/>`
+        if (planet) msg += gs.captain.grantBounty(planet, bounty)
+    }
     showModal(coloredName(gs.encounter.fleet), msg, [['Continue', ()=>startCombat(false)]])
 }
 
@@ -168,7 +181,7 @@ function showPlayerDidSurrenderModal( fameLossMultiplier = 1) {
         if (infamyLoss) msg += gs.captain.grantFactionInfamy(faction, infamyLoss)
     }
 
-    showModal(fleetName, msg, [['Continue', ()=>gs.encounter.encounterType.onDefeat()]])
+    showModal(fleetName, msg, [['Continue', ()=>gs.encounter.onDefeat()]])
 }
 
 
@@ -434,6 +447,7 @@ function showPlayerDefeatedByNeutralsModal( infamyLossMultiplier = 1) {
     console.log('showPlayerDefeatedByNeutralsModal', { infamyLossMultiplier });
     const {enemyFleet, disabledPlayerShips} = gs.encounter
     const planet = gs.encounter.planet
+    const faction = gs.encounter.fleet.faction
     
     const infamyLoss = 5 * infamyLossMultiplier
 
@@ -442,6 +456,7 @@ function showPlayerDefeatedByNeutralsModal( infamyLossMultiplier = 1) {
     msg += `They quickly depart the scene in case there are other attackers nearby.<br/>`
 
     if (infamyLoss && planet) msg += gs.captain.grantInfamy(planet, -infamyLoss)
+    if (infamyLoss && faction) msg += gs.captain.grantFactionInfamy(faction, -infamyLoss)
     if (disabledPlayerShips.length > 0) {
         msg += `${disabledPlayerShips.length} of your ships were disabled in the fighting.<br/>`
         msg += loseCargoFromDisabledShips(disabledPlayerShips)

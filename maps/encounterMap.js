@@ -88,7 +88,7 @@ class EncounterMap extends BaseMap {
                 ce({tag:'button', innerHTML:'+', onClick: () => this.cvs.adjustZoom(1.33)}),
                 ce({tag:'button', innerHTML:'-', onClick: () => this.cvs.adjustZoom(0.66)}),
                 //ship info button?
-                ce({tag:'button', innerHTML: '🗨', classNames: [(!this.encounter.combatEnabled ? 'highlighted' : null)], onClick: ()=> this.onHail(), disabled: (this.encounter.combatEnabled && !this.encounter.encounterType.onSurrender)})
+                ce({tag:'button', innerHTML: '🗨', classNames: [(!this.encounter.combatEnabled ? 'highlighted' : null)], onClick: ()=> this.onHail(), disabled: false})
             ]
         })
     }
@@ -531,11 +531,11 @@ class EncounterMap extends BaseMap {
     onHail() {
         if (gs.encounter.combatEnabled) {
             showModal(`Surrender?`, `Surrender to the ${coloredName(gs.encounter.fleet)}?`, [
-                ['Surrender', ()=>gs.encounter.encounterType.onSurrender()],
+                ['Surrender', ()=>gs.encounter.onSurrender()],
                 ['Cancel', ()=>closeModal()]
             ])
         }
-        else gs.encounter.encounterType.onStart()
+        else gs.encounter.onStart()
     }
 }
 

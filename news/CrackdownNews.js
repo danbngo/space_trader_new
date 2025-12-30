@@ -38,13 +38,13 @@ class CrackdownNews extends News {
 
     determineOutcome() {
         const {planet: p} = this
-        this.rollOutcome(planet.c.security*planet.c.culture/planet.settlement.cryme, CL.LOW) //this usually suceeds
+        this.rollOutcome(p.c.security*p.c.culture/planet.settlement.cryme, CL.LOW) //this usually suceeds
     }
 
     isValid() {
         const {planet: p} = this
         const crimeValid = (planet.settlement.corruption > CL.HIGH || planet.settlement.cryme > CL.HIGH)
-        const securityValid = planet.c.security < CL.HIGH
+        const securityValid = p.c.security < CL.HIGH
         const interferingEvent = News.planetHasAnyNews(planet, [NT.CRACKDOWN, ...NT_CRIME_PREVENTING])
         return crimeValid && securityValid && !interferingEvent
     }
