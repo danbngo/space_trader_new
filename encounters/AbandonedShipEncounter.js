@@ -29,7 +29,7 @@ class AbandonedShipEncounter extends Encounter {
     pirateAmbush() {
         // Generate pirate ships
         const pirateFleet = generateFleet(FLEET_TYPES.PIRATES, gs.encounter.planet)
-        pirateFleet.captain = new Officer(`Pirate Captain`, 0, 0, 0)
+        pirateFleet.captain = new Officer(`Pirate Captain`, 0)
         pirateFleet.captain.credits = rng(FLEET_TYPES.PIRATES.maxCredits, 0)
         
         // Position pirates near the abandoned ship

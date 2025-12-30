@@ -13,6 +13,8 @@ class GameState {
         this.fleet = null;
         /** @type {Encounter} */
         this.encounter = null;
+        /** @type {Contract[]} */
+        this.contracts = [];
     }
 
     get captain() {

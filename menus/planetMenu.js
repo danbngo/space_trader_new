@@ -46,6 +46,10 @@ function showPlanetMenu(planet = new Planet()) {
     if (settlement.cyberSurgeon) {
         options.push(["Cyber Surgeon", () => showCyberSurgeonBuyMenu(settlement.cyberSurgeon)]);
     }
+    if (settlement.palace) {
+        const hasBounty = gs.captain.calcInfamyForPlanet(planet) > 0
+        options.push(["Palace", () => showPalaceMenu(settlement.palace), !isDocked || hasBounty]);
+    }
     options.push(ce({tag:'br'}));
     options.push(["News", () => showNewsTimelineMenu(planet, () => showPlanetMenu(planet))]);
     options.push([`Overview`, () => showPlanetSocietyMenu(planet)]);

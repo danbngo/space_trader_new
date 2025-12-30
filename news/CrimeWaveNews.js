@@ -11,20 +11,19 @@ class CrimeWaveNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                security: CL.LOW,
-                crime: CL.VERY_HIGH,
-                corruption: CL.HIGH,
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.EXTREMELY_LOW], [CARGO_TYPES.DRUGS, CL.EXTREMELY_LOW]])),
+                civilizationMultipliers: new Civilization({
+                    security: CL.LOW,
+                    crime: CL.VERY_HIGH,
+                    corruption: CL.HIGH,
+                    cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.EXTREMELY_LOW], [CARGO_TYPES.DRUGS, CL.EXTREMELY_LOW]])),
+                })
             })
         ]
 
-        this.completeEffects = [
-            new NewsEffect({
-                planet:this.planet,
-                security: CL.HIGH/CL.LOW,
-                cargoPriceMultipliers: NewsEffect.getInvertedCargoPriceMultipliers(this.startEffects[0].cargoPriceMultipliers),
-            })
-        ]
+        this.completeEffects = this.startEffects.map(fx=>fx.getInverse())
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
+            security: CL.HIGH,
+        }))
 
         this.failEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.failEffects[0], {

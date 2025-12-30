@@ -21,6 +21,9 @@ class AddictionNews extends News {
             })
         ]
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
+            culture: CL.HIGH,
+        }))
 
         this.failEffects = this.startEffects.map(effect => effect.getInverse())
         this.failEffects[0].civilizationMultipliers.overwrite(new Civilization({
@@ -29,6 +32,7 @@ class AddictionNews extends News {
             economy: CL.NO_REGRESSION,
             crime: CL.NO_REGRESSION,
             corruption: CL.NO_REGRESSION,
+            culture: CL.SLIGHTLY_LOW,
         }))
     }
 

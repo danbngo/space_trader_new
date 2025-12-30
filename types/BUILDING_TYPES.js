@@ -29,5 +29,6 @@ const BUILDING_TYPES = {
     ACADEMY: new BuildingType('Academy', COLORS.Green, 10*1000, false),
     COURTHOUSE: new BuildingType('Court House', COLORS.Brown, 10*1000, false),
     CYBER_SURGEON: new BuildingType('Cyber Surgeon', COLORS.Cyan, 15*1000, false),
+    PALACE: new BuildingType('Palace', COLORS.Gold, 10*1000, false),
 }
 const BUILDING_TYPES_ALL = Object.values(BUILDING_TYPES)

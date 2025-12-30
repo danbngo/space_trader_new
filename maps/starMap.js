@@ -73,11 +73,13 @@ class StarMap extends BaseMap {
     openAssistant() {
         this.togglePause(true)
         const hasSkillPoints = gs.captain.skillPoints > 0
+        const hasContracts = gs.contracts && gs.contracts.length > 0
         showModal(`Assistant`, 'How can I help you captain?', [
             ['Trade Info', ()=>showTradeInfoSellMenu()],
             ['Ships Manifest', ()=>showShipsMenu()],
             ['Cargo Manifest', ()=>showCargoMenu()],
             ['Officer Roster', ()=>showOfficersMenu()],
+            ['Contracts', ()=>showContractsMenu(), false, hasContracts ? 'highlighted' : null],
             ['Captain Overview', ()=>showCaptainSkillsMenu(), false, hasSkillPoints ? 'highlighted' : null],
             ['Galactic News', ()=>showNewsTimelineMenu(null, ()=>this.openAssistant())],
             ['Cancel', ()=>closeModal()],

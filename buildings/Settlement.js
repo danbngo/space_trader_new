@@ -14,8 +14,9 @@ class Settlement {
      * @param {Academy} academy - The academy building.
      * @param {Academy} tavern - The tavern building.
      * @param {CyberSurgeon} cyberSurgeon - The cyber surgeon building.
+     * @param {Palace} palace - The palace building.
      */
-    constructor(planet = new Planet(), shipyard = null, market = null, blackMarket = null, guild = null, bank = null, courthouse = null, academy = null, tavern = null, cyberSurgeon = null) {
+    constructor(planet = new Planet(), shipyard = null, market = null, blackMarket = null, guild = null, bank = null, courthouse = null, academy = null, tavern = null, cyberSurgeon = null, palace = null) {
         /** @type {Planet} */
         this.planet = planet;
         /** @type {Shipyard} */
@@ -36,8 +37,10 @@ class Settlement {
         this.tavern = tavern;
         /** @type {CyberSurgeon} */
         this.cyberSurgeon = cyberSurgeon;
+        /** @type {Palace} */
+        this.palace = palace;
     }
     get buildings() {
-        return [this.academy, this.bank, this.blackMarket, this.courthouse, this.cyberSurgeon, this.guild, this.market, this.shipyard, this.tavern]
+        return [this.academy, this.bank, this.blackMarket, this.courthouse, this.cyberSurgeon, this.guild, this.market, this.palace, this.shipyard, this.tavern]
     }
 }
