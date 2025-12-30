@@ -19,8 +19,9 @@ class ConscriptionNews extends News {
         this.completeEffects = [
             new NewsEffect({
                 planet: this.planet,
-                military: CL.VERY_HIGH,
-                labor: CL.VERY_HIGH
+                army: CL.VERY_HIGH,
+                navy: CL.VERY_HIGH,
+                education: CL.HIGH // trained conscripts
             })
         ]
         

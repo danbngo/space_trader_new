@@ -40,6 +40,9 @@ function showPlanetMenu(planet = new Planet()) {
     if (settlement.academy) {
         options.push(["Academy", () => showAcademyMenu(settlement.academy)]);
     }
+    if (settlement.tavern) {
+        options.push(["Tavern", () => showAcademyMenu(settlement.tavern)]);
+    }
     options.push(ce({tag:'br'}));
     options.push(["News", () => showNewsTimelineMenu(planet, () => showPlanetMenu(planet))]);
     options.push([`Overview`, () => showPlanetSocietyMenu(planet)]);
@@ -103,6 +106,7 @@ function showPlanetClimateMenu(planet = new Planet()) {
     msg += `<u>Physical Properties</u><br/>`
     msg += `Type: ${coloredName(planet.planetType)}<br/>`
     msg += `Radius: ${roundToPlaces(planet.radius, 2)} Earth radii<br/>`
+    msg += `Day Length: ${roundToPlaces(planet.dayLength, 2)} Earth days<br/>`
     if (planet.orbit) {
         msg += `Orbital Distance: ${roundToPlaces(planet.orbit.radius, 2)} AU<br/>`
         msg += `Orbital Period: ${roundToPlaces(planet.orbit.calcPeriod(), 2)} years<br/>`
@@ -118,6 +122,32 @@ function showPlanetClimateMenu(planet = new Planet()) {
     msg += `Geological Activity: ${geologicalActivity.coloredName}<br/>`
     msg += `Magnetosphere: ${magnetosphere.coloredName}<br/>`
     msg += `Radiation Level: ${radiationLevel.coloredName}<br/>`
+    
+    // Composition
+    msg += `<br/>`
+    msg += `<u>Composition</u><br/>`
+    if (planet.atmosphereType) {
+        msg += `Atmosphere: ${colorSpan(planet.atmosphereType.name, planet.atmosphereType.color)}<br/>`
+        msg += `<span style="font-size: 0.9em; opacity: 0.8;">${planet.atmosphereType.description}</span><br/>`
+    }
+    if (planet.oceanType) {
+        msg += `Ocean: ${colorSpan(planet.oceanType.name, planet.oceanType.color)}<br/>`
+        msg += `<span style="font-size: 0.9em; opacity: 0.8;">${planet.oceanType.description}</span><br/>`
+    }
+    if (planet.geologyType) {
+        msg += `Geology: ${colorSpan(planet.geologyType.name, planet.geologyType.color)}<br/>`
+        msg += `<span style="font-size: 0.9em; opacity: 0.8;">${planet.geologyType.description}</span><br/>`
+    }
+    
+    // Planet features
+    if (planet.features && planet.features.length > 0) {
+        msg += `<br/>`
+        msg += `<u>Notable Features</u><br/>`
+        for (const feature of planet.features) {
+            msg += `${colorSpan('●', feature.color)} ${colorSpan(feature.name, feature.color)}: ${feature.description}<br/>`
+        }
+    }
+    
     showPlanetModal(planet, `${coloredName(planet)} - Climate`, msg, [
         ["Society", () => showPlanetSocietyMenu(planet)],
         ["Back", () => showPlanetMenu(planet)]

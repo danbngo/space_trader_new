@@ -13,9 +13,6 @@ class AllianceNews extends News {
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
                 newRelationship: RELATIONSHIP_TYPES.ALLY,
-                territory: CL.HIGH,
-                stockpile: CL.SLIGHTLY_HIGH,
-                labor: CL.HIGH,
                 security: CL.SLIGHTLY_HIGH,
                 economy: CL.SLIGHTLY_HIGH,
                 education: CL.SLIGHTLY_HIGH,
@@ -27,10 +24,9 @@ class AllianceNews extends News {
                 targetPlanet: this.planet,
                 newRelationship: RELATIONSHIP_TYPES.ALLY,
                 territory: CL.HIGH,
-                stockpile: CL.SLIGHTLY_HIGH,
-                labor: CL.HIGH,
+                reserves: CL.SLIGHTLY_HIGH,
+                economy: CL.HIGH, // workforce expansion through trade
                 security: CL.SLIGHTLY_HIGH,
-                economy: CL.SLIGHTLY_HIGH,
                 education: CL.SLIGHTLY_HIGH,
                 technology: CL.SLIGHTLY_HIGH,
                 prestige: CL.SLIGHTLY_HIGH,
@@ -47,14 +43,14 @@ class AllianceNews extends News {
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
                 territory: News.clHalfRegression(CL.HIGH),
-                stockpile: News.clHalfRegression(CL.SLIGHTLY_HIGH),
+                reserves: News.clHalfRegression(CL.SLIGHTLY_HIGH),
                 prestige: CL.LOW, // diplomatic failure
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
                 territory: News.clHalfRegression(CL.HIGH),
-                stockpile: News.clHalfRegression(CL.SLIGHTLY_HIGH),
+                reserves: News.clHalfRegression(CL.SLIGHTLY_HIGH),
                 prestige: CL.LOW,
             })
         ]

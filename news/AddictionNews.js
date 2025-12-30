@@ -36,7 +36,7 @@ class AddictionNews extends News {
     isValid() {
         const {planet} = this
         //more likely if high drug availability
-        const ratingsValid = (planet.settlement.cryme) > CL.HIGH
+        const ratingsValid = (planet.civilization.crime*planet.civilization.corruption/planet.civilization.security) > CL.HIGH
         const interferingEvent = News.planetHasAnyNews(planet, [NT.ADDICTION, ...NT_CRIME_PREVENTING])
         return ratingsValid && !interferingEvent
     }

@@ -11,10 +11,10 @@ class FestivalNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                credits: CL.LOW,
+                wealth: CL.LOW,
                 economy: CL.LOW,
                 industry: CL.LOW,
-                stockpile: CL.LOW,
+                reserves: CL.LOW,
                 crime: CL.HIGH,
                 corruption: CL.HIGH,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.HOLOCUBES, CL.VERY_HIGH], [CARGO_TYPES.DRUGS, CL.ASTRONOMICAL]]),
@@ -24,8 +24,8 @@ class FestivalNews extends News {
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         //economy recovers, prestige is boosted
         Object.assign(this.completeEffects[0], {
-            credits: News.clHalfRegression(this.completeEffects[0].credits),
-            stockpile: News.clHalfRegression(this.completeEffects[0].stockpile),
+            wealth: News.clHalfRegression(this.completeEffects[0].wealth),
+            reserves: News.clHalfRegression(this.completeEffects[0].reserves),
             crime: News.clHalfRegression(this.completeEffects[0].crime),
             //corruption: News.clHalfRegression(this.completeEffects[0].corruption),
             prestige: CL.SLIGHTLY_HIGH,
@@ -35,7 +35,7 @@ class FestivalNews extends News {
         this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
-                credits: CL.NO_REGRESSION, // money wasted
+                wealth: CL.NO_REGRESSION, // money wasted
                 economy: CL.NO_REGRESSION,
                 crime: CL.NO_REGRESSION, // crime persists
                 prestige: CL.LOW, // embarrassment
@@ -53,7 +53,7 @@ class FestivalNews extends News {
     isValid() {
         const {planet} = this
         //need high credits to afford it, low prestige to want it
-        const ratingsValid = planet.settlement.wealth > CL.SLIGHTLY_HIGH && planet.civilization.prestige < CL.MEDIUM
+        const ratingsValid = planet.civilization.wealth > CL.SLIGHTLY_HIGH && planet.civilization.prestige < CL.MEDIUM
         const interferingEvent = News.planetHasAnyNews(planet, [NT.FESTIVAL, ...NT_ECONOMY_PREVENTING, ...NT_DANGEROUS])
         return ratingsValid && !interferingEvent
     }

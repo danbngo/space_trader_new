@@ -11,18 +11,16 @@ class TerraformingNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                labor: CL.LOW,
                 education: CL.LOW,
-                credits: CL.LOW,
-                ships: CL.SLIGHTLY_LOW,
+                wealth: CL.LOW,
+                navy: CL.SLIGHTLY_LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.METAL, CL.VERY_HIGH], [CARGO_TYPES.NANITES, CL.VERY_HIGH]]),
             })
         ]
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         // Ships and officers stay deployed, territory and industry gains are permanent
         Object.assign(this.completeEffects[0], {
-            ships: CL.NO_REGRESSION, // ships stay stationed there
-            labor: CL.NO_REGRESSION, // officers stay stationed there
+            navy: CL.NO_REGRESSION, // ships stay stationed there
             education: CL.NO_REGRESSION, // officers maintain quality
             industry: CL.SLIGHTLY_HIGH, // permanent industry boost
             economy: CL.SLIGHTLY_HIGH, // permanent economy boost
@@ -32,10 +30,9 @@ class TerraformingNews extends News {
         this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
-                ships: CL.NO_REGRESSION,
-                labor: CL.NO_REGRESSION,
+                navy: CL.NO_REGRESSION,
                 education: CL.NO_REGRESSION,
-                credits: CL.NO_REGRESSION,
+                wealth: CL.NO_REGRESSION,
                 prestige: CL.LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.METAL, CL.NO_REGRESSION], [CARGO_TYPES.NANITES, CL.NO_REGRESSION]]),
             })
@@ -52,9 +49,9 @@ class TerraformingNews extends News {
     isValid() {
         const {planet} = this
         // Need sufficient ships, officers, and credits to undertake terraforming
-        const ratingsValid = planet.navy > CL.MEDIUM && 
-                            planet.army > CL.MEDIUM && 
-                            planet.settlement.wealth > CL.MEDIUM
+        const ratingsValid = planet.civilization.navy > CL.MEDIUM && 
+                            planet.civilization.army > CL.MEDIUM && 
+                            planet.civilization.wealth > CL.MEDIUM
         // Planet must not already have this event
         const interferingEvent = News.planetHasAnyNews(planet, [NT.TERRAFORMING, ...NT_ECONOMY_PREVENTING])
         return ratingsValid && !interferingEvent

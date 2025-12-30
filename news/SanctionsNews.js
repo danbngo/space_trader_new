@@ -12,17 +12,17 @@ class SanctionsNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
-                stockpile: CL.LOW,
+                reserves: CL.LOW,
                 economy: CL.LOW,
-                credits: CL.SLIGHTLY_LOW,
+                wealth: CL.SLIGHTLY_LOW,
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
-                stockpile: CL.VERY_LOW,
+                reserves: CL.VERY_LOW,
                 economy: CL.VERY_LOW,
-                labor: CL.LOW,
-                credits: CL.LOW,
+                education: CL.LOW,
+                wealth: CL.LOW,
             })
         ]
 
@@ -30,7 +30,7 @@ class SanctionsNews extends News {
         //some lingering damage after
         Object.assign(this.completeEffects[0], {
             economy: News.clHalfRegression(this.completeEffects[0].economy),
-            credits: News.clHalfRegression(this.completeEffects[0].credits),
+            wealth: News.clHalfRegression(this.completeEffects[0].wealth),
         })
         Object.assign(this.completeEffects[1], {
             economy: News.clHalfRegression(this.completeEffects[1].economy),
@@ -41,7 +41,7 @@ class SanctionsNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 economy: CL.VERY_LOW, // domestic economic crisis
-                credits: CL.LOW,
+                wealth: CL.LOW,
                 prestige: CL.LOW, // policy failure
             }),
             new NewsEffect({
@@ -54,15 +54,15 @@ class SanctionsNews extends News {
         this.cancelEffects = [
             new NewsEffect({
                 planet: this.planet,
-                stockpile: News.clHalfRegression(CL.LOW),
+                reserves: News.clHalfRegression(CL.LOW),
                 economy: News.clHalfRegression(CL.LOW),
-                credits: News.clHalfRegression(CL.SLIGHTLY_LOW),
+                wealth: News.clHalfRegression(CL.SLIGHTLY_LOW),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                stockpile: News.clHalfRegression(CL.VERY_LOW),
+                reserves: News.clHalfRegression(CL.VERY_LOW),
                 economy: News.clHalfRegression(CL.VERY_LOW),
-                credits: News.clHalfRegression(CL.LOW),
+                wealth: News.clHalfRegression(CL.LOW),
             })
         ]
     }
@@ -83,7 +83,7 @@ class SanctionsNews extends News {
     isValid() {
         const {planet, targetPlanet} = this
         //we need a strong economy to pull it off
-        const ratingsValid = planet.civilization.economy > CL.HIGH && planet.settlement.wealth >= CL.HIGH
+        const ratingsValid = planet.civilization.economy > CL.HIGH && planet.civilization.wealth >= CL.HIGH
         //aggressor must be hostile towards victim
         const aggressorRelationship = planet.civilization.relationships.get(targetPlanet)
         const relationshipsValid = aggressorRelationship == RELATIONSHIP_TYPES.TENSE

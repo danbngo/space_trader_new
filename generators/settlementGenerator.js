@@ -10,10 +10,11 @@ function generateSettlement(planet = new Planet()) {
     const guild =  new Guild(planet) 
     const bank =  new Bank(planet) 
     const courthouse = new Courthouse(planet)
-    const academy = new Academy(planet)
+    const academy = new Academy(planet, false)
+    const tavern = new Academy(planet, true)
 
-    const buildings = [shipyard, market, blackMarket, guild, bank, courthouse, academy]
+    const buildings = [shipyard, market, blackMarket, guild, bank, courthouse, academy, tavern]
     for (const building of buildings) if (Math.random() > .8) building.enabled = false
 
-    return new Settlement(planet, shipyard, market, blackMarket, guild, bank, courthouse, academy)
+    return new Settlement(planet, shipyard, market, blackMarket, guild, bank, courthouse, academy, tavern)
 }

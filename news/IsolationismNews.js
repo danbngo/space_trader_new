@@ -14,10 +14,10 @@ class IsolationismNews extends News {
                 territory: CL.LOW,
                 economy: CL.LOW,
                 inflation: CL.LOW,
-                stockpile: CL.LOW,
+                reserves: CL.LOW,
                 crime: CL.LOW,
                 corruption: CL.LOW,
-                credits: CL.LOW,
+                wealth: CL.LOW,
                 education: CL.SLIGHTLY_LOW,
                 technology: CL.SLIGHTLY_LOW,
                 prestige: CL.SLIGHTLY_LOW,
@@ -42,7 +42,7 @@ class IsolationismNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 economy: CL.NO_REGRESSION, // economic isolation damage persists
-                credits: CL.NO_REGRESSION,
+                wealth: CL.NO_REGRESSION,
                 education: CL.NO_REGRESSION, // knowledge loss is permanent
                 technology: CL.NO_REGRESSION,
                 prestige: CL.LOW, // failed policy

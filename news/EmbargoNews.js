@@ -12,7 +12,7 @@ class EmbargoNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
-                military: CL.LOW, //get stretched thin
+                navy: CL.LOW, //blockade stretches fleet thin
                 prestige: CL.SLIGHTLY_HIGH,
             }),
             new NewsEffect({
@@ -21,7 +21,7 @@ class EmbargoNews extends News {
                 prestige: CL.SLIGHTLY_LOW,
                 economy: CL.VERY_LOW,
                 inflation: CL.VERY_HIGH,
-                stockpile: CL.LOW,
+                reserves: CL.LOW,
                 corruption: CL.HIGH,
                 crime: CL.LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WATER, CL.VERY_HIGH], [CARGO_TYPES.METAL, CL.VERY_HIGH]]),
@@ -39,14 +39,14 @@ class EmbargoNews extends News {
         this.cancelEffects = [
             new NewsEffect({
                 planet: this.planet,
-                military: News.clHalfRegression(CL.LOW),
+                navy: News.clHalfRegression(CL.LOW),
                 prestige: News.clHalfRegression(CL.SLIGHTLY_HIGH),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 economy: News.clHalfRegression(CL.VERY_LOW),
                 inflation: News.clHalfRegression(CL.VERY_HIGH),
-                stockpile: News.clHalfRegression(CL.LOW),
+                reserves: News.clHalfRegression(CL.LOW),
             })
         ]
     }

@@ -18,15 +18,15 @@ class ArmsDealNews extends News {
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
 
         Object.assign(this.completeEffects[0], {
-            credits: CL.LOW,
-            military: CL.HIGH, //gain some knowledge, new sytems etc.
-            ships: CL.HIGH,
+            wealth: CL.LOW, // payment for arms
+            army: CL.HIGH, // gain military knowledge
+            navy: CL.HIGH, // gain new ships
             crime: CL.HIGH,
             corruption: CL.LOW,
         })
         Object.assign(this.completeEffects[1], {
-            credits: CL.HIGH,
-            ships: CL.LOW,
+            wealth: CL.HIGH, // payment received
+            navy: CL.LOW, // sold ships
             crime: CL.LOW,
             corruption: CL.LOW,
         })
@@ -50,15 +50,15 @@ class ArmsDealNews extends News {
         }
         // Fail if targetPlanet refuses to sell - based on planet's low prestige/credits
         // Lower prestige and credits increase the chance seller refuses
-        this.rollOutcome(planet.civilization.prestige*planet.settlement.wealth, CL.MEDIUM)
+        this.rollOutcome(planet.civilization.prestige*planet.civilization.wealth, CL.MEDIUM)
     }
 
     isValid() {
         const {planet, targetPlanet} = this
         //targetPlanet (seller) needs to have sufficient military to sell
-        const ratingsValid = (targetPlanet.civilization.military >= CL.HIGH || targetPlanet.navy > CL.HIGH) && targetPlanet.settlement.cryme > CL.MEDIUM
+        const ratingsValid = (targetPlanet.civilization.navy >= CL.HIGH || targetPlanet.civilization.navy > CL.HIGH) && targetPlanet.settlement.cryme > CL.MEDIUM
         //seller's military should be larger than purchaser's
-        const transferValid = targetPlanet.civilization.military > planet.civilization.military && targetPlanet.navy > planet.navy
+        const transferValid = targetPlanet.civilization.military > planet.civilization.military && targetPlanet.civilization.navy > planet.civilization.navy
         //both planets must be neutral or allies
         const relationships = [planet.civilization.relationships.get(targetPlanet), targetPlanet.civilization.relationships.get(planet)]
         const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.NEUTRAL || rel == RELATIONSHIP_TYPES.ALLY)

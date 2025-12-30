@@ -13,13 +13,12 @@ class ScarcityNews extends News {
                 planet: this.planet,
                 population: CL.LOW,
                 inflation: CL.EXTREMELY_HIGH,
-                stockpile: CL.EXTREMELY_LOW,
+                reserves: CL.EXTREMELY_LOW,
                 industry: CL.LOW,
                 economy: CL.LOW,
-                crime: CL.LOW,
-                corruption: CL.HIGH,
                 crime: CL.HIGH,
-                ships: CL.VERY_LOW,
+                corruption: CL.HIGH,
+                navy: CL.VERY_LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WATER, CL.ASTRONOMICAL]]),
             })
         ]

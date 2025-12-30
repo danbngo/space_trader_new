@@ -12,22 +12,20 @@ class TradeAgreementNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
-                stockpile: CL.HIGH,
+                reserves: CL.HIGH,
                 economy: CL.SLIGHTLY_HIGH,
-                labor: CL.HIGH,
-                education: CL.SLIGHTLY_HIGH,
+                education: CL.HIGH,
                 technology: CL.SLIGHTLY_HIGH,
-                credits: CL.HIGH,
+                wealth: CL.HIGH,
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
-                stockpile: CL.HIGH,
+                reserves: CL.HIGH,
                 economy: CL.SLIGHTLY_HIGH,
-                labor: CL.HIGH,
-                education: CL.SLIGHTLY_HIGH,
+                education: CL.HIGH,
                 technology: CL.SLIGHTLY_HIGH,
-                credits: CL.HIGH,
+                wealth: CL.HIGH,
             })
         ]
 
@@ -35,11 +33,11 @@ class TradeAgreementNews extends News {
         //some lingering benefits after
         Object.assign(this.completeEffects[0], {
             economy: News.clHalfRegression(this.completeEffects[0].economy),
-            credits: News.clHalfRegression(this.completeEffects[0].credits),
+            wealth: News.clHalfRegression(this.completeEffects[0].wealth),
         })
         Object.assign(this.completeEffects[1], {
             economy: News.clHalfRegression(this.completeEffects[1].economy),
-            credits: News.clHalfRegression(this.completeEffects[1].credits),
+            wealth: News.clHalfRegression(this.completeEffects[1].wealth),
         })
 
         // Failed: economic collapse ruins trade benefits
@@ -47,12 +45,12 @@ class TradeAgreementNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 economy: CL.LOW, // economic disruption
-                credits: CL.LOW,
+                wealth: CL.LOW,
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 economy: CL.LOW,
-                credits: CL.LOW,
+                wealth: CL.LOW,
             })
         ]
 
@@ -60,15 +58,15 @@ class TradeAgreementNews extends News {
         this.cancelEffects = [
             new NewsEffect({
                 planet: this.planet,
-                stockpile: News.clHalfRegression(CL.HIGH),
+                reserves: News.clHalfRegression(CL.HIGH),
                 economy: News.clHalfRegression(CL.SLIGHTLY_HIGH),
-                credits: News.clHalfRegression(CL.HIGH),
+                wealth: News.clHalfRegression(CL.HIGH),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                stockpile: News.clHalfRegression(CL.HIGH),
+                reserves: News.clHalfRegression(CL.HIGH),
                 economy: News.clHalfRegression(CL.SLIGHTLY_HIGH),
-                credits: News.clHalfRegression(CL.HIGH),
+                wealth: News.clHalfRegression(CL.HIGH),
             })
         ]
     }

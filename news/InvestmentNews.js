@@ -12,35 +12,35 @@ class InvestmentNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
-                credits: CL.LOW,
-                stockpile: CL.VERY_LOW,
-                ships: CL.VERY_LOW,
+                wealth: CL.LOW,
+                reserves: CL.VERY_LOW,
+                navy: CL.VERY_LOW,
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                stockpile: CL.VERY_HIGH,
-                credits: CL.HIGH,
+                reserves: CL.VERY_HIGH,
+                wealth: CL.HIGH,
             })
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
 
         Object.assign(this.completeEffects[0], {
-            credits: News.clHalfRegression(this.completeEffects[0].credits),
-            stockpile: News.clHalfRegression(this.completeEffects[0].stockpile),
+            wealth: News.clHalfRegression(this.completeEffects[0].wealth),
+            reserves: News.clHalfRegression(this.completeEffects[0].reserves),
             prestige: CL.SLIGHTLY_HIGH,
         })
         Object.assign(this.completeEffects[1], {
             industry: CL.VERY_HIGH,
             economy: CL.SLIGHTLY_HIGH,
-            ships: CL.SLIGHTLY_HIGH,
+            navy: CL.SLIGHTLY_HIGH,
         })
 
         // Failed: investment collapses, money lost
         this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
-                credits: CL.NO_REGRESSION, // money lost
+                wealth: CL.NO_REGRESSION, // money lost
                 prestige: CL.LOW, // investment failure
             }),
             new NewsEffect({
@@ -54,14 +54,14 @@ class InvestmentNews extends News {
         this.cancelEffects = [
             new NewsEffect({
                 planet: this.planet,
-                credits: News.clHalfRegression(CL.LOW),
-                stockpile: News.clHalfRegression(CL.VERY_LOW),
+                wealth: News.clHalfRegression(CL.LOW),
+                reserves: News.clHalfRegression(CL.VERY_LOW),
                 prestige: News.clHalfRegression(CL.SLIGHTLY_HIGH),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                stockpile: News.clHalfRegression(CL.VERY_HIGH),
-                credits: News.clHalfRegression(CL.HIGH),
+                reserves: News.clHalfRegression(CL.VERY_HIGH),
+                wealth: News.clHalfRegression(CL.HIGH),
                 industry: News.clHalfRegression(CL.VERY_HIGH),
                 economy: News.clHalfRegression(CL.SLIGHTLY_HIGH),
             })
@@ -86,7 +86,7 @@ class InvestmentNews extends News {
     isValid() {
         const {planet, targetPlanet} = this
         //need to have sufficient economy of our own
-        const ratingsValid = planet.settlement.wealth >= CL.SLIGHTLY_HIGH || planet.settlement.market.baseCargo.average/MARKET_AVERAGE_CARGO_PER_TYPE > CL.SLIGHTLY_HIGH
+        const ratingsValid = planet.civilization.wealth >= CL.SLIGHTLY_HIGH || planet.settlement.market.baseCargo.average/MARKET_AVERAGE_CARGO_PER_TYPE > CL.SLIGHTLY_HIGH
         //our economy should be larger than theirs
         const transferValid = planet.civilization.economy > targetPlanet.civilization.economy && planet.settlement.bank.baseCredits > targetPlanet.settlement.bank.baseCredits && planet.settlement.market.baseCargo.average > targetPlanet.settlement.market.baseCargo.average
         //both planets must be neutral or allies

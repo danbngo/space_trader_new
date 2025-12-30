@@ -12,11 +12,11 @@ class ForeignAidNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 inflation: CL.LOW,
-                stockpile: CL.HIGH,
+                reserves: CL.HIGH,
                 economy: CL.SLIGHTLY_HIGH,
                 industry: CL.SLIGHTLY_HIGH,
-                credits: CL.HIGH,
-                ships: CL.SLIGHTLY_HIGH,
+                wealth: CL.HIGH,
+                navy: CL.SLIGHTLY_HIGH,
                 prestige: CL.SLIGHTLY_LOW,
             })
         ]
@@ -25,11 +25,11 @@ class ForeignAidNews extends News {
 
         Object.assign(this.completeEffects[0], {
             inflation: News.clHalfRegression(this.completeEffects[0].inflation),
-            stockpile: News.clHalfRegression(this.completeEffects[0].stockpile),
+            reserves: News.clHalfRegression(this.completeEffects[0].reserves),
             economy: News.clHalfRegression(this.completeEffects[0].economy),
-            credits: News.clHalfRegression(this.completeEffects[0].credits),
+            wealth: News.clHalfRegression(this.completeEffects[0].wealth),
             industry: News.clHalfRegression(this.completeEffects[0].industry),
-            ships: News.clHalfRegression(this.completeEffects[0].ships),
+            navy: News.clHalfRegression(this.completeEffects[0].navy),
             prestige: CL.NO_REGRESSION //not the best for your reputation
         })
 
@@ -39,7 +39,7 @@ class ForeignAidNews extends News {
                 planet: this.planet,
                 economy: CL.NO_REGRESSION, // no economic gain
                 industry: CL.NO_REGRESSION,
-                credits: CL.NO_REGRESSION,
+                wealth: CL.NO_REGRESSION,
                 prestige: CL.VERY_LOW, // international embarrassment
                 crime: CL.HIGH, // corruption spike
             })
@@ -56,7 +56,7 @@ class ForeignAidNews extends News {
     isValid() {
         const {planet} = this
         //more likely to happen when economy is poor and has some prestige to burn
-        const economyValid = planet.civilization.economy < CL.LOW && planet.civilization.industry < CL.LOW && planet.settlement.wealth < CL.LOW
+        const economyValid = planet.civilization.economy < CL.LOW && planet.civilization.industry < CL.LOW && planet.civilization.wealth < CL.LOW
         const prestigeValid = planet.civilization.prestige > CL.LOW
         const interferingEvent =
             News.planetHasAnyNews(planet, [NT.FOREIGN_AID, ...NT_ECONOMY_BOOSTING])

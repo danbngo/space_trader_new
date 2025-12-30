@@ -12,36 +12,36 @@ class WarOffensiveNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
-                military: CL.SLIGHTLY_LOW,
-                ships: CL.LOW,
-                labor: CL.SLIGHTLY_LOW,
+                army: CL.SLIGHTLY_LOW,
+                navy: CL.LOW,
+                education: CL.SLIGHTLY_LOW,
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
-                military: CL.SLIGHTLY_LOW,
-                ships: CL.LOW,
-                labor: CL.SLIGHTLY_LOW,
+                army: CL.SLIGHTLY_LOW,
+                navy: CL.LOW,
+                education: CL.SLIGHTLY_LOW,
             })
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         // Victor: minor permanent losses, prestige gain persists
         Object.assign(this.completeEffects[0], {
-            ships: News.clHalfRegression(this.completeEffects[0].ships),
-            labor: News.clHalfRegression(this.completeEffects[0].labor),
+            navy: News.clHalfRegression(this.completeEffects[0].navy),
+            education: News.clHalfRegression(this.completeEffects[0].education),
         })
         // Loser: major permanent losses
         Object.assign(this.completeEffects[1], {
-            ships: CL.NO_REGRESSION,
-            labor: CL.NO_REGRESSION,
-            military: CL.SLIGHTLY_LOW,
+            navy: CL.NO_REGRESSION,
+            education: CL.NO_REGRESSION,
+            army: CL.SLIGHTLY_LOW,
         })
 
         this.cancelEffects = this.completeEffects.map(effect => {
             const e = effect.clone()
-            e.ships = News.clHalfRegression(effect.ships)
-            e.labor = News.clHalfRegression(effect.labor)
+            e.navy = News.clHalfRegression(effect.navy)
+            e.education = News.clHalfRegression(effect.education)
             return e
         })
     }

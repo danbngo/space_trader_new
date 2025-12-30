@@ -7,6 +7,10 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0])
     const {planet} = academy
     const reloadMenu = (skill = selectedSkill) => showAcademyMenu(academy, skill)
     const isDocked = gs.location == planet
+    
+    const buildingName = academy.isTavern ? 'Tavern' : 'Academy'
+    const trainVerb = academy.isTavern ? 'Practice' : 'Train'
+    const welcomeMsg = academy.isTavern ? 'Welcome to the tavern. Select a skill to practice:' : 'Welcome to the academy. Select a skill to train:'
 
     function upgradeSkill(skill = SKILLS_ALL[0]) {
         const cost = academy.calcSkillUpgradeCost(gs.captain, skill)
@@ -23,10 +27,10 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0])
         const currentLevel = gs.captain.skills.getAmount(skill)
         
         showModal(
-            `Train ${skill}?`,
-            `Train <b>${skill}</b> from level ${currentLevel} to ${currentLevel + 1} for <b>${cost} CR</b>?<br/><br/>Your CR after training: ${gs.credits - cost}`,
+            `${trainVerb} ${skill}?`,
+            `${trainVerb} <b>${skill}</b> from level ${currentLevel} to ${currentLevel + 1} for <b>${cost} CR</b>?<br/><br/>Your CR after training: ${gs.credits - cost}`,
             [
-                ['Train', () => upgradeSkill(skill)],
+                [trainVerb, () => upgradeSkill(skill)],
                 ['Cancel', () => reloadMenu(skill)]
             ]
         )
@@ -74,7 +78,7 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0])
 
     let infoContainer = ce({
         children: [
-            `<br/>${isDocked ? 'Welcome to the academy. Select a skill to train:' : colorSpan('You must dock to use the academy.', COLORS.Yellow)}`,
+            `<br/>${isDocked ? welcomeMsg : colorSpan(academy.isTavern ? 'You must dock to use the tavern.' : 'You must dock to use the academy.', COLORS.Yellow)}`,
             skillTable,
             `Your CR: ${gs.credits}<br/>`,
             `Training Fee: ${statColorSpan(roundToPlaces(100*academy.rake, 2), 1/(1+academy.rake))}%<br/>`,
@@ -83,7 +87,7 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0])
 
     showPlanetModal(
         planet,
-        `${coloredName(planet)} - Academy`,
+        `${coloredName(planet)} - ${buildingName}`,
         ce({
             children:[
                 infoContainer,
@@ -93,7 +97,10 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0])
             ['Back', ()=>showPlanetMenu(planet)]
         ],
         'academy_panel',
-        (nextPlanet) => nextPlanet.settlement?.academy ? showAcademyMenu(nextPlanet.settlement.academy) : showPlanetMenu(nextPlanet)
+        (nextPlanet) => {
+            const nextAcademy = academy.isTavern ? nextPlanet.settlement?.tavern : nextPlanet.settlement?.academy
+            return nextAcademy ? showAcademyMenu(nextAcademy) : showPlanetMenu(nextPlanet)
+        }
     );
 
     if (selectedSkill) {

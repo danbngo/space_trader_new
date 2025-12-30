@@ -14,14 +14,14 @@ class WarScorchedEarthNews extends News {
                 targetPlanet: this.targetPlanet,
                 territory: CL.LOW, // destroyed own territory
                 industry: CL.LOW, // factories demolished
-                stockpile: CL.LOW, // supplies destroyed
+                reserves: CL.LOW, // supplies destroyed
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
-                ships: CL.LOW, // losses from traps/ambushes
+                navy: CL.LOW, // losses from traps/ambushes
                 technology: CL.LOW, // damaged ships
-                labor: CL.SLIGHTLY_LOW, // losses in hostile territory
+                education: CL.SLIGHTLY_LOW, // losses in hostile territory
             })
         ]
 
@@ -30,13 +30,13 @@ class WarScorchedEarthNews extends News {
         Object.assign(this.completeEffects[0], {
             territory: CL.NO_REGRESSION, // destroyed territory stays destroyed
             industry: News.clHalfRegression(this.completeEffects[0].industry),
-            stockpile: News.clHalfRegression(this.completeEffects[0].stockpile),
+            reserves: News.clHalfRegression(this.completeEffects[0].reserves),
         })
         // Defender: permanent losses from hostile terrain
         Object.assign(this.completeEffects[1], {
-            ships: CL.NO_REGRESSION,
+            navy: CL.NO_REGRESSION,
             technology: CL.NO_REGRESSION,
-            labor: CL.NO_REGRESSION,
+            education: CL.NO_REGRESSION,
         })
 
         // Cancelled: peace before full destruction, partial damage
@@ -45,13 +45,13 @@ class WarScorchedEarthNews extends News {
                 planet: this.planet,
                 territory: News.clHalfRegression(CL.LOW),
                 industry: News.clHalfRegression(CL.LOW),
-                stockpile: News.clHalfRegression(CL.LOW),
+                reserves: News.clHalfRegression(CL.LOW),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                ships: News.clHalfRegression(CL.LOW),
+                navy: News.clHalfRegression(CL.LOW),
                 technology: News.clHalfRegression(CL.LOW),
-                labor: News.clHalfRegression(CL.SLIGHTLY_LOW),
+                education: News.clHalfRegression(CL.SLIGHTLY_LOW),
             })
         ]
     }

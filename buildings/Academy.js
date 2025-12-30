@@ -6,9 +6,15 @@
 class Academy extends Building {
     /**
      * @param {Planet} planet - The planet this academy is on.
+     * @param {boolean} isTavern - Whether this is a tavern (less formal training establishment).
      */
-    constructor(planet = new Planet()) {
+    constructor(planet = new Planet(), isTavern = false) {
         super(planet, BUILDING_TYPES.ACADEMY)
+        /** @type {boolean} */
+        this.isTavern = isTavern;
+        /** @type {Officer[]} */
+        this.officers = [];
+        this.normalize(true)
     }
     calcSkillUpgradeCost(officer = new Officer(), skill = SKILLS_ALL[0]) {
         // Base cost scales exponentially with current skill level
@@ -18,5 +24,25 @@ class Academy extends Building {
     }
     calcCanUpgradeSkill(officer = new Officer(), targetLevel = 1) {
         return this.planet.civilization.education * officer.level >= targetLevel
+    }
+    calcHirePrice(officer = new Officer()) {
+        return Math.round(officer.value * (1+this.planet.civilization.corruption) * this.planet.civilization.inflation / (this.isTavern ? this.planet.civilization.crime : this.planet.civilization.army))
+    }
+    get baseNumOfficers() {
+        return GUILD_AVERAGE_NUM_OFFICERS * (this.isTavern ? this.planet.civilization.crime : this.planet.civilization.army)
+    }
+    normalize(clearExisting = false) {
+        super.normalize()
+        if (clearExisting) {
+            this.officers = []
+        }
+        const officerDiffFromBase = this.officers.length - this.baseNumOfficers
+        if (officerDiffFromBase > 0) {
+            this.officers.splice(0, officerDiffFromBase)
+        } else if (officerDiffFromBase < 0) {
+            for (let i = 0; i < -officerDiffFromBase; i++) {
+                this.officers.push(generateOfficer(this.planet))
+            }
+        }
     }
 }

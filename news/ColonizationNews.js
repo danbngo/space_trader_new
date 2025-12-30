@@ -13,11 +13,11 @@ class ColonizationNews extends News {
                 planet: this.planet,
                 population: CL.LOW,
                 inflation: CL.HIGH,
-                ships: CL.VERY_LOW,
+                navy: CL.VERY_LOW, // ships sent to colonize
                 technology: CL.LOW,
-                stockpile: CL.LOW,
+                reserves: CL.LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.METAL, CL.VERY_HIGH], [CARGO_TYPES.ISOTOPES, CL.EXTREMELY_HIGH]]),
-                credits: CL.LOW,
+                wealth: CL.LOW, // funding colonization
             })
         ]
 
@@ -40,12 +40,12 @@ class ColonizationNews extends News {
     determineOutcome() {
         const {planet} = this
         //better navy and economy (logistics) helps
-        this.rollOutcome((planet.navy*planet.civilization.economy), CL.SLIGHTLY_LOW)
+        this.rollOutcome((planet.civilization.navy*planet.civilization.economy), CL.SLIGHTLY_LOW)
     }
 
     isValid() {
         const {planet} = this
-        const ratingsValid = planet.civilization.population > CL.MEDIUM && (planet.navy > CL.MEDIUM)
+        const ratingsValid = planet.civilization.population > CL.MEDIUM && (planet.civilization.navy > CL.MEDIUM)
         //basically dont do it if ANYTHING bad is happening
         const interferingEvent = 
             News.planetHasAnyNewsTargeting(planet, NT_ECONOMY_PREVENTING) ||

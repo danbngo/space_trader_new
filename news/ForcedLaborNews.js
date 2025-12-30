@@ -15,7 +15,7 @@ class ForcedLaborNews extends News {
                 economy: CL.SLIGHTLY_LOW,
                 population: CL.LOW,
                 prestige: CL.LOW,
-                stockpile: CL.HIGH,
+                reserves: CL.HIGH,
                 //inflation: CL.LOW,
             })
         ]
@@ -24,7 +24,7 @@ class ForcedLaborNews extends News {
         Object.assign(this.completeEffects[0], {
             industry: News.clHalfRegression(this.completeEffects[0].industry),
             population: News.clHalfRegression(this.completeEffects[0].population),
-            stockpile: News.clHalfRegression(this.completeEffects[0].stockpile),
+            reserves: News.clHalfRegression(this.completeEffects[0].reserves),
             prestige: CL.NO_REGRESSION, // permanent prestige loss
         })
 
@@ -36,7 +36,7 @@ class ForcedLaborNews extends News {
                 economy: CL.LOW, // disruption
                 prestige: CL.VERY_LOW, // humanitarian crisis
                 crime: CL.VERY_HIGH, // lawlessness from revolts
-                military: CL.LOW, // military stretched dealing with revolts
+                army: CL.LOW, // military stretched dealing with revolts
             })
         ]
     }

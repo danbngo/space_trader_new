@@ -12,20 +12,20 @@ class EconomicBoomNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 inflation: CL.VERY_LOW,
-                stockpile: CL.VERY_HIGH,
+                reserves: CL.VERY_HIGH,
                 crime: CL.VERY_HIGH,
                 //dont effect BM prices due to decadent spending!
                 economy: CL.EXTREMELY_HIGH,
                 industry: CL.VERY_HIGH,
-                credits: CL.EXTREMELY_HIGH,
-                ships: CL.VERY_HIGH,
+                wealth: CL.EXTREMELY_HIGH,
+                navy: CL.VERY_HIGH,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.HOLOCUBES, CL.EXTREMELY_HIGH]]),
             })
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.completeEffects[0], {
-            credits: News.clHalfRegression(this.completeEffects[0].credits),
+            wealth: News.clHalfRegression(this.completeEffects[0].wealth),
             economy: News.clHalfRegression(this.completeEffects[0].economy),
         })
 
@@ -33,11 +33,11 @@ class EconomicBoomNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 inflation: CL.HIGH,
-                stockpile: CL.LOW,
+                reserves: CL.LOW,
                 crime: CL.LOW,
                 economy: CL.LOW,
                 industry: CL.LOW,
-                credits: CL.VERY_LOW,
+                wealth: CL.VERY_LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.HOLOCUBES, CL.NO_REGRESSION]]),
             })
         ]
@@ -53,7 +53,7 @@ class EconomicBoomNews extends News {
     isValid() {
         const {planet} = this
         //cant already having a booming economy
-        const ratingsValid = planet.civilization.economy < CL.VERY_HIGH && planet.settlement.wealth < CL.VERY_HIGH
+        const ratingsValid = planet.civilization.economy < CL.VERY_HIGH && planet.civilization.wealth < CL.VERY_HIGH
         //basically just a bonus for not being in a war or anything stupid
         const interferingEvent = 
             News.planetHasAnyNews(planet, [NT.ECONOMIC_BOOM, ...NT_ECONOMY_PREVENTING]) ||

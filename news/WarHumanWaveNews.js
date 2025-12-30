@@ -13,7 +13,7 @@ class WarHumanWaveNews extends News {
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
                 population: CL.VERY_LOW, // massive casualties
-                labor: CL.LOW, // officers leading charges
+                education: CL.LOW, // officers leading charges
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
@@ -25,13 +25,13 @@ class WarHumanWaveNews extends News {
         // Attacker: massive permanent losses
         Object.assign(this.completeEffects[0], {
             population: CL.NO_REGRESSION, // dead don't return
-            labor: CL.NO_REGRESSION,
+            education: CL.NO_REGRESSION,
             prestige: CL.NO_REGRESSION,
         })
         // Defender: permanent losses
         Object.assign(this.completeEffects[1], {
-            labor: CL.LOW, // officers killed defending
-            military: CL.SLIGHTLY_LOW, // ground forces worn down
+            education: CL.LOW, // officers killed defending
+            army: CL.SLIGHTLY_LOW, // ground forces worn down
         })
 
         // Cancelled: peace declared mid-offensive, troops pull back
@@ -39,12 +39,12 @@ class WarHumanWaveNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 population: News.clHalfRegression(CL.VERY_LOW), // some casualties already taken
-                labor: News.clHalfRegression(CL.LOW),
+                education: News.clHalfRegression(CL.LOW),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                labor: News.clHalfRegression(CL.LOW),
-                military: News.clHalfRegression(CL.SLIGHTLY_LOW),
+                education: News.clHalfRegression(CL.LOW),
+                army: News.clHalfRegression(CL.SLIGHTLY_LOW),
             })
         ]
     }

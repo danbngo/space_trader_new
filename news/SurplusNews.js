@@ -12,11 +12,11 @@ class SurplusNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 inflation: CL.EXTREMELY_LOW,
-                stockpile: CL.EXTREMELY_HIGH,
+                reserves: CL.EXTREMELY_HIGH,
                 economy: CL.HIGH,
                 industry: CL.HIGH,
-                credits: CL.HIGH,
-                ships: CL.VERY_HIGH,
+                wealth: CL.HIGH,
+                navy: CL.VERY_HIGH,
             })
         ]
 
@@ -25,8 +25,8 @@ class SurplusNews extends News {
         Object.assign(this.completeEffects[0], {
             industry: News.clHalfRegression(this.completeEffects[0].industry),
             //economy: News.clHalfRegression(this.completeEffects[0].economy),
-            stockpile: News.clHalfRegression(this.completeEffects[0].stockpile),
-            credits: News.clHalfRegression(this.completeEffects[0].credits),
+            reserves: News.clHalfRegression(this.completeEffects[0].reserves),
+            wealth: News.clHalfRegression(this.completeEffects[0].wealth),
         })
 
         // Failed: boom goes bust, reserves exhausted
@@ -35,7 +35,7 @@ class SurplusNews extends News {
                 planet: this.planet,
                 industry: CL.LOW, // extraction infrastructure damaged
                 economy: CL.LOW, // economic disruption
-                stockpile: CL.NO_REGRESSION, // back to scarcity
+                reserves: CL.NO_REGRESSION, // back to scarcity
             })
         ]
     }

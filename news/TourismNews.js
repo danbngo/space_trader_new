@@ -11,9 +11,9 @@ class TourismNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 inflation: CL.VERY_HIGH,
-                stockpile: CL.LOW,
+                reserves: CL.LOW,
                 industry: CL.LOW,
-                credits: CL.LOW,
+                wealth: CL.LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.METAL, 2], [CARGO_TYPES.NANITES, 2]]),
             })
         ]
@@ -21,9 +21,8 @@ class TourismNews extends News {
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.completeEffects[0], {
             industry: News.clHalfRegression(this.completeEffects[0].industry), //industry doesnt fully recover
-            credits: 1.5/(0.7),
+            wealth: 1.5/(0.7),
             economy: CL.SLIGHTLY_HIGH,
-            crime: CL.SLIGHTLY_HIGH,
             crime: CL.VERY_HIGH,
             corruption: CL.VERY_HIGH,
         })
@@ -32,7 +31,7 @@ class TourismNews extends News {
         this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
-                credits: CL.NO_REGRESSION, // money lost
+                wealth: CL.NO_REGRESSION, // money lost
                 industry: CL.NO_REGRESSION, // damaged industry
                 prestige: CL.LOW, // embarrassment
             })
@@ -49,7 +48,7 @@ class TourismNews extends News {
     isValid() {
         const {planet} = this
         //more likely to try this out if we need money
-        const ratingsValid = planet.settlement.wealth < CL.LOW
+        const ratingsValid = planet.civilization.wealth < CL.LOW
         const interferingEvent = 
             News.planetHasAnyNews(planet, [NT.TOURISM, ...NT_ECONOMY_PREVENTING]) ||
             News.planetHasAnyNewsTargeting(planet, NT_ECONOMY_PREVENTING) ||

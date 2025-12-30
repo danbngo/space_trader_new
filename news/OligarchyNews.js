@@ -15,7 +15,7 @@ class OligarchyNews extends News {
                 prestige: CL.SLIGHTLY_LOW,
                 industry: CL.SLIGHTLY_LOW,
                 security: CL.LOW,
-                credits: CL.LOW,
+                wealth: CL.LOW,
             })
         ]
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
@@ -32,7 +32,7 @@ class OligarchyNews extends News {
                 economy: CL.NO_REGRESSION, // permanent economic damage
                 prestige: CL.NO_REGRESSION,
                 security: CL.NO_REGRESSION,
-                credits: CL.NO_REGRESSION,
+                wealth: CL.NO_REGRESSION,
                 crime: CL.HIGH, // corruption entrenched
             })
         ]

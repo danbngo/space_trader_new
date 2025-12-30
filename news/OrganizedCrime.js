@@ -12,12 +12,11 @@ class OrganizedCrimeNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 economy: CL.LOW,
-                credits: CL.LOW,
+                wealth: CL.LOW,
                 industry: CL.LOW,
                 security: CL.LOW,
                 crime: CL.VERY_HIGH,
-                corruption: CL.LOW,
-                crime: CL.VERY_HIGH,
+                corruption: CL.VERY_HIGH,
             })
         ]
 
@@ -25,10 +24,9 @@ class OrganizedCrimeNews extends News {
         //some lingering corruption after
         Object.assign(this.completeEffects[0], {
             economy: News.clHalfRegression(this.completeEffects[0].economy),
-            credits: News.clHalfRegression(this.completeEffects[0].credits),
+            wealth: News.clHalfRegression(this.completeEffects[0].wealth),
             industry: News.clHalfRegression(this.completeEffects[0].industry),
             security: News.clHalfRegression(this.completeEffects[0].security),
-            crime: News.clHalfRegression(this.completeEffects[0].crime),
             crime: News.clHalfRegression(this.completeEffects[0].crime),
         })
 
@@ -39,7 +37,7 @@ class OrganizedCrimeNews extends News {
                 economy: CL.NO_REGRESSION, // permanent economic damage
                 security: CL.NO_REGRESSION,
                 crime: CL.NO_REGRESSION, // crime entrenched
-                credits: CL.NO_REGRESSION,
+                wealth: CL.NO_REGRESSION,
                 prestige: CL.LOW, // failed state
             })
         ]

@@ -11,14 +11,14 @@ class ResearchAgreementNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                credits: CL.LOW,
+                wealth: CL.LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.ISOTOPES, 2]]),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                credits: CL.LOW,
+                wealth: CL.LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.ISOTOPES, 2]]),
-            }),      
+            }),
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
@@ -26,23 +26,25 @@ class ResearchAgreementNews extends News {
         Object.assign(this.completeEffects[0], {
             technology: CL.SLIGHTLY_HIGH,
             education: CL.HIGH,
-            military: CL.SLIGHTLY_HIGH,
+            army: CL.SLIGHTLY_HIGH,
+            navy: CL.SLIGHTLY_HIGH,
         })
         Object.assign(this.completeEffects[1], {
             technology: CL.SLIGHTLY_HIGH,
             education: CL.HIGH,
-            military: CL.SLIGHTLY_HIGH,
+            army: CL.SLIGHTLY_HIGH,
+            navy: CL.SLIGHTLY_HIGH,
         })
 
         // Failed: research yields nothing, wasted resources
         this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
-                credits: CL.NO_REGRESSION, // money wasted
+                wealth: CL.NO_REGRESSION, // money wasted
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                credits: CL.NO_REGRESSION,
+                wealth: CL.NO_REGRESSION,
             })
         ]
 
@@ -50,13 +52,13 @@ class ResearchAgreementNews extends News {
         this.cancelEffects = [
             new NewsEffect({
                 planet: this.planet,
-                credits: News.clHalfRegression(CL.LOW),
+                wealth: News.clHalfRegression(CL.LOW),
                 technology: CL.SLIGHTLY_HIGH, // partial gains
                 education: News.clHalfRegression(CL.HIGH),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                credits: News.clHalfRegression(CL.LOW),
+                wealth: News.clHalfRegression(CL.LOW),
                 technology: CL.SLIGHTLY_HIGH,
                 education: News.clHalfRegression(CL.HIGH),
             })

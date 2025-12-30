@@ -12,12 +12,12 @@ class DepressionNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 inflation: CL.EXTREMELY_LOW,
-                stockpile: CL.EXTREMELY_LOW,
+                reserves: CL.EXTREMELY_LOW,
                 economy: CL.EXTREMELY_LOW,
                 industry: CL.VERY_LOW,
-                credits: CL.EXTREMELY_LOW,
+                wealth: CL.EXTREMELY_LOW,
                 crime: CL.HIGH,
-                labor: CL.HIGH, //more ppl available
+                education: CL.LOW, // workforce quality drops
                 //crime: 0.7, -recession-proof industry
             })
         ]
@@ -26,8 +26,8 @@ class DepressionNews extends News {
 
         //some lingering price rate, cargo, commercial, and credit rate decreases
         Object.assign(this.completeEffects[0], {
-            credits: News.clHalfRegression(this.completeEffects[0].credits),
-            stockpile: News.clHalfRegression(this.completeEffects[0].stockpile),
+            wealth: News.clHalfRegression(this.completeEffects[0].wealth),
+            reserves: News.clHalfRegression(this.completeEffects[0].reserves),
             inflation: News.clHalfRegression(this.completeEffects[0].inflation),
             economy: News.clHalfRegression(this.completeEffects[0].economy),
             corruption: (1 + this.completeEffects[0].corruption)/2,
@@ -38,10 +38,10 @@ class DepressionNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 inflation: CL.NO_REGRESSION,
-                stockpile: CL.NO_REGRESSION,
+                reserves: CL.NO_REGRESSION,
                 economy: CL.NO_REGRESSION,
                 industry: CL.NO_REGRESSION,
-                credits: CL.NO_REGRESSION,
+                wealth: CL.NO_REGRESSION,
                 crime: CL.NO_REGRESSION,
                 prestige: CL.VERY_LOW,
             })
@@ -58,7 +58,7 @@ class DepressionNews extends News {
     isValid() {
         const {planet} = this
         //more likely to happen when credit is REALLY high
-        const ratingsValid = (planet.settlement.wealth) > CL.HIGH && planet.civilization.economy < CL.HIGH
+        const ratingsValid = (planet.civilization.wealth) > CL.HIGH && planet.civilization.economy < CL.HIGH
         const interferingEvent =
             News.planetHasAnyNews(planet, [NT.DEPRESSION, ...NT_ECONOMY_BOOSTING]) || 
             News.planetHasAnyNewsTargeting(planet, NT_ECONOMY_BOOSTING)

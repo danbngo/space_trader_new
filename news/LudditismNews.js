@@ -12,7 +12,8 @@ class LudditismNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 technology: CL.VERY_LOW,
-                military: CL.SLIGHTLY_LOW,
+                army: CL.SLIGHTLY_LOW,
+                navy: CL.SLIGHTLY_LOW,
                 economy: CL.SLIGHTLY_LOW,
                 industry: CL.SLIGHTLY_LOW,
                 education: CL.SLIGHTLY_LOW,
@@ -32,10 +33,10 @@ class LudditismNews extends News {
             prestige: CL.SLIGHTLY_HIGH,
             technology: News.clHalfRegression(this.completeEffects[0].technology), //tech knowledge lost
             education: News.clHalfRegression(this.completeEffects[0].education), //tech knowledge lost
-            military: News.clHalfRegression(this.completeEffects[0].military),
+            army: News.clHalfRegression(this.completeEffects[0].army),
+            navy: News.clHalfRegression(this.completeEffects[0].navy),
             economy: News.clHalfRegression(this.completeEffects[0].economy),
             industry: News.clHalfRegression(this.completeEffects[0].industry),
-            crime: News.clHalfRegression(this.completeEffects[0].crime),
             crime: CL.LOW,
             corruption: CL.LOW,
         })
@@ -46,7 +47,8 @@ class LudditismNews extends News {
                 planet: this.planet,
                 technology: CL.NO_REGRESSION, // tech degradation remains
                 education: CL.NO_REGRESSION,
-                military: CL.NO_REGRESSION,
+                army: CL.NO_REGRESSION,
+                navy: CL.NO_REGRESSION,
                 economy: CL.NO_REGRESSION,
                 industry: CL.NO_REGRESSION,
                 population: News.clHalfRegression(CL.HIGH), // partial growth

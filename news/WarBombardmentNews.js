@@ -21,17 +21,19 @@ class WarBombardmentNews extends News {
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
                 prestige: CL.HIGH, //this makes you scary...
-                military: CL.SLIGHTLY_LOW, //but expends some of your arsenal
+                army: CL.SLIGHTLY_LOW, //but expends some of your arsenal
+                navy: CL.SLIGHTLY_LOW,
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
                 population: CL.LOW,
-                military: CL.EXTREMELY_LOW,
+                army: CL.EXTREMELY_LOW,
+                navy: CL.EXTREMELY_LOW,
                 industry: CL.LOW,
                 economy: CL.LOW,
                 security: CL.LOW,
-                stockpile: CL.LOW,
+                reserves: CL.LOW,
                 inflation: CL.EXTREMELY_HIGH,
                 technology: CL.LOW, //back to the stone age!
                 education: CL.LOW,
@@ -45,11 +47,12 @@ class WarBombardmentNews extends News {
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.completeEffects[1], {
             population: CL.NO_REGRESSION,
-            military: CL.NO_REGRESSION,
+            army: CL.NO_REGRESSION,
+            navy: CL.NO_REGRESSION,
             industry: CL.NO_REGRESSION,
             economy: CL.NO_REGRESSION,
             security: CL.NO_REGRESSION,
-            stockpile: CL.NO_REGRESSION,
+            reserves: CL.NO_REGRESSION,
             technology: CL.NO_REGRESSION,
             education: CL.NO_REGRESSION,
             prestige: CL.NO_REGRESSION,
@@ -62,13 +65,15 @@ class WarBombardmentNews extends News {
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
                 prestige: CL.NO_REGRESSION,
-                military: News.clHalfRegression(this.completeEffects[0].military),
+                army: News.clHalfRegression(this.completeEffects[0].army),
+                navy: News.clHalfRegression(this.completeEffects[0].navy),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
                 population: News.clHalfRegression(this.completeEffects[1].population),
-                military: News.clHalfRegression(this.completeEffects[1].military),
+                army: News.clHalfRegression(this.completeEffects[1].army),
+                navy: News.clHalfRegression(this.completeEffects[1].navy),
                 industry: News.clHalfRegression(this.completeEffects[1].industry),
                 economy: News.clHalfRegression(this.completeEffects[1].economy),
                 security: News.clHalfRegression(this.completeEffects[1].security),
@@ -88,7 +93,7 @@ class WarBombardmentNews extends News {
     isValid() {
         const {planet, targetPlanet} = this
         //our military must be significantly stronger than theirs and navy must be MUCH stronger
-        const navyAdvantage = planet.civilization.military > targetPlanet.civilization.military * CL.HIGH && planet.navy > targetPlanet.navy * CL.VERY_HIGH
+        const navyAdvantage = planet.civilization.military > targetPlanet.civilization.military * CL.HIGH && planet.civilization.navy > targetPlanet.civilization.navy * CL.VERY_HIGH
         
         const relationshipValid = planet.civilization.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR
         const interferingEvent = 

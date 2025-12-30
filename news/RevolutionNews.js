@@ -17,7 +17,8 @@ class RevolutionNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 newGovernmentType: GT.ANARCHY ? null : GT.ANARCHY,
-                military: CL.VERY_LOW,
+                army: CL.VERY_LOW,
+                navy: CL.VERY_LOW,
                 security: CL.VERY_LOW,
                 crime: CL.VERY_HIGH,
                 economy: CL.LOW,
@@ -35,10 +36,11 @@ class RevolutionNews extends News {
         //government related ratings randomize a bit after a revolution
         Object.assign(this.completeEffects[0], {
             newGovernmentType,
-            military: (rng(0.5,1.5,false) + this.completeEffects[0].military)/2,
+            army: (rng(0.5,1.5,false) + this.completeEffects[0].army)/2,
+            navy: (rng(0.5,1.5,false) + this.completeEffects[0].navy)/2,
             security: (rng(0.5,1.5,false)  + this.completeEffects[0].security)/2,
             industry: (rng(0.5,1.5,false)  + this.completeEffects[0].industry)/2,
-            credits: (rng(0.5,1.5,false)  + this.completeEffects[0].credits)/2,
+            wealth: (rng(0.5,1.5,false)  + this.completeEffects[0].wealth)/2,
             prestige: (rng(0.5,1.5,false)  + this.completeEffects[0].prestige)/2,
         })
 
@@ -46,7 +48,8 @@ class RevolutionNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 newGovernmentType: GT.ANARCHY,
-                military: CL.NO_REGRESSION,
+                army: CL.NO_REGRESSION,
+                navy: CL.NO_REGRESSION,
                 security: CL.NO_REGRESSION,
                 crime: CL.NO_REGRESSION,
                 economy: CL.NO_REGRESSION,

@@ -14,9 +14,10 @@ class WarSubjugationNews extends News {
                 targetPlanet: this.targetPlanet,
                 newRelationship: RELATIONSHIP_TYPES.SOVEREIGN,
                 territory: CL.VERY_HIGH,
-                military: CL.SLIGHTLY_LOW,
+                army: CL.SLIGHTLY_LOW,
+                navy: CL.SLIGHTLY_LOW,
                 economy: CL.HIGH,
-                stockpile: CL.HIGH,
+                reserves: CL.HIGH,
                 prestige: CL.VERY_HIGH,
             }),
             new NewsEffect({
@@ -25,10 +26,11 @@ class WarSubjugationNews extends News {
                 newGovernmentType: GT.PUPPET_STATE,
                 newRelationship: RELATIONSHIP_TYPES.SUBJECT,
                 territory: CL.VERY_LOW,
-                military: CL.EXTREMELY_LOW,
+                army: CL.EXTREMELY_LOW,
+                navy: CL.EXTREMELY_LOW,
                 security: CL.VERY_LOW,
                 economy: CL.LOW,
-                stockpile: CL.LOW,
+                reserves: CL.LOW,
                 prestige: CL.VERY_LOW,
                 relationsReset: true,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_LOW]]),
@@ -40,14 +42,16 @@ class WarSubjugationNews extends News {
         //subjugating others has some lingering effects on territory, military, prestige
         Object.assign(this.completeEffects[0], {
             territory: News.clHalfRegression(this.completeEffects[0].territory),
-            military: News.clHalfRegression(this.completeEffects[0].military),
+            army: News.clHalfRegression(this.completeEffects[0].army),
+            navy: News.clHalfRegression(this.completeEffects[0].navy),
             prestige: News.clHalfRegression(this.completeEffects[0].prestige),
             newRelationship: RELATIONSHIP_TYPES.NEUTRAL,
         })
         //being subjugated has some lingering ill effects on territory, military, prestige
         Object.assign(this.completeEffects[1], {
             territory: News.clHalfRegression(this.completeEffects[1].territory),
-            military: News.clHalfRegression(this.completeEffects[1].military),
+            army: News.clHalfRegression(this.completeEffects[1].army),
+            navy: News.clHalfRegression(this.completeEffects[1].navy),
             prestige: News.clHalfRegression(this.completeEffects[0].prestige),
             newRelationship: RELATIONSHIP_TYPES.NEUTRAL,
         })
@@ -56,14 +60,15 @@ class WarSubjugationNews extends News {
         this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
-                military: CL.LOW, // failed invasion losses
-                ships: CL.LOW,
+                army: CL.LOW, // failed invasion losses
+                navy: CL.LOW,
                 prestige: CL.LOW, // humiliation
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 prestige: CL.HIGH, // victory boosts morale
-                military: News.clHalfRegression(CL.EXTREMELY_LOW), // but fighting took toll
+                army: News.clHalfRegression(CL.EXTREMELY_LOW), // but fighting took toll
+                navy: News.clHalfRegression(CL.EXTREMELY_LOW),
             })
         ]
 
@@ -72,14 +77,16 @@ class WarSubjugationNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 territory: News.clHalfRegression(CL.VERY_HIGH),
-                military: News.clHalfRegression(CL.SLIGHTLY_LOW),
+                army: News.clHalfRegression(CL.SLIGHTLY_LOW),
+                navy: News.clHalfRegression(CL.SLIGHTLY_LOW),
                 economy: News.clHalfRegression(CL.HIGH),
                 prestige: News.clHalfRegression(CL.VERY_HIGH),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 territory: News.clHalfRegression(CL.VERY_LOW),
-                military: News.clHalfRegression(CL.EXTREMELY_LOW),
+                army: News.clHalfRegression(CL.EXTREMELY_LOW),
+                navy: News.clHalfRegression(CL.EXTREMELY_LOW),
                 security: News.clHalfRegression(CL.VERY_LOW),
                 economy: News.clHalfRegression(CL.LOW),
                 prestige: News.clHalfRegression(CL.VERY_LOW),
@@ -103,7 +110,7 @@ class WarSubjugationNews extends News {
     isValid() {
         const {planet, targetPlanet} = this
         //our army must be both large and  significantly better than theirs in every way
-        const ratingsValid = (planet.army/targetPlanet.army > CL.HIGH) && (planet.navy/targetPlanet.navy > CL.HIGH)
+        const ratingsValid = (planet.civilization.army/targetPlanet.civilization.army > CL.HIGH) && (planet.civilization.navy/targetPlanet.civilization.navy > CL.HIGH)
         //planet must be at war with the target
         const relationshipValid = planet.civilization.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR
         const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.SUBJUGATION, ...NT_COOPERATIVE])

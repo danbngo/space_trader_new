@@ -18,7 +18,8 @@ class WarSurrenderNews extends News {
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
                 // Losing side begins negotiations, temporary instability
-                military: CL.LOW,
+                army: CL.LOW,
+                navy: CL.LOW,
                 prestige: CL.LOW,
             })
         ]
@@ -28,13 +29,14 @@ class WarSurrenderNews extends News {
         Object.assign(this.completeEffects[0], {
             prestige: CL.HIGH,
             territory: CL.SLIGHTLY_HIGH,
-            credits: CL.HIGH, // war indemnity
+            wealth: CL.HIGH, // war indemnity
         })
         // Loser: permanent losses from surrender
         Object.assign(this.completeEffects[1], {
             territory: CL.LOW, // territorial concessions
-            credits: CL.LOW, // war indemnity paid
-            military: CL.LOW, // forced demilitarization
+            wealth: CL.LOW, // war indemnity paid
+            army: CL.LOW, // forced demilitarization
+            navy: CL.LOW,
             prestige: CL.LOW, // shame of defeat
             forcePeace: true, // ends the war
         })
@@ -47,7 +49,8 @@ class WarSurrenderNews extends News {
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                military: News.clHalfRegression(CL.LOW), // partial recovery
+                army: News.clHalfRegression(CL.LOW), // partial recovery
+                navy: News.clHalfRegression(CL.LOW),
                 prestige: News.clHalfRegression(CL.LOW),
             })
         ]

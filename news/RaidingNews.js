@@ -12,21 +12,22 @@ class RaidingNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
-                stockpile: CL.VERY_HIGH,
+                reserves: CL.VERY_HIGH,
                 crime: CL.VERY_HIGH,
                 inflation: CL.VERY_LOW,
                 corruption: CL.VERY_LOW,
                 territory: CL.SLIGHTLY_HIGH,
                 economy: CL.HIGH,
-                military: CL.LOW, // diverting forces to raiding weakens defense
+                army: CL.LOW, // diverting forces to raiding weakens defense
+                navy: CL.LOW,
                 prestige: CL.SLIGHTLY_LOW,
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
-                stockpile: CL.LOW,
+                reserves: CL.LOW,
                 crime: CL.LOW,
-                credits: CL.LOW,
+                wealth: CL.LOW,
                 security: CL.LOW,
                 economy: CL.LOW,
                 prestige: CL.LOW,
@@ -37,20 +38,21 @@ class RaidingNews extends News {
         Object.assign(this.completeEffects[0], {
             //prestige: CL.NO_REGRESSION,
             economy: News.clHalfRegression(this.completeEffects[0].economy),
-            military: News.clHalfRegression(this.completeEffects[0].military),
+            army: News.clHalfRegression(this.completeEffects[0].army),
+            navy: News.clHalfRegression(this.completeEffects[0].navy),
             inflation: News.clHalfRegression(this.completeEffects[0].inflation),
             corruption: News.clHalfRegression(this.completeEffects[0].corruption),
             prestige: CL.NO_REGRESSION,
             territory: CL.NO_REGRESSION,
-            stockpile: CL.NO_REGRESSION,
+            reserves: CL.NO_REGRESSION,
             crime: CL.NO_REGRESSION,
         })
         // Victim: permanent loss to market goods and prestige
         Object.assign(this.completeEffects[1], {
-            stockpile: CL.NO_REGRESSION, // goods stolen don't come back
+            reserves: CL.NO_REGRESSION, // goods stolen don't come back
             crime: CL.NO_REGRESSION,
             prestige: CL.NO_REGRESSION, // permanent prestige loss from being raided
-            credits: News.clHalfRegression(this.completeEffects[1].credits),
+            wealth: News.clHalfRegression(this.completeEffects[1].wealth),
             security: News.clHalfRegression(this.completeEffects[1].security),
         })
 
@@ -58,14 +60,16 @@ class RaidingNews extends News {
         this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
-                military: CL.VERY_LOW, // raiders destroyed
+                army: CL.VERY_LOW, // raiders destroyed
+                navy: CL.VERY_LOW,
                 prestige: CL.VERY_LOW, // humiliation
                 economy: CL.NO_REGRESSION, // no plunder gained
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 prestige: CL.HIGH, // victory
-                military: News.clHalfRegression(CL.LOW),
+                army: News.clHalfRegression(CL.LOW),
+                navy: News.clHalfRegression(CL.LOW),
             })
         ]
 
@@ -73,14 +77,15 @@ class RaidingNews extends News {
         this.cancelEffects = [
             new NewsEffect({
                 planet: this.planet,
-                stockpile: News.clHalfRegression(CL.VERY_HIGH),
+                reserves: News.clHalfRegression(CL.VERY_HIGH),
                 economy: News.clHalfRegression(CL.HIGH),
-                military: News.clHalfRegression(CL.LOW),
+                army: News.clHalfRegression(CL.LOW),
+                navy: News.clHalfRegression(CL.LOW),
                 territory: News.clHalfRegression(CL.SLIGHTLY_HIGH),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                stockpile: News.clHalfRegression(CL.LOW),
+                reserves: News.clHalfRegression(CL.LOW),
                 economy: News.clHalfRegression(CL.LOW),
                 security: News.clHalfRegression(CL.LOW),
             })

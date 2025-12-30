@@ -13,15 +13,14 @@ class WarSabotageNews extends News {
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
                 security: CL.LOW, // agents deployed
-                labor: CL.LOW, // agents/spies
-                education: CL.SLIGHTLY_LOW,
+                education: CL.LOW, // agents/spies
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
-                military: CL.LOW, // sabotaged military infrastructure
+                army: CL.LOW, // sabotaged military infrastructure
+                navy: CL.SLIGHTLY_LOW,
                 industry: CL.LOW, // factories bombed
-                ships: CL.SLIGHTLY_LOW,
             })
         ]
 
@@ -29,12 +28,12 @@ class WarSabotageNews extends News {
         // Attacker: agents lost permanently
         Object.assign(this.completeEffects[0], {
             security: CL.NO_REGRESSION, // security apparatus damaged
-            labor: CL.NO_REGRESSION, // agents don't return
-            education: CL.NO_REGRESSION,
+            education: CL.NO_REGRESSION, // agents don't return
         })
         // Defender: permanent damage from sabotage
         Object.assign(this.completeEffects[1], {
-            military: CL.NO_REGRESSION,
+            army: CL.NO_REGRESSION,
+            navy: CL.NO_REGRESSION,
             industry: News.clHalfRegression(this.completeEffects[1].industry),
         })
 
@@ -43,13 +42,13 @@ class WarSabotageNews extends News {
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
                 security: News.clHalfRegression(this.completeEffects[0].security),
-                labor: News.clHalfRegression(this.completeEffects[0].labor),
                 education: News.clHalfRegression(this.completeEffects[0].education),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
-                military: News.clHalfRegression(this.completeEffects[1].military),
+                army: News.clHalfRegression(this.completeEffects[1].army),
+                navy: News.clHalfRegression(this.completeEffects[1].navy),
                 industry: News.clHalfRegression(this.completeEffects[1].industry),
             })
         ]

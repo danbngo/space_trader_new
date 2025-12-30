@@ -12,7 +12,8 @@ class GenocideNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 population: CL.LOW,
-                military: CL.LOW,
+                army: CL.LOW,
+                navy: CL.LOW,
                 economy: CL.LOW,
                 education: CL.LOW,
                 prestige: CL.LOW,
@@ -24,7 +25,8 @@ class GenocideNews extends News {
         Object.assign(this.completeEffects[0], {
             population: CL.NO_REGRESSION,
             prestige: CL.NO_REGRESSION,
-            military: CL.NO_REGRESSION,
+            army: CL.NO_REGRESSION,
+            navy: CL.NO_REGRESSION,
             economy: CL.NO_REGRESSION,
             education: CL.NO_REGRESSION,
             crime: CL.NO_REGRESSION,

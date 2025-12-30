@@ -19,19 +19,20 @@ class CoupDetatNews extends News {
                 targetPlanet: this.targetPlanet,
                 //newRelationship: RELATIONSHIP_TYPES.NEUTRAL,
                 prestige: CL.SLIGHTLY_LOW,
-                credits: CL.LOW, // funding the coup is expensive
+                wealth: CL.LOW, // funding the coup is expensive
                 crime: CL.LOW, //gotta arm them
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 newGovernmentType: GT.ANARCHY ? null : GT.ANARCHY,
-                military: CL.VERY_LOW,
+                army: CL.VERY_LOW,
+                navy: CL.VERY_LOW,
                 security: CL.VERY_LOW,
                 corruption: CL.HIGH,
                 economy: CL.LOW,
                 industry: CL.LOW,
                 prestige: CL.LOW,
-                //credits: CL.VERY_LOW,
+                //wealth: CL.VERY_LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, CL.ASTRONOMICAL]]),
             })
         ]
@@ -40,16 +41,17 @@ class CoupDetatNews extends News {
         // Instigator: prestige boost persists
         Object.assign(this.completeEffects[0], {
             prestige: CL.NO_REGRESSION,
-            credits: CL.NO_REGRESSION,
+            wealth: CL.NO_REGRESSION,
             crime: CL.NO_REGRESSION,
         })
         // Target: government stabilizes but some damage lingers
         Object.assign(this.completeEffects[1], {
-            military: (rng(0.5,1.5,false) + this.completeEffects[0].military)/2,
-            security: (rng(0.5,1.5,false)  + this.completeEffects[0].security)/2,
-            industry: (rng(0.5,1.5,false)  + this.completeEffects[0].industry)/2,
-            credits: (rng(0.5,1.5,false)  + this.completeEffects[0].credits)/2,
-            prestige: (rng(0.5,1.5,false)  + this.completeEffects[0].prestige)/2,
+            army: (rng(0.5,1.5,false) + this.completeEffects[1].army)/2,
+            navy: (rng(0.5,1.5,false) + this.completeEffects[1].navy)/2,
+            security: (rng(0.5,1.5,false)  + this.completeEffects[1].security)/2,
+            industry: (rng(0.5,1.5,false)  + this.completeEffects[1].industry)/2,
+            wealth: (rng(0.5,1.5,false)  + this.completeEffects[1].wealth)/2,
+            prestige: (rng(0.5,1.5,false)  + this.completeEffects[1].prestige)/2,
             forcePeace: true,
             newRelationship: RELATIONSHIP_TYPES.NEUTRAL,
             newGovernmentType
@@ -59,7 +61,7 @@ class CoupDetatNews extends News {
         this.failEffects = this.startEffects.map(fx => fx.getInverse())
         Object.assign(this.failEffects[0], {
             prestige: CL.LOW, // international humiliation
-            credits: CL.NO_REGRESSION, // wasted funds
+            wealth: CL.NO_REGRESSION, // wasted funds
             crime: CL.NO_REGRESSION,
         })
         Object.assign(this.failEffects[1], {

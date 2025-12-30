@@ -13,8 +13,8 @@ class StockMarketCrashNews extends News {
                 planet: this.planet,
                 industry: CL.VERY_LOW,
                 economy: CL.VERY_LOW,
-                credits: CL.EXTREMELY_LOW,
-                stockpile: CL.LOW,
+                wealth: CL.EXTREMELY_LOW,
+                reserves: CL.LOW,
                 inflation: CL.HIGH,
             })
         ]
@@ -22,7 +22,7 @@ class StockMarketCrashNews extends News {
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         // Economy damage and credit scarcity are partially permanent
         Object.assign(this.completeEffects[0], {
-            credits: News.clHalfRegression(this.completeEffects[0].credits),
+            wealth: News.clHalfRegression(this.completeEffects[0].wealth),
             industry: News.clHalfRegression(this.completeEffects[0].industry),
             economy: News.clHalfRegression(this.completeEffects[0].economy),
         })
@@ -32,7 +32,7 @@ class StockMarketCrashNews extends News {
         const {planet} = this
         // More likely when credit is very high (bubble about to burst)
         const ratingsValid = 
-            (planet.settlement.wealth) > 1.5 
+            (planet.civilization.wealth) > 1.5 
         const interferingEvent = News.hasNews(NT.STOCK_MARKET_CRASH, planet)
         return ratingsValid && !interferingEvent
     }

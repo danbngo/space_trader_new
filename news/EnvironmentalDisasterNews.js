@@ -12,12 +12,12 @@ class EnvironmentalDisasterNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 inflation: CL.SLIGHTLY_HIGH,
-                stockpile: CL.LOW,
+                reserves: CL.LOW,
                 economy: CL.SLIGHTLY_LOW,
                 industry: CL.VERY_LOW,
                 population: CL.SLIGHTLY_LOW,
-                credits: CL.LOW,
-                ships: CL.LOW,
+                wealth: CL.LOW,
+                navy: CL.LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WATER, CL.VERY_HIGH], [CARGO_TYPES.MEDICINE, CL.VERY_HIGH]]),
             })
         ]
@@ -26,7 +26,7 @@ class EnvironmentalDisasterNews extends News {
         //market, economy, industry, population do not fully bounce back
         Object.assign(this.completeEffects[0], {
             inflation: News.clHalfRegression(this.completeEffects[0].inflation),
-            stockpile: News.clHalfRegression(this.completeEffects[0].stockpile),
+            reserves: News.clHalfRegression(this.completeEffects[0].reserves),
             industry: News.clHalfRegression(this.completeEffects[0].industry),
             population: News.clHalfRegression(this.completeEffects[0].population),
         })
@@ -38,7 +38,7 @@ class EnvironmentalDisasterNews extends News {
                 industry: CL.NO_REGRESSION, // permanent damage
                 population: CL.NO_REGRESSION,
                 economy: CL.NO_REGRESSION,
-                stockpile: CL.NO_REGRESSION,
+                reserves: CL.NO_REGRESSION,
                 prestige: CL.VERY_LOW, // ecological disaster
             })
         ]

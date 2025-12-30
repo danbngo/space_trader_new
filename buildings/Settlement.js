@@ -12,8 +12,9 @@ class Settlement {
      * @param {Bank} bank - The bank building.
      * @param {Courthouse} courthouse - The courthouse building.
      * @param {Academy} academy - The academy building.
+     * @param {Academy} tavern - The tavern building.
      */
-    constructor(planet = new Planet(), shipyard = null, market = null, blackMarket = null, guild = null, bank = null, courthouse = null, academy = null) {
+    constructor(planet = new Planet(), shipyard = null, market = null, blackMarket = null, guild = null, bank = null, courthouse = null, academy = null, tavern = null) {
         /** @type {Planet} */
         this.planet = planet;
         /** @type {Shipyard} */
@@ -30,5 +31,7 @@ class Settlement {
         this.courthouse = courthouse;
         /** @type {Academy} */
         this.academy = academy;
+        /** @type {Academy} */
+        this.tavern = tavern;
     }
 }

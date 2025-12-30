@@ -73,6 +73,7 @@ const NT = {
     OLIGARCHY: new NewsType('Oligarchy', NF.ESPIONAGE, 1, 5, 15, 1, [GT.COMMUNISM], [GT.CORPORATISM], []),
     ORGANIZED_CRIME: new NewsType('Organized Crime', NF.CRIME, 1, 3, 8, 1, [GT.POLICE_STATE], [GT.ANARCHY, GT.CORPORATISM], []),
     PLAGUE: new NewsType('Plague', NF.HEALTH_HAZARD, 1, 2, 6, 1, [], [], []),
+    POLICY_CHANGE: new NewsType('Policy Change', NF.POLITICS, 1, 3, 8, 1, [GT.ANARCHY, GT.PUPPET_STATE], [], []),
     RAIDING: new NewsType('Raiding', NF.MILITARY, 1, 15, 30, 1, [GT.DEMOCRACY, GT.PUPPET_STATE], [GT.ANARCHY, GT.ARISTOCRACY, GT.THEOCRACY], []),
     RESEARCH_AGREEMENT: new NewsType('Research Agreement', NF.SCIENCE, 1, 2, 8, 1, [], [GT.TECHNOCRACY, GT.DEMOCRACY], []),
     REVIVAL: new NewsType('Religious Revival', NF.RELIGION, 1, 10, 20, 1, [GT.TECHNOCRACY], [GT.THEOCRACY], []),

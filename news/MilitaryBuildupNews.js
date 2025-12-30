@@ -12,8 +12,8 @@ class MilitaryBuildupNews extends News {
                 planet: this.planet,
                 economy: CL.LOW,
                 industry: CL.LOW,
-                stockpile: CL.LOW,
-                credits: CL.LOW,
+                reserves: CL.LOW,
+                wealth: CL.LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, CL.VERY_HIGH], [CARGO_TYPES.ANTIMATTER, 2]]),
             })
         ]
@@ -21,11 +21,11 @@ class MilitaryBuildupNews extends News {
         //military effect is permanent
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.completeEffects[0], {
-                military: CL.EXTREMELY_HIGH,
+                army: CL.EXTREMELY_HIGH,
+                navy: CL.EXTREMELY_HIGH,
                 prestige: CL.SLIGHTLY_HIGH,
                 education: CL.HIGH,
-                labor: CL.HIGH,
-                credits: CL.NO_REGRESSION, //so is wasting money
+                wealth: CL.NO_REGRESSION, //so is wasting money
                 economy: CL.NO_REGRESSION,
                 industry: CL.NO_REGRESSION,
         })
@@ -34,7 +34,7 @@ class MilitaryBuildupNews extends News {
         this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
-                credits: CL.NO_REGRESSION, // money wasted
+                wealth: CL.NO_REGRESSION, // money wasted
                 economy: CL.NO_REGRESSION, // damage permanent
                 industry: CL.NO_REGRESSION,
                 prestige: CL.LOW, // failed militarization

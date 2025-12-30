@@ -105,14 +105,13 @@ function checkForPlanetEncounters(elapsedDays = 1) {
         const proximityFactor = 1 / (1 + distance / territory)
         
         // Base encounter chance influenced by civilization properties
-        const {military, security, culture, economy, industry} = planet.civilization
-        const {crime} = planet.settlement
+        const {army, navy, security, culture, economy, industry, crime} = planet.civilization
         
         // Build weighted encounter type array based on civilization
         const encounterWeights = []
         
         // Police (influenced by government and security)
-        encounterWeights.push({type: ENCOUNTER_TYPES.POLICE, weight: (military + security) * 2})
+        encounterWeights.push({type: ENCOUNTER_TYPES.POLICE, weight: (navy + security) * 2})
         
         // Pirates (influenced by crime, reduced by security)
         encounterWeights.push({type: ENCOUNTER_TYPES.PIRATES, weight: crime * 3 / security})
@@ -127,14 +126,14 @@ function checkForPlanetEncounters(elapsedDays = 1) {
         encounterWeights.push({type: ENCOUNTER_TYPES.MINERS, weight: industry * 2})
         
         // Tourists (influenced by commercial and government)
-        encounterWeights.push({type: ENCOUNTER_TYPES.TOURISTS, weight: (economy + military)})
+        encounterWeights.push({type: ENCOUNTER_TYPES.TOURISTS, weight: (economy + culture)})
         
         // Calculate total weight
         const totalWeight = encounterWeights.reduce((sum, e) => sum + e.weight, 0)
         if (totalWeight <= 0) continue
         
         // Adjust base chance by civilization activity level
-        const activityLevel = (military + security + culture + economy + industry + crime) / 6
+        const activityLevel = totalWeight / encounterWeights.length
         if (!calcOccurrencesPerTimespan(PLANET_ENCOUNTER_CHANCE_PER_DAY, elapsedDays * activityLevel * proximityFactor)) continue
         
         // Select encounter type using weighted random

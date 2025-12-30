@@ -11,22 +11,20 @@ class ExplorationNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                labor: CL.LOW,
                 education: CL.LOW,
-                stockpile: CL.SLIGHTLY_LOW,
+                reserves: CL.SLIGHTLY_LOW,
                 technology: CL.LOW,
-                ships: CL.SLIGHTLY_LOW,
-                credits: CL.LOW,
+                navy: CL.SLIGHTLY_LOW,
+                wealth: CL.LOW,
             })
         ]
 
         //exploration pays off with territory and prestige
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.completeEffects[0], {
-            labor: CL.NO_REGRESSION, //officers don't auto return
             education: CL.NO_REGRESSION,
-            credits: News.clHalfRegression(this.completeEffects[0].credits),
-            stockpile: News.clHalfRegression(this.completeEffects[0].stockpile),
+            wealth: News.clHalfRegression(this.completeEffects[0].wealth),
+            reserves: News.clHalfRegression(this.completeEffects[0].reserves),
             //economy: CL.SLIGHTLY_HIGH,
             //industry: CL.SLIGHTLY_HIGH,
             technology: CL.NO_REGRESSION,
@@ -37,11 +35,10 @@ class ExplorationNews extends News {
         this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
-                labor: CL.NO_REGRESSION,
                 education: CL.NO_REGRESSION,
                 technology: CL.NO_REGRESSION,
                 prestige: CL.LOW,
-                credits: CL.NO_REGRESSION,
+                wealth: CL.NO_REGRESSION,
             })
         ]
     }
@@ -55,7 +52,7 @@ class ExplorationNews extends News {
 
     isValid() {
         const {planet} = this
-        const ratingsValid = planet.army > CL.MEDIUM && planet.settlement.wealth > CL.MEDIUM
+        const ratingsValid = planet.civilization.army > CL.MEDIUM && planet.civilization.wealth > CL.MEDIUM
         //basically don't do it if anything bad is happening
         const interferingEvent = 
             News.planetHasAnyNewsTargeting(planet, NT_ECONOMY_PREVENTING) ||

@@ -14,16 +14,16 @@ class ConstructionNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 economy: CL.SLIGHTLY_LOW,
-                stockpile: CL.LOW,
+                reserves: CL.LOW,
                 inflation: CL.HIGH,
-                credits: CL.LOW,
+                wealth: CL.LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.METAL, CL.EXTREMELY_HIGH], [CARGO_TYPES.NANITES, CL.ASTRONOMICAL]]),
             })
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.completeEffects[0], {
-            credits: News.clHalfRegression(this.completeEffects[0].credits),
+            wealth: News.clHalfRegression(this.completeEffects[0].wealth),
             economy: CL.HIGH,
             industry: CL.HIGH,
             buildingsEnabled
@@ -45,7 +45,7 @@ class ConstructionNews extends News {
         const {planet} = this
         //must be missing at least one building OR industry is low and credits are high
         const buildingsValid = News.calcRepairableBuildings(planet).length > 0
-        const ratingsValid = planet.civilization.industry < CL.LOW && (planet.settlement.stockpile > CL.SLIGHTLY_HIGH || planet.settlement.wealth > CL.SLIGHTLY_HIGH)
+        const ratingsValid = planet.civilization.industry < CL.LOW && (planet.settlement.reserves > CL.SLIGHTLY_HIGH || planet.civilization.wealth > CL.SLIGHTLY_HIGH)
         const interferingEvent =
             News.planetHasAnyNewsTargeting(planet, NT_DANGEROUS) ||
             News.planetHasAnyNews(planet, [NT.CONSTRUCTION, ...NT_ECONOMY_PREVENTING])

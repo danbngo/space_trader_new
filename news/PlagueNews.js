@@ -14,9 +14,9 @@ class PlagueNews extends News {
                 population: CL.VERY_LOW,
                 economy: CL.VERY_LOW,
                 industry: CL.VERY_LOW,
-                labor: CL.VERY_LOW,
+                education: CL.VERY_LOW,
                 inflation: CL.SLIGHTLY_HIGH,
-                stockpile: CL.SLIGHTLY_LOW,
+                reserves: CL.SLIGHTLY_LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.MEDICINE, CL.EXTREMELY_HIGH]]),
             })
         ]
@@ -25,7 +25,7 @@ class PlagueNews extends News {
         //population does not fully bounce back
         Object.assign(this.completeEffects[0], {
             population: News.clHalfRegression(this.completeEffects[0].population),
-            labor: News.clHalfRegression(this.completeEffects[0].labor),
+            education: News.clHalfRegression(this.completeEffects[0].education),
         })
 
         this.failEffects = [
@@ -34,7 +34,7 @@ class PlagueNews extends News {
                 population: CL.NO_REGRESSION,
                 economy: CL.NO_REGRESSION,
                 industry: CL.NO_REGRESSION,
-                labor: CL.NO_REGRESSION,
+                education: CL.NO_REGRESSION,
                 prestige: CL.VERY_LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.MEDICINE, CL.NO_REGRESSION]]),
             })

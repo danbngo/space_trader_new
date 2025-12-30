@@ -14,8 +14,13 @@ class Planet extends OrbitingObject {
      * @param {Settlement} settlement - The settlement on the planet.
      * @param {Civilization} civilization - The civilization of the planet.
      * @param {Climate} climate - The climate of the planet.
+     * @param {PlanetFeatureType[]} features - Unique features of the planet.
+     * @param {PlanetAtmosphereType} atmosphereType - The atmospheric composition.
+     * @param {PlanetOceanType} oceanType - The ocean/liquid composition (can be null).
+     * @param {PlanetGeologyType} geologyType - The geological composition (can be null for gas giants).
+     * @param {number} dayLength - The length of one day in Earth days.
      */
-    constructor(name = "Unnamed", color = COLORS.White, radius = 0, x = 0, y = 0, orbit = null, planetType = PLANET_TYPES_ALL[0], settlement = null, civilization = null, climate = null) {
+    constructor(name = "Unnamed", color = COLORS.White, radius = 0, x = 0, y = 0, orbit = null, planetType = PLANET_TYPES_ALL[0], settlement = null, civilization = null, climate = null, features = [], atmosphereType = null, oceanType = null, geologyType = null, dayLength = 1.0) {
         super(name, color, radius, x, y, orbit);
         /** @type {PlanetType} */
         this.planetType = planetType
@@ -25,6 +30,16 @@ class Planet extends OrbitingObject {
         this.civilization = civilization
         /** @type {Climate} */
         this.climate = climate || new Climate()
+        /** @type {PlanetFeatureType[]} */
+        this.features = features
+        /** @type {PlanetAtmosphereType} */
+        this.atmosphereType = atmosphereType
+        /** @type {PlanetOceanType} */
+        this.oceanType = oceanType
+        /** @type {PlanetGeologyType} */
+        this.geologyType = geologyType
+        /** @type {number} */
+        this.dayLength = dayLength
     }
 
     get ianName() {

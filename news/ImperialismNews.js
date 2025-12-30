@@ -12,14 +12,16 @@ class ImperialismNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
-                military: CL.LOW,
+                army: CL.LOW,
+                navy: CL.LOW,
                 security: CL.LOW,
                 prestige: CL.SLIGHTLY_LOW,
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
-                military: CL.LOW,
+                army: CL.LOW,
+                navy: CL.LOW,
                 prestige: CL.LOW,
             })
         ]
@@ -31,7 +33,8 @@ class ImperialismNews extends News {
             territory: CL.HIGH,
             prestige: News.clHalfRegression(this.completeEffects[0].prestige),
             security: News.clHalfRegression(this.completeEffects[0].security),
-            military: News.clHalfRegression(this.completeEffects[0].military),
+            army: News.clHalfRegression(this.completeEffects[0].army),
+            navy: News.clHalfRegression(this.completeEffects[0].navy),
         })
         //victim recovers partially
         Object.assign(this.completeEffects[1], {
@@ -43,13 +46,15 @@ class ImperialismNews extends News {
         this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
-                military: CL.NO_REGRESSION, // losses remain
+                army: CL.NO_REGRESSION, // losses remain
+                navy: CL.NO_REGRESSION,
                 security: CL.NO_REGRESSION,
                 prestige: CL.VERY_LOW, // failed expansion
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                military: News.clHalfRegression(CL.LOW),
+                army: News.clHalfRegression(CL.LOW),
+                navy: News.clHalfRegression(CL.LOW),
                 prestige: CL.HIGH, // victory boosts morale
             })
         ]
@@ -58,13 +63,15 @@ class ImperialismNews extends News {
         this.cancelEffects = [
             new NewsEffect({
                 planet: this.planet,
-                military: News.clHalfRegression(CL.LOW),
+                army: News.clHalfRegression(CL.LOW),
+                navy: News.clHalfRegression(CL.LOW),
                 security: News.clHalfRegression(CL.LOW),
                 territory: News.clHalfRegression(CL.HIGH), // partial gains
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                military: News.clHalfRegression(CL.LOW),
+                army: News.clHalfRegression(CL.LOW),
+                navy: News.clHalfRegression(CL.LOW),
                 territory: News.clHalfRegression(CL.LOW), // partial losses
             })
         ]

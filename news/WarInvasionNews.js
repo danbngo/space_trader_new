@@ -12,9 +12,8 @@ class WarInvasionNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
-                labor: CL.LOW,
-                ships: CL.SLIGHTLY_LOW,
-                education: CL.SLIGHTLY_LOW, //meat grinder
+                education: CL.LOW,
+                navy: CL.SLIGHTLY_LOW,
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
@@ -29,29 +28,26 @@ class WarInvasionNews extends News {
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         // Attacker: permanent officer losses from invasion
         Object.assign(this.completeEffects[0], {
-            labor: CL.NO_REGRESSION,
-            ships: CL.NO_REGRESSION,
             education: CL.NO_REGRESSION,
+            navy: CL.NO_REGRESSION,
         })
         // Defender: even heavier permanent losses
         Object.assign(this.completeEffects[1], {
-            labor: CL.SLIGHTLY_LOW, // defenders advantage?
-            ships: CL.SLIGHTLY_LOW,
-            education: CL.SLIGHTLY_LOW,
+            education: CL.SLIGHTLY_LOW, // defenders advantage?
+            navy: CL.SLIGHTLY_LOW,
             security: News.clHalfRegression(this.completeEffects[1].security),
             economy: News.clHalfRegression(this.completeEffects[1].economy),
             industry: News.clHalfRegression(this.completeEffects[1].industry),
             population: News.clHalfRegression(this.completeEffects[1].population),
-            military: CL.LOW,
+            army: CL.LOW,
         })
 
         this.cancelEffects = [
             new NewsEffect({
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
-                labor: News.clHalfRegression(this.completeEffects[0].labor),
-                ships: News.clHalfRegression(this.completeEffects[0].ships),
                 education: News.clHalfRegression(this.completeEffects[0].education),
+                navy: News.clHalfRegression(this.completeEffects[0].navy),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
@@ -79,7 +75,7 @@ class WarInvasionNews extends News {
         // Must have an ongoing war event
         const hasWar = News.hasNews(NT.WAR, planet, targetPlanet)
         // Attacker must have ship  AND ground advantage to launch invasion
-        const militaryValid = (planet.navy > targetPlanet.navy) && (planet.army > targetPlanet.army)
+        const militaryValid = (planet.civilization.navy > targetPlanet.civilization.navy) && (planet.civilization.army > targetPlanet.civilization.army)
         // Can't have invasion already
         const interferingEvent = News.hasNews(NT.WAR_INVASION, planet, targetPlanet)
         return relationshipValid && hasWar && militaryValid && !interferingEvent

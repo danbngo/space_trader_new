@@ -11,10 +11,11 @@ class NewsEffect {
      * @param {GovernmentType|null} [params.newGovernmentType] - New government type to change to.
      * @param {RelationshipType|null} [params.newRelationship] - New relationship with target planet.
      * @param {number} [params.inflation] - Multiplier for market prices (inflation).
-     * @param {number} [params.stockpile] - Multiplier for market cargo quantities.
+     * @param {number} [params.reserves] - Multiplier for market cargo quantities.
      * @param {number} [params.corruption] - Multiplier for black market prices.
      * @param {number} [params.crime] - Multiplier for black market cargo quantities.
-     * @param {number} [params.military] - Multiplier for military rating.
+     * @param {number} [params.army] - Multiplier for army rating.
+     * @param {number} [params.navy] - Multiplier for navy rating.
      * @param {number} [params.industry] - Multiplier for industrial rating.
      * @param {number} [params.economy] - Multiplier for commercial rating.
      * @param {number} [params.security] - Multiplier for security rating.
@@ -24,12 +25,11 @@ class NewsEffect {
      * @param {number} [params.territory] - Multiplier for territory.
      * @param {number} [params.technology] - Multiplier for ship quality.
      * @param {number} [params.education] - Multiplier for officer quality.
+     * @param {number} [params.wealth] - More credits in each building
      * @param {Building[]} [params.buildingsDisabled] - Buildings to disable.
      * @param {Building[]} [params.buildingsEnabled] - Buildings to enable.
-     * @param {number} [params.ships] - Multiplier for shipyard inventory.
-     * @param {number} [params.labor] - Multiplier for guild officer availability.
      * @param {Map<CargoType, number>} [params.cargoPriceModifiers] - Cargo-specific price modifiers.
-     * @param {number} [params.credits] - Multiplier for building credits.
+     * @param {Map<SkillType, number>} [params.skillPriceModifiers] - Skill experience modifiers.
      * @param {boolean} [params.relationsReset] - Whether to reset all relationships to neutral.
      * @param {boolean} [params.forcePeace] - Whether to cease hostilities TARGETING this planet.
      * @param {boolean} [params.forceWithdrawal] - Whether to force this planet to withdraw from the solar stage.
@@ -46,17 +46,19 @@ class NewsEffect {
         
         // Market/Economic changes
         inflation = 1.0,
-        stockpile = 1.0,
-        corruption = 1.0,
+        reserves = 1.0,
         crime = 1.0,
+        corruption = 1.0,
         
         // Civilization rating changes
-        military = 1.0,
+        army = 1.0,
+        navy = 1.0,
         industry = 1.0,
         economy = 1.0,
         security = 1.0,
         culture = 1.0,
         prestige = 1.0,
+        wealth = 1.0,
         
         // Population and territory changes
         population = 1.0,
@@ -70,17 +72,9 @@ class NewsEffect {
         buildingsDisabled = [],
         buildingsEnabled = [],
         
-        // Shipyard changes
-        ships = 1.0,
-        
-        // Guild changes
-        labor = 1.0,
-
         //Market and black market changes
         cargoPriceModifiers = new Map(),
-        
-        // Bank changes
-        credits = 1.0,
+        skillPriceModifiers = new Map(),
 
         relationsReset = false,
         forcePeace = false,
@@ -103,13 +97,17 @@ class NewsEffect {
         /** @type {number} */
         this.inflation = inflation;
         /** @type {number} */
-        this.stockpile = stockpile;
+        this.reserves = reserves;
         /** @type {number} */
         this.corruption = corruption;
         /** @type {number} */
         this.crime = crime;
         /** @type {number} */
-        this.military = military;
+        this.corruption = corruption;
+        /** @type {number} */
+        this.army = army;
+        /** @type {number} */
+        this.navy = navy;
         /** @type {number} */
         this.industry = industry;
         /** @type {number} */
@@ -124,16 +122,12 @@ class NewsEffect {
         this.population = population;
         /** @type {number} */
         this.territory = territory;
+        /** @type {number} */
+        this.wealth = wealth;
         /** @type {Building[]} */
         this.buildingsDisabled = buildingsDisabled;
         /** @type {Building[]} */
         this.buildingsEnabled = buildingsEnabled;
-        /** @type {number} */
-        this.labor = labor;
-        /** @type {number} */
-        this.ships = ships;
-        /** @type {number} */
-        this.credits = credits;
         /** @type {number} */
         this.technology = technology;
         /** @type {number} */
@@ -146,16 +140,18 @@ class NewsEffect {
         this.forceWithdrawal = forceWithdrawal;
         /** @type {Map<CargoType, number>} */
         this.cargoPriceModifiers = cargoPriceModifiers;
+        /** @type {Map<SkillType, number>} */
+        this.skillPriceModifiers = skillPriceModifiers;
         /** @type {function(): void} */
         this.onApply = onApply //use sparingly!
         this.fired = false;
     }
 
     apply(elapsedYears = 0) {
-        const {planet, targetPlanet, military, newGovernmentType, newRelationship, credits, 
-            crime, corruption, buildingsDisabled, buildingsEnabled, territory,
+        const {planet, targetPlanet, army, navy, newGovernmentType, newRelationship, 
+            buildingsDisabled, buildingsEnabled, territory, skillPriceModifiers,
             population, culture, inflation, security, economy, 
-            labor, industry, ships, stockpile, fired,
+            industry, reserves, fired, crime, corruption, wealth,
             technology, education, relationsReset, forcePeace, forceWithdrawal, prestige, cargoPriceModifiers} = this;
 
         this.fired = true;
@@ -165,7 +161,8 @@ class NewsEffect {
             civilization.governmentType = newGovernmentType || civilization.governmentType;
             civilization.technology *= technology;
             civilization.education *= education;
-            civilization.military *= military;
+            civilization.army *= army;
+            civilization.navy *= navy;
             civilization.industry *= industry;
             civilization.economy *= economy;
             civilization.security *= security;
@@ -173,6 +170,11 @@ class NewsEffect {
             civilization.prestige *= prestige;
             civilization.population *= population;
             civilization.territory *= territory;
+            civilization.crime *= crime;
+            civilization.corruption *= corruption;
+            civilization.wealth *= wealth;
+            civilization.reserves *= reserves;
+            civilization.inflation *= inflation;
             //FIRST end any wars to let their completeEffects run
             if (forcePeace) {
                 News.forcePeace(planet)
@@ -197,47 +199,15 @@ class NewsEffect {
             for (const [cargoType, modifier] of cargoPriceModifiers) {
                 civilization.cargoPriceModifiers.multiply(cargoType, modifier);
             }
-
+            for (const [skillType, modifier] of skillPriceModifiers) {
+                civilization.skillPriceModifiers.multiply(skillType, modifier)
+            }
             for (const building of buildingsDisabled) {
                 building.enabled = false;
             }
             for (const building of buildingsEnabled) {
                 building.enabled = true;
             }
-        }
-
-        if (planet && planet.settlement) {
-            const {settlement} = planet
-            if (credits !== 1.0) {
-                for (const building of settlement.buildings) {
-                    if (!building.baseCredits) continue
-                    //console.log('1 altering credits for building by factor:',credits,'starting base credits:',building.baseCredits);
-                    building.baseCredits = Math.max(1, rndRound(building.baseCredits * credits));
-                    //console.log('2 altered credits for building by factor:',credits,'new base credits:',building.baseCredits);
-                    building.normalize();
-                    if (building.baseCredits > MARKET_AVERAGE_CREDITS*1000) {
-                        console.log('building:',building,'this:',this)
-                        console.log('WARNING!!!!!!!!!!!!! building has extremely high credits after modification:')
-                    }
-                }
-            }
-            if (labor !== 1.0) {
-                settlement.guild.baseNumOfficers = Math.max(1, rndRound(settlement.guild.baseNumOfficers * labor))
-                settlement.guild.normalize();
-            }
-            if (ships !== 1.0) {
-                settlement.shipyard.baseNumShips = Math.max(1, rndRound(settlement.shipyard.baseNumShips * ships));
-                settlement.shipyard.baseNumModules = Math.max(1, rndRound(settlement.shipyard.baseNumModules * ships));
-                settlement.shipyard.normalize();
-            }
-            if (inflation !== 1.0) settlement.market.inflation *= inflation;
-            if (corruption !== 1.0) settlement.blackMarket.inflation *= 1/corruption; //corruption works IN REVERSE on prices
-            for (const ct of CARGO_TYPES_ALL) {
-                if (stockpile !== 1.0) settlement.market.baseCargo.setAmount(ct, Math.max(1, rndRound(settlement.market.baseCargo.getAmount(ct) * stockpile)));
-                if (crime !== 1.0) settlement.blackMarket.baseCargo.setAmount(ct, Math.max(1, rndRound(settlement.blackMarket.baseCargo.getAmount(ct) * crime)));
-            }
-            if (stockpile !== 1.0) settlement.market.normalize()
-            if (crime !== 1.0) settlement.blackMarket.normalize()
         }
 
         if (this.onApply) this.onApply();
@@ -254,10 +224,11 @@ class NewsEffect {
             buildingsDisabled: this.buildingsEnabled,
             buildingsEnabled: this.buildingsDisabled,
             inflation: 1 / this.inflation,
-            stockpile: 1 / this.stockpile,
+            reserves: 1 / this.reserves,
             corruption: 1 / this.corruption,
             crime: 1 / this.crime,
-            military: 1 / this.military,
+            army: 1 / this.army,
+            navy: 1 / this.navy,
             industry: 1 / this.industry,
             economy: 1 / this.economy,
             security: 1 / this.security,
@@ -267,9 +238,7 @@ class NewsEffect {
             territory: 1 / this.territory,
             technology: 1 / this.technology,
             education: 1 / this.education,
-            labor: 1/this.labor,
-            ships: 1/this.ships,
-            credits: 1 / this.credits,
+            wealth: 1 / this.wealth,
             cargoPriceModifiers: NewsEffect.getInvertedCargoPriceModifiers(this.cargoPriceModifiers),
             relationsReset: false, //this cant be undone.
         });
@@ -285,10 +254,11 @@ class NewsEffect {
         //apply News.clHalfRegression to every numeric value
         Object.assign(inversion, {
             inflation: News.clHalfRegression(inversion.inflation),
-            stockpile: News.clHalfRegression(inversion.stockpile),
+            reserves: News.clHalfRegression(inversion.reserves),
             corruption: News.clHalfRegression(inversion.corruption),
             crime: News.clHalfRegression(inversion.crime),
-            military: News.clHalfRegression(inversion.military),
+            army: News.clHalfRegression(inversion.army),
+            navy: News.clHalfRegression(inversion.navy),
             industry: News.clHalfRegression(inversion.industry),
             economy: News.clHalfRegression(inversion.economy),
             security: News.clHalfRegression(inversion.security),
@@ -298,9 +268,7 @@ class NewsEffect {
             territory: News.clHalfRegression(inversion.territory),
             technology: News.clHalfRegression(inversion.technology),
             education: News.clHalfRegression(inversion.education),
-            ships: News.clHalfRegression(inversion.ships),
-            labor: News.clHalfRegression(inversion.labor),
-            credits: News.clHalfRegression(inversion.credits),
+            wealth: News.clHalfRegression(inversion.wealth),
         })
         return inversion            
     }
@@ -312,10 +280,11 @@ class NewsEffect {
             newGovernmentType: this.newGovernmentType,
             newRelationship: this.newRelationship,
             inflation: this.inflation,
-            stockpile: this.stockpile,
+            reserves: this.reserves,
             corruption: this.corruption,
             crime: this.crime,
-            military: this.military,
+            army: this.army,
+            navy: this.navy,
             industry: this.industry,
             economy: this.economy,
             security: this.security,
@@ -327,10 +296,8 @@ class NewsEffect {
             education: this.education,
             buildingsDisabled: [...this.buildingsDisabled],
             buildingsEnabled: [...this.buildingsEnabled],
-            ships: this.ships,
-            labor: this.labor,
             cargoPriceModifiers: new Map(this.cargoPriceModifiers),
-            credits: this.credits,
+            skillPriceModifiers: new Map(this.skillPriceModifiers),
             relationsReset: this.relationsReset,
             forcePeace: this.forcePeace,
             forceWithdrawal: this.forceWithdrawal,
@@ -343,10 +310,9 @@ class NewsEffect {
             return `${label}: ${describeRating(rating, invertColor)} ➜ ${describeRating(newRating, invertColor)}.<br/>`
         }
 
-        const {planet, targetPlanet, military, newGovernmentType, newRelationship, credits, 
+        const {planet, targetPlanet, army, navy, newGovernmentType, newRelationship, reserves, 
             crime, corruption, buildingsDisabled, buildingsEnabled, territory,
-            population, culture, inflation, security, economy, 
-            labor, industry, ships, stockpile,
+            population, culture, inflation, security, economy, industry, wealth,
             technology, education, relationsReset, prestige, cargoPriceModifiers, forcePeace} = this;
         
         let msg = ''
@@ -376,41 +342,21 @@ class NewsEffect {
             if (population !== 1.0) msg += `- Population: ${describePopulation(civilization.population)} ➜ ${describePopulation(civilization.population*population)}.<br/>`
             if (territory !== 1.0) msg += `- Territory: ${describeTerritory(civilization.territory)} ➜ ${describeTerritory(civilization.territory*territory)}.<br/>`
             if (prestige !== 1.0) msg += dscr('- Prestige', civilization.prestige, civilization.prestige*prestige)
-            if (military !== 1.0) msg += dscr('- GovernmentType', civilization.military, civilization.military*military)
-            if (industry !== 1.0) msg += dscr('- Industrial', civilization.industry, civilization.industry*industry)
-            if (economy !== 1.0) msg += dscr('- Economic', civilization.economy, civilization.economy*economy)
             if (security !== 1.0) msg += dscr('- Security', civilization.security, civilization.security*security)
-            if (culture !== 1.0) msg += dscr('- Crime', civilization.culture, civilization.culture*culture, true)
-            if (technology !== 1.0) msg += dscr('- Ships', civilization.technology, civilization.technology*technology)
-            if (education !== 1.0) msg += dscr('- Officers', civilization.education, civilization.education*education)
+            if (economy !== 1.0) msg += dscr('- Economy', civilization.economy, civilization.economy*economy)
+            if (industry !== 1.0) msg += dscr('- Industry', civilization.industry, civilization.industry*industry)
+            if (culture !== 1.0) msg += dscr('- Culture', civilization.culture, civilization.culture*culture, true)
+            if (technology !== 1.0) msg += dscr('- Technology', civilization.technology, civilization.technology*technology)
+            if (education !== 1.0) msg += dscr('- Education', civilization.education, civilization.education*education)
+            if (wealth !== 1.0) msg += dscr('- Wealth', civilization.wealth, civilization.wealth*wealth)
+            if (reserves !== 1.0) msg += dscr('- Reserves', civilization.reserves, civilization.reserves*reserves)
+            if (inflation !== 1.0) msg += dscr('- Inflation', civilization.inflation, civilization.inflation*inflation, true)
+            if (army !== 1.0) msg += dscr('- Army', civilization.army, civilization.army*army)
+            if (navy !== 1.0) msg += dscr('- Navy', civilization.navy, civilization.navy*navy)
+            if (crime !== 1.0) msg += dscr('- Crime', civilization.crime, civilization.crime*crime, true)
+            if (corruption !== 1.0) msg += dscr('- Corruption', civilization.corruption, civilization.corruption*corruption, true)
 
         }
-
-        if (planet && planet.settlement) {
-            const {settlement} = planet
-            if (credits !== 1.0) {
-                msg += `- Bank Credits: ${settlement.bank.baseCredits} ➜ ${settlement.bank.baseCredits*credits}.<br/>`
-            }
-            if (labor) {
-                msg += `- Guild Officers: ${settlement.guild.baseNumOfficers} ➜ ${Math.round(settlement.guild.baseNumOfficers * labor)}.<br/>`
-            }
-            if (ships) {
-                msg += `- Shipyard Ships: ${settlement.shipyard.baseNumShips} ➜ ${Math.round(settlement.shipyard.baseNumShips * ships)}.<br/>`
-            }
-            if (stockpile) {
-                msg += `- Market Units Per Cargo Type: ${settlement.market.baseCargo.average} ➜ ${settlement.market.baseCargo.average * stockpile}.<br/>`
-            }
-            if (stockpile) {
-                msg += `- Market Prices: ${settlement.market.inflation}x ➜ ${settlement.market.inflation * inflation}x.<br/>`
-            }
-            if (crime) {
-                msg += `- Black Market Units Per Cargo Type: ${settlement.blackMarket.baseCargo.average} ➜ ${settlement.blackMarket.baseCargo.average * crime}.<br/>`
-            }
-            if (corruption) {
-                msg += `- Black Market Prices: ${settlement.blackMarket.inflation}x ➜ ${settlement.blackMarket.inflation * corruption}x.<br/>`
-            }
-        }
-
         return msg
    }
 }

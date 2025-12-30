@@ -11,12 +11,12 @@ class CivilStrifeNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                military: CL.SLIGHTLY_LOW,
+                army: CL.SLIGHTLY_LOW,
                 security: CL.VERY_LOW,
                 economy: CL.LOW,
                 industry: CL.VERY_LOW,
-                credits: CL.LOW,
-                stockpile: CL.LOW,
+                wealth: CL.LOW,
+                reserves: CL.LOW,
                 prestige: CL.SLIGHTLY_LOW,
                 crime: CL.HIGH,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.WEAPONS, CL.VERY_HIGH]]),
@@ -31,7 +31,7 @@ class CivilStrifeNews extends News {
         this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
-                military: CL.NO_REGRESSION,
+                army: CL.NO_REGRESSION,
                 security: CL.LOW/CL.VERY_LOW,
                 crime: CL.SLIGHTLY_HIGH/CL.HIGH,
                 prestige: CL.LOW/CL.SLIGHTLY_LOW,

@@ -23,7 +23,7 @@ class EnslavementNews extends News {
                 targetPlanet: this.planet,
                 population: CL.LOW,
                 security: CL.LOW,
-                labor: CL.LOW,
+                education: CL.LOW, // skilled workers taken
             })
         ]
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
@@ -38,7 +38,7 @@ class EnslavementNews extends News {
         // Victim: permanent population loss, prestige loss
         Object.assign(this.completeEffects[1], {
             population: CL.NO_REGRESSION, // stolen population doesn't return
-            labor: CL.NO_REGRESSION,
+            education: CL.NO_REGRESSION,
             //prestige: CL.NO_REGRESSION, // permanent shame
             economy: News.clHalfRegression(this.completeEffects[1].economy),
             industry: News.clHalfRegression(this.completeEffects[1].industry),

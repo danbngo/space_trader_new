@@ -12,8 +12,8 @@ class ScientificBreakthroughNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 industry: CL.LOW,
-                credits: CL.LOW,
-                stockpile: CL.SLIGHTLY_LOW,
+                wealth: CL.LOW,
+                reserves: CL.SLIGHTLY_LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.ISOTOPES, 2]]),
             })
         ]
@@ -21,18 +21,19 @@ class ScientificBreakthroughNews extends News {
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         //actual knowledge gained cannot be lost
         Object.assign(this.completeEffects[0], {
-            credits: News.clHalfRegression(this.completeEffects[0].credits),
+            wealth: News.clHalfRegression(this.completeEffects[0].wealth),
             technology: CL.HIGH,
             prestige: CL.SLIGHTLY_HIGH,
             education: CL.SLIGHTLY_HIGH,
-            military: CL.SLIGHTLY_HIGH,
+            army: CL.SLIGHTLY_HIGH,
+            navy: CL.SLIGHTLY_HIGH,
         })
 
         // Failed: research yields nothing, resources wasted
         this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
-                credits: CL.NO_REGRESSION, // money wasted
+                wealth: CL.NO_REGRESSION, // money wasted
                 prestige: CL.LOW, // scientific embarrassment
             })
         ]

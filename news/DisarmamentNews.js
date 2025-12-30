@@ -11,20 +11,20 @@ class DisarmamentNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                military: CL.VERY_LOW,
+                army: CL.VERY_LOW,
+                navy: CL.VERY_LOW,
                 territory: CL.SLIGHTLY_LOW,
                 cargoPriceModifiers: new Map([[CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_LOW], [CARGO_TYPES.WEAPONS, CL.EXTREMELY_LOW]]),
                 crime: CL.SLIGHTLY_LOW,
-                ships: CL.VERY_LOW,
             })
         ]
 
         //system becomes more crowded over time...
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.completeEffects[0], {
-            military: CL.NO_REGRESSION, 
+            army: CL.NO_REGRESSION, 
+            navy: CL.NO_REGRESSION,
             territory: CL.NO_REGRESSION,
-            ships: CL.NO_REGRESSION,
             economy: CL.SLIGHTLY_HIGH, //small bonuses to the economy
             industry: CL.SLIGHTLY_HIGH,
             prestige: CL.SLIGHTLY_HIGH,
@@ -34,8 +34,8 @@ class DisarmamentNews extends News {
         this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
-                military: CL.NO_REGRESSION, // stayed weak
-                ships: CL.NO_REGRESSION,
+                army: CL.NO_REGRESSION, // stayed weak
+                navy: CL.NO_REGRESSION,
                 territory: CL.NO_REGRESSION,
                 prestige: CL.LOW, // seen as weak
             })
@@ -61,7 +61,7 @@ class DisarmamentNews extends News {
     isValid() {
         const {planet} = this
         //unlikely if planet has a low military already
-        const ratingsValid = (planet.civilization.military > CL.HIGH) && (planet.navy > CL.HIGH)
+        const ratingsValid = (planet.civilization.military > CL.HIGH) && (planet.civilization.navy > CL.HIGH)
         const interferingEvent =
             News.planetHasAnyNewsTargeting(planet, NT_MARTIAL) ||
             News.planetHasAnyNews(planet, NT_MARTIAL)

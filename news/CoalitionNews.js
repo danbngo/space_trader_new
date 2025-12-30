@@ -46,7 +46,7 @@ class CoalitionNews extends News {
     isValid() {
         const {planet} = this
         //more likely if REALLY REALLY high territory and military
-        const ratingsValid = planet.civilization.territory > CL.VERY_HIGH && (planet.civilization.military > CL.VERY_HIGH || planet.navy > CL.VERY_HIGH || planet.army > CL.VERY_HIGH)
+        const ratingsValid = planet.civilization.territory > CL.VERY_HIGH && (planet.civilization.military > CL.VERY_HIGH || planet.civilization.navy > CL.VERY_HIGH || planet.civilization.army > CL.VERY_HIGH)
         const interferingEvent =
             News.planetHasAnyNews(planet, [NT.COALITION])
         const [badNews] = News.calcRelationshipWorseningNews(planet)
