@@ -39,19 +39,21 @@ class CivilWarNews extends News {
         Object.assign(this.failEffects[0], {
             buildingsDisabled,
             newGovernmentType,
-            population: CL.VERY_LOW,
-            territory: CL.NO_REGRESSION,
-            army: CL.LOW/CL.VERY_LOW,
-            navy: CL.LOW/CL.VERY_LOW,
-            security: CL.LOW/CL.VERY_LOW,
-            economy: CL.LOW/CL.VERY_LOW,
-            industry: CL.LOW/CL.VERY_LOW,
-            reserves: CL.LOW/CL.VERY_LOW,
-            inflation: CL.NO_REGRESSION,
-            crime: CL.HIGH/CL.SLIGHTLY_HIGH,
-            wealth: CL.NO_REGRESSION,
-            prestige: CL.NO_REGRESSION,
         })
+        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
+            population: CL.VERY_LOW,
+            territory: CL.SLIGHTLY_LOW,
+            army: CL.LOW,
+            navy: CL.LOW,
+            security: CL.LOW,
+            economy: CL.LOW,
+            industry: CL.LOW,
+            reserves: CL.LOW,
+            inflation: CL.NO_REGRESSION,
+            crime: CL.HIGH,
+            wealth: CL.LOW,
+            prestige: CL.LOW,
+        }))
     }
 
     determineOutcome() {

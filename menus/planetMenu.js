@@ -47,8 +47,12 @@ function showPlanetMenu(planet = new Planet()) {
         options.push(["Cyber Surgeon", () => showCyberSurgeonBuyMenu(settlement.cyberSurgeon)]);
     }
     if (settlement.palace) {
-        const hasBounty = gs.captain.calcInfamyForPlanet(planet) > 0
-        options.push(["Palace", () => showPalaceMenu(settlement.palace), !isDocked || hasBounty]);
+        const hasBounty = gs.captain.calcBountyForPlanet(planet) > 0
+        const hasInfamy = gs.captain.calcInfamyForPlanet(planet) > 0
+        const playerRank = gs.captain.ranks.get(planet) || RANK_TYPES.NO_RANK
+        const isElite = playerRank === RANK_TYPES.ELITE
+        const canEnter = !hasBounty && (!hasInfamy || isElite)
+        options.push(["Palace", () => showPalaceMenu(settlement.palace), !isDocked || !canEnter]);
     }
     options.push(ce({tag:'br'}));
     options.push(["News", () => showNewsTimelineMenu(planet, () => showPlanetMenu(planet))]);

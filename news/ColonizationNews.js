@@ -24,7 +24,7 @@ class ColonizationNews extends News {
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        Object.assign(this.completeEffects[0], {
+        this.completeEffects[0].civilizationMultipliers.overwrite(new Civilization({
             economy: CL.HIGH,
             industry: CL.HIGH,
             territory: CL.HIGH,
@@ -32,17 +32,15 @@ class ColonizationNews extends News {
             navy: CL.NO_REGRESSION,
             wealth: CL.NO_REGRESSION,
             prestige: CL.NO_REGRESSION
-        })
+        }))
 
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        Object.assign(this.completeEffects[0], {
-            economy: CL.HIGH,
-            industry: CL.HIGH,
-            territory: CL.HIGH,
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        this.failEffects[0].civilizationMultipliers.overwrite(new Civilization({
             population: CL.NO_REGRESSION,
             navy: CL.NO_REGRESSION,
             wealth: CL.NO_REGRESSION,
-        })
+            prestige: CL.SLIGHTLY_LOW,
+        }))
    }
 
     determineOutcome() {

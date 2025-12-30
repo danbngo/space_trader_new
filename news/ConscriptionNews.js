@@ -25,7 +25,6 @@ class ConscriptionNews extends News {
                 civilizationMultipliers: new Civilization({
                     army: CL.VERY_HIGH,
                     navy: CL.HIGH,
-                    taxes: CL.NO_REGRESSION
                 })
             })
         ]
@@ -36,7 +35,6 @@ class ConscriptionNews extends News {
             prestige: CL.LOW,
             security: CL.LOW,
             crime: CL.HIGH,
-            taxes: CL.NO_REGRESSION
         }))
     }
 

@@ -18,14 +18,14 @@ class CoalitionNews extends News {
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
+            prestige: CL.HIGH,
+        }))
 
         // Failed: coalition persists, permanent diplomatic damage
         this.failEffects = [
             new NewsEffect({
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    prestige: CL.NO_REGRESSION,
-                }),
                 onApply: ()=>{
                     const badNews = News.calcRelationshipWorseningNews(planet)[0]
                     for (const bn of badNews) {

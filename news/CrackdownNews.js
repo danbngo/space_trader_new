@@ -23,19 +23,19 @@ class CrackdownNews extends News {
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         //some lingering crime decrease
-        Object.assign(this.completeEffects[0], {
-            security: CL.HIGH/CL.SLIGHTLY_HIGH,
-            crime: CL.LOW/CL.SLIGHTLY_LOW,
-            corruption: CL.LOW/CL.SLIGHTLY_LOW,
-        })
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
+            security: CL.HIGH,
+            crime: CL.LOW,
+            corruption: CL.LOW,
+        }))
 
         this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        Object.assign(this.failEffects[0], {
-            security: CL.SLIGHTLY_LOW/CL.SLIGHTLY_HIGH,
-            crime: CL.HIGH/CL.SLIGHTLY_LOW,
-            culture: CL.NO_REGRESSION,
-            corruption: CL.HIGH/CL.SLIGHTLY_LOW,
-        })
+        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
+            security: CL.SLIGHTLY_LOW,
+            crime: CL.HIGH,
+            culture: CL.LOW,
+            corruption: CL.HIGH,
+        }))
     }
 
     determineOutcome() {

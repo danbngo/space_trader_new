@@ -26,24 +26,23 @@ class CrimeWaveNews extends News {
         }))
 
         this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        Object.assign(this.failEffects[0], {
-            security: CL.NO_REGRESSION,
-            crime: CL.EXTREMELY_HIGH/CL.VERY_HIGH,
-            corruption: CL.VERY_HIGH/CL.HIGH,
-        })
+        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
+            security: CL.LOW,
+            crime: CL.EXTREMELY_HIGH,
+            corruption: CL.VERY_HIGH,
+        }))
     }
 
     determineOutcome() {
         const {planet: p} = this
-        this.rollOutcome(p.c.security*p.c.culture*p.c.economy)
+        this.rollOutcome(p.c.security*p.c.culture*p.c.economy*p.c.crime/p.c.corruption, CL.LOW)
     }
 
     isValid() {
         const {planet: p} = this
         //wont happen if crime or security is already high
-        const povertyValid = p.c.wealth < CL.MEDIUM
-        const ratingsValid = planet.settlement.cryme < CL.MEDIUM && p.c.security < CL.MEDIUM
-        const interferingEvent = News.planetHasAnyNews(planet, [NT.CRIME_WAVE, ...NT_CRIME_PREVENTING])
-        return ratingsValid && povertyValid && !interferingEvent
+        const ratingsValid = p.c.wealth < CL.MEDIUM && p.c.crime < CL.MEDIUM
+        const interferingEvent = News.planetHasAnyNews(p, NT_CRIME_PREVENTING)
+        return ratingsValid && ratingsValid && !interferingEvent
     }
 }
