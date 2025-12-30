@@ -73,6 +73,7 @@ class StarMap extends BaseMap {
     openAssistant() {
         this.togglePause(true)
         const hasSkillPoints = gs.captain.skillPoints > 0
+        const hasPerkPoints = gs.captain.numPerkPoints > 0
         const hasContracts = gs.contracts && gs.contracts.length > 0
         showModal(`Assistant`, 'How can I help you captain?', [
             ['Trade Info', ()=>showTradeInfoSellMenu()],
@@ -81,6 +82,7 @@ class StarMap extends BaseMap {
             ['Officer Roster', ()=>showOfficersMenu()],
             ['Contracts', ()=>showContractsMenu(), false, hasContracts ? 'highlighted' : null],
             ['Captain Overview', ()=>showCaptainSkillsMenu(), false, hasSkillPoints ? 'highlighted' : null],
+            ['Perks', ()=>showCaptainPerksMenu(), false, hasPerkPoints ? 'highlighted' : null],
             ['Galactic News', ()=>showNewsTimelineMenu(null, ()=>this.openAssistant())],
             ['Cancel', ()=>closeModal()],
         ])
@@ -90,12 +92,13 @@ class StarMap extends BaseMap {
         const {fleet, year} = gs
         const {location, route} = fleet
         const destination = route?.destination
-        const distance = roundToPlaces(route?.distance, 2)
+        const distance = roundToPlaces(route?.path.distance, 2)
         const endYear = route?.endYear
         const yearsRemaining = describeTimespan(endYear-year)
 
-        const planetLink = (planet = new Planet())=> {
-            return ce({innerHTML: coloredName(planet), onClick: ()=>this.selectObject(planet), style: {color: colorArrToRgbaString(planet.color)}, classNames:['clickable-text']})
+        /** @param {Planet|Waypoint} destination */
+        const planetLink = (destination)=> {
+            return ce({innerHTML: coloredName(destination), onClick: ()=>this.selectObject(destination), style: {color: colorArrToRgbaString(destination.color)}, classNames:['clickable-text']})
         }
 
         this.infoBar.innerHTML = ""
@@ -287,7 +290,7 @@ class StarMap extends BaseMap {
         const {backgroundStars, asteroids} = starSystem
         backgroundStars.forEach( (bgStar, index) => {
             bgStar.twinkle(year)
-            cvs.pixels[index].a = bgStar.a
+            cvs.pixels[index].a = bgStar.color[3]
         });
         const numBackgroundStars = backgroundStars.length
         asteroids.forEach( (asteroid, index) => {

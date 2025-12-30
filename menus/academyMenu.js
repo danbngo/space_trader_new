@@ -15,7 +15,7 @@ function createAcademyHireOfficerMenu(officers = [new Officer()], academy = new 
         const implantCount = officer.implants.length
         rows.push([
             officer.name,
-            officer.age,
+            ''+officer.age,
             statColorSpan(officer.level, officer.level/5),
             statColorSpan(officer.crShare*100+'%', 5/officer.level),
             ...SKILLS_ALL.map(sk=>statColorSpan(officer.skills.getAmount(sk), officer.skills.getAmount(sk)*SKILLS_ALL.length/5/SKILL_POINTS_PER_LEVEL)),

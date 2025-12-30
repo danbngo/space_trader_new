@@ -20,6 +20,7 @@ function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
         const canAfford = skillPoints >= cost
         const buttons = [
             ['Upgrade', () => improveSkill(skill), !canAfford],
+            ['Perks', () => showCaptainPerksMenu(), false, captain.numPerkPoints > 0 ? 'highlighted' : null],
             ['Reputation', () => showCaptainReputationMenu()],
             ['Close', () => closeModal()],
         ]
@@ -42,10 +43,6 @@ function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
         ? captain.implants.map(i => colorSpan(i.implantType.name, i.implantType.color) + ` (${roundToPlaces(i.quality*100, 1)}%)`).join(', ')
         : colorSpan('(None)', COLORS.Gray)
 
-    const perksText = captain.perks.length > 0
-        ? captain.perks.map(p => colorSpan(p.name, p.color)).join(', ')
-        : colorSpan('(None)', COLORS.Gray)
-
     showModal(
         `Captain Overview`,
         ce({children:[
@@ -54,11 +51,11 @@ function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
             `Skill Points: ${colorSpan(String(skillPoints), skillPoints > 0 ? COLORS.Green : '')}`,
             skillTable,
             ce({style: 'margin-top: 20px;', children: [
-                ce({children: [`<b>Cybernetic Implants:</b><br/>`, implantsText]}),
-                ce({children: [`<br/><b>Perks:</b><br/>`, perksText]})
+                ce({children: [`<b>Cybernetic Implants:</b><br/>`, implantsText]})
             ]})
         ]}),
         [
+            ["Perks", () => showCaptainPerksMenu(), false, captain.numPerkPoints > 0 ? 'highlighted' : null],
             ["Reputation", () => showCaptainReputationMenu()],
             ["Close", () => closeModal()],
         ],
@@ -71,6 +68,106 @@ function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
     }
 }
 
+
+/**
+ * Displays the captain's perks menu for viewing and purchasing perks.
+ * @param {Officer} captain - The captain whose perks to display.
+ * @param {PerkType|null} selectedPerk - The currently selected perk to highlight.
+ */
+function showCaptainPerksMenu(captain = gs.captain, selectedPerk = null) {
+    console.log('showCaptainPerksMenu called with captain:', captain, 'selectedPerk:', selectedPerk)
+    const {name, level, numPerkPoints, perks} = captain
+
+    function takePerk(perk = PERK_TYPES_ALL[0]) {
+        captain.perks.push(perk)
+        captain.numPerkPoints -= 1
+        showModal(
+            'Perk Acquired!',
+            `You have acquired ${colorSpan(perk.name, perk.color)}!<br/><br/>${perk.description}`,
+            [['Continue', () => showCaptainPerksMenu(captain, perk)]]
+        )
+    }
+
+    function onSelectPerk(perk = PERK_TYPES_ALL[0]) {
+        console.log('on select perk:', perk)
+        const alreadyHas = perks.includes(perk)
+        const canAfford = numPerkPoints > 0
+        const meetsLevel = level >= perk.minLevel
+        const canTake = !alreadyHas && canAfford && meetsLevel
+        
+        let reasonText = ''
+        if (alreadyHas) reasonText = 'You already have this perk.'
+        else if (!meetsLevel) reasonText = `Requires level ${perk.minLevel}.`
+        else if (!canAfford) reasonText = 'You need a perk point.'
+
+        const buttons = [
+            ['Take', () => {
+                showModal(
+                    'Confirm Perk',
+                    `Take ${colorSpan(perk.name, perk.color)}?<br/><br/>${perk.description}<br/><br/>This will cost 1 perk point.`,
+                    [
+                        ['Confirm', () => takePerk(perk)],
+                        ['Cancel', () => showCaptainPerksMenu(captain, perk)]
+                    ]
+                )
+            }, !canTake],
+            ['Skills', () => showCaptainSkillsMenu()],
+            ['Reputation', () => showCaptainReputationMenu()],
+            ['Close', () => closeModal()],
+        ]
+        refreshPanelButtons('captain_panel', buttons)
+    }
+
+    // Display current perks
+    const currentPerksText = perks.length > 0
+        ? perks.map(p => colorSpan(p.name, p.color)).join(', ')
+        : colorSpan('(None)', COLORS.Gray)
+
+    // Build available perks table
+    const availablePerks = PERK_TYPES_ALL.filter(p => !perks.includes(p))
+    const availablePerkRows = [
+        ['Perk', 'Min Level', 'Description'],
+        ...availablePerks.map(pk => {
+            const meetsLevel = level >= pk.minLevel
+            const levelText = meetsLevel ? colorSpan(String(pk.minLevel), COLORS.Green) : colorSpan(String(pk.minLevel), COLORS.Red)
+            return [
+                colorSpan(pk.name, pk.color),
+                levelText,
+                pk.description
+            ]
+        })
+    ]
+
+    const availablePerksTable = availablePerks.length > 0 
+        ? createTable(availablePerkRows, (rowIndex) => onSelectPerk(availablePerks[rowIndex]), selectedPerk ? availablePerks.indexOf(selectedPerk) + 1 : null)
+        : ce({children: [colorSpan('No perks available to acquire.', COLORS.Gray)]})
+
+    showModal(
+        `Captain Perks`,
+        ce({children:[
+            `Name: ${name} | Level: ${level}`,
+            `Perk Points: ${colorSpan(String(numPerkPoints), numPerkPoints > 0 ? COLORS.Green : '')}`,
+            ce({style: 'margin-top: 15px;', children: [
+                ce({children: [`<b>Current Perks:</b><br/>`, currentPerksText]})
+            ]}),
+            ce({style: 'margin-top: 20px;', children: [
+                ce({children: [`<b>Available Perks:</b>`]}),
+                availablePerksTable
+            ]})
+        ]}),
+        [
+            ["Skills", () => showCaptainSkillsMenu()],
+            ["Reputation", () => showCaptainReputationMenu()],
+            ["Close", () => closeModal()],
+        ],
+        'captain_panel'
+    );
+
+    if (selectedPerk) {
+        console.log('auto selecting perk:', selectedPerk)
+        onSelectPerk(selectedPerk);
+    }
+}
 
 function showCaptainReputationMenu() {
     const captain = gs.captain

@@ -175,3 +175,25 @@ class Civilization {
         return (p1.c.governmentType.opposingType === p2.c.governmentType || p2.c.governmentType.opposingType === p1.c.governmentType)
     }
 }
+
+
+class Policies {
+    constructor(economic = ECONOMIC_POLICIES[0], labor = LABOR_POLICIES[0], social = SOCIAL_POLICIES[0], foreign = FOREIGN_POLICIES[0]) {
+        /** @type {PolicyType} */
+        this.economic = economic
+        /** @type {PolicyType} */
+        this.labor = labor
+        /** @type {PolicyType} */
+        this.social = social
+        /** @type {PolicyType} */
+        this.foreign = foreign
+    }
+
+    get all() {
+        return [this.economic, this.labor, this.social, this.foreign]
+    }
+
+    clone() {
+        return new Policies(this.economic, this.labor, this.social, this.foreign)
+    }
+}

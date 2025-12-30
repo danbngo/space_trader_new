@@ -90,19 +90,3 @@ const SOCIAL_POLICIES = [PT.ETHNIC_NATIONALISM, PT.STATE_RELIGION, PT.TOTALITARI
 const FOREIGN_POLICIES = [PT.IMPERIALISM, PT.ISOLATIONISM, PT.COMMERCIALISM, PT.UNIVERSALISM]
 
 
-class Policies {
-    constructor(economic = ECONOMIC_POLICIES[0], labor = LABOR_POLICIES[0], social = SOCIAL_POLICIES[0], foreign = FOREIGN_POLICIES[0]) {
-        /** @type {PolicyType} */
-        this.economic = economic
-        /** @type {PolicyType} */
-        this.labor = labor
-        /** @type {PolicyType} */
-        this.social = social
-        /** @type {PolicyType} */
-        this.foreign = foreign
-    }
-
-    clone() {
-        return new Policies(this.economic, this.labor, this.social, this.foreign)
-    }
-}

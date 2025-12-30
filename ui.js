@@ -198,7 +198,7 @@ function rgbArrayToString(color = [255, 255, 255, 1.0]) {
  * @function colorSpan
  * @param {string} text
  * @param {string | Array<number>} color
- * @returns {string | HTMLElement}
+ * @returns {string}
  */
 function colorSpan(text = '', color = '') {
     if (Array.isArray(color)) {

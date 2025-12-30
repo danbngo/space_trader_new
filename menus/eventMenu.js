@@ -76,7 +76,7 @@ function checkForAsteroidBeltEncounters(elapsedDays = 1) {
     // Start the encounter
     if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
     const encounter = generateEncounter(encounterType, null, selectedBelt.effectTypes)
-    startEncounter(encounter)
+    encounter.onStart()
     return true
 }
 
@@ -157,7 +157,7 @@ function checkForPlanetEncounters(elapsedDays = 1) {
         if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
         const effectTypes = rollEncounterEffectTypes()
         const encounter = generateEncounter(selectedType, planet, effectTypes)
-        startEncounter(encounter)
+        encounter.onStart()
         return true
     }
     
@@ -296,7 +296,7 @@ function checkForFleetSpawning(elapsedDays = 1) {
         if (existingFleets.length >= maxFleets) continue
         
         // Check policies that prevent certain fleet types
-        const hasIsolationism = c.policies.some(p => p === POLICY_TYPES.ISOLATIONISM)
+        const hasIsolationism = c.policies.all.some(p => p === PT.ISOLATIONISM)
         
         // Define spawn chances for each fleet type based on civilization stats
         const spawnChances = []

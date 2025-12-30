@@ -28,6 +28,8 @@ class Officer {
         /** @type {number} */
         this.skillPoints = STARTING_SKILL_POINTS;
         /** @type {number} */
+        this.numPerkPoints = 0;
+        /** @type {number} */
         this.expPoints = 0;
         /** @type {BankLoan[]} */
         this.loans = []
@@ -50,9 +52,14 @@ class Officer {
             msg += `You gained ${amount} experience points.<br/>`;
         }
         if (this.canLevelUp) {
+            const oldLevel = this.level
             if (this == gs.captain) msg += colorSpan(`You leveled up to level ${this.level + 1}!<br/>`, COLORS.LightGreen);
             while (autoLevelUp && this.canLevelUp) {
                 this.levelUp(autoImproveSkills);
+            }
+            // Check if perk point was earned
+            if (this == gs.captain && Math.floor(this.level / 3) > Math.floor(oldLevel / 3)) {
+                msg += colorSpan(`You earned a perk point!<br/>`, COLORS.Gold);
             }
         }
         return msg
@@ -123,6 +130,10 @@ class Officer {
         this.expPoints -= this.expToNextLevel;
         this.level++;
         this.skillPoints += SKILL_POINTS_PER_LEVEL;
+        // Grant a perk point every 3 levels
+        if (this.level % 3 === 0) {
+            this.numPerkPoints += 1;
+        }
         if (autoImproveSkills) {
             this.autoImproveSkills();
         }
