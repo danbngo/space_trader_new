@@ -98,11 +98,19 @@ function showMoonsMenu(planet = new Planet()) {
  * @param {Planet} planet - The planet to display information for.
  */
 function showPlanetSocietyMenu(planet = new Planet()) {
-    const {civilization} = planet
+    const {civilization, settlement} = planet
     const {governmentType, policies} = civilization
     let msg = ''
     msg += `<u>Overview</u><br/>`
     msg += `Government: ${coloredName(governmentType)}<br/>`
+    
+    // Settlement type
+    if (settlement && settlement.settlementType) {
+        msg += `Settlement: ${colorSpan(settlement.settlementType.name, settlement.settlementType.color)}<br/>`
+        msg += `<span style="font-size: 0.9em; opacity: 0.8;">${settlement.settlementType.description}</span><br/>`
+    }
+    msg += `<br/>`
+    
     // Loop through all civilization ratings dynamically
     for (const rating of CIVILIZATION_RATINGS_ALL) {
         const key = rating.name.toLowerCase()

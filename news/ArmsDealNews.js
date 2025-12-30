@@ -20,13 +20,13 @@ class ArmsDealNews extends News {
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
 
-        this.completeEffects[0].civilizationMultipliers.overwrite(new Civilization({
-            wealth: CL.LOW, // payment for arms
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
             army: CL.HIGH, // gain military knowledge
             navy: CL.HIGH, // gain new ships
             technology: CL.SLIGHTLY_HIGH,
+            taxes: CL.HIGH
         }))
-        this.completeEffects[1].civilizationMultipliers.overwrite(new Civilization({
+        this.completeEffects[1].civilizationMultipliers.multiply(new Civilization({
             wealth: CL.HIGH, // payment received
             navy: CL.LOW, // sold ships
             army: CL.LOW,

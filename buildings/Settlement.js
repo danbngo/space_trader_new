@@ -5,6 +5,7 @@
 class Settlement {
     /**
      * @param {Planet} planet - The planet this settlement is on.
+     * @param {SettlementType} settlementType - The type of settlement.
      * @param {Shipyard} shipyard - The shipyard building.
      * @param {Market} market - The market building.
      * @param {Market} blackMarket - The black market building.
@@ -16,9 +17,11 @@ class Settlement {
      * @param {CyberSurgeon} cyberSurgeon - The cyber surgeon building.
      * @param {Palace} palace - The palace building.
      */
-    constructor(planet = new Planet(), shipyard = null, market = null, blackMarket = null, guild = null, bank = null, courthouse = null, academy = null, tavern = null, cyberSurgeon = null, palace = null) {
+    constructor(planet = new Planet(), settlementType = null, shipyard = null, market = null, blackMarket = null, guild = null, bank = null, courthouse = null, academy = null, tavern = null, cyberSurgeon = null, palace = null) {
         /** @type {Planet} */
         this.planet = planet;
+        /** @type {SettlementType} */
+        this.settlementType = settlementType;
         /** @type {Shipyard} */
         this.shipyard = shipyard;
         /** @type {Market} */

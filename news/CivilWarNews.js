@@ -53,6 +53,7 @@ class CivilWarNews extends News {
             crime: CL.HIGH,
             wealth: CL.LOW,
             prestige: CL.LOW,
+            taxes: CL.HIGH,
         }))
     }
 

@@ -41,6 +41,7 @@ class ColonizationNews extends News {
             navy: CL.NO_REGRESSION,
             wealth: CL.NO_REGRESSION,
             prestige: CL.SLIGHTLY_LOW,
+            taxes: CL.SLIGHTLY_HIGH,
         }))
    }
 

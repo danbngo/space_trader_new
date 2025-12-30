@@ -19,15 +19,12 @@ class ConscriptionNews extends News {
                 })
             })
         ]
-        this.completeEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    army: CL.VERY_HIGH,
-                    navy: CL.HIGH,
-                })
-            })
-        ]
+        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
+            army: CL.VERY_HIGH,
+            navy: CL.HIGH,
+            taxes: CL.HIGH
+        }))
         
         // Failed: riots force abandonment, no military gain
         this.failEffects = this.startEffects.map(fx=> fx.getInverse())
