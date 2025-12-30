@@ -41,12 +41,12 @@ class CivilStrifeNews extends News {
     }
 
     determineOutcome() {
-        const {planet} = this
+        const {planet: p} = this
         this.rollOutcome(planet.civilization.military*planet.civilization.security, CL.MEDIUM)
     }
 
     isValid() {
-        const {planet} = this
+        const {planet: p} = this
         //more likely if security is too high
         const ratingsValid = planet.civilization.security > CL.HIGH
         //planet must not already be in anarchy or puppet state

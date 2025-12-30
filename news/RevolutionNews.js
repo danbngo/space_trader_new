@@ -62,14 +62,14 @@ class RevolutionNews extends News {
     }
 
     determineOutcome() {
-        const {planet} = this
+        const {planet: p} = this
         // Higher military and prestige = more likely to succeed
         const successProbability = (planet.civilization.military + planet.civilization.prestige) / 2
         this.failed = Math.random() > successProbability
     }
 
     isValid() {
-        const {planet} = this
+        const {planet: p} = this
         //a generally robust economy/govt less prone to this
         const ratingsValid = planet.civilization.security < CL.MEDIUM || planet.civilization.military < CL.MEDIUM || planet.civilization.prestige < CL.MEDIUM || planet.civilization.crime > CL.MEDIUM || planet.civilization.security < CL.MEDIUM || planet.civilization.economy < CL.MEDIUM
         //planet must not be puppet state (anarcy is fine otherwise how do we get back out of it)

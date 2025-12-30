@@ -67,7 +67,7 @@ class NewsEffect {
         this.civilizationMultipliers = civilizationMultipliers;
     }
 
-    apply() {
+    apply(elapsedYears = 0) {
         const {planet, targetPlanet, newGovernmentType, newRelationship, 
             buildingsDisabled, buildingsEnabled, relationsReset, forcePeace, forceWithdrawal, onApply,
             civilizationMultipliers} = this;

@@ -66,7 +66,7 @@ class ResearchAgreementNews extends News {
     }
 
     determineOutcome() {
-        const {planet, targetPlanet} = this
+        const {planet: p, targetPlanet: tp} = this
         // Check if relationship deteriorated
         const rel1 = planet.civilization.relationships.get(targetPlanet)
         const rel2 = targetPlanet.civilization.relationships.get(planet)
@@ -82,7 +82,7 @@ class ResearchAgreementNews extends News {
     }
 
     isValid() {
-        const {planet, targetPlanet} = this
+        const {planet: p, targetPlanet: tp} = this
         //planets must be neutral or allied towards each other
         const relationships = [planet.civilization.relationships.get(targetPlanet), targetPlanet.civilization.relationships.get(planet)]
         const relationshipsValid = relationships.every(r => r == RELATIONSHIP_TYPES.NEUTRAL || r == RELATIONSHIP_TYPES.ALLY)

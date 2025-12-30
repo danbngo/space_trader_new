@@ -66,7 +66,7 @@ class ImmigrationNews extends News {
     }
 
     determineOutcome() {
-        const {planet, targetPlanet} = this
+        const {planet: p, targetPlanet: tp} = this
         // Check if relationship deteriorated
         const rel1 = planet.civilization.relationships.get(targetPlanet)
         const rel2 = targetPlanet.civilization.relationships.get(planet)
@@ -81,7 +81,7 @@ class ImmigrationNews extends News {
     }
 
     isValid() {
-        const {planet, targetPlanet} = this
+        const {planet: p, targetPlanet: tp} = this
         // Source must have population to give, target must have economic opportunity
         const ratingsValid = planet.civilization.population < CL.HIGH && planet.civilization.economy > CL.SLIGHTLY_HIGH && targetPlanet.civilization.population > CL.LOW
         // Must not be at war

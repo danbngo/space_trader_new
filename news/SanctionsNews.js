@@ -68,7 +68,7 @@ class SanctionsNews extends News {
     }
 
     determineOutcome() {
-        const {planet, targetPlanet} = this
+        const {planet: p, targetPlanet: tp} = this
         // Check if relationship improved
         const rel = planet.civilization.relationships.get(targetPlanet)
         if (rel === RELATIONSHIP_TYPES.NEUTRAL || rel === RELATIONSHIP_TYPES.ALLY) {
@@ -81,7 +81,7 @@ class SanctionsNews extends News {
     }
 
     isValid() {
-        const {planet, targetPlanet} = this
+        const {planet: p, targetPlanet: tp} = this
         //we need a strong economy to pull it off
         const ratingsValid = planet.civilization.economy > CL.HIGH && planet.civilization.wealth >= CL.HIGH
         //aggressor must be hostile towards victim

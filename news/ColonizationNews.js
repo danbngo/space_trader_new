@@ -38,13 +38,13 @@ class ColonizationNews extends News {
     }
 
     determineOutcome() {
-        const {planet} = this
+        const {planet: p} = this
         //better navy and economy (logistics) helps
         this.rollOutcome((planet.civilization.navy*planet.civilization.economy), CL.SLIGHTLY_LOW)
     }
 
     isValid() {
-        const {planet} = this
+        const {planet: p} = this
         const ratingsValid = planet.civilization.population > CL.MEDIUM && (planet.civilization.navy > CL.MEDIUM)
         //basically dont do it if ANYTHING bad is happening
         const interferingEvent = 

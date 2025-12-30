@@ -43,7 +43,7 @@ class DisarmamentNews extends News {
     }
 
     determineOutcome() {
-        const {planet} = this
+        const {planet: p} = this
         // Disarmament fails if tensions arise
         let tensionsDetected = false
         for (const p of gs.system.planets) {
@@ -59,7 +59,7 @@ class DisarmamentNews extends News {
     }
 
     isValid() {
-        const {planet} = this
+        const {planet: p} = this
         //unlikely if planet has a low military already
         const ratingsValid = (planet.civilization.military > CL.HIGH) && (planet.civilization.navy > CL.HIGH)
         const interferingEvent =

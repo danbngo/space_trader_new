@@ -35,7 +35,7 @@ class GenocideNews extends News {
     }
 
     isValid() {
-        const {planet} = this
+        const {planet: p} = this
         //more likely if security is very low (except in a police state)
         const ratingsValid = planet.civilization.military > CL.MEDIUM && planet.civilization.security < CL.VERY_LOW
         //planet must not already be in anarchy or puppet state

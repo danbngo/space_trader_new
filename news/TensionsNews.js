@@ -40,7 +40,7 @@ class TensionsNews extends News {
     }
 
     determineOutcome() {
-        const {planet, targetPlanet} = this
+        const {planet: p, targetPlanet: tp} = this
         // Check if relationships improved (became allies) or escalated to war
         const currentRel1 = planet.civilization.relationships.get(targetPlanet)
         const currentRel2 = targetPlanet.civilization.relationships.get(planet)
@@ -49,7 +49,7 @@ class TensionsNews extends News {
     }
 
     isValid(ignorePolitics = false) {
-        const {planet, targetPlanet} = this
+        const {planet: p, targetPlanet: tp} = this
         //cant have same government type or be a puppet
         const governmentsValid = planet.civilization.governmentType != targetPlanet.civilization.governmentType
 
@@ -63,7 +63,7 @@ class TensionsNews extends News {
     }
 
     isValidEnd() {
-        const {planet, targetPlanet} = this
+        const {planet: p, targetPlanet: tp} = this
         //can only end if planets are not actively at war
         const relationshipsValid = planet.civilization.relationships.get(targetPlanet) != RELATIONSHIP_TYPES.WAR && targetPlanet.civilization.relationships.get(planet) != RELATIONSHIP_TYPES.WAR
         return relationshipsValid

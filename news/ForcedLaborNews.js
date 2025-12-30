@@ -42,14 +42,14 @@ class ForcedLaborNews extends News {
     }
 
     determineOutcome() {
-        const {planet} = this
+        const {planet: p} = this
         // Forced labor fails if security too low (revolts succeed)
         const revoltProbability = (1 - planet.civilization.security) * 0.4
         this.failed = Math.random() < revoltProbability
     }
 
     isValid() {
-        const {planet} = this
+        const {planet: p} = this
         // More likely if industry is low (trying to industrialize)
         const ratingsValid = planet.civilization.industry < CL.LOW
         // Authoritarian governments, police states, and communist states would do this

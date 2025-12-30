@@ -43,13 +43,13 @@ class MilitaryBuildupNews extends News {
     }
 
     determineOutcome() {
-        const {planet} = this
+        const {planet: p} = this
         // Buildup fails if economy collapses during the process
         const failProbability = (1 - planet.civilization.economy) * 0.35
         this.failed = Math.random() < failProbability
     }
     isValid() {
-        const {planet} = this
+        const {planet: p} = this
         //dont do it if military is already big
         const ratingsValid = (planet.civilization.military < CL.MEDIUM) && (planet.civilization.prestige < CL.VERY_HIGH)
         //dont do it if no government are tense with us or vice versa

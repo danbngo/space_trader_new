@@ -33,16 +33,16 @@ class AddictionNews extends News {
     }
 
     determineOutcome() {
-        const {planet} = this
+        const {planet: p} = this
         // Higher security and culture helps mitigate
-        this.rollOutcome(planet.civilization.security*planet.civilization.culture, CL.MEDIUM)
+        this.rollOutcome(p.civilization.security*p.civilization.culture, CL.MEDIUM)
     }
 
     isValid() {
-        const {planet} = this
+        const {planet: p} = this
         //more likely if high drug availability
-        const ratingsValid = (planet.civilization.crime*planet.civilization.corruption/planet.civilization.security) > CL.HIGH
-        const interferingEvent = News.planetHasAnyNews(planet, [NT.ADDICTION, ...NT_CRIME_PREVENTING])
+        const ratingsValid = (p.civilization.crime*p.civilization.corruption/p.civilization.security) > CL.HIGH
+        const interferingEvent = News.planetHasAnyNews(p, [NT.ADDICTION, ...NT_CRIME_PREVENTING])
         return ratingsValid && !interferingEvent
     }
 }

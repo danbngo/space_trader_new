@@ -95,7 +95,7 @@ class WarSubjugationNews extends News {
     }
 
     determineOutcome() {
-        const {planet, targetPlanet} = this
+        const {planet: p, targetPlanet: tp} = this
         // Check if war still ongoing
         const stillAtWar = planet.civilization.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
         if (!stillAtWar) {
@@ -108,7 +108,7 @@ class WarSubjugationNews extends News {
     }
 
     isValid() {
-        const {planet, targetPlanet} = this
+        const {planet: p, targetPlanet: tp} = this
         //our army must be both large and  significantly better than theirs in every way
         const ratingsValid = (planet.civilization.army/targetPlanet.civilization.army > CL.HIGH) && (planet.civilization.navy/targetPlanet.civilization.navy > CL.HIGH)
         //planet must be at war with the target

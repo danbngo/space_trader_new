@@ -88,14 +88,14 @@ class PolicyChangeNews extends News {
     }
 
     determineOutcome() {
-        const {planet} = this
+        const {planet: p} = this
         // Higher prestige, culture, and stability make policy changes more likely to succeed
         const successProbability = (planet.civilization.prestige + planet.civilization.culture + planet.civilization.security) / 3
         this.rollOutcome(successProbability, CL.MEDIUM)
     }
 
     isValid() {
-        const {planet} = this
+        const {planet: p} = this
         // More likely during stable times with decent prestige
         const ratingsValid = planet.civilization.prestige > CL.LOW && planet.civilization.security > CL.LOW
         

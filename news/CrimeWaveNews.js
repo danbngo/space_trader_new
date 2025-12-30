@@ -35,12 +35,12 @@ class CrimeWaveNews extends News {
     }
 
     determineOutcome() {
-        const {planet} = this
+        const {planet: p} = this
         this.rollOutcome(planet.civilization.security*planet.civilization.culture*planet.civilization.economy)
     }
 
     isValid() {
-        const {planet} = this
+        const {planet: p} = this
         //wont happen if crime or security is already high
         const povertyValid = planet.civilization.wealth < CL.MEDIUM
         const ratingsValid = planet.settlement.cryme < CL.MEDIUM && planet.civilization.security < CL.MEDIUM

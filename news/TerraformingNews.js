@@ -40,14 +40,14 @@ class TerraformingNews extends News {
     }
 
     determineOutcome() {
-        const {planet} = this
+        const {planet: p} = this
         // Higher industry and officer quality = more likely to succeed
         const successProbability = (planet.civilization.industry + planet.civilization.education) / 2
         this.failed = Math.random() > successProbability
     }
 
     isValid() {
-        const {planet} = this
+        const {planet: p} = this
         // Need sufficient ships, officers, and credits to undertake terraforming
         const ratingsValid = planet.civilization.navy > CL.MEDIUM && 
                             planet.civilization.army > CL.MEDIUM && 

@@ -7,6 +7,8 @@ class SystemWidePlague extends News {
         super(
             ''+colorSpan(`${gs.system.name} ERUPTS INTO A SYSTEM-WIDE PLAGUE!`, COLORS.Red),
             ''+colorSpan(`${gs.system.name}'S SYSTEM-WIDE PLAGUE ENDS!`, COLORS.Green),
+            '',
+            '',
             META_NT.SYSTEM_WIDE_PLAGUE
         )
 
@@ -20,17 +22,13 @@ class SystemWidePlague extends News {
             }),
         ]
 
-        this.ongoingEffects = [
-            new NewsEffect({
-                onApply: (elapsedYears)=>{
-                    const numPlaguesToStart = calcOccurrencesPerTimespan(SystemWidePlague.AVERAGE_ADDITIONAL_PLAGUES_PER_YEAR, elapsedYears)
-                    if (numPlaguesToStart < 1) return
-                    const plagues = SystemWidePlague.getPlaguesToSpread(numPlaguesToStart)
-                    if (plagues.length > 0) SimpleNews.add(''+colorSpan(`${gs.system.name}'S SYSTEM-WIDE PLAGUE SPREADS!`, COLORS.Red))
-                    for (const p of plagues) p.start()
-                }
-            })
-        ]
+        this.onTick = (elapsedYears)=>{
+            const numPlaguesToStart = calcOccurrencesPerTimespan(SystemWidePlague.AVERAGE_ADDITIONAL_PLAGUES_PER_YEAR, elapsedYears)
+            if (numPlaguesToStart < 1) return
+            const plagues = SystemWidePlague.getPlaguesToSpread(numPlaguesToStart)
+            if (plagues.length > 0) SimpleNews.add(''+colorSpan(`${gs.system.name}'S SYSTEM-WIDE PLAGUE SPREADS!`, COLORS.Red))
+            for (const p of plagues) p.start()
+        }
 
         this.completeEffects = [
             new NewsEffect({

@@ -70,7 +70,7 @@ class CoupDetatNews extends News {
     }
 
     determineOutcome() {
-        const {planet, targetPlanet} = this
+        const {planet: p, targetPlanet: tp} = this
         // Coup fails if target has high security or military
         const resistanceProbability = (targetPlanet.civilization.security + targetPlanet.civilization.military) / 2
         const failProbability = resistanceProbability * 0.4
@@ -79,7 +79,7 @@ class CoupDetatNews extends News {
     }
 
     isValid() {
-        const {planet, targetPlanet} = this
+        const {planet: p, targetPlanet: tp} = this
         // Aggressor must have high prestige, target must have lowER prestige
         const ratingsValid = (planet.civilization.prestige > CL.HIGH) && (planet.civilization.security > CL.MEDIUM) && (planet.civilization.security > targetPlanet.civilization.security)
         // Target must have opposing government type - nevermind, CIA flouts this all the time

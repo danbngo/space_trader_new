@@ -7,6 +7,8 @@ class SystemAtWarNews extends News {
         super(
             ''+colorSpan(`${gs.system.name} ERUPTS INTO TOTAL WAR!`, COLORS.Red),
             ''+colorSpan(`${gs.system.name}'S TOTAL WAR ENDS!`, COLORS.Green),
+            '',
+            '',
             META_NT.SYSTEM_AT_WAR
         )
 
@@ -21,18 +23,14 @@ class SystemAtWarNews extends News {
             }),
         ]
 
-        this.ongoingEffects = [
-            new NewsEffect({
-                onApply: (elapsedYears)=>{
-                    console.log('world war tick')
-                    const numWarsToStart = calcOccurrencesPerTimespan(SystemAtWarNews.AVERAGE_ADDITIONAL_WARS_PER_YEAR, elapsedYears)
-                    if (numWarsToStart < 1) return
-                    const wars = SystemAtWarNews.getWarsToSpread(numWarsToStart)
-                    if (wars.length > 0) SimpleNews.add(''+colorSpan(`${gs.system.name}'S TOTAL WAR SPREADS!`, COLORS.Red))
-                    for (const w of wars) w.start()
-                }
-            })
-        ]
+        this.onTick = (elapsedYears)=>{
+            console.log('world war tick')
+            const numWarsToStart = calcOccurrencesPerTimespan(SystemAtWarNews.AVERAGE_ADDITIONAL_WARS_PER_YEAR, elapsedYears)
+            if (numWarsToStart < 1) return
+            const wars = SystemAtWarNews.getWarsToSpread(numWarsToStart)
+            if (wars.length > 0) SimpleNews.add(''+colorSpan(`${gs.system.name}'S TOTAL WAR SPREADS!`, COLORS.Red))
+            for (const w of wars) w.start()
+        }
 
 
         this.completeEffects = [

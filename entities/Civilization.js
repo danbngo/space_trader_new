@@ -147,4 +147,10 @@ class Civilization {
     static areTenseOrAtWar(p1 = new Planet(), p2 = new Planet()) {
         return Civilization.areTense(p1, p2) || Civilization.areAtWar(p1, p2)
     }
+    static areAlliesOrNeutral(p1 = new Planet(), p2 = new Planet()) {
+        return Civilization.areAllies(p1, p2) || Civilization.areNeutral(p1, p2)
+    }
+    static areOpposingGovernments(p1 = new Planet(), p2 = new Planet()) {
+        return (p1.civilization.governmentType.opposingType === p2.civilization.governmentType || p2.civilization.governmentType.opposingType === p1.civilization.governmentType)
+    }
 }

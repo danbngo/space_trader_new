@@ -69,7 +69,7 @@ class InvestmentNews extends News {
     }
 
     determineOutcome() {
-        const {planet, targetPlanet} = this
+        const {planet: p, targetPlanet: tp} = this
         // Check if relationship deteriorated
         const rel1 = planet.civilization.relationships.get(targetPlanet)
         const rel2 = targetPlanet.civilization.relationships.get(planet)
@@ -84,7 +84,7 @@ class InvestmentNews extends News {
     }
 
     isValid() {
-        const {planet, targetPlanet} = this
+        const {planet: p, targetPlanet: tp} = this
         //need to have sufficient economy of our own
         const ratingsValid = planet.civilization.wealth >= CL.SLIGHTLY_HIGH || planet.settlement.market.baseCargo.average/MARKET_AVERAGE_CARGO_PER_TYPE > CL.SLIGHTLY_HIGH
         //our economy should be larger than theirs

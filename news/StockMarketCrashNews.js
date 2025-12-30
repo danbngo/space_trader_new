@@ -29,7 +29,7 @@ class StockMarketCrashNews extends News {
     }
 
     isValid() {
-        const {planet} = this
+        const {planet: p} = this
         // More likely when credit is very high (bubble about to burst)
         const ratingsValid = 
             (planet.civilization.wealth) > 1.5 

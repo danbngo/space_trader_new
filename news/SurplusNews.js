@@ -41,13 +41,13 @@ class SurplusNews extends News {
     }
 
     determineOutcome() {
-        const {planet} = this
+        const {planet: p} = this
         // Surplus fails (goes bust) with small probability
         this.failed = Math.random() < 0.15
     }
 
     isValid() {
-        const {planet} = this
+        const {planet: p} = this
         //we needed to be resource scarce to be looking for them so hard
         const ratingsValid = planet.settlement.market.baseCargo.average/MARKET_AVERAGE_CARGO_PER_TYPE < CL.LOW
         //more for flavor than anything, irl you could find goodies at any time

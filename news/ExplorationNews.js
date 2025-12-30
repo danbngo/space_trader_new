@@ -44,14 +44,14 @@ class ExplorationNews extends News {
     }
 
     determineOutcome() {
-        const {planet} = this
+        const {planet: p} = this
         // Higher prestige and officer quality = more likely to succeed
         const successProbability = (planet.civilization.prestige + planet.civilization.education) / 2
         this.failed = Math.random() > successProbability
     }
 
     isValid() {
-        const {planet} = this
+        const {planet: p} = this
         const ratingsValid = planet.civilization.army > CL.MEDIUM && planet.civilization.wealth > CL.MEDIUM
         //basically don't do it if anything bad is happening
         const interferingEvent = 

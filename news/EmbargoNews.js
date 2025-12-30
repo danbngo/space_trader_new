@@ -52,7 +52,7 @@ class EmbargoNews extends News {
     }
 
     determineOutcome() {
-        const {planet, targetPlanet} = this
+        const {planet: p, targetPlanet: tp} = this
         // Check if relationship improved to neutral
         const rel = planet.civilization.relationships.get(targetPlanet)
         if (rel === RELATIONSHIP_TYPES.NEUTRAL || rel === RELATIONSHIP_TYPES.ALLY) {
@@ -61,7 +61,7 @@ class EmbargoNews extends News {
     }
 
     isValid() {
-        const {planet, targetPlanet} = this
+        const {planet: p, targetPlanet: tp} = this
         //need to have enough ships for it
         const ratingsValid = planet.civilization.military > CL.MEDIUM
         //cant be anarchic or puppet state

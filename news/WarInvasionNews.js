@@ -61,7 +61,7 @@ class WarInvasionNews extends News {
     }
 
     determineOutcome() {
-        const {planet, targetPlanet} = this
+        const {planet: p, targetPlanet: tp} = this
         // Check if peace was forced (relationships changed during invasion)
         const currentRel1 = planet.civilization.relationships.get(targetPlanet)
         const currentRel2 = targetPlanet.civilization.relationships.get(planet)
@@ -69,7 +69,7 @@ class WarInvasionNews extends News {
     }
 
     isValid() {
-        const {planet, targetPlanet} = this
+        const {planet: p, targetPlanet: tp} = this
         // Must be at war
         const relationshipValid = planet.civilization.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
         // Must have an ongoing war event

@@ -51,7 +51,7 @@ class IsolationismNews extends News {
     }
 
     determineOutcome() {
-        const {planet} = this
+        const {planet: p} = this
         // Isolationism fails if external threats emerge
         let threatsDetected = false
         for (const p of gs.system.planets) {
@@ -67,7 +67,7 @@ class IsolationismNews extends News {
     }
 
     isValid() {
-        const {planet} = this
+        const {planet: p} = this
         //more likely after population collapse or being stretched thin
         const ratingsValid = planet.civilization.population < CL.SLIGHTLY_HIGH && planet.civilization.territory > CL.HIGH
         //must not be a puppet state or anarchic

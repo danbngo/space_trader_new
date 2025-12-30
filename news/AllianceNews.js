@@ -59,22 +59,13 @@ class AllianceNews extends News {
     }
 
     isValid() {
-        const {planet, targetPlanet} = this
+        const {planet: p, targetPlanet: tp} = this
         //both planets must be currently neutral towards each other
-        const relationships = [planet.civilization.relationships.get(targetPlanet), targetPlanet.civilization.relationships.get(planet)]
+        const relationships = [p.civilization.relationships.get(tp), tp.civilization.relationships.get(p)]
         const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.NEUTRAL)
         //never ally with an opposing govt OR someone who is allied to one!!!
-        const opposingGovernmentsValid = 
-            (planet.civilization.governmentType.opposingType !== targetPlanet.civilization.governmentType)
-            && (targetPlanet.civilization.governmentType.opposingType !== planet.civilization.governmentType)
-        /*const alliedToOpposingGovtValid = 
-            !(this.getAllies(targetPlanet).some(ally => ally.civilization.governmentType === planet.civilization.governmentType.opposingType))
-            && !(this.getAllies(planet).some(ally => ally.civilization.governmentType === targetPlanet.civilization.governmentType.opposingType))*/
-        const alliedToOpposingGovtValid = true //was a bit too harsh earlier
-        //most of the below shouldnt be possible based on above checked but just in case
-        const interferingEvent = 
-            News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.ALLIANCE, ...NT_COOPERATION_PREVENTING]) || 
-            News.hasNews(NT.PLAGUE, planet) || News.hasNews(NT.PLAGUE, targetPlanet)
-        return opposingGovernmentsValid && relationshipsValid && alliedToOpposingGovtValid && !interferingEvent
+        const opposingGovernmentsValid = !Civilization.areOpposingGovernments(p, tp)
+        const interferingEvent = News.hasAnyNewsBidirectional(p, tp, [NT.ALLIANCE, ...NT_COOPERATION_PREVENTING])
+        return opposingGovernmentsValid && relationshipsValid && !interferingEvent
     }
 }

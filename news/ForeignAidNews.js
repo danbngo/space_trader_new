@@ -47,14 +47,14 @@ class ForeignAidNews extends News {
     }
 
     determineOutcome() {
-        const {planet} = this
+        const {planet: p} = this
         // Aid fails if governance is too weak (low security means corruption)
         const failProbability = (1 - planet.civilization.security) * 0.4
         this.failed = Math.random() < failProbability
     }
 
     isValid() {
-        const {planet} = this
+        const {planet: p} = this
         //more likely to happen when economy is poor and has some prestige to burn
         const economyValid = planet.civilization.economy < CL.LOW && planet.civilization.industry < CL.LOW && planet.civilization.wealth < CL.LOW
         const prestigeValid = planet.civilization.prestige > CL.LOW

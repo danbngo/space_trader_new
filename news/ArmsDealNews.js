@@ -11,24 +11,24 @@ class ArmsDealNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                prestige: CL.SLIGHTLY_LOW,
+                civilizationMultipliers: new Civilization({
+                    prestige: CL.SLIGHTLY_LOW,
+                })
             }),
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
 
-        Object.assign(this.completeEffects[0], {
+        Object.assign(this.completeEffects[0].civilizationMultipliers, {
             wealth: CL.LOW, // payment for arms
             army: CL.HIGH, // gain military knowledge
             navy: CL.HIGH, // gain new ships
-            crime: CL.HIGH,
-            corruption: CL.LOW,
+            technology: CL.SLIGHTLY_HIGH,
         })
-        Object.assign(this.completeEffects[1], {
+        Object.assign(this.completeEffects[1].civilizationMultipliers, {
             wealth: CL.HIGH, // payment received
             navy: CL.LOW, // sold ships
-            crime: CL.LOW,
-            corruption: CL.LOW,
+            army: CL.LOW,
         })
 
         // Failed: seller refuses to sell
@@ -38,32 +38,26 @@ class ArmsDealNews extends News {
         this.cancelEffects = []
     }
 
+    shouldCancel() {
+        return (Civilization.areTenseOrAtWar(this.planet, this.targetPlanet))
+    }
+
     determineOutcome() {
-        const {planet, targetPlanet} = this
-        // Check if relationship deteriorated
-        const rel1 = planet.civilization.relationships.get(targetPlanet)
-        const rel2 = targetPlanet.civilization.relationships.get(planet)
-        if (rel1 === RELATIONSHIP_TYPES.TENSE || rel1 === RELATIONSHIP_TYPES.WAR ||
-            rel2 === RELATIONSHIP_TYPES.TENSE || rel2 === RELATIONSHIP_TYPES.WAR) {
-            this.cancelled = true
-            return
-        }
         // Fail if targetPlanet refuses to sell - based on planet's low prestige/credits
         // Lower prestige and credits increase the chance seller refuses
-        this.rollOutcome(planet.civilization.prestige*planet.civilization.wealth, CL.MEDIUM)
+        this.rollOutcome(this.planet.civilization.prestige*this.planet.civilization.wealth, CL.MEDIUM)
     }
 
     isValid() {
-        const {planet, targetPlanet} = this
+        const {planet: p, targetPlanet: tp} = this
         //targetPlanet (seller) needs to have sufficient military to sell
-        const ratingsValid = (targetPlanet.civilization.navy >= CL.HIGH || targetPlanet.civilization.navy > CL.HIGH) && targetPlanet.settlement.cryme > CL.MEDIUM
+        const ratingsValid = (tp.civilization.navy >= CL.SLIGHTLY_HIGH && tp.civilization.technology > CL.SLIGHTLY_HIGH)
         //seller's military should be larger than purchaser's
-        const transferValid = targetPlanet.civilization.military > planet.civilization.military && targetPlanet.civilization.navy > planet.civilization.navy
+        const transferValid = tp.civilization.navy/p.civilization.navy > CL.SLIGHTLY_HIGH && tp.civilization.technology/p.civilization.technology > CL.SLIGHTLY_HIGH
         //both planets must be neutral or allies
-        const relationships = [planet.civilization.relationships.get(targetPlanet), targetPlanet.civilization.relationships.get(planet)]
-        const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.NEUTRAL || rel == RELATIONSHIP_TYPES.ALLY)
+        const relationshipsValid = Civilization.areAlliesOrNeutral(p, tp)
         const interferingEvent = 
-            News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.ARMS_DEAL, ...NT_COOPERATION_PREVENTING])
+            News.hasAnyNewsBidirectional(p, tp, [NT.ARMS_DEAL, ...NT_COOPERATION_PREVENTING])
         return transferValid && ratingsValid && relationshipsValid && !interferingEvent
     }
 }

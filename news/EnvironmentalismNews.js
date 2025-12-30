@@ -38,14 +38,14 @@ class EnvironmentalismNews extends News {
     }
 
     determineOutcome() {
-        const {planet} = this
+        const {planet: p} = this
         // Movement fails if economy becomes too weak to sustain
         const failProbability = (1 - planet.civilization.economy) * 0.35
         this.failed = Math.random() < failProbability
     }
 
     isValid() {
-        const {planet} = this
+        const {planet: p} = this
         //happens when industry is getting out of hand
         const ratingsValid = planet.civilization.industry >= CL.HIGH
         const interferingEvent = News.planetHasAnyNews(planet, [NT.ENVIRONMENTALISM, ...NT_ECONOMY_PREVENTING])

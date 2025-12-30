@@ -43,11 +43,11 @@ class CivilWarNews extends News {
     }
 
     determineOutcome() {
-        const {planet} = this
+        const {planet: p} = this
         this.rollOutcome(0.5*(planet.civilization.security+planet.civilization.culture)/planet.civilization.population, CL.HIGH)
     }
     isValid() {
-        const {planet} = this
+        const {planet: p} = this
         //usually happens when military or security is large
         const ratingsValid = planet.civilization.military > CL.VERY_HIGH || planet.civilization.security > CL.VERY_HIGH
         //cant be having any of: construction, economic boom, revolution

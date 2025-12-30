@@ -83,7 +83,7 @@ class WarBombardmentNews extends News {
     }
 
     determineOutcome() {
-        const {planet, targetPlanet} = this
+        const {planet: p, targetPlanet: tp} = this
         // Check if peace was forced (relationships changed during bombardment)
         const currentRel1 = planet.civilization.relationships.get(targetPlanet)
         const currentRel2 = targetPlanet.civilization.relationships.get(planet)
@@ -91,7 +91,7 @@ class WarBombardmentNews extends News {
     }
 
     isValid() {
-        const {planet, targetPlanet} = this
+        const {planet: p, targetPlanet: tp} = this
         //our military must be significantly stronger than theirs and navy must be MUCH stronger
         const navyAdvantage = planet.civilization.military > targetPlanet.civilization.military * CL.HIGH && planet.civilization.navy > targetPlanet.civilization.navy * CL.VERY_HIGH
         

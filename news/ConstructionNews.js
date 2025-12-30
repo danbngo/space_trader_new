@@ -36,13 +36,13 @@ class ConstructionNews extends News {
     }
 
     determineOutcome() {
-        const {planet} = this
+        const {planet: p} = this
         // Higher economy = more likely to succeed
         this.rollOutcome(planet.civilization.economy, CL.LOW)
     }
 
     isValid() {
-        const {planet} = this
+        const {planet: p} = this
         //must be missing at least one building OR industry is low and credits are high
         const buildingsValid = News.calcRepairableBuildings(planet).length > 0
         const ratingsValid = planet.civilization.industry < CL.LOW && (planet.settlement.reserves > CL.SLIGHTLY_HIGH || planet.civilization.wealth > CL.SLIGHTLY_HIGH)

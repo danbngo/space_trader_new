@@ -69,7 +69,7 @@ class WarNews extends News {
     }
 
     determineOutcome() {
-        const {planet, targetPlanet} = this
+        const {planet: p, targetPlanet: tp} = this
         // Check if peace was forced (relationships changed during war)
         const currentRel1 = planet.civilization.relationships.get(targetPlanet)
         const currentRel2 = targetPlanet.civilization.relationships.get(planet)
@@ -77,7 +77,7 @@ class WarNews extends News {
     }
 
     isValid(ignorePolitics = false) {
-        const {planet, targetPlanet} = this
+        const {planet: p, targetPlanet: tp} = this
         //planets tend not to want to go to war with stronger ones
         const prestigeValid = planet.civilization.prestige > targetPlanet.civilization.prestige || planet.civilization.military > targetPlanet.civilization.military
         //must not have same form of government

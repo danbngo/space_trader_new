@@ -78,7 +78,7 @@ class ImperialismNews extends News {
     }
 
     determineOutcome() {
-        const {planet, targetPlanet} = this
+        const {planet: p, targetPlanet: tp} = this
         // Check if peace declared
         const rel = planet.civilization.relationships.get(targetPlanet)
         if (rel === RELATIONSHIP_TYPES.NEUTRAL || rel === RELATIONSHIP_TYPES.ALLY) {
@@ -91,7 +91,7 @@ class ImperialismNews extends News {
     }
 
     isValid() {
-        const {planet, targetPlanet} = this
+        const {planet: p, targetPlanet: tp} = this
         //aggressor needs high military and low territory, victim needs territory to take
         const ratingsValid = (planet.civilization.military > CL.SLIGHTLY_HIGH) && (planet.civilization.territory < CL.HIGH) && (targetPlanet.civilization.territory > CL.SLIGHTLY_LOW)
         //aggressor must have at least 1.5x the military of victim

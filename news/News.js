@@ -38,8 +38,6 @@ class News {
         this.completeEffects = [];
         /** @type {NewsEffect[]} */
         /** @type {NewsEffect[]} */
-        this.ongoingEffects = []
-        /** @type {NewsEffect[]} */
         this.failEffects = [];
         /** @type {NewsEffect[]} */
         this.cancelEffects = [];
@@ -55,6 +53,7 @@ class News {
         this.endAsap = false;
         /** @type {number|null} */
         this.endedYear = null;
+        this.onTick = (elapsedYears = 1)=>{}
     }
 
     /**
@@ -118,6 +117,10 @@ class News {
         return (this.started && !this.ended && (this.expired || this.endAsap) && this.isValidEnd())
     }
 
+    shouldCancel() {
+        //implement in local news files
+    }
+
     /**
      * Applies ongoing effects for this news event.
      * @param {number} elapsedYears - Years elapsed since last update.
@@ -131,6 +134,11 @@ class News {
         }
     }
 
+    cancel() {
+        this.cancelled = true
+        this.end()
+    }
+
     /**
      * Ends the news event, applying appropriate end effects based on failure/cancellation state.
      * @throws {Error} If the event hasn't started yet.
@@ -142,16 +150,16 @@ class News {
         this.endedYear = gs.year
         
         // Determine the ending state (failed, cancelled, or normal)
-        //this.determineOutcome()
+        this.determineOutcome()
         
         // Select which effects to apply based on the ending state
         let effectsToApply = this.completeEffects
-        if (this.failed && this.failEffects.length > 0) {
-            effectsToApply = this.failEffects
-        } else if (this.cancelled && this.cancelEffects.length > 0) {
+        if (this.cancelled && this.cancelEffects.length > 0) {
             effectsToApply = this.cancelEffects
         }
-        
+        else if (this.failed && this.failEffects.length > 0) {
+            effectsToApply = this.failEffects
+        }
         if (effectsToApply.length == 0) return; //no end effects to apply, dont update feeds
         //gs.system.newsFeed.push(this.endDescription)
         for (const fx of effectsToApply) {
@@ -307,7 +315,8 @@ class News {
         //console.log('found news items to end:',newsToEnd)
         for (const n of newsToEnd) {
             n.endAsap = true
-            if (n.shouldEnd()) n.end()
+            if (n.shouldCancel()) n.cancel()
+            else if (n.shouldEnd()) n.end()
         }
     }
 
@@ -326,7 +335,8 @@ class News {
         //console.log('found news items to end:',newsToEnd)
         for (const n of newsToEnd) {
             n.endAsap = true
-            if (n.shouldEnd()) n.end()
+            if (n.shouldCancel()) n.cancel()
+            else if (n.shouldEnd()) n.end()
         }
     }
 
@@ -339,6 +349,9 @@ class News {
         //remove anything older than the threshold
         const ancientHistory = []
         for (const news of gs.system.news) {
+            if (news.shouldCancel()) {
+                news.cancel()
+            }
             if (news.shouldEnd()) {
                 news.end()
             }

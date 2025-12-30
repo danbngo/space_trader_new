@@ -44,14 +44,14 @@ class EconomicBoomNews extends News {
     }
 
     determineOutcome() {
-        const {planet} = this
+        const {planet: p} = this
         // Higher industry and economy = more sustainable boom
         const sustainProbability = (planet.civilization.industry + planet.civilization.economy) / 2
         this.failed = Math.random() > sustainProbability
     }
 
     isValid() {
-        const {planet} = this
+        const {planet: p} = this
         //cant already having a booming economy
         const ratingsValid = planet.civilization.economy < CL.VERY_HIGH && planet.civilization.wealth < CL.VERY_HIGH
         //basically just a bonus for not being in a war or anything stupid

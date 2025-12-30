@@ -58,7 +58,7 @@ class LudditismNews extends News {
     }
 
     determineOutcome() {
-        const {planet} = this
+        const {planet: p} = this
         // Movement fails if external pressures (economy/military threats)
         let threatsDetected = false
         for (const p of gs.system.planets) {
@@ -75,7 +75,7 @@ class LudditismNews extends News {
     }
 
     isValid() {
-        const {planet} = this
+        const {planet: p} = this
         //more likely if high tech and population pressure
         const ratingsValid = planet.civilization.technology > CL.HIGH && planet.civilization.industry > CL.MEDIUM
         //must not be at engaged in or targeted by any hostile acts

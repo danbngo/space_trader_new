@@ -42,14 +42,14 @@ class PlagueNews extends News {
     }
 
     determineOutcome() {
-        const {planet} = this
+        const {planet: p} = this
         // Higher economy/industry = better medical infrastructure
         const cureProbability = (planet.civilization.economy + planet.civilization.industry) / 2
         this.failed = Math.random() > cureProbability
     }
 
     isValid() {
-        const {planet} = this
+        const {planet: p} = this
         //happens when population is getting out of hand
         const ratingsValid = planet.civilization.population > CL.MEDIUM
 
