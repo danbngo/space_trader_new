@@ -13,10 +13,9 @@
 class ColonistsEncounter extends Encounter {
     /**
      * @param {EncounterType} encounterType
-     * @param {GameState} gameState
      */
-    constructor(encounterType, gameState) {
-        super(encounterType, gameState)
+    constructor(encounterType) {
+        super(encounterType)
     }
 
     /**

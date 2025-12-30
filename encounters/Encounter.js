@@ -6,14 +6,13 @@
  */
 class Encounter {
     /**
-     * @param {GameState} gs - The game state.
      * @param {EncounterType} encounterType - The type of encounter.
      * @param {Planet} planet - The planet where the encounter occurs.
      * @param {Fleet} fleet - The enemy fleet.
      * @param {Effect[]} effects - Environmental effects active in the encounter.
      */
-    constructor(gs = new GameState(), encounterType = ENCOUNTER_TYPES_ALL[0], planet = new Planet(), fleet = new Fleet(), effects = []) {
-        console.log('Encounter.constructor', { gs, encounterType, planet, fleet });
+    constructor(encounterType = ENCOUNTER_TYPES_ALL[0], planet = new Planet(), fleet = new Fleet(), effects = []) {
+        console.log('Encounter.constructor', { encounterType, planet, fleet });
         /** @type {EncounterType} */
         this.encounterType = encounterType;
         /** @type {Planet} */
@@ -110,7 +109,7 @@ class Encounter {
     handleTurnComplete() {
         console.log('Encounter.handleTurnComplete', { activeTurnFleet: this.activeTurnFleet });
         if (!this.isTurnComplete()) return
-        this.encounterType.onEndTurn?.(this)
+        this.onEndTurn?.()
         for (const ship of this.activeTurnFleet.ships) {
             ship.actionsRemaining = 0
             // Decrement module cooldowns

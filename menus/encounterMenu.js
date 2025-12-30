@@ -16,22 +16,67 @@ function startEncounter(encounter = gs.encounter) {
         ship.resetCombatVars()
     }
 
-    for (const ship of playerShips) {
-        const [x,y] = rotatePoint(rng(maxSpawnDistance, minSpawnDistance/2, false), 0, 0, 0, rng(Math.PI + Math.PI/4, Math.PI  -Math.PI/4, false))
-        Object.assign(ship, {x, y})
+    // Position player ships based on formation
+    if (formationType == FORMATION_TYPES.PlayerEncircle) {
+        // Player ships surround enemy - place in circle facing inward
+        const angleStep = (Math.PI * 2) / playerShips.length
+        playerShips.forEach((ship, i) => {
+            const angle = angleStep * i
+            const [x, y] = rotatePoint(maxSpawnDistance, 0, 0, 0, angle)
+            Object.assign(ship, {x, y})
+        })
     }
+    else if (formationType == FORMATION_TYPES.PlayerEncircled) {
+        // Player ships are surrounded - place in tight cluster
+        for (const ship of playerShips) {
+            const [x, y] = rotatePoint(rng(minSpawnDistance/2, 0, false), 0, 0, 0, rng(Math.PI * 2, 0, false))
+            Object.assign(ship, {x, y})
+        }
+    }
+    else {
+        // FaceOff or Storm - original player positioning
+        for (const ship of playerShips) {
+            const [x,y] = rotatePoint(rng(maxSpawnDistance, minSpawnDistance/2, false), 0, 0, 0, rng(Math.PI + Math.PI/4, Math.PI  -Math.PI/4, false))
+            Object.assign(ship, {x, y})
+        }
+    }
+
+    // Position enemy ships based on formation
     for (const ship of enemyShips) {
         Object.assign(ship, {color: encounter.encounterType.enemyColor})
-        if (formationType == FORMATION_TYPES.FaceOff) {
+    }
+
+    if (formationType == FORMATION_TYPES.PlayerEncircle) {
+        // Enemy ships in center cluster
+        for (const ship of enemyShips) {
+            const [x, y] = rotatePoint(rng(minSpawnDistance/2, 0, false), 0, 0, 0, rng(Math.PI * 2, 0, false))
+            Object.assign(ship, {x, y})
+        }
+    }
+    else if (formationType == FORMATION_TYPES.PlayerEncircled) {
+        // Enemy ships surround player - place in circle facing inward
+        const angleStep = (Math.PI * 2) / enemyShips.length
+        enemyShips.forEach((ship, i) => {
+            const angle = angleStep * i
+            const [x, y] = rotatePoint(maxSpawnDistance, 0, 0, 0, angle)
+            Object.assign(ship, {x, y})
+        })
+    }
+    else if (formationType == FORMATION_TYPES.FaceOff) {
+        for (const ship of enemyShips) {
             const [x,y] = rotatePoint(rng(maxSpawnDistance, minSpawnDistance, false), 0, 0, 0, rng(0 + Math.PI/4, 0 -Math.PI/4, false))
             Object.assign(ship, {x, y})
         }
-        else if (formationType == FORMATION_TYPES.Storm) {
+    }
+    else if (formationType == FORMATION_TYPES.Storm) {
+        for (const ship of enemyShips) {
             let [x,y] = rotatePoint(rng(encounter.mapRadius*0.9, minSpawnDistance, false), 0, 0, 0, rng(0 + Math.PI*3/4, 0 -Math.PI*3/4, false))
             x += rng(encounter.mapRadius*2, 0, false)
             Object.assign(ship, {x, y})
         }
     }
+
+    // Set ship angles to face targets
     for (const ship of playerShips) {
         const randomTarget = rndMember(enemyShips)
         if (randomTarget) {
@@ -40,16 +85,17 @@ function startEncounter(encounter = gs.encounter) {
         }
     }
     for (const ship of enemyShips) {
-        if (formationType == FORMATION_TYPES.FaceOff) {
+        if (formationType == FORMATION_TYPES.Storm) {
+            const angle = rng(Math.PI + Math.PI/4, Math.PI - Math.PI/4, false)
+            Object.assign(ship, {angle})
+        }
+        else {
+            // All other formations: face player ships
             const randomTarget = rndMember(playerShips)
             if (randomTarget) {
                 const angle = new Path(ship.x, ship.y, randomTarget.x, randomTarget.y).angle
                 Object.assign(ship, {angle})
             }
-        }
-        else if (formationType == FORMATION_TYPES.Storm) {
-            const angle = rng(Math.PI + Math.PI/4, Math.PI - Math.PI/4, false)
-            Object.assign(ship, {angle})
         }
     }
 
@@ -195,6 +241,11 @@ function showPlayerAttackFleetModal(fameMultiplier = 0, bountyMultiplier = 0, sn
     const bounty = 1000 * bountyMultiplier
 
     if (sneakAttack) {
+        // Change formation to player encircling enemy
+        gs.encounter.encounterType.formationType = FORMATION_TYPES.PlayerEncircle
+        // Reposition ships for the new formation
+        startEncounter(gs.encounter)
+        // Drop shields after repositioning
         for (const ship of gs.encounter.ships) ship.shields[0] = 0
     }
 
@@ -597,10 +648,10 @@ function showPlayerDefeatedBySlaversModal() {
         }
         
         if (capturedOfficers.length > 0) {
-            msg += ce({tagName: 'br'})
-            msg += ce({tagName: 'span', style: 'color: red; font-weight: bold;', 
+            msg += ce({tag: 'br'})
+            msg += ce({tag: 'span', style: 'color: red; font-weight: bold;', 
                 textContent: `The slavers capture ${capturedOfficers.length} of your officers!`})
-            msg += ce({tagName: 'br'})
+            msg += ce({tag: 'br'})
             for (const officer of capturedOfficers) {
                 msg += `${officer.name} (${officer.role}) was taken into slavery.<br/>`
             }

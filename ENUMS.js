@@ -100,6 +100,8 @@ const FORMATION_TYPES = Object.freeze({
     //Ambush: 'Ambush',
     FaceOff: 'FaceOff', //ships all facing each other initially
     Storm: 'Storm', //ships all moving in an arbitrary direction - could be used for asteroid encounters
+    PlayerEncircle: 'PlayerEncircle', //player ships surround enemy ships
+    PlayerEncircled: 'PlayerEncircled', //enemy ships surround player ships
 })
 const FORMATION_TYPES_ALL = Object.values(FORMATION_TYPES)
 

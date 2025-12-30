@@ -13,6 +13,11 @@ function generateEncounter(encounterType = rndMember(ENCOUNTER_TYPES_ALL), plane
     for (const s of fleet.ships) s.aiType = encounterType.aiType
     const effects = effectTypes && effectTypes.length > 0 ? generateEffects(encounterType, effectTypes) : []
     
+    // Randomly choose formation for pirates and slavers (50% chance to encircle player)
+    if ((encounterType === ENCOUNTER_TYPES.PIRATES || encounterType === ENCOUNTER_TYPES.SLAVERS) && Math.random() < 0.5) {
+        encounterType.formationType = FORMATION_TYPES.PlayerEncircled
+    }
+    
     // Get the encounter class from the encounterType
     const EncounterClass = encounterType.encounterClass || Encounter
     const encounter = new EncounterClass(gs, encounterType, planet, fleet, effects)

@@ -16,8 +16,8 @@ class SlaversEncounter extends Encounter {
      * @param {EncounterType} encounterType
      * @param {GameState} gameState
      */
-    constructor(encounterType, gameState) {
-        super(encounterType, gameState)
+    constructor(encounterType) {
+        super(encounterType)
     }
 
     /**
@@ -68,7 +68,7 @@ class SlaversEncounter extends Encounter {
         // Hostile - demand surrender
         const panel = createPanel(ce({children: [
             ce({textContent: `The ${coloredName(enemyFleet)} hail you.`}),
-            ce({tagName: 'br'}),
+            ce({tag: 'br'}),
             ce({textContent: `"Your ships and crew belong to us now. Surrender immediately or be destroyed!"`}),
         ]}))
 
