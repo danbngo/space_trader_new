@@ -74,7 +74,7 @@ class WarScorchedEarthNews extends News {
         // Requires high territory to sacrifice
         const territoryValid = p.c.territory > CL.HIGH
         // we need to be desperate
-        const militaryValid = planet.militaryPower/targetPlanet.militaryPower < CL.SLIGHTLY_LOW
+        const militaryValid = planet.militaryPower/tp.militaryPower < CL.SLIGHTLY_LOW
         // Can't have scorched earth already
         const interferingEvent = News.hasNews(NT.WAR_SCORCHED_EARTH, planet, targetPlanet)
         return militaryValid && relationshipValid && hasWar && territoryValid && !interferingEvent

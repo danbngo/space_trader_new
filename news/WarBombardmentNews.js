@@ -10,7 +10,7 @@ class WarBombardmentNews extends News {
 
         const buildingsToDisable = [];
         const numBuildings = Math.floor(Math.random() * 3) + 1; // 1-3 buildings
-        const enabledBuildings = targetPlanet.settlement.buildings.filter(b => b.enabled);
+        const enabledBuildings = tp.settlement.buildings.filter(b => b.enabled);
         for (let i = 0; i < Math.min(numBuildings, enabledBuildings.length); i++) {
             const building = rndMember(enabledBuildings.filter(b => b.enabled && !buildingsToDisable.includes(b)));
             if (building) buildingsToDisable.push(building);
@@ -86,14 +86,14 @@ class WarBombardmentNews extends News {
         const {planet: p, targetPlanet: tp} = this
         // Check if peace was forced (relationships changed during bombardment)
         const currentRel1 = p.c.relationships.get(targetPlanet)
-        const currentRel2 = targetPlanet.c.relationships.get(planet)
+        const currentRel2 = tp.c.relationships.get(planet)
         this.cancelled = (currentRel1 !== RELATIONSHIP_TYPES.WAR || currentRel2 !== RELATIONSHIP_TYPES.WAR)
     }
 
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         //our military must be significantly stronger than theirs and navy must be MUCH stronger
-        const navyAdvantage = p.c.military > targetPlanet.c.military * CL.HIGH && p.c.navy > targetPlanet.c.navy * CL.VERY_HIGH
+        const navyAdvantage = p.c.military > tp.c.military * CL.HIGH && p.c.navy > tp.c.navy * CL.VERY_HIGH
         
         const relationshipValid = p.c.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR
         const interferingEvent = 

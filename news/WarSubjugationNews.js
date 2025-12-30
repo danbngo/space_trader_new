@@ -103,14 +103,14 @@ class WarSubjugationNews extends News {
             return
         }
         // Resistance probability based on target's military strength relative to occupier
-        const resistanceProbability = (targetPlanet.militaryPower / planet.militaryPower) * 0.3
+        const resistanceProbability = (tp.militaryPower / planet.militaryPower) * 0.3
         this.failed = Math.random() < resistanceProbability
     }
 
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         //our army must be both large and  significantly better than theirs in every way
-        const ratingsValid = (p.c.army/targetPlanet.c.army > CL.HIGH) && (p.c.navy/targetPlanet.c.navy > CL.HIGH)
+        const ratingsValid = (p.c.army/tp.c.army > CL.HIGH) && (p.c.navy/tp.c.navy > CL.HIGH)
         //planet must be at war with the target
         const relationshipValid = p.c.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR
         const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.SUBJUGATION, ...NT_COOPERATIVE])

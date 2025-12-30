@@ -43,7 +43,7 @@ class TensionsNews extends News {
         const {planet: p, targetPlanet: tp} = this
         // Check if relationships improved (became allies) or escalated to war
         const currentRel1 = p.c.relationships.get(targetPlanet)
-        const currentRel2 = targetPlanet.c.relationships.get(planet)
+        const currentRel2 = tp.c.relationships.get(planet)
         this.cancelled = (currentRel1 === RELATIONSHIP_TYPES.ALLY || currentRel2 === RELATIONSHIP_TYPES.ALLY || 
                          currentRel1 === RELATIONSHIP_TYPES.WAR || currentRel2 === RELATIONSHIP_TYPES.WAR)
     }
@@ -51,13 +51,13 @@ class TensionsNews extends News {
     isValid(ignorePolitics = false) {
         const {planet: p, targetPlanet: tp} = this
         //cant have same government type or be a puppet
-        const governmentsValid = p.c.governmentType != targetPlanet.c.governmentType
+        const governmentsValid = p.c.governmentType != tp.c.governmentType
 
         //there generally won't be beef if the power disparity is too large
-        const powerRatio = p.c.military / targetPlanet.c.military
+        const powerRatio = p.c.military / tp.c.military
         const powerValid = powerRatio < CL.VERY_HIGH && powerRatio > CL.VERY_LOW
 
-        const relationshipValid = p.c.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.NEUTRAL && targetPlanet.c.relationships.get(planet) == RELATIONSHIP_TYPES.NEUTRAL
+        const relationshipValid = p.c.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.NEUTRAL && tp.c.relationships.get(planet) == RELATIONSHIP_TYPES.NEUTRAL
         const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.TENSIONS, ...NT_COOPERATIVE])
         return (powerValid) && (governmentsValid) && relationshipValid && !interferingEvent
     }
@@ -65,7 +65,7 @@ class TensionsNews extends News {
     isValidEnd() {
         const {planet: p, targetPlanet: tp} = this
         //can only end if planets are not actively at war
-        const relationshipsValid = p.c.relationships.get(targetPlanet) != RELATIONSHIP_TYPES.WAR && targetPlanet.c.relationships.get(planet) != RELATIONSHIP_TYPES.WAR
+        const relationshipsValid = p.c.relationships.get(targetPlanet) != RELATIONSHIP_TYPES.WAR && tp.c.relationships.get(planet) != RELATIONSHIP_TYPES.WAR
         return relationshipsValid
     }
 }

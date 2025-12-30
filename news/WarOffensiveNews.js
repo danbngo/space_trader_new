@@ -50,7 +50,7 @@ class WarOffensiveNews extends News {
         const {planet: p, targetPlanet: tp} = this
         // Check if peace was forced during offensive
         const currentRel1 = p.c.relationships.get(targetPlanet)
-        const currentRel2 = targetPlanet.c.relationships.get(planet)
+        const currentRel2 = tp.c.relationships.get(planet)
         this.cancelled = (currentRel1 !== RELATIONSHIP_TYPES.WAR || currentRel2 !== RELATIONSHIP_TYPES.WAR)
     }
 
@@ -61,7 +61,7 @@ class WarOffensiveNews extends News {
         // Must have an ongoing war event
         const hasWar = News.hasNews(NT.WAR, planet, targetPlanet)
         // Our officers must be better than theirs
-        const advantage = p.c.education/targetPlanet.c.education >= CL.SLIGHTLY_HIGH
+        const advantage = p.c.education/tp.c.education >= CL.SLIGHTLY_HIGH
         // Can't have victory already
         const interferingEvent = News.hasNews(NT.WAR_OFFENSIVE, planet, targetPlanet)
         return relationshipValid && hasWar && advantage && !interferingEvent

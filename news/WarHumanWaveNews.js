@@ -67,7 +67,7 @@ class WarHumanWaveNews extends News {
         // Requires high population to sacrifice
         const populationValid = p.c.population > CL.HIGH
         // we need to be desperate
-        const militaryValid = planet.militaryPower/targetPlanet.militaryPower < CL.LOW
+        const militaryValid = planet.militaryPower/tp.militaryPower < CL.LOW
         // Can't have human wave already
         const interferingEvent = News.hasNews(NT.WAR_HUMAN_WAVE, planet, targetPlanet)
         return relationshipValid && hasWar && populationValid && militaryValid && !interferingEvent

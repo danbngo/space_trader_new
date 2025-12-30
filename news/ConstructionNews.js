@@ -13,26 +13,35 @@ class ConstructionNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                economy: CL.SLIGHTLY_LOW,
-                reserves: CL.LOW,
-                inflation: CL.HIGH,
-                wealth: CL.LOW,
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.METAL, CL.EXTREMELY_HIGH], [CARGO_TYPES.NANITES, CL.ASTRONOMICAL]])),
+                civilizationMultipliers: new Civilization({
+                    economy: CL.SLIGHTLY_LOW,
+                    reserves: CL.LOW,
+                    inflation: CL.HIGH,
+                    wealth: CL.LOW,
+                    taxes: CL.HIGH,
+                    cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.METAL, CL.EXTREMELY_HIGH], [CARGO_TYPES.NANITES, CL.ASTRONOMICAL]])),
+                })
             })
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        Object.assign(this.completeEffects[0], {
-            wealth: News.clHalfRegression(this.completeEffects[0].wealth),
-            economy: CL.HIGH,
+        this.completeEffects[0].civilizationMultipliers.overwrite(new Civilization({
+            economy: CL.HIGH/CL.SLIGHTLY_LOW,
+            reserves: CL.NO_REGRESSION,
+            wealth: CL.NO_REGRESSION,
+            taxes: CL.SLIGHTLY_HIGH/CL.HIGH,
             industry: CL.HIGH,
-            buildingsEnabled
-        })
+        }))
+        this.completeEffects[0].buildingsEnabled = buildingsEnabled
 
-        this.failEffects = this.startEffects.map(effect => effect.getHalfRegression())
-        Object.assign(this.failEffects[0], {
-            cargoPriceMultipliers: NewsEffect.getInvertedCargoPriceMultipliers(this.startEffects[0].cargoPriceMultipliers)
-        })
+        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        this.failEffects[0].civilizationMultipliers.overwrite(new Civilization({
+            economy: CL.NO_REGRESSION,
+            reserves: CL.NO_REGRESSION,
+            inflation: CL.NO_REGRESSION,
+            wealth: CL.NO_REGRESSION,
+            taxes: CL.SLIGHTLY_HIGH/CL.HIGH,
+        }))
     }
 
     determineOutcome() {
@@ -44,11 +53,9 @@ class ConstructionNews extends News {
     isValid() {
         const {planet: p} = this
         //must be missing at least one building OR industry is low and credits are high
-        const buildingsValid = News.calcRepairableBuildings(planet).length > 0
-        const ratingsValid = p.c.industry < CL.LOW && (planet.settlement.reserves > CL.SLIGHTLY_HIGH || p.c.wealth > CL.SLIGHTLY_HIGH)
-        const interferingEvent =
-            News.planetHasAnyNewsTargeting(planet, NT_DANGEROUS) ||
-            News.planetHasAnyNews(planet, [NT.CONSTRUCTION, ...NT_ECONOMY_PREVENTING])
+        const buildingsValid = News.calcRepairableBuildings(p).length > 0
+        const ratingsValid = p.c.industry < CL.LOW && (p.c.reserves > CL.SLIGHTLY_HIGH || p.c.wealth > CL.SLIGHTLY_HIGH)
+        const interferingEvent = News.planetHasAnyNewsTargeting(p, NT_DANGEROUS) || News.planetHasAnyNews(p, NT_ECONOMY_PREVENTING)
         return (buildingsValid || ratingsValid) && !interferingEvent
     }
 }

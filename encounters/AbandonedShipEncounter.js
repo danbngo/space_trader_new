@@ -5,7 +5,54 @@
 class AbandonedShipEncounter extends Encounter {
     onStart() {
         const abandonedShip = gs.encounter.fleet.ships[0]
-        abandonedShip.disabled = true
+        abandonedShip.takeDamage(Infinity, false, false, null)
+        
+        let msg = `You discover an abandoned ${abandonedShip.shipType.name}!<br/>`
+        msg += `The ship appears to have been disabled and abandoned by its crew.<br/>`
+        msg += `Your scanners detect cargo aboard. Do you want to investigate?<br/>`
+        
+        showModal('Abandoned Ship', msg, [
+            ['Loot', ()=>this.attemptLoot()],
+            ['Leave', ()=>endEncounter()]
+        ])
+    }
+
+    attemptLoot() {
+        // 50% chance of pirate ambush
+        if (Math.random() < 0.5) {
+            this.pirateAmbush()
+        } else {
+            this.successfulLoot()
+        }
+    }
+
+    pirateAmbush() {
+        // Generate pirate ships
+        const pirateFleet = generateFleet(FLEET_TYPES.PIRATES, gs.encounter.planet)
+        pirateFleet.captain = new Officer(`Pirate Captain`, 0, 0, 0)
+        pirateFleet.captain.credits = rng(FLEET_TYPES.PIRATES.maxCredits, 0)
+        
+        // Position pirates near the abandoned ship
+        for (const ship of pirateFleet.ships) {
+            ship.aiType = AI_TYPES.Ship
+            ship.x = gs.encounter.fleet.ships[0].x + rng(30, -30)
+            ship.y = gs.encounter.fleet.ships[0].y + rng(30, -30)
+            gs.encounter.fleet.addShip(ship)
+        }
+        
+        // Update encounter fleet captain to pirate captain
+        gs.encounter.fleet.captain = pirateFleet.captain
+        
+        let msg = `It's a trap! Pirates decloak from behind the abandoned ship!<br/>`
+        msg += `${pirateFleet.ships.length} pirate ships appear and move to attack!<br/>`
+        
+        showModal('Pirate Ambush!', msg, [
+            ['Fight', ()=>startCombat(false)]
+        ])
+    }
+
+    successfulLoot() {
+        const abandonedShip = gs.encounter.fleet.ships[0]
         
         // Calculate loot from the abandoned ship
         const cargoRatio = 1 // All cargo is available
@@ -19,8 +66,7 @@ class AbandonedShipEncounter extends Encounter {
         const officersShare = gs.fleet.calcTotalCRShare(creditsAmt, true)
         const finalCredits = creditsAmt - officersShare
         
-        let msg = `You discover an abandoned ${abandonedShip.shipType.name}!<br/>`
-        msg += `The ship appears to have been disabled and abandoned by its crew.<br/>`
+        let msg = `No signs of danger. You begin salvaging the abandoned ship.<br/>`
         
         if (baseLootAmt > 0) {
             msg += `Your scanners reveal ${baseLootAmt} units of cargo aboard.<br/>`
@@ -40,13 +86,12 @@ class AbandonedShipEncounter extends Encounter {
     }
 
     onVictory() {
-        // Not applicable for abandoned ships
-        endEncounter()
+        // After defeating pirates, allow looting both pirate ships and abandoned ship
+        showPlayerDefeatedEnemyModal(1)
     }
 
     onDefeat() {
-        // Not applicable for abandoned ships
-        endEncounter()
+        showPlayerDefeatedByPiratesModal()
     }
 
     onEscape() {
@@ -56,7 +101,6 @@ class AbandonedShipEncounter extends Encounter {
     }
 
     onSurrender() {
-        // Not applicable for abandoned ships
-        endEncounter()
+        gs.encounter.onDefeat()
     }
 }

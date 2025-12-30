@@ -69,14 +69,14 @@ class ResearchAgreementNews extends News {
         const {planet: p, targetPlanet: tp} = this
         // Check if relationship deteriorated
         const rel1 = p.c.relationships.get(targetPlanet)
-        const rel2 = targetPlanet.c.relationships.get(planet)
+        const rel2 = tp.c.relationships.get(planet)
         if (rel1 === RELATIONSHIP_TYPES.TENSE || rel1 === RELATIONSHIP_TYPES.WAR ||
             rel2 === RELATIONSHIP_TYPES.TENSE || rel2 === RELATIONSHIP_TYPES.WAR) {
             this.cancelled = true
             return
         }
         // Research fails based on combined officer quality
-        const avgQuality = (p.c.education + targetPlanet.c.education) / 2
+        const avgQuality = (p.c.education + tp.c.education) / 2
         const successProbability = avgQuality * 0.7 + 0.2
         this.failed = Math.random() > successProbability
     }
@@ -84,10 +84,10 @@ class ResearchAgreementNews extends News {
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         //planets must be neutral or allied towards each other
-        const relationships = [p.c.relationships.get(targetPlanet), targetPlanet.c.relationships.get(planet)]
+        const relationships = [p.c.relationships.get(targetPlanet), tp.c.relationships.get(planet)]
         const relationshipsValid = relationships.every(r => r == RELATIONSHIP_TYPES.NEUTRAL || r == RELATIONSHIP_TYPES.ALLY)
         //planets must have similar level of development
-        const developmentValid = Math.abs(p.c.education - targetPlanet.c.education) < 0.5
+        const developmentValid = Math.abs(p.c.education - tp.c.education) < 0.5
         //removed most requirements for this
         const interferingEvent =
             News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.RESEARCH_AGREEMENT, ...NT_COOPERATION_PREVENTING])
