@@ -1,10 +1,10 @@
 class EnslavementNews extends News {
     constructor(planet = new Planet(), targetPlanet = new Planet()) {
         super(
-            `${coloredName(planet)} begins enslaving populations from ${coloredName(targetPlanet)}! Forced labor crews arrive in chains!`,
-            `${coloredName(planet)} officially ends its slavery programs against ${coloredName(targetPlanet)}.`,
-            `Slave revolts in ${coloredName(planet)} force end to enslavement of ${coloredName(targetPlanet)}'s people!`,
-            `Peace treaty forces ${coloredName(planet)} to free enslaved populations from ${coloredName(targetPlanet)}!`,
+            `${coloredName(planet)} begins abducting people from ${coloredName(targetPlanet)} and pressing them into service as laborers!`,
+            `${coloredName(planet)} has satiated its need for cheap labor and ceasees its abductions from ${coloredName(targetPlanet)}.`,
+            `${coloredName(planet)} abductions of ${coloredName(targetPlanet)}'s people cease after multiple armed skirmishes!`,
+            `Improved relations prompt ${coloredName(planet)} to free abducted populations from ${coloredName(targetPlanet)}!`,
             NT.ENSLAVEMENT, planet, targetPlanet
         )
 
@@ -13,35 +13,45 @@ class EnslavementNews extends News {
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
                 civilizationMultipliers: new Civilization({
-                    economy: CL.HIGH,
-                    industry: CL.HIGH,
-                    population: CL.VERY_HIGH,
-                    security: CL.VERY_LOW,
+                    economy: CL.SLIGHTLY_HIGH,
+                    industry: CL.SLIGHTLY_HIGH,
+                    population: CL.SLIGHTLY_HIGH,
+                    security: CL.LOW,
+                    navy: CL.LOW,
+                    army: CL.LOW,
                     prestige: CL.LOW,
+                    culture: CL.LOW,
+                    corruption: CL.HIGH,
                 })
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
                 civilizationMultipliers: new Civilization({
-                    population: CL.LOW,
-                    security: CL.LOW,
-                    education: CL.LOW,
+                    population: CL.SLIGHTLY_LOW,
+                    security: CL.SLIGHTLY_LOW,
+                    education: CL.SLIGHTLY_LOW,
+                    prestige: CL.LOW,
                 })
             })
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            security: CL.SLIGHTLY_LOW,
-            prestige: CL.SLIGHTLY_LOW,
-            population: CL.VERY_HIGH, // keep population gains
-            economy: CL.SLIGHTLY_HIGH,
-            industry: CL.SLIGHTLY_HIGH,
+            economy: CL.HIGH,
+            industry: CL.HIGH,
+            population: CL.HIGH,
+            security: CL.LOW,
+            prestige: CL.LOW,
+            culture: CL.LOW,
+            corruption: CL.HIGH,
         }))
         this.completeEffects[1].civilizationMultipliers.multiply(new Civilization({
-            population: CL.LOW, // permanent population loss
-            education: CL.LOW, // permanent education loss
+            population: CL.LOW,
+            security: CL.LOW,
+            education: CL.LOW,
+            army: CL.SLIGHTLY_LOW,
+            prestige: CL.VERY_LOW
         }))
 
         this.failEffects = this.startEffects.map(effect => effect.getInverse())
@@ -53,45 +63,42 @@ class EnslavementNews extends News {
             prestige: CL.VERY_LOW,
         }))
         this.failEffects[1].civilizationMultipliers.multiply(new Civilization({
-            population: CL.SLIGHTLY_LOW,
+            culture: CL.HIGH,
             prestige: CL.HIGH,
         }))
 
         this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
         this.cancelEffects[0].civilizationMultipliers.multiply(new Civilization({
-            population: CL.SLIGHTLY_HIGH,
-            economy: CL.SLIGHTLY_HIGH,
-            industry: CL.SLIGHTLY_HIGH,
             security: CL.SLIGHTLY_LOW,
+            navy: CL.SLIGHTLY_LOW,
+            army: CL.SLIGHTLY_LOW,
             prestige: CL.SLIGHTLY_LOW,
-        }))
-        this.cancelEffects[1].civilizationMultipliers.multiply(new Civilization({
-            population: CL.SLIGHTLY_LOW,
+            culture: CL.SLIGHTLY_LOW,
+            corruption: CL.SLIGHTLY_HIGH,
         }))
     }
 
     shouldCancel() {
-        const rel = this.planet.c.relationships.get(this.targetPlanet)
-        return rel === RELATIONSHIP_TYPES.NEUTRAL || rel === RELATIONSHIP_TYPES.ALLY
+        return Civilization.areAlliesOrNeutral(this.planet, this.targetPlanet)
     }
 
     determineOutcome() {
-        this.rollOutcome(this.planet.c.security)
+        const {planet: p, targetPlanet: tp} = this
+        this.rollOutcome((p.c.army + p.c.navy + p.c.security)/(tp.c.army + tp.c.navy + p.c.corruption), CL.HIGH)
     }
 
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         // More likely if economy/industry AND population is low (seeking economic boost)
-        const ratingsValid = (p.c.economy < CL.LOW || p.c.industry < CL.LOW) && p.c.population < CL.MEDIUM
+        const ratingsValid = (p.c.economy < CL.LOW || p.c.industry < CL.LOW) && p.c.population < CL.SLIGHTLY_LOW
         // Target must have population to steal
-        const targetValid = targetPlanet.c.population > CL.LOW
+        const targetValid = tp.c.population > CL.LOW
         // our military must be stronger than theirs
-        const militaryValid = p.c.military > targetPlanet.c.military * CL.HIGH
+        const militaryValid = (p.c.army + p.c.navy) > (tp.c.army + tp.c.navy) * CL.HIGH
+        const relationshipsValid = Civilization.areTenseOrAtWar(p, tp)
         // Both parties must be at least TENSE (TENSE or WAR)
-        const relationships = [p.c.relationships.get(targetPlanet), targetPlanet.c.relationships.get(planet)]
-        const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.TENSE || rel == RELATIONSHIP_TYPES.WAR)
         // Must not already have this event between these planets
-        const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.ENSLAVEMENT])
+        const interferingEvent = News.hasAnyNewsBidirectional(p, tp, [NT.ENSLAVEMENT])
         return ratingsValid && targetValid && militaryValid && relationshipsValid && !interferingEvent
     }
 }

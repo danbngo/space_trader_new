@@ -7,11 +7,14 @@
 function createOfficersTable(officers = [new Officer()], onSelectOfficer = (officer = new Officer())=>{}) {
     if (officers.length == 0) return `(None)`
     const rows = [
-        ['Name', 'Age', 'Level', 'CR Share', ...SKILLS_ALL]
+        ['Name', 'Piloting', 'Age', 'Level', 'CR Share', ...SKILLS_ALL]
     ]
     for (const officer of officers) {
+        const assignedShip = gs.fleet.getAssignedShip(officer)
+        const shipName = assignedShip ? assignedShip.name : colorSpan('(None)', COLORS.Gray)
         rows.push([
             officer.name,
+            shipName,
             ''+officer.age,
             ''+statColorSpan(officer.level, officer.level/5),
             ''+statColorSpan(officer.crShare*100+'%', 5/officer.level),
@@ -47,6 +50,9 @@ function showOfficersMenu(officers = gs.fleet.officers) {
             ? officer.implants.map(i => colorSpan(i.implantType.name, i.implantType.color) + ` (${roundToPlaces(i.quality*100, 1)}%)`).join(', ')
             : colorSpan('(None)', COLORS.Gray)
         
+        const assignedShip = gs.fleet.getAssignedShip(officer)
+        const pilotingText = assignedShip ? assignedShip.name : colorSpan('(None)', COLORS.Gray)
+        
         const buttons = [
             ['Fire', ()=>showFireOfficerModal(officer), gs.fleet.numPilots <= gs.fleet.ships.length],
             ["Close", () => closeModal()],
@@ -54,6 +60,7 @@ function showOfficersMenu(officers = gs.fleet.officers) {
         
         const infoPanel = ce({children: [
             `<b>${officer.name}</b> (Level ${officer.level})<br/>`,
+            `<b>Piloting:</b> ${pilotingText}<br/>`,
             `<b>Skills:</b> `,
             SKILLS_ALL.map(sk => `${sk}: ${officer.skills.getAmount(sk)}`).join(', '),
             `<br/><br/><b>Cybernetic Implants:</b><br/>`,

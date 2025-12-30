@@ -105,6 +105,9 @@ async function startNewGame() {
 
     gs.fleet.addShip(playerShip)
     gs.fleet.addOfficer(captain)
+    
+    // Auto-assign captain to starting ship
+    gs.fleet.autoAssignPilots()
 
     // Add player's fleet to system
     gs.system.fleets = [gs.fleet];

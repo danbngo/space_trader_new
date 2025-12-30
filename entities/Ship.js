@@ -37,6 +37,8 @@ class Ship {
         this.cargoSpace = cargoSpace; //hold more stuff in your ships
         /** @type {Fleet} */
         this.fleet = null;
+        /** @type {Officer|null} */
+        this.pilot = null;
 
         //combat vars
         /** @type {number} */

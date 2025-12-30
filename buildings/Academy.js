@@ -35,7 +35,7 @@ class Academy extends Building {
         return Math.round(basePrice * (1 + this.planet.c.taxRate))
     }
     get baseNumOfficers() {
-        return GUILD_AVERAGE_NUM_OFFICERS * (this.isTavern ? this.planet.c.crime : this.planet.c.army)
+        return GUILD_AVERAGE_NUM_OFFICERS * (this.isTavern ? this.planet.c.crime : this.planet.c.army) * this.planet.c.population
     }
     normalize(clearExisting = false) {
         super.normalize()

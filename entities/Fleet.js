@@ -79,6 +79,62 @@ class Fleet extends SpaceObject {
         return totalSkills
     }
 
+    /**
+     * Get all officers who are not currently piloting any ship
+     * @returns {Officer[]} Array of unassigned officers
+     */
+    getUnassignedOfficers() {
+        return [this.captain, ...this.officers].filter(officer => {
+            return !this.ships.some(ship => ship.pilot === officer)
+        })
+    }
+
+    /**
+     * Get the ship that an officer is piloting
+     * @param {Officer} officer - The officer to check
+     * @returns {Ship|null} The ship being piloted or null
+     */
+    getAssignedShip(officer) {
+        return this.ships.find(ship => ship.pilot === officer) || null
+    }
+
+    /**
+     * Assign an officer to pilot a ship
+     * @param {Ship} ship - The ship to assign
+     * @param {Officer} officer - The officer to assign
+     */
+    assignPilot(ship, officer) {
+        if (!this.ships.includes(ship)) {
+            console.error('Cannot assign pilot to ship not in fleet', ship)
+            return
+        }
+        if (officer && officer !== this.captain && !this.officers.includes(officer)) {
+            console.error('Cannot assign officer not in fleet', officer)
+            return
+        }
+        ship.pilot = officer
+    }
+
+    /**
+     * Auto-assign unassigned officers to ships without pilots
+     */
+    autoAssignPilots() {
+        const unassignedOfficers = this.getUnassignedOfficers()
+        const unassignedShips = this.ships.filter(ship => !ship.pilot)
+        
+        // Always assign captain to flagship if it has no pilot
+        if (this.flagship && !this.flagship.pilot) {
+            this.flagship.pilot = this.captain
+            const idx = unassignedOfficers.indexOf(this.captain)
+            if (idx >= 0) unassignedOfficers.splice(idx, 1)
+        }
+        
+        // Assign remaining officers to remaining ships
+        for (let i = 0; i < Math.min(unassignedOfficers.length, unassignedShips.length); i++) {
+            unassignedShips[i].pilot = unassignedOfficers[i]
+        }
+    }
+
     get totalMass() {
         return this.ships.reduce((total, ship) => total + ship.mass, 0);
     }

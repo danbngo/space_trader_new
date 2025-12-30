@@ -7,11 +7,13 @@
 function createShipsListMenu(ships = [new Ship()], onSelectShip = (s = new Ship())=>{}) {
     if (ships.length == 0) return `(None)`
     const rows = [
-        ['Ship Name', 'Hull', 'Shields', 'Lasers', 'Engine', 'Cargo Space']
+        ['Ship Name', 'Pilot', 'Hull', 'Shields', 'Lasers', 'Engine', 'Cargo']
     ]
     for (const ship of ships) {
+        const pilotName = ship.pilot ? ship.pilot.name : colorSpan('(Unassigned)', COLORS.Gray)
         rows.push([
             ship.name,
+            pilotName,
             ''+statColorSpan(`${ship.hull[0]}/${ship.hull[1]}`, ship.hull[0]/ship.hull[1]),
             ''+statColorSpan(`${ship.shields[0]}/${ship.shields[1]}`, ship.shields[0]/ship.shields[1]),
             ''+ship.lasers,
@@ -44,18 +46,54 @@ function showShipsMenu(ships = [...gs.fleet.ships]) {
         )
     }
 
+    function showAssignPilotModal(ship = new Ship()) {
+        const allOfficers = [gs.captain, ...gs.fleet.officers]
+        const rows = [['Officer', 'Level', 'Current Assignment']]
+        
+        for (const officer of allOfficers) {
+            const assignedShip = gs.fleet.getAssignedShip(officer)
+            const assignment = assignedShip ? assignedShip.name : colorSpan('(Unassigned)', COLORS.Gray)
+            rows.push([officer.name, ''+officer.level, assignment])
+        }
+        
+        const table = createTable(rows, (rowIndex) => {
+            const selectedOfficer = allOfficers[rowIndex]
+            gs.fleet.assignPilot(ship, selectedOfficer)
+            reloadMenu()
+        })
+        
+        showModal(
+            `Assign Pilot to ${ship.name}`,
+            ce({children: [
+                'Select an officer to pilot this ship:',
+                table
+            ]}),
+            [
+                ['Unassign', () => {
+                    gs.fleet.assignPilot(ship, null)
+                    reloadMenu()
+                }],
+                ['Cancel', () => reloadMenu()]
+            ]
+        )
+    }
+
     function onSelectShip(ship = new Ship()) {
         const modulesText = ship.modules.length > 0 
             ? ship.modules.map(m => colorSpan(m.moduleType.name, m.moduleType.color) + ` (${roundToPlaces(m.quality*100, 1)}%)`).join(', ')
             : colorSpan('(None)', COLORS.Gray)
         
+        const pilotText = ship.pilot ? ship.pilot.name : colorSpan('(Unassigned)', COLORS.Gray)
+        
         const buttons = [
+            ['Assign Pilot', ()=>showAssignPilotModal(ship)],
             ['Dump', ()=>showDumpShipModal(ship), gs.fleet.ships.length < 2],
             ["Close", () => closeModal()],
         ]
         
         const infoPanel = ce({children: [
             `<b>${ship.name}</b><br/>`,
+            `Pilot: ${pilotText}<br/>`,
             `Hull: ${statColorSpan(`${ship.hull[0]}/${ship.hull[1]}`, ship.hull[0]/ship.hull[1])} | `,
             `Shields: ${statColorSpan(`${ship.shields[0]}/${ship.shields[1]}`, ship.shields[0]/ship.shields[1])}<br/>`,
             `Lasers: ${ship.lasers} | Engine: ${ship.engine} | Cargo: ${ship.cargoSpace}<br/>`,

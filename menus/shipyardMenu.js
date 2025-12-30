@@ -110,6 +110,10 @@ function showShipyardBuyMenu(shipyard = new Shipyard()) {
         shipyard.credits += buyPrice;
         fleet.addShip(ship)
         safeRemove(shipyard.ships, ship)
+        
+        // Auto-assign an unassigned officer as pilot
+        fleet.autoAssignPilots()
+        
         rebuildMenu()
     }
 

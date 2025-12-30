@@ -14,11 +14,9 @@ class EconomicBoomNews extends News {
                 civilizationMultipliers: new Civilization({
                     inflation: CL.VERY_LOW,
                     reserves: CL.VERY_HIGH,
-                    crime: CL.VERY_HIGH,
                     economy: CL.EXTREMELY_HIGH,
                     industry: CL.VERY_HIGH,
                     wealth: CL.EXTREMELY_HIGH,
-                    navy: CL.VERY_HIGH,
                     cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.HOLOCUBES, CL.EXTREMELY_HIGH]])),
                 })
             })
@@ -26,23 +24,23 @@ class EconomicBoomNews extends News {
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            wealth: CL.SLIGHTLY_HIGH,
-            economy: CL.SLIGHTLY_HIGH,
+            inflation: CL.LOW,
+            reserves: CL.VERY_HIGH,
+            economy: CL.HIGH,
+            industry: CL.SLIGHTLY_HIGH,
+            wealth: CL.EXTREMELY_HIGH,
         }))
 
         this.failEffects = this.startEffects.map(effect => effect.getInverse())
         this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
             inflation: CL.HIGH,
-            reserves: CL.LOW,
-            crime: CL.LOW,
-            economy: CL.LOW,
-            industry: CL.LOW,
-            wealth: CL.VERY_LOW,
+            wealth: CL.LOW,
+            crime: CL.HIGH
         }))
     }
 
     determineOutcome() {
-        this.rollOutcome((this.planet.c.industry + this.planet.c.economy) / 2)
+        this.rollOutcome((this.planet.c.industry + this.planet.c.economy) / 2, CL.MEDIUM)
     }
 
     isValid() {
