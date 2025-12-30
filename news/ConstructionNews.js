@@ -25,22 +25,22 @@ class ConstructionNews extends News {
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        this.completeEffects[0].civilizationMultipliers.overwrite(new Civilization({
-            economy: CL.HIGH/CL.SLIGHTLY_LOW,
-            reserves: CL.NO_REGRESSION,
-            wealth: CL.NO_REGRESSION,
-            taxes: CL.SLIGHTLY_HIGH/CL.HIGH,
+        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
+            economy: CL.HIGH,
+            reserves: CL.LOW,
+            wealth: CL.LOW,
+            taxes: CL.SLIGHTLY_HIGH,
             industry: CL.HIGH,
         }))
         this.completeEffects[0].buildingsEnabled = buildingsEnabled
 
         this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.failEffects[0].civilizationMultipliers.overwrite(new Civilization({
-            economy: CL.NO_REGRESSION,
-            reserves: CL.NO_REGRESSION,
-            inflation: CL.NO_REGRESSION,
-            wealth: CL.NO_REGRESSION,
-            taxes: CL.SLIGHTLY_HIGH/CL.HIGH,
+        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
+            economy: CL.SLIGHTLY_LOW,
+            reserves: CL.LOW,
+            inflation: CL.HIGH,
+            wealth: CL.LOW,
+            taxes: CL.SLIGHTLY_HIGH,
         }))
     }
 

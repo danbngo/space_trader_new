@@ -11,6 +11,7 @@ class Contract {
      * @param {CargoType} [cargoType] - The type of cargo involved (if applicable).
      * @param {number} [amount] - Amount of cargo or credits (if applicable).
      * @param {number} [reward] - The reward for completing the contract.
+     * @param {string} [description] - A description of the contract.
      */
     constructor(
         contractType = CONTRACT_TYPES_ALL[0],
@@ -19,7 +20,8 @@ class Contract {
         expirationDate = 0,
         cargoType = null,
         amount = 0,
-        reward = 0
+        reward = 0,
+        description = ''
     ) {
         /** @type {ContractType} */
         this.contractType = contractType;
@@ -35,6 +37,8 @@ class Contract {
         this.amount = amount;
         /** @type {number} */
         this.reward = reward;
+        /** @type {string} */
+        this.description = description;
     }
 
     get isExpired() {

@@ -71,6 +71,12 @@ const FACTION_TYPES = {
         COLORS.LightOrange,
         'Pleasure cruisers and sightseers traveling the galaxy for leisure.'
     ),
+    SLAVERS: new FactionType(
+        'Slaver Cartels',
+        '⛓️',
+        COLORS.DarkRed,
+        'Ruthless criminals who capture and enslave crews. They are feared throughout the galaxy.'
+    ),
 }
 
 const FACTION_TYPES_ALL = Object.values(FACTION_TYPES)

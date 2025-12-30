@@ -540,6 +540,84 @@ function showPlayerDefeatedByPoliceModal() {
     showModal(coloredName(enemyFleet), msg, [['Continue', ()=> showFineOrJailModal(fine+smugglingFine)]])
 }
 
+function showPlayerDefeatedBySlaversModal() {
+    console.log('showPlayerDefeatedBySlaversModal');
+    const {enemyFleet, fleet, disabledPlayerShips} = gs.encounter
+    let msg = `Unfortunately, you were no match for the ${coloredName(enemyFleet)}.<br/>`
+
+    if (disabledPlayerShips.length > 0) {
+        msg += `${disabledPlayerShips.length} of your ships were disabled in the fighting.<br/>`
+        msg += loseCargoFromDisabledShips(disabledPlayerShips)
+    }
+
+    msg += `Now that the fighting is over, the ${coloredName(enemyFleet)} eagerly board your ships.<br/>`
+    
+    // Take cargo
+    const lootableCargoAmount = gs.fleet.cargo.total
+    if (lootableCargoAmount <= 0) {
+        msg += 'They are disgusted to find nothing worth looting!<br/>'
+    }
+    else {
+        const canLootAmount = fleet.availableCargoSpace
+        if (canLootAmount <= 0) {
+            msg += 'They are embarrassed to find their cargo bays are too full to hold any more loot.<br/>'
+        }
+        else {
+            const maxLootAmount = Math.min(canLootAmount, lootableCargoAmount)
+            const lootAmount = rng(maxLootAmount, maxLootAmount/2)
+            msg += `They take ${lootAmount} units of loot from your cargo bays.<br/>`
+            const looted = fleet.cargo.randomSubset(lootAmount)
+            fleet.cargo.subtractAmounts(looted)
+        }
+    }
+    
+    // Take credits
+    if (gs.credits <= 10) {
+        msg += `They note with contempt that you have ${gs.credits == 0 ? 'no' : 'barely any'} credits to steal!<br/>`
+    }
+    else {
+        const creditsStolen = rng(gs.credits, gs.credits/2, true)
+        msg += `They take ${creditsStolen} credits from you.<br/>`
+        gs.credits -= creditsStolen
+    }
+
+    // Capture officers
+    const officerCount = gs.fleet.officers.length
+    if (officerCount > 0) {
+        const officersToCaptureCount = Math.max(1, Math.round(officerCount * rng(0.5, 0.33)))
+        const capturedOfficers = []
+        
+        // Remove random officers
+        for (let i = 0; i < officersToCaptureCount; i++) {
+            if (gs.fleet.officers.length > 0) {
+                const randomIndex = Math.floor(Math.random() * gs.fleet.officers.length)
+                const officer = gs.fleet.officers.splice(randomIndex, 1)[0]
+                capturedOfficers.push(officer)
+            }
+        }
+        
+        if (capturedOfficers.length > 0) {
+            msg += ce({tagName: 'br'})
+            msg += ce({tagName: 'span', style: 'color: red; font-weight: bold;', 
+                textContent: `The slavers capture ${capturedOfficers.length} of your officers!`})
+            msg += ce({tagName: 'br'})
+            for (const officer of capturedOfficers) {
+                msg += `${officer.name} (${officer.role}) was taken into slavery.<br/>`
+            }
+        }
+    }
+
+    // Grant infamy
+    const infamy = rng(5, 3)
+    gs.captain.grantInfamy(infamy)
+    gs.captain.reputation.add(enemyFleet.faction, infamy)
+    msg += `<br/>You gained ${infamy} infamy and ${infamy} reputation with ${enemyFleet.faction}.`
+    
+    msg += conductRepairs()
+    
+    showModal(coloredName(enemyFleet), msg, [['Continue', ()=>endEncounter()]])
+}
+
 function showPlayerEscapedFromEnemyModal() {
     console.log('showPlayerEscapedFromEnemyModal');
     const {enemyFleet, disabledPlayerShips, escapedPlayerShips, playerShips} = gs.encounter

@@ -65,13 +65,13 @@ class CoupDetatNews extends News {
 
         // Failed: coup crushed, instigator embarrassed
         this.failEffects = this.startEffects.map(fx => fx.getInverse())
-        this.failEffects[0].civilizationMultipliers.overwrite(new Civilization({
-            prestige: CL.VERY_LOW/CL.LOW, // international humiliation
-            wealth: CL.NO_REGRESSION, // wasted funds
-            corruption: CL.NO_REGRESSION,
+        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
+            prestige: CL.VERY_LOW, // international humiliation
+            wealth: CL.LOW, // wasted funds
+            corruption: CL.LOW,
         }))
-        this.failEffects[1].civilizationMultipliers.overwrite(new Civilization({
-            prestige: CL.HIGH/CL.LOW,
+        this.failEffects[1].civilizationMultipliers.multiply(new Civilization({
+            prestige: CL.HIGH,
             security: CL.HIGH, //you did just crush a buncha rebels
         }))
     }
