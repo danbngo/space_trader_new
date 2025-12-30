@@ -41,6 +41,7 @@ class EncounterType {
 const ENCOUNTER_TYPES = {
     MINERS: new EncounterType('Miners', COLORS.Brown, 'You encountered: miners.', FLEET_TYPES.MINERS, AI_TYPES.Ship, FORMATION_TYPES.FaceOff, MinersEncounter),
     TOURISTS: new EncounterType('Tourists', COLORS.LightOrange, 'You encountered: tourists.', FLEET_TYPES.TOURISTS, AI_TYPES.Ship, FORMATION_TYPES.FaceOff, TouristsEncounter),
+    COLONISTS: new EncounterType('Colonists', COLORS.LightGreen, 'You encountered: colonists.', FLEET_TYPES.COLONISTS, AI_TYPES.Ship, FORMATION_TYPES.FaceOff, ColonistsEncounter),
     MERCHANTS: new EncounterType('Merchants', COLORS.Yellow, 'You encountered: merchants.', FLEET_TYPES.MERCHANTS, AI_TYPES.Ship, FORMATION_TYPES.FaceOff, MerchantsEncounter),
     SMUGGLERS: new EncounterType('Smugglers', COLORS.Yellow, 'You encountered: smugglers.', FLEET_TYPES.SMUGGLERS, AI_TYPES.Ship, FORMATION_TYPES.FaceOff, SmugglersEncounter),
     PIRATES: new EncounterType('Pirates', COLORS.LightRed, 'You encountered: pirates.', FLEET_TYPES.PIRATES, AI_TYPES.Ship, FORMATION_TYPES.FaceOff, PiratesEncounter),

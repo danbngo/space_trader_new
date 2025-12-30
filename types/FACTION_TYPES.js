@@ -77,6 +77,12 @@ const FACTION_TYPES = {
         COLORS.DarkRed,
         'Ruthless criminals who capture and enslave crews. They are feared throughout the galaxy.'
     ),
+    COLONISTS: new FactionType(
+        'Colonists',
+        '🏘️',
+        COLORS.LightGreen,
+        'Settlers traveling to establish new colonies. They prefer to avoid trouble and focus on their mission.'
+    ),
 }
 
 const FACTION_TYPES_ALL = Object.values(FACTION_TYPES)
