@@ -9,7 +9,7 @@ class CivilWarNews extends News {
         )
 
         const buildingsDisabled = rndMembers(News.calcDestroyableBuildings(this.planet), rng(3, 1), true)
-        const newGovernmentType = Math.random() > .5 ? this.p.c.governmentType : rndMember(GT_ALL.filter(g => g !== GT.PUPPET_STATE))
+        const newGovernmentType = Math.random() > .5 ? this.planet.c.governmentType : rndMember(GT_ALL.filter(g => g !== GT.PUPPET_STATE))
 
         this.startEffects = [
             new NewsEffect({
