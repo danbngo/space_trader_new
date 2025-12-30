@@ -47,6 +47,7 @@ const ENCOUNTER_TYPES = {
     POLICE: new EncounterType('Police', COLORS.LightBlue, 'You encountered: police.', FLEET_TYPES.POLICE, AI_TYPES.Ship, FORMATION_TYPES.FaceOff, PoliceEncounter),
     SOLDIERS: new EncounterType('Soldiers', COLORS.LightGreen, 'You encountered: soldiers.', FLEET_TYPES.SOLDIERS, AI_TYPES.Ship, FORMATION_TYPES.FaceOff, SoldiersEncounter),
     BOUNTY_HUNTERS: new EncounterType('Bounty Hunters', COLORS.LightPurple, 'You encountered: bounty hunters.', FLEET_TYPES.BOUNTY_HUNTERS, AI_TYPES.Ship, FORMATION_TYPES.FaceOff, BountyHuntersEncounter),
+    ABANDONED_SHIP: new EncounterType('Abandoned Ship', COLORS.Gray, 'You encountered: an abandoned ship.', FLEET_TYPES.ABANDONED_SHIP, AI_TYPES.Ship, FORMATION_TYPES.FaceOff, AbandonedShipEncounter),
     ASTEROIDS: new EncounterType('Asteroids', COLORS.LightGray, 'You encountered: asteroids.', FLEET_TYPES.ASTEROIDS, AI_TYPES.Asteroid, FORMATION_TYPES.Storm, AsteroidsEncounter, 60),
     CRYOIDS: new EncounterType('Cryoids', COLORS.LightBlue, 'You encountered: cryoids.', FLEET_TYPES.CRYOIDS, AI_TYPES.Asteroid, FORMATION_TYPES.Storm, CryoidsEncounter, 60),
     PLASMOIDS: new EncounterType('Plasmoids', COLORS.LightRed, 'You encountered: plasmoids.', FLEET_TYPES.PLASMOIDS, AI_TYPES.Asteroid, FORMATION_TYPES.Storm, PlasmoidsEncounter, 60),
