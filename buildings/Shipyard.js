@@ -6,20 +6,20 @@
 class Shipyard extends Building {
     /**
      * @param {Planet} planet - The planet this shipyard is on.
-     * @param {Ship[]} ships - The ships available for purchase.
-     * @param {ShipModule[]} modules - The modules available for purchase.
-     * @param {number} credits - The credits available at this shipyard.
      */
-    constructor(planet = new Planet(), ships = [], modules = [], credits = 0) {
-        super(planet, BUILDING_TYPES.SHIPYARD, credits)
+    constructor(planet = new Planet()) {
+        super(planet, BUILDING_TYPES.SHIPYARD)
         /** @type {Ship[]} */
-        this.ships = ships; // Ship[]
+        this.ships = []; // Ship[]
         /** @type {ShipModule[]} */
-        this.modules = modules; // ShipModule[]
-        /** @type {number} */
-        this.baseNumShips = ships.length
-        /** @type {number} */
-        this.baseNumModules = modules.length
+        this.modules = []; // ShipModule[]
+        this.normalize(true)
+    }
+    get baseNumShips() {
+        return this.planet.civilization.navy * SHIPYARD_AVERAGE_NUM_SHIPS
+    }
+    get baseNumModules() {
+        return this.planet.civilization.navy * SHIPYARD_AVERAGE_NUM_MODULES
     }
     normalize(clearExisting = false) {
         super.normalize()
@@ -59,12 +59,25 @@ class Shipyard extends Building {
     }
 
     calcBuyPrice(ship = new Ship()) {
-        return Math.round(ship.value * (1+this.planet.civilization.corruption))
+        return Math.round(ship.value * (1+this.planet.civilization.corruption) * (1+this.planet.civilization.inflation) / this.planet.civilization.navy)
     }
     calcSellPrice(ship = new Ship()) {
-        return Math.round(ship.value / (1+this.planet.civilization.corruption))
+        return Math.round(ship.value / (1+this.planet.civilization.corruption) * (1+this.planet.civilization.inflation) / this.planet.civilization.navy)
     }
     calcBuyModulePrice(module = new ShipModule()) {
         return Math.round(module.moduleType.value * module.quality * (1+this.planet.civilization.corruption))
     }
+}
+
+
+/**
+ * Generates a ship module with quality based on planet.
+ * @param {Planet} planet - The planet determining module quality.
+ * @param {ShipModuleType} moduleType - The type of module to generate.
+ * @returns {ShipModule} The generated ship module.
+ */
+function generateShipModule(planet = new Planet(), moduleType = rndMember(SHIP_MODULE_TYPES_ALL)) {
+    const technology = planet ? planet.civilization.technology : 1
+    const quality = rng(2, 0.5, false)*technology
+    return new ShipModule(moduleType, quality)
 }

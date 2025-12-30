@@ -4,14 +4,13 @@
  * @extends {Building}
  */
 class Bank extends Building {
-    static playerBalance = 0 //might need to improve this later if like..multiplayer becomes a thing
-
     /**
      * @param {Planet} planet - The planet this bank is on.
-     * @param {number} credits - The credits available at this bank.
      */
-    constructor(planet = new Planet(), credits = 0) {
-        super(planet, BUILDING_TYPES.BANK, credits)
+    constructor(planet = new Planet()) {
+        super(planet, BUILDING_TYPES.BANK)
+        /** @type {number} */
+        this.playerBalance = 0
     }
     calcDepositPenalty(depositAmount = 0) {
         return Math.ceil( depositAmount * Math.pow(0.01, 1/(1+this.planet.civilization.corruption)) )
@@ -26,7 +25,7 @@ class Bank extends Building {
     calcLoanMaxAmount(officer = new Officer()) {
         let maxLoanAmount = Math.pow(officer.level, 1.5) * 5000
         maxLoanAmount += officer.fame.total*10 - officer.infamy.total*10
-        maxLoanAmount += Bank.playerBalance
+        maxLoanAmount += this.playerBalance
         maxLoanAmount -= officer.bounty.total
         maxLoanAmount -= officer.calcTotalDebts()
         return Math.floor(maxLoanAmount)

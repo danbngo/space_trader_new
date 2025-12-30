@@ -6,22 +6,20 @@ class Building {
     /**
      * @param {Planet} planet - The planet this building is on.
      * @param {BuildingType} buildingType - The type of building.
-     * @param {number} credits - The credits available at this building.
      */
-    constructor(planet = new Planet(), buildingType = BUILDING_TYPES_ALL[0], credits = 0) {
+    constructor(planet = new Planet(), buildingType = BUILDING_TYPES_ALL[0]) {
         /** @type {Planet} */
         this.planet = planet
         /** @type {BuildingType} */
         this.buildingType = buildingType
         /** @type {number} */
-        this.credits = credits
-        /** @type {number} */
-        this.baseCredits = credits //gradually revert back towards this amount over time
+        this.credits = 1
         /** @type {boolean} */
         this.enabled = true
+        this.normalize()
     }
     normalize() {
-        this.credits = this.baseCredits
+        this.credits = this.buildingType.baseCredits * this.planet.civilization.wealth * this.planet.civilization.inflation
     }
     get rake() {
         const corruption = this.planet.civilization.corruption

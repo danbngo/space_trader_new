@@ -36,7 +36,7 @@ function showBankMenu(bank = new Bank()) {
         const penalty = bank.calcDepositPenalty(amt)
         gs.credits -= amt
         bank.credits += amt
-        Bank.playerBalance += amt-penalty
+        bank.playerBalance += amt-penalty
         reloadMenu()
     }
 
@@ -44,7 +44,7 @@ function showBankMenu(bank = new Bank()) {
         const penalty = bank.calcWithdrawalPenalty(amt)
         gs.credits += amt-penalty
         bank.credits -= amt-penalty
-        Bank.playerBalance -= amt
+        bank.playerBalance -= amt
         reloadMenu()
     }
 
@@ -74,7 +74,7 @@ function showBankMenu(bank = new Bank()) {
                 return `
                     Deposit Penalty : ${penalty}<br/>
                     Your CR After Deposit: ${gs.credits-amt}<br/>
-                    Your Balance After Deposit : ${Bank.playerBalance+amt-penalty}<br/>
+                    Your Balance After Deposit : ${bank.playerBalance+amt-penalty}<br/>
                     Bank CR After Deposit: ${bank.credits+amt}<br/>
                 `
             },
@@ -84,14 +84,14 @@ function showBankMenu(bank = new Bank()) {
 
     function showWithdrawSlider() {
         showSliderModal(
-            1, Bank.playerBalance, `Withdraw`,
+            1, bank.playerBalance, `Withdraw`,
             `How many credits would you like to withdraw?`,
             (amt)=>{
                 const penalty = bank.calcWithdrawalPenalty(amt)
                 return `
                     Withdrawal Penalty : ${penalty}<br/>
                     Your CR After Deposit: ${gs.credits+amt-penalty}<br/>
-                    Your Balance After Withdrawal: ${Bank.playerBalance-amt}<br/>
+                    Your Balance After Withdrawal: ${bank.playerBalance-amt}<br/>
                     Bank CR After Withdrawal: ${bank.credits-amt+penalty}<br/>
                 `
             },
@@ -142,7 +142,7 @@ function showBankMenu(bank = new Bank()) {
         )
     }
 
-    const canWithdraw = Bank.playerBalance > 0
+    const canWithdraw = bank.playerBalance > 0
     const canDeposit = gs.credits > 0
     const canBorrow = bank.calcLoanMaxAmount(gs.captain) > 0
 
@@ -167,7 +167,7 @@ function showBankMenu(bank = new Bank()) {
             isDocked ? 'Welcome to the bank.<br/>' : colorSpan('You must dock to use the bank.', COLORS.Yellow) + '<br/>',
             `<u>Your loans</u>`,
             createBankLoansTable(gs.loans, onSelectLoan),
-            `Your CR: ${gs.credits} | Your Balance: ${Bank.playerBalance}<br/>`,
+            `Your CR: ${gs.credits} | Your Balance: ${bank.playerBalance}<br/>`,
             `Bank CR: ${bank.credits} | Bank Transaction Penalty: ${roundToPlaces(bank.calcWithdrawalPenalty(100),2)}%<br/>`,
             `Max Approved Loan: ${bank.calcLoanMaxAmount(gs.captain)}<br/>`,
         ]

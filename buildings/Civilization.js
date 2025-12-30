@@ -9,6 +9,7 @@ class Civilization {
      * @param {Planet} [params.planet] - The planet this civilization belongs to.
      * @param {GovernmentType} [params.governmentType] - The type of government of the civilization.
      * @param {CountsMap} [params.cargoPriceModifiers] - Modifiers for cargo prices specific to this civilization.
+     * @param {CountsMap} [params.skillPriceModifiers] - Modifiers for cargo prices specific to this civilization.
      * @param {number} [params.technology] - Quality rating of ships produced by this civilization.
      * @param {number} [params.education] - Quality rating of officers from this civilization.
      * @param {number} [params.territory] - The territorial reach of the civilization in Astronomical Units (AUs).
@@ -30,7 +31,7 @@ class Civilization {
      * 
      */
     constructor({
-        planet = new Planet(), governmentType = GT_ALL[0], cargoPriceModifiers = new CountsMap(),
+        planet = new Planet(), governmentType = GT_ALL[0], cargoPriceModifiers = new CountsMap(), skillPriceModifiers = new CountsMap(),
         technology = 1.0, education = 1.0, territory = 1, population = 1, industry = 1,
         economy = 1, security = 1, culture = 1, prestige = 1, policies = new Policies(),
         navy = 1, army = 1, corruption = 1, crime = 1, wealth = 1, reserves = 1, inflation = 1
@@ -45,6 +46,8 @@ class Civilization {
         this.relationships = new Map()
         /** @type {CountsMap} */
         this.cargoPriceModifiers = cargoPriceModifiers
+        /** @type {CountsMap} */
+        this.skillPriceModifiers = skillPriceModifiers
         /** @type {number} */
         this.territory = territory; //AUs, recall that neptune is 30. encounters for this civilization can be found further from its planet
         /** @type {number} */

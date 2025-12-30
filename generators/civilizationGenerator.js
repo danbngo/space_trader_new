@@ -18,7 +18,9 @@ function generateCivilization(planet = new Planet()) {
     const prestige = rng(8,1,false)/4
     const crime = rng(8,1,false)/4
     const corruption = rng(8,1,false)/4
-
+    const wealth = rng(8,1,false)/4
+    const reserves = rng(8,1,false)/4
+    const inflation = rng(8,1,false)/4
 
     const cargoPriceModifiers = new CountsMap()
     for (const ct of CARGO_TYPES_ALL) {
@@ -50,6 +52,7 @@ function generateCivilization(planet = new Planet()) {
 
     return new Civilization({
         planet, governmentType, cargoPriceModifiers, technology, education, territory, population,
-         army, navy, industry, economy, security, culture, prestige, corruption, crime, policies
+         army, navy, industry, economy, security, culture, prestige, corruption, crime, policies,
+         wealth, reserves, inflation
     })
 }

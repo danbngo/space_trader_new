@@ -11,6 +11,9 @@ class Courthouse extends Building {
         super(planet, BUILDING_TYPES.COURTHOUSE)
     }
     calcPayBountyPenalty(bountyAmount = 0) {
-        return Math.ceil( bountyAmount * Math.pow(0.01, 1/(1+this.planet.civilization.corruption)) )
+        //higher corruption = EASIER to pay off bounties.
+        //maybe examine logic for this later. it might make more sense for player to have to pay a fraction of his total bounty
+        //OR, if you're caught with a bounty you pay it PLUS do jailtime.
+        return Math.ceil( bountyAmount * this.planet.civilization.inflation * Math.pow(0.01, 1+this.planet.civilization.corruption) )
     }
 }

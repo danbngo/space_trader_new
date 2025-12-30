@@ -115,43 +115,41 @@ function assessPlanets() {
 
     const totalPopulation = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.population,0)
     const totalTerritory = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.territory,0)
-    const totalMilitary = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.military,0)
+    const totalArmy = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.army,0)
+    const totalNavy = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.navy,0)
+    const totalCorruption = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.corruption,0)
+    const totalCrime = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.crime,0)
     const totalSecurity = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.security,0)
     const totalEconomic = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.economy,0)
     const totalIndustrial = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.industry,0)
     const totalCulture = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.culture,0)
     const totalPrestige = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.prestige,0)
-    const totalMarketInflation = gs.system.planets.reduce((sum,planet)=>sum+planet.settlement.market.inflation,0)
-    const totalBlackMarketInflation = gs.system.planets.reduce((sum,planet)=>sum+planet.settlement.blackMarket.inflation,0)
-    const totalBankCredits = gs.system.planets.reduce((sum,planet)=>sum+planet.settlement.bank.baseCredits,0)
-    const totalMarketCargoAmounts = gs.system.planets.reduce((sum,planet)=>sum+planet.settlement.market.baseCargo.total,0)
-    const totalBlackMarketCargoAmounts = gs.system.planets.reduce((sum,planet)=>sum+planet.settlement.blackMarket.baseCargo.total,0)
-    const totalGuildNumOfficers = gs.system.planets.reduce((sum,planet)=>sum+planet.settlement.guild.baseNumOfficers,0)
-    const totalShipyardNumShips = gs.system.planets.reduce((sum,planet)=>sum+planet.settlement.shipyard.baseNumShips,0)
-    const totalShipyardNumModules = gs.system.planets.reduce((sum,planet)=>sum+planet.settlement.shipyard.baseNumModules,0)
-    const totalShipQuality = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.technology,0)
-    const totalOfficerQuality = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.education,0)
+    const totalTechnology = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.technology,0)
+    const totalEducation = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.education,0)
+    const totalWealth = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.wealth,0)
+    const totalInflation = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.inflation,0)
+    const totalReserves = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.reserves,0)
     const totalCargoPriceModifier = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.cargoPriceModifiers.average,0)
+    const totalSkillPriceModifier = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.skillPriceModifiers.average,0)
 
+    const averageInflation = totalInflation / gs.system.planets.length
+    const averageTechnology = totalTechnology / gs.system.planets.length
+    const averageCorruption = totalCorruption / gs.system.planets.length
+    const averageCrime = totalCrime / gs.system.planets.length
+    const averageWealth = totalWealth / gs.system.planets.length
+    const averageEducation = totalEducation / gs.system.planets.length
     const averagePopulation = totalPopulation / gs.system.planets.length
     const averageTerritory = totalTerritory / gs.system.planets.length
-    const averageMilitary = totalMilitary / gs.system.planets.length
     const averageSecurity = totalSecurity / gs.system.planets.length
     const averageEconomic = totalEconomic / gs.system.planets.length
     const averageIndustrial = totalIndustrial / gs.system.planets.length
     const averageCulture = totalCulture / gs.system.planets.length
     const averagePrestige = totalPrestige / gs.system.planets.length
-    const averageMarketInflation = totalMarketInflation / gs.system.planets.length
-    const averageBlackMarketInflation = totalBlackMarketInflation / gs.system.planets.length
-    const averageMarketCargoAmounts = totalMarketCargoAmounts / gs.system.planets.length
-    const averageBlackMarketCargoAmounts = totalBlackMarketCargoAmounts / gs.system.planets.length
-    const averageBankCredits = totalBankCredits / gs.system.planets.length
-    const averageGuildNumOfficers = totalGuildNumOfficers / gs.system.planets.length
-    const averageShipyardNumShips = totalShipyardNumShips / gs.system.planets.length
-    const averageShipyardNumModules = totalShipyardNumModules / gs.system.planets.length
-    const averageShipQuality = totalShipQuality / gs.system.planets.length
-    const averageOfficerQuality = totalOfficerQuality / gs.system.planets.length
+    const averageMilitary = (totalArmy + totalNavy) / gs.system.planets.length
+    const averageReserves = totalReserves / gs.system.planets.length
+    
     const averageCargoPriceModifier = totalCargoPriceModifier / gs.system.planets.length
+    const averageSkillPriceModifier = totalSkillPriceModifier / gs.system.planets.length
 
     console.log('Average planet')
     console.log('Population:', averagePopulation.toFixed(2))
@@ -162,22 +160,13 @@ function assessPlanets() {
     console.log('Industrial Rating:', averageIndustrial.toFixed(2))
     console.log('Culture Rating:', averageCulture.toFixed(2))
     console.log('Prestige Rating:', averagePrestige.toFixed(2))
-    console.log('Market Inflation Rate:', averageMarketInflation.toFixed(4))
-    console.log('Black Market Inflation Rate:', averageBlackMarketInflation.toFixed(4))
-    console.log('Market Cargo Amounts:', averageMarketCargoAmounts.toFixed(2))
-    console.log('Market Cargo Amounts (Normalized):', (averageMarketCargoAmounts/MARKET_AVERAGE_CARGO_PER_TYPE/CARGO_TYPES_ALL.length).toFixed(2))
-    console.log('Black Market Cargo Amounts:', averageBlackMarketCargoAmounts.toFixed(2))
-    console.log('Black Market Cargo Amounts (Normalized):', (averageBlackMarketCargoAmounts/MARKET_AVERAGE_CARGO_PER_TYPE/CARGO_TYPES_ALL.length).toFixed(2))
-    console.log('Bank Credits:', averageBankCredits.toFixed(2))
-    console.log('Bank Credits (Normalized):', (averageBankCredits/BANK_AVERAGE_CREDITS).toFixed(2))
-    console.log('Guild Number of Officers:', averageGuildNumOfficers.toFixed(2))
-    console.log('Guild Number of Officers (Normalized):', (averageGuildNumOfficers/GUILD_AVERAGE_NUM_OFFICERS).toFixed(2))
-    console.log('Shipyard Number of Ships:', averageShipyardNumShips.toFixed(2))
-    console.log('Shipyard Number of Ships (Normalized):', (averageShipyardNumShips/SHIPYARD_AVERAGE_NUM_SHIPS).toFixed(2))
-    console.log('Shipyard Number of Modules:', averageShipyardNumModules.toFixed(2))
-    console.log('Shipyard Number of Modules (Normalized):', (averageShipyardNumModules/SHIPYARD_AVERAGE_NUM_MODULES).toFixed(2))
-    console.log('Ship Quality:', averageShipQuality.toFixed(2))
-    console.log('Officer Quality:', averageOfficerQuality.toFixed(2))
-    console.log('Cargo Price Modifier:', averageCargoPriceModifier.toFixed(4))
+    console.log('Technology Rating:', averageTechnology.toFixed(4))
+    console.log('Education Rating:', averageEducation.toFixed(4))
+    console.log('Corruption Rating:', averageCorruption.toFixed(4))
+    console.log('Crime Rating:', averageCrime.toFixed(4))
+    console.log('Wealth Rating:', averageWealth.toFixed(4))
+    console.log('Inflation Rating:', averageInflation.toFixed(4))
+    console.log('Reserves Rating:', averageReserves.toFixed(4))
     console.log('Cargo Price Modifier (Normalized):', (averageCargoPriceModifier/MARKET_AVERAGE_CARGO_PRICE_MODIFIER).toFixed(4))
+    console.log('Skill Price Modifier (Normalized):', (averageSkillPriceModifier/ACADEMY_AVERAGE_SKILL_PRICE_MODIFIER).toFixed(4))
 }

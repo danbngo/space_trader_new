@@ -7,31 +7,47 @@ class Market extends Building {
     /**
      * @param {Planet} planet - The planet this market is on.
      * @param {boolean} blackMarket - Whether this is a black market (illegal goods).
-     * @param {CountsMap} cargo - The cargo available for purchase.
-     * @param {number} credits - The credits available at this market.
-     * @param {number} inflation - The inflation multiplier for prices.
      */
-    constructor(planet = new Planet(), blackMarket = false, cargo = new CountsMap(), credits = 0, inflation = 1) {
-        super(planet, BUILDING_TYPES.MARKET, credits)
+    constructor(planet = new Planet(), blackMarket = false) {
+        super(planet, BUILDING_TYPES.MARKET)
         /** @type {boolean} */
         this.blackMarket = blackMarket;
         /** @type {CountsMap} */
-        this.cargo = cargo; // Cargo[]
-        /** @type {CountsMap} */
-        this.baseCargo = cargo.clone()
-        /** @type {number} */
-        this.inflation = inflation
+        this.cargo = new CountsMap();
+        this.normalize()
     }
 
     normalize() {
         super.normalize()
-        this.cargo = this.baseCargo.clone()
+        this.cargo = this.calcBaseCargo()
+        //apply a bit of rng
+        for (const cargoType of CARGO_TYPES_ALL) {
+            const currentAmount = this.cargo.getAmount(cargoType)
+            const variation = Math.round(currentAmount * 0.25)
+            const newAmount = rng(currentAmount - variation, currentAmount + variation)
+            this.cargo.setAmount(cargoType, newAmount)
+        }
     }
 
+    calcBaseCargo() {
+        const baseCargo = new CountsMap()
+        for (const cargoType of CARGO_TYPES_ALL) {
+            //simple supply and demand - as price goes up, availability goes down
+            const baseAmount = Math.round(MARKET_AVERAGE_CARGO_PER_TYPE/this.planet.civilization.cargoPriceModifiers.getAmount(cargoType))
+            const amount = this.blackMarket ? baseAmount * this.planet.civilization.crime : baseAmount * this.planet.civilization.reserves
+            baseCargo.setAmount(cargoType, amount)
+        }
+        return baseCargo
+    }
+
+    //sticking with having corruption raise prices even at the black market
     calcCargoBuyPrices() {
         const prices = new CountsMap()
         for (const cargoType of CARGO_TYPES_ALL) {
-            const price = Math.round(cargoType.value * this.planet.civilization.cargoPriceModifiers.getAmount(cargoType) * (1+this.planet.civilization.corruption) * this.inflation)
+            const basePrice = cargoType.value * this.planet.civilization.cargoPriceModifiers.getAmount(cargoType)
+            const price = 
+                this.blackMarket ? Math.round(basePrice * (1+this.planet.civilization.corruption) * this.planet.civilization.inflation / this.planet.civilization.crime)
+                : Math.round(basePrice * (1+this.planet.civilization.corruption) * this.planet.civilization.inflation / this.planet.civilization.reserves)
             prices.setAmount(cargoType, price)
         }
         return prices
@@ -40,7 +56,10 @@ class Market extends Building {
     calcCargoSellPrices() {
         const prices = new CountsMap()
             for (const cargoType of CARGO_TYPES_ALL) {
-            const price = Math.round(cargoType.value * this.planet.civilization.cargoPriceModifiers.getAmount(cargoType) / (1+this.planet.civilization.corruption) * this.inflation)
+            const basePrice = cargoType.value * this.planet.civilization.cargoPriceModifiers.getAmount(cargoType)
+            const price = 
+                this.blackMarket ? Math.round(basePrice / (1+this.planet.civilization.corruption) * this.planet.civilization.inflation / this.planet.civilization.crime)
+                : Math.round(basePrice / (1+this.planet.civilization.corruption) * this.planet.civilization.inflation / this.planet.civilization.reserves)
             prices.setAmount(cargoType, price)
         }
         return prices

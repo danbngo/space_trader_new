@@ -6,17 +6,18 @@
 class Guild extends Building {
     /**
      * @param {Planet} planet - The planet this guild is on.
-     * @param {Officer[]} officers - The officers available for hire.
      */
-    constructor(planet = new Planet(), officers = []) {
+    constructor(planet = new Planet()) {
         super(planet, BUILDING_TYPES.GUILD)
         /** @type {Officer[]} */
-        this.officers = officers; // Officer[]
-        /** @type {number} */
-        this.baseNumOfficers = officers.length
+        this.officers = []; // Officer[]
+        this.normalize(true)
     }
     calcHirePrice(officer = new Officer()) {
-        return Math.round(officer.value * (1+this.planet.civilization.corruption))
+        return Math.round(officer.value * (1+this.planet.civilization.corruption) * this.planet.civilization.inflation / this.planet.civilization.army)
+    }
+    get baseNumOfficers() {
+        return GUILD_AVERAGE_NUM_OFFICERS*this.planet.civilization.army
     }
     normalize(clearExisting = false) {
         super.normalize()

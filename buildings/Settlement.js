@@ -31,33 +31,4 @@ class Settlement {
         /** @type {Academy} */
         this.academy = academy;
     }
-
-    get buildings() {
-        return [this.shipyard, this.market, this.blackMarket, this.guild, this.bank, this.courthouse, this.academy]
-    }
-
-    get wealth() {
-        return this.bank.baseCredits/BANK_AVERAGE_CREDITS
-    }
-
-    get stockpile() {
-        const marketCargoAvg = this.market.baseCargo.average
-        const marketCargoNormalized = marketCargoAvg / MARKET_AVERAGE_CARGO_PER_TYPE
-        return marketCargoNormalized
-    }
-
-    get cryme() {
-        const blackMarketCargoAvg = this.blackMarket.baseCargo.average
-        const blackMarketCargoNormalized = blackMarketCargoAvg / MARKET_AVERAGE_CARGO_PER_TYPE
-        return blackMarketCargoNormalized
-    }
-
-    get inflation() {
-        return this.market.inflation
-    }
-
-    get corruption() {
-        // it is EASIER to get a good deal when corruption is high, so invert this value
-        return 1/this.blackMarket.inflation
-    }
 }

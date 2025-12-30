@@ -34,10 +34,14 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0])
 
     function onSelectSkill(skill = SKILLS_ALL[0]) {
         const cost = academy.calcSkillUpgradeCost(gs.captain, skill)
+        const currentLevel = gs.captain.skills.getAmount(skill)
+        const targetLevel = currentLevel + 1
+        const canUpgrade = academy.calcCanUpgradeSkill(gs.captain, targetLevel)
         const canAfford = gs.credits >= cost && isDocked
+        const canTrain = canUpgrade && canAfford
         
         const buttons = [
-            ...(isDocked ? [['Upgrade', () => showUpgradeConfirmation(skill), !canAfford]] : []),
+            ...(isDocked ? [['Upgrade', () => showUpgradeConfirmation(skill), !canTrain]] : []),
             ['Back', () => showPlanetMenu(planet)]
         ]
         refreshPanelButtons('academy_panel', buttons)
@@ -45,11 +49,13 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0])
 
     // Build skills table with columns: Skill Name, CR to Upgrade
     const skillTableRows = [
-        ['Skill', 'Current Lvl', 'CR to Upgrade'],
+        ['Skill', 'Current Lvl', 'Can Upgrade?', 'CR to Upgrade'],
         ...SKILLS_ALL.map(skill => {
             const currentLevel = gs.captain.skills.getAmount(skill)
+            const targetLevel = currentLevel + 1
+            const canUpgrade = academy.calcCanUpgradeSkill(gs.captain, targetLevel)
             const cost = academy.calcSkillUpgradeCost(gs.captain, skill)
-            const skillModifier = academy.skillCosts.getAmount(skill) || 1
+            const skillModifier = planet.civilization.skillPriceModifiers.getAmount(skill) || 1
             const totalMultiplier = skillModifier * (1 + academy.rake)
             // Calculate stat ratio: 1.0 rake and 1.0 skillCost = white (ratio 1)
             // Higher = red (ratio < 1), Lower = green (ratio > 1)
@@ -58,6 +64,7 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0])
             return [
                 skill,
                 currentLevel,
+                colorSpan(canUpgrade ? 'Yes' : 'No', canUpgrade ? COLORS.Green : COLORS.Red),
                 ''+statColorSpan(cost, statRatio) + ' CR'
             ]
         })
