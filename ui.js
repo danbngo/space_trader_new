@@ -186,6 +186,14 @@ function statColorSpan(text = '', ratio = 1.0) {
     return colorSpan(text, color)
 }
 
+function rgbArrayToString(color = [255, 255, 255, 1.0]) {
+    if (color.length >= 4) {
+        return `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${color[3]})`;
+    } else {
+        return `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
+    }
+}
+
 /** 
  * @function colorSpan
  * @param {string} text
@@ -195,7 +203,7 @@ function statColorSpan(text = '', ratio = 1.0) {
 function colorSpan(text = '', color = '') {
     if (Array.isArray(color)) {
         // convert color array to rgba string
-        color = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${color.length > 3 ? color[3] : 1})`;
+        color = rgbArrayToString(color);
     }
 
     // return HTML string instead of DOM element

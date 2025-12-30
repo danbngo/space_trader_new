@@ -107,11 +107,27 @@ function showCaptainReputationMenu() {
     
     const ranksTable = createTable(ranksTableRows)
 
+    // Build faction reputation table
+    const factionTableRows = [
+        // Header row
+        ['Faction', 'Fame', 'Infamy'],
+        // Data rows for each faction
+        ...FACTION_TYPES_ALL.map(faction => [
+            `${faction.symbol} ${colorSpan(faction.name, faction.color)}`,
+            statColorSpan(captain.fame.getAmount(faction), 1 + captain.fame.getAmount(faction)/50),
+            statColorSpan(captain.infamy.getAmount(faction), 1 / (1 + captain.infamy.getAmount(faction)/50)),
+        ])
+    ]
+    
+    const factionTable = createTable(factionTableRows)
+
     showModal(
         `Captain Reputation`,
         ce({children: [
-            ce({children: ['<b>Reputation</b>']}),
+            ce({children: ['<b>Planetary Reputation</b>']}),
             reputationTable,
+            ce({style: 'margin-top: 20px;', children: ['<b>Factional Reputation</b>']}),
+            factionTable,
             ce({style: 'margin-top: 20px;', children: ['<b>Planetary Ranks</b>']}),
             ranksTable,
         ]}),

@@ -14,7 +14,7 @@ class MilitaryBuildupNews extends News {
                 industry: CL.LOW,
                 reserves: CL.LOW,
                 wealth: CL.LOW,
-                cargoPriceMultipliers: new Map([[CARGO_TYPES.WEAPONS, CL.VERY_HIGH], [CARGO_TYPES.ANTIMATTER, 2]]),
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.VERY_HIGH], [CARGO_TYPES.ANTIMATTER, 2]])),
             })
         ]
 

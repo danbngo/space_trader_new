@@ -156,12 +156,17 @@ function showPlayerDidSurrenderModal( fameLossMultiplier = 1) {
     console.log('showPlayerDidSurrenderModal', { fameLossMultiplier });
     const fleetName = coloredName(gs.encounter.fleet)
     const planet = gs.encounter.planet
+    const faction = gs.encounter.fleet.faction
     const fameLoss = fameLossMultiplier < 0 ? 5 * fameLossMultiplier : 0
     const infamyLoss = fameLossMultiplier < 0 ? 5 * fameLossMultiplier : 0
 
     let msg = `There's no other choice. You power your ships down and broadcast the universal signal for surrender.<br/>`
     if (fameLoss && planet) msg += gs.captain.grantFame(planet, fameLoss)
     if (infamyLoss && planet) msg += gs.captain.grantInfamy(planet, infamyLoss)
+    if (faction) {
+        if (fameLoss) msg += gs.captain.grantFactionFame(faction, fameLoss)
+        if (infamyLoss) msg += gs.captain.grantFactionInfamy(faction, infamyLoss)
+    }
 
     showModal(fleetName, msg, [['Continue', ()=>gs.encounter.encounterType.onDefeat()]])
 }
@@ -171,6 +176,7 @@ function showPlayerAttackFleetModal(fameMultiplier = 0, bountyMultiplier = 0, sn
     console.log('showPlayerAttackFleetModal', { fameMultiplier, bountyMultiplier });
     const fleetName = coloredName(gs.encounter.fleet)
     const planet = gs.encounter.planet
+    const faction = gs.encounter.fleet.faction
     const fame = fameMultiplier > 0 ? 1 * fameMultiplier : 0
     const infamy = fameMultiplier < 0 ? 1 * Math.abs(fameMultiplier) : 0
     const bounty = 1000 * bountyMultiplier
@@ -184,6 +190,10 @@ function showPlayerAttackFleetModal(fameMultiplier = 0, bountyMultiplier = 0, sn
     if (infamy && planet) msg += gs.captain.grantInfamy(planet, infamy)
     if (fame && planet) msg += gs.captain.grantFame(planet, fame)
     if (bounty && planet) msg += gs.captain.grantBounty(planet, bounty)
+    if (faction) {
+        if (infamy) msg += gs.captain.grantFactionInfamy(faction, infamy)
+        if (fame) msg += gs.captain.grantFactionFame(faction, fame)
+    }
 
 
     showModal(fleetName, msg, [['Continue', ()=>{
@@ -301,6 +311,7 @@ function showPlayerDefeatedEnemyModal(fameMultiplier = 0) {
     console.log('showPlayerDefeatedEnemyModal', { fameMultiplier });
     const {enemyFleet, disabledEnemyShips} = gs.encounter
     const planet = gs.encounter.planet
+    const faction = gs.encounter.fleet.faction
     const fame = fameMultiplier > 0 ? 5 * fameMultiplier : 0
     const infamy = fameMultiplier < 0 ? 5 * Math.abs(fameMultiplier) : 0
     const abandonedCargoCapacity = disabledEnemyShips.reduce( (total, ship) => {
@@ -326,6 +337,10 @@ function showPlayerDefeatedEnemyModal(fameMultiplier = 0) {
     msg += gs.captain.grantExperience(expGained)
     if (infamy && planet) msg += gs.captain.grantInfamy(planet, infamy)
     if (fame && planet) msg += gs.captain.grantFame(planet, fame)
+    if (faction) {
+        if (infamy) msg += gs.captain.grantFactionInfamy(faction, infamy)
+        if (fame) msg += gs.captain.grantFactionFame(faction, fame)
+    }
 
     if (disabledPlayerShips.length > 0) {
         msg += `${disabledPlayerShips.length} of your ships were disabled in the fighting.<br/>`

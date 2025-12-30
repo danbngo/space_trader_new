@@ -31,6 +31,8 @@ class Fleet extends SpaceObject {
         this.location = null;
         /** @type {Route} */
         this.route = null //could be Route class
+        /** @type {FactionType} */
+        this.faction = null;
     }
 
     dock(planet) {

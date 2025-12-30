@@ -33,7 +33,7 @@ class WarSubjugationNews extends News {
                 reserves: CL.LOW,
                 prestige: CL.VERY_LOW,
                 relationsReset: true,
-                cargoPriceMultipliers: new Map([[CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_LOW]]),
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_LOW]])),
                 forcePeace: true,
             })
         ]

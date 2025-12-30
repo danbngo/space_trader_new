@@ -1,11 +1,11 @@
-class ImperialismNews extends News {
+class LandGrabNews extends News {
     constructor(planet = new Planet(), targetPlanet = new Planet()) {
         super(
-            `${coloredName(planet)} carries out imperialist expansion, seizing territory from ${coloredName(targetPlanet)}!`,
-            `${coloredName(planet)}'s imperialist expansion against ${coloredName(targetPlanet)} finally grinds to a halt!`,
-            `${coloredName(targetPlanet)} repels ${coloredName(planet)}'s imperialist aggression!`,
-            `Peace treaty forces ${coloredName(planet)} to abandon expansion into ${coloredName(targetPlanet)}!`,
-            NT.IMPERIALISM, planet, targetPlanet
+            `${coloredName(planet)}'s navies are infringing on ${coloredName(targetPlanet)}'s territory in a blatant land grab!`,
+            `${coloredName(planet)}'s aggressive expansion against ${coloredName(targetPlanet)} finally grinds to a halt!`,
+            `${coloredName(targetPlanet)} repels ${coloredName(planet)}'s navies from their borders!`,
+            `Peace treaty forces ${coloredName(planet)} to abandon their border incursions into ${coloredName(targetPlanet)}!`,
+            NT.LAND_GRAB, planet, targetPlanet
         )
 
         this.startEffects = [
@@ -100,7 +100,7 @@ class ImperialismNews extends News {
         const relationships = [planet.c.relationships.get(targetPlanet), targetPlanet.c.relationships.get(planet)]
         const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.TENSE || rel == RELATIONSHIP_TYPES.WAR)
         const interferingEvent =
-            News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.IMPERIALISM])
+            News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.LAND_GRAB])
         return ratingsValid && militaryValid && relationshipsValid && !interferingEvent
     }
 }

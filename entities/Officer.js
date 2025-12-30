@@ -7,22 +7,19 @@ class Officer {
     /**
      * @param {string} name - The name of the officer.
      * @param {number} credits - The credits owned by the officer.
-     * @param {CountsMap|number} fame - Fame per planet (or legacy number for backwards compatibility).
-     * @param {CountsMap|number} infamy - Infamy per planet (or legacy number for backwards compatibility).
-     * @param {CountsMap|number} bounty - Bounty per planet (or legacy number for backwards compatibility).
      */
-    constructor(name = "Unnamed", credits = 0, fame = 0, infamy = 0, bounty = 0) {
+    constructor(name = "Unnamed", credits = 0) {
         /** @type {string} */
         this.name = name;
         /** @type {number} */
         this.credits = credits;
         // Convert old number values to CountsMap if needed (for backwards compatibility)
         /** @type {CountsMap} */
-        this.fame = (typeof fame === 'number') ? new CountsMap() : fame;
+        this.fame = new CountsMap()
         /** @type {CountsMap} */
-        this.infamy = (typeof infamy === 'number') ? new CountsMap() : infamy;
+        this.infamy = new CountsMap();
         /** @type {CountsMap} */
-        this.bounty = (typeof bounty === 'number') ? new CountsMap() : bounty;
+        this.bounty = new CountsMap();
         // If we received numbers, we can't assign them to a planet, so leave maps empty
         /** @type {CountsMap} */
         this.skills = new CountsMap();
@@ -71,6 +68,22 @@ class Officer {
         this.fame.increment(planet, amount);
         if (this == gs.captain) {
             return colorSpan(`You ${amount >= 0 ? 'gained' : 'lost'} ${Math.abs(amount)} fame on ${coloredName(planet)}.<br/>`, amount >= 0 ? COLORS.LightGreen : COLORS.LightRed);
+        }
+        return ''
+    }
+
+    grantFactionInfamy(faction = FACTION_TYPES_ALL[0], amount = 1) {
+        this.infamy.increment(faction, amount);
+        if (this == gs.captain) {
+            return colorSpan(`You ${amount >= 0 ? 'gained' : 'lost'} ${Math.abs(amount)} infamy with ${faction.symbol} ${colorSpan(faction.name, faction.color)}.<br/>`, amount >= 0 ? COLORS.LightRed : COLORS.LightGreen);
+        }
+        return ''
+    }
+
+    grantFactionFame(faction = FACTION_TYPES_ALL[0], amount = 1) {
+        this.fame.increment(faction, amount);
+        if (this == gs.captain) {
+            return colorSpan(`You ${amount >= 0 ? 'gained' : 'lost'} ${Math.abs(amount)} fame with ${faction.symbol} ${colorSpan(faction.name, faction.color)}.<br/>`, amount >= 0 ? COLORS.LightGreen : COLORS.LightRed);
         }
         return ''
     }

@@ -17,7 +17,7 @@ class FestivalNews extends News {
                 reserves: CL.LOW,
                 crime: CL.HIGH,
                 corruption: CL.HIGH,
-                cargoPriceMultipliers: new Map([[CARGO_TYPES.HOLOCUBES, CL.VERY_HIGH], [CARGO_TYPES.DRUGS, CL.ASTRONOMICAL]]),
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.HOLOCUBES, CL.VERY_HIGH], [CARGO_TYPES.DRUGS, CL.ASTRONOMICAL]])),
             })
         ]
 

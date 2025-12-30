@@ -16,7 +16,7 @@ class ColonizationNews extends News {
                 navy: CL.VERY_LOW, // ships sent to colonize
                 technology: CL.LOW,
                 reserves: CL.LOW,
-                cargoPriceMultipliers: new Map([[CARGO_TYPES.METAL, CL.VERY_HIGH], [CARGO_TYPES.ISOTOPES, CL.EXTREMELY_HIGH]]),
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.METAL, CL.VERY_HIGH], [CARGO_TYPES.ISOTOPES, CL.EXTREMELY_HIGH]])),
                 wealth: CL.LOW, // funding colonization
             })
         ]

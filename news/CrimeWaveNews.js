@@ -14,7 +14,7 @@ class CrimeWaveNews extends News {
                 security: CL.LOW,
                 crime: CL.VERY_HIGH,
                 corruption: CL.HIGH,
-                cargoPriceMultipliers: new Map([[CARGO_TYPES.WEAPONS, CL.EXTREMELY_LOW], [CARGO_TYPES.DRUGS, CL.EXTREMELY_LOW]]),
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.EXTREMELY_LOW], [CARGO_TYPES.DRUGS, CL.EXTREMELY_LOW]])),
             })
         ]
 

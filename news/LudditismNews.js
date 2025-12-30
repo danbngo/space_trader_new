@@ -18,7 +18,7 @@ class LudditismNews extends News {
                 industry: CL.SLIGHTLY_LOW,
                 education: CL.SLIGHTLY_LOW,
                 crime: CL.SLIGHTLY_LOW,
-                cargoPriceMultipliers: new Map([
+                cargoPriceMultipliers: new CountsMap(new Map([
                     [CARGO_TYPES.NANITES, CL.EXTREMELY_LOW],
                     [CARGO_TYPES.ISOTOPES, CL.EXTREMELY_LOW],
                     [CARGO_TYPES.HOLOCUBES, CL.VERY_LOW]

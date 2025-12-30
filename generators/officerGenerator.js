@@ -22,11 +22,8 @@ function generateOfficer(planet = new Planet()) {
     const {civilization} = planet
     const {education} = civilization
     const level = rng(10*education, 1)
-    const fame = rng(level, -level)
-    const infamy = rng(level, -level)
-    const bounty = 0
     const credits = 0
-    const officer = new Officer(generateOfficerName(planet), credits, fame, infamy, bounty)
+    const officer = new Officer(generateOfficerName(planet), credits)
     
     // Level up to target level
     for (let i = 0; i < level; i++) {

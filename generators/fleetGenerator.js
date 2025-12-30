@@ -40,6 +40,16 @@ function generateFleet(fleetType = rndMember(FLEET_TYPES_ALL), planet = new Plan
     ships.forEach(s=>fleet.addShip(s))
     
     fleet.cargo = generateFleetCargo(fleet, fleetType)
+    
+    // Assign faction based on fleet type
+    if (fleetType === FLEET_TYPES.MINERS) fleet.faction = FACTION_TYPES.MINERS
+    else if (fleetType === FLEET_TYPES.MERCHANTS) fleet.faction = FACTION_TYPES.MERCHANTS
+    else if (fleetType === FLEET_TYPES.SMUGGLERS) fleet.faction = FACTION_TYPES.SMUGGLERS
+    else if (fleetType === FLEET_TYPES.PIRATES) fleet.faction = FACTION_TYPES.PIRATES
+    else if (fleetType === FLEET_TYPES.POLICE) fleet.faction = FACTION_TYPES.POLICE
+    else if (fleetType === FLEET_TYPES.SOLDIERS) fleet.faction = FACTION_TYPES.SOLDIERS
+    else if (fleetType === FLEET_TYPES.BOUNTY_HUNTERS) fleet.faction = FACTION_TYPES.BOUNTY_HUNTERS
+    else if (fleetType === FLEET_TYPES.TOURISTS) fleet.faction = FACTION_TYPES.TOURISTS
 
     return fleet
 }

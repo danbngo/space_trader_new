@@ -30,7 +30,7 @@ const NEWS_TYPE_CLASSES = [
     [NT.FOREIGN_AID, ForeignAidNews],
     [NT.GENOCIDE, GenocideNews],
     [NT.IMMIGRATION, ImmigrationNews],
-    [NT.IMPERIALISM, ImperialismNews],
+    [NT.LAND_GRAB, LandGrabNews],
     [NT.INVESTMENT, InvestmentNews],
     [NT.ISOLATIONISM, IsolationismNews],
     [NT.LUDDITISM, LudditismNews],

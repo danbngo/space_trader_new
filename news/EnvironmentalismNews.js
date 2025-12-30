@@ -13,7 +13,7 @@ class EnvironmentalismNews extends News {
                 planet: this.planet,
                 industry: CL.EXTREMELY_LOW,
                 navy: CL.VERY_LOW,
-                cargoPriceMultipliers: new Map([[CARGO_TYPES.NANITES, CL.EXTREMELY_LOW], [CARGO_TYPES.METAL, CL.EXTREMELY_LOW]]),
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.NANITES, CL.EXTREMELY_LOW], [CARGO_TYPES.METAL, CL.EXTREMELY_LOW]])),
             })
         ]
 

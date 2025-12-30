@@ -12,12 +12,12 @@ class ResearchAgreementNews extends News {
             new NewsEffect({
                 planet: this.planet,
                 wealth: CL.LOW,
-                cargoPriceMultipliers: new Map([[CARGO_TYPES.ISOTOPES, 2]]),
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ISOTOPES, 2]])),
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
                 wealth: CL.LOW,
-                cargoPriceMultipliers: new Map([[CARGO_TYPES.ISOTOPES, 2]]),
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ISOTOPES, 2]])),
             }),
         ]
 

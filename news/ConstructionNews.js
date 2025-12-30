@@ -17,7 +17,7 @@ class ConstructionNews extends News {
                 reserves: CL.LOW,
                 inflation: CL.HIGH,
                 wealth: CL.LOW,
-                cargoPriceMultipliers: new Map([[CARGO_TYPES.METAL, CL.EXTREMELY_HIGH], [CARGO_TYPES.NANITES, CL.ASTRONOMICAL]]),
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.METAL, CL.EXTREMELY_HIGH], [CARGO_TYPES.NANITES, CL.ASTRONOMICAL]])),
             })
         ]
 

@@ -33,7 +33,7 @@ class CoupDetatNews extends News {
                 industry: CL.LOW,
                 prestige: CL.LOW,
                 //wealth: CL.VERY_LOW,
-                cargoPriceMultipliers: new Map([[CARGO_TYPES.WEAPONS, CL.ASTRONOMICAL]]),
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.ASTRONOMICAL]])),
             })
         ]
 

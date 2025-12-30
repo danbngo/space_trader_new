@@ -25,7 +25,7 @@ class RevolutionNews extends News {
                 industry: CL.LOW,
                 //credits: CL.VERY_LOW,
                 buildingsDisabled: courthouseBuilding ? [courthouseBuilding] : [],
-                cargoPriceMultipliers: new Map([[CARGO_TYPES.WEAPONS, CL.VERY_HIGH], [CARGO_TYPES.HOLOCUBES, CL.VERY_HIGH]]),
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.VERY_HIGH], [CARGO_TYPES.HOLOCUBES, CL.VERY_HIGH]])),
                 //relationsReset: true
             })
         ]
@@ -56,7 +56,7 @@ class RevolutionNews extends News {
                 industry: CL.NO_REGRESSION,
                 prestige: CL.VERY_LOW,
                 buildingsEnabled: courthouseBuilding ? [] : [],
-                cargoPriceMultipliers: new Map([[CARGO_TYPES.WEAPONS, CL.NO_REGRESSION]]),
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.NO_REGRESSION]])),
             })
         ]
     }
