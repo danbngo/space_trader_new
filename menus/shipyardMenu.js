@@ -145,8 +145,8 @@ function showShipyardBuyMenu(shipyard = new Shipyard()) {
             createBuyShipMenu(shipyard.ships, shipyard, (ship)=>onSelectShipyardShip(ship)),
             `Your # ships: ${fleet.ships.length}/${fleet.numPilots} | Your credits: ${gs.credits}`,
             //`Shipyard credits: ${shipyard.credits}`,
-            `Local Ship Quality: ${roundToPlaces(100*shipyard.planet.civilization.technology, 2)}%`,
-            `Buy Fee: ${statColorSpan(roundToPlaces(100*planet.civilization.corruption, 2), 2/(1+planet.civilization.corruption))}%`,
+            `Local Ship Quality: ${roundToPlaces(100*shipyard.planet.c.technology, 2)}%`,
+            `Buy Fee: ${statColorSpan(roundToPlaces(100*planet.c.corruption, 2), 2/(1+planet.c.corruption))}%`,
             (gs.fleet.totalSkills.getAmount(SKILLS.Barter) > 0) ? `Fee After Barter | ${statColorSpan(roundToPlaces(100*(1+shipyard.rake) - 100, 2), 2/(1+shipyard.rake))}% Buy` : '',
         ]}),
         [
@@ -217,7 +217,7 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
             `Your # ships: ${fleet.ships.length}/${fleet.numPilots}` + (fleet.ships.length < 2 ? colorSpan(` (You can't sell your last ship!)`, COLORS.Yellow) : ''),
             colorSpan(`Your credits: ${gs.credits}`, gs.credits == 0 ? COLORS.Red : ''),
             colorSpan(`Shipyard credits: ${shipyard.credits}`, shipyard.credits == 0 ? COLORS.Red : ''),
-            `Sell Fee: ${statColorSpan(roundToPlaces(100*planet.civilization.corruption/(planet.civilization.corruption+1), 2), 2/(planet.civilization.corruption+1))}%`,
+            `Sell Fee: ${statColorSpan(roundToPlaces(100*planet.c.corruption/(planet.c.corruption+1), 2), 2/(planet.c.corruption+1))}%`,
             (gs.fleet.totalSkills.getAmount(SKILLS.Barter) > 0) ? `Fee After Barter | ${statColorSpan(roundToPlaces(100*shipyard.rake/(shipyard.rake+1), 2), 2/(shipyard.rake+1))}% Sell` : '',
         ]}),
         [
@@ -263,7 +263,7 @@ function showShipyardBuyModulesMenu(shipyard = new Shipyard()) {
             `<b>Available Modules</b>`,
             createBuyModuleMenu(shipyard.modules, shipyard, (module)=>onSelectModule(module)),
             `Your credits: ${gs.credits} | Your Ships With Open Slots: ${fleet.ships.filter(s => s.unusedModuleSlots > 0).length} / ${fleet.ships.length}`,
-            `Buy Fee: ${statColorSpan(roundToPlaces(100*planet.civilization.corruption, 2), 2/(1+planet.civilization.corruption))}%`,
+            `Buy Fee: ${statColorSpan(roundToPlaces(100*planet.c.corruption, 2), 2/(1+planet.c.corruption))}%`,
             (gs.fleet.totalSkills.getAmount(SKILLS.Barter) > 0) ? `Fee After Barter | ${statColorSpan(roundToPlaces(100*(1+shipyard.rake) - 100, 2), 2/(1+shipyard.rake))}% Buy` : '',
         ]}),
         [

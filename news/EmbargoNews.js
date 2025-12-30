@@ -54,7 +54,7 @@ class EmbargoNews extends News {
     determineOutcome() {
         const {planet: p, targetPlanet: tp} = this
         // Check if relationship improved to neutral
-        const rel = planet.civilization.relationships.get(targetPlanet)
+        const rel = planet.c.relationships.get(targetPlanet)
         if (rel === RELATIONSHIP_TYPES.NEUTRAL || rel === RELATIONSHIP_TYPES.ALLY) {
             this.cancelled = true
         }
@@ -63,10 +63,10 @@ class EmbargoNews extends News {
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         //need to have enough ships for it
-        const ratingsValid = planet.civilization.military > CL.MEDIUM
+        const ratingsValid = planet.c.military > CL.MEDIUM
         //cant be anarchic or puppet state
         //planet must already be hostile to the target planet
-        const relationshipValid = planet.civilization.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.TENSE || planet.civilization.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR
+        const relationshipValid = planet.c.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.TENSE || planet.c.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR
         const interferingEvent = 
             News.hasNews(NT.EMBARGO, planet, targetPlanet) || 
             News.hasAnyNewsBidirectional(planet, targetPlanet, NT_COOPERATIVE)

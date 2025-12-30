@@ -59,7 +59,7 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0])
             const targetLevel = currentLevel + 1
             const canUpgrade = academy.calcCanUpgradeSkill(gs.captain, targetLevel)
             const cost = academy.calcSkillUpgradeCost(gs.captain, skill)
-            const skillModifier = planet.civilization.skillPriceMultipliers.getAmount(skill) || 1
+            const skillModifier = planet.c.skillPriceMultipliers.getAmount(skill) || 1
             const totalMultiplier = skillModifier * (1 + academy.rake)
             // Calculate stat ratio: 1.0 rake and 1.0 skillCost = white (ratio 1)
             // Higher = red (ratio < 1), Lower = green (ratio > 1)

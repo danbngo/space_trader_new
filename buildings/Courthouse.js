@@ -14,6 +14,6 @@ class Courthouse extends Building {
         //higher corruption = EASIER to pay off bounties.
         //maybe examine logic for this later. it might make more sense for player to have to pay a fraction of his total bounty
         //OR, if you're caught with a bounty you pay it PLUS do jailtime.
-        return Math.ceil( bountyAmount * this.planet.civilization.inflation * Math.pow(0.01, 1+this.planet.civilization.corruption) )
+        return Math.ceil( bountyAmount * this.planet.c.inflation * Math.pow(0.01, 1+this.planet.c.corruption) )
     }
 }

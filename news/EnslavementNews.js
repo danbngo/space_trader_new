@@ -82,26 +82,26 @@ class EnslavementNews extends News {
     determineOutcome() {
         const {planet: p, targetPlanet: tp} = this
         // Check if peace declared
-        const rel = planet.civilization.relationships.get(targetPlanet)
+        const rel = planet.c.relationships.get(targetPlanet)
         if (rel === RELATIONSHIP_TYPES.NEUTRAL || rel === RELATIONSHIP_TYPES.ALLY) {
             this.cancelled = true
             return
         }
         // Slavery fails if security too low (revolts)
-        const revoltProbability = (1 - planet.civilization.security) * 0.45
+        const revoltProbability = (1 - planet.c.security) * 0.45
         this.failed = Math.random() < revoltProbability
     }
 
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         // More likely if economy/industry AND population is low (seeking economic boost)
-        const ratingsValid = (planet.civilization.economy < CL.LOW || planet.civilization.industry < CL.LOW) && planet.civilization.population < CL.MEDIUM
+        const ratingsValid = (planet.c.economy < CL.LOW || planet.c.industry < CL.LOW) && planet.c.population < CL.MEDIUM
         // Target must have population to steal
-        const targetValid = targetPlanet.civilization.population > CL.LOW
+        const targetValid = targetPlanet.c.population > CL.LOW
         // our military must be stronger than theirs
-        const militaryValid = planet.civilization.military > targetPlanet.civilization.military * CL.HIGH
+        const militaryValid = planet.c.military > targetPlanet.c.military * CL.HIGH
         // Both parties must be at least TENSE (TENSE or WAR)
-        const relationships = [planet.civilization.relationships.get(targetPlanet), targetPlanet.civilization.relationships.get(planet)]
+        const relationships = [planet.c.relationships.get(targetPlanet), targetPlanet.c.relationships.get(planet)]
         const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.TENSE || rel == RELATIONSHIP_TYPES.WAR)
         // Must not already have this event between these planets
         const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.ENSLAVEMENT])

@@ -9,7 +9,7 @@ class CivilWarNews extends News {
         )
 
         const buildingsDisabled = rndMembers(News.calcDestroyableBuildings(this.planet), rng(3, 1), true)
-        const newGovernmentType = Math.random() > .5 ? this.planet.civilization.governmentType : rndMember(GT_ALL.filter(g => g !== GT.PUPPET_STATE))
+        const newGovernmentType = Math.random() > .5 ? this.planet.c.governmentType : rndMember(GT_ALL.filter(g => g !== GT.PUPPET_STATE))
 
         this.startEffects = [
             new NewsEffect({
@@ -44,12 +44,12 @@ class CivilWarNews extends News {
 
     determineOutcome() {
         const {planet: p} = this
-        this.rollOutcome(0.5*(planet.civilization.security+planet.civilization.culture)/planet.civilization.population, CL.HIGH)
+        this.rollOutcome(0.5*(planet.c.security+planet.c.culture)/planet.c.population, CL.HIGH)
     }
     isValid() {
         const {planet: p} = this
         //usually happens when military or security is large
-        const ratingsValid = planet.civilization.military > CL.VERY_HIGH || planet.civilization.security > CL.VERY_HIGH
+        const ratingsValid = planet.c.military > CL.VERY_HIGH || planet.c.security > CL.VERY_HIGH
         //cant be having any of: construction, economic boom, revolution
         const interferingEvent =
             News.planetHasAnyNews(planet, [NT.CIVIL_WAR, NT.ECONOMIC_BOOM, NT.REVOLUTION]) ||

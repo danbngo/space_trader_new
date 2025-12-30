@@ -30,7 +30,7 @@ class RevivalNews extends News {
     isValid() {
         const {planet: p} = this
         //cant become even dumber if we're already low
-        const ratingsValid = planet.civilization.education > CL.LOW
+        const ratingsValid = planet.c.education > CL.LOW
         //planet must not already be in anarchy or puppet state
         const interferingEvent =
             News.planetHasAnyNews(planet, [NT.REVIVAL])

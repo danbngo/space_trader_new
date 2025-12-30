@@ -13,14 +13,14 @@ class Bank extends Building {
         this.playerBalance = 0
     }
     calcDepositPenalty(depositAmount = 0) {
-        return Math.ceil( depositAmount * Math.pow(0.01, 1/(1+this.planet.civilization.corruption)) )
+        return Math.ceil( depositAmount * Math.pow(0.01, 1/(1+this.planet.c.corruption)) )
     }
     calcWithdrawalPenalty(withdrawalAmount = 0) {
-        return Math.ceil( withdrawalAmount * Math.pow(0.01, 1/(1+this.planet.civilization.corruption)) )
+        return Math.ceil( withdrawalAmount * Math.pow(0.01, 1/(1+this.planet.c.corruption)) )
     }
     calcLoanInterest(loanAmount = 1, loanDuration = 1) {
         console.log('calculating loan interest:', loanAmount, loanDuration)
-        return Math.ceil( loanAmount * Math.pow(0.01*loanDuration, 1/(1+this.planet.civilization.corruption)) )
+        return Math.ceil( loanAmount * Math.pow(0.01*loanDuration, 1/(1+this.planet.c.corruption)) )
     }
     calcLoanMaxAmount(officer = new Officer()) {
         let maxLoanAmount = Math.pow(officer.level, 1.5) * 5000

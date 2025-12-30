@@ -43,11 +43,11 @@ class NewsEffect {
         /** @type {Planet|null} */
         this.targetPlanet = targetPlanet;
         /** @type {GovernmentType} */
-        this.oldGovernmentType = planet && planet.civilization ? planet.civilization.governmentType : null;
+        this.oldGovernmentType = planet && planet.civilization ? planet.c.governmentType : null;
         /** @type {GovernmentType|null} */
         this.newGovernmentType = newGovernmentType;
         /** @type {RelationshipType|null} */
-        this.oldRelationship = planet && planet.civilization ? planet.civilization.relationships.get(targetPlanet) || null : null;
+        this.oldRelationship = planet && planet.civilization ? planet.c.relationships.get(targetPlanet) || null : null;
         /** @type {RelationshipType|null} */
         this.newRelationship = newRelationship;
         /** @type {Building[]} */
@@ -180,7 +180,7 @@ class NewsEffect {
 
             if (population !== 1.0) msg += `- Population: ${describePopulation(civilization.population)} ➜ ${describePopulation(civilization.population*population)}.<br/>`
             if (territory !== 1.0) msg += `- Territory: ${describeTerritory(civilization.territory)} ➜ ${describeTerritory(civilization.territory*territory)}.<br/>`
-            if (prestige !== 1.0) msg += dscr('- Prestige', civilization.prestige, civilization.prestige*prestige)
+            if (prestige !== 1.0) msg += dscr('- Prestige', c.prestige, c.prestige*prestige)
             if (security !== 1.0) msg += dscr('- Security', civilization.security, civilization.security*security)
             if (economy !== 1.0) msg += dscr('- Economy', civilization.economy, civilization.economy*economy)
             if (industry !== 1.0) msg += dscr('- Industry', civilization.industry, civilization.industry*industry)

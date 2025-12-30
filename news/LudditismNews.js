@@ -63,21 +63,21 @@ class LudditismNews extends News {
         let threatsDetected = false
         for (const p of gs.system.planets) {
             if (p !== planet) {
-                const rel = p.civilization.relationships.get(planet)
+                const rel = p.c.relationships.get(planet)
                 if (rel === RELATIONSHIP_TYPES.TENSE || rel === RELATIONSHIP_TYPES.TENSE || rel === RELATIONSHIP_TYPES.WAR) {
                     threatsDetected = true
                     break
                 }
             }
         }
-        const failProbability = threatsDetected ? 0.5 : ((1 - planet.civilization.economy) * 0.25)
+        const failProbability = threatsDetected ? 0.5 : ((1 - planet.c.economy) * 0.25)
         this.failed = Math.random() < failProbability
     }
 
     isValid() {
         const {planet: p} = this
         //more likely if high tech and population pressure
-        const ratingsValid = planet.civilization.technology > CL.HIGH && planet.civilization.industry > CL.MEDIUM
+        const ratingsValid = planet.c.technology > CL.HIGH && planet.c.industry > CL.MEDIUM
         //must not be at engaged in or targeted by any hostile acts
         const interferingEvent =
             News.planetHasAnyNews(planet, [NT.LUDDITISM, ...NT_DANGEROUS]) ||

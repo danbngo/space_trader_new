@@ -10,20 +10,20 @@ class PolicyChangeNews extends News {
         
         switch(categoryToChange) {
             case 'economic':
-                validPolicies = ECONOMIC_POLICIES.filter(p => !p.forbiddenGovs.includes(planet.civilization.governmentType))
-                currentPolicy = planet.civilization.policies.economic
+                validPolicies = ECONOMIC_POLICIES.filter(p => !p.forbiddenGovs.includes(planet.c.governmentType))
+                currentPolicy = planet.c.policies.economic
                 break
             case 'labor':
-                validPolicies = LABOR_POLICIES.filter(p => !p.forbiddenGovs.includes(planet.civilization.governmentType))
-                currentPolicy = planet.civilization.policies.labor
+                validPolicies = LABOR_POLICIES.filter(p => !p.forbiddenGovs.includes(planet.c.governmentType))
+                currentPolicy = planet.c.policies.labor
                 break
             case 'social':
-                validPolicies = SOCIAL_POLICIES.filter(p => !p.forbiddenGovs.includes(planet.civilization.governmentType))
-                currentPolicy = planet.civilization.policies.social
+                validPolicies = SOCIAL_POLICIES.filter(p => !p.forbiddenGovs.includes(planet.c.governmentType))
+                currentPolicy = planet.c.policies.social
                 break
             case 'foreign':
-                validPolicies = FOREIGN_POLICIES.filter(p => !p.forbiddenGovs.includes(planet.civilization.governmentType))
-                currentPolicy = planet.civilization.policies.foreign
+                validPolicies = FOREIGN_POLICIES.filter(p => !p.forbiddenGovs.includes(planet.c.governmentType))
+                currentPolicy = planet.c.policies.foreign
                 break
         }
         
@@ -69,16 +69,16 @@ class PolicyChangeNews extends News {
         this.completeEffects[0].onApply = () => {
             switch(this.categoryToChange) {
                 case 'economic':
-                    this.planet.civilization.policies.economic = this.newPolicy
+                    this.planet.c.policies.economic = this.newPolicy
                     break
                 case 'labor':
-                    this.planet.civilization.policies.labor = this.newPolicy
+                    this.planet.c.policies.labor = this.newPolicy
                     break
                 case 'social':
-                    this.planet.civilization.policies.social = this.newPolicy
+                    this.planet.c.policies.social = this.newPolicy
                     break
                 case 'foreign':
-                    this.planet.civilization.policies.foreign = this.newPolicy
+                    this.planet.c.policies.foreign = this.newPolicy
                     break
             }
         }
@@ -90,14 +90,14 @@ class PolicyChangeNews extends News {
     determineOutcome() {
         const {planet: p} = this
         // Higher prestige, culture, and stability make policy changes more likely to succeed
-        const successProbability = (planet.civilization.prestige + planet.civilization.culture + planet.civilization.security) / 3
+        const successProbability = (planet.c.prestige + planet.c.culture + planet.c.security) / 3
         this.rollOutcome(successProbability, CL.MEDIUM)
     }
 
     isValid() {
         const {planet: p} = this
         // More likely during stable times with decent prestige
-        const ratingsValid = planet.civilization.prestige > CL.LOW && planet.civilization.security > CL.LOW
+        const ratingsValid = planet.c.prestige > CL.LOW && planet.c.security > CL.LOW
         
         // Can't change policy during major upheaval
         const interferingEvent = News.planetHasAnyNews(planet, [

@@ -40,11 +40,11 @@ class AllianceNews extends News {
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         //this is the only relationship that cannot be dissolved mid-event
         this.completeEffects[0].onApply = ()=>{
-            if (this.planet.civilization.relationships.get(this.targetPlanet) == RELATIONSHIP_TYPES.ALLY) {
-                this.planet.civilization.relationships.set(this.targetPlanet, RELATIONSHIP_TYPES.NEUTRAL)
+            if (this.planet.c.relationships.get(this.targetPlanet) == RELATIONSHIP_TYPES.ALLY) {
+                this.planet.c.relationships.set(this.targetPlanet, RELATIONSHIP_TYPES.NEUTRAL)
             }
-            if (this.targetPlanet.civilization.relationships.get(this.planet) == RELATIONSHIP_TYPES.ALLY) {
-                this.targetPlanet.civilization.relationships.set(this.planet, RELATIONSHIP_TYPES.NEUTRAL)
+            if (this.targetPlanet.c.relationships.get(this.planet) == RELATIONSHIP_TYPES.ALLY) {
+                this.targetPlanet.c.relationships.set(this.planet, RELATIONSHIP_TYPES.NEUTRAL)
             }
         }
 
@@ -61,7 +61,7 @@ class AllianceNews extends News {
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         //both planets must be currently neutral towards each other
-        const relationships = [p.civilization.relationships.get(tp), tp.civilization.relationships.get(p)]
+        const relationships = [p.c.relationships.get(tp), tp.c.relationships.get(p)]
         const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.NEUTRAL)
         //never ally with an opposing govt OR someone who is allied to one!!!
         const opposingGovernmentsValid = !Civilization.areOpposingGovernments(p, tp)

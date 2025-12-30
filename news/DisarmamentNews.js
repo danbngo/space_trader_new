@@ -48,7 +48,7 @@ class DisarmamentNews extends News {
         let tensionsDetected = false
         for (const p of gs.system.planets) {
             if (p !== planet) {
-                const rel = p.civilization.relationships.get(planet)
+                const rel = p.c.relationships.get(planet)
                 if (rel === RELATIONSHIP_TYPES.TENSE || rel === RELATIONSHIP_TYPES.WAR) {
                     tensionsDetected = true
                     break
@@ -61,7 +61,7 @@ class DisarmamentNews extends News {
     isValid() {
         const {planet: p} = this
         //unlikely if planet has a low military already
-        const ratingsValid = (planet.civilization.military > CL.HIGH) && (planet.civilization.navy > CL.HIGH)
+        const ratingsValid = (planet.c.military > CL.HIGH) && (planet.c.navy > CL.HIGH)
         const interferingEvent =
             News.planetHasAnyNewsTargeting(planet, NT_MARTIAL) ||
             News.planetHasAnyNews(planet, NT_MARTIAL)

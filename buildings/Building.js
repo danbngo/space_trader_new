@@ -19,10 +19,10 @@ class Building {
         this.normalize()
     }
     normalize() {
-        this.credits = this.buildingType.baseCredits * this.planet.civilization.wealth * this.planet.civilization.inflation
+        this.credits = this.buildingType.baseCredits * this.planet.c.wealth * this.planet.c.inflation
     }
     get rake() {
-        const corruption = this.planet.civilization.corruption
+        const corruption = this.planet.c.corruption
         const barterSkill = gs.fleet.totalSkills.getAmount(SKILLS.Barter)
         return corruption / (1 + barterSkill / 50)
     }

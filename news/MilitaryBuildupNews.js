@@ -45,19 +45,19 @@ class MilitaryBuildupNews extends News {
     determineOutcome() {
         const {planet: p} = this
         // Buildup fails if economy collapses during the process
-        const failProbability = (1 - planet.civilization.economy) * 0.35
+        const failProbability = (1 - planet.c.economy) * 0.35
         this.failed = Math.random() < failProbability
     }
     isValid() {
         const {planet: p} = this
         //dont do it if military is already big
-        const ratingsValid = (planet.civilization.military < CL.MEDIUM) && (planet.civilization.prestige < CL.VERY_HIGH)
+        const ratingsValid = (planet.c.military < CL.MEDIUM) && (planet.c.prestige < CL.VERY_HIGH)
         //dont do it if no government are tense with us or vice versa
         let politicsValid = false
         for (const p of gs.system.planets) {
             if (p !== planet) {
-                const relationship = planet.civilization.relationships.get(p)
-                const relationship2 = p.civilization.relationships.get(planet)
+                const relationship = planet.c.relationships.get(p)
+                const relationship2 = p.c.relationships.get(planet)
                 if (relationship == RELATIONSHIP_TYPES.TENSE || relationship2 == RELATIONSHIP_TYPES.TENSE) {
                     politicsValid = true
                     break
@@ -65,7 +65,7 @@ class MilitaryBuildupNews extends News {
             }
         }
         //planet must not already be in anarchy or puppet state
-        const validGov = planet.civilization.governmentType != GT.ANARCHY && planet.civilization.governmentType != GT.PUPPET_STATE
+        const validGov = planet.c.governmentType != GT.ANARCHY && planet.c.governmentType != GT.PUPPET_STATE
         //removed most requirements for this, even juntas do this on a whim
         const interferingEvent = News.planetHasAnyNews(planet, [NT.MILITARY_BUILDUP]) 
         return ratingsValid && validGov && !interferingEvent

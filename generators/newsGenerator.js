@@ -87,7 +87,7 @@ function generateNews(attemptsRemaining = 100, weights = []) {//only needs to be
     if (weights.length == 0) weights = NEWS_TYPE_CLASSES.map(([newsType, cls]) => {
         let weight = newsType.weight || 1
         // Triple the weight if this planet's government is a favorite for this news type
-        if (newsType.favoriteGovs.includes(planet.civilization.governmentType)) {
+        if (newsType.favoriteGovs.includes(planet.c.governmentType)) {
             weight *= 3
         }
         return weight
@@ -95,8 +95,8 @@ function generateNews(attemptsRemaining = 100, weights = []) {//only needs to be
     const index = rndIndexWeighted(weights)
     const [newsType, cls] = NEWS_TYPE_CLASSES[index]
     
-    if (!newsType.forbiddenGovs.includes(planet.civilization.governmentType)) {
-        if (!newsType.immuneGovs.includes(targetPlanet.civilization.governmentType)) {
+    if (!newsType.forbiddenGovs.includes(planet.c.governmentType)) {
+        if (!newsType.immuneGovs.includes(targetPlanet.c.governmentType)) {
             /** @ts-ignore */
             const news = new cls(planet, targetPlanet)
             if (news.isValid()) return news

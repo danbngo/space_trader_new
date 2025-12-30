@@ -2,7 +2,7 @@ class CoupDetatNews extends News {
     constructor(planet = new Planet(), targetPlanet = new Planet()) {
         // Select a random government type for the coup (not puppet state or previous type)
         const availableGovTypes = GT_ALL.filter(
-            gov => gov !== GT.PUPPET_STATE && gov !== targetPlanet.civilization.governmentType
+            gov => gov !== GT.PUPPET_STATE && gov !== targetPlanet.c.governmentType
         )
         const newGovernmentType = availableGovTypes[Math.floor(Math.random() * availableGovTypes.length)]
         super(
@@ -72,20 +72,20 @@ class CoupDetatNews extends News {
     determineOutcome() {
         const {planet: p, targetPlanet: tp} = this
         // Coup fails if target has high security or military
-        const resistanceProbability = (targetPlanet.civilization.security + targetPlanet.civilization.military) / 2
+        const resistanceProbability = (targetPlanet.c.security + targetPlanet.c.military) / 2
         const failProbability = resistanceProbability * 0.4
         this.failed = Math.random() < failProbability
-        this.rollOutcome((planet.civilization.security+planet.settlement.cryme)/(targetPlanet.civilization.security + targetPlanet.civilization.military), CL.HIGH)
+        this.rollOutcome((planet.c.security+planet.settlement.cryme)/(targetPlanet.c.security + targetPlanet.c.military), CL.HIGH)
     }
 
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         // Aggressor must have high prestige, target must have lowER prestige
-        const ratingsValid = (planet.civilization.prestige > CL.HIGH) && (planet.civilization.security > CL.MEDIUM) && (planet.civilization.security > targetPlanet.civilization.security)
+        const ratingsValid = (planet.c.prestige > CL.HIGH) && (planet.c.security > CL.MEDIUM) && (planet.c.security > targetPlanet.c.security)
         // Target must have opposing government type - nevermind, CIA flouts this all the time
-        //const govValid = planet.civilization.governmentType.opposingType == targetPlanet.civilization.governmentType
+        //const govValid = planet.c.governmentType.opposingType == targetPlanet.c.governmentType
         // Must be at least TENSE beforehand
-        const relationships = [planet.civilization.relationships.get(targetPlanet), targetPlanet.civilization.relationships.get(planet)]
+        const relationships = [planet.c.relationships.get(targetPlanet), targetPlanet.c.relationships.get(planet)]
         const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.TENSE || rel == RELATIONSHIP_TYPES.WAR)
         const interferingEvent = News.planetHasAnyNews(targetPlanet, [NT.COUP_DETAT, ...NT_CRIME_PREVENTING])
         return ratingsValid && relationshipsValid && !interferingEvent

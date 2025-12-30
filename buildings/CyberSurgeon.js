@@ -14,7 +14,7 @@ class CyberSurgeon extends Building {
         this.normalize(true)
     }
     get baseNumImplants() {
-        return this.planet.civilization.technology * CYBER_SURGEON_AVERAGE_NUM_IMPLANTS
+        return this.planet.c.technology * CYBER_SURGEON_AVERAGE_NUM_IMPLANTS
     }
     normalize(clearExisting = false) {
         super.normalize()
@@ -32,7 +32,7 @@ class CyberSurgeon extends Building {
     }
 
     calcBuyImplantPrice(implant = new CyberImplant()) {
-        return Math.round(implant.implantType.value * implant.quality * (1+this.planet.civilization.corruption))
+        return Math.round(implant.implantType.value * implant.quality * (1+this.planet.c.corruption))
     }
 }
 
@@ -44,7 +44,7 @@ class CyberSurgeon extends Building {
  * @returns {CyberImplant} The generated cybernetic implant.
  */
 function generateCyberImplant(planet = new Planet(), implantType = rndMember(CYBER_IMPLANT_TYPES_ALL)) {
-    const technology = planet ? planet.civilization.technology : 1
+    const technology = planet ? planet.c.technology : 1
     const quality = rng(2, 0.5, false)*technology
     return new CyberImplant(implantType, quality)
 }

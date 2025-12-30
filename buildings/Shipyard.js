@@ -16,10 +16,10 @@ class Shipyard extends Building {
         this.normalize(true)
     }
     get baseNumShips() {
-        return this.planet.civilization.navy * SHIPYARD_AVERAGE_NUM_SHIPS
+        return this.planet.c.navy * SHIPYARD_AVERAGE_NUM_SHIPS
     }
     get baseNumModules() {
-        return this.planet.civilization.navy * SHIPYARD_AVERAGE_NUM_MODULES
+        return this.planet.c.navy * SHIPYARD_AVERAGE_NUM_MODULES
     }
     normalize(clearExisting = false) {
         super.normalize()
@@ -59,16 +59,16 @@ class Shipyard extends Building {
     }
 
     calcBuyPrice(ship = new Ship()) {
-        const basePrice = Math.round(ship.value * (1+this.planet.civilization.corruption) * (1+this.planet.civilization.inflation) / this.planet.civilization.navy)
-        return Math.round(basePrice * (1 + this.planet.civilization.taxRate))
+        const basePrice = Math.round(ship.value * (1+this.planet.c.corruption) * (1+this.planet.c.inflation) / this.planet.c.navy)
+        return Math.round(basePrice * (1 + this.planet.c.taxRate))
     }
     calcSellPrice(ship = new Ship()) {
-        const basePrice = Math.round(ship.value / (1+this.planet.civilization.corruption) * (1+this.planet.civilization.inflation) / this.planet.civilization.navy)
-        return Math.round(basePrice * (1 - this.planet.civilization.taxRate))
+        const basePrice = Math.round(ship.value / (1+this.planet.c.corruption) * (1+this.planet.c.inflation) / this.planet.c.navy)
+        return Math.round(basePrice * (1 - this.planet.c.taxRate))
     }
     calcBuyModulePrice(module = new ShipModule()) {
-        const basePrice = Math.round(module.moduleType.value * module.quality * (1+this.planet.civilization.corruption))
-        return Math.round(basePrice * (1 + this.planet.civilization.taxRate))
+        const basePrice = Math.round(module.moduleType.value * module.quality * (1+this.planet.c.corruption))
+        return Math.round(basePrice * (1 + this.planet.c.taxRate))
     }
 }
 
@@ -80,7 +80,7 @@ class Shipyard extends Building {
  * @returns {ShipModule} The generated ship module.
  */
 function generateShipModule(planet = new Planet(), moduleType = rndMember(SHIP_MODULE_TYPES_ALL)) {
-    const technology = planet ? planet.civilization.technology : 1
+    const technology = planet ? planet.c.technology : 1
     const quality = rng(2, 0.5, false)*technology
     return new ShipModule(moduleType, quality)
 }

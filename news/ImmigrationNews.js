@@ -68,24 +68,24 @@ class ImmigrationNews extends News {
     determineOutcome() {
         const {planet: p, targetPlanet: tp} = this
         // Check if relationship deteriorated
-        const rel1 = planet.civilization.relationships.get(targetPlanet)
-        const rel2 = targetPlanet.civilization.relationships.get(planet)
+        const rel1 = planet.c.relationships.get(targetPlanet)
+        const rel2 = targetPlanet.c.relationships.get(planet)
         if (rel1 === RELATIONSHIP_TYPES.TENSE || rel1 === RELATIONSHIP_TYPES.WAR ||
             rel2 === RELATIONSHIP_TYPES.TENSE || rel2 === RELATIONSHIP_TYPES.WAR) {
             this.cancelled = true
             return
         }
         // Immigration fails if economy collapses
-        const failProbability = (1 - planet.civilization.economy) * 0.3
+        const failProbability = (1 - planet.c.economy) * 0.3
         this.failed = Math.random() < failProbability
     }
 
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         // Source must have population to give, target must have economic opportunity
-        const ratingsValid = planet.civilization.population < CL.HIGH && planet.civilization.economy > CL.SLIGHTLY_HIGH && targetPlanet.civilization.population > CL.LOW
+        const ratingsValid = planet.c.population < CL.HIGH && planet.c.economy > CL.SLIGHTLY_HIGH && targetPlanet.c.population > CL.LOW
         // Must not be at war
-        const relationships = [planet.civilization.relationships.get(targetPlanet), targetPlanet.civilization.relationships.get(planet)]
+        const relationships = [planet.c.relationships.get(targetPlanet), targetPlanet.c.relationships.get(planet)]
         const relationshipsValid = relationships.every(rel => rel != RELATIONSHIP_TYPES.WAR)
         const interferingEvent = 
             News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.IMMIGRATION]) ||

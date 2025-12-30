@@ -11,7 +11,7 @@ function generateContract(planet = new Planet()) {
         [CONTRACT_TYPES.LETTER_OF_MARQUE]: civilization.security * 2,
         [CONTRACT_TYPES.MERCHANT_LICENSE]: civilization.economy * 2,
         [CONTRACT_TYPES.MINING_PERMIT]: civilization.industry * 2,
-        [CONTRACT_TYPES.DIPLOMATIC_PASS]: civilization.prestige,
+        [CONTRACT_TYPES.DIPLOMATIC_PASS]: c.prestige,
         [CONTRACT_TYPES.CARGO_DELIVERY]: civilization.economy * 3,
         [CONTRACT_TYPES.URGENT_DELIVERY]: civilization.economy * 2,
         [CONTRACT_TYPES.DELIVER_MISSIVE]: civilization.culture,

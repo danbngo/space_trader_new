@@ -85,17 +85,17 @@ class WarBombardmentNews extends News {
     determineOutcome() {
         const {planet: p, targetPlanet: tp} = this
         // Check if peace was forced (relationships changed during bombardment)
-        const currentRel1 = planet.civilization.relationships.get(targetPlanet)
-        const currentRel2 = targetPlanet.civilization.relationships.get(planet)
+        const currentRel1 = planet.c.relationships.get(targetPlanet)
+        const currentRel2 = targetPlanet.c.relationships.get(planet)
         this.cancelled = (currentRel1 !== RELATIONSHIP_TYPES.WAR || currentRel2 !== RELATIONSHIP_TYPES.WAR)
     }
 
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         //our military must be significantly stronger than theirs and navy must be MUCH stronger
-        const navyAdvantage = planet.civilization.military > targetPlanet.civilization.military * CL.HIGH && planet.civilization.navy > targetPlanet.civilization.navy * CL.VERY_HIGH
+        const navyAdvantage = planet.c.military > targetPlanet.c.military * CL.HIGH && planet.c.navy > targetPlanet.c.navy * CL.VERY_HIGH
         
-        const relationshipValid = planet.civilization.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR
+        const relationshipValid = planet.c.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR
         const interferingEvent = 
             News.hasNews(NT.BOMBARDMENT, planet, targetPlanet) || 
             News.hasAnyNewsBidirectional(planet, targetPlanet, NT_COOPERATIVE)

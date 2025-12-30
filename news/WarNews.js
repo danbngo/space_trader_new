@@ -42,17 +42,17 @@ class WarNews extends News {
 
         this.completeEffects[0].onApply = ()=>{
             //dont revert relationships if one was vassalized
-            if (planet.civilization.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR) planet.civilization.relationships.set(targetPlanet, RELATIONSHIP_TYPES.NEUTRAL)
+            if (planet.c.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR) planet.c.relationships.set(targetPlanet, RELATIONSHIP_TYPES.NEUTRAL)
             console.log('1 war ended between', planet.name, 'and', targetPlanet.name)
-            console.log('1 new diplomatic status:', planet.civilization.relationships.get(targetPlanet))
-            console.log('1 target new diplomatic status:', targetPlanet.civilization.relationships.get(planet))
+            console.log('1 new diplomatic status:', planet.c.relationships.get(targetPlanet))
+            console.log('1 target new diplomatic status:', targetPlanet.c.relationships.get(planet))
         }
         this.completeEffects[1].onApply = ()=>{
             //dont revert relationships if one was vassalized
-            if (targetPlanet.civilization.relationships.get(planet) == RELATIONSHIP_TYPES.WAR) targetPlanet.civilization.relationships.set(planet, RELATIONSHIP_TYPES.NEUTRAL)
+            if (targetPlanet.c.relationships.get(planet) == RELATIONSHIP_TYPES.WAR) targetPlanet.c.relationships.set(planet, RELATIONSHIP_TYPES.NEUTRAL)
             console.log('2 war ended between', planet.name, 'and', targetPlanet.name)
-            console.log('2 new diplomatic status:', planet.civilization.relationships.get(targetPlanet))
-            console.log('2 target new diplomatic status:', targetPlanet.civilization.relationships.get(planet))
+            console.log('2 new diplomatic status:', planet.c.relationships.get(targetPlanet))
+            console.log('2 target new diplomatic status:', targetPlanet.c.relationships.get(planet))
             //if there are no more wars remaining, and there was a world war, end the world war
             const numWarsRemaining = gs.system.news.filter(n=>(n.newsType == NT.WAR && !n.ended)).length
             if (numWarsRemaining == 0) {
@@ -71,20 +71,20 @@ class WarNews extends News {
     determineOutcome() {
         const {planet: p, targetPlanet: tp} = this
         // Check if peace was forced (relationships changed during war)
-        const currentRel1 = planet.civilization.relationships.get(targetPlanet)
-        const currentRel2 = targetPlanet.civilization.relationships.get(planet)
+        const currentRel1 = planet.c.relationships.get(targetPlanet)
+        const currentRel2 = targetPlanet.c.relationships.get(planet)
         this.cancelled = (currentRel1 !== RELATIONSHIP_TYPES.WAR || currentRel2 !== RELATIONSHIP_TYPES.WAR)
     }
 
     isValid(ignorePolitics = false) {
         const {planet: p, targetPlanet: tp} = this
         //planets tend not to want to go to war with stronger ones
-        const prestigeValid = planet.civilization.prestige > targetPlanet.civilization.prestige || planet.civilization.military > targetPlanet.civilization.military
+        const prestigeValid = planet.c.prestige > targetPlanet.c.prestige || planet.c.military > targetPlanet.c.military
         //must not have same form of government
-        const governmentsValid = (planet.civilization.governmentType !== targetPlanet.civilization.governmentType)
+        const governmentsValid = (planet.c.governmentType !== targetPlanet.c.governmentType)
         //must not be anarchic or a puppet state
         //planets must be hostile
-        const relationships = [planet.civilization.relationships.get(targetPlanet), targetPlanet.civilization.relationships.get(planet)]
+        const relationships = [planet.c.relationships.get(targetPlanet), targetPlanet.c.relationships.get(planet)]
         const relationshipValid = relationships.every(r => r === RELATIONSHIP_TYPES.TENSE)
         const interferingEvent = 
             News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.WAR, ...NT_COOPERATIVE]) ||

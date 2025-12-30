@@ -41,14 +41,14 @@ class TourismNews extends News {
     determineOutcome() {
         const {planet: p} = this
         // Tourism fails if planet has low prestige or poor economy during construction
-        const failProbability = (1 - planet.civilization.prestige) * (1 - planet.civilization.economy) * 0.3
+        const failProbability = (1 - planet.c.prestige) * (1 - planet.c.economy) * 0.3
         this.failed = Math.random() < failProbability
     }
 
     isValid() {
         const {planet: p} = this
         //more likely to try this out if we need money
-        const ratingsValid = planet.civilization.wealth < CL.LOW
+        const ratingsValid = planet.c.wealth < CL.LOW
         const interferingEvent = 
             News.planetHasAnyNews(planet, [NT.TOURISM, ...NT_ECONOMY_PREVENTING]) ||
             News.planetHasAnyNewsTargeting(planet, NT_ECONOMY_PREVENTING) ||

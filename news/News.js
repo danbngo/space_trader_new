@@ -380,7 +380,7 @@ class News {
         const possibleWarNews = []
         for (const otherPlanet of gs.system.planets) {
             if (otherPlanet == targetPlanet) continue
-            const relationship = otherPlanet.civilization.relationships.get(targetPlanet)
+            const relationship = otherPlanet.c.relationships.get(targetPlanet)
             if (relationship == RELATIONSHIP_TYPES.NEUTRAL) {
                 const n = new TensionsNews(otherPlanet, targetPlanet)
                 //skip political considerations as this is about raw power/survival
@@ -401,7 +401,7 @@ class News {
      * @returns {Building[]} Array of enabled buildings.
      */
     static calcDestroyableBuildings = (targetPlanet = new Planet())=> {
-        return targetPlanet.settlement.buildings.filter(b => b.enabled);
+        return targetPlanet.s.buildings.filter(b => b.enabled);
     }
 
     /**
@@ -410,7 +410,7 @@ class News {
      * @returns {Building[]} Array of disabled buildings.
      */
     static calcRepairableBuildings = (targetPlanet = new Planet())=> {
-        return targetPlanet.settlement.buildings.filter(b => !b.enabled);
+        return targetPlanet.s.buildings.filter(b => !b.enabled);
     }
 
     /**

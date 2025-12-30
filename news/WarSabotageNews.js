@@ -57,19 +57,19 @@ class WarSabotageNews extends News {
     determineOutcome() {
         const {planet: p, targetPlanet: tp} = this
         // Check if peace was forced during sabotage
-        const currentRel1 = planet.civilization.relationships.get(targetPlanet)
-        const currentRel2 = targetPlanet.civilization.relationships.get(planet)
+        const currentRel1 = planet.c.relationships.get(targetPlanet)
+        const currentRel2 = targetPlanet.c.relationships.get(planet)
         this.cancelled = (currentRel1 !== RELATIONSHIP_TYPES.WAR || currentRel2 !== RELATIONSHIP_TYPES.WAR)
     }
 
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         // Must be at war
-        const relationshipValid = planet.civilization.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
+        const relationshipValid = planet.c.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
         // Must have an ongoing war event
         const hasWar = News.hasNews(NT.WAR, planet, targetPlanet)
         // Requires high security to conduct sabotage
-        const securityValid = (planet.civilization.security > CL.MEDIUM) && (planet.civilization.security/targetPlanet.civilization.security > CL.HIGH)
+        const securityValid = (planet.c.security > CL.MEDIUM) && (planet.c.security/targetPlanet.c.security > CL.HIGH)
         // Can't have sabotage already
         const interferingEvent = News.hasNews(NT.WAR_SABOTAGE, planet, targetPlanet)
         return relationshipValid && hasWar && securityValid && !interferingEvent

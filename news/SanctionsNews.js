@@ -70,22 +70,22 @@ class SanctionsNews extends News {
     determineOutcome() {
         const {planet: p, targetPlanet: tp} = this
         // Check if relationship improved
-        const rel = planet.civilization.relationships.get(targetPlanet)
+        const rel = planet.c.relationships.get(targetPlanet)
         if (rel === RELATIONSHIP_TYPES.NEUTRAL || rel === RELATIONSHIP_TYPES.ALLY) {
             this.cancelled = true
             return
         }
         // Sanctions fail if sanctioner's economy weakens too much
-        const failProbability = 1 - planet.civilization.economy
+        const failProbability = 1 - planet.c.economy
         this.failed = Math.random() < failProbability * 0.3
     }
 
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         //we need a strong economy to pull it off
-        const ratingsValid = planet.civilization.economy > CL.HIGH && planet.civilization.wealth >= CL.HIGH
+        const ratingsValid = planet.c.economy > CL.HIGH && planet.c.wealth >= CL.HIGH
         //aggressor must be hostile towards victim
-        const aggressorRelationship = planet.civilization.relationships.get(targetPlanet)
+        const aggressorRelationship = planet.c.relationships.get(targetPlanet)
         const relationshipsValid = aggressorRelationship == RELATIONSHIP_TYPES.TENSE
         //blocked if already at war or other hostile actions
         const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.SANCTIONS, ...NT_COOPERATIVE])

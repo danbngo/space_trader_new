@@ -52,7 +52,7 @@ class WarHumanWaveNews extends News {
     determineOutcome() {
         const {planet: p, targetPlanet: tp} = this
         // Check if war still ongoing
-        const stillAtWar = planet.civilization.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
+        const stillAtWar = planet.c.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
         if (!stillAtWar) {
             this.cancelled = true
         }
@@ -61,11 +61,11 @@ class WarHumanWaveNews extends News {
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         // Must be at war
-        const relationshipValid = planet.civilization.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
+        const relationshipValid = planet.c.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
         // Must have an ongoing war event
         const hasWar = News.hasNews(NT.WAR, planet, targetPlanet)
         // Requires high population to sacrifice
-        const populationValid = planet.civilization.population > CL.HIGH
+        const populationValid = planet.c.population > CL.HIGH
         // we need to be desperate
         const militaryValid = planet.militaryPower/targetPlanet.militaryPower < CL.LOW
         // Can't have human wave already

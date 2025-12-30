@@ -27,7 +27,7 @@ async function startNewGame() {
         planet.settlement = generateSettlement(planet)
         //begin as neutral
         for (const p of gs.system.planets) { 
-            planet.civilization.relationships.set(p, RELATIONSHIP_TYPES.NEUTRAL)
+            planet.c.relationships.set(p, RELATIONSHIP_TYPES.NEUTRAL)
         }
     }
 

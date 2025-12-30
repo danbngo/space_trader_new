@@ -45,15 +45,15 @@ class ArmsDealNews extends News {
     determineOutcome() {
         // Fail if targetPlanet refuses to sell - based on planet's low prestige/credits
         // Lower prestige and credits increase the chance seller refuses
-        this.rollOutcome(this.planet.civilization.prestige*this.planet.civilization.wealth, CL.MEDIUM)
+        this.rollOutcome(this.planet.c.prestige*this.planet.c.wealth, CL.MEDIUM)
     }
 
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         //targetPlanet (seller) needs to have sufficient military to sell
-        const ratingsValid = (tp.civilization.navy >= CL.SLIGHTLY_HIGH && tp.civilization.technology > CL.SLIGHTLY_HIGH)
+        const ratingsValid = (tp.c.navy >= CL.SLIGHTLY_HIGH && tp.c.technology > CL.SLIGHTLY_HIGH)
         //seller's military should be larger than purchaser's
-        const transferValid = tp.civilization.navy/p.civilization.navy > CL.SLIGHTLY_HIGH && tp.civilization.technology/p.civilization.technology > CL.SLIGHTLY_HIGH
+        const transferValid = tp.c.navy/p.c.navy > CL.SLIGHTLY_HIGH && tp.c.technology/p.c.technology > CL.SLIGHTLY_HIGH
         //both planets must be neutral or allies
         const relationshipsValid = Civilization.areAlliesOrNeutral(p, tp)
         const interferingEvent = 

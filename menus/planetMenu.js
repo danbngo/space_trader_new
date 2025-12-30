@@ -118,17 +118,17 @@ function showPlanetClimateMenu(planet = new Planet()) {
     // Composition
     msg += `<br/>`
     msg += `<u>Composition</u><br/>`
-    if (planet.atmosphereType) {
-        msg += `Atmosphere: ${colorSpan(planet.atmosphereType.name, planet.atmosphereType.color)}<br/>`
-        msg += `<span style="font-size: 0.9em; opacity: 0.8;">${planet.atmosphereType.description}</span><br/>`
+    if (planet.climate.atmosphereType) {
+        msg += `Atmosphere: ${colorSpan(planet.climate.atmosphereType.name, planet.climate.atmosphereType.color)}<br/>`
+        msg += `<span style="font-size: 0.9em; opacity: 0.8;">${planet.climate.atmosphereType.description}</span><br/>`
     }
-    if (planet.oceanType) {
-        msg += `Ocean: ${colorSpan(planet.oceanType.name, planet.oceanType.color)}<br/>`
-        msg += `<span style="font-size: 0.9em; opacity: 0.8;">${planet.oceanType.description}</span><br/>`
+    if (planet.climate.oceanType) {
+        msg += `Ocean: ${colorSpan(planet.climate.oceanType.name, planet.climate.oceanType.color)}<br/>`
+        msg += `<span style="font-size: 0.9em; opacity: 0.8;">${planet.climate.oceanType.description}</span><br/>`
     }
-    if (planet.geologyType) {
-        msg += `Geology: ${colorSpan(planet.geologyType.name, planet.geologyType.color)}<br/>`
-        msg += `<span style="font-size: 0.9em; opacity: 0.8;">${planet.geologyType.description}</span><br/>`
+    if (planet.climate.geologyType) {
+        msg += `Geology: ${colorSpan(planet.climate.geologyType.name, planet.climate.geologyType.color)}<br/>`
+        msg += `<span style="font-size: 0.9em; opacity: 0.8;">${planet.climate.geologyType.description}</span><br/>`
     }
     
     // Planet features

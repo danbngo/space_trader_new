@@ -133,16 +133,16 @@ class Civilization {
     }
 
     static areTense(p1 = new Planet(), p2 = new Planet()) {
-        return (p1.civilization.relationships.get(p2) === RELATIONSHIP_TYPES.TENSE || p2.civilization.relationships.get(p1) === RELATIONSHIP_TYPES.TENSE)
+        return (p1.c.relationships.get(p2) === RELATIONSHIP_TYPES.TENSE || p2.c.relationships.get(p1) === RELATIONSHIP_TYPES.TENSE)
     }
     static areAtWar(p1 = new Planet(), p2 = new Planet()) {
-        return (p1.civilization.relationships.get(p2) === RELATIONSHIP_TYPES.WAR || p2.civilization.relationships.get(p1) === RELATIONSHIP_TYPES.WAR)
+        return (p1.c.relationships.get(p2) === RELATIONSHIP_TYPES.WAR || p2.c.relationships.get(p1) === RELATIONSHIP_TYPES.WAR)
     }
     static areAllies(p1 = new Planet(), p2 = new Planet()) {
-        return (p1.civilization.relationships.get(p2) === RELATIONSHIP_TYPES.ALLY && p2.civilization.relationships.get(p1) === RELATIONSHIP_TYPES.ALLY)
+        return (p1.c.relationships.get(p2) === RELATIONSHIP_TYPES.ALLY && p2.c.relationships.get(p1) === RELATIONSHIP_TYPES.ALLY)
     }
     static areNeutral(p1 = new Planet(), p2 = new Planet()) {
-        return (p1.civilization.relationships.get(p2) === RELATIONSHIP_TYPES.NEUTRAL && p2.civilization.relationships.get(p1) === RELATIONSHIP_TYPES.NEUTRAL)
+        return (p1.c.relationships.get(p2) === RELATIONSHIP_TYPES.NEUTRAL && p2.c.relationships.get(p1) === RELATIONSHIP_TYPES.NEUTRAL)
     }
     static areTenseOrAtWar(p1 = new Planet(), p2 = new Planet()) {
         return Civilization.areTense(p1, p2) || Civilization.areAtWar(p1, p2)
@@ -151,6 +151,6 @@ class Civilization {
         return Civilization.areAllies(p1, p2) || Civilization.areNeutral(p1, p2)
     }
     static areOpposingGovernments(p1 = new Planet(), p2 = new Planet()) {
-        return (p1.civilization.governmentType.opposingType === p2.civilization.governmentType || p2.civilization.governmentType.opposingType === p1.civilization.governmentType)
+        return (p1.c.governmentType.opposingType === p2.c.governmentType || p2.c.governmentType.opposingType === p1.c.governmentType)
     }
 }

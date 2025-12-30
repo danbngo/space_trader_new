@@ -96,7 +96,7 @@ function checkForPlanetEncounters(elapsedDays = 1) {
         if (!planet.civilization) continue
         
         const distance = calcDistance(fleet.x, fleet.y, planet.x, planet.y)
-        const territory = planet.civilization.territory
+        const territory = planet.c.territory
         
         // Calculate proximity factor using 1/(1+d/t) formula
         // At planet (d=0): factor = 1.0

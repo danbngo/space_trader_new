@@ -46,14 +46,14 @@ class FestivalNews extends News {
     determineOutcome() {
         const {planet: p} = this
         // Festival fails if security too low (riots, crime)
-        const failProbability = (1 - planet.civilization.security) * 0.3
+        const failProbability = (1 - planet.c.security) * 0.3
         this.failed = Math.random() < failProbability
     }
 
     isValid() {
         const {planet: p} = this
         //need high credits to afford it, low prestige to want it
-        const ratingsValid = planet.civilization.wealth > CL.SLIGHTLY_HIGH && planet.civilization.prestige < CL.MEDIUM
+        const ratingsValid = planet.c.wealth > CL.SLIGHTLY_HIGH && planet.c.prestige < CL.MEDIUM
         const interferingEvent = News.planetHasAnyNews(planet, [NT.FESTIVAL, ...NT_ECONOMY_PREVENTING, ...NT_DANGEROUS])
         return ratingsValid && !interferingEvent
     }

@@ -8,6 +8,9 @@ class Climate {
      * @param {GeologicalActivity} geologicalActivity - The geological activity level (from GEOLOGICAL_ACTIVITIES)
      * @param {Magnetosphere} magnetosphere - The magnetosphere strength (from MAGNETOSPHERES)
      * @param {RadiationLevel} radiationLevel - The radiation level (from RADIATION_LEVELS)
+     * @param {PlanetAtmosphereType} atmosphereType - The atmospheric composition
+     * @param {PlanetOceanType} oceanType - The ocean/liquid composition (can be null)
+     * @param {PlanetGeologyType} geologyType - The geological composition (can be null for gas giants)
      */
     constructor(
         temperature = TEMPERATURES.NONE,
@@ -16,7 +19,10 @@ class Climate {
         oceanCoverage = OCEAN_COVERAGES.NONE,
         geologicalActivity = GEOLOGICAL_ACTIVITIES.NONE,
         magnetosphere = MAGNETOSPHERES.NONE,
-        radiationLevel = RADIATION_LEVELS.NONE
+        radiationLevel = RADIATION_LEVELS.NONE,
+        atmosphereType = null,
+        oceanType = null,
+        geologyType = null
     ) {
         /** @type {Temperature} */
         this.temperature = temperature
@@ -32,6 +38,12 @@ class Climate {
         this.magnetosphere = magnetosphere
         /** @type {RadiationLevel} */
         this.radiationLevel = radiationLevel
+        /** @type {PlanetAtmosphereType} */
+        this.atmosphereType = atmosphereType
+        /** @type {PlanetOceanType} */
+        this.oceanType = oceanType
+        /** @type {PlanetGeologyType} */
+        this.geologyType = geologyType
     }
 
     /**

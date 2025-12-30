@@ -4,11 +4,11 @@ function assessPlanets() {
     console.log("Debugging Planets:")
     console.log('Total Planets:', gs.system.planets.length, gs.system.planets)
 
-    const governmentTypes = gs.system.planets.map(p=>p.civilization.governmentType)
+    const governmentTypes = gs.system.planets.map(p=>p.c.governmentType)
     console.log('GovernmentType Types:', governmentTypes)
     const relationshipCounts = {}
     for (const p of gs.system.planets) {
-        for (const [otherPlanet, relationship] of p.civilization.relationships) {
+        for (const [otherPlanet, relationship] of p.c.relationships) {
             relationshipCounts[relationship.name] = relationshipCounts[relationship.name] ? relationshipCounts[relationship.name] + 1 : 1
         }
     }
@@ -113,24 +113,24 @@ function assessPlanets() {
 
     console.log('-----Average Planet Stats:------')
 
-    const totalPopulation = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.population,0)
-    const totalTerritory = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.territory,0)
-    const totalArmy = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.army,0)
-    const totalNavy = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.navy,0)
-    const totalCorruption = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.corruption,0)
-    const totalCrime = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.crime,0)
-    const totalSecurity = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.security,0)
-    const totalEconomic = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.economy,0)
-    const totalIndustrial = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.industry,0)
-    const totalCulture = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.culture,0)
-    const totalPrestige = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.prestige,0)
-    const totalTechnology = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.technology,0)
-    const totalEducation = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.education,0)
-    const totalWealth = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.wealth,0)
-    const totalInflation = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.inflation,0)
-    const totalReserves = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.reserves,0)
-    const totalCargoPriceModifier = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.cargoPriceMultipliers.average,0)
-    const totalSkillPriceModifier = gs.system.planets.reduce((sum,planet)=>sum+planet.civilization.skillPriceMultipliers.average,0)
+    const totalPopulation = gs.system.planets.reduce((sum,planet)=>sum+planet.c.population,0)
+    const totalTerritory = gs.system.planets.reduce((sum,planet)=>sum+planet.c.territory,0)
+    const totalArmy = gs.system.planets.reduce((sum,planet)=>sum+planet.c.army,0)
+    const totalNavy = gs.system.planets.reduce((sum,planet)=>sum+planet.c.navy,0)
+    const totalCorruption = gs.system.planets.reduce((sum,planet)=>sum+planet.c.corruption,0)
+    const totalCrime = gs.system.planets.reduce((sum,planet)=>sum+planet.c.crime,0)
+    const totalSecurity = gs.system.planets.reduce((sum,planet)=>sum+planet.c.security,0)
+    const totalEconomic = gs.system.planets.reduce((sum,planet)=>sum+planet.c.economy,0)
+    const totalIndustrial = gs.system.planets.reduce((sum,planet)=>sum+planet.c.industry,0)
+    const totalCulture = gs.system.planets.reduce((sum,planet)=>sum+planet.c.culture,0)
+    const totalPrestige = gs.system.planets.reduce((sum,planet)=>sum+planet.c.prestige,0)
+    const totalTechnology = gs.system.planets.reduce((sum,planet)=>sum+planet.c.technology,0)
+    const totalEducation = gs.system.planets.reduce((sum,planet)=>sum+planet.c.education,0)
+    const totalWealth = gs.system.planets.reduce((sum,planet)=>sum+planet.c.wealth,0)
+    const totalInflation = gs.system.planets.reduce((sum,planet)=>sum+planet.c.inflation,0)
+    const totalReserves = gs.system.planets.reduce((sum,planet)=>sum+planet.c.reserves,0)
+    const totalCargoPriceModifier = gs.system.planets.reduce((sum,planet)=>sum+planet.c.cargoPriceMultipliers.average,0)
+    const totalSkillPriceModifier = gs.system.planets.reduce((sum,planet)=>sum+planet.c.skillPriceMultipliers.average,0)
 
     const averageInflation = totalInflation / gs.system.planets.length
     const averageTechnology = totalTechnology / gs.system.planets.length

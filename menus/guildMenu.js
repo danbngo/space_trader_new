@@ -76,8 +76,8 @@ function showGuildMenu(guild = new Guild()) {
             createHireOfficerMenu(guild.officers, guild, (officer)=>onSelectGuildOfficer(officer)),
             `Your # officers: ${fleet.officers.length}/${captain.maxSubordinates} | Your credits: ${gs.credits}`,
             //`Guild credits: ${guild.credits}`,
-            `Local Officer Level: ${roundToPlaces(100*guild.planet.civilization.education, 2)}%`,
-            `Hire Fee: ${statColorSpan(roundToPlaces(100*planet.civilization.corruption, 2), 2/(1+planet.civilization.corruption))}%`,
+            `Local Officer Level: ${roundToPlaces(100*guild.planet.c.education, 2)}%`,
+            `Hire Fee: ${statColorSpan(roundToPlaces(100*planet.c.corruption, 2), 2/(1+planet.c.corruption))}%`,
             (gs.fleet.totalSkills.getAmount(SKILLS.Barter) > 0) ? `Fee After Barter | ${statColorSpan(roundToPlaces(100*(1+guild.rake) - 100, 2), 2/(1+guild.rake))}% Hire` : '',
         ]}),
         [

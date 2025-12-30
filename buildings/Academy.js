@@ -19,22 +19,22 @@ class Academy extends Building {
     calcSkillUpgradeCost(officer = new Officer(), skill = SKILLS_ALL[0]) {
         // Base cost scales exponentially with current skill level
         const baseCost = 250 * officer.calcSkillPointsToUpgrade(skill, false)
-        const skillModifier = this.planet.civilization.skillPriceMultipliers.getAmount(skill) || 1
-        return Math.ceil(baseCost * skillModifier * (1 + this.planet.civilization.corruption) * this.planet.civilization.inflation)
+        const skillModifier = this.planet.c.skillPriceMultipliers.getAmount(skill) || 1
+        return Math.ceil(baseCost * skillModifier * (1 + this.planet.c.corruption) * this.planet.c.inflation)
     }
     calcCanUpgradeSkill(officer = new Officer(), targetLevel = 1) {
-        return this.planet.civilization.education * officer.level >= targetLevel
+        return this.planet.c.education * officer.level >= targetLevel
     }
     calcHirePrice(officer = new Officer()) {
-        const basePrice = Math.round(officer.value * (1+this.planet.civilization.corruption) * this.planet.civilization.inflation / (this.isTavern ? this.planet.civilization.crime : this.planet.civilization.army))
+        const basePrice = Math.round(officer.value * (1+this.planet.c.corruption) * this.planet.c.inflation / (this.isTavern ? this.planet.c.crime : this.planet.c.army))
         // Taverns don't charge taxes (similar to black market)
         if (this.isTavern) {
             return basePrice
         }
-        return Math.round(basePrice * (1 + this.planet.civilization.taxRate))
+        return Math.round(basePrice * (1 + this.planet.c.taxRate))
     }
     get baseNumOfficers() {
-        return GUILD_AVERAGE_NUM_OFFICERS * (this.isTavern ? this.planet.civilization.crime : this.planet.civilization.army)
+        return GUILD_AVERAGE_NUM_OFFICERS * (this.isTavern ? this.planet.c.crime : this.planet.c.army)
     }
     normalize(clearExisting = false) {
         super.normalize()

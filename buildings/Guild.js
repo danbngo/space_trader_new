@@ -16,14 +16,14 @@ class Guild extends Building {
         this.normalize(true)
     }
     calcHirePrice(officer = new Officer()) {
-        const basePrice = Math.round(officer.value * (1+this.planet.civilization.corruption) * this.planet.civilization.inflation / this.planet.civilization.army)
-        return Math.round(basePrice * (1 + this.planet.civilization.taxes))
+        const basePrice = Math.round(officer.value * (1+this.planet.c.corruption) * this.planet.c.inflation / this.planet.c.army)
+        return Math.round(basePrice * (1 + this.planet.c.taxes))
     }
     get baseNumOfficers() {
-        return GUILD_AVERAGE_NUM_OFFICERS*this.planet.civilization.army
+        return GUILD_AVERAGE_NUM_OFFICERS*this.planet.c.army
     }
     get baseNumContracts() {
-        return Math.round(GUILD_AVERAGE_NUM_CONTRACTS*this.planet.civilization.economy)
+        return Math.round(GUILD_AVERAGE_NUM_CONTRACTS*this.planet.c.economy)
     }
     normalize(clearExisting = false) {
         super.normalize()

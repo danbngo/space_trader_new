@@ -80,7 +80,7 @@ class ImperialismNews extends News {
     determineOutcome() {
         const {planet: p, targetPlanet: tp} = this
         // Check if peace declared
-        const rel = planet.civilization.relationships.get(targetPlanet)
+        const rel = planet.c.relationships.get(targetPlanet)
         if (rel === RELATIONSHIP_TYPES.NEUTRAL || rel === RELATIONSHIP_TYPES.ALLY) {
             this.cancelled = true
             return
@@ -93,11 +93,11 @@ class ImperialismNews extends News {
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         //aggressor needs high military and low territory, victim needs territory to take
-        const ratingsValid = (planet.civilization.military > CL.SLIGHTLY_HIGH) && (planet.civilization.territory < CL.HIGH) && (targetPlanet.civilization.territory > CL.SLIGHTLY_LOW)
+        const ratingsValid = (planet.c.military > CL.SLIGHTLY_HIGH) && (planet.c.territory < CL.HIGH) && (targetPlanet.c.territory > CL.SLIGHTLY_LOW)
         //aggressor must have at least 1.5x the military of victim
-        const militaryValid = planet.civilization.military >= targetPlanet.civilization.military * CL.HIGH
+        const militaryValid = planet.c.military >= targetPlanet.c.military * CL.HIGH
         //both must have tensions with each other
-        const relationships = [planet.civilization.relationships.get(targetPlanet), targetPlanet.civilization.relationships.get(planet)]
+        const relationships = [planet.c.relationships.get(targetPlanet), targetPlanet.c.relationships.get(planet)]
         const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.TENSE || rel == RELATIONSHIP_TYPES.WAR)
         const interferingEvent =
             News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.IMPERIALISM])
