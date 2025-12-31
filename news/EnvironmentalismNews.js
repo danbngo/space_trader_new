@@ -29,7 +29,7 @@ class EnvironmentalismNews extends News {
     }
 
     determineOutcome() {
-        this.rollOutcome(this.planet.c.economy)
+        this.rollOutcome(this.planet.c.education*this.planet.c.culture/this.planet.c.industry/this.planet.c.corruption)
     }
 
     isValid() {

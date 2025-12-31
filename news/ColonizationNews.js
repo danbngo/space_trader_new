@@ -1,7 +1,7 @@
 class ColonizationNews extends News {
     constructor(planet = new Planet()) {
         super(
-            `${coloredName(planet)} begins building a fleet to colonize resource-rich asteroids in the central belt!`,
+            `${coloredName(planet)} begins gathering manpower to colonize resource-rich asteroids in the central belt!`,
             `${coloredName(planet)}'s colony ships have finished building settlements on resource laden asteroids!`,
             `${coloredName(planet)}'s colonization effort fails! Pirates raid their ships and hazards, scarcity and disease afflict their colonies!`,
             '',
@@ -10,23 +10,27 @@ class ColonizationNews extends News {
 
         this.addPlanetEffect(
             {
-                navy: CL.VERY_LOW,
+                army: CL.LOW,
+                navy: CL.SLIGHTLY_LOW,
                 population: CL.LOW,
                 reserves: CL.LOW,
                 taxes: CL.HIGH,
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.METAL, CL.VERY_HIGH], [CARGO_TYPES.ISOTOPES, CL.EXTREMELY_HIGH]])),
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.FOOD, CL.VERY_HIGH]])),
             },
             {
-                navy: CL.LOW,
+                army: CL.VERY_LOW,
+                navy: CL.SLIGHTLY_LOW,
                 population: CL.LOW,
                 wealth: CL.HIGH,
                 prestige: CL.HIGH,
                 economy: CL.HIGH,
                 industry: CL.HIGH,
+                taxes: CL.SLIGHTLY_HIGH,
                 territory: CL.HIGH,
             },
             {
-                navy: CL.VERY_LOW,
+                army: CL.VERY_LOW,
+                navy: CL.SLIGHTLY_LOW,
                 population: CL.LOW,
                 reserves: CL.LOW,
                 taxes: CL.SLIGHTLY_HIGH,
@@ -43,11 +47,10 @@ class ColonizationNews extends News {
 
     isValid() {
         const {planet: p} = this
-        const ratingsValid = p.c.population > CL.MEDIUM && (p.c.navy > CL.MEDIUM)
+        const ratingsValid = p.c.population > CL.MEDIUM && (p.c.army > CL.MEDIUM)
         //basically dont do it if ANYTHING bad is happening
         const interferingEvent = 
-            News.planetHasAnyNewsTargeting(p, NT_ECONOMY_PREVENTING) ||
-            News.planetHasAnyNews(p, NT_ECONOMY_PREVENTING)
+            News.planetHasAnyNewsTargeting(p, NT_ECONOMY_PREVENTING) || News.planetHasAnyNews(p, NT_ECONOMY_PREVENTING)
         return ratingsValid && !interferingEvent
     }
 }
