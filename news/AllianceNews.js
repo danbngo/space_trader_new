@@ -10,8 +10,6 @@ class AllianceNews extends News {
 
         this.addPlanetEffect({
             newRelationship: RELATIONSHIP_TYPES.ALLY,
-            security: CL.SLIGHTLY_HIGH,
-            technology: CL.SLIGHTLY_HIGH,
             prestige: CL.SLIGHTLY_HIGH,
             army: CL.SLIGHTLY_HIGH,
             navy: CL.SLIGHTLY_HIGH
@@ -19,8 +17,6 @@ class AllianceNews extends News {
 
         this.addTargetPlanetEffect({
             newRelationship: RELATIONSHIP_TYPES.ALLY,
-            security: CL.SLIGHTLY_HIGH,
-            technology: CL.SLIGHTLY_HIGH,
             prestige: CL.SLIGHTLY_HIGH,
             army: CL.SLIGHTLY_HIGH,
             navy: CL.SLIGHTLY_HIGH

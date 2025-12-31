@@ -8,55 +8,42 @@ class ImmigrationNews extends News {
             NT.IMMIGRATION, planet, targetPlanet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addPlanetEffect(
+            {
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
-                civilizationMultipliers: new Civilization({
-                    population: CL.HIGH,
-                    economy: CL.SLIGHTLY_HIGH,
-                    security: CL.LOW,
-                })
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
+                population: CL.HIGH,
+                economy: CL.SLIGHTLY_HIGH,
+            },
+            {
+                population: CL.HIGH,
+                economy: CL.SLIGHTLY_HIGH,
+            },
+            {
+                population: CL.SLIGHTLY_HIGH,
+                economy: CL.LOW,
+            },
+            {
+                population: CL.SLIGHTLY_HIGH,
+                economy: CL.SLIGHTLY_HIGH,
+            }
+        )
+
+        this.addTargetPlanetEffect(
+            {
                 targetPlanet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    population: CL.LOW,
-                    economy: CL.SLIGHTLY_LOW,
-                })
-            }),
-        ]
-
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            population: CL.HIGH,
-            economy: CL.SLIGHTLY_HIGH,
-        }))
-        this.completeEffects[1].civilizationMultipliers.multiply(new Civilization({
-            population: CL.LOW,
-            economy: CL.SLIGHTLY_LOW,
-        }))
-
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
-            population: CL.SLIGHTLY_HIGH,
-            security: CL.LOW,
-            economy: CL.LOW,
-        }))
-        this.failEffects[1].civilizationMultipliers.multiply(new Civilization({
-            population: CL.SLIGHTLY_LOW,
-        }))
-
-        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
-        this.cancelEffects[0].civilizationMultipliers.multiply(new Civilization({
-            population: CL.SLIGHTLY_HIGH,
-            economy: CL.SLIGHTLY_HIGH,
-            security: CL.SLIGHTLY_LOW,
-        }))
-        this.cancelEffects[1].civilizationMultipliers.multiply(new Civilization({
-            population: CL.SLIGHTLY_LOW,
-        }))
+                population: CL.LOW,
+            },
+            {
+                population: CL.LOW,
+            },
+            {
+                population: CL.SLIGHTLY_LOW,
+            },
+            {
+                population: CL.SLIGHTLY_LOW,
+            }
+        )
     }
 
     shouldCancel() {
@@ -69,18 +56,15 @@ class ImmigrationNews extends News {
     determineOutcome() {
         this.rollOutcome(this.planet.c.economy)
     }
-    }
 
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         // Source must have population to give, target must have economic opportunity
         const ratingsValid = p.c.population < CL.HIGH && p.c.economy > CL.SLIGHTLY_HIGH && tp.c.population > CL.LOW
         // Must not be at war
-        const relationships = [p.c.relationships.get(targetPlanet), tp.c.relationships.get(planet)]
+        const relationships = [p.c.relationships.get(tp), tp.c.relationships.get(p)]
         const relationshipsValid = relationships.every(rel => rel != RELATIONSHIP_TYPES.WAR)
-        const interferingEvent = 
-            News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.IMMIGRATION]) ||
-            News.planetHasAnyNews(targetPlanet, NT_ECONOMY_PREVENTING)
+        const interferingEvent = News.hasAnyNewsBidirectional(p, tp, [NT.IMMIGRATION]) || News.planetHasAnyNews(p, NT_ECONOMY_PREVENTING)
         return ratingsValid && relationshipsValid && !interferingEvent
     }
 }

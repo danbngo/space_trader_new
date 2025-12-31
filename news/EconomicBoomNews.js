@@ -8,25 +8,20 @@ class EconomicBoomNews extends News {
             NT.ECONOMIC_BOOM, planet
         )
 
-        this.addEffect(
+        this.addPlanetEffect(
             {
                 planet: this.planet,
-                inflation: CL.VERY_LOW,
-                reserves: CL.VERY_HIGH,
                 economy: CL.EXTREMELY_HIGH,
-                industry: CL.VERY_HIGH,
                 wealth: CL.EXTREMELY_HIGH,
+                reserves: CL.VERY_HIGH,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.HOLOCUBES, CL.EXTREMELY_HIGH]])),
             },
             {
-                inflation: CL.LOW,
-                reserves: CL.VERY_HIGH,
                 economy: CL.HIGH,
-                industry: CL.SLIGHTLY_HIGH,
                 wealth: CL.EXTREMELY_HIGH,
+                reserves: CL.VERY_HIGH,
             },
             {
-                inflation: CL.HIGH,
                 wealth: CL.LOW,
                 crime: CL.HIGH
             }

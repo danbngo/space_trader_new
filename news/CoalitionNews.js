@@ -8,7 +8,7 @@ class CoalitionNews extends News {
             NT.COALITION, planet
         )
 
-        this.addEffect(
+        this.addPlanetEffect(
             {
                 planet: this.planet,
                 prestige: CL.LOW,
@@ -39,10 +39,8 @@ class CoalitionNews extends News {
         const {planet: p} = this
         //more likely if REALLY REALLY high territory and military
         const ratingsValid = p.c.territory > CL.VERY_HIGH && (p.c.army > CL.VERY_HIGH || p.c.navy > CL.VERY_HIGH)
-        const interferingEvent =
-            News.planetHasAnyNews(p, [NT.COALITION])
         const [badNews] = News.calcRelationshipWorseningNews(p)
         const canFormCoalition = badNews.length >= 3
-        return ratingsValid && canFormCoalition && !interferingEvent
+        return ratingsValid && canFormCoalition
     }
 }

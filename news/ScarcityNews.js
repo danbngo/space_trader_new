@@ -8,42 +8,22 @@ class ScarcityNews extends News {
             NT.SCARCITY, planet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addPlanetEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    population: CL.LOW,
-                    inflation: CL.EXTREMELY_HIGH,
-                    reserves: CL.EXTREMELY_LOW,
-                    industry: CL.LOW,
-                    economy: CL.LOW,
-                    crime: CL.HIGH,
-                    corruption: CL.HIGH,
-                    military: CL.VERY_LOW
-                }),
+                population: CL.LOW,
+                reserves: CL.EXTREMELY_LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WATER, CL.ASTRONOMICAL]]))
-            })
-        ]
-
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        // Population does not fully bounce back
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            population: CL.SLIGHTLY_LOW,
-            industry: CL.SLIGHTLY_LOW,
-            economy: CL.SLIGHTLY_LOW
-        }))
-
-        // Failed: famine becomes catastrophic
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
-            population: CL.NO_REGRESSION,  // Massive die-off
-            industry: CL.NO_REGRESSION,
-            economy: CL.NO_REGRESSION,
-            crime: CL.NO_REGRESSION,  // Lawlessness persists
-            prestige: CL.VERY_LOW  // Failed state
-        }))
-
-        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
+            },
+            {
+                population: CL.SLIGHTLY_LOW,
+            },
+            {
+                population: CL.NO_REGRESSION,
+                crime: CL.NO_REGRESSION,
+                prestige: CL.VERY_LOW
+            }
+        )
     }
 
     determineOutcome() {

@@ -8,53 +8,31 @@ class WarScorchedEarthNews extends News {
             NT.WAR_SCORCHED_EARTH, planet, targetPlanet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addPlanetEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    territory: CL.LOW,  // Destroyed own territory
-                    industry: CL.LOW,  // Factories demolished
-                    reserves: CL.LOW  // Supplies destroyed
-                })
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                civilizationMultipliers: new Civilization({
-                    military: CL.SLIGHTLY_LOW,  // Losses from traps/ambushes
-                    technology: CL.LOW,  // Damaged ships
-                    education: CL.SLIGHTLY_LOW  // Losses in hostile territory
-                })
-            })
-        ]
+                territory: CL.LOW,
+                industry: CL.LOW,
+            },
+            {
+                territory: CL.NO_REGRESSION,
+            },
+            {},
+            {
+                territory: CL.SLIGHTLY_HIGH,
+            }
+        )
 
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        // Attacker: permanent self-inflicted damage
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            territory: CL.NO_REGRESSION,  // Destroyed territory stays destroyed
-            industry: CL.SLIGHTLY_HIGH,
-            reserves: CL.SLIGHTLY_HIGH
-        }))
-        // Defender: permanent losses from hostile terrain
-        this.completeEffects[1].civilizationMultipliers.multiply(new Civilization({
-            military: CL.NO_REGRESSION,
-            technology: CL.NO_REGRESSION,
-            education: CL.NO_REGRESSION
-        }))
-
-        // Cancelled: peace before full destruction, partial damage
-        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
-        this.cancelEffects[0].civilizationMultipliers.multiply(new Civilization({
-            territory: CL.SLIGHTLY_HIGH,
-            industry: CL.SLIGHTLY_HIGH,
-            reserves: CL.SLIGHTLY_HIGH
-        }))
-        this.cancelEffects[1].civilizationMultipliers.multiply(new Civilization({
-            military: CL.SLIGHTLY_HIGH,
-            technology: CL.SLIGHTLY_HIGH,
-            education: CL.SLIGHTLY_HIGH
-        }))
-
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        this.addTargetPlanetEffect(
+            {
+                military: CL.SLIGHTLY_LOW,
+            },
+            {
+                military: CL.NO_REGRESSION,
+            },
+            {},
+            {}
+        )
     }
 
     shouldCancel() {

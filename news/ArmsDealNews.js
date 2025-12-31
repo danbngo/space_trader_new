@@ -8,23 +8,25 @@ class ArmsDealNews extends News {
             NT.ARMS_DEAL, planet, targetPlanet
         )
 
-        this.addPlanetEffect({
-            taxes: CL.HIGH
-        }, {
-            army: CL.HIGH, // gain military knowledge
-            navy: CL.HIGH, // gain new ships
-            reserves: CL.HIGH,
-            technology: CL.SLIGHTLY_HIGH,
-            taxes: CL.VERY_HIGH,
-        }, {
-            prestige: CL.SLIGHTLY_LOW,
-        })
+        this.addPlanetEffect(
+            {
+                reserves: CL.LOW
+            },
+            {
+                army: CL.HIGH,
+                navy: CL.HIGH,
+            },
+            {
+                prestige: CL.SLIGHTLY_LOW
+            }
+        )
         
-        this.addTargetPlanetEffect({}, {
-            wealth: CL.HIGH, // payment received
-            navy: CL.LOW, // sold ships
-            army: CL.LOW,
-        })
+        this.addTargetPlanetEffect(
+            {},
+            {
+                wealth: CL.HIGH,
+            }
+        )
     }
 
     shouldCancel() {

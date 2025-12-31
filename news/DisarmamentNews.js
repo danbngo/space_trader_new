@@ -8,22 +8,17 @@ class DisarmamentNews extends News {
             NT.DISARMAMENT, planet
         )
 
-        this.addEffect(
+        this.addPlanetEffect(
             {
                 planet: this.planet,
                 army: CL.LOW,
                 navy: CL.LOW,
-                territory: CL.SLIGHTLY_LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_LOW], [CARGO_TYPES.WEAPONS, CL.EXTREMELY_LOW]])),
             },
             {
                 army: CL.VERY_LOW,
                 navy: CL.VERY_LOW,
-                territory: CL.SLIGHTLY_LOW,
                 economy: CL.SLIGHTLY_HIGH,
-                industry: CL.SLIGHTLY_HIGH,
-                prestige: CL.SLIGHTLY_HIGH,
-                taxes: CL.VERY_LOW
             }
         )
     }

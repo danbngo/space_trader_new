@@ -7,40 +7,24 @@ class TourismNews extends News {
             ``,
             NT.TOURISM, planet
         )
-        this.startEffects = [
-            new NewsEffect({
+        this.addPlanetEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    inflation: CL.VERY_HIGH,
-                    reserves: CL.LOW,
-                    industry: CL.LOW,
-                    wealth: CL.LOW
-                }),
+                wealth: CL.LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([
                     [CARGO_TYPES.METAL, 2],
                     [CARGO_TYPES.NANITES, 2]
                 ]))
-            })
-        ]
-
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            industry: CL.SLIGHTLY_HIGH,  // Industry doesn't fully recover
-            wealth: 1.5 / 0.7,
-            economy: CL.SLIGHTLY_HIGH,
-            crime: CL.VERY_HIGH,
-            corruption: CL.VERY_HIGH
-        }))
-
-        // Failed: resort attracts no tourists, investment wasted
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
-            wealth: CL.NO_REGRESSION,  // Money lost
-            industry: CL.NO_REGRESSION,  // Damaged industry
-            prestige: CL.LOW  // Embarrassment
-        }))
-
-        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
+            },
+            {
+                wealth: 1.5 / 0.7,
+                culture: CL.SLIGHTLY_HIGH,
+            },
+            {
+                wealth: CL.NO_REGRESSION,
+                prestige: CL.LOW
+            }
+        )
     }
 
     determineOutcome() {

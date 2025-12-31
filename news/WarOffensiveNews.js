@@ -8,46 +8,28 @@ class WarOffensiveNews extends News {
             NT.WAR_OFFENSIVE, planet, targetPlanet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addPlanetEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    military: CL.LOW,
-                    education: CL.SLIGHTLY_LOW
-                })
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                civilizationMultipliers: new Civilization({
-                    military: CL.SLIGHTLY_LOW,
-                    education: CL.SLIGHTLY_LOW
-                })
-            })
-        ]
+                military: CL.LOW,
+            },
+            {
+                military: CL.SLIGHTLY_HIGH,
+            },
+            {},
+            {}
+        )
 
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        // Victor: minor permanent losses, prestige gain persists
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            military: CL.SLIGHTLY_HIGH,
-            education: CL.SLIGHTLY_HIGH
-        }))
-        // Loser: major permanent losses
-        this.completeEffects[1].civilizationMultipliers.multiply(new Civilization({
-            military: CL.SLIGHTLY_LOW,
-            education: CL.NO_REGRESSION
-        }))
-
-        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
-        this.cancelEffects[0].civilizationMultipliers.multiply(new Civilization({
-            military: CL.SLIGHTLY_HIGH,
-            education: CL.SLIGHTLY_HIGH
-        }))
-        this.cancelEffects[1].civilizationMultipliers.multiply(new Civilization({
-            military: CL.SLIGHTLY_HIGH,
-            education: CL.SLIGHTLY_HIGH
-        }))
-
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        this.addTargetPlanetEffect(
+            {
+                military: CL.SLIGHTLY_LOW,
+            },
+            {
+                military: CL.SLIGHTLY_LOW,
+            },
+            {},
+            {}
+        )
     }
 
     determineOutcome() {

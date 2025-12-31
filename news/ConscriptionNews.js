@@ -8,18 +8,14 @@ class ConscriptionNews extends News {
             NT.CONSCRIPTION, planet
         )
 
-        this.addEffect(
+        this.addPlanetEffect(
             {
                 planet: this.planet,
                 population: CL.LOW,
                 economy: CL.LOW,
-                industry: CL.LOW,
-                taxes: CL.HIGH
             },
             {
                 army: CL.VERY_HIGH,
-                navy: CL.HIGH,
-                taxes: CL.HIGH
             },
             {
                 prestige: CL.LOW,
@@ -37,7 +33,7 @@ class ConscriptionNews extends News {
     isValid() {
         const {planet: p} = this
         // More likely if military is low or security is low (militarizing society)
-        const ratingsValid = p.c.army < CL.LOW && p.c.population > CL.MEDIUM
+        const ratingsValid = p.c.army < CL.VERY_LOW
         // will not happen if we are not tense with anyone
         const numTenseRelationships = Array.from(p.c.relationships.values()).filter(v=>(v == RELATIONSHIP_TYPES.TENSE || v == RELATIONSHIP_TYPES.WAR)).length
         return ratingsValid && numTenseRelationships > 0

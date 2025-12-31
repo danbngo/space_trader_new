@@ -16,68 +16,45 @@ class WarBombardmentNews extends News {
             if (building) buildingsToDisable.push(building);
         }
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addPlanetEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    prestige: CL.HIGH,  // This makes you scary...
-                    military: CL.SLIGHTLY_LOW  // But expends some of your arsenal
-                })
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                civilizationMultipliers: new Civilization({
-                    population: CL.LOW,
-                    military: CL.EXTREMELY_LOW,
-                    industry: CL.LOW,
-                    economy: CL.LOW,
-                    security: CL.LOW,
-                    reserves: CL.LOW,
-                    inflation: CL.EXTREMELY_HIGH,
-                    technology: CL.LOW,  // Back to the stone age!
-                    education: CL.LOW,
-                    prestige: CL.VERY_LOW
-                }),
+                prestige: CL.HIGH,
+                military: CL.SLIGHTLY_LOW
+            },
+            {},
+            {},
+            {
+                prestige: CL.NO_REGRESSION,
+            }
+        )
+
+        this.addTargetPlanetEffect(
+            {
+                population: CL.LOW,
+                military: CL.EXTREMELY_LOW,
+                technology: CL.LOW,
                 buildingsDisabled: buildingsToDisable,
                 cargoPriceMultipliers: new CountsMap(new Map([
                     [CARGO_TYPES.WATER, 2],
-                    [CARGO_TYPES.MEDICINE, 2],
-                    [CARGO_TYPES.HOLOCUBES, 0.5]
+                    [CARGO_TYPES.MEDICINE, 2]
                 ]))
-            })
-        ]
-
-        // Don't automatically recover
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        this.completeEffects[1].civilizationMultipliers.multiply(new Civilization({
-            population: CL.NO_REGRESSION,
-            military: CL.NO_REGRESSION,
-            industry: CL.NO_REGRESSION,
-            economy: CL.NO_REGRESSION,
-            security: CL.NO_REGRESSION,
-            reserves: CL.NO_REGRESSION,
-            technology: CL.NO_REGRESSION,
-            education: CL.NO_REGRESSION,
-            prestige: CL.NO_REGRESSION
-        }))
-        this.completeEffects[1].buildingsEnabled = []
-        this.completeEffects[1].forcePeace = true
-
-        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
-        this.cancelEffects[0].civilizationMultipliers.multiply(new Civilization({
-            prestige: CL.NO_REGRESSION,
-            military: CL.SLIGHTLY_HIGH
-        }))
-        this.cancelEffects[1].civilizationMultipliers.multiply(new Civilization({
-            population: CL.SLIGHTLY_HIGH,
-            military: CL.SLIGHTLY_HIGH,
-            industry: CL.SLIGHTLY_HIGH,
-            economy: CL.SLIGHTLY_HIGH,
-            security: CL.SLIGHTLY_HIGH
-        }))
-        this.cancelEffects[1].forcePeace = true
-
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+            },
+            {
+                population: CL.NO_REGRESSION,
+                military: CL.NO_REGRESSION,
+                technology: CL.NO_REGRESSION,
+                buildingsEnabled: [],
+                forcePeace: true
+            },
+            {},
+            {
+                population: CL.SLIGHTLY_HIGH,
+                military: CL.SLIGHTLY_HIGH,
+                security: CL.SLIGHTLY_HIGH,
+                forcePeace: true
+            }
+        )
     }
 
     determineOutcome() {

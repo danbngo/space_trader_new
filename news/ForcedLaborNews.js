@@ -8,35 +8,23 @@ class ForcedLaborNews extends News {
             NT.FORCED_LABOR, planet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addPlanetEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    industry: CL.VERY_HIGH,
-                    economy: CL.SLIGHTLY_LOW,
-                    population: CL.LOW,
-                    prestige: CL.LOW,
-                    reserves: CL.HIGH,
-                })
-            })
-        ]
-
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            industry: CL.SLIGHTLY_HIGH,
-            population: CL.SLIGHTLY_LOW,
-            reserves: CL.SLIGHTLY_HIGH,
-            prestige: CL.LOW,
-        }))
-
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
-            population: CL.VERY_LOW,
-            economy: CL.LOW,
-            prestige: CL.VERY_LOW,
-            crime: CL.VERY_HIGH,
-            army: CL.LOW,
-        }))
+                industry: CL.VERY_HIGH,
+                population: CL.LOW,
+                prestige: CL.LOW,
+            },
+            {
+                industry: CL.SLIGHTLY_HIGH,
+                prestige: CL.LOW,
+            },
+            {
+                population: CL.VERY_LOW,
+                prestige: CL.VERY_LOW,
+                crime: CL.VERY_HIGH,
+            }
+        )
     }
 
     determineOutcome() {
@@ -47,8 +35,6 @@ class ForcedLaborNews extends News {
         const {planet: p} = this
         // More likely if industry is low (trying to industrialize)
         const ratingsValid = p.c.industry < CL.LOW
-        // Authoritarian governments, police states, and communist states would do this
-        const interferingEvent = News.planetHasAnyNews(planet, [NT.FORCED_LABOR])
-        return ratingsValid && !interferingEvent
+        return ratingsValid
     }
 }

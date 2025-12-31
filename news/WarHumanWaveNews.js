@@ -8,45 +8,30 @@ class WarHumanWaveNews extends News {
             NT.WAR_HUMAN_WAVE, planet, targetPlanet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addPlanetEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    population: CL.VERY_LOW,  // Massive casualties
-                    education: CL.LOW  // Officers leading charges
-                })
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                civilizationMultipliers: new Civilization({})
-            })
-        ]
+                population: CL.VERY_LOW,
+                education: CL.LOW
+            },
+            {
+                population: CL.NO_REGRESSION,
+                education: CL.NO_REGRESSION,
+            },
+            {},
+            {
+                population: CL.SLIGHTLY_LOW,
+            }
+        )
 
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        // Attacker: massive permanent losses
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            population: CL.NO_REGRESSION,  // Dead don't return
-            education: CL.NO_REGRESSION,
-            prestige: CL.NO_REGRESSION
-        }))
-        // Defender: permanent losses
-        this.completeEffects[1].civilizationMultipliers.multiply(new Civilization({
-            education: CL.LOW,  // Officers killed defending
-            military: CL.SLIGHTLY_LOW  // Ground forces worn down
-        }))
-
-        // Cancelled: peace declared mid-offensive, troops pull back
-        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
-        this.cancelEffects[0].civilizationMultipliers.multiply(new Civilization({
-            population: CL.SLIGHTLY_LOW,  // Some casualties already taken
-            education: CL.SLIGHTLY_HIGH
-        }))
-        this.cancelEffects[1].civilizationMultipliers.multiply(new Civilization({
-            education: CL.SLIGHTLY_HIGH,
-            military: CL.SLIGHTLY_HIGH
-        }))
-
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        this.addTargetPlanetEffect(
+            {},
+            {
+                education: CL.LOW,
+            },
+            {},
+            {}
+        )
     }
 
     shouldCancel() {

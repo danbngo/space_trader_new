@@ -8,36 +8,21 @@ class ScientificBreakthroughNews extends News {
             NT.SCIENTIFIC_BREAKTHROUGH, planet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addPlanetEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    industry: CL.LOW,
-                    wealth: CL.LOW,
-                    reserves: CL.SLIGHTLY_LOW
-                }),
+                wealth: CL.LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ISOTOPES, 2]]))
-            })
-        ]
-
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        // Actual knowledge gained cannot be lost
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            wealth: CL.SLIGHTLY_HIGH,
-            technology: CL.HIGH,
-            prestige: CL.SLIGHTLY_HIGH,
-            education: CL.SLIGHTLY_HIGH,
-            military: CL.SLIGHTLY_HIGH
-        }))
-
-        // Failed: research yields nothing, resources wasted
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
-            wealth: CL.NO_REGRESSION,  // Money wasted
-            prestige: CL.LOW  // Scientific embarrassment
-        }))
-
-        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
+            },
+            {
+                technology: CL.HIGH,
+                education: CL.SLIGHTLY_HIGH,
+            },
+            {
+                wealth: CL.NO_REGRESSION,
+                prestige: CL.LOW
+            }
+        )
     }
 
     determineOutcome() {

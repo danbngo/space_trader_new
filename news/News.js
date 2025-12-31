@@ -82,10 +82,10 @@ class News {
     }
 
     addPlanetEffect(startEffect, multiplyCompleteBy, multiplyFailBy, multiplyCancelBy) {
-        return this.addEffect(startEffect, multiplyCompleteBy, multiplyFailBy, multiplyCancelBy, false)
+        return this.addPlanetEffect(startEffect, multiplyCompleteBy, multiplyFailBy, multiplyCancelBy, false)
     }
     addTargetPlanetEffect(startEffect, multiplyCompleteBy, multiplyFailBy, multiplyCancelBy) {
-        return this.addEffect(startEffect, multiplyCompleteBy, multiplyFailBy, multiplyCancelBy, true)
+        return this.addPlanetEffect(startEffect, multiplyCompleteBy, multiplyFailBy, multiplyCancelBy, true)
     }
 
     /**

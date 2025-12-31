@@ -8,36 +8,21 @@ class OligarchyNews extends News {
             NT.OLIGARCHY, planet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addPlanetEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    economy: CL.SLIGHTLY_LOW,
-                    prestige: CL.SLIGHTLY_LOW,
-                    industry: CL.SLIGHTLY_LOW,
-                    security: CL.LOW,
-                    wealth: CL.LOW
-                })
-            })
-        ]
-
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        // Economy damage is permanent (oligarchs still control economy)
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            economy: CL.SLIGHTLY_LOW
-        }))
-
-        // Failed: oligarchs entrench permanently
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
-            economy: CL.NO_REGRESSION,  // Permanent economic damage
-            prestige: CL.NO_REGRESSION,
-            security: CL.NO_REGRESSION,
-            wealth: CL.NO_REGRESSION,
-            crime: CL.HIGH  // Corruption entrenched
-        }))
-
-        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
+                economy: CL.SLIGHTLY_LOW,
+                wealth: CL.LOW
+            },
+            {
+                economy: CL.SLIGHTLY_LOW
+            },
+            {
+                economy: CL.NO_REGRESSION,
+                wealth: CL.NO_REGRESSION,
+                crime: CL.HIGH
+            }
+        )
     }
 
     determineOutcome() {

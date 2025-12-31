@@ -8,30 +8,21 @@ class RevivalNews extends News {
             NT.REVIVAL, planet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addPlanetEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    education: CL.LOW,
-                    crime: CL.LOW,
-                    corruption: CL.LOW
-                }),
+                education: CL.LOW,
+                crime: CL.LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([
                     [CARGO_TYPES.HOLOCUBES, CL.VERY_HIGH],
                     [CARGO_TYPES.ISOTOPES, CL.EXTREMELY_LOW]
                 ]))
-            })
-        ]
-
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        // Don't revert ratings, but raise birthrates
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            population: CL.HIGH,
-            education: CL.NO_REGRESSION
-        }))
-
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
+            },
+            {
+                population: CL.HIGH,
+                education: CL.NO_REGRESSION
+            }
+        )
     }
 
     isValid() {

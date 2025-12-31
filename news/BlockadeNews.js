@@ -23,16 +23,12 @@ class BlockadeNews extends News {
 
         this.addTargetPlanetEffect(
             {
-                prestige: CL.SLIGHTLY_LOW,
                 economy: CL.SLIGHTLY_LOW,
                 inflation: CL.VERY_HIGH,
-                reserves: CL.SLIGHTLY_LOW,
             },
             {
-                prestige: CL.SLIGHTLY_LOW,
                 economy: CL.LOW,
                 inflation: CL.HIGH,
-                reserves: CL.LOW,
             },
             {
                 prestige: CL.SLIGHTLY_HIGH,
@@ -55,9 +51,7 @@ class BlockadeNews extends News {
         //cant be anarchic or puppet state
         //planet must already be hostile to the target planet
         const relationshipValid = Civilization.areTenseOrAtWar(p, tp)
-        const interferingEvent = 
-            News.hasNews(NT.BLOCKADE, p, tp) || 
-            News.hasAnyNewsBidirectional(p, tp, NT_COOPERATIVE)
+        const interferingEvent = News.hasAnyNewsBidirectional(p, tp, NT_COOPERATIVE)
         return ratingsValid && relationshipValid && !interferingEvent
     }
 }

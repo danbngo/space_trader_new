@@ -8,11 +8,10 @@ class CrackdownNews extends News {
             NT.CRACKDOWN, planet
         )
 
-        this.addEffect(
+        this.addPlanetEffect(
             {
                 planet: this.planet,
                 security: CL.SLIGHTLY_HIGH,
-                culture: CL.LOW,
                 crime: CL.SLIGHTLY_LOW,
                 corruption: CL.SLIGHTLY_LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.DRUGS, CL.HIGH], [CARGO_TYPES.WEAPONS, CL.HIGH]])),
@@ -25,7 +24,6 @@ class CrackdownNews extends News {
             {
                 security: CL.SLIGHTLY_LOW,
                 crime: CL.HIGH,
-                culture: CL.LOW,
                 corruption: CL.HIGH,
             }
         )

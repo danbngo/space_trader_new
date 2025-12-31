@@ -8,41 +8,23 @@ class OrganizedCrimeNews extends News {
             NT.ORGANIZED_CRIME, planet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addPlanetEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    economy: CL.LOW,
-                    wealth: CL.LOW,
-                    industry: CL.LOW,
-                    security: CL.LOW,
-                    crime: CL.VERY_HIGH,
-                    corruption: CL.VERY_HIGH
-                })
-            })
-        ]
-
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        // Some lingering corruption after
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            economy: CL.SLIGHTLY_LOW,
-            wealth: CL.SLIGHTLY_LOW,
-            industry: CL.SLIGHTLY_LOW,
-            security: CL.SLIGHTLY_LOW,
-            crime: CL.SLIGHTLY_HIGH
-        }))
-
-        // Failed: syndicates win, permanent corruption
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
-            economy: CL.NO_REGRESSION,  // Permanent economic damage
-            security: CL.NO_REGRESSION,
-            crime: CL.NO_REGRESSION,  // Crime entrenched
-            wealth: CL.NO_REGRESSION,
-            prestige: CL.LOW  // Failed state
-        }))
-
-        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
+                security: CL.LOW,
+                crime: CL.VERY_HIGH,
+                corruption: CL.VERY_HIGH
+            },
+            {
+                security: CL.SLIGHTLY_LOW,
+                crime: CL.SLIGHTLY_HIGH
+            },
+            {
+                security: CL.NO_REGRESSION,
+                crime: CL.NO_REGRESSION,
+                prestige: CL.LOW
+            }
+        )
     }
 
     determineOutcome() {

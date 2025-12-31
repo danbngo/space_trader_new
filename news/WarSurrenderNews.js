@@ -8,44 +8,30 @@ class WarSurrenderNews extends News {
             NT.WAR_SURRENDER, planet, targetPlanet
         )
 
-        this.startEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                civilizationMultipliers: new Civilization({})
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                civilizationMultipliers: new Civilization({
-                    military: CL.LOW,
-                    prestige: CL.LOW
-                })
-            })
-        ]
+        this.addPlanetEffect(
+            {
+                planet: this.planet
+            },
+            {
+                prestige: CL.HIGH,
+                territory: CL.SLIGHTLY_HIGH,
+            }
+        )
 
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        // Victor: gains from peace treaty
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            prestige: CL.HIGH,
-            territory: CL.SLIGHTLY_HIGH,
-            wealth: CL.HIGH  // War indemnity
-        }))
-        // Loser: permanent losses from surrender
-        this.completeEffects[1].civilizationMultipliers.multiply(new Civilization({
-            territory: CL.LOW,  // Territorial concessions
-            wealth: CL.LOW,  // War indemnity paid
-            military: CL.LOW,  // Forced demilitarization
-            prestige: CL.LOW  // Shame of defeat
-        }))
-        this.completeEffects[1].forcePeace = true  // Ends the war
-
-        // Cancelled: negotiations break down, war continues
-        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
-        this.cancelEffects[1].civilizationMultipliers.multiply(new Civilization({
-            military: CL.SLIGHTLY_HIGH,  // Partial recovery
-            prestige: CL.SLIGHTLY_HIGH
-        }))
-
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        this.addTargetPlanetEffect(
+            {
+                military: CL.LOW,
+            },
+            {
+                territory: CL.LOW,
+                military: CL.LOW,
+                forcePeace: true
+            },
+            {},
+            {
+                military: CL.SLIGHTLY_HIGH,
+            }
+        )
     }
 
     shouldCancel() {

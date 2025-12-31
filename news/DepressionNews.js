@@ -8,17 +8,13 @@ class DepressionNews extends News {
             NT.DEPRESSION, planet
         )
 
-        this.addEffect(
+        this.addPlanetEffect(
             {
                 planet: this.planet,
                 inflation: CL.EXTREMELY_LOW,
                 reserves: CL.EXTREMELY_LOW,
                 economy: CL.EXTREMELY_LOW,
-                industry: CL.VERY_LOW,
                 wealth: CL.EXTREMELY_LOW,
-                crime: CL.HIGH,
-                education: CL.LOW,
-                taxes: CL.HIGH
             },
             {
                 inflation: CL.EXTREMELY_LOW,
@@ -28,10 +24,7 @@ class DepressionNews extends News {
                 inflation: CL.EXTREMELY_LOW,
                 reserves: CL.LOW,
                 economy: CL.LOW,
-                industry: CL.LOW,
                 wealth: CL.EXTREMELY_LOW,
-                crime: CL.HIGH,
-                education: CL.LOW,
             }
         )
     }

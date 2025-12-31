@@ -8,73 +8,48 @@ class LandGrabNews extends News {
             NT.LAND_GRAB, planet, targetPlanet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addPlanetEffect(
+            {
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
                 army: CL.LOW,
                 navy: CL.LOW,
-                security: CL.LOW,
                 prestige: CL.SLIGHTLY_LOW,
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                targetPlanet: this.planet,
-                army: CL.LOW,
-                navy: CL.LOW,
-                prestige: CL.LOW,
-            })
-        ]
-
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-
-        //aggressor gains territory, some lingering drops
-        Object.assign(this.completeEffects[0], {
-            territory: CL.HIGH,
-            prestige: News.clHalfRegression(this.completeEffects[0].prestige),
-            security: News.clHalfRegression(this.completeEffects[0].security),
-            army: News.clHalfRegression(this.completeEffects[0].army),
-            navy: News.clHalfRegression(this.completeEffects[0].navy),
-        })
-        //victim recovers partially
-        Object.assign(this.completeEffects[1], {
-            territory: CL.LOW,
-            prestige: CL.NO_REGRESSION,
-        })
-
-        // Failed: expansion repelled, aggressor humiliated
-        this.failEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                army: CL.NO_REGRESSION, // losses remain
+            },
+            {
+                territory: CL.HIGH,
+                prestige: News.clHalfRegression(CL.SLIGHTLY_LOW),
+            },
+            {
+                army: CL.NO_REGRESSION,
                 navy: CL.NO_REGRESSION,
-                security: CL.NO_REGRESSION,
-                prestige: CL.VERY_LOW, // failed expansion
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                army: News.clHalfRegression(CL.LOW),
-                navy: News.clHalfRegression(CL.LOW),
-                prestige: CL.HIGH, // victory boosts morale
-            })
-        ]
+                prestige: CL.VERY_LOW,
+            },
+            {
+                territory: News.clHalfRegression(CL.HIGH),
+            }
+        )
 
-        // Cancelled: peace forces withdrawal
-        this.cancelEffects = [
-            new NewsEffect({
-                planet: this.planet,
+        this.addTargetPlanetEffect(
+            {
+                targetPlanet: this.planet,
+                prestige: CL.LOW,
+            },
+            {
+                territory: CL.LOW,
+                prestige: CL.NO_REGRESSION,
+            },
+            {
                 army: News.clHalfRegression(CL.LOW),
                 navy: News.clHalfRegression(CL.LOW),
-                security: News.clHalfRegression(CL.LOW),
-                territory: News.clHalfRegression(CL.HIGH), // partial gains
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
+                prestige: CL.HIGH,
+            },
+            {
                 army: News.clHalfRegression(CL.LOW),
                 navy: News.clHalfRegression(CL.LOW),
-                territory: News.clHalfRegression(CL.LOW), // partial losses
-            })
-        ]
+                territory: News.clHalfRegression(CL.LOW),
+            }
+        )
     }
 
     shouldCancel() {

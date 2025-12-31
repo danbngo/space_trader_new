@@ -8,46 +8,30 @@ class WarSabotageNews extends News {
             NT.WAR_SABOTAGE, planet, targetPlanet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addPlanetEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    security: CL.LOW,  // Agents deployed
-                    education: CL.LOW  // Agents/spies
-                })
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                civilizationMultipliers: new Civilization({
-                    military: CL.SLIGHTLY_LOW,  // Sabotaged military infrastructure
-                    industry: CL.LOW  // Factories bombed
-                })
-            })
-        ]
+                security: CL.LOW,
+            },
+            {
+                security: CL.NO_REGRESSION,
+            },
+            {},
+            {}
+        )
 
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        // Attacker: agents lost permanently
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            security: CL.NO_REGRESSION,  // Security apparatus damaged
-            education: CL.NO_REGRESSION  // Agents don't return
-        }))
-        // Defender: permanent damage from sabotage
-        this.completeEffects[1].civilizationMultipliers.multiply(new Civilization({
-            military: CL.NO_REGRESSION,
-            industry: CL.SLIGHTLY_HIGH
-        }))
-
-        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
-        this.cancelEffects[0].civilizationMultipliers.multiply(new Civilization({
-            security: CL.SLIGHTLY_HIGH,
-            education: CL.SLIGHTLY_HIGH
-        }))
-        this.cancelEffects[1].civilizationMultipliers.multiply(new Civilization({
-            military: CL.SLIGHTLY_HIGH,
-            industry: CL.SLIGHTLY_HIGH
-        }))
-
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        this.addTargetPlanetEffect(
+            {
+                industry: CL.LOW
+            },
+            {
+                industry: CL.SLIGHTLY_HIGH
+            },
+            {},
+            {
+                industry: CL.SLIGHTLY_HIGH
+            }
+        )
     }
 
     determineOutcome() {

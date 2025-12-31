@@ -8,59 +8,41 @@ class SanctionsNews extends News {
             NT.SANCTIONS, planet, targetPlanet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addPlanetEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    reserves: CL.LOW,
-                    economy: CL.LOW,
-                    wealth: CL.SLIGHTLY_LOW
-                })
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                civilizationMultipliers: new Civilization({
-                    reserves: CL.VERY_LOW,
-                    economy: CL.VERY_LOW,
-                    education: CL.LOW,
-                    wealth: CL.LOW
-                })
-            })
-        ]
+                reserves: CL.LOW,
+                economy: CL.LOW,
+            },
+            {
+                economy: CL.SLIGHTLY_LOW,
+            },
+            {
+                economy: CL.VERY_LOW,
+                prestige: CL.LOW
+            },
+            {
+                reserves: CL.SLIGHTLY_HIGH,
+                economy: CL.SLIGHTLY_HIGH,
+            }
+        )
 
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        // Some lingering damage after
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            economy: CL.SLIGHTLY_LOW,
-            wealth: CL.SLIGHTLY_LOW
-        }))
-        this.completeEffects[1].civilizationMultipliers.multiply(new Civilization({
-            economy: CL.SLIGHTLY_LOW
-        }))
-
-        // Failed: sanctions backfire, hurt sanctioner more
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
-            economy: CL.VERY_LOW,  // Domestic economic crisis
-            wealth: CL.LOW,
-            prestige: CL.LOW  // Policy failure
-        }))
-        this.failEffects[1].civilizationMultipliers.multiply(new Civilization({
-            economy: CL.SLIGHTLY_LOW  // Partial damage
-        }))
-
-        // Cancelled: relations improve, sanctions dropped
-        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
-        this.cancelEffects[0].civilizationMultipliers.multiply(new Civilization({
-            reserves: CL.SLIGHTLY_HIGH,
-            economy: CL.SLIGHTLY_HIGH,
-            wealth: CL.SLIGHTLY_HIGH
-        }))
-        this.cancelEffects[1].civilizationMultipliers.multiply(new Civilization({
-            reserves: CL.SLIGHTLY_HIGH,
-            economy: CL.SLIGHTLY_HIGH,
-            wealth: CL.SLIGHTLY_HIGH
-        }))
+        this.addTargetPlanetEffect(
+            {
+                reserves: CL.VERY_LOW,
+                economy: CL.VERY_LOW,
+            },
+            {
+                economy: CL.SLIGHTLY_LOW
+            },
+            {
+                economy: CL.SLIGHTLY_LOW
+            },
+            {
+                reserves: CL.SLIGHTLY_HIGH,
+                economy: CL.SLIGHTLY_HIGH,
+            }
+        )
     }
 
     shouldCancel() {

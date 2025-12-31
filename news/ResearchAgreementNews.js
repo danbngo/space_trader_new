@@ -8,57 +8,42 @@ class ResearchAgreementNews extends News {
             NT.RESEARCH_AGREEMENT, planet, targetPlanet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addPlanetEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    wealth: CL.LOW
-                }),
+                wealth: CL.LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ISOTOPES, 2]]))
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                civilizationMultipliers: new Civilization({
-                    wealth: CL.LOW
-                }),
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ISOTOPES, 2]]))
-            })
-        ]
+            },
+            {
+                technology: CL.SLIGHTLY_HIGH,
+                education: CL.HIGH,
+            },
+            {
+                wealth: CL.NO_REGRESSION
+            },
+            {
+                technology: CL.SLIGHTLY_HIGH,
+                education: CL.SLIGHTLY_HIGH
+            }
+        )
 
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        // Actual knowledge gained cannot be lost
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            technology: CL.SLIGHTLY_HIGH,
-            education: CL.HIGH,
-            military: CL.SLIGHTLY_HIGH
-        }))
-        this.completeEffects[1].civilizationMultipliers.multiply(new Civilization({
-            technology: CL.SLIGHTLY_HIGH,
-            education: CL.HIGH,
-            military: CL.SLIGHTLY_HIGH
-        }))
-
-        // Failed: research yields nothing, wasted resources
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
-            wealth: CL.NO_REGRESSION  // Money wasted
-        }))
-        this.failEffects[1].civilizationMultipliers.multiply(new Civilization({
-            wealth: CL.NO_REGRESSION
-        }))
-
-        // Cancelled: tensions end collaboration early
-        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
-        this.cancelEffects[0].civilizationMultipliers.multiply(new Civilization({
-            wealth: CL.SLIGHTLY_HIGH,
-            technology: CL.SLIGHTLY_HIGH,  // Partial gains
-            education: CL.SLIGHTLY_HIGH
-        }))
-        this.cancelEffects[1].civilizationMultipliers.multiply(new Civilization({
-            wealth: CL.SLIGHTLY_HIGH,
-            technology: CL.SLIGHTLY_HIGH,
-            education: CL.SLIGHTLY_HIGH
-        }))
+        this.addTargetPlanetEffect(
+            {
+                wealth: CL.LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ISOTOPES, 2]]))  
+            },
+            {
+                technology: CL.SLIGHTLY_HIGH,
+                education: CL.HIGH,
+            },
+            {
+                wealth: CL.NO_REGRESSION
+            },
+            {
+                technology: CL.SLIGHTLY_HIGH,
+                education: CL.SLIGHTLY_HIGH
+            }
+        )
     }
 
     shouldCancel() {

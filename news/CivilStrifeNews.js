@@ -3,34 +3,25 @@ class CivilStrifeNews extends News {
         super(
             `${coloredName(planet)}'s people are rioting in the streets against their oppressive government!'`,
             `${coloredName(planet)}'s rioting is quelled as the government soothes the concerns of its citizens!`,
-            `${coloredName(planet)} fails to stop the riots and is forced to put them down with force!`,
+            `${coloredName(planet)} fails to stop the riots and is forced to suppress the population with force!`,
             '',
             NT.CIVIL_STRIFE, planet
         )
 
-        this.addEffect(
+        this.addPlanetEffect(
             {
-                planet: this.planet,
-                army: CL.SLIGHTLY_LOW,
                 security: CL.VERY_LOW,
-                economy: CL.LOW,
-                industry: CL.VERY_LOW,
-                wealth: CL.LOW,
-                reserves: CL.LOW,
-                prestige: CL.SLIGHTLY_LOW,
                 crime: CL.HIGH,
+                prestige: CL.SLIGHTLY_LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.VERY_HIGH]])),
             },
             {
-                culture: CL.HIGH,
+                security: CL.HIGH,
             },
             {
-                army: CL.SLIGHTLY_LOW,
                 security: CL.LOW,
                 crime: CL.SLIGHTLY_HIGH,
                 prestige: CL.LOW,
-                culture: CL.LOW,
-                corruption: CL.SLIGHTLY_HIGH,
             }
         )
     }

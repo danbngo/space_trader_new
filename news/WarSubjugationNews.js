@@ -8,78 +8,49 @@ class WarSubjugationNews extends News {
             NT.SUBJUGATION, planet, targetPlanet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addPlanetEffect(
+            {
                 planet: this.planet,
                 newRelationship: RELATIONSHIP_TYPES.SOVEREIGN,
-                civilizationMultipliers: new Civilization({
-                    territory: CL.VERY_HIGH,
-                    military: CL.SLIGHTLY_LOW,
-                    economy: CL.HIGH,
-                    reserves: CL.HIGH,
-                    prestige: CL.VERY_HIGH
-                })
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
+                territory: CL.VERY_HIGH,
+                prestige: CL.VERY_HIGH
+            },
+            {
+                newRelationship: RELATIONSHIP_TYPES.NEUTRAL,
+                territory: CL.SLIGHTLY_HIGH,
+                prestige: CL.SLIGHTLY_HIGH
+            },
+            {
+                military: CL.LOW,
+                prestige: CL.LOW
+            },
+            {
+                territory: CL.SLIGHTLY_HIGH,
+                prestige: CL.SLIGHTLY_HIGH
+            }
+        )
+
+        this.addTargetPlanetEffect(
+            {
                 governmentType: GT.PUPPET_STATE,
                 newRelationship: RELATIONSHIP_TYPES.SUBJECT,
-                civilizationMultipliers: new Civilization({
-                    territory: CL.VERY_LOW,
-                    military: CL.EXTREMELY_LOW,
-                    security: CL.VERY_LOW,
-                    economy: CL.LOW,
-                    reserves: CL.LOW,
-                    prestige: CL.VERY_LOW
-                }),
+                military: CL.EXTREMELY_LOW,
+                prestige: CL.VERY_LOW,
                 relationsReset: true,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_LOW]])),
                 forcePeace: true
-            })
-        ]
-
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        // Subjugating others has some lingering effects
-        this.completeEffects[0].newRelationship = RELATIONSHIP_TYPES.NEUTRAL
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            territory: CL.SLIGHTLY_HIGH,
-            military: CL.SLIGHTLY_HIGH,
-            prestige: CL.SLIGHTLY_HIGH
-        }))
-        // Being subjugated has some lingering ill effects
-        this.completeEffects[1].newRelationship = RELATIONSHIP_TYPES.NEUTRAL
-        this.completeEffects[1].civilizationMultipliers.multiply(new Civilization({
-            territory: CL.SLIGHTLY_HIGH,
-            military: CL.SLIGHTLY_HIGH,
-            prestige: CL.SLIGHTLY_HIGH
-        }))
-
-        // Failed: occupation repelled, attacker loses forces
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
-            military: CL.LOW,  // Failed invasion losses
-            prestige: CL.LOW  // Humiliation
-        }))
-        this.failEffects[1].civilizationMultipliers.multiply(new Civilization({
-            prestige: CL.HIGH,  // Victory boosts morale
-            military: CL.SLIGHTLY_LOW  // But fighting took toll
-        }))
-
-        // Cancelled: peace forces withdrawal
-        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
-        this.cancelEffects[0].civilizationMultipliers.multiply(new Civilization({
-            territory: CL.SLIGHTLY_HIGH,
-            military: CL.SLIGHTLY_HIGH,
-            economy: CL.SLIGHTLY_HIGH,
-            prestige: CL.SLIGHTLY_HIGH
-        }))
-        this.cancelEffects[1].civilizationMultipliers.multiply(new Civilization({
-            territory: CL.SLIGHTLY_HIGH,
-            military: CL.SLIGHTLY_HIGH,
-            security: CL.SLIGHTLY_HIGH,
-            economy: CL.SLIGHTLY_HIGH,
-            prestige: CL.SLIGHTLY_HIGH
-        }))
+            },
+            {
+                newRelationship: RELATIONSHIP_TYPES.NEUTRAL,
+                prestige: CL.SLIGHTLY_HIGH
+            },
+            {
+                prestige: CL.HIGH,
+            },
+            {
+                prestige: CL.SLIGHTLY_HIGH
+            }
+        )
     }
 
     shouldCancel() {

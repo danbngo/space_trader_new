@@ -273,7 +273,7 @@ class EncounterMap extends BaseMap {
         effects.forEach( (effect, index) => {
             const cvsEffectObject = cvs.getObject(`effect${effect.uuid}`)
             if (!cvsEffectObject) {
-                this.addEffectCanvasObject(effect)
+                this.addPlanetEffectCanvasObject(effect)
                 return
             }
             if (effect.effectType.shape == SHAPES.FilledOval) {

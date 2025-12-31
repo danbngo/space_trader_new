@@ -8,23 +8,19 @@ class EnvironmentalismNews extends News {
             NT.ENVIRONMENTALISM, planet
         )
 
-        this.addEffect(
+        this.addPlanetEffect(
             {
                 planet: this.planet,
                 industry: CL.EXTREMELY_LOW,
-                navy: CL.VERY_LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.NANITES, CL.EXTREMELY_LOW], [CARGO_TYPES.METAL, CL.EXTREMELY_LOW]])),
             },
             {
                 population: CL.SLIGHTLY_HIGH,
-                navy: CL.SLIGHTLY_LOW,
                 industry: CL.SLIGHTLY_LOW,
-                prestige: CL.SLIGHTLY_HIGH,
             },
             {
                 industry: CL.SLIGHTLY_LOW,
                 economy: CL.LOW,
-                prestige: CL.LOW,
             }
         )
     }
@@ -37,7 +33,7 @@ class EnvironmentalismNews extends News {
         const {planet: p} = this
         //happens when industry is getting out of hand
         const ratingsValid = p.c.industry >= CL.HIGH
-        const interferingEvent = News.planetHasAnyNews(p, [NT.ENVIRONMENTALISM, ...NT_ECONOMY_PREVENTING])
+        const interferingEvent = News.planetHasAnyNews(p, NT_ECONOMY_PREVENTING)
         return ratingsValid && !interferingEvent
     }
 }

@@ -8,54 +8,30 @@ class WarInvasionNews extends News {
             NT.WAR_INVASION, planet, targetPlanet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addPlanetEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    education: CL.LOW,
-                    military: CL.SLIGHTLY_LOW
-                })
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                civilizationMultipliers: new Civilization({
-                    security: CL.LOW,
-                    economy: CL.LOW,
-                    industry: CL.LOW,
-                    population: CL.SLIGHTLY_LOW
-                })
-            })
-        ]
+                education: CL.LOW,
+            },
+            {
+                education: CL.NO_REGRESSION,
+            },
+            {},
+            {}
+        )
 
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        // Attacker: permanent officer losses from invasion
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            education: CL.NO_REGRESSION,
-            military: CL.NO_REGRESSION
-        }))
-        // Defender: even heavier permanent losses
-        this.completeEffects[1].civilizationMultipliers.multiply(new Civilization({
-            education: CL.SLIGHTLY_LOW,  // Defenders advantage?
-            military: CL.LOW,
-            security: CL.SLIGHTLY_HIGH,
-            economy: CL.SLIGHTLY_HIGH,
-            industry: CL.SLIGHTLY_HIGH,
-            population: CL.SLIGHTLY_HIGH
-        }))
-
-        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
-        this.cancelEffects[0].civilizationMultipliers.multiply(new Civilization({
-            education: CL.SLIGHTLY_HIGH,
-            military: CL.SLIGHTLY_HIGH
-        }))
-        this.cancelEffects[1].civilizationMultipliers.multiply(new Civilization({
-            security: CL.SLIGHTLY_HIGH,
-            economy: CL.SLIGHTLY_HIGH,
-            industry: CL.SLIGHTLY_HIGH,
-            population: CL.SLIGHTLY_HIGH
-        }))
-
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
+        this.addTargetPlanetEffect(
+            {
+                population: CL.SLIGHTLY_LOW
+            },
+            {
+                population: CL.SLIGHTLY_HIGH
+            },
+            {},
+            {
+                population: CL.SLIGHTLY_HIGH
+            }
+        )
     }
 
     determineOutcome() {

@@ -10,29 +10,22 @@ class ConstructionNews extends News {
 
         const buildingsEnabled = rndMembers(News.calcRepairableBuildings(planet), rng(3,1), true);
 
-        this.addEffect(
+        this.addPlanetEffect(
             {
                 planet: this.planet,
                 reserves: CL.LOW,
-                inflation: CL.HIGH,
-                wealth: CL.LOW,
-                taxes: CL.HIGH,
+                economy: CL.SLIGHTLY_HIGH,
+                industry: CL.SLIGHTLY_HIGH,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.METAL, CL.EXTREMELY_HIGH], [CARGO_TYPES.NANITES, CL.ASTRONOMICAL]])),
             },
             {
-                buildingsEnabled,
-                economy: CL.HIGH,
                 reserves: CL.LOW,
-                wealth: CL.LOW,
-                taxes: CL.SLIGHTLY_HIGH,
+                economy: CL.HIGH,
                 industry: CL.HIGH,
+                buildingsEnabled,
             },
             {
-                economy: CL.SLIGHTLY_LOW,
                 reserves: CL.LOW,
-                inflation: CL.HIGH,
-                wealth: CL.LOW,
-                taxes: CL.SLIGHTLY_HIGH,
             }
         )
     }

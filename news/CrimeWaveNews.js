@@ -8,7 +8,7 @@ class CrimeWaveNews extends News {
             NT.CRIME_WAVE, planet
         )
 
-        this.addEffect(
+        this.addPlanetEffect(
             {
                 planet: this.planet,
                 security: CL.LOW,
@@ -18,6 +18,7 @@ class CrimeWaveNews extends News {
             },
             {
                 security: CL.HIGH,
+                crime: CL.LOW,
             },
             {
                 security: CL.LOW,

@@ -7,43 +7,27 @@ class MilitaryBuildupNews extends News {
             ``,
             NT.MILITARY_BUILDUP, planet
         )
-        this.startEffects = [
-            new NewsEffect({
+
+        this.addPlanetEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    economy: CL.LOW,
-                    industry: CL.LOW,
-                    reserves: CL.LOW,
-                    wealth: CL.LOW
-                }),
+                wealth: CL.LOW,
+                reserves: CL.LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([
                     [CARGO_TYPES.WEAPONS, CL.VERY_HIGH],
                     [CARGO_TYPES.ANTIMATTER, 2]
                 ]))
-            })
-        ]
-
-        // Military effect is permanent
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            military: CL.EXTREMELY_HIGH,
-            prestige: CL.SLIGHTLY_HIGH,
-            education: CL.HIGH,
-            wealth: CL.NO_REGRESSION,  // Money wasted
-            economy: CL.NO_REGRESSION,
-            industry: CL.NO_REGRESSION
-        }))
-
-        // Failed: buildup collapses, no military gain
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
-            wealth: CL.NO_REGRESSION,  // Money wasted
-            economy: CL.NO_REGRESSION,  // Damage permanent
-            industry: CL.NO_REGRESSION,
-            prestige: CL.LOW  // Failed militarization
-        }))
-
-        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
+            },
+            {
+                military: CL.EXTREMELY_HIGH,
+                education: CL.HIGH,
+                wealth: CL.NO_REGRESSION,
+            },
+            {
+                wealth: CL.NO_REGRESSION,
+                prestige: CL.LOW
+            }
+        )
     }
 
     determineOutcome() {

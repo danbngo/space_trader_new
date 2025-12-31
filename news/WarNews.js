@@ -10,66 +10,62 @@ class WarNews extends News {
 
         const [p, tp] = [this.planet, this.targetPlanet]
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addPlanetEffect(
+            {
                 planet: this.planet,
                 newRelationship: RELATIONSHIP_TYPES.WAR,
-                civilizationMultipliers: new Civilization({
-                    military: CL.SLIGHTLY_HIGH,
-                    security: CL.SLIGHTLY_HIGH,
-                    economy: CL.LOW,
-                    reserves: CL.LOW
-                }),
+                military: CL.SLIGHTLY_HIGH,
+                reserves: CL.LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([
                     [CARGO_TYPES.WEAPONS, 2],
                     [CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_HIGH]
                 ]))
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                newRelationship: RELATIONSHIP_TYPES.WAR,
-                civilizationMultipliers: new Civilization({
-                    military: CL.SLIGHTLY_HIGH,
-                    security: CL.SLIGHTLY_HIGH,
-                    economy: CL.LOW,
-                    reserves: CL.LOW
-                }),
-                cargoPriceMultipliers: new CountsMap(new Map([
-                    [CARGO_TYPES.WEAPONS, 2],
-                    [CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_HIGH]
-                ]))
-            })
-        ]
-
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-
-        this.completeEffects[0].onApply = () => {
-            // Don't revert relationships if one was vassalized
-            if (p.c.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR) p.c.relationships.set(targetPlanet, RELATIONSHIP_TYPES.NEUTRAL)
-            console.log('1 war ended between', planet.name, 'and', tp.name)
-            console.log('1 new diplomatic status:', p.c.relationships.get(targetPlanet))
-            console.log('1 target new diplomatic status:', tp.c.relationships.get(planet))
-        }
-        this.completeEffects[1].onApply = () => {
-            // Don't revert relationships if one was vassalized
-            if (tp.c.relationships.get(planet) == RELATIONSHIP_TYPES.WAR) tp.c.relationships.set(planet, RELATIONSHIP_TYPES.NEUTRAL)
-            console.log('2 war ended between', planet.name, 'and', tp.name)
-            console.log('2 new diplomatic status:', p.c.relationships.get(targetPlanet))
-            console.log('2 target new diplomatic status:', tp.c.relationships.get(planet))
-            // If there are no more wars remaining, and there was a world war, end the world war
-            const numWarsRemaining = gs.system.news.filter(n => (n.newsType == NT.WAR && !n.ended)).length
-            if (numWarsRemaining == 0) {
-                const systemAtWarNews = gs.system.news.find(n => (n.newsType == META_NT.SYSTEM_AT_WAR && !n.ended))
-                if (systemAtWarNews) {
-                    console.log('cleaning up world war prematurely')
-                    systemAtWarNews.endAsap = true
-                    if (systemAtWarNews.shouldEnd()) systemAtWarNews.end()
+            },
+            {
+                onApply: () => {
+                    if (p.c.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.WAR) {
+                        p.c.relationships.set(targetPlanet, RELATIONSHIP_TYPES.NEUTRAL)
+                    }
+                    console.log('1 war ended between', this.planet.name, 'and', this.targetPlanet.name)
+                    console.log('1 new diplomatic status:', p.c.relationships.get(targetPlanet))
+                    console.log('1 target new diplomatic status:', tp.c.relationships.get(this.planet))
                 }
             }
-        }
+        )
+
+        this.addTargetPlanetEffect(
+            {
+                newRelationship: RELATIONSHIP_TYPES.WAR,
+                military: CL.SLIGHTLY_HIGH,
+                reserves: CL.LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.WEAPONS, 2],
+                    [CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_HIGH]
+                ]))
+            },
+            {
+                onApply: () => {
+                    if (tp.c.relationships.get(this.planet) == RELATIONSHIP_TYPES.WAR) {
+                        tp.c.relationships.set(this.planet, RELATIONSHIP_TYPES.NEUTRAL)
+                    }
+                    console.log('2 war ended between', this.planet.name, 'and', this.targetPlanet.name)
+                    console.log('2 new diplomatic status:', p.c.relationships.get(this.targetPlanet))
+                    console.log('2 target new diplomatic status:', tp.c.relationships.get(this.planet))
+                    // If there are no more wars remaining, and there was a world war, end the world war
+                    const numWarsRemaining = gs.system.news.filter(n => (n.newsType == NT.WAR && !n.ended)).length
+                    if (numWarsRemaining == 0) {
+                        const systemAtWarNews = gs.system.news.find(n => (n.newsType == META_NT.SYSTEM_AT_WAR && !n.ended))
+                        if (systemAtWarNews) {
+                            console.log('cleaning up world war prematurely')
+                            systemAtWarNews.endAsap = true
+                            if (systemAtWarNews.shouldEnd()) systemAtWarNews.end()
+                        }
+                    }
+                }
+            }
+        )
 
         this.cancelEffects = this.completeEffects.map(effect => effect.clone())
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
     }
 
     determineOutcome() {

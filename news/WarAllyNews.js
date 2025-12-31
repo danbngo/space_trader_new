@@ -8,30 +8,20 @@ class WarAllyNews extends News {
             NT.WAR_ALLY, planet, targetPlanet
         )
         
-        this.startEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                civilizationMultipliers: new Civilization({})
-            })
-        ]
-
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        // Original instigator: prestige cost is permanent
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            prestige: CL.NO_REGRESSION
-        }))
-
-        // Failed: diplomatic effort rebuffed, no ally joins
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
-            prestige: CL.LOW  // Diplomatic failure
-        }))
-
-        // Cancelled: peace declared before ally commits
-        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
-        this.cancelEffects[0].civilizationMultipliers.multiply(new Civilization({
-            prestige: CL.SLIGHTLY_LOW  // Partial prestige recovery
-        }))
+        this.addPlanetEffect(
+            {
+                planet: this.planet
+            },
+            {
+                prestige: CL.NO_REGRESSION
+            },
+            {
+                prestige: CL.LOW
+            },
+            {
+                prestige: CL.SLIGHTLY_LOW
+            }
+        )
     }
 
     shouldCancel() {

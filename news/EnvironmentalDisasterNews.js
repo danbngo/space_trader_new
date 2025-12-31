@@ -8,29 +8,21 @@ class EnvironmentalDisasterNews extends News {
             NT.ENVIRONMENTAL_DISASTER, planet
         )
 
-        this.addEffect(
+        this.addPlanetEffect(
             {
                 planet: this.planet,
                 industry: CL.LOW,
                 reserves: CL.LOW,
                 population: CL.SLIGHTLY_LOW,
-                wealth: CL.SLIGHTLY_LOW,
-                inflation: CL.SLIGHTLY_HIGH,
-                economy: CL.SLIGHTLY_LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WATER, CL.VERY_HIGH], [CARGO_TYPES.MEDICINE, CL.VERY_HIGH]])),
             },
             {
                 culture: CL.HIGH,
-                reserves: CL.SLIGHTLY_LOW,
-                wealth: CL.SLIGHTLY_LOW,
             },
             {
                 industry: CL.VERY_LOW,
                 reserves: CL.LOW,
                 population: CL.LOW,
-                wealth: CL.SLIGHTLY_LOW,
-                inflation: CL.SLIGHTLY_HIGH,
-                economy: CL.LOW,
             }
         )
     }

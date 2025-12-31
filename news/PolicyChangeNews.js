@@ -43,55 +43,48 @@ class PolicyChangeNews extends News {
         this.oldPolicy = currentPolicy
         this.newPolicy = newPolicy
 
-        // Base effects depend on policy category being changed
-        const baseEffects = {
+        // Base effects with variation based on policy flavor
+        const baseParams = {
             planet: this.planet,
-            civilizationMultipliers: new Civilization({
-                prestige: CL.LOW,\n                economy: CL.LOW
-            })
+            prestige: CL.LOW,
         }
 
-        // Add some variation based on policy flavor
         if (newPolicy.flavor === NF.ECONOMY) {
-            baseEffects.civilizationMultipliers.inflation = CL.MEDIUM
+            baseParams.inflation = CL.MEDIUM
         } else if (newPolicy.flavor === NF.LABOR) {
-            baseEffects.civilizationMultipliers.economy = CL.MEDIUM
+            baseParams.economy = CL.MEDIUM
         } else if (newPolicy.flavor === NF.CULTURE) {
-            baseEffects.civilizationMultipliers.culture = CL.MEDIUM
-            baseEffects.civilizationMultipliers.crime = CL.MEDIUM
+            baseParams.culture = CL.MEDIUM
+            baseParams.crime = CL.MEDIUM
         } else if (newPolicy.flavor === NF.POLITICS) {
-            baseEffects.civilizationMultipliers.prestige = CL.MEDIUM
+            baseParams.prestige = CL.MEDIUM
         }
 
-        this.startEffects = [new NewsEffect(baseEffects)]
-        
-        // On completion, apply the policy change
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        this.completeEffects[0].onApply = () => {
-            switch(this.categoryToChange) {
-                case 'economic':
-                    this.p.c.policies.economic = this.newPolicy
-                    break
-                case 'labor':
-                    this.p.c.policies.labor = this.newPolicy
-                    break
-                case 'social':
-                    this.p.c.policies.social = this.newPolicy
-                    break
-                case 'foreign':
-                    this.p.c.policies.foreign = this.newPolicy
-                    break
+        this.addPlanetEffect(
+            baseParams,
+            {
+                onApply: () => {
+                    switch(this.categoryToChange) {
+                        case 'economic':
+                            this.planet.c.policies.economic = this.newPolicy
+                            break
+                        case 'labor':
+                            this.planet.c.policies.labor = this.newPolicy
+                            break
+                        case 'social':
+                            this.planet.c.policies.social = this.newPolicy
+                            break
+                        case 'foreign':
+                            this.planet.c.policies.foreign = this.newPolicy
+                            break
+                    }
+                }
+            },
+            {
+                prestige: CL.SLIGHTLY_LOW,
+                economy: CL.SLIGHTLY_LOW
             }
-        }
-
-        // On failure, revert the economic/prestige hits but don't change policy
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
-            prestige: CL.SLIGHTLY_LOW,
-            economy: CL.SLIGHTLY_LOW
-        }))
-
-        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
+        )
     }
 
     determineOutcome() {

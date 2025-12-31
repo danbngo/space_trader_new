@@ -8,37 +8,21 @@ class SurplusNews extends News {
             NT.SURPLUS, planet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addPlanetEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    inflation: CL.EXTREMELY_LOW,
-                    reserves: CL.EXTREMELY_HIGH,
-                    economy: CL.HIGH,
-                    industry: CL.HIGH,
-                    wealth: CL.HIGH,
-                    military: CL.VERY_HIGH
-                })
-            })
-        ]
-
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        // Goods remain high after
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            industry: CL.SLIGHTLY_HIGH,
-            reserves: CL.SLIGHTLY_HIGH,
-            wealth: CL.SLIGHTLY_HIGH
-        }))
-
-        // Failed: boom goes bust, reserves exhausted
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
-            industry: CL.LOW,  // Extraction infrastructure damaged
-            economy: CL.LOW,  // Economic disruption
-            reserves: CL.NO_REGRESSION  // Back to scarcity
-        }))
-
-        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
+                reserves: CL.EXTREMELY_HIGH,
+                industry: CL.HIGH,
+            },
+            {
+                industry: CL.SLIGHTLY_HIGH,
+                reserves: CL.SLIGHTLY_HIGH,
+            },
+            {
+                industry: CL.LOW,
+                reserves: CL.NO_REGRESSION
+            }
+        )
     }
 
     determineOutcome() {

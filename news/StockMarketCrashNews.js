@@ -8,29 +8,17 @@ class StockMarketCrashNews extends News {
             NT.STOCK_MARKET_CRASH, planet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addPlanetEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    industry: CL.VERY_LOW,
-                    economy: CL.VERY_LOW,
-                    wealth: CL.EXTREMELY_LOW,
-                    reserves: CL.LOW,
-                    inflation: CL.HIGH
-                })
-            })
-        ]
-
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        // Economy damage and credit scarcity are partially permanent
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            wealth: CL.SLIGHTLY_HIGH,
-            industry: CL.SLIGHTLY_HIGH,
-            economy: CL.SLIGHTLY_HIGH
-        }))
-
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
+                economy: CL.VERY_LOW,
+                wealth: CL.EXTREMELY_LOW,
+            },
+            {
+                economy: CL.SLIGHTLY_HIGH,
+                wealth: CL.SLIGHTLY_HIGH,
+            }
+        )
     }
 
     isValid() {

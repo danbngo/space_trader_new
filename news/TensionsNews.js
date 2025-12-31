@@ -8,36 +8,38 @@ class TensionsNews extends News {
             NT.TENSIONS, planet, targetPlanet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addPlanetEffect(
+            {
                 planet: this.planet,
                 newRelationship: RELATIONSHIP_TYPES.TENSE,
-                civilizationMultipliers: new Civilization({
-                    military: CL.SLIGHTLY_HIGH,
-                    economy: CL.SLIGHTLY_LOW
-                }),
+                military: CL.SLIGHTLY_HIGH,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.VERY_HIGH]]))
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                newRelationship: RELATIONSHIP_TYPES.TENSE,
-                civilizationMultipliers: new Civilization({
-                    military: CL.SLIGHTLY_HIGH,
-                    economy: CL.SLIGHTLY_LOW
-                }),
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.VERY_HIGH]]))
-            })
-        ]
-
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        for (const fx of this.completeEffects) {
-            fx.onApply = () => {
-                if (p.c.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.TENSE) p.c.relationships.set(targetPlanet, RELATIONSHIP_TYPES.NEUTRAL)
+            },
+            {
+                onApply: () => {
+                    if (this.planet.c.relationships.get(this.targetPlanet) == RELATIONSHIP_TYPES.TENSE) {
+                        this.planet.c.relationships.set(this.targetPlanet, RELATIONSHIP_TYPES.NEUTRAL)
+                    }
+                }
             }
-        }
+        )
+
+        this.addTargetPlanetEffect(
+            {
+                newRelationship: RELATIONSHIP_TYPES.TENSE,
+                military: CL.SLIGHTLY_HIGH,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.VERY_HIGH]]))
+            },
+            {
+                onApply: () => {
+                    if (this.targetPlanet.c.relationships.get(this.planet) == RELATIONSHIP_TYPES.TENSE) {
+                        this.targetPlanet.c.relationships.set(this.planet, RELATIONSHIP_TYPES.NEUTRAL)
+                    }
+                }
+            }
+        )
 
         this.cancelEffects = this.completeEffects.map(effect => effect.clone())
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
     }
 
     determineOutcome() {

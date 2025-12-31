@@ -1,44 +1,49 @@
 class ForeignAidNews extends News {
-    constructor(planet = new Planet()) {
+    constructor(planet = new Planet(), targetPlanet = new Planet()) {
         super(
-            `${coloredName(planet)}'s plight inspires other planets to send it foreign aid!`,
-            `${coloredName(planet)}'s foreign aid finally dries up!`,
-            `${coloredName(planet)} squanders foreign aid on corruption and mismanagement!`,
+            `${coloredName(targetPlanet)} sends foreign aid to help struggling ${coloredName(planet)}!`,
+            `${coloredName(targetPlanet)}'s foreign aid program to ${coloredName(planet)} finally ends!`,
+            `${coloredName(planet)} squanders foreign aid from ${coloredName(targetPlanet)} on corruption and mismanagement!`,
             ``,
-            NT.FOREIGN_AID, planet
+            NT.FOREIGN_AID, planet, targetPlanet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addPlanetEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    inflation: CL.LOW,
-                    reserves: CL.HIGH,
-                    economy: CL.SLIGHTLY_HIGH,
-                    industry: CL.SLIGHTLY_HIGH,
-                    wealth: CL.HIGH,
-                    navy: CL.SLIGHTLY_HIGH,
-                    prestige: CL.SLIGHTLY_LOW,
-                })
-            })
-        ]
+                reserves: CL.HIGH,
+                wealth: CL.HIGH,
+                prestige: CL.SLIGHTLY_LOW,
+            },
+            {
+                reserves: CL.SLIGHTLY_HIGH,
+                wealth: CL.SLIGHTLY_HIGH,
+                prestige: CL.SLIGHTLY_LOW,
+            },
+            {
+                prestige: CL.VERY_LOW,
+                corruption: CL.HIGH,
+            }
+        )
 
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            inflation: CL.SLIGHTLY_LOW,
-            reserves: CL.SLIGHTLY_HIGH,
-            economy: CL.SLIGHTLY_HIGH,
-            wealth: CL.SLIGHTLY_HIGH,
-            industry: CL.SLIGHTLY_HIGH,
-            navy: CL.SLIGHTLY_HIGH,
-            prestige: CL.SLIGHTLY_LOW,
-        }))
-
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
-            prestige: CL.VERY_LOW,
-            crime: CL.HIGH,
-        }))
+        this.addTargetPlanetEffect(
+            {
+                reserves: CL.LOW,
+                taxes: CL.HIGH,
+                wealth: CL.LOW,
+                prestige: CL.SLIGHTLY_HIGH,
+            },
+            {
+                reserves: CL.SLIGHTLY_LOW,
+                wealth: CL.SLIGHTLY_LOW,
+                prestige: CL.SLIGHTLY_HIGH,
+            },
+            {
+                reserves: CL.SLIGHTLY_LOW,
+                wealth: CL.SLIGHTLY_LOW,
+                prestige: CL.SLIGHTLY_HIGH,
+            }
+        )
     }
 
     determineOutcome() {
@@ -46,12 +51,17 @@ class ForeignAidNews extends News {
     }
 
     isValid() {
-        const {planet: p} = this
-        //more likely to happen when economy is poor and has some prestige to burn
+        const {planet: p, targetPlanet: tp} = this
+        //recipient must have poor economy
         const economyValid = p.c.economy < CL.LOW && p.c.industry < CL.LOW && p.c.wealth < CL.LOW
         const prestigeValid = p.c.prestige > CL.LOW
-        const interferingEvent =
-            News.planetHasAnyNews(planet, [NT.FOREIGN_AID, ...NT_ECONOMY_BOOSTING])
-        return economyValid && prestigeValid && !interferingEvent
+        //donor must have more wealth/reserves/economy than recipient
+        const donorValid = tp.c.reserves > p.c.reserves && tp.c.wealth > p.c.wealth && tp.c.economy > p.c.economy
+        //donor must have enough to spare
+        const donorCapable = tp.c.reserves > CL.HIGH && tp.c.wealth > CL.HIGH
+        //planets must be neutral or allied
+        const relationshipValid = Civilization.areAlliesOrNeutral(p, tp)
+        const interferingEvent = News.planetHasAnyNews(p, NT_ECONOMY_BOOSTING) || News.hasAnyNewsBidirectional(p, tp, NT_COOPERATION_PREVENTING)
+        return economyValid && prestigeValid && donorValid && donorCapable && relationshipValid && !interferingEvent
     }
 }

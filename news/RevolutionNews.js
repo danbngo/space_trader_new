@@ -1,9 +1,9 @@
 class RevolutionNews extends News {
     constructor(planet = new Planet()) {
-        const governmentType = rndMember(GT_ALL.filter(g => g !== p.c.governmentType && g !== GT.PUPPET_STATE));
+        const governmentType = rndMember(GT_ALL.filter(g => g !== planet.c.governmentType && g !== GT.PUPPET_STATE));
         
         super(
-            p.c.governmentType != GT.ANARCHY ? `${coloredName(planet)}'s people have deposed the government and begin a glorious revolution!` :
+            planet.c.governmentType != GT.ANARCHY ? `${coloredName(planet)}'s people have deposed the government and begin a glorious revolution!` :
             `${coloredName(planet)}'s people clamor for a government to take the reigns and end the anarchy they live in!`,
             `${coloredName(planet)} stabilizes under new government: ${coloredName(governmentType)}!`,
             `${coloredName(planet)}'s revolution fails! Chaos reigns!`,
@@ -13,48 +13,32 @@ class RevolutionNews extends News {
 
         const courthouseBuilding = this.planet.settlement.courthouse;
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addPlanetEffect(
+            {
                 planet: this.planet,
                 governmentType: GT.ANARCHY ? null : GT.ANARCHY,
-                civilizationMultipliers: new Civilization({
-                    military: CL.VERY_LOW,
-                    security: CL.VERY_LOW,
-                    crime: CL.VERY_HIGH,
-                    economy: CL.LOW,
-                    industry: CL.LOW
-                }),
                 buildingsDisabled: courthouseBuilding ? [courthouseBuilding] : [],
+                military: CL.VERY_LOW,
+                security: CL.VERY_LOW,
+                crime: CL.VERY_HIGH,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.VERY_HIGH], [CARGO_TYPES.HOLOCUBES, CL.VERY_HIGH]]))
-            })
-        ]
-
-        // Don't revert the government type back afterwards
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        // Government related ratings randomize a bit after a revolution
-        this.completeEffects[0].governmentType = governmentType
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            military: (rng(0.5, 1.5, false) + 1) / 2,
-            security: (rng(0.5, 1.5, false) + 1) / 2,
-            industry: (rng(0.5, 1.5, false) + 1) / 2,
-            wealth: (rng(0.5, 1.5, false) + 1) / 2,
-            prestige: (rng(0.5, 1.5, false) + 1) / 2
-        }))
-
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.failEffects[0].governmentType = GT.ANARCHY
-        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
-            military: CL.NO_REGRESSION,
-            security: CL.NO_REGRESSION,
-            crime: CL.NO_REGRESSION,
-            economy: CL.NO_REGRESSION,
-            industry: CL.NO_REGRESSION,
-            prestige: CL.VERY_LOW
-        }))
-        this.failEffects[0].buildingsEnabled = courthouseBuilding ? [] : []
-        this.failEffects[0].cargoPriceMultipliers = new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.NO_REGRESSION]]))
-
-        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
+            },
+            {
+                governmentType,
+                military: (rng(0.5, 1.5, false) + 1) / 2,
+                security: (rng(0.5, 1.5, false) + 1) / 2,
+                prestige: (rng(0.5, 1.5, false) + 1) / 2
+            },
+            {
+                governmentType: GT.ANARCHY,
+                buildingsEnabled: [],
+                military: CL.NO_REGRESSION,
+                security: CL.NO_REGRESSION,
+                crime: CL.NO_REGRESSION,
+                prestige: CL.VERY_LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.NO_REGRESSION]]))
+            }
+        )
     }
 
     determineOutcome() {
