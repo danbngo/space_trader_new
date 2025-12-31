@@ -60,8 +60,8 @@ class RevolutionNews extends News {
         const ratingsValid = p.c.security < CL.MEDIUM || p.c.military < CL.MEDIUM || p.c.prestige < CL.MEDIUM || p.c.crime > CL.MEDIUM || p.c.security < CL.MEDIUM || p.c.economy < CL.MEDIUM
         //planet must not be puppet state (anarcy is fine otherwise how do we get back out of it)
         const interferingEvent =
-            News.planetHasAnyNews(planet, [NT.REVOLUTION, NT.WAR]) || News.hasNewsTargeting(NT.WAR, planet) ||
-            News.planetHasAnyNews(planet, NT_CRIME_PREVENTING)
+            News.planetHasAnyNews(p, NT_GOVERNANCE_PREVENTING) ||
+            News.planetHasAnyNews(p, NT_CRIME_PREVENTING)
         return ratingsValid && !interferingEvent
     }
 }

@@ -2,8 +2,8 @@ class ForeignAidNews extends News {
     constructor(planet = new Planet(), targetPlanet = new Planet()) {
         super(
             `${coloredName(targetPlanet)} sends foreign aid to help struggling ${coloredName(planet)}!`,
-            `${coloredName(targetPlanet)}'s foreign aid program to ${coloredName(planet)} finally ends!`,
-            `${coloredName(planet)} squanders foreign aid from ${coloredName(targetPlanet)} on corruption and mismanagement!`,
+            `${coloredName(targetPlanet)}'s foreign aid program to ${coloredName(planet)} helps strengthen their economy!`,
+            `${coloredName(planet)} squanders majority of foreign aid from ${coloredName(targetPlanet)} due to corruption and mismanagement!`,
             ``,
             NT.FOREIGN_AID, planet, targetPlanet
         )
@@ -13,46 +13,53 @@ class ForeignAidNews extends News {
                 reserves: CL.HIGH,
                 wealth: CL.HIGH,
                 prestige: CL.SLIGHTLY_LOW,
+                inflation: CL.HIGH,
+            },
+            {
+                reserves: CL.HIGH,
+                wealth: CL.HIGH,
+                economy: CL.HIGH,
+                industry: CL.HIGH,
+                education: CL.HIGH,
+                prestige: CL.SLIGHTLY_LOW,
+                inflation: CL.HIGH,
             },
             {
                 reserves: CL.SLIGHTLY_HIGH,
                 wealth: CL.SLIGHTLY_HIGH,
-                prestige: CL.SLIGHTLY_LOW,
-            },
-            {
-                prestige: CL.VERY_LOW,
-                corruption: CL.HIGH,
+                prestige: CL.LOW,
+                inflation: CL.HIGH,
             }
         )
 
         this.addTargetPlanetEffect(
             {
                 reserves: CL.LOW,
-                taxes: CL.HIGH,
                 wealth: CL.LOW,
                 prestige: CL.SLIGHTLY_HIGH,
             },
             {
-                reserves: CL.SLIGHTLY_LOW,
-                wealth: CL.SLIGHTLY_LOW,
-                prestige: CL.SLIGHTLY_HIGH,
+                reserves: CL.LOW,
+                wealth: CL.LOW,
+                prestige: CL.HIGH,
             },
             {
-                reserves: CL.SLIGHTLY_LOW,
-                wealth: CL.SLIGHTLY_LOW,
+                reserves: CL.LOW,
+                wealth: CL.LOW,
                 prestige: CL.SLIGHTLY_HIGH,
             }
         )
     }
 
     determineOutcome() {
-        this.rollOutcome(this.planet.c.security)
+        this.rollOutcome(this.planet.c.education/this.planet.c.corruption, CL.VERY_LOW)
     }
 
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         //recipient must have poor economy
         const economyValid = p.c.economy < CL.LOW && p.c.industry < CL.LOW && p.c.wealth < CL.LOW
+        //recipient can't be hated
         const prestigeValid = p.c.prestige > CL.LOW
         //donor must have more wealth/reserves/economy than recipient
         const donorValid = tp.c.reserves > p.c.reserves && tp.c.wealth > p.c.wealth && tp.c.economy > p.c.economy

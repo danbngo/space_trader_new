@@ -31,5 +31,8 @@ const BUILDING_TYPES = {
     CYBER_SURGEON: new BuildingType('Cyber Surgeon', COLORS.Cyan, 15*1000, false),
     PALACE: new BuildingType('Palace', COLORS.Gold, 10*1000, false),
     TEMPLE: new BuildingType('Temple', COLORS.White, 5*1000, false),
+    ARMORY: new BuildingType('Armory', COLORS.DarkGray, 12*1000, false),
+    OUTFITTER: new BuildingType('Outfitter', COLORS.LightGreen, 12*1000, false),
+    CASINO: new BuildingType('Casino', COLORS.Magenta, 20*1000, false),
 }
 const BUILDING_TYPES_ALL = Object.values(BUILDING_TYPES)

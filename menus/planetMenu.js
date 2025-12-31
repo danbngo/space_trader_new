@@ -70,6 +70,15 @@ function showPlanetMenu(planet = new Planet()) {
     if (settlement.temple) {
         options.push(["Temple", () => showModal("Temple", "The temple is quiet and serene.", [["Close", () => showPlanetMenu(planet)]])]);
     }
+    if (settlement.casino) {
+        options.push(["Casino", () => showCasinoMenu(settlement.casino)]);
+    }
+    if (settlement.armory) {
+        options.push(["Armory", () => showArmoryMenu(settlement.armory)]);
+    }
+    if (settlement.outfitter) {
+        options.push(["Outfitter", () => showOutfitterMenu(settlement.outfitter)]);
+    }
     options.push(ce({tag:'br'}));
     options.push(["News", () => showNewsTimelineMenu(planet, () => showPlanetMenu(planet))]);
     options.push([`Overview`, () => showPlanetSocietyMenu(planet)]);
