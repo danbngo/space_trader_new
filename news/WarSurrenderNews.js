@@ -3,7 +3,7 @@ class WarSurrenderNews extends News {
         super(
             `${coloredName(targetPlanet)} sues for peace with ${coloredName(planet)}, offering indemnity and territorial concessions!`,
             `${coloredName(targetPlanet)} has negotiated the terms of its surrender to ${coloredName(planet)}!`,
-            `Negotiations collapse as ${coloredName(targetPlanet)} rejects surrender terms from ${coloredName(planet)}!`,
+            `Peace negotiations collapse as ${coloredName(targetPlanet)} rejects surrender terms from ${coloredName(planet)}!`,
             `Events make the surrender of ${coloredName(targetPlanet)} to ${coloredName(planet)} irrelevant!`,
             NT.WAR_SURRENDER, planet, targetPlanet
         )
@@ -12,22 +12,24 @@ class WarSurrenderNews extends News {
             {},
             {
                 prestige: CL.HIGH,
-                territory: CL.SLIGHTLY_HIGH,
+                territory: CL.HIGH,
+                wealth: CL.HIGH
             }
         )
 
         this.addTargetPlanetEffect(
             {
-                military: CL.LOW,
+                prestige: CL.LOW,
             },
             {
                 territory: CL.LOW,
-                military: CL.LOW,
+                prestige: CL.LOW,
+                wealth: CL.LOW,
                 forcePeace: true
             },
             {},
             {
-                military: CL.SLIGHTLY_HIGH,
+                prestige: CL.SLIGHTLY_HIGH,
             }
         )
     }
@@ -38,7 +40,7 @@ class WarSurrenderNews extends News {
 
     determineOutcome() {
         //could fail if everyone really hates us
-        this.rollOutcome(this.planet.c.prestige * this.planet.c.military / this.targetPlanet.c.military, CL.LOW)
+        this.rollOutcome(this.planet.c.prestige * this.planet.c.military / this.targetPlanet.c.military, CL.EXTREMELY_LOW)
     }
 
     isValid() {
@@ -47,8 +49,6 @@ class WarSurrenderNews extends News {
         const relationshipValid = Civilization.areAtWar(p, tp)
         // Target should be significantly weaker (losing the war)
         const militaryValid = p.c.military/tp.c.military > CL.HIGH
-        // Can't have surrender already
-        const interferingEvent = News.hasNews(NT.WAR_SURRENDER, p, tp)
-        return relationshipValid && militaryValid && !interferingEvent
+        return relationshipValid && militaryValid
     }
 }
