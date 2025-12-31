@@ -12,16 +12,19 @@ class EnvironmentalDisasterNews extends News {
             {
                 industry: CL.LOW,
                 reserves: CL.LOW,
+                economy: CL.LOW,
                 population: CL.SLIGHTLY_LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WATER, CL.VERY_HIGH], [CARGO_TYPES.MEDICINE, CL.VERY_HIGH]])),
             },
             {
                 culture: CL.HIGH,
+                corruption: CL.SLIGHTLY_LOW,
             },
             {
                 industry: CL.VERY_LOW,
                 reserves: CL.LOW,
                 population: CL.LOW,
+                economy: CL.LOW
             }
         )
     }
