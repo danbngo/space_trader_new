@@ -1,7 +1,7 @@
 class LandGrabNews extends News {
     constructor(planet = new Planet(), targetPlanet = new Planet()) {
         super(
-            `${coloredName(planet)} is aggressively pushing into to disputed territories that are claimed by both it and ${coloredName(targetPlanet)}!`,
+            `${coloredName(planet)}'s army pushes aggressively in disputed territories that are claimed by both it and ${coloredName(targetPlanet)}!`,
             `${coloredName(planet)} has wrested control of several asteroids and other small bodies from ${coloredName(targetPlanet)}!`,
             `${coloredName(targetPlanet)} repels ${coloredName(planet)}'s ships from the disputed territories!`,
             `Peace treaty forces ${coloredName(planet)} to abandon their border incursions into ${coloredName(targetPlanet)}!`,
@@ -10,13 +10,12 @@ class LandGrabNews extends News {
 
         this.addPlanetEffect(
             {
-                navy: CL.LOW,
+                navy: CL.SLIGHTLY_LOW,
                 army: CL.LOW,
                 prestige: CL.SLIGHTLY_LOW,
             },
             {
                 territory: CL.HIGH,
-                navy: CL.SLIGHTLY_LOW,
                 army: CL.SLIGHTLY_LOW,
             },
             {
@@ -26,10 +25,9 @@ class LandGrabNews extends News {
 
         this.addTargetPlanetEffect(
             {
-                prestige: CL.LOW,
+                prestige: CL.SLIGHTLY_LOW,
                 territory: CL.SLIGHTLY_LOW,
-                navy: CL.LOW,
-                army: CL.LOW,
+                army: CL.SLIGHTLY_LOW,
             },
             {
                 prestige: CL.LOW,
@@ -37,6 +35,7 @@ class LandGrabNews extends News {
             },
             {
                 prestige: CL.HIGH,
+                culture: CL.HIGH
             }
         )
     }
@@ -52,9 +51,9 @@ class LandGrabNews extends News {
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         //aggressor needs high military and low territory, victim needs territory to take
-        const ratingsValid = (p.c.navy > CL.SLIGHTLY_HIGH) && (p.c.territory < CL.HIGH) && (tp.c.territory > CL.SLIGHTLY_LOW)
+        const ratingsValid = (p.c.army > CL.SLIGHTLY_HIGH && p.c.prestige > tp.c.prestige)
         //aggressor must have at least 1.5x the military of victim
-        const militaryValid = p.c.navy >= tp.c.navy * CL.HIGH
+        const militaryValid = p.c.army >= tp.c.army * CL.HIGH
         //both must have tensions with each other
         const relationshipsValid = Civilization.areTenseOrAtWar(p, tp)
         const interferingEvent =
