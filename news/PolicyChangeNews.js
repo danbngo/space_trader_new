@@ -7,6 +7,8 @@ class PolicyChangeNews extends News {
         // Get valid policies for this planet's government
         let validPolicies = []
         let currentPolicy = null
+
+        const p = planet
         
         switch(categoryToChange) {
             case 'economic':

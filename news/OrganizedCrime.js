@@ -29,14 +29,14 @@ class OrganizedCrimeNews extends News {
     determineOutcome() {
         const {planet: p} = this
         // Crime crackdown succeeds if security high enough
-        this.rollOutcome(p.c.security * 0.55 + 0.45)
+        this.rollOutcome(p.c.security * p.c.education * p.c.culture / p.c.corruption, CL.MEDIUM)
     }
 
     isValid() {
         const {planet: p} = this
         //more likely when black market prices are high (profitable for criminals)
-        const ratingsValid = planet.settlement.blackMarket.inflation > CL.HIGH
-        const interferingEvent = News.planetHasAnyNews(planet, [NT.ORGANIZED_CRIME, ...NT_CRIME_PREVENTING])
+        const ratingsValid = p.c.corruption > CL.HIGH
+        const interferingEvent = News.planetHasAnyNews(p, NT_CRIME_PREVENTING)
         return ratingsValid && !interferingEvent
     }
 }

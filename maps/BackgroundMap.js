@@ -46,8 +46,14 @@ class BackgroundMap extends BaseMap {
                 for (let i = 1; i < trail.length; i++) {
                     const curr = trail[i]
                     const prev = trail[i - 1]
+                    
+                    // Calculate brightness for trail segment based on distance from center
+                    const segmentDist = calcDistance(0, 0, curr.x, curr.y)
+                    const segmentNormalized = segmentDist / this.outerRadius
+                    const segmentBrightness = segmentNormalized * 4
+                    
                     const fadeFactor = i / trail.length
-                    const trailAlpha = bgStar.color[3] * fadeFactor * 0.3
+                    const trailAlpha = Math.round(255 * fadeFactor * 0.3 * segmentBrightness)
                     const trailColor = [...bgStar.color.slice(0, 3), trailAlpha]
                     cvs.addLine(`trail_${starIndex}_${i}`, prev.x, prev.y, curr.x, curr.y, trailColor, bgStar.radius * 0.5)
                 }
@@ -56,7 +62,12 @@ class BackgroundMap extends BaseMap {
         
         // Draw stars
         bgStars.forEach((bgStar, index) => {
-            cvs.addPixel(bgStar.x, bgStar.y, bgStar.color, bgStar.radius)
+            // Calculate brightness multiplier based on distance from center
+            const distanceFromCenter = calcDistance(0, 0, bgStar.x, bgStar.y)
+            const normalizedDistance = distanceFromCenter / this.outerRadius
+            const brightnessFactor = normalizedDistance * 4
+            
+            cvs.addPixel(bgStar.x, bgStar.y, [bgStar.color[0], bgStar.color[1], bgStar.color[2], Math.round(255 * brightnessFactor)], bgStar.radius*1)
         });
         cvs.recalculateDrawOrder()
     }
@@ -71,7 +82,7 @@ class BackgroundMap extends BaseMap {
         const trailLength = 5
         
         bgStars.forEach( (bgStar, index) => {
-            bgStar.twinkle(year)
+            //bgStar.twinkle(year)
 
             // Store previous position in trail history
             const trail = starTrails.get(bgStar) || []
@@ -91,16 +102,6 @@ class BackgroundMap extends BaseMap {
                 bgStar.y = y
                 starTrails.set(bgStar, []) // Clear trail on reset
             }
-
-            // Calculate brightness multiplier based on distance from center
-            const distanceFromCenter = calcDistance(0, 0, bgStar.x, bgStar.y)
-            const normalizedDistance = distanceFromCenter / this.outerRadius
-            const brightnessFactor = normalizedDistance * 4 // Ranges from 0.3 to 1.0
-
-            const pixel = cvs.pixels[index]
-            pixel.x = bgStar.x
-            pixel.y = bgStar.y
-            pixel.color[3] = bgStar.color[3] * brightnessFactor
         });
     }
 

@@ -10,42 +10,41 @@ class PlagueNews extends News {
 
         this.addPlanetEffect(
             {
-                population: CL.VERY_LOW,
-                education: CL.VERY_LOW,
+                population: CL.LOW,
+                industry: CL.LOW,
+                economy: CL.LOW,
+                army: CL.SLIGHTLY_LOW,
+                reserves: CL.SLIGHTLY_LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([
                     [CARGO_TYPES.MEDICINE, CL.EXTREMELY_HIGH]
                 ]))
             },
             {
                 population: CL.SLIGHTLY_LOW,
-                education: CL.SLIGHTLY_LOW
+                industry: CL.SLIGHTLY_LOW,
+                economy: CL.SLIGHTLY_LOW,
+                reserves: CL.SLIGHTLY_LOW
             },
             {
-                population: CL.NO_REGRESSION,
-                education: CL.NO_REGRESSION,
-                prestige: CL.VERY_LOW,
-                cargoPriceMultipliers: new CountsMap(new Map([
-                    [CARGO_TYPES.MEDICINE, CL.NO_REGRESSION]
-                ]))
+                population: CL.VERY_LOW,
+                industry: CL.VERY_LOW,
+                economy: CL.VERY_LOW,
+                army: CL.LOW,
+                reserves: CL.LOW,
+                culture: CL.LOW
             }
         )
     }
 
     determineOutcome() {
-        const {planet: p} = this
-        // Higher economy/industry = better medical infrastructure
-        const cureProbability = (p.c.economy + p.c.industry) / 2
-        this.rollOutcome(cureProbability)
+        //the LESS populous and interconnected you are the better
+        this.rollOutcome(this.planet.c.taxes*this.planet.c.education*this.planet.c.technology/this.planet.c.population/this.planet.c.economy, CL.SLIGHTLY_HIGH)
     }
 
     isValid() {
         const {planet: p} = this
-        //happens when population is getting out of hand
-        const ratingsValid = p.c.population > CL.MEDIUM
-
-        const interferingEvent = //can happy anytime, anywhere!
-            News.hasNews(NT.PLAGUE, planet)
-
-        return ratingsValid && !interferingEvent
+        //happens when population is getting out of hand AND either too interconnected, too dumb, or too little medicine
+        const ratingsValid = p.c.population > CL.VERY_LOW && (p.c.economy > CL.HIGH || p.c.education < CL.SLIGHTLY_HIGH || p.c.technology > CL.HIGH)
+        return ratingsValid
     }
 }
