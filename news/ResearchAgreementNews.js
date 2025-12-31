@@ -10,62 +10,54 @@ class ResearchAgreementNews extends News {
 
         this.addPlanetEffect(
             {
-                wealth: CL.LOW,
+                taxes: CL.HIGH,
+                education: CL.SLIGHTLY_HIGH,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ISOTOPES, 2]]))
             },
             {
-                technology: CL.SLIGHTLY_HIGH,
-                education: CL.HIGH,
+                technology: CL.HIGH,
+                education: CL.SLIGHTLY_HIGH,
+                taxes: CL.SLIGHTLY_HIGH,
+                prestige: CL.SLIGHTLY_HIGH
             },
             {
-                wealth: CL.NO_REGRESSION
+                taxes: CL.HIGH,
             },
-            {
-                technology: CL.SLIGHTLY_HIGH,
-                education: CL.SLIGHTLY_HIGH
-            }
         )
 
         this.addTargetPlanetEffect(
             {
-                wealth: CL.LOW,
+                taxes: CL.HIGH,
+                education: CL.SLIGHTLY_HIGH,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ISOTOPES, 2]]))  
             },
             {
-                technology: CL.SLIGHTLY_HIGH,
-                education: CL.HIGH,
+                technology: CL.HIGH,
+                education: CL.SLIGHTLY_HIGH,
+                taxes: CL.SLIGHTLY_HIGH,
+                prestige: CL.SLIGHTLY_HIGH
             },
             {
-                wealth: CL.NO_REGRESSION
+                taxes: CL.HIGH,
             },
-            {
-                technology: CL.SLIGHTLY_HIGH,
-                education: CL.SLIGHTLY_HIGH
-            }
         )
     }
 
     shouldCancel() {
-        return Civilization.areAtWar(this.planet, this.targetPlanet)
+        return Civilization.areTenseOrAtWar(this.planet, this.targetPlanet)
     }
 
     determineOutcome() {
-        const {planet: p, targetPlanet: tp} = this
-        // Research succeeds based on combined education quality
-        const avgQuality = (p.c.education + tp.c.education) / 2
-        this.rollOutcome(avgQuality * 0.7 + 0.2)
+        this.rollOutcome(this.planet.c.education*this.targetPlanet.c.education*this.planet.c.taxes*this.targetPlanet.c.taxes/this.planet.c.technology/this.targetPlanet.c.technology, CL.MEDIUM)
     }
 
     isValid() {
         const {planet: p, targetPlanet: tp} = this
-        //planets must be neutral or allied towards each other
-        const relationships = [p.c.relationships.get(tp), tp.c.relationships.get(p)]
-        const relationshipsValid = relationships.every(r => r == RELATIONSHIP_TYPES.NEUTRAL || r == RELATIONSHIP_TYPES.ALLY)
+        const relationshipsValid = Civilization.areAlliesOrNeutral(p, tp)
         //planets must have similar level of development
-        const developmentValid = Math.abs(p.c.education - tp.c.education) < 0.5
+        const developmentValid = CL.HIGH > (p.c.education/tp.c.education) && (p.c.education/tp.c.education) > CL.LOW
         //removed most requirements for this
-        const interferingEvent =
-            News.hasAnyNewsBidirectional(p, tp, NT_COOPERATION_PREVENTING)
+        const interferingEvent = News.hasAnyNewsBidirectional(p, tp, NT_COOPERATION_PREVENTING)
         return relationshipsValid && !interferingEvent && developmentValid
     }
 }

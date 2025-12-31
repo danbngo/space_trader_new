@@ -1,71 +1,70 @@
 class RaidingNews extends News {
     constructor(planet = new Planet(), targetPlanet = new Planet()) {
         super(
-            `${coloredName(planet)} launches raids on ${coloredName(targetPlanet)}! Plundered goods flood their markets!`,
-            `${coloredName(planet)} ceases its raiding operations against ${coloredName(targetPlanet)}!`,
+            `${coloredName(planet)} sends raiding parties to take riches and goods from ${coloredName(targetPlanet)}! Plundered goods flood their markets!`,
+            `${coloredName(planet)} ceases its raiding operations against ${coloredName(targetPlanet)}, having satiated its hunger for riches!`,
             `${coloredName(targetPlanet)} repels ${coloredName(planet)}'s raiders, inflicting heavy losses!`,
-            `Peace treaty forces ${coloredName(planet)} to end raids on ${coloredName(targetPlanet)}!`,
+            `Peace treaty sees ${coloredName(planet)} end its raids on ${coloredName(targetPlanet)}!`,
             NT.RAIDING, planet, targetPlanet
         )
 
         this.addPlanetEffect(
             {
-                reserves: CL.VERY_HIGH,
+                reserves: CL.SLIGHTLY_HIGH,
+                wealth: CL.SLIGHTLY_HIGH,
                 territory: CL.SLIGHTLY_HIGH,
-                prestige: CL.SLIGHTLY_LOW
+                prestige: CL.SLIGHTLY_LOW,
+                navy: CL.SLIGHTLY_LOW,
+                army: CL.SLIGHTLY_LOW
             },
             {
-                territory: CL.NO_REGRESSION,
-                reserves: CL.NO_REGRESSION,
+                reserves: CL.HIGH,
+                wealth: CL.HIGH,
+                territory: CL.HIGH,
+                prestige: CL.SLIGHTLY_LOW,
+                army: CL.SLIGHTLY_LOW
             },
             {
                 prestige: CL.VERY_LOW,
+                navy: CL.SLIGHTLY_LOW,
+                army: CL.LOW
             },
             {
-                reserves: CL.SLIGHTLY_HIGH,
-                territory: CL.SLIGHTLY_HIGH
+                prestige: CL.SLIGHTLY_LOW
             }
         )
 
         this.addTargetPlanetEffect(
             {
+                reserves: CL.SLIGHTLY_LOW,
+                wealth: CL.SLIGHTLY_LOW,
+                security: CL.SLIGHTLY_LOW,
+                economy: CL.SLIGHTLY_LOW,
+                prestige: CL.SLIGHTLY_LOW,
+                army: CL.SLIGHTLY_LOW
+            },
+            {
                 reserves: CL.LOW,
                 wealth: CL.LOW,
                 security: CL.LOW,
                 economy: CL.LOW,
-                prestige: CL.LOW
-            },
-            {
-                reserves: CL.NO_REGRESSION,
-                crime: CL.NO_REGRESSION,
-                prestige: CL.NO_REGRESSION,
-                wealth: CL.SLIGHTLY_LOW,
-                security: CL.SLIGHTLY_LOW
+                prestige: CL.LOW,
+                army: CL.LOW
             },
             {
                 prestige: CL.HIGH,
-                military: CL.SLIGHTLY_LOW
+                military: CL.SLIGHTLY_LOW,
+                culture: CL.SLIGHTLY_HIGH,
             },
-            {
-                reserves: CL.SLIGHTLY_LOW,
-                economy: CL.SLIGHTLY_LOW,
-                security: CL.SLIGHTLY_LOW
-            }
         )
     }
 
     shouldCancel() {
-        const {planet: p, targetPlanet: tp} = this
-        // Cancel if peace declared
-        const rel = p.c.relationships.get(tp)
-        return rel === RELATIONSHIP_TYPES.NEUTRAL || rel === RELATIONSHIP_TYPES.ALLY
+        return Civilization.areAlliesOrNeutral(this.planet, this.targetPlanet)
     }
 
     determineOutcome() {
-        const {planet: p, targetPlanet: tp} = this
-        // Raids succeed unless target has strong defense
-        const successProbability = 1 - (tp.c.army / p.c.army) * 0.3
-        this.rollOutcome(successProbability)
+        this.rollOutcome((this.planet.c.military/this.targetPlanet.c.military), CL.MEDIUM)
     }
 
     isValid() {
