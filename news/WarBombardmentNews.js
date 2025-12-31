@@ -73,7 +73,7 @@ class WarBombardmentNews extends News {
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         //our military must be significantly stronger than theirs and navy must be MUCH stronger
-        const navyAdvantage = p.c.navy > tp.c.navy * CL.HIGH
+        const navyAdvantage = p.c.navy/tp.c.navy > CL.HIGH
         const relationshipsValid = Civilization.areAtWar(p, tp)
         return navyAdvantage && relationshipsValid
     }

@@ -65,7 +65,7 @@ class EnslavementNews extends News {
         // Target must have population to steal
         const targetValid = tp.c.population > CL.LOW
         // our military must be stronger than theirs
-        const militaryValid = (p.c.army + p.c.navy) > (tp.c.army + tp.c.navy) * CL.HIGH
+        const militaryValid = (p.c.army + p.c.navy) / (tp.c.army + tp.c.navy) > CL.HIGH
         const relationshipsValid = Civilization.areTenseOrAtWar(p, tp)
         const interferingEvent = News.hasAnyNewsBidirectional(p, tp, NT_COOPERATIVE)
         return ratingsValid && targetValid && militaryValid && relationshipsValid && !interferingEvent

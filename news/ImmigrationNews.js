@@ -55,7 +55,7 @@ class ImmigrationNews extends News {
         // Source must have population to give, target must have economic opportunity
         const ratingsValid = p.c.economy > CL.SLIGHTLY_HIGH && p.c.crime < CL.SLIGHTLY_HIGH && tp.c.population > CL.LOW
         // Must not be at war
-        const relationshipsValid = Civilization.areAlliesOrNeutral(p, tp) && p.c.economy > tp.c.economy * CL.HIGH
+        const relationshipsValid = Civilization.areAlliesOrNeutral(p, tp) && p.c.economy/tp.c.economy > CL.HIGH
         const interferingEvent = News.hasAnyNewsBidirectional(p, tp, [NT.IMMIGRATION]) || News.planetHasAnyNews(p, NT_ECONOMY_PREVENTING)
         return ratingsValid && relationshipsValid && !interferingEvent
     }

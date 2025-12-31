@@ -53,7 +53,7 @@ class LandGrabNews extends News {
         //aggressor needs high military and low territory, victim needs territory to take
         const ratingsValid = (p.c.army > CL.SLIGHTLY_HIGH && p.c.prestige > tp.c.prestige)
         //aggressor must have at least 1.5x the military of victim
-        const militaryValid = p.c.army >= tp.c.army * CL.HIGH
+        const militaryValid = p.c.army/tp.c.army > CL.HIGH
         //both must have tensions with each other
         const relationshipsValid = Civilization.areTenseOrAtWar(p, tp)
         const interferingEvent =

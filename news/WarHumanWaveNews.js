@@ -2,22 +2,28 @@ class WarHumanWaveNews extends News {
     constructor(planet = new Planet(), targetPlanet = new Planet()) {
         super(
             `${coloredName(planet)} launches desperate human wave attacks against ${coloredName(targetPlanet)}!`,
-            `${coloredName(planet)}'s human wave offensive finally ends with staggering casualties!`,
-            ``,
+            `${coloredName(planet)}'s human wave assault overwhelms ${coloredName(targetPlanet)}'s defenses, wreaking havoc!`,
+            `${coloredName(planet)}'s human wave offensive is easily repelled by ${coloredName(targetPlanet)}'s defenses!`,
             `Peace treaty ends ${coloredName(planet)}'s human wave offensive before full deployment!`,
             NT.WAR_HUMAN_WAVE, planet, targetPlanet
         )
 
         this.addPlanetEffect(
             {
-                population: CL.VERY_LOW,
-                education: CL.LOW
+                population: CL.LOW,
+                education: CL.SLIGHTLY_LOW,
+                army: CL.SLIGHTLY_LOW
             },
             {
-                population: CL.NO_REGRESSION,
-                education: CL.NO_REGRESSION,
+                population: CL.LOW,
+                education: CL.SLIGHTLY_LOW,
+                army: CL.SLIGHTLY_LOW
             },
-            {},
+            {
+                population: CL.LOW,
+                education: CL.SLIGHTLY_LOW,
+                army: CL.SLIGHTLY_LOW
+            },
             {
                 population: CL.SLIGHTLY_LOW,
             }
@@ -26,7 +32,8 @@ class WarHumanWaveNews extends News {
         this.addTargetPlanetEffect(
             {},
             {
-                education: CL.LOW,
+                army: CL.LOW,
+                reserves: CL.LOW
             },
             {},
             {}
@@ -38,7 +45,8 @@ class WarHumanWaveNews extends News {
     }
 
     determineOutcome() {
-        // Human wave attacks always complete (no rollOutcome needed)
+        //it tends never to work based on what i've read
+        this.rollOutcome(this.planet.c.population*this.planet.c.army / this.targetPlanet.c.army, CL.HIGH)
     }
 
     isValid() {
@@ -48,8 +56,6 @@ class WarHumanWaveNews extends News {
         const populationValid = p.c.population > CL.HIGH
         // we need to be desperate
         const militaryValid = p.c.military / tp.c.military < CL.LOW
-        // Can't have human wave already
-        const interferingEvent = News.hasNews(NT.WAR_HUMAN_WAVE, p, tp)
-        return relationshipsValid && populationValid && militaryValid && !interferingEvent
+        return relationshipsValid && populationValid && militaryValid
     }
 }
