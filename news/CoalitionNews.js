@@ -34,6 +34,12 @@ class CoalitionNews extends News {
         this.rollOutcome(p.c.prestige/p.c.territory/p.c.army/p.c.navy, CL.HIGH)
     }
 
+    shouldCancel() {
+        const {planet: p} = this
+        // Coalition disbands if planet becomes puppet state (under external control)
+        return p.c.governmentType === GT.PUPPET_STATE
+    }
+
     isValid() {
         const {planet: p} = this
         //more likely if REALLY REALLY high territory and military

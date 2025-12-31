@@ -69,6 +69,8 @@ const NT = {
     FOREIGN_AID: new NewsType('Foreign Aid', NF.PEACE, 1, 3, 8, 1, [], [GT.DEMOCRACY, GT.THEOCRACY], []),
     GENOCIDE: new NewsType('Genocide', NF.WAR, 1, 5, 15, 1, [GT.ANARCHY, GT.DEMOCRACY], [GT.POLICE_STATE, GT.ARISTOCRACY], []),
     IMMIGRATION: new NewsType('Immigration', NF.CULTURE, 1, 5, 10, 1, [], [GT.DEMOCRACY, GT.CORPORATISM], [GT.POLICE_STATE, GT.COMMUNISM]),
+    INDUSTRIAL_ACCIDENT: new NewsType('Industrial Accident', NF.HEALTH_HAZARD, 1, 2, 5, 1, [], [GT.CORPORATISM], []),
+    BANKRUPTCY: new NewsType('Bankruptcy', NF.ECONOMY, 1, 3, 8, 1, [GT.COMMUNISM], [GT.CORPORATISM, GT.DEMOCRACY], []),
     LAND_GRAB: new NewsType('Imperialism', NF.POLITICS, 1, 10, 30, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.ARISTOCRACY, GT.POLICE_STATE, GT.THEOCRACY], []),
     INVESTMENT: new NewsType('Investment', NF.ECONOMY, 1, 5, 10, 1, [], [GT.CORPORATISM], []),
     ISOLATIONISM: new NewsType('Isolationism', NF.POLITICS, 1, 5, 15, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.POLICE_STATE, GT.THEOCRACY, GT.COMMUNISM], []),
@@ -87,6 +89,7 @@ const NT = {
     SCIENTIFIC_BREAKTHROUGH: new NewsType('Scientific Breakthrough', NF.SCIENCE, 1, 1, 4, 1, [], [GT.TECHNOCRACY], []),
     STOCK_MARKET_CRASH: new NewsType('Stock Market Crash', NF.ECONOMY, 1, 3, 8, 1, [GT.COMMUNISM], [GT.CORPORATISM], []),
     SURPLUS: new NewsType('Surplus', NF.LABOR, 1, 3, 8, 1, [], [], []), 
+    TERRORISM: new NewsType('Terrorism', NF.ESPIONAGE, 1, 5, 15, 1, [GT.DEMOCRACY, GT.PUPPET_STATE], [GT.POLICE_STATE, GT.THEOCRACY, GT.ANARCHY], [GT.POLICE_STATE]),
     TENSIONS: new NewsType('Tensions', NF.UNREST, 1, 5, 40, 1, [GT.PUPPET_STATE, GT.ANARCHY], [], []), //two neutral planets have relations changed to hostile
     TERRAFORMING: new NewsType('Terraforming', NF.LABOR, 1, 5, 40, 1, [], [GT.TECHNOCRACY, GT.CORPORATISM], []), //two neutral planets have relations changed to hostile
     TOURISM: new NewsType('Tourism', NF.CULTURE, 1, 3, 8, 1, [], [GT.DEMOCRACY, GT.CORPORATISM], []),

@@ -98,6 +98,12 @@ class PolicyChangeNews extends News {
         this.rollOutcome(successProbability, CL.MEDIUM)
     }
 
+    shouldCancel() {
+        const {planet: p} = this
+        // Policy change cancelled if government type changes (new government abandons reforms)
+        return p.c.governmentType !== p.c._prevGovernmentType
+    }
+
     isValid() {
         const {planet: p} = this
         // cultures with higher culture, education more prone to change

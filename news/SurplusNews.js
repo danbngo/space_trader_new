@@ -1,8 +1,8 @@
 class SurplusNews extends News {
     constructor(planet = new Planet()) {
         super(
-            `${coloredName(planet)}'s miners have hit the motherlode! A surplus of goods floods the market!`,
-            `${coloredName(planet)}'s resource-rich economy returns to normal.`,
+            `${coloredName(planet)}'s deep mining efforts have uncovered a new rich vein of resources! Low priced goods are flooding their markets!`,
+            `${coloredName(planet)} carefully manages the surplus from its new resource veins, ensuring that benefits accrue to all sectors of its economy!`,
             `${coloredName(planet)}'s resource boom collapses as reserves are exhausted!`,
             ``,
             NT.SURPLUS, planet
@@ -12,15 +12,13 @@ class SurplusNews extends News {
             {
                 reserves: CL.EXTREMELY_HIGH,
                 industry: CL.HIGH,
+                economy: CL.HIGH,
+
             },
             {
                 industry: CL.SLIGHTLY_HIGH,
                 reserves: CL.SLIGHTLY_HIGH,
             },
-            {
-                industry: CL.LOW,
-                reserves: CL.NO_REGRESSION
-            }
         )
     }
 
@@ -32,9 +30,9 @@ class SurplusNews extends News {
     isValid() {
         const {planet: p} = this
         //we needed to be resource scarce to be looking for them so hard
-        const ratingsValid = planet.c.reserves/MARKET_AVERAGE_CARGO_PER_TYPE < CL.LOW
+        const ratingsValid = p.c.reserves < CL.SLIGHTLY_LOW
         //more for flavor than anything, irl you could find goodies at any time
-        const interferingEvent = News.planetHasAnyNews(planet, [NT.SURPLUS, NT.DEPRESSION, NT.SCARCITY])
+        const interferingEvent = News.planetHasAnyNews(p, [NT.SURPLUS, NT.DEPRESSION, NT.SCARCITY])
         return ratingsValid && !interferingEvent
     }
 }

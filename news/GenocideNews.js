@@ -37,6 +37,12 @@ class GenocideNews extends News {
         this.rollOutcome(this.planet.c.security*this.planet.c.army*this.planet.c.corruption/this.planet.c.culture/this.planet.c.prestige, CL.LOW)
     }
 
+    shouldCancel() {
+        const {planet: p} = this
+        // Genocide cancelled if government undergoes major change
+        return News.planetHasAnyNews(p, NT_GOVERNANCE_PREVENTING)
+    }
+
     isValid() {
         const {planet: p} = this
         const ratingsValid = p.c.army > CL.MEDIUM && p.c.security < CL.VERY_LOW && p.c.corruption > CL.HIGH

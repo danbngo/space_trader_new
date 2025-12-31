@@ -53,9 +53,26 @@ function generateCivilization(planet = new Planet()) {
         selectPolicy(validForeignPolicies)
     )
 
+    // Generate random race demographics
+    const races = new Map()
+    const numRaces = rng(3, 1) // 1-3 races present
+    const selectedRaces = rndMembers(RACES_ALL, numRaces, true)
+    
+    // Generate random weights
+    const weights = []
+    for (let i = 0; i < selectedRaces.length; i++) {
+        weights.push(Math.random() * 10 + 1) // Random weight between 1-11
+    }
+    
+    // Normalize to sum to 1.0
+    const totalWeight = weights.reduce((sum, w) => sum + w, 0)
+    for (let i = 0; i < selectedRaces.length; i++) {
+        races.set(selectedRaces[i], weights[i] / totalWeight)
+    }
+
     return new Civilization({
         planet, governmentType, cargoPriceMultipliers, technology, education, territory, population,
          army, navy, industry, economy, security, culture, prestige, corruption, crime, policies,
-         wealth, reserves, inflation, taxes
+         wealth, reserves, inflation, taxes, races
     })
 }

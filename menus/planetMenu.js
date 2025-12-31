@@ -127,13 +127,14 @@ function showPlanetSocietyMenu(planet = new Planet()) {
     for (const rating of CIVILIZATION_RATINGS_ALL) {
         const key = rating.name.toLowerCase()
         const value = civilization[key]
+        // Skip population and territory - they're now in demographics
+        if (key === 'population' || key === 'territory') continue
+        
         if (value !== undefined) {
             let displayValue = describeRating(value)
             
             // Use specific describe functions where available
             switch(key) {
-                case 'population': displayValue = describePopulation(value); break;
-                case 'territory': displayValue = describeTerritory(value); break;
                 case 'army': displayValue = describeArmy(value); break;
                 case 'navy': displayValue = describeNavy(value); break;
                 case 'industry': displayValue = describeIndustry(value); break;
@@ -164,6 +165,7 @@ function showPlanetSocietyMenu(planet = new Planet()) {
     msg += `${policies.foreign.flavor.symbol} ${colorSpan(policies.foreign.name, policies.foreign.color)}<br/>`
     
     showPlanetModal(planet, `${coloredName(planet)} - Society`, msg, [
+        ["Demographics", () => showPlanetDemographicsMenu(planet)],
         ["Climate", () => showPlanetClimateMenu(planet)],
         ["Back", () => showPlanetMenu(planet)]
     ], 'planet_society', (nextPlanet) => showPlanetSocietyMenu(nextPlanet));

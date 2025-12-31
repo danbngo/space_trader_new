@@ -33,6 +33,12 @@ class FestivalNews extends News {
         this.rollOutcome(this.planet.c.security*this.planet.c.culture, CL.LOW)
     }
 
+    shouldCancel() {
+        const {planet: p} = this
+        // Festival cancelled if any dangerous event threatens the planet
+        return News.planetHasAnyNews(p, NT_DANGEROUS)
+    }
+
     isValid() {
         const {planet: p} = this
         //need high credits to afford it, low prestige to want it

@@ -69,6 +69,12 @@ class CoupDetatNews extends News {
         this.rollOutcome((tp.c.security + tp.c.army + tp.c.culture) / 3, CL.SLIGHTLY_LOW)
     }
 
+    shouldCancel() {
+        const {targetPlanet: tp} = this
+        // Coup cancelled if target becomes puppet state (already under external control)
+        return tp.c.governmentType === GT.PUPPET_STATE
+    }
+
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         // Aggressor must have high prestige, target must have lowER prestige

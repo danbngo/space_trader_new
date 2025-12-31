@@ -24,6 +24,7 @@
  * @property {number} [inflation] - Higher costs for everything but also higher sales prices in market
  * @property {number} [taxes] - Tax rate applied to most transactions (0 to MAX_TAX_RATE).
  * @property {CountsMap} [religions] - Religious representation on this planet (Religion -> adherent population ratio).
+ * @property {Map<Race, number>} [races] - Racial demographics of this civilization (Race -> population proportion).
  */
 
 /**
@@ -39,7 +40,7 @@ class Civilization {
         technology = 1.0, education = 1.0, territory = 1, population = 1, industry = 1,
         economy = 1, security = 1, culture = 1, prestige = 1, policies = new Policies(),
         navy = 1, army = 1, corruption = 1, crime = 1, wealth = 1, reserves = 1, inflation = 1, taxes = 1,
-        religions = new CountsMap()
+        religions = new CountsMap(), races = new Map()
     } = {}) {
         /** @type {Planet} */
         this.planet = planet;
@@ -55,6 +56,8 @@ class Civilization {
         this.skillPriceMultipliers = skillPriceMultipliers
         /** @type {CountsMap} */
         this.religions = religions
+        /** @type {Map<Race, number>} */
+        this.races = races
         /** @type {number} */
         this.territory = territory; //AUs, recall that neptune is 30. encounters for this civilization can be found further from its planet
         /** @type {number} */
@@ -157,6 +160,7 @@ class Civilization {
             cargoPriceMultipliers: this.cargoPriceMultipliers.clone(),
             skillPriceMultipliers: this.skillPriceMultipliers.clone(),
             religions: this.religions.clone(),
+            races: new Map(this.races),
             governmentType: this.governmentType,
         })
         for (const cr of CIVILIZATION_RATINGS_ALL) {
