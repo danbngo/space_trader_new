@@ -42,7 +42,7 @@ class TensionsNews extends News {
     }
 
     shouldCancel() {
-        return !Civilization.areNeutral(this.planet, this.targetPlanet)
+        return !Civilization.areTense(this.planet, this.targetPlanet)
     }
 
     isValid() {
@@ -62,7 +62,7 @@ class TensionsNews extends News {
     isValidEnd() {
         const {planet: p, targetPlanet: tp} = this
         //can only end if planets are not actively at war
-        const relationshipsValid = p.c.relationships.get(tp) != RELATIONSHIP_TYPES.WAR && tp.c.relationships.get(p) != RELATIONSHIP_TYPES.WAR
+        const relationshipsValid = !Civilization.areAtWar(p, tp)
         return relationshipsValid
     }
 }

@@ -23,6 +23,8 @@ class Fleet extends SpaceObject {
         this.ships = []
         /** @type {CountsMap} */
         this.cargo = new CountsMap();
+        /** @type {Equipment[]} */
+        this.equipment = [];
         /** @type {Officer} */
         this.captain = null;
         /** @type {Officer[]} */

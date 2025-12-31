@@ -3,8 +3,8 @@ class WarSurrenderNews extends News {
         super(
             `${coloredName(targetPlanet)} sues for peace with ${coloredName(planet)}, offering indemnity and territorial concessions!`,
             `${coloredName(targetPlanet)} has negotiated the terms of its surrender to ${coloredName(planet)}!`,
-            ``,
             `Negotiations collapse as ${coloredName(targetPlanet)} rejects surrender terms from ${coloredName(planet)}!`,
+            `Events make the surrender of ${coloredName(targetPlanet)} to ${coloredName(planet)} irrelevant!`,
             NT.WAR_SURRENDER, planet, targetPlanet
         )
 
@@ -33,18 +33,12 @@ class WarSurrenderNews extends News {
     }
 
     shouldCancel() {
-        const {planet: p, targetPlanet: tp} = this
-        // Check if war still ongoing
-        const stillAtWar = p.c.relationships.get(tp) === RELATIONSHIP_TYPES.WAR
-        if (!stillAtWar) return true
-        
-        // Negotiations succeed unless target suddenly regains strength
-        const rejectProbability = (tp.c.military / p.c.military) * 0.2
-        return Math.random() < rejectProbability
+        return !Civilization.areAtWar(this.planet, this.targetPlanet)
     }
 
     determineOutcome() {
-        // Surrender negotiations always complete if not cancelled
+        //could fail if everyone really hates us
+        this.rollOutcome(this.planet.c.prestige * this.planet.c.military / this.targetPlanet.c.military, CL.LOW)
     }
 
     isValid() {

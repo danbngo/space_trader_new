@@ -53,9 +53,7 @@ class WarSubjugationNews extends News {
     }
 
     shouldCancel() {
-        const {planet: p, targetPlanet: tp} = this
-        // Cancel if war no longer ongoing
-        return p.c.relationships.get(tp) !== RELATIONSHIP_TYPES.WAR
+        return !Civilization.areAtWar(this.planet, this.targetPlanet)
     }
 
     determineOutcome() {

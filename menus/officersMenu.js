@@ -26,13 +26,14 @@ function createOfficersTable(officers = [new Officer()], onSelectOfficer = (offi
 /**
  * Displays the officers roster menu for managing hired officers.
  * @param {Officer[]} officers - Array of officers to display.
+ * @param {string} tab - Which tab to show ('roster' or 'equipment')
  */
-function showOfficersMenu(officers = gs.fleet.officers) {
-    const reloadMenu = ()=>showOfficersMenu(officers)
+function showOfficersMenu(officers = gs.fleet.officers, tab = 'roster') {
+    const reloadMenu = (newTab = tab)=>showOfficersMenu(officers, newTab)
 
     function fireOfficer(officer = new Officer()) {
         safeRemove(gs.fleet.officers, officer)
-        showOfficersMenu(officers) //DONT use reloadMenu here, wont reflect changes to ship list
+        showOfficersMenu(officers, tab) //DONT use reloadMenu here, wont reflect changes to ship list
     }
 
     function showFireOfficerModal(officer = new Officer()) {
@@ -76,13 +77,103 @@ function showOfficersMenu(officers = gs.fleet.officers) {
         refreshPanelButtons('officers_panel', buttons)
     }
 
-    showModal(
-        `Officer Roster`,
-        ce({children:[
+    // Equipment management functions
+    function equipItem(officer = new Officer(), equipment) {
+        const slot = equipment.equipmentType.slot
+        // Unequip existing item in that slot
+        if (officer.equipment.has(slot)) {
+            const oldEquipment = officer.equipment.get(slot)
+            gs.fleet.equipment.push(oldEquipment)
+        }
+        // Equip new item
+        officer.equipment.set(slot, equipment)
+        safeRemove(gs.fleet.equipment, equipment)
+        reloadMenu('equipment')
+    }
+
+    function unequipItem(officer = new Officer(), slot = EQUIPMENT_SLOTS.HEAD) {
+        if (officer.equipment.has(slot)) {
+            const equipment = officer.equipment.get(slot)
+            gs.fleet.equipment.push(equipment)
+            officer.equipment.delete(slot)
+        }
+        reloadMenu('equipment')
+    }
+
+    function showEquipModal(officer = new Officer(), slot = EQUIPMENT_SLOTS.HEAD) {
+        const availableEquipment = gs.fleet.equipment.filter(e => e.equipmentType.slot === slot)
+        
+        if (availableEquipment.length === 0) {
+            showModal(`Equip ${slot.name}`, 
+                `No ${slot.name.toLowerCase()} equipment available.`,
+                [["Close", () => reloadMenu('equipment')]]
+            )
+            return
+        }
+
+        const rows = [['Name', 'Quality', 'Value']]
+        for (const equipment of availableEquipment) {
+            rows.push([
+                equipment.name,
+                statColorSpan(roundToPlaces(equipment.quality * 100, 1) + '%', equipment.quality),
+                equipment.value + 'CR',
+            ])
+        }
+
+        showModal(
+            `Equip ${slot.name} for ${officer.name}`,
+            createTable(rows, (rowIndex) => equipItem(officer, availableEquipment[rowIndex])),
+            [["Cancel", () => reloadMenu('equipment')]]
+        )
+    }
+
+    function createEquipmentManagementPanel() {
+        const panels = []
+        
+        for (const officer of officers) {
+            const equipmentRows = []
+            
+            for (const slot of EQUIPMENT_SLOTS_ALL) {
+                const equipped = officer.equipment.get(slot)
+                const equippedText = equipped 
+                    ? `${equipped.name} (${statColorSpan(roundToPlaces(equipped.quality * 100, 1) + '%', equipped.quality)})`
+                    : colorSpan('(Empty)', COLORS.Gray)
+                
+                equipmentRows.push(ce({children: [
+                    `<b>${slot.name}:</b> ${equippedText} `,
+                    ce({
+                        tag: 'button',
+                        innerText: equipped ? 'Unequip' : 'Equip',
+                        onclick: equipped ? () => unequipItem(officer, slot) : () => showEquipModal(officer, slot)
+                    }),
+                    '<br/>'
+                ]}))
+            }
+
+            panels.push(ce({children: [
+                `<br/><b>${officer.name}</b> (Level ${officer.level})<br/>`,
+                ...equipmentRows,
+            ]}))
+        }
+
+        return ce({children: [
+            `<b>Available Equipment:</b> ${gs.fleet.equipment.length} items<br/>`,
+            ...panels,
+        ]})
+    }
+
+    const content = tab === 'roster' 
+        ? ce({children:[
             createOfficersTable(officers, onSelectOfficer),
             ce({id: 'officers_panel_content'}),
-        ]}),
+        ]})
+        : createEquipmentManagementPanel()
+
+    showModal(
+        `Officer ${tab === 'roster' ? 'Roster' : 'Equipment'}`,
+        content,
         [
+            [tab === 'roster' ? 'Equipment' : 'Roster', () => reloadMenu(tab === 'roster' ? 'equipment' : 'roster')],
             ["Close", () => closeModal()],
         ],
         'officers_panel'

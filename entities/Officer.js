@@ -43,6 +43,8 @@ class Officer {
         this.perks = [];
         /** @type {number} */
         this.age = 25; // Default age
+        /** @type {Map<EquipmentSlot, Equipment>} */
+        this.equipment = new Map();
     }
 
     grantExperience(amount = 0, autoLevelUp = (this !== gs.captain), autoImproveSkills = (this !== gs.captain)) {

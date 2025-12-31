@@ -35,7 +35,7 @@ class OligarchyNews extends News {
         // More likely if economy is high 
         const ratingsValid = (p.c.economy > CL.HIGH)
         // Planet must not already have this event
-        const interferingEvent = News.planetHasAnyNews(planet, [NT.OLIGARCHY])
+        const interferingEvent = News.planetHasAnyNews(p, [NT.OLIGARCHY])
         return ratingsValid && !interferingEvent
     }
 }
