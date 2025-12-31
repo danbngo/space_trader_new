@@ -36,6 +36,18 @@ class CyberImplant {
         /** @type {number} */
         this.quality = quality
     }
+
+    /**
+     * Gets the value of this cyber implant based on its base value and quality.
+     * @returns {number} The value in credits.
+     */
+    get value() {
+        return Math.round(this.implantType.value * this.quality)
+    }
+
+    get name() {
+        return this.implantType.name
+    }
 }
 
 const CYBER_IMPLANT_TYPES = {

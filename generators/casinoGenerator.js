@@ -15,8 +15,8 @@ function generateCasinoPrizes(planet = new Planet(), numPrizes = 5) {
             const ship = generateShip(planet)
             // Boost quality significantly - aim for 1.5x to 2.5x normal quality
             const qualityBoost = rng(1.5, 2.5, false)
-            ship.hull = Math.round(ship.hull * qualityBoost)
-            ship.shields = Math.round(ship.shields * qualityBoost)
+            ship.hull[1] = Math.round(ship.hull[1] * qualityBoost)
+            ship.shields[1] = Math.round(ship.shields[1] * qualityBoost)
             ship.lasers = Math.round(ship.lasers * qualityBoost)
             ship.engine = Math.round(ship.engine * qualityBoost)
             ship.cargoSpace = Math.round(ship.cargoSpace * qualityBoost)

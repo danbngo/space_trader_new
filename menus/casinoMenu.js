@@ -3,7 +3,7 @@ function showCasinoMenu(casino) {
 
     const currentPrize = casino.getCurrentPrize()
     if (!currentPrize) {
-        showModal('Casino', ce({ tag: 'p', text: 'No prizes available at this casino!' }), [
+        showModal('Casino', 'No prizes available at this casino!', [
             ['Back', showPlanetMenu]
         ])
         return
@@ -24,16 +24,12 @@ function showCasinoMenu(casino) {
 
     const content = ce({
         children: [
-            ce({ tag: 'p', text: `Welcome to the ${casino.planet.name} Casino!` }),
-            ce({ tag: 'p', text: `The house is feeling generous today. Care to try your luck?` }),
-            ce({ tag: 'hr' }),
-            ce({ tag: 'h3', text: 'Current Prize:' }),
-            ce({ tag: 'p', text: prizeDesc }),
-            ce({ tag: 'p', text: `Prize Value: ${formatCredits(currentPrize.value)}` }),
-            ce({ tag: 'hr' }),
-            ce({ tag: 'p', text: `Cost to Gamble: ${formatCredits(gambleCost)}` }),
-            ce({ tag: 'p', text: `Your Credits: ${formatCredits(credits)}` }),
-            !canAfford ? ce({ tag: 'p', text: '(Insufficient funds)', style: { color: '#f44' } }) : null
+            `Welcome to the ${casino.planet.name} Casino<br/>
+            The house is feeling generous today. Care to try your luck?<br/>
+            Current Prize: ${prizeDesc}
+            Prize Value: ${currentPrize.value}CR<br/>
+            Cost to Gamble: ${gambleCost}CR<br/>
+            Your Credits: ${credits}CR<br/>`
         ]
     })
 
@@ -56,49 +52,34 @@ function handleGamble(casino, prize, cost) {
 
     if (won) {
         // Player won!
+        let msg = '🎉 JACKPOT! 🎉<br/><br/>'
+        if (prize instanceof Ship) {
+            msg += `You won a ${prize.name} (${prize.shipType.name})!<br/>`
+            msg += `The ship has been added to your fleet.`
+        } else if (prize instanceof Equipment) {
+            msg += `You won ${prize.name} (${prize.equipmentType.name})!<br/>`
+            msg += `The equipment has been added to your inventory.`
+        } else if (prize instanceof CyberImplant) {
+            msg += `You won a ${prize.name} cyber implant!<br/>`
+            msg += `The implant has been added to your captain.`
+        }
+
+        showModal('Casino - You Won!', msg, [
+            ['Continue', () => showCasinoMenu(casino)]
+        ])
+
+        // Add prize to appropriate place
         if (prize instanceof Ship) {
             fleet.ships.push(prize)
-            showModal('Casino - You Won!', ce({
-                children: [
-                    ce({ tag: 'h2', text: '🎉 JACKPOT! 🎉', style: { color: '#4f4' } }),
-                    ce({ tag: 'p', text: `You won a ${prize.name} (${prize.shipType.name})!` }),
-                    ce({ tag: 'p', text: `The ship has been added to your fleet.` })
-                ]
-            }), [
-                ['Continue', () => showCasinoMenu(casino)]
-            ])
         } else if (prize instanceof Equipment) {
             fleet.equipment.push(prize)
-            showModal('Casino - You Won!', ce({
-                children: [
-                    ce({ tag: 'h2', text: '🎉 JACKPOT! 🎉', style: { color: '#4f4' } }),
-                    ce({ tag: 'p', text: `You won ${prize.name} (${prize.equipmentType.name})!` }),
-                    ce({ tag: 'p', text: `The equipment has been added to your inventory.` })
-                ]
-            }), [
-                ['Continue', () => showCasinoMenu(casino)]
-            ])
         } else if (prize instanceof CyberImplant) {
             captain.implants.push(prize)
-            showModal('Casino - You Won!', ce({
-                children: [
-                    ce({ tag: 'h2', text: '🎉 JACKPOT! 🎉', style: { color: '#4f4' } }),
-                    ce({ tag: 'p', text: `You won a ${prize.name} cyber implant!` }),
-                    ce({ tag: 'p', text: `The implant has been added to your captain.` })
-                ]
-            }), [
-                ['Continue', () => showCasinoMenu(casino)]
-            ])
         }
     } else {
         // Player lost
-        showModal('Casino - Better Luck Next Time', ce({
-            children: [
-                ce({ tag: 'p', text: 'The dice didn\'t roll in your favor this time.' }),
-                ce({ tag: 'p', text: `You lost ${formatCredits(cost)}.` }),
-                ce({ tag: 'p', text: 'Try again?' })
-            ]
-        }), [
+        const loseMsg = `The dice didn't roll in your favor this time.<br/><br/>You lost ${formatCredits(cost)}.<br/><br/>Try again?`
+        showModal('Casino - Better Luck Next Time', loseMsg, [
             ['Continue', () => showCasinoMenu(casino)]
         ])
     }

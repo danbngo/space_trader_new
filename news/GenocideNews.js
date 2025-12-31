@@ -18,28 +18,28 @@ class GenocideNews extends News {
             {
                 population: CL.LOW,
                 prestige: CL.LOW,
+                education: CL.LOW,
+                culture: CL.VERY_LOW,
                 crime: CL.VERY_LOW,
                 security: CL.VERY_HIGH,
-                culture: CL.VERY_LOW
             },
             {
                 population: CL.SLIGHTLY_LOW,
                 prestige: CL.VERY_LOW,
+                education: CL.LOW,
+                culture: CL.VERY_LOW,
                 security: CL.LOW, //people are mad now
-                culture: CL.VERY_LOW
             }
         )
     }
 
     determineOutcome() {
-        // Genocide always completes, never fails
+        this.rollOutcome(this.planet.c.security*this.planet.c.army*this.planet.c.corruption/this.planet.c.culture/this.planet.c.prestige, CL.LOW)
     }
 
     isValid() {
         const {planet: p} = this
-        //more likely if security is very low (except in a police state)
-        const ratingsValid = p.c.army > CL.MEDIUM && p.c.security < CL.VERY_LOW
-        //planet must not already be in anarchy or puppet state
+        const ratingsValid = p.c.army > CL.MEDIUM && p.c.security < CL.VERY_LOW && p.c.corruption > CL.HIGH
         return (ratingsValid)
     }
 }
