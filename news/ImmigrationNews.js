@@ -10,7 +10,6 @@ class ImmigrationNews extends News {
 
         this.addPlanetEffect(
             {
-                targetPlanet: this.targetPlanet,
                 population: CL.HIGH,
                 economy: CL.SLIGHTLY_HIGH,
             },
@@ -30,7 +29,6 @@ class ImmigrationNews extends News {
 
         this.addTargetPlanetEffect(
             {
-                targetPlanet: this.planet,
                 population: CL.LOW,
             },
             {

@@ -67,6 +67,9 @@ function showPlanetMenu(planet = new Planet()) {
         const canEnter = !hasBounty && (!hasInfamy || isElite)
         options.push(["Palace", () => showPalaceMenu(settlement.palace), !isDocked || !canEnter]);
     }
+    if (settlement.temple) {
+        options.push(["Temple", () => showModal("Temple", "The temple is quiet and serene.", [["Close", () => showPlanetMenu(planet)]])]);
+    }
     options.push(ce({tag:'br'}));
     options.push(["News", () => showNewsTimelineMenu(planet, () => showPlanetMenu(planet))]);
     options.push([`Overview`, () => showPlanetSocietyMenu(planet)]);

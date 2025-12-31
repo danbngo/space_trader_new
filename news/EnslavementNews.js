@@ -10,7 +10,6 @@ class EnslavementNews extends News {
 
         this.addPlanetEffect(
             {
-                targetPlanet: this.targetPlanet,
                 industry: CL.SLIGHTLY_HIGH,
                 population: CL.SLIGHTLY_HIGH,
                 prestige: CL.LOW,
@@ -31,7 +30,6 @@ class EnslavementNews extends News {
 
         this.addTargetPlanetEffect(
             {
-                targetPlanet: this.planet,
                 population: CL.SLIGHTLY_LOW,
                 security: CL.SLIGHTLY_LOW,
                 education: CL.SLIGHTLY_LOW,

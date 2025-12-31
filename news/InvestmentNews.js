@@ -10,7 +10,6 @@ class InvestmentNews extends News {
 
         this.addPlanetEffect(
             {
-                targetPlanet: this.targetPlanet,
                 wealth: CL.LOW,
                 reserves: CL.VERY_LOW,
             },

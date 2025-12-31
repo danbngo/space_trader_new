@@ -30,7 +30,6 @@ class LandGrabNews extends News {
 
         this.addTargetPlanetEffect(
             {
-                targetPlanet: this.planet,
                 prestige: CL.LOW,
             },
             {

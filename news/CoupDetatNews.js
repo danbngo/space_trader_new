@@ -15,7 +15,6 @@ class CoupDetatNews extends News {
 
         this.addPlanetEffect(
             {
-                targetPlanet: this.targetPlanet,
                 prestige: CL.LOW,
                 taxes: CL.LOW,
                 corruption: CL.HIGH,
@@ -46,7 +45,6 @@ class CoupDetatNews extends News {
             },
             {
                 forcePeace: true,
-                targetPlanet: this.planet,
                 newRelationship: RELATIONSHIP_TYPES.NEUTRAL,
                 governmentType,
                 security: rng(0.5,1.5,false),
