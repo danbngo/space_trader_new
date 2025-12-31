@@ -3,7 +3,7 @@ class FestivalNews extends News {
         super(
             `${coloredName(planet)} announces an extravagant festival open to all visitors, diverting resources to celebrate!`,
             `${coloredName(planet)}'s festival concludes, leaving the planet with enhanced prestige!`,
-            `${coloredName(planet)}'s festival is marred by violence and disasters!`,
+            `${coloredName(planet)}'s festival is marred by local protests and security incidents!`,
             ``,
             NT.FESTIVAL, planet
         )
@@ -12,22 +12,25 @@ class FestivalNews extends News {
             {
                 wealth: CL.LOW,
                 crime: CL.HIGH,
+                taxes: CL.HIGH,
+                security: CL.HIGH,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.HOLOCUBES, CL.VERY_HIGH], [CARGO_TYPES.DRUGS, CL.ASTRONOMICAL]])),
             },
             {
-                crime: CL.SLIGHTLY_HIGH,
-                prestige: CL.SLIGHTLY_HIGH,
+                wealth: CL.SLIGHTLY_LOW,
+                taxes: CL.SLIGHTLY_HIGH,
+                culture: CL.HIGH,
+                prestige: CL.HIGH,
             },
             {
-                wealth: CL.LOW,
-                crime: CL.HIGH,
-                prestige: CL.LOW,
+                wealth: CL.SLIGHTLY_LOW,
+                taxes: CL.SLIGHTLY_HIGH,
             }
         )
     }
 
     determineOutcome() {
-        this.rollOutcome(this.planet.c.security)
+        this.rollOutcome(this.planet.c.security*this.planet.c.culture, CL.LOW)
     }
 
     isValid() {
