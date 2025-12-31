@@ -74,7 +74,7 @@ class WarNews extends News {
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         //planets tend not to want to go to war with stronger ones
-        const ratingsValid = p.c.prestige > tp.c.prestige || (p.c.army+p.c.navy) > (tp.c.army+tp.c.navy)
+        const ratingsValid = p.c.prestige > tp.c.prestige || (p.c.military > tp.c.military)
         //must not have same form of government
         const governmentsValid = (p.c.governmentType !== tp.c.governmentType)
         //must not be anarchic or a puppet state

@@ -13,6 +13,7 @@ class LandGrabNews extends News {
                 navy: CL.SLIGHTLY_LOW,
                 army: CL.LOW,
                 prestige: CL.SLIGHTLY_LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.HIGH]])),
             },
             {
                 territory: CL.HIGH,

@@ -1,7 +1,7 @@
 class TourismNews extends News {
     constructor(planet = new Planet()) {
         super(
-            `${planet.name} has begun building lush attractions and resorts to attract tourists from across the system!`,
+            `${coloredName(planet)} has begun building lush attractions and resorts to attract tourists from across the system!`,
             `${coloredName(planet)} completes its attractions and resorts, attracting a rush of lucrative tourism!`,
             `${coloredName(planet)}'s push to attract tourism fails due to crime and safety concerns!`,
             ``,
@@ -10,10 +10,7 @@ class TourismNews extends News {
         this.addPlanetEffect(
             {
                 taxes: CL.HIGH,
-                cargoPriceMultipliers: new CountsMap(new Map([
-                    [CARGO_TYPES.METAL, CL.HIGH],
-                    [CARGO_TYPES.HOLOCUBES, CL.HIGH]
-                ]))
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.DRUGS, CL.VERY_HIGH], [CARGO_TYPES.HOLOCUBES, CL.HIGH]]))
             },
             {
                 taxes: CL.SLIGHTLY_HIGH,

@@ -14,6 +14,7 @@ class DepressionNews extends News {
                 reserves: CL.EXTREMELY_LOW,
                 economy: CL.EXTREMELY_LOW,
                 wealth: CL.EXTREMELY_LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.FOOD, CL.HIGH], [CARGO_TYPES.WATER, CL.HIGH], [CARGO_TYPES.MEDICINE, CL.HIGH]])),
             },
             {
                 inflation: CL.EXTREMELY_LOW,

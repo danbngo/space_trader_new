@@ -10,6 +10,7 @@ class ConscriptionNews extends News {
 
         this.addPlanetEffect(
             {
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.VERY_HIGH]])),
                 population: CL.LOW,
                 economy: CL.LOW,
                 industry: CL.LOW,

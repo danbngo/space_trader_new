@@ -14,10 +14,7 @@ class TerraformingNews extends News {
                 taxes: CL.VERY_HIGH,
                 reserves: CL.LOW,
                 education: CL.SLIGHTLY_HIGH,
-                cargoPriceMultipliers: new CountsMap(new Map([
-                    [CARGO_TYPES.NANITES, CL.VERY_HIGH],
-                    [CARGO_TYPES.ISOTOPES, CL.VERY_HIGH],
-                ]))
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.NANITES, CL.VERY_HIGH], [CARGO_TYPES.ISOTOPES, CL.VERY_HIGH],]))
             },
             {
                 wealth: CL.LOW,

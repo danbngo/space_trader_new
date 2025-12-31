@@ -10,6 +10,7 @@ class CulturalPurgeNews extends News {
 
         this.addPlanetEffect(
             {
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.HOLOCUBES, CL.EXTREMELY_LOW]])),
                 education: CL.SLIGHTLY_LOW,
                 culture: CL.SLIGHTLY_LOW,
                 security: CL.SLIGHTLY_HIGH,

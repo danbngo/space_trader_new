@@ -14,7 +14,8 @@ class ForcedLaborNews extends News {
                 population: CL.SLIGHTLY_LOW,
                 prestige: CL.LOW,
                 education: CL.SLIGHTLY_LOW,
-                culture: CL.LOW
+                culture: CL.LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.NANITES, CL.LOW], [CARGO_TYPES.METAL, CL.HIGH]])),
             },
             {
                 industry: CL.VERY_HIGH,

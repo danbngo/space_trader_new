@@ -18,6 +18,7 @@ const NEWS_TYPE_CLASSES = [
     [NT.CRACKDOWN, CrackdownNews],
     [NT.CRIME_WAVE, CrimeWaveNews],
     [NT.CULTURAL_PURGE, CulturalPurgeNews],
+    [NT.CULTURAL_RENAISSANCE, CulturalRenaissanceNews],
     [NT.CYBER_WARFARE, CyberWarfareNews],
     [NT.DEPRESSION, DepressionNews],
     [NT.DISARMAMENT, DisarmamentNews],

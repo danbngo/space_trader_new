@@ -12,6 +12,7 @@ class RaidingNews extends News {
 
         this.addPlanetEffect(
             {
+                cargoPriceModifiers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.VERY_HIGH], [CARGO_TYPES.ANTIMATTER, CL.HIGH]])),
                 prestige: CL.SLIGHTLY_LOW,
                 navy: CL.SLIGHTLY_LOW,
                 army: CL.LOW
@@ -37,6 +38,7 @@ class RaidingNews extends News {
 
         this.addTargetPlanetEffect(
             {
+                cargoPriceModifiers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.VERY_HIGH], [CARGO_TYPES.ANTIMATTER, CL.HIGH]])),
                 reserves: CL.SLIGHTLY_LOW,
                 wealth: CL.SLIGHTLY_LOW,
                 security: CL.SLIGHTLY_LOW,

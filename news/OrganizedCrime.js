@@ -13,7 +13,8 @@ class OrganizedCrimeNews extends News {
                 security: CL.LOW,
                 crime: CL.SLIGHTLY_HIGH,
                 economy: CL.SLIGHTLY_LOW,
-                corruption: CL.HIGH
+                corruption: CL.HIGH,
+                cargoPriceModifiers: new CountsMap(new Map([[CARGO_TYPES.DRUGS, CL.VERY_LOW], [CARGO_TYPES.WEAPONS, CL.VERY_LOW]])),
             },
             {
                 security: CL.VERY_LOW,

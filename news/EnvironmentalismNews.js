@@ -13,7 +13,7 @@ class EnvironmentalismNews extends News {
                 industry: CL.SLIGHTLY_LOW,
                 economy: CL.SLIGHTLY_LOW,
                 culture: CL.SLIGHTLY_HIGH,
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.NANITES, CL.EXTREMELY_LOW], [CARGO_TYPES.METAL, CL.EXTREMELY_LOW]])),
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.NANITES, CL.EXTREMELY_LOW], [CARGO_TYPES.ISOTOPES, CL.LOW]])),
             },
             {
                 population: CL.SLIGHTLY_HIGH,

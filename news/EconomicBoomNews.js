@@ -15,7 +15,7 @@ class EconomicBoomNews extends News {
                 economy: CL.EXTREMELY_HIGH,
                 wealth: CL.EXTREMELY_HIGH,
                 reserves: CL.VERY_HIGH,
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.HOLOCUBES, CL.EXTREMELY_HIGH]])),
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.HOLOCUBES, CL.HIGH]])),
                 taxes: CL.LOW,
             },
             {

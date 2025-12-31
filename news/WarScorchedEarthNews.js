@@ -12,6 +12,7 @@ class WarScorchedEarthNews extends News {
             {
                 territory: CL.LOW,
                 industry: CL.LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.FOOD, CL.EXTREMELY_HIGH], [CARGO_TYPES.WATER, CL.EXTREMELY_HIGH]]))
             },
             {
                 territory: CL.NO_REGRESSION,

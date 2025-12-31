@@ -16,6 +16,7 @@ class IndustrialAccidentNews extends News {
                 economy: CL.LOW,
                 industry: CL.LOW,
                 reserves: CL.SLIGHTLY_LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.FOOD, CL.HIGH], [CARGO_TYPES.WATER, CL.HIGH], [CARGO_TYPES.MEDICINE, CL.ASTRONOMICAL]])),
             },
             {
                 population: CL.SLIGHTLY_LOW,

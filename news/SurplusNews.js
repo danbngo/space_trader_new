@@ -13,7 +13,7 @@ class SurplusNews extends News {
                 reserves: CL.EXTREMELY_HIGH,
                 industry: CL.HIGH,
                 economy: CL.HIGH,
-
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.METAL, CL.EXTREMELY_LOW], [CARGO_TYPES.WATER, CL.EXTREMELY_LOW], [CARGO_TYPES.ISOTOPES, CL.EXTREMELY_LOW]]))
             },
             {
                 industry: CL.SLIGHTLY_HIGH,

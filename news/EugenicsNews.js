@@ -14,6 +14,7 @@ class EugenicsNews extends News {
                 culture: CL.LOW,
                 population: CL.SLIGHTLY_LOW,
                 prestige: CL.LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.MEDICINE, CL.LOW]])),
             },
             {
                 wealth: CL.LOW,

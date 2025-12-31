@@ -53,6 +53,7 @@ const NT = {
     CRACKDOWN: new NewsType('Crackdown', NF.CRIME, 1, 3, 8, 1, [GT.ANARCHY], [GT.POLICE_STATE], []),
     CRIME_WAVE: new NewsType('Crime Wave', NF.CRIME, 1, 3, 8, 1, [GT.POLICE_STATE], [GT.ANARCHY], []),
     CULTURAL_PURGE: new NewsType('Cultural Purge', NF.OPPRESSION, 1, 5, 15, 1, [GT.DEMOCRACY, GT.ANARCHY], [GT.POLICE_STATE, GT.THEOCRACY], []),
+    CULTURAL_RENAISSANCE: new NewsType('Cultural Renaissance', NF.CULTURE, 1, 5, 12, 1, [], [GT.DEMOCRACY, GT.ARISTOCRACY], []),
     CYBER_WARFARE: new NewsType('Cyber Warfare', NF.ESPIONAGE, 1, 3, 10, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.TECHNOCRACY], []),
     DEPRESSION: new NewsType('Depression', NF.ECONOMY, 1, 7, 15, 1, [], [GT.DEMOCRACY, GT.CORPORATISM], []),
     DISARMAMENT: new NewsType('Disarmament', NF.PEACE, 1, 5, 10, 1, [GT.POLICE_STATE], [], []),

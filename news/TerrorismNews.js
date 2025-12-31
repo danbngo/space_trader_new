@@ -8,11 +8,14 @@ class TerrorismNews extends News {
             NT.TERRORISM, planet, targetPlanet
         )
 
+        const buildingsDisabled = rndMembers(targetPlanet.settlement.destroyableBuildings, 1, true)
+
         this.addPlanetEffect(
             {
                 prestige: CL.VERY_LOW,
                 wealth: CL.LOW,
-                security: CL.SLIGHTLY_LOW
+                security: CL.SLIGHTLY_LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.VERY_HIGH]]))
             },
             {
                 prestige: CL.VERY_LOW,
@@ -33,9 +36,11 @@ class TerrorismNews extends News {
 
         this.addTargetPlanetEffect(
             {
+                buildingsDisabled,
                 security: CL.LOW,
                 culture: CL.SLIGHTLY_LOW,
                 economy: CL.SLIGHTLY_LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.HIGH]]))
             },
             {
                 security: CL.HIGH,

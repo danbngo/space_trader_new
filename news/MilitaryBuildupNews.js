@@ -15,13 +15,13 @@ class MilitaryBuildupNews extends News {
                 taxes: CL.HIGH,
                 cargoPriceMultipliers: new CountsMap(new Map([
                     [CARGO_TYPES.WEAPONS, CL.VERY_HIGH],
-                    [CARGO_TYPES.ANTIMATTER, 2]
+                    [CARGO_TYPES.ANTIMATTER, CL.ASTRONOMICAL]
                 ]))
             },
             {
                 industry: CL.LOW,
                 army: CL.VERY_HIGH,
-                mavy: CL.VERY_HIGH,
+                navy: CL.VERY_HIGH,
                 reserves: CL.LOW,
                 taxes: CL.HIGH,
             },

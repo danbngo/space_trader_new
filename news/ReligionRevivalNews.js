@@ -16,7 +16,8 @@ class ReligionRevivalNews extends News {
                 corruption: CL.SLIGHTLY_LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([
                     [CARGO_TYPES.HOLOCUBES, CL.VERY_HIGH],
-                    [CARGO_TYPES.ISOTOPES, CL.EXTREMELY_LOW]
+                    [CARGO_TYPES.ISOTOPES, CL.EXTREMELY_LOW],
+                    [CARGO_TYPES.DRUGS, CL.LOW]
                 ]))
             },
             {

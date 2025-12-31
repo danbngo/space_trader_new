@@ -16,7 +16,7 @@ class EnvironmentalDisasterNews extends News {
                 reserves: CL.LOW,
                 economy: CL.LOW,
                 population: CL.SLIGHTLY_LOW,
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WATER, CL.VERY_HIGH], [CARGO_TYPES.MEDICINE, CL.VERY_HIGH]])),
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.FOOD, CL.HIGH], [CARGO_TYPES.WATER, CL.ASTRONOMICAL], [CARGO_TYPES.MEDICINE, CL.HIGH]])),
             },
             {
                 culture: CL.HIGH,

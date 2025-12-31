@@ -15,7 +15,7 @@ class ColonizationNews extends News {
                 population: CL.LOW,
                 reserves: CL.LOW,
                 taxes: CL.HIGH,
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.FOOD, CL.VERY_HIGH]])),
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.FOOD, CL.VERY_HIGH], [CARGO_TYPES.WATER, CL.VERY_HIGH], [CARGO_TYPES.NANITES, CL.HIGH]])),
             },
             {
                 army: CL.VERY_LOW,

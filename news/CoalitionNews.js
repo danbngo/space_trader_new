@@ -11,6 +11,7 @@ class CoalitionNews extends News {
         this.addPlanetEffect(
             {
                 prestige: CL.LOW,
+                cargoPriceModifiers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.SLIGHTLY_HIGH]])),
             },
             {
                 prestige: CL.HIGH,

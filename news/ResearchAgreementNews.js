@@ -12,7 +12,7 @@ class ResearchAgreementNews extends News {
             {
                 taxes: CL.HIGH,
                 education: CL.SLIGHTLY_HIGH,
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ISOTOPES, 2]]))
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ISOTOPES, CL.ASTRONOMICAL]]))
             },
             {
                 technology: CL.HIGH,
@@ -29,7 +29,7 @@ class ResearchAgreementNews extends News {
             {
                 taxes: CL.HIGH,
                 education: CL.SLIGHTLY_HIGH,
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ISOTOPES, 2]]))  
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ISOTOPES, CL.ASTRONOMICAL]]))  
             },
             {
                 technology: CL.HIGH,

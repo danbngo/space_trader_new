@@ -15,9 +15,7 @@ class PlagueNews extends News {
                 economy: CL.LOW,
                 army: CL.SLIGHTLY_LOW,
                 reserves: CL.SLIGHTLY_LOW,
-                cargoPriceMultipliers: new CountsMap(new Map([
-                    [CARGO_TYPES.MEDICINE, CL.ASTRONOMICAL]
-                ]))
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.MEDICINE, CL.ASTRONOMICAL]]))
             },
             {
                 population: CL.SLIGHTLY_LOW,

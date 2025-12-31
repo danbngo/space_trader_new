@@ -12,7 +12,8 @@ class WarHumanWaveNews extends News {
             {
                 population: CL.LOW,
                 education: CL.SLIGHTLY_LOW,
-                army: CL.SLIGHTLY_LOW
+                army: CL.SLIGHTLY_LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.MEDICINE, CL.EXTREMELY_HIGH]]))
             },
             {
                 population: CL.LOW,

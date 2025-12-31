@@ -18,6 +18,7 @@ class CoupDetatNews extends News {
                 prestige: CL.LOW,
                 taxes: CL.LOW,
                 corruption: CL.HIGH,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.ASTRONOMICAL]])),
             },
             {
                 prestige: CL.LOW,

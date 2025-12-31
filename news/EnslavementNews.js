@@ -13,6 +13,7 @@ class EnslavementNews extends News {
                 industry: CL.SLIGHTLY_HIGH,
                 population: CL.SLIGHTLY_HIGH,
                 prestige: CL.LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.VERY_HIGH]])),
             },
             {
                 industry: CL.HIGH,

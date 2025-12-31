@@ -12,7 +12,7 @@ class TensionsNews extends News {
             {
                 newRelationship: RELATIONSHIP_TYPES.TENSE,
                 military: CL.SLIGHTLY_HIGH,
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.VERY_HIGH]]))
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.VERY_HIGH], [CARGO_TYPES.WEAPONS, CL.HIGH]]))
             },
             {
                 onApply: () => {
@@ -27,7 +27,7 @@ class TensionsNews extends News {
             {
                 newRelationship: RELATIONSHIP_TYPES.TENSE,
                 military: CL.SLIGHTLY_HIGH,
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.VERY_HIGH]]))
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.VERY_HIGH], [CARGO_TYPES.WEAPONS, CL.HIGH]]))
             },
             {
                 onApply: () => {

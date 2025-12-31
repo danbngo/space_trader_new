@@ -11,7 +11,8 @@ class CyberWarfareNews extends News {
         this.addPlanetEffect(
             {
                 prestige: CL.SLIGHTLY_LOW,
-                wealth: CL.SLIGHTLY_LOW
+                wealth: CL.SLIGHTLY_LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.HOLOCUBES, CL.HIGH]])),
             },
             {
                 prestige: CL.SLIGHTLY_LOW,

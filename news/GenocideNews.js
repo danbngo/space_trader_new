@@ -13,7 +13,8 @@ class GenocideNews extends News {
                 population: CL.LOW,
                 prestige: CL.LOW,
                 education: CL.LOW,
-                culture: CL.VERY_LOW
+                culture: CL.VERY_LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.FOOD, CL.LOW], [CARGO_TYPES.WATER, CL.LOW], [CARGO_TYPES.MEDICINE, CL.LOW]])),
             },
             {
                 population: CL.LOW,
