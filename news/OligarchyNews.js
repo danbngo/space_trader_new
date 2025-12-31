@@ -1,41 +1,45 @@
 class OligarchyNews extends News {
     constructor(planet = new Planet()) {
         super(
-            `${coloredName(planet)}'s economy is seized by powerful oligarchs who carve out private fiefdoms!`,
+            `${coloredName(planet)}'s economy and government are falling into the grip of powerful oligarchs!`,
             `${coloredName(planet)}'s oligarchs lose their grip on power as the masses rise up!`,
-            `${coloredName(planet)}'s oligarchs consolidate permanent control over the economy!`,
+            `${coloredName(planet)}'s oligarchs consolidate their insidious control over society!`,
             ``,
             NT.OLIGARCHY, planet
         )
 
         this.addPlanetEffect(
             {
+                corruption: CL.SLIGHTLY_HIGH,
                 economy: CL.SLIGHTLY_LOW,
-                wealth: CL.LOW
+                wealth: CL.SLIGHTLY_LOW,
+                taxes: CL.LOW,
             },
             {
-                economy: CL.SLIGHTLY_LOW
+                corruption: CL.LOW,
+                wealth: CL.SLIGHTLY_HIGH,
+                culture: CL.SLIGHTLY_HIGH
             },
             {
-                economy: CL.NO_REGRESSION,
-                wealth: CL.NO_REGRESSION,
-                crime: CL.HIGH
+                corruption: CL.HIGH,
+                economy: CL.SLIGHTLY_LOW,
+                wealth: CL.LOW,
+                taxes: CL.EXTREMELY_LOW,
+                culture: CL.SLIGHTLY_LOW
             }
         )
     }
 
     determineOutcome() {
         const {planet: p} = this
-        // Oligarchy overthrown if security strong enough to resist
-        this.rollOutcome(p.c.security * 0.6 + 0.4)
+        this.rollOutcome(p.c.culture*p.c.education*p.c.population/p.c.corruption/p.c.economy, CL.SLIGHTLY_HIGH)
     }
 
     isValid() {
         const {planet: p} = this
-        // More likely if economy is high 
-        const ratingsValid = (p.c.economy > CL.HIGH)
-        // Planet must not already have this event
-        const interferingEvent = News.planetHasAnyNews(p, [NT.OLIGARCHY])
+        // More likely if wealth is high 
+        const ratingsValid = (p.c.wealth > CL.HIGH && p.c.corruption > CL.VERY_LOW)
+        const interferingEvent = News.planetHasAnyNews(p, [...NT_GOVERNANCE_PREVENTING, ...NT_ECONOMY_PREVENTING])
         return ratingsValid && !interferingEvent
     }
 }

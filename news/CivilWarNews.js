@@ -2,7 +2,7 @@ class CivilWarNews extends News {
     constructor(planet = new Planet()) {
         super(
             `${coloredName(planet)} is being torn apart by two factions! Civil war has begun!`,
-            `${coloredName(planet)}'s civil war ends with minimal fighting as the two sides are able to reach a political compromise!`,
+            `${coloredName(planet)}'s civil war is averted with minimal fighting as the two sides are able to reach a political compromise!`,
             `${coloredName(planet)}'s civil war ends in mass devastation as one side brutally crushes the other!`,
             '',
             NT.CIVIL_WAR, planet
@@ -24,8 +24,7 @@ class CivilWarNews extends News {
             },
             {
                 governmentType,
-                culture: CL.SLIGHTLY_LOW,
-                corruption: CL.SLIGHTLY_HIGH,
+                culture: CL.SLIGHTLY_HIGH,
             },
             {
                 buildingsDisabled,
@@ -59,7 +58,7 @@ class CivilWarNews extends News {
     isValid() {
         const {planet: p} = this
         //this one really hurts, lets do it if army/security is too high
-        const ratingsValid = (p.c.army > CL.VERY_HIGH || p.c.security > CL.VERY_HIGH) && p.c.culture < CL.VERY_LOW
+        const ratingsValid = (p.c.army > CL.VERY_HIGH || p.c.security > CL.VERY_HIGH) && p.c.culture < CL.LOW
         const interferingEvent =
             News.planetHasAnyNews(p, NT.GOVERNANCE_PREVENTING) ||
             News.planetHasAnyNewsTargeting(p, NT_WARLIKE)

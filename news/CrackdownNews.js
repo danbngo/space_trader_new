@@ -18,8 +18,9 @@ class CrackdownNews extends News {
             },
             {
                 security: CL.HIGH,
-                crime: CL.LOW,
-                corruption: CL.LOW,
+                culture: CL.SLIGHTLY_LOW,
+                crime: CL.EXTREMELY_LOW,
+                corruption: CL.VERY_LOW,
             },
             {
                 security: CL.SLIGHTLY_LOW,

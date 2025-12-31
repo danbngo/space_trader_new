@@ -51,7 +51,7 @@ class LudditismNews extends News {
     isValid() {
         const {planet: p} = this
         //more likely if high tech and population pressure
-        const ratingsValid = p.c.technology > CL.HIGH && p.c.industry > CL.MEDIUM
+        const ratingsValid = p.c.technology > CL.HIGH || p.c.industry > CL.HIGH
         //must not be at engaged in or targeted by any hostile acts
         const interferingEvent = News.planetHasAnyNews(p, NT_DANGEROUS) || News.planetHasAnyNewsTargeting(p, NT_DANGEROUS) 
         const peaceValid = Civilization.getPlanetsAtWarWith(p).length === 0
