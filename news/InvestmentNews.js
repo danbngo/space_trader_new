@@ -1,9 +1,9 @@
 class InvestmentNews extends News {
     constructor(planet = new Planet(), targetPlanet = new Planet()) {
         super(
-            `${coloredName(planet)} sends a massive economic investment to ${coloredName(targetPlanet)}!`,
-            `${coloredName(planet)}'s economic investment in ${coloredName(targetPlanet)} is complete!`,
-            `${coloredName(planet)}'s investment in ${coloredName(targetPlanet)} collapses due to mismanagement!`,
+            `${coloredName(planet)}'s investors send a massive investment to ${coloredName(targetPlanet)} in order to boost their economy!`,
+            `${coloredName(planet)}'s investment in ${coloredName(targetPlanet)} produces great yields for either side!`,
+            `${coloredName(planet)}'s investment in ${coloredName(targetPlanet)} collapses due to fraud and mismanagement! Both sides lose out!`,
             `Tensions force ${coloredName(planet)} to pull investment from ${coloredName(targetPlanet)}!`,
             NT.INVESTMENT, planet, targetPlanet
         )
@@ -11,40 +11,37 @@ class InvestmentNews extends News {
         this.addPlanetEffect(
             {
                 wealth: CL.LOW,
-                reserves: CL.VERY_LOW,
+                inflation: CL.LOW,
+                prestige: CL.SLIGHTLY_HIGH
             },
             {
-                wealth: News.clHalfRegression(CL.LOW),
-                prestige: CL.SLIGHTLY_HIGH,
+                wealth: CL.HIGH,
+                inflation: CL.LOW,
+                prestige: CL.SLIGHTLY_HIGH
             },
             {
-                wealth: CL.NO_REGRESSION,
-                prestige: CL.LOW,
+                wealth: CL.LOW,
+                inflation: CL.LOW
             },
-            {
-                wealth: News.clHalfRegression(CL.LOW),
-                prestige: News.clHalfRegression(CL.SLIGHTLY_HIGH),
-            }
         )
 
         this.addTargetPlanetEffect(
             {
-                reserves: CL.VERY_HIGH,
                 wealth: CL.HIGH,
+                inflation: CL.HIGH,
+                industry: CL.SLIGHTLY_HIGH,
+                econommy: CL.SLIGHTLY_HIGH
             },
             {
+                wealth: CL.HIGH,
+                inflation: CL.HIGH,
                 industry: CL.VERY_HIGH,
-                economy: CL.SLIGHTLY_HIGH,
+                econommy: CL.HIGH,
+                taxes: CL.LOW
             },
             {
-                industry: News.clHalfRegression(CL.VERY_HIGH),
+                corruption: CL.HIGH
             },
-            {
-                reserves: News.clHalfRegression(CL.VERY_HIGH),
-                wealth: News.clHalfRegression(CL.HIGH),
-                industry: News.clHalfRegression(CL.VERY_HIGH),
-                economy: News.clHalfRegression(CL.SLIGHTLY_HIGH),
-            }
         )
     }
 
@@ -53,21 +50,19 @@ class InvestmentNews extends News {
     }
 
     determineOutcome() {
-        const {planet: p, targetPlanet: tp} = this
-        this.rollOutcome((tp.c.economy + tp.c.security) / 2)
+        this.rollOutcome((this.targetPlanet.c.economy/this.targetPlanet.c.corruption/this.targetPlanet.c.crime) / 2)
     }
 
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         //need to have sufficient economy of our own
-        const ratingsValid = p.c.wealth >= CL.SLIGHTLY_HIGH || p.c.reserves/MARKET_AVERAGE_CARGO_PER_TYPE > CL.SLIGHTLY_HIGH
+        const ratingsValid = p.c.wealth > CL.SLIGHTLY_HIGH && tp.c.industry < CL.MEDIUM
         //our economy should be larger than theirs
-        const transferValid = p.c.economy > tp.c.economy && p.c.wealth > tp.c.wealth && p.c.reserves > tp.c.reserves
+        const transferValid = p.c.economy > tp.c.economy && p.c.wealth > tp.c.wealth
         //both planets must be neutral or allies
         const relationshipsValid = Civilization.areAlliesOrNeutral(p, tp)
         //removed most of the requirements for this, can we not have like a marshall plan??
-        const interferingEvent = 
-            News.hasNews(NT.INVESTMENT, p, tp)
+        const interferingEvent = News.planetHasAnyNews(tp, NT_ECONOMY_PREVENTING) || News.hasAnyNewsBidirectional(p, tp, NT_COOPERATION_PREVENTING)
         return transferValid && ratingsValid && relationshipsValid && !interferingEvent
     }
 }

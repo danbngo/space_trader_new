@@ -78,7 +78,7 @@ function handleGamble(casino, prize, cost) {
         }
     } else {
         // Player lost
-        const loseMsg = `The dice didn't roll in your favor this time.<br/><br/>You lost ${formatCredits(cost)}.<br/><br/>Try again?`
+        const loseMsg = `The dice didn't roll in your favor this time.<br/><br/>You lost ${cost}CR.<br/><br/>Try again?`
         showModal('Casino - Better Luck Next Time', loseMsg, [
             ['Continue', () => showCasinoMenu(casino)]
         ])
