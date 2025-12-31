@@ -39,7 +39,7 @@ const NEWS_TYPE_CLASSES = [
     [NT.PLAGUE, PlagueNews],
     [NT.RAIDING, RaidingNews],
     [NT.RESEARCH_AGREEMENT, ResearchAgreementNews],
-    [NT.REVIVAL, RevivalNews],
+    [NT.RELIGION_REVIVAL, ReligionRevivalNews],
     [NT.REVOLUTION, RevolutionNews],
     [NT.SANCTIONS, SanctionsNews],
     [NT.SCARCITY, ScarcityNews],

@@ -76,7 +76,7 @@ const NT = {
     POLICY_CHANGE: new NewsType('Policy Change', NF.POLITICS, 1, 3, 8, 1, [GT.ANARCHY, GT.PUPPET_STATE], [], []),
     RAIDING: new NewsType('Raiding', NF.MILITARY, 1, 15, 30, 1, [GT.DEMOCRACY, GT.PUPPET_STATE], [GT.ANARCHY, GT.ARISTOCRACY, GT.THEOCRACY], []),
     RESEARCH_AGREEMENT: new NewsType('Research Agreement', NF.SCIENCE, 1, 2, 8, 1, [], [GT.TECHNOCRACY, GT.DEMOCRACY], []),
-    REVIVAL: new NewsType('Religious Revival', NF.RELIGION, 1, 10, 20, 1, [GT.TECHNOCRACY], [GT.THEOCRACY], []),
+    RELIGION_REVIVAL: new NewsType('Religious Revival', NF.RELIGION, 1, 10, 20, 1, [GT.TECHNOCRACY], [GT.THEOCRACY], []),
     REVOLUTION: new NewsType('Revolution', NF.POLITICS, 1, 3, 8, 1, [GT.PUPPET_STATE], [], []),
     SANCTIONS: new NewsType('Sanctions', NF.ECONOMY, 1, 3, 15, 1, [GT.ANARCHY, GT.PUPPET_STATE, GT.CORPORATISM], [GT.DEMOCRACY], []),
     SCARCITY: new NewsType('Scarcity', NF.HEALTH_HAZARD, 1, 3, 8, 1, [], [], []),
