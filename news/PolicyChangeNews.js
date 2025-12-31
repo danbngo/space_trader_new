@@ -40,7 +40,7 @@ class PolicyChangeNews extends News {
             '',
             NT.POLICY_CHANGE, planet
         )
-
+        this.oldGovernmentType = planet.c.governmentType
         this.categoryToChange = categoryToChange
         this.oldPolicy = currentPolicy
         this.newPolicy = newPolicy
@@ -101,7 +101,7 @@ class PolicyChangeNews extends News {
     shouldCancel() {
         const {planet: p} = this
         // Policy change cancelled if government type changes (new government abandons reforms)
-        return p.c.governmentType !== p.c._prevGovernmentType
+        return p.c.governmentType !== this.oldGovernmentType
     }
 
     isValid() {

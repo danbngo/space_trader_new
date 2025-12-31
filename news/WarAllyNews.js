@@ -2,7 +2,7 @@ class WarAllyNews extends News {
     constructor(planet = new Planet(), targetPlanet = new Planet()) {
         super(
             `${coloredName(planet)} begins diplomatic efforts to convince its allies to join the fight against ${coloredName(targetPlanet)}!`,
-            `${coloredName(planet)}'s diplomatic efforts lead to its allies joining the fight against ${coloredName(targetPlanet)}!`,
+            `${coloredName(planet)}'s diplomatic efforts lead to some of its allies joining the fight against ${coloredName(targetPlanet)}!`,
             `${coloredName(planet)}'s diplomatic efforts fail to secure its allies' commitment in the fight against ${coloredName(targetPlanet)}!`,
             `Peace between ${coloredName(planet)} and ${coloredName(targetPlanet)} renders alliance negotiations moot!`,
             NT.WAR_ALLY, planet, targetPlanet
@@ -10,15 +10,25 @@ class WarAllyNews extends News {
         
         this.addPlanetEffect({},
             {
-                prestige: CL.NO_REGRESSION
+                wealth: CL.LOW,
+                prestige: CL.LOW,
             },
             {
+                wealth: CL.LOW,
+                prestige: CL.SLIGHTLY_LOW,
+            },
+            {
+                wealth: CL.LOW,
                 prestige: CL.LOW
-            },
-            {
-                prestige: CL.SLIGHTLY_LOW
             }
         )
+        this.completeEffects[0].apply = ()=>{
+            const pan = News.calcPotentialWarAlliesNews(this.planet, this.targetPlanet)
+            const newsToApply = rndMembers(pan, rng(3,1))
+            if (newsToApply.length > 0) {
+                for (const n of newsToApply) n.start()
+            }
+        }
     }
 
     shouldCancel() {
@@ -26,34 +36,23 @@ class WarAllyNews extends News {
     }
 
     determineOutcome() {
-        const {planet: p} = this
         // Success probability based on prestige
-        this.rollOutcome(p.c.prestige * 0.7 + 0.2)
+        const pan = News.calcPotentialWarAlliesNews(this.planet, this.targetPlanet)
+        if (pan.length == 0) {
+            this.failed = true
+        }
+        else this.rollOutcome(this.planet.c.prestige/this.targetPlanet.c.prestige, CL.MEDIUM)
     }
 
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         // Must be at war
         const relationshipsValid = Civilization.areAtWar(p, tp)
-        
-        // Find potential allies
-        const potentialAllies = PLANETS.filter(ap => {
-            if (ap === p || ap === tp) return false
-            if (ap.c.governmentType === GT.PUPPET_STATE) return false
-            if (News.planetHasAnyNews(ap, NT_GOVERNANCE_PREVENTING)) return false
-            if (!Civilization.areAllies(ap, p)) return false
-            return true
-        })
-        
-        if (potentialAllies.length === 0) return false
-        
-        // Set ally planet for this instance
-        this.allyPlanet = rndMember(potentialAllies)
-        
+        const pan = News.calcPotentialWarAlliesNews(p, tp)
+        if (pan.length === 0) return false
         // Must have high prestige to convince allies
-        const prestigeValid = p.c.prestige > CL.HIGH
+        const prestigeValid = p.c.prestige > CL.MEDIUM
         // Can't have ally recruitment already
-        const interferingEvent = News.hasNews(NT.WAR_ALLY, p, tp)
-        return relationshipsValid && prestigeValid && !interferingEvent
+        return relationshipsValid && prestigeValid
     }
 }

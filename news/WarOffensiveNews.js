@@ -1,10 +1,10 @@
 class WarOffensiveNews extends News {
     constructor(planet = new Planet(), targetPlanet = new Planet()) {
         super(
-            `${coloredName(planet)} launches a major offensive against ${coloredName(targetPlanet)}, relying on its generals!`,
-            `${coloredName(planet)}'s brilliant offensive has wreaked havoc on ${coloredName(targetPlanet)}!`,
+            `${coloredName(planet)} launches a major naval offensive against ${coloredName(targetPlanet)}, relying on its generals!`,
+            `${coloredName(planet)}'s brilliant naval offensive has wreaked havoc on ${coloredName(targetPlanet)}!`,
             '',
-            `${coloredName(planet)}'s offensive against ${coloredName(targetPlanet)} is cancelled! Peace treaty signed!`,
+            `${coloredName(planet)}'s naval offensive against ${coloredName(targetPlanet)} is cancelled! Peace treaty signed!`,
             NT.WAR_OFFENSIVE, planet, targetPlanet
         )
 

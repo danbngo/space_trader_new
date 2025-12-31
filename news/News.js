@@ -426,6 +426,10 @@ class News {
         return [news, possibleWarNews, possibleHostileNews]
     }
 
+    static calcPotentialWarAlliesNews(planet = new Planet(), targetPlanet = new Planet()) {
+        const worseningNews = News.calcRelationshipWorseningNews(targetPlanet)[0]
+        return worseningNews.filter(n=>Civilization.areAllies(n.planet, planet))
+    }
 
     /**
      * Rolls for failure based on success chance and difficulty modifier.
