@@ -34,9 +34,7 @@ class WarHumanWaveNews extends News {
     }
 
     shouldCancel() {
-        const {planet: p, targetPlanet: tp} = this
-        // Cancel if war no longer ongoing
-        return p.c.relationships.get(tp) !== RELATIONSHIP_TYPES.WAR
+        return !Civilization.areAtWar(this.planet, this.targetPlanet)
     }
 
     determineOutcome() {
@@ -46,15 +44,12 @@ class WarHumanWaveNews extends News {
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         // Must be at war
-        const relationshipValid = p.c.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
-        // Must have an ongoing war event
-        const hasWar = News.hasNews(NT.WAR, planet, targetPlanet)
-        // Requires high population to sacrifice
+        const relationshipsValid = Civilization.areAtWar(p, tp)
         const populationValid = p.c.population > CL.HIGH
         // we need to be desperate
-        const militaryValid = planet.militaryPower/tp.militaryPower < CL.LOW
+        const militaryValid = p.c.military / tp.c.military < CL.LOW
         // Can't have human wave already
-        const interferingEvent = News.hasNews(NT.WAR_HUMAN_WAVE, planet, targetPlanet)
-        return relationshipValid && hasWar && populationValid && militaryValid && !interferingEvent
+        const interferingEvent = News.hasNews(NT.WAR_HUMAN_WAVE, p, tp)
+        return relationshipsValid && populationValid && militaryValid && !interferingEvent
     }
 }

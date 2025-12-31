@@ -116,7 +116,30 @@ function showPlanetSocietyMenu(planet = new Planet()) {
         const key = rating.name.toLowerCase()
         const value = civilization[key]
         if (value !== undefined) {
-            msg += `${rating.symbol} ${rating.name}: ${describeRating(value)}<br/>`
+            let displayValue = describeRating(value)
+            
+            // Use specific describe functions where available
+            switch(key) {
+                case 'population': displayValue = describePopulation(value); break;
+                case 'territory': displayValue = describeTerritory(value); break;
+                case 'army': displayValue = describeArmy(value); break;
+                case 'navy': displayValue = describeNavy(value); break;
+                case 'industry': displayValue = describeIndustry(value); break;
+                case 'economy': displayValue = describeEconomy(value); break;
+                case 'security': displayValue = describeSecurity(value); break;
+                case 'culture': displayValue = describeCulture(value); break;
+                case 'technology': displayValue = describeTechnology(value); break;
+                case 'education': displayValue = describeEducation(value); break;
+                case 'wealth': displayValue = describeWealth(value); break;
+                case 'reserves': displayValue = describeReserves(value); break;
+                case 'crime': displayValue = describeCrime(value); break;
+                case 'corruption': displayValue = describeCorruption(value); break;
+                case 'inflation': displayValue = describeInflation(value); break;
+                case 'taxes': displayValue = describeTaxes(value); break;
+                case 'prestige': displayValue = describePrestige(value); break;
+            }
+            
+            msg += `${rating.symbol} ${rating.name}: ${displayValue}<br/>`
         }
     }
     

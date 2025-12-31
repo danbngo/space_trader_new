@@ -64,19 +64,15 @@ class RaidingNews extends News {
     determineOutcome() {
         const {planet: p, targetPlanet: tp} = this
         // Raids succeed unless target has strong defense
-        const successProbability = 1 - (tp.c.military / p.c.military) * 0.3
+        const successProbability = 1 - (tp.c.army / p.c.army) * 0.3
         this.rollOutcome(successProbability)
     }
 
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         // More likely if military is high and goods are low
-        const ratingsValid = p.c.military > 1.25 && (planet.c.reserves/MARKET_AVERAGE_CARGO_PER_TYPE < 0.5 || planet.settlement.cryme < 0.5)
-        // Both parties must be at least TENSE (TENSE or WAR)
-        const relationships = [p.c.relationships.get(targetPlanet), tp.c.relationships.get(planet)]
-        const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.TENSE || rel == RELATIONSHIP_TYPES.WAR)
-        // Planet must not already have this event
-        const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.RAIDING])
-        return ratingsValid && relationshipsValid && !interferingEvent
+        const ratingsValid = p.c.army > 1.25 && (p.c.reserves/MARKET_AVERAGE_CARGO_PER_TYPE < 0.5 || p.c.crime < 0.5)
+        const relationshipsValid = Civilization.areAtWar(p, tp)
+        return ratingsValid && relationshipsValid
     }
 }

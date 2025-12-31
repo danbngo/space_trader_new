@@ -35,9 +35,7 @@ class WarScorchedEarthNews extends News {
     }
 
     shouldCancel() {
-        const {planet: p, targetPlanet: tp} = this
-        // Cancel if war no longer ongoing
-        return p.c.relationships.get(tp) !== RELATIONSHIP_TYPES.WAR
+        return !Civilization.areAtWar(this.planet, this.targetPlanet)
     }
 
     determineOutcome() {
@@ -47,15 +45,12 @@ class WarScorchedEarthNews extends News {
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         // Must be at war
-        const relationshipValid = p.c.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
-        // Must have an ongoing war event
-        const hasWar = News.hasNews(NT.WAR, planet, targetPlanet)
-        // Requires high territory to sacrifice
+        const relationshipValid = Civilization.areAtWar(p, tp)
         const territoryValid = p.c.territory > CL.HIGH
         // we need to be desperate
-        const militaryValid = planet.militaryPower/tp.militaryPower < CL.SLIGHTLY_LOW
+        const militaryValid = p.c.military/tp.c.military < CL.SLIGHTLY_LOW
         // Can't have scorched earth already
-        const interferingEvent = News.hasNews(NT.WAR_SCORCHED_EARTH, planet, targetPlanet)
-        return militaryValid && relationshipValid && hasWar && territoryValid && !interferingEvent
+        const interferingEvent = News.hasNews(NT.WAR_SCORCHED_EARTH, p, tp)
+        return militaryValid && relationshipValid && territoryValid && !interferingEvent
     }
 }

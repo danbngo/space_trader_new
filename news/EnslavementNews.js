@@ -69,8 +69,6 @@ class EnslavementNews extends News {
         // our military must be stronger than theirs
         const militaryValid = (p.c.army + p.c.navy) > (tp.c.army + tp.c.navy) * CL.HIGH
         const relationshipsValid = Civilization.areTenseOrAtWar(p, tp)
-        // Both parties must be at least TENSE (TENSE or WAR)
-        // Must not already have this event between these planets
         const interferingEvent = News.hasAnyNewsBidirectional(p, tp, NT_COOPERATIVE)
         return ratingsValid && targetValid && militaryValid && relationshipsValid && !interferingEvent
     }

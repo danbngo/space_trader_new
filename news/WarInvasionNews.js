@@ -33,24 +33,22 @@ class WarInvasionNews extends News {
         )
     }
 
+    shouldCancel() {
+        return !Civilization.areAtWar(this.planet, this.targetPlanet)
+    }
+
     determineOutcome() {
-        const {planet: p, targetPlanet: tp} = this
-        // Check if peace was forced (relationships changed during invasion)
-        const currentRel1 = p.c.relationships.get(targetPlanet)
-        const currentRel2 = tp.c.relationships.get(planet)
-        this.cancelled = (currentRel1 !== RELATIONSHIP_TYPES.WAR || currentRel2 !== RELATIONSHIP_TYPES.WAR)
+        
     }
 
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         // Must be at war
-        const relationshipValid = p.c.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
-        // Must have an ongoing war event
-        const hasWar = News.hasNews(NT.WAR, planet, targetPlanet)
+        const relationshipsValid = Civilization.areAtWar(p, tp)
         // Attacker must have ship  AND ground advantage to launch invasion
         const militaryValid = (p.c.navy > tp.c.navy) && (p.c.army > tp.c.army)
         // Can't have invasion already
-        const interferingEvent = News.hasNews(NT.WAR_INVASION, planet, targetPlanet)
-        return relationshipValid && hasWar && militaryValid && !interferingEvent
+        const interferingEvent = News.hasNews(NT.WAR_INVASION, p, tp)
+        return relationshipsValid && militaryValid && !interferingEvent
     }
 }

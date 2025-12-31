@@ -46,6 +46,12 @@ class RevolutionNews extends News {
         this.rollOutcome((p.c.military + p.c.prestige) / 2)
     }
 
+    shouldCancel() {
+        const {planet: p} = this
+        // Revolution ends if planet becomes puppet state (external control imposed)
+        return p.c.governmentType === GT.PUPPET_STATE
+    }
+
     isValid() {
         const {planet: p} = this
         //a generally robust economy/govt less prone to this

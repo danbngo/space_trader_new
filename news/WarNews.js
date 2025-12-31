@@ -67,27 +67,20 @@ class WarNews extends News {
         this.cancelEffects = this.completeEffects.map(effect => effect.clone())
     }
 
-    determineOutcome() {
-        const {planet: p, targetPlanet: tp} = this
-        // Check if peace was forced (relationships changed during war)
-        const currentRel1 = p.c.relationships.get(targetPlanet)
-        const currentRel2 = tp.c.relationships.get(planet)
-        this.cancelled = (currentRel1 !== RELATIONSHIP_TYPES.WAR || currentRel2 !== RELATIONSHIP_TYPES.WAR)
+    shouldCancel() {
+        return !Civilization.areAtWar(this.planet, this.targetPlanet)
     }
 
-    isValid(ignorePolitics = false) {
+    isValid() {
         const {planet: p, targetPlanet: tp} = this
         //planets tend not to want to go to war with stronger ones
-        const prestigeValid = p.c.prestige > tp.c.prestige || p.c.military > tp.c.military
+        const ratingsValid = p.c.prestige > tp.c.prestige || (p.c.army+p.c.navy) > (tp.c.army+tp.c.navy)
         //must not have same form of government
         const governmentsValid = (p.c.governmentType !== tp.c.governmentType)
         //must not be anarchic or a puppet state
         //planets must be hostile
-        const relationships = [p.c.relationships.get(targetPlanet), tp.c.relationships.get(planet)]
-        const relationshipValid = relationships.every(r => r === RELATIONSHIP_TYPES.TENSE)
-        const interferingEvent = 
-            News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.WAR, ...NT_COOPERATIVE]) ||
-            News.planetHasAnyNews(planet, NT_CRIME_PREVENTING)
-        return (prestigeValid) && (governmentsValid) && (relationshipValid) && !interferingEvent
+        const relationshipValid = Civilization.areTense(p, tp)
+        const interferingEvent = News.hasAnyNewsBidirectional(p, tp, NT_COOPERATIVE) || News.planetHasAnyNews(p, NT_GOVERNANCE_PREVENTING)
+        return (ratingsValid) && (governmentsValid) && (relationshipValid) && !interferingEvent
     }
 }

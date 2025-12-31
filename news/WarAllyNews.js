@@ -22,9 +22,7 @@ class WarAllyNews extends News {
     }
 
     shouldCancel() {
-        const {planet: p, targetPlanet: tp} = this
-        // Cancel if war no longer ongoing
-        return p.c.relationships.get(tp) !== RELATIONSHIP_TYPES.WAR
+        return !Civilization.areAtWar(this.planet, this.targetPlanet)
     }
 
     determineOutcome() {
@@ -36,18 +34,15 @@ class WarAllyNews extends News {
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         // Must be at war
-        const relationshipValid = p.c.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
-        // Must have an ongoing war event
-        const hasWar = News.hasNews(NT.WAR, planet, targetPlanet)
+        const relationshipsValid = Civilization.areAtWar(p, tp)
         
         // Find potential allies
-        const potentialAllies = PLANETS.filter(p => {
-            if (p === planet || p === targetPlanet) return false
-            if (p.c.governmentType === GT.PUPPET_STATE) return false
-            const relWithPlanet = p.c.relationships.get(planet)
-            const relWithTarget = p.c.relationships.get(targetPlanet)
-            return relWithPlanet === RELATIONSHIP_TYPES.ALLY && 
-                   (relWithTarget === RELATIONSHIP_TYPES.NEUTRAL || relWithTarget === RELATIONSHIP_TYPES.TENSE)
+        const potentialAllies = PLANETS.filter(ap => {
+            if (ap === p || ap === tp) return false
+            if (ap.c.governmentType === GT.PUPPET_STATE) return false
+            if (News.planetHasAnyNews(ap, NT_GOVERNANCE_PREVENTING)) return false
+            if (!Civilization.areAllies(ap, p)) return false
+            return true
         })
         
         if (potentialAllies.length === 0) return false
@@ -58,7 +53,7 @@ class WarAllyNews extends News {
         // Must have high prestige to convince allies
         const prestigeValid = p.c.prestige > CL.HIGH
         // Can't have ally recruitment already
-        const interferingEvent = News.hasNews(NT.WAR_ALLY, planet, targetPlanet)
-        return relationshipValid && hasWar && prestigeValid && !interferingEvent
+        const interferingEvent = News.hasNews(NT.WAR_ALLY, p, tp)
+        return relationshipsValid && prestigeValid && !interferingEvent
     }
 }

@@ -46,12 +46,7 @@ class ResearchAgreementNews extends News {
     }
 
     shouldCancel() {
-        const {planet: p, targetPlanet: tp} = this
-        // Cancel if relationship deteriorated
-        const rel1 = p.c.relationships.get(tp)
-        const rel2 = tp.c.relationships.get(p)
-        return rel1 === RELATIONSHIP_TYPES.TENSE || rel1 === RELATIONSHIP_TYPES.WAR ||
-               rel2 === RELATIONSHIP_TYPES.TENSE || rel2 === RELATIONSHIP_TYPES.WAR
+        return Civilization.areAtWar(this.planet, this.targetPlanet)
     }
 
     determineOutcome() {
@@ -64,13 +59,13 @@ class ResearchAgreementNews extends News {
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         //planets must be neutral or allied towards each other
-        const relationships = [p.c.relationships.get(targetPlanet), tp.c.relationships.get(planet)]
+        const relationships = [p.c.relationships.get(tp), tp.c.relationships.get(p)]
         const relationshipsValid = relationships.every(r => r == RELATIONSHIP_TYPES.NEUTRAL || r == RELATIONSHIP_TYPES.ALLY)
         //planets must have similar level of development
         const developmentValid = Math.abs(p.c.education - tp.c.education) < 0.5
         //removed most requirements for this
         const interferingEvent =
-            News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.RESEARCH_AGREEMENT, ...NT_COOPERATION_PREVENTING])
+            News.hasAnyNewsBidirectional(p, tp, NT_COOPERATION_PREVENTING)
         return relationshipsValid && !interferingEvent && developmentValid
     }
 }

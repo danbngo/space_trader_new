@@ -95,6 +95,10 @@ class Civilization {
         return this.taxes * MAX_TAX_RATE / 2 //this.taxes ranges from 0-2
     }
 
+    get military() {
+        return (this.army + this.navy)/2
+    }
+
     /** @param {CivilizationParams} civMultipliers */
     multiply(civMultipliers) {
         for (const cr of CIVILIZATION_RATINGS_ALL) {

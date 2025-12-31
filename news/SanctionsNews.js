@@ -61,11 +61,9 @@ class SanctionsNews extends News {
         const {planet: p, targetPlanet: tp} = this
         //we need a strong economy to pull it off
         const ratingsValid = p.c.economy > CL.HIGH && p.c.wealth >= CL.HIGH
-        //aggressor must be hostile towards victim
-        const aggressorRelationship = p.c.relationships.get(targetPlanet)
-        const relationshipsValid = aggressorRelationship == RELATIONSHIP_TYPES.TENSE
+        const relationshipsValid = Civilization.areTenseOrAtWar(p, tp)
         //blocked if already at war or other hostile actions
-        const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.SANCTIONS, ...NT_COOPERATIVE])
+        const interferingEvent = News.hasAnyNewsBidirectional(p, tp, NT_COOPERATIVE)
         return ratingsValid && relationshipsValid && !interferingEvent
     }
 }

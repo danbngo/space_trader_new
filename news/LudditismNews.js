@@ -33,16 +33,7 @@ class LudditismNews extends News {
     }
 
     shouldCancel() {
-        // Cancel if external military threats emerge
-        for (const p of gs.system.planets) {
-            if (p !== this.planet) {
-                const rel = p.c.relationships.get(this.planet)
-                if (rel === RELATIONSHIP_TYPES.WAR) {
-                    return true
-                }
-            }
-        }
-        return false
+        return Civilization.getPlanetsAtWarWith(this.planet).length > 0
     }
 
     determineOutcome() {
@@ -58,6 +49,7 @@ class LudditismNews extends News {
         const ratingsValid = p.c.technology > CL.HIGH && p.c.industry > CL.MEDIUM
         //must not be at engaged in or targeted by any hostile acts
         const interferingEvent = News.planetHasAnyNews(p, NT_DANGEROUS) || News.planetHasAnyNewsTargeting(p, NT_DANGEROUS) 
-        return ratingsValid && !interferingEvent
+        const peaceValid = Civilization.getPlanetsAtWarWith(p).length === 0
+        return ratingsValid && !interferingEvent && peaceValid
     }
 }

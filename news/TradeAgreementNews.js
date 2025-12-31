@@ -52,12 +52,7 @@ class TradeAgreementNews extends News {
     }
 
     shouldCancel() {
-        const {planet: p, targetPlanet: tp} = this
-        // Cancel for hostile relationships
-        const rel1 = p.c.relationships.get(tp)
-        const rel2 = tp.c.relationships.get(p)
-        return rel1 === RELATIONSHIP_TYPES.TENSE || rel1 === RELATIONSHIP_TYPES.WAR ||
-               rel2 === RELATIONSHIP_TYPES.TENSE || rel2 === RELATIONSHIP_TYPES.WAR
+        return Civilization.areTenseOrAtWar(this.planet, this.targetPlanet)
     }
 
     determineOutcome() {
@@ -72,12 +67,11 @@ class TradeAgreementNews extends News {
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         //planets must be neutral or allied towards each other
-        const relationships = [p.c.relationships.get(targetPlanet), tp.c.relationships.get(planet)]
-        const relationshipsValid = relationships.every(r => r == RELATIONSHIP_TYPES.NEUTRAL || r == RELATIONSHIP_TYPES.ALLY)
+        const relationshipsValid = Civilization.areAlliesOrNeutral(p, tp)
         //dont trade with opposing governments
-        const govTypesValid = p.c.governmentType.opposingType !== tp.c.governmentType && tp.c.governmentType.opposingType !== p.c.governmentType
+        const govTypesValid = !Civilization.areOpposingGovernments(p, tp)
         //trade is only blocked if you're actively hostile to each other. 
-        const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.TRADE_AGREEMENT, ...NT_COOPERATION_PREVENTING])
+        const interferingEvent = News.hasAnyNewsBidirectional(p, tp, [NT.TRADE_AGREEMENT, ...NT_COOPERATION_PREVENTING])
         return govTypesValid && relationshipsValid && !interferingEvent
     }
 }

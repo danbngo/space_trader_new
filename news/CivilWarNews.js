@@ -49,6 +49,13 @@ class CivilWarNews extends News {
         const {planet: p} = this
         this.rollOutcome(p.c.culture/p.c.population/p.c.corruption, CL.HIGH)
     }
+    
+    shouldCancel() {
+        const {planet: p} = this
+        // Civil war ends if planet becomes puppet state (external power ends conflict)
+        return p.c.governmentType === GT.PUPPET_STATE
+    }
+    
     isValid() {
         const {planet: p} = this
         //this one really hurts, lets do it if army/security is too high

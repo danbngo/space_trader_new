@@ -39,7 +39,7 @@ class WarSurrenderNews extends News {
         if (!stillAtWar) return true
         
         // Negotiations succeed unless target suddenly regains strength
-        const rejectProbability = (tp.militaryPower / p.militaryPower) * 0.2
+        const rejectProbability = (tp.c.military / p.c.military) * 0.2
         return Math.random() < rejectProbability
     }
 
@@ -50,13 +50,11 @@ class WarSurrenderNews extends News {
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         // Must be at war
-        const relationshipValid = p.c.relationships.get(targetPlanet) === RELATIONSHIP_TYPES.WAR
-        // Must have an ongoing war event
-        const hasWar = News.hasNews(NT.WAR, planet, targetPlanet)
+        const relationshipValid = Civilization.areAtWar(p, tp)
         // Target should be significantly weaker (losing the war)
-        const militaryValid = planet.militaryPower/tp.militaryPower > CL.HIGH
+        const militaryValid = p.c.military/tp.c.military > CL.HIGH
         // Can't have surrender already
-        const interferingEvent = News.hasNews(NT.WAR_SURRENDER, planet, targetPlanet)
-        return relationshipValid && hasWar && militaryValid && !interferingEvent
+        const interferingEvent = News.hasNews(NT.WAR_SURRENDER, p, tp)
+        return relationshipValid && militaryValid && !interferingEvent
     }
 }

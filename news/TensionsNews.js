@@ -4,7 +4,7 @@ class TensionsNews extends News {
             `Tensions rise between ${coloredName(planet)} and ${coloredName(targetPlanet)}!`,
             `Tensions cease between ${coloredName(planet)} and ${coloredName(targetPlanet)}!`,
             '',
-            `Tensions between ${coloredName(planet)} and ${coloredName(targetPlanet)} de-escalate suddenly!`,
+            `Tensions between ${coloredName(planet)} and ${coloredName(targetPlanet)} are swept aside by other events!`,
             NT.TENSIONS, planet, targetPlanet
         )
 
@@ -41,16 +41,11 @@ class TensionsNews extends News {
         this.cancelEffects = this.completeEffects.map(effect => effect.clone())
     }
 
-    determineOutcome() {
-        const {planet: p, targetPlanet: tp} = this
-        // Check if relationships improved (became allies) or escalated to war
-        const currentRel1 = p.c.relationships.get(targetPlanet)
-        const currentRel2 = tp.c.relationships.get(planet)
-        this.cancelled = (currentRel1 === RELATIONSHIP_TYPES.ALLY || currentRel2 === RELATIONSHIP_TYPES.ALLY || 
-                         currentRel1 === RELATIONSHIP_TYPES.WAR || currentRel2 === RELATIONSHIP_TYPES.WAR)
+    shouldCancel() {
+        return !Civilization.areNeutral(this.planet, this.targetPlanet)
     }
 
-    isValid(ignorePolitics = false) {
+    isValid() {
         const {planet: p, targetPlanet: tp} = this
         //cant have same government type or be a puppet
         const governmentsValid = p.c.governmentType != tp.c.governmentType
@@ -59,15 +54,15 @@ class TensionsNews extends News {
         const powerRatio = p.c.military / tp.c.military
         const powerValid = powerRatio < CL.VERY_HIGH && powerRatio > CL.VERY_LOW
 
-        const relationshipValid = p.c.relationships.get(targetPlanet) == RELATIONSHIP_TYPES.NEUTRAL && tp.c.relationships.get(planet) == RELATIONSHIP_TYPES.NEUTRAL
-        const interferingEvent = News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.TENSIONS, ...NT_COOPERATIVE])
+        const relationshipValid = Civilization.areNeutral(p, tp)
+        const interferingEvent = News.hasAnyNewsBidirectional(p, tp, [NT.TENSIONS, ...NT_COOPERATIVE])
         return (powerValid) && (governmentsValid) && relationshipValid && !interferingEvent
     }
 
     isValidEnd() {
         const {planet: p, targetPlanet: tp} = this
         //can only end if planets are not actively at war
-        const relationshipsValid = p.c.relationships.get(targetPlanet) != RELATIONSHIP_TYPES.WAR && tp.c.relationships.get(planet) != RELATIONSHIP_TYPES.WAR
+        const relationshipsValid = p.c.relationships.get(tp) != RELATIONSHIP_TYPES.WAR && tp.c.relationships.get(p) != RELATIONSHIP_TYPES.WAR
         return relationshipsValid
     }
 }

@@ -111,6 +111,83 @@ function describeTerritory(territoryRating = 0) {
     return `${statColorSpan(roundToPlaces(territoryRating,2), territoryRating)} AU`
 }
 
+function describeArmy(armyRating = 0) {
+    const soldiers = Math.round(Math.pow(10, armyRating) * 100000)
+    return `${statColorSpan(describeLargeNumber(soldiers), armyRating)} soldiers`
+}
+
+function describeNavy(navyRating = 0) {
+    const ships = Math.round(Math.pow(10, navyRating) * 50)
+    return `${statColorSpan(describeLargeNumber(ships), navyRating)} ships`
+}
+
+function describeIndustry(industryRating = 0) {
+    const factories = Math.round(Math.pow(10, industryRating) * 1000)
+    return `${statColorSpan(describeLargeNumber(factories), industryRating)} facilities`
+}
+
+function describeEconomy(economyRating = 0) {
+    const gdp = Math.round(Math.pow(10, economyRating) * 1000000000) // billions
+    return `${statColorSpan(describeLargeNumber(gdp), economyRating)}CR GDP`
+}
+
+function describeSecurity(securityRating = 0) {
+    const officers = Math.round(Math.pow(10, securityRating) * 10000)
+    return `${statColorSpan(describeLargeNumber(officers), securityRating)} officers`
+}
+
+function describeCulture(cultureRating = 0) {
+    const sites = Math.round(Math.pow(10, cultureRating) * 500)
+    return `${statColorSpan(describeLargeNumber(sites), cultureRating)} cultural sites`
+}
+
+function describeTechnology(technologyRating = 0) {
+    const level = Math.round(technologyRating * 10)
+    const tier = level < 5 ? 'Primitive' : level < 10 ? 'Developing' : level < 15 ? 'Advanced' : level < 20 ? 'Cutting-Edge' : 'Revolutionary'
+    return `${statColorSpan(`Tech ${level} (${tier})`, technologyRating)}`
+}
+
+function describeEducation(educationRating = 0) {
+    const literacyRate = Math.min(99.9, 50 + (educationRating * 25))
+    return `${statColorSpan(`${roundToPlaces(literacyRate, 1)}% literacy`, educationRating)}`
+}
+
+function describeWealth(wealthRating = 0) {
+    const avgIncome = Math.round(Math.pow(10, wealthRating) * 10000)
+    return `${statColorSpan(describeLargeNumber(avgIncome), wealthRating)}CR per capita`
+}
+
+function describeReserves(reservesRating = 0) {
+    const stockpile = Math.round(Math.pow(10, reservesRating) * 1000000)
+    return `${statColorSpan(describeLargeNumber(stockpile), reservesRating)} tons stockpiled`
+}
+
+function describeCrime(crimeRating = 0) {
+    const incidents = Math.round(Math.pow(10, crimeRating) * 1000)
+    return `${statColorSpan(describeLargeNumber(incidents), crimeRating, true)} incidents/year`
+}
+
+function describeCorruption(corruptionRating = 0) {
+    const corruptionIndex = Math.round(corruptionRating * 50)
+    return `${statColorSpan(`${corruptionIndex} corruption index`, corruptionRating, true)}`
+}
+
+function describeInflation(inflationRating = 0) {
+    const inflationRate = roundToPlaces((inflationRating - 1) * 100, 1)
+    const sign = inflationRate > 0 ? '+' : ''
+    return `${statColorSpan(`${sign}${inflationRate}% annual`, inflationRating, inflationRating < 1)}`
+}
+
+function describeTaxes(taxesRating = 0) {
+    const taxRate = roundToPlaces(taxesRating * MAX_TAX_RATE / 2 * 100, 1)
+    return `${statColorSpan(`${taxRate}% tax rate`, taxesRating, true)}`
+}
+
+function describePrestige(prestigeRating = 0) {
+    const prestigeLevel = prestigeRating < 0.5 ? 'Pariah' : prestigeRating < 0.8 ? 'Ignored' : prestigeRating < 1.2 ? 'Recognized' : prestigeRating < 1.5 ? 'Respected' : prestigeRating < 2 ? 'Influential' : 'Dominant'
+    return `${statColorSpan(prestigeLevel, prestigeRating)}`
+}
+
 function describeRating(rating = 0, invertColor = false) {
     return `${statColorSpan(roundToPlaces(rating,2), invertColor ? 1/rating : rating)}x`
 }
