@@ -86,6 +86,20 @@ class CountsMap {
         return Array.from(this.counts.keys())
     }
 
+    /**
+     * Normalizes all numeric values so they maintain the same ratios but sum to toAmount.
+     * @param {number} toAmount - The target sum (default 1.0 for percentages)
+     */
+    normalize(toAmount = 1.0) {
+        const currentTotal = this.total
+        if (currentTotal === 0 || currentTotal === toAmount) return
+        
+        const multiplier = toAmount / currentTotal
+        for (const [key, value] of this.counts.entries()) {
+            this.counts.set(key, value * multiplier)
+        }
+    }
+
     //probably not mathematically correct but oh well
     randomSubset(amt = 0) {
         const subset = new CountsMap()

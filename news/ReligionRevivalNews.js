@@ -10,6 +10,14 @@ class ReligionRevivalNews extends News {
 
         this.addPlanetEffect(
             {
+                onApply: () => {
+                    // Increase state religion presence during revival
+                    if (planet.c.stateReligion) {
+                        const currentAmount = planet.c.religions.getAmount(planet.c.stateReligion) || 0
+                        planet.c.religions.setAmount(planet.c.stateReligion, currentAmount + 0.2)
+                        planet.c.religions.normalize()
+                    }
+                },
                 culture: CL.SLIGHTLY_HIGH,
                 population: CL.SLIGHTLY_HIGH,
                 education: CL.SLIGHTLY_LOW,
@@ -21,6 +29,14 @@ class ReligionRevivalNews extends News {
                 ]))
             },
             {
+                onApply: () => {
+                    // Major increase in state religion on success
+                    if (planet.c.stateReligion) {
+                        const currentAmount = planet.c.religions.getAmount(planet.c.stateReligion) || 0
+                        planet.c.religions.setAmount(planet.c.stateReligion, currentAmount + 0.4)
+                        planet.c.religions.normalize()
+                    }
+                },
                 population: CL.HIGH,
                 education: CL.SLIGHTLY_LOW,
                 culture: CL.VERY_HIGH,

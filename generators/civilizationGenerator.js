@@ -72,14 +72,25 @@ function generateCivilization(planet = new Planet()) {
 
     // Generate random religion demographics from star system religions
     const religions = new CountsMap()
+    let stateReligion = null
     if (RELIGIONS && RELIGIONS.length > 0) {
         const numReligions = Math.min(rng(RELIGIONS.length, 1), RELIGIONS.length)
         const selectedReligions = rndMembers(RELIGIONS, numReligions, true)
         
+        // Set state religion first (70% chance if religions exist)
+        if (Math.random() < 0.7 && selectedReligions.length > 0) {
+            stateReligion = rndMember(selectedReligions)
+        }
+        
         // Generate random weights for religions
         const religionWeights = []
         for (let i = 0; i < selectedReligions.length; i++) {
-            religionWeights.push(Math.random() * 10 + 1)
+            // If this is the state religion, give it a much higher weight
+            if (selectedReligions[i] === stateReligion) {
+                religionWeights.push(Math.random() * 15 + 10) // 10-25 weight
+            } else {
+                religionWeights.push(Math.random() * 5 + 1) // 1-6 weight
+            }
         }
         
         // Normalize to sum to 1.0
@@ -87,11 +98,14 @@ function generateCivilization(planet = new Planet()) {
         for (let i = 0; i < selectedReligions.length; i++) {
             religions.setAmount(selectedReligions[i], religionWeights[i] / totalReligionWeight)
         }
+        
+        // Ensure normalized
+        religions.normalize()
     }
 
     return new Civilization({
         planet, governmentType, cargoPriceMultipliers, technology, education, territory, population,
          army, navy, industry, economy, security, culture, prestige, corruption, crime, policies,
-         wealth, reserves, inflation, taxes, races, religions
+         wealth, reserves, inflation, taxes, races, religions, stateReligion
     })
 }

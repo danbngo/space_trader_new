@@ -28,6 +28,7 @@ const FLEET_AI_TYPES = {
     BOUNTY_HUNTER: new FleetAIType('Bounty Hunter AI', BountyHunterFleetAI, FLEET_TYPES.BOUNTY_HUNTERS),
     TOURIST: new FleetAIType('Tourist AI', TouristFleetAI, FLEET_TYPES.TOURISTS),
     COLONIST: new FleetAIType('Colonist AI', ColonistFleetAI, FLEET_TYPES.COLONISTS),
+    SCIENTIST: new FleetAIType('Scientist AI', ScientistFleetAI, FLEET_TYPES.SCIENTISTS),
     SLAVER: new FleetAIType('Slaver AI', SlaverFleetAI, FLEET_TYPES.SLAVERS),
 }
 

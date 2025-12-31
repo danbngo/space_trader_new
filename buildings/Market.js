@@ -33,6 +33,9 @@ class Market extends Building {
     calcBaseCargo() {
         const baseCargo = new CountsMap()
         for (const cargoType of CARGO_TYPES_ALL) {
+            // Skip RELICS - they are never available in standard markets
+            if (cargoType === CARGO_TYPES.RELICS) continue
+            
             //simple supply and demand - as price goes up, availability goes down
             const baseAmount = Math.round(MARKET_AVERAGE_CARGO_PER_TYPE/this.planet.c.cargoPriceMultipliers.getAmount(cargoType))
             const availabilityModifier = this.calcCargoAvailabilityModifier(cargoType)

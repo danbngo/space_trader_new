@@ -35,5 +35,6 @@ const CARGO_TYPES = {
     WEAPONS: new CargoType('Weapons', '🔫', COLORS.Red, 400, true), //civil war, conflict
     DRUGS: new CargoType('Drugs', '💉', COLORS.Orange, 1600, true), //crime
     ANTIMATTER: new CargoType('Antimatter', '⚡', COLORS.Purple, 800, true), //military
+    RELICS: new CargoType('Relics', '🏺', COLORS.Brown, 2000, false), //ancient artifacts, not sold in markets
 }
 const CARGO_TYPES_ALL = Object.values(CARGO_TYPES)
