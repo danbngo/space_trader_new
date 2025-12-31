@@ -8,32 +8,27 @@ class AddictionNews extends News {
             NT.ADDICTION, planet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    security: CL.LOW,
-                    economy: CL.LOW,
-                    crime: CL.HIGH,
-                    corruption: CL.HIGH,
-                    cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.MEDICINE, CL.VERY_HIGH], [CARGO_TYPES.DRUGS, CL.EXTREMELY_HIGH]])),
-                })
-            })
-        ]
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            culture: CL.HIGH,
-        }))
-
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
-            population: CL.SLIGHTLY_LOW,
-            security: CL.LOW,
-            economy: CL.LOW,
-            crime: CL.HIGH,
-            corruption: CL.HIGH,
-            culture: CL.SLIGHTLY_LOW,
-        }))
+                security: CL.LOW,
+                economy: CL.LOW,
+                crime: CL.HIGH,
+                corruption: CL.HIGH,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.MEDICINE, CL.VERY_HIGH], [CARGO_TYPES.DRUGS, CL.EXTREMELY_HIGH]])),
+            },
+            {
+                culture: CL.HIGH,
+            },
+            {
+                population: CL.SLIGHTLY_LOW,
+                security: CL.LOW,
+                economy: CL.LOW,
+                crime: CL.HIGH,
+                corruption: CL.HIGH,
+                culture: CL.SLIGHTLY_LOW,
+            }
+        )
     }
 
     determineOutcome() {

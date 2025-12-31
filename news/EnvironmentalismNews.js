@@ -43,7 +43,7 @@ class EnvironmentalismNews extends News {
         const {planet: p} = this
         //happens when industry is getting out of hand
         const ratingsValid = p.c.industry >= CL.HIGH
-        const interferingEvent = News.planetHasAnyNews(planet, [NT.ENVIRONMENTALISM, ...NT_ECONOMY_PREVENTING])
+        const interferingEvent = News.planetHasAnyNews(p, [NT.ENVIRONMENTALISM, ...NT_ECONOMY_PREVENTING])
         return ratingsValid && !interferingEvent
     }
 }

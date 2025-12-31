@@ -1,36 +1,38 @@
 
 /**
+ * @typedef {Object} CivilizationParams
+ * @property {Planet} [planet] - The planet this civilization belongs to.
+ * @property {GovernmentType} [governmentType] - The type of government of the civilization.
+ * @property {Policies} [policies] - The active policies for this civilization.
+ * @property {CountsMap} [cargoPriceMultipliers] - Multipliers for cargo prices specific to this civilization.
+ * @property {CountsMap} [skillPriceMultipliers] - Multipliers for cargo prices specific to this civilization.
+ * @property {number} [technology] - Quality rating of ships produced by this civilization.
+ * @property {number} [education] - Quality rating of officers from this civilization.
+ * @property {number} [territory] - The territorial reach of the civilization in Astronomical Units (AUs).
+ * @property {number} [population] - The population factor affecting fleet sizes and officer availability.
+ * @property {number} [industry] - Rating affecting merchants, miners, and ship availability.
+ * @property {number} [economy] - Rating affecting merchants, smugglers, and market cargo availability.
+ * @property {number} [security] - Rating affecting police and bounty hunter presence.
+ * @property {number} [culture] - More tourists
+ * @property {number} [prestige] - Effects how planets interact with each other.
+ * @property {number} [army] - More guild officers and army patrols
+ * @property {number} [navy] - More shipyard ships
+ * @property {number} [corruption] - Higher corruption means LOWER black market prices.
+ * @property {number} [crime] - Higher crime means more crime events and black market activity.
+ * @property {number} [wealth] - Overall wealth of the civilization.
+ * @property {number} [reserves] - Higher reserves means more goods in markets, but lower prices
+ * @property {number} [inflation] - Higher costs for everything but also higher sales prices in market
+ * @property {number} [taxes] - Tax rate applied to most transactions (0 to MAX_TAX_RATE).
+ * @property {CountsMap} [religions] - Religious representation on this planet (Religion -> adherent population ratio).
+ */
+
+/**
  * Represents the civilization of a planet, including government type, cargo price modifiers, and various quality and rating attributes.
  * @class Civilization
  */
 class Civilization {
     /**
-     * @param {Object} params - The effect parameters.
-     * @param {Planet} [params.planet] - The planet this civilization belongs to.
-     * @param {GovernmentType} [params.governmentType] - The type of government of the civilization.
-     * @param {Policies} [params.policies] - The active policies for this civilization.
-     * @param {CountsMap} [params.cargoPriceMultipliers] - Multipliers for cargo prices specific to this civilization.
-     * @param {CountsMap} [params.skillPriceMultipliers] - Multipliers for cargo prices specific to this civilization.
-     * @param {number} [params.technology] - Quality rating of ships produced by this civilization.
-     * @param {number} [params.education] - Quality rating of officers from this civilization.
-     * @param {number} [params.territory] - The territorial reach of the civilization in Astronomical Units (AUs).
-     * @param {number} [params.population] - The population factor affecting fleet sizes and officer availability.
-     * @param {number} [params.military] - Rating affecting war fleets, bounty hunters, and bank credits.
-     * @param {number} [params.industry] - Rating affecting merchants, miners, and ship availability.
-     * @param {number} [params.economy] - Rating affecting merchants, smugglers, and market cargo availability.
-     * @param {number} [params.security] - Rating affecting police and bounty hunter presence.
-     * @param {number} [params.culture] - More tourists
-     * @param {number} [params.prestige] - Effects how planets interact with each other.
-     * @param {number} [params.army] - More guild officers and army patrols
-     * @param {number} [params.navy] - More shipyard ships
-     * @param {number} [params.corruption] - Higher corruption means LOWER black market prices.
-     * @param {number} [params.crime] - Higher crime means more crime events and black market activity.
-     * @param {number} [params.wealth] - Overall wealth of the civilization.
-     * @param {number} [params.reserves] - Higher reserves means more goods in markets, but lower prices
-     * @param {number} [params.inflation] - Higher costs for everything but also higher sales prices in market
-     * @param {number} [params.taxes] - Tax rate applied to most transactions (0 to MAX_TAX_RATE).
-     * @param {CountsMap} [params.religions] - Religious representation on this planet (Religion -> adherent population ratio).
-     * 
+     * @param {CivilizationParams} params - The civilization parameters.
      */
     constructor({
         planet = null, governmentType = null, cargoPriceMultipliers = new CountsMap(), skillPriceMultipliers = new CountsMap(),
@@ -93,9 +95,8 @@ class Civilization {
         return this.taxes * MAX_TAX_RATE / 2 //this.taxes ranges from 0-2
     }
 
-    //add(civMultipliers = new Civilization()) {}
-    //subtract(civMultipliers = new Civilization()) {}
-    multiply(civMultipliers = new Civilization()) {
+    /** @param {CivilizationParams} civMultipliers */
+    multiply(civMultipliers) {
         for (const cr of CIVILIZATION_RATINGS_ALL) {
             //if (cr.id === 'cargoPriceMultipliers' || cr.id === 'skillPriceMultipliers') continue;
             const modifier = civMultipliers[cr.id];

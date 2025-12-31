@@ -9,7 +9,7 @@ class CivilWarNews extends News {
         )
 
         const buildingsDisabled = rndMembers(News.calcDestroyableBuildings(this.planet), rng(3, 1), true)
-        const newGovernmentType = Math.random() > .5 ? this.planet.c.governmentType : rndMember(GT_ALL.filter(g => g !== GT.PUPPET_STATE))
+        const governmentType = Math.random() > .5 ? this.planet.c.governmentType : rndMember(GT_ALL.filter(g => g !== GT.PUPPET_STATE))
 
         this.startEffects = [
             new NewsEffect({
@@ -33,12 +33,12 @@ class CivilWarNews extends News {
         ]
 
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        Object.assign(this.completeEffects[0], {newGovernmentType})
+        Object.assign(this.completeEffects[0], {governmentType})
 
         this.failEffects = this.startEffects.map(effect => effect.getInverse())
         Object.assign(this.failEffects[0], {
             buildingsDisabled,
-            newGovernmentType,
+            governmentType,
         })
         this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
             population: CL.VERY_LOW,

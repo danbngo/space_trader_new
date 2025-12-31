@@ -1,53 +1,91 @@
 
 /**
+ * @typedef {CivilizationParams & {
+ *   targetPlanet?: Planet|null,
+ *   newRelationship?: RelationshipType|null,
+ *   buildingsDisabled?: Building[],
+ *   buildingsEnabled?: Building[],
+ *   relationsReset?: boolean,
+ *   forcePeace?: boolean,
+ *   forceWithdrawal?: boolean,
+ *   onApply?: function(number): void
+ * }} NewsEffectParams - The effect parameters extending CivilizationParams with additional NewsEffect-specific properties.
+ */
+
+/**
  * Represents the effects a news event has on a planet's civilization, economy, and relationships.
  * @class NewsEffect
  */
-class NewsEffect {
+class NewsEffect extends Civilization {
     /**
-     * @param {Object} params - The effect parameters.
-     * @param {Planet} [params.planet] - The planet affected.
-     * @param {Planet|null} [params.targetPlanet] - The target planet for relationship changes.
-     * @param {GovernmentType|null} [params.newGovernmentType] - New government type to change to.
-     * @param {RelationshipType|null} [params.newRelationship] - New relationship with target planet.
-     * @param {Civilization} [params.civilizationMultipliers] - Multipliers applied to all the planet's civ scores
-     * @param {Building[]} [params.buildingsDisabled] - Buildings to disable.
-     * @param {Building[]} [params.buildingsEnabled] - Buildings to enable.
-     * @param {boolean} [params.relationsReset] - Whether to reset all relationships to neutral.
-     * @param {boolean} [params.forcePeace] - Whether to cease hostilities TARGETING this planet.
-     * @param {boolean} [params.forceWithdrawal] - Whether to force this planet to withdraw from the solar stage.
-     * @param {function(): void} [params.onApply] - Custom callback function when effect is applied.
+     * @param {NewsEffectParams} params - The effect parameters.
      */
     constructor({
         planet = null,
         targetPlanet = null,
-        // GovernmentType changes
-        newGovernmentType = null,
-        // Relationship changes
+        governmentType = null,
         newRelationship = null,
-        
-        civilizationMultipliers = null,
-        
-        // Building changes
         buildingsDisabled = [],
         buildingsEnabled = [],
-
         relationsReset = false,
         forcePeace = false,
         forceWithdrawal = false,
-
         onApply = ()=>{},
+        cargoPriceMultipliers = new CountsMap(),
+        skillPriceMultipliers = new CountsMap(),
+        technology = 1.0,
+        education = 1.0,
+        territory = 1,
+        population = 1,
+        industry = 1,
+        economy = 1,
+        security = 1,
+        culture = 1,
+        prestige = 1,
+        policies = new Policies(),
+        navy = 1,
+        army = 1,
+        corruption = 1,
+        crime = 1,
+        wealth = 1,
+        reserves = 1,
+        inflation = 1,
+        taxes = 1,
+        religions = new CountsMap()
+
     }) {
-        /** @type {Planet|null} */
-        this.planet = planet;
+        super({
+            cargoPriceMultipliers,
+            skillPriceMultipliers,
+            technology,
+            education,
+            territory,
+            population,
+            industry,
+            economy,
+            security,
+            culture,
+            prestige,
+            policies,
+            navy,
+            army,
+            corruption,
+            crime,
+            wealth,
+            reserves,
+            inflation,  
+            taxes,
+            religions
+        });
+
         /** @type {Planet|null} */
         this.targetPlanet = targetPlanet;
         /** @type {GovernmentType} */
-        this.oldGovernmentType = planet && planet.civilization ? p.c.governmentType : null;
+        this.oldGovernmentType = planet && planet.civilization ? planet.civilization.governmentType : null;
         /** @type {GovernmentType|null} */
-        this.newGovernmentType = newGovernmentType;
+        this.governmentType = governmentType;
         /** @type {RelationshipType|null} */
-        this.oldRelationship = planet && planet.civilization ? p.c.relationships.get(targetPlanet) || null : null;
+        this.oldRelationship = planet && planet.civilization ? planet.civilization.relationships.get(targetPlanet) || null : null;
         /** @type {RelationshipType|null} */
         this.newRelationship = newRelationship;
         /** @type {Building[]} */
@@ -60,26 +98,21 @@ class NewsEffect {
         this.forcePeace = forcePeace;
         /** @type {boolean} */
         this.forceWithdrawal = forceWithdrawal;
-        /** @type {function(): void} */
+        /** @type {function(number): void} */
         this.onApply = onApply //use sparingly!
         this.fired = false;
-        /** @type {Civilization} */
-        this.civilizationMultipliers = civilizationMultipliers;
     }
 
     apply(elapsedYears = 0) {
-        const {planet, targetPlanet, newGovernmentType, newRelationship, 
-            buildingsDisabled, buildingsEnabled, relationsReset, forcePeace, forceWithdrawal, onApply,
-            civilizationMultipliers} = this;
+        const {planet, targetPlanet, governmentType, newRelationship, 
+            buildingsDisabled, buildingsEnabled, relationsReset, forcePeace, forceWithdrawal, onApply} = this;
         this.fired = true;
 
         if (planet && planet.civilization) {
             const {civilization} = planet
-            civilization.governmentType = newGovernmentType || civilization.governmentType;
+            civilization.governmentType = governmentType || civilization.governmentType;
 
-            if (civilizationMultipliers) {
-                civilization.multiply(civilizationMultipliers);
-            }
+            civilization.multiply(this);
            
             //FIRST end any wars to let their completeEffects run
             if (forcePeace) {
@@ -110,32 +143,34 @@ class NewsEffect {
             }
         }
 
-        if (this.onApply) this.onApply();
+        if (this.onApply) this.onApply(elapsedYears);
     }
 
     getInverse() {
+        const inverseCivilization = new Civilization({...this})
         const inverseEffect = new NewsEffect({
+            ...inverseCivilization,
             planet: this.planet,
             targetPlanet: this.targetPlanet,
-            newGovernmentType: this.oldGovernmentType,
+            governmentType: this.oldGovernmentType,
             newRelationship: null,
             onApply: null,
             //newRelationship: this.oldRelationship, //MUST be handled through onApply as relationships can evolve mid-event
             buildingsDisabled: this.buildingsEnabled,
             buildingsEnabled: this.buildingsDisabled,
-            civilizationMultipliers: this.civilizationMultipliers.getInverse(),
             relationsReset: false, //this cant be undone.
         });
         return inverseEffect
     }
 
     clone() {
+        const newCiv = new Civilization({...this});
         return new NewsEffect({
+            ...newCiv,
             planet: this.planet,
             targetPlanet: this.targetPlanet,
-            newGovernmentType: this.newGovernmentType,
+            governmentType: this.governmentType,
             newRelationship: this.newRelationship,
-            civilizationMultipliers: this.civilizationMultipliers.clone(),
             buildingsDisabled: [...this.buildingsDisabled],
             buildingsEnabled: [...this.buildingsEnabled],
             relationsReset: this.relationsReset,
@@ -150,15 +185,15 @@ class NewsEffect {
             return `${label}: ${describeRating(rating, invertColor)} ➜ ${describeRating(newRating, invertColor)}.<br/>`
         }
 
-        const {planet, targetPlanet, newGovernmentType, newRelationship, buildingsDisabled, buildingsEnabled,
+        const {planet, targetPlanet, governmentType, newRelationship, buildingsDisabled, buildingsEnabled,
             relationsReset, forcePeace} = this;
         
         let msg = ''
         
         if (planet && planet.civilization) {
             const {civilization} = planet
-            const {reserves, army, navy, crime, corruption, territory, population, culture, inflation, security, economy, industry, wealth, technology, education, prestige, cargoPriceMultipliers, } = this.civilizationMultipliers
-            if (newGovernmentType) msg += `- GovernmentType: ${coloredName(civilization.governmentType)} ➜ ${coloredName(newGovernmentType)}.<br/>`
+            const {reserves, army, navy, crime, corruption, territory, population, culture, inflation, security, economy, industry, wealth, technology, education, prestige, cargoPriceMultipliers, } = this
+            if (governmentType) msg += `- GovernmentType: ${coloredName(civilization.governmentType)} ➜ ${coloredName(governmentType)}.<br/>`
             if (relationsReset) msg += `- All relationships reset to neutral.<br/>`
             if (forcePeace) msg += `- All hostilities towards this planet have ceased.<br/>`
             if (this.forceWithdrawal) msg += `- All interactions with other planets have ceased.<br/>`
@@ -180,7 +215,7 @@ class NewsEffect {
 
             if (population !== 1.0) msg += `- Population: ${describePopulation(civilization.population)} ➜ ${describePopulation(civilization.population*population)}.<br/>`
             if (territory !== 1.0) msg += `- Territory: ${describeTerritory(civilization.territory)} ➜ ${describeTerritory(civilization.territory*territory)}.<br/>`
-            if (prestige !== 1.0) msg += dscr('- Prestige', c.prestige, c.prestige*prestige)
+            if (prestige !== 1.0) msg += dscr('- Prestige', civilization.prestige, civilization.prestige*prestige)
             if (security !== 1.0) msg += dscr('- Security', civilization.security, civilization.security*security)
             if (economy !== 1.0) msg += dscr('- Economy', civilization.economy, civilization.economy*economy)
             if (industry !== 1.0) msg += dscr('- Industry', civilization.industry, civilization.industry*industry)

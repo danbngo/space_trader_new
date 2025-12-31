@@ -8,35 +8,25 @@ class ArmsDealNews extends News {
             NT.ARMS_DEAL, planet, targetPlanet
         )
 
-        this.startEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    prestige: CL.SLIGHTLY_LOW,
-                    taxes: CL.SLIGHTLY_HIGH
-                })
-            }),
-        ]
-
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
+        this.addEffect({
+            taxes: CL.HIGH
+        }, {
             army: CL.HIGH, // gain military knowledge
             navy: CL.HIGH, // gain new ships
+            reserves: CL.HIGH,
             technology: CL.SLIGHTLY_HIGH,
-            taxes: CL.HIGH
-        }))
-        this.completeEffects[1].civilizationMultipliers.multiply(new Civilization({
+            taxes: CL.VERY_HIGH,
+        }, {
+            prestige: CL.SLIGHTLY_LOW,
+        })
+        
+        this.addEffect({}, {
+            planet: this.targetPlanet,
+            targetPlanet: this.planet,
             wealth: CL.HIGH, // payment received
             navy: CL.LOW, // sold ships
             army: CL.LOW,
-        }))
-
-        // Failed: seller refuses to sell
-        this.failEffects = []
-
-        // Cancelled: deal cancelled midway
-        this.cancelEffects = []
+        })
     }
 
     shouldCancel() {
@@ -44,21 +34,22 @@ class ArmsDealNews extends News {
     }
 
     determineOutcome() {
-        // Fail if targetPlanet refuses to sell - based on planet's low prestige/credits
-        // Lower prestige and credits increase the chance seller refuses
-        this.rollOutcome(this.planet.c.prestige*this.planet.c.wealth, CL.MEDIUM)
+        this.rollOutcome(this.planet.c.prestige*this.planet.c.taxes, CL.MEDIUM)
     }
 
     isValid() {
         const {planet: p, targetPlanet: tp} = this
+        const ratingsValid = 
         //targetPlanet (seller) needs to have sufficient military to sell
-        const ratingsValid = (tp.c.navy >= CL.SLIGHTLY_HIGH && tp.c.technology > CL.SLIGHTLY_HIGH)
+            (tp.c.navy >= CL.SLIGHTLY_HIGH || tp.c.army > CL.SLIGHTLY_HIGH) && (tp.c.technology > CL.SLIGHTLY_HIGH)
         //seller's military should be larger than purchaser's
-        const transferValid = tp.c.navy/p.c.navy > CL.SLIGHTLY_HIGH && tp.c.technology/p.c.technology > CL.SLIGHTLY_HIGH
+            && (tp.c.navy/p.c.navy > CL.SLIGHTLY_HIGH || tp.c.army/p.c.army > CL.SLIGHTLY_HIGH) && tp.c.technology/p.c.technology > CL.SLIGHTLY_HIGH
+        //gotta have enough taxes to buy
+            && (p.c.taxes > CL.MEDIUM)
         //both planets must be neutral or allies
         const relationshipsValid = Civilization.areAlliesOrNeutral(p, tp)
         const interferingEvent = 
             News.hasAnyNewsBidirectional(p, tp, NT_COOPERATION_PREVENTING)
-        return transferValid && ratingsValid && relationshipsValid && !interferingEvent
+        return ratingsValid && relationshipsValid && !interferingEvent
     }
 }

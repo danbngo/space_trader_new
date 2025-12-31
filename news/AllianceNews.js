@@ -8,37 +8,30 @@ class AllianceNews extends News {
             NT.ALLIANCE, planet, targetPlanet
         )
 
-        this.startEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                targetPlanet: this.targetPlanet,
-                newRelationship: RELATIONSHIP_TYPES.ALLY,
-                civilizationMultipliers: new Civilization({
-                    security: CL.SLIGHTLY_HIGH,
-                    economy: CL.SLIGHTLY_HIGH,
-                    technology: CL.SLIGHTLY_HIGH,
-                    prestige: CL.SLIGHTLY_HIGH,
-                    army: CL.SLIGHTLY_HIGH,
-                    navy: CL.SLIGHTLY_HIGH
-                })
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                targetPlanet: this.planet,
-                newRelationship: RELATIONSHIP_TYPES.ALLY,
-                civilizationMultipliers: new Civilization({
-                    security: CL.SLIGHTLY_HIGH,
-                    economy: CL.SLIGHTLY_HIGH,
-                    technology: CL.SLIGHTLY_HIGH,
-                    prestige: CL.SLIGHTLY_HIGH,
-                    army: CL.SLIGHTLY_HIGH,
-                    navy: CL.SLIGHTLY_HIGH
-                })
-            })
-        ]
+        this.addEffect({
+            planet: this.planet,
+            targetPlanet: this.targetPlanet,
+            newRelationship: RELATIONSHIP_TYPES.ALLY,
+            security: CL.SLIGHTLY_HIGH,
+            economy: CL.SLIGHTLY_HIGH,
+            technology: CL.SLIGHTLY_HIGH,
+            prestige: CL.SLIGHTLY_HIGH,
+            army: CL.SLIGHTLY_HIGH,
+            navy: CL.SLIGHTLY_HIGH
+        })
 
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        //this is the only relationship that cannot be dissolved mid-event
+        this.addEffect({
+            planet: this.targetPlanet,
+            targetPlanet: this.planet,
+            newRelationship: RELATIONSHIP_TYPES.ALLY,
+            security: CL.SLIGHTLY_HIGH,
+            economy: CL.SLIGHTLY_HIGH,
+            technology: CL.SLIGHTLY_HIGH,
+            prestige: CL.SLIGHTLY_HIGH,
+            army: CL.SLIGHTLY_HIGH,
+            navy: CL.SLIGHTLY_HIGH
+        })
+
         this.completeEffects[0].onApply = ()=>{
             if (this.planet.c.relationships.get(this.targetPlanet) == RELATIONSHIP_TYPES.ALLY) {
                 this.planet.c.relationships.set(this.targetPlanet, RELATIONSHIP_TYPES.NEUTRAL)
@@ -47,9 +40,6 @@ class AllianceNews extends News {
                 this.targetPlanet.c.relationships.set(this.planet, RELATIONSHIP_TYPES.NEUTRAL)
             }
         }
-
-        // Cancelled: relationship soured before alliance solidified
-        this.cancelEffects = []
     }
 
     determineOutcome() {

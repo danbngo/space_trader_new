@@ -1,11 +1,11 @@
 class RevolutionNews extends News {
     constructor(planet = new Planet()) {
-        const newGovernmentType = rndMember(GT_ALL.filter(g => g !== p.c.governmentType && g !== GT.PUPPET_STATE));
+        const governmentType = rndMember(GT_ALL.filter(g => g !== p.c.governmentType && g !== GT.PUPPET_STATE));
         
         super(
             p.c.governmentType != GT.ANARCHY ? `${coloredName(planet)}'s people have deposed the government and begin a glorious revolution!` :
             `${coloredName(planet)}'s people clamor for a government to take the reigns and end the anarchy they live in!`,
-            `${coloredName(planet)} stabilizes under new government: ${coloredName(newGovernmentType)}!`,
+            `${coloredName(planet)} stabilizes under new government: ${coloredName(governmentType)}!`,
             `${coloredName(planet)}'s revolution fails! Chaos reigns!`,
             '',
             NT.REVOLUTION, planet
@@ -16,7 +16,7 @@ class RevolutionNews extends News {
         this.startEffects = [
             new NewsEffect({
                 planet: this.planet,
-                newGovernmentType: GT.ANARCHY ? null : GT.ANARCHY,
+                governmentType: GT.ANARCHY ? null : GT.ANARCHY,
                 civilizationMultipliers: new Civilization({
                     military: CL.VERY_LOW,
                     security: CL.VERY_LOW,
@@ -32,7 +32,7 @@ class RevolutionNews extends News {
         // Don't revert the government type back afterwards
         this.completeEffects = this.startEffects.map(effect => effect.getInverse())
         // Government related ratings randomize a bit after a revolution
-        this.completeEffects[0].newGovernmentType = newGovernmentType
+        this.completeEffects[0].governmentType = governmentType
         this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
             military: (rng(0.5, 1.5, false) + 1) / 2,
             security: (rng(0.5, 1.5, false) + 1) / 2,
@@ -42,7 +42,7 @@ class RevolutionNews extends News {
         }))
 
         this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.failEffects[0].newGovernmentType = GT.ANARCHY
+        this.failEffects[0].governmentType = GT.ANARCHY
         this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
             military: CL.NO_REGRESSION,
             security: CL.NO_REGRESSION,

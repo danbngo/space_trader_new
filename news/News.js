@@ -56,6 +56,23 @@ class News {
         this.onTick = (elapsedYears = 1)=>{}
     }
 
+    /** 
+     * @param {NewsEffectParams} startEffect 
+     * @param {NewsEffectParams|null} [multiplyCompleteBy]
+     * @param {NewsEffectParams|null} [multiplyFailBy]
+     * @param {NewsEffectParams|null} [multiplyCancelBy]
+    */
+    addEffect(startEffect, multiplyCompleteBy, multiplyFailBy, multiplyCancelBy) {
+        const fx = new NewsEffect(startEffect)
+        this.startEffects.push(fx)
+        this.completeEffects.push(fx.getInverse())
+        this.failEffects.push(fx.getInverse())
+        this.cancelEffects.push(fx.getInverse())
+        if (multiplyCompleteBy) this.completeEffects[this.completeEffects.length-1].multiply(multiplyCompleteBy)
+        if (multiplyFailBy) this.failEffects[this.failEffects.length-1].multiply(multiplyFailBy)
+        if (multiplyCancelBy) this.cancelEffects[this.cancelEffects.length-1].multiply(multiplyCancelBy)
+    }
+
     /**
      * Calculates a half-regression value for civilization level changes.
      * @param {number} magnitude - The magnitude of the effect (default 1.0).

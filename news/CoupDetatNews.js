@@ -4,10 +4,10 @@ class CoupDetatNews extends News {
         const availableGovTypes = GT_ALL.filter(
             gov => gov !== GT.PUPPET_STATE && gov !== targetPlanet.c.governmentType
         )
-        const newGovernmentType = availableGovTypes[Math.floor(Math.random() * availableGovTypes.length)]
+        const governmentType = availableGovTypes[Math.floor(Math.random() * availableGovTypes.length)]
         super(
             `${coloredName(planet)} orchestrates a coup attempt in ${coloredName(targetPlanet)}! Guerillas invade the capital!`,
-            `${coloredName(planet)}'s coup in ${coloredName(targetPlanet)} succeeds! A new ${newGovernmentType.name} government is established!`,
+            `${coloredName(planet)}'s coup in ${coloredName(targetPlanet)} succeeds! A new ${governmentType.name} government is established!`,
             `${coloredName(planet)}'s coup attempt in ${coloredName(targetPlanet)} is crushed by loyalist forces!`,
             ``,
             NT.COUP_DETAT, planet, targetPlanet
@@ -26,7 +26,7 @@ class CoupDetatNews extends News {
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                newGovernmentType: GT.ANARCHY ? null : GT.ANARCHY,
+                governmentType: GT.ANARCHY ? null : GT.ANARCHY,
                 civilizationMultipliers: new Civilization({
                     army: CL.VERY_LOW,
                     navy: CL.VERY_LOW,
@@ -60,7 +60,7 @@ class CoupDetatNews extends News {
         Object.assign(this.completeEffects[1], {
             forcePeace: true,
             newRelationship: RELATIONSHIP_TYPES.NEUTRAL,
-            newGovernmentType
+            governmentType
         })
 
         // Failed: coup crushed, instigator embarrassed

@@ -22,7 +22,7 @@ class WarSubjugationNews extends News {
             }),
             new NewsEffect({
                 planet: this.targetPlanet,
-                newGovernmentType: GT.PUPPET_STATE,
+                governmentType: GT.PUPPET_STATE,
                 newRelationship: RELATIONSHIP_TYPES.SUBJECT,
                 civilizationMultipliers: new Civilization({
                     territory: CL.VERY_LOW,
