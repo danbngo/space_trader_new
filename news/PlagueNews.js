@@ -2,7 +2,7 @@ class PlagueNews extends News {
     constructor(planet = new Planet()) {
         super(
             `${coloredName(planet)} is struck by a vicious plague! The population is being decimated!`,
-            `${coloredName(planet)} develops a cure for their plague!`,
+            `${coloredName(planet)} rushes out a cure for their plague, saving millions of lives!`,
             `${coloredName(planet)} fails to contain the plague! The death toll is catastrophic!`,
             '',
             NT.PLAGUE, planet
@@ -16,7 +16,7 @@ class PlagueNews extends News {
                 army: CL.SLIGHTLY_LOW,
                 reserves: CL.SLIGHTLY_LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([
-                    [CARGO_TYPES.MEDICINE, CL.EXTREMELY_HIGH]
+                    [CARGO_TYPES.MEDICINE, CL.ASTRONOMICAL]
                 ]))
             },
             {
