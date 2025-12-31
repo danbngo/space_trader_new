@@ -8,29 +8,23 @@ class CrimeWaveNews extends News {
             NT.CRIME_WAVE, planet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    security: CL.LOW,
-                    crime: CL.VERY_HIGH,
-                    corruption: CL.HIGH,
-                    cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.EXTREMELY_LOW], [CARGO_TYPES.DRUGS, CL.EXTREMELY_LOW]])),
-                })
-            })
-        ]
-
-        this.completeEffects = this.startEffects.map(fx=>fx.getInverse())
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            security: CL.HIGH,
-        }))
-
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
-            security: CL.LOW,
-            crime: CL.EXTREMELY_HIGH,
-            corruption: CL.VERY_HIGH,
-        }))
+                security: CL.LOW,
+                crime: CL.VERY_HIGH,
+                corruption: CL.HIGH,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.EXTREMELY_LOW], [CARGO_TYPES.DRUGS, CL.EXTREMELY_LOW]])),
+            },
+            {
+                security: CL.HIGH,
+            },
+            {
+                security: CL.LOW,
+                crime: CL.EXTREMELY_HIGH,
+                corruption: CL.VERY_HIGH,
+            }
+        )
     }
 
     determineOutcome() {

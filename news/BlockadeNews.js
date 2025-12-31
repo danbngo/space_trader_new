@@ -8,41 +8,36 @@ class BlockadeNews extends News {
             NT.BLOCKADE, planet, targetPlanet
         )
 
-        this.startEffects = [
-            new NewsEffect({
-                planet: this.planet,
-                targetPlanet: this.targetPlanet,
-                civilizationMultipliers: new Civilization({
-                    navy: CL.VERY_LOW,
-                })
-            }),
-            new NewsEffect({
-                planet: this.targetPlanet,
-                targetPlanet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    prestige: CL.SLIGHTLY_LOW,
-                    economy: CL.SLIGHTLY_LOW,
-                    inflation: CL.VERY_HIGH,
-                    reserves: CL.SLIGHTLY_LOW,
-                    //cargoPriceModifiers - no need, EVERYTHING is more expensivve
-                })
-            })
-        ]
+        this.addPlanetEffect(
+            {
+                navy: CL.VERY_LOW,
+            },
+            {
+                prestige: CL.SLIGHTLY_HIGH,
+            },
+            {
+                navy: CL.LOW,
+                prestige: CL.SLIGHTLY_LOW
+            }
+        )
 
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            prestige: CL.SLIGHTLY_HIGH,
-        }))
-        this.completeEffects[1].civilizationMultipliers.multiply(new Civilization({
-            prestige: CL.SLIGHTLY_LOW,
-            economy: CL.LOW,
-            inflation: CL.HIGH,
-            reserves: CL.LOW,
-        }))
-
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        
-        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
+        this.addTargetPlanetEffect(
+            {
+                prestige: CL.SLIGHTLY_LOW,
+                economy: CL.SLIGHTLY_LOW,
+                inflation: CL.VERY_HIGH,
+                reserves: CL.SLIGHTLY_LOW,
+            },
+            {
+                prestige: CL.SLIGHTLY_LOW,
+                economy: CL.LOW,
+                inflation: CL.HIGH,
+                reserves: CL.LOW,
+            },
+            {
+                prestige: CL.SLIGHTLY_HIGH,
+            }
+        )
     }
 
     shouldCancel() {

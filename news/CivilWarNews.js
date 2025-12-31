@@ -11,50 +11,44 @@ class CivilWarNews extends News {
         const buildingsDisabled = rndMembers(News.calcDestroyableBuildings(this.planet), rng(3, 1), true)
         const governmentType = Math.random() > .5 ? this.planet.c.governmentType : rndMember(GT_ALL.filter(g => g !== GT.PUPPET_STATE))
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    territory: CL.SLIGHTLY_LOW,
-                    army: CL.VERY_LOW,
-                    navy: CL.VERY_LOW,
-                    security: CL.VERY_LOW,
-                    economy: CL.VERY_LOW,
-                    industry: CL.VERY_LOW,
-                    reserves: CL.VERY_LOW,
-                    inflation: CL.HIGH,
-                    crime: CL.SLIGHTLY_HIGH,
-                    corruption: CL.SLIGHTLY_HIGH,
-                    wealth: CL.LOW,
-                    prestige: CL.LOW,
-                    cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.ASTRONOMICAL], [CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_HIGH]])),
-                })
-            })
-        ]
-
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        Object.assign(this.completeEffects[0], {governmentType})
-
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        Object.assign(this.failEffects[0], {
-            buildingsDisabled,
-            governmentType,
-        })
-        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
-            population: CL.VERY_LOW,
-            territory: CL.SLIGHTLY_LOW,
-            army: CL.LOW,
-            navy: CL.LOW,
-            security: CL.LOW,
-            economy: CL.LOW,
-            industry: CL.LOW,
-            reserves: CL.LOW,
-            inflation: CL.NO_REGRESSION,
-            crime: CL.HIGH,
-            wealth: CL.LOW,
-            prestige: CL.LOW,
-            taxes: CL.HIGH,
-        }))
+                territory: CL.SLIGHTLY_LOW,
+                army: CL.VERY_LOW,
+                navy: CL.VERY_LOW,
+                security: CL.VERY_LOW,
+                economy: CL.VERY_LOW,
+                industry: CL.VERY_LOW,
+                reserves: CL.VERY_LOW,
+                inflation: CL.HIGH,
+                crime: CL.SLIGHTLY_HIGH,
+                corruption: CL.SLIGHTLY_HIGH,
+                wealth: CL.LOW,
+                prestige: CL.LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.ASTRONOMICAL], [CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_HIGH]])),
+            },
+            {
+                governmentType,
+            },
+            {
+                buildingsDisabled,
+                governmentType,
+                population: CL.VERY_LOW,
+                territory: CL.SLIGHTLY_LOW,
+                army: CL.LOW,
+                navy: CL.LOW,
+                security: CL.LOW,
+                economy: CL.LOW,
+                industry: CL.LOW,
+                reserves: CL.LOW,
+                inflation: CL.NO_REGRESSION,
+                crime: CL.HIGH,
+                wealth: CL.LOW,
+                prestige: CL.LOW,
+                taxes: CL.HIGH,
+            }
+        )
     }
 
     determineOutcome() {

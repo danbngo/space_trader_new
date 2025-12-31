@@ -8,38 +8,31 @@ class CivilStrifeNews extends News {
             NT.CIVIL_STRIFE, planet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    army: CL.SLIGHTLY_LOW,
-                    security: CL.VERY_LOW,
-                    economy: CL.LOW,
-                    industry: CL.VERY_LOW,
-                    wealth: CL.LOW,
-                    reserves: CL.LOW,
-                    prestige: CL.SLIGHTLY_LOW,
-                    crime: CL.HIGH,
-                    cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.VERY_HIGH]])),
-                })
-
-            })
-        ]
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            culture: CL.HIGH
-        }))
-        //some lingering security and prestige decrease and destroyed goods
-
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
-            army: CL.SLIGHTLY_LOW,
-            security: CL.LOW,
-            crime: CL.SLIGHTLY_HIGH,
-            prestige: CL.LOW,
-            culture: CL.LOW,
-            corruption: CL.SLIGHTLY_HIGH,
-        }))
+                army: CL.SLIGHTLY_LOW,
+                security: CL.VERY_LOW,
+                economy: CL.LOW,
+                industry: CL.VERY_LOW,
+                wealth: CL.LOW,
+                reserves: CL.LOW,
+                prestige: CL.SLIGHTLY_LOW,
+                crime: CL.HIGH,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.VERY_HIGH]])),
+            },
+            {
+                culture: CL.HIGH,
+            },
+            {
+                army: CL.SLIGHTLY_LOW,
+                security: CL.LOW,
+                crime: CL.SLIGHTLY_HIGH,
+                prestige: CL.LOW,
+                culture: CL.LOW,
+                corruption: CL.SLIGHTLY_HIGH,
+            }
+        )
     }
 
     determineOutcome() {

@@ -8,74 +8,67 @@ class EnslavementNews extends News {
             NT.ENSLAVEMENT, planet, targetPlanet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addEffect(
+            {
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
-                civilizationMultipliers: new Civilization({
-                    economy: CL.SLIGHTLY_HIGH,
-                    industry: CL.SLIGHTLY_HIGH,
-                    population: CL.SLIGHTLY_HIGH,
-                    security: CL.LOW,
-                    navy: CL.LOW,
-                    army: CL.LOW,
-                    prestige: CL.LOW,
-                    culture: CL.LOW,
-                    corruption: CL.HIGH,
-                })
-            }),
-            new NewsEffect({
+                economy: CL.SLIGHTLY_HIGH,
+                industry: CL.SLIGHTLY_HIGH,
+                population: CL.SLIGHTLY_HIGH,
+                security: CL.LOW,
+                navy: CL.LOW,
+                army: CL.LOW,
+                prestige: CL.LOW,
+                culture: CL.LOW,
+                corruption: CL.HIGH,
+            },
+            {
+                economy: CL.HIGH,
+                industry: CL.HIGH,
+                population: CL.HIGH,
+                security: CL.LOW,
+                prestige: CL.LOW,
+                culture: CL.LOW,
+                corruption: CL.HIGH,
+            },
+            {
+                population: CL.LOW,
+                security: CL.VERY_LOW,
+                economy: CL.LOW,
+                industry: CL.LOW,
+                prestige: CL.VERY_LOW,
+            },
+            {
+                security: CL.SLIGHTLY_LOW,
+                navy: CL.SLIGHTLY_LOW,
+                army: CL.SLIGHTLY_LOW,
+                prestige: CL.SLIGHTLY_LOW,
+                culture: CL.SLIGHTLY_LOW,
+                corruption: CL.SLIGHTLY_HIGH,
+            }
+        )
+
+        this.addEffect(
+            {
                 planet: this.targetPlanet,
                 targetPlanet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    population: CL.SLIGHTLY_LOW,
-                    security: CL.SLIGHTLY_LOW,
-                    education: CL.SLIGHTLY_LOW,
-                    prestige: CL.LOW,
-                })
-            })
-        ]
-
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            economy: CL.HIGH,
-            industry: CL.HIGH,
-            population: CL.HIGH,
-            security: CL.LOW,
-            prestige: CL.LOW,
-            culture: CL.LOW,
-            corruption: CL.HIGH,
-        }))
-        this.completeEffects[1].civilizationMultipliers.multiply(new Civilization({
-            population: CL.LOW,
-            security: CL.LOW,
-            education: CL.LOW,
-            army: CL.SLIGHTLY_LOW,
-            prestige: CL.VERY_LOW
-        }))
-
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
-            population: CL.LOW,
-            security: CL.VERY_LOW,
-            economy: CL.LOW,
-            industry: CL.LOW,
-            prestige: CL.VERY_LOW,
-        }))
-        this.failEffects[1].civilizationMultipliers.multiply(new Civilization({
-            culture: CL.HIGH,
-            prestige: CL.HIGH,
-        }))
-
-        this.cancelEffects = this.startEffects.map(effect => effect.getInverse())
-        this.cancelEffects[0].civilizationMultipliers.multiply(new Civilization({
-            security: CL.SLIGHTLY_LOW,
-            navy: CL.SLIGHTLY_LOW,
-            army: CL.SLIGHTLY_LOW,
-            prestige: CL.SLIGHTLY_LOW,
-            culture: CL.SLIGHTLY_LOW,
-            corruption: CL.SLIGHTLY_HIGH,
-        }))
+                population: CL.SLIGHTLY_LOW,
+                security: CL.SLIGHTLY_LOW,
+                education: CL.SLIGHTLY_LOW,
+                prestige: CL.LOW,
+            },
+            {
+                population: CL.LOW,
+                security: CL.LOW,
+                education: CL.LOW,
+                army: CL.SLIGHTLY_LOW,
+                prestige: CL.VERY_LOW
+            },
+            {
+                culture: CL.HIGH,
+                prestige: CL.HIGH,
+            }
+        )
     }
 
     shouldCancel() {

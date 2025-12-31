@@ -13,67 +13,56 @@ class CoupDetatNews extends News {
             NT.COUP_DETAT, planet, targetPlanet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addEffect(
+            {
                 planet: this.planet,
                 targetPlanet: this.targetPlanet,
-                //newRelationship: RELATIONSHIP_TYPES.NEUTRAL,
-                civilizationMultipliers: new Civilization({
-                    prestige: CL.LOW,
-                    wealth: CL.LOW, // funding the coup is expensive
-                    corruption: CL.HIGH,
-                })
-            }),
-            new NewsEffect({
+                prestige: CL.LOW,
+                wealth: CL.LOW,
+                corruption: CL.HIGH,
+            },
+            {
+                prestige: CL.NO_REGRESSION,
+                wealth: CL.NO_REGRESSION,
+                corruption: CL.NO_REGRESSION,
+            },
+            {
+                prestige: CL.VERY_LOW,
+                wealth: CL.LOW,
+                corruption: CL.LOW,
+            }
+        )
+
+        this.addEffect(
+            {
                 planet: this.targetPlanet,
                 governmentType: GT.ANARCHY ? null : GT.ANARCHY,
-                civilizationMultipliers: new Civilization({
-                    army: CL.VERY_LOW,
-                    navy: CL.VERY_LOW,
-                    security: CL.VERY_LOW,
-                    corruption: CL.HIGH,
-                    economy: CL.LOW,
-                    industry: CL.LOW,
-                    prestige: CL.LOW,
-                    //wealth: CL.VERY_LOW,
-                    cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.ASTRONOMICAL]])),
-                })
-            })
-        ]
-
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        // Instigator: prestige boost persists
-        Object.assign(this.completeEffects[0], {
-            prestige: CL.NO_REGRESSION,
-            wealth: CL.NO_REGRESSION,
-            corruption: CL.NO_REGRESSION,
-        })
-        // Target: government stabilizes but some damage lingers
-        this.completeEffects[1].civilizationMultipliers.multiply(new Civilization({
-            army: rng(0.5,1.5,false),
-            navy: rng(0.5,1.5,false),
-            security: rng(0.5,1.5,false),
-            industry: rng(0.5,1.5,false),
-            wealth: rng(0.5,1.5,false),
-            prestige: rng(0.5,1.5,false),
-        }))
-        Object.assign(this.completeEffects[1], {
-            forcePeace: true,
-            newRelationship: RELATIONSHIP_TYPES.NEUTRAL,
-            governmentType
-        })
-
-        // Failed: coup crushed, instigator embarrassed
-        this.failEffects = this.startEffects.map(fx => fx.getInverse())
-        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
-            prestige: CL.VERY_LOW, // international humiliation
-            wealth: CL.LOW, // wasted funds
-            corruption: CL.LOW,
-        }))
-        this.failEffects[1].civilizationMultipliers.multiply(new Civilization({
-            prestige: CL.HIGH,
-            security: CL.HIGH, //you did just crush a buncha rebels
-        }))
+                army: CL.VERY_LOW,
+                navy: CL.VERY_LOW,
+                security: CL.VERY_LOW,
+                corruption: CL.HIGH,
+                economy: CL.LOW,
+                industry: CL.LOW,
+                prestige: CL.LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.ASTRONOMICAL]])),
+            },
+            {
+                forcePeace: true,
+                targetPlanet: this.planet,
+                newRelationship: RELATIONSHIP_TYPES.NEUTRAL,
+                governmentType,
+                army: rng(0.5,1.5,false),
+                navy: rng(0.5,1.5,false),
+                security: rng(0.5,1.5,false),
+                industry: rng(0.5,1.5,false),
+                wealth: rng(0.5,1.5,false),
+                prestige: rng(0.5,1.5,false),
+            },
+            {
+                prestige: CL.HIGH,
+                security: CL.HIGH,
+            }
+        )
     }
 
     determineOutcome() {

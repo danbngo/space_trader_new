@@ -8,36 +8,30 @@ class FestivalNews extends News {
             NT.FESTIVAL, planet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    wealth: CL.LOW,
-                    economy: CL.LOW,
-                    industry: CL.LOW,
-                    reserves: CL.LOW,
-                    crime: CL.HIGH,
-                    corruption: CL.HIGH,
-                    cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.HOLOCUBES, CL.VERY_HIGH], [CARGO_TYPES.DRUGS, CL.ASTRONOMICAL]])),
-                })
-            })
-        ]
-
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            wealth: CL.SLIGHTLY_LOW,
-            reserves: CL.SLIGHTLY_LOW,
-            crime: CL.SLIGHTLY_HIGH,
-            prestige: CL.SLIGHTLY_HIGH,
-        }))
-
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
-            wealth: CL.LOW,
-            economy: CL.LOW,
-            crime: CL.HIGH,
-            prestige: CL.LOW,
-        }))
+                wealth: CL.LOW,
+                economy: CL.LOW,
+                industry: CL.LOW,
+                reserves: CL.LOW,
+                crime: CL.HIGH,
+                corruption: CL.HIGH,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.HOLOCUBES, CL.VERY_HIGH], [CARGO_TYPES.DRUGS, CL.ASTRONOMICAL]])),
+            },
+            {
+                wealth: CL.SLIGHTLY_LOW,
+                reserves: CL.SLIGHTLY_LOW,
+                crime: CL.SLIGHTLY_HIGH,
+                prestige: CL.SLIGHTLY_HIGH,
+            },
+            {
+                wealth: CL.LOW,
+                economy: CL.LOW,
+                crime: CL.HIGH,
+                prestige: CL.LOW,
+            }
+        )
     }
 
     determineOutcome() {

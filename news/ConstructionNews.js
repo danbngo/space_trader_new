@@ -10,38 +10,31 @@ class ConstructionNews extends News {
 
         const buildingsEnabled = rndMembers(News.calcRepairableBuildings(planet), rng(3,1), true);
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    economy: CL.SLIGHTLY_LOW,
-                    reserves: CL.LOW,
-                    inflation: CL.HIGH,
-                    wealth: CL.LOW,
-                    taxes: CL.HIGH,
-                    cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.METAL, CL.EXTREMELY_HIGH], [CARGO_TYPES.NANITES, CL.ASTRONOMICAL]])),
-                })
-            })
-        ]
-
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            economy: CL.HIGH,
-            reserves: CL.LOW,
-            wealth: CL.LOW,
-            taxes: CL.SLIGHTLY_HIGH,
-            industry: CL.HIGH,
-        }))
-        this.completeEffects[0].buildingsEnabled = buildingsEnabled
-
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
-            economy: CL.SLIGHTLY_LOW,
-            reserves: CL.LOW,
-            inflation: CL.HIGH,
-            wealth: CL.LOW,
-            taxes: CL.SLIGHTLY_HIGH,
-        }))
+                reserves: CL.LOW,
+                inflation: CL.HIGH,
+                wealth: CL.LOW,
+                taxes: CL.HIGH,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.METAL, CL.EXTREMELY_HIGH], [CARGO_TYPES.NANITES, CL.ASTRONOMICAL]])),
+            },
+            {
+                buildingsEnabled,
+                economy: CL.HIGH,
+                reserves: CL.LOW,
+                wealth: CL.LOW,
+                taxes: CL.SLIGHTLY_HIGH,
+                industry: CL.HIGH,
+            },
+            {
+                economy: CL.SLIGHTLY_LOW,
+                reserves: CL.LOW,
+                inflation: CL.HIGH,
+                wealth: CL.LOW,
+                taxes: CL.SLIGHTLY_HIGH,
+            }
+        )
     }
 
     determineOutcome() {

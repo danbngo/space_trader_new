@@ -8,31 +8,25 @@ class EnvironmentalismNews extends News {
             NT.ENVIRONMENTALISM, planet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    industry: CL.EXTREMELY_LOW,
-                    navy: CL.VERY_LOW,
-                    cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.NANITES, CL.EXTREMELY_LOW], [CARGO_TYPES.METAL, CL.EXTREMELY_LOW]])),
-                })
-            })
-        ]
-
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            population: CL.SLIGHTLY_HIGH,
-            navy: CL.SLIGHTLY_LOW,
-            industry: CL.SLIGHTLY_LOW,
-            prestige: CL.SLIGHTLY_HIGH,
-        }))
-
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
-            industry: CL.SLIGHTLY_LOW,
-            economy: CL.LOW,
-            prestige: CL.LOW,
-        }))
+                industry: CL.EXTREMELY_LOW,
+                navy: CL.VERY_LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.NANITES, CL.EXTREMELY_LOW], [CARGO_TYPES.METAL, CL.EXTREMELY_LOW]])),
+            },
+            {
+                population: CL.SLIGHTLY_HIGH,
+                navy: CL.SLIGHTLY_LOW,
+                industry: CL.SLIGHTLY_LOW,
+                prestige: CL.SLIGHTLY_HIGH,
+            },
+            {
+                industry: CL.SLIGHTLY_LOW,
+                economy: CL.LOW,
+                prestige: CL.LOW,
+            }
+        )
     }
 
     determineOutcome() {

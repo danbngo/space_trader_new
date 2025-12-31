@@ -8,11 +8,8 @@ class AddictionNews extends News {
             NT.ADDICTION, planet
         )
 
-        this.addEffect(
+        this.addPlanetEffect(
             {
-                planet: this.planet,
-                security: CL.LOW,
-                economy: CL.LOW,
                 crime: CL.HIGH,
                 corruption: CL.HIGH,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.MEDICINE, CL.VERY_HIGH], [CARGO_TYPES.DRUGS, CL.EXTREMELY_HIGH]])),
@@ -22,8 +19,6 @@ class AddictionNews extends News {
             },
             {
                 population: CL.SLIGHTLY_LOW,
-                security: CL.LOW,
-                economy: CL.LOW,
                 crime: CL.HIGH,
                 corruption: CL.HIGH,
                 culture: CL.SLIGHTLY_LOW,

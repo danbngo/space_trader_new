@@ -8,33 +8,24 @@ class DisarmamentNews extends News {
             NT.DISARMAMENT, planet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    army: CL.LOW,
-                    navy: CL.LOW,
-                    territory: CL.SLIGHTLY_LOW,
-                    cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_LOW], [CARGO_TYPES.WEAPONS, CL.EXTREMELY_LOW]])),
-                })
-            })
-        ]
-
-        //system becomes more crowded over time...
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            army: CL.VERY_LOW, 
-            navy: CL.VERY_LOW,
-            territory: CL.SLIGHTLY_LOW,
-            economy: CL.SLIGHTLY_HIGH, //small bonuses to the economy
-            industry: CL.SLIGHTLY_HIGH,
-            prestige: CL.SLIGHTLY_HIGH,
-            taxes: CL.VERY_LOW
-        }))
-
-        this.failEffects = this.failEffects.map(effect => effect.getInverse())
-        // Failed: forced to rearm, economic benefits lost
-        this.cancelEffects = this.cancelEffects.map(effect => effect.getInverse())
+                army: CL.LOW,
+                navy: CL.LOW,
+                territory: CL.SLIGHTLY_LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_LOW], [CARGO_TYPES.WEAPONS, CL.EXTREMELY_LOW]])),
+            },
+            {
+                army: CL.VERY_LOW,
+                navy: CL.VERY_LOW,
+                territory: CL.SLIGHTLY_LOW,
+                economy: CL.SLIGHTLY_HIGH,
+                industry: CL.SLIGHTLY_HIGH,
+                prestige: CL.SLIGHTLY_HIGH,
+                taxes: CL.VERY_LOW
+            }
+        )
     }
 
     shouldCancel() {

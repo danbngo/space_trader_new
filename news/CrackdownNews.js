@@ -8,34 +8,27 @@ class CrackdownNews extends News {
             NT.CRACKDOWN, planet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    security: CL.SLIGHTLY_HIGH,
-                    culture: CL.LOW,
-                    crime: CL.SLIGHTLY_LOW,
-                    corruption: CL.SLIGHTLY_LOW,
-                    cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.DRUGS, CL.HIGH], [CARGO_TYPES.WEAPONS, CL.HIGH]])),
-                })
-            })
-        ]
-
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        //some lingering crime decrease
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            security: CL.HIGH,
-            crime: CL.LOW,
-            corruption: CL.LOW,
-        }))
-
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
-            security: CL.SLIGHTLY_LOW,
-            crime: CL.HIGH,
-            culture: CL.LOW,
-            corruption: CL.HIGH,
-        }))
+                security: CL.SLIGHTLY_HIGH,
+                culture: CL.LOW,
+                crime: CL.SLIGHTLY_LOW,
+                corruption: CL.SLIGHTLY_LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.DRUGS, CL.HIGH], [CARGO_TYPES.WEAPONS, CL.HIGH]])),
+            },
+            {
+                security: CL.HIGH,
+                crime: CL.LOW,
+                corruption: CL.LOW,
+            },
+            {
+                security: CL.SLIGHTLY_LOW,
+                crime: CL.HIGH,
+                culture: CL.LOW,
+                corruption: CL.HIGH,
+            }
+        )
     }
 
     determineOutcome() {

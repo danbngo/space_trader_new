@@ -8,36 +8,30 @@ class ExplorationNews extends News {
             NT.EXPLORATION, planet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    education: CL.LOW,
-                    reserves: CL.SLIGHTLY_LOW,
-                    technology: CL.LOW,
-                    navy: CL.SLIGHTLY_LOW,
-                    wealth: CL.LOW,
-                })
-            })
-        ]
-
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            education: CL.LOW,
-            wealth: CL.SLIGHTLY_LOW,
-            reserves: CL.SLIGHTLY_LOW,
-            technology: CL.LOW,
-            territory: CL.HIGH,
-            prestige: CL.SLIGHTLY_HIGH,
-        }))
-
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
-            education: CL.LOW,
-            technology: CL.LOW,
-            prestige: CL.LOW,
-            wealth: CL.LOW,
-        }))
+                education: CL.LOW,
+                reserves: CL.SLIGHTLY_LOW,
+                technology: CL.LOW,
+                navy: CL.SLIGHTLY_LOW,
+                wealth: CL.LOW,
+            },
+            {
+                education: CL.LOW,
+                wealth: CL.SLIGHTLY_LOW,
+                reserves: CL.SLIGHTLY_LOW,
+                technology: CL.LOW,
+                territory: CL.HIGH,
+                prestige: CL.SLIGHTLY_HIGH,
+            },
+            {
+                education: CL.LOW,
+                technology: CL.LOW,
+                prestige: CL.LOW,
+                wealth: CL.LOW,
+            }
+        )
     }
 
     determineOutcome() {

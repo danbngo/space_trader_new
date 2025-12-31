@@ -8,41 +8,32 @@ class DepressionNews extends News {
             NT.DEPRESSION, planet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    inflation: CL.EXTREMELY_LOW,
-                    reserves: CL.EXTREMELY_LOW,
-                    economy: CL.EXTREMELY_LOW,
-                    industry: CL.VERY_LOW,
-                    wealth: CL.EXTREMELY_LOW,
-                    crime: CL.HIGH,
-                    education: CL.LOW, // workforce quality drops
-                    taxes: CL.HIGH
-                })
-                //crime: 0.7, -recession-proof industry
-            })
-        ]
-
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-
-        //some lingering price rate, cargo, commercial, and credit rate decreases
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            inflation: CL.EXTREMELY_LOW,
-            wealth: CL.LOW,
-        }))
-
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
-            inflation: CL.EXTREMELY_LOW,
-            reserves: CL.LOW,
-            economy: CL.LOW,
-            industry: CL.LOW,
-            wealth: CL.EXTREMELY_LOW,
-            crime: CL.HIGH,
-            education: CL.LOW,
-        }))
+                inflation: CL.EXTREMELY_LOW,
+                reserves: CL.EXTREMELY_LOW,
+                economy: CL.EXTREMELY_LOW,
+                industry: CL.VERY_LOW,
+                wealth: CL.EXTREMELY_LOW,
+                crime: CL.HIGH,
+                education: CL.LOW,
+                taxes: CL.HIGH
+            },
+            {
+                inflation: CL.EXTREMELY_LOW,
+                wealth: CL.LOW,
+            },
+            {
+                inflation: CL.EXTREMELY_LOW,
+                reserves: CL.LOW,
+                economy: CL.LOW,
+                industry: CL.LOW,
+                wealth: CL.EXTREMELY_LOW,
+                crime: CL.HIGH,
+                education: CL.LOW,
+            }
+        )
     }
 
     determineOutcome() {

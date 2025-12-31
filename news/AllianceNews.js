@@ -8,24 +8,18 @@ class AllianceNews extends News {
             NT.ALLIANCE, planet, targetPlanet
         )
 
-        this.addEffect({
-            planet: this.planet,
-            targetPlanet: this.targetPlanet,
+        this.addPlanetEffect({
             newRelationship: RELATIONSHIP_TYPES.ALLY,
             security: CL.SLIGHTLY_HIGH,
-            economy: CL.SLIGHTLY_HIGH,
             technology: CL.SLIGHTLY_HIGH,
             prestige: CL.SLIGHTLY_HIGH,
             army: CL.SLIGHTLY_HIGH,
             navy: CL.SLIGHTLY_HIGH
         })
 
-        this.addEffect({
-            planet: this.targetPlanet,
-            targetPlanet: this.planet,
+        this.addTargetPlanetEffect({
             newRelationship: RELATIONSHIP_TYPES.ALLY,
             security: CL.SLIGHTLY_HIGH,
-            economy: CL.SLIGHTLY_HIGH,
             technology: CL.SLIGHTLY_HIGH,
             prestige: CL.SLIGHTLY_HIGH,
             army: CL.SLIGHTLY_HIGH,

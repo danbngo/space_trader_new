@@ -8,31 +8,24 @@ class ConscriptionNews extends News {
             NT.CONSCRIPTION, planet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    population: CL.LOW,
-                    economy: CL.LOW,
-                    industry: CL.LOW,
-                    taxes: CL.HIGH //to pay for the recruits
-                })
-            })
-        ]
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            army: CL.VERY_HIGH,
-            navy: CL.HIGH,
-            taxes: CL.HIGH
-        }))
-        
-        // Failed: riots force abandonment, no military gain
-        this.failEffects = this.startEffects.map(fx=> fx.getInverse())
-        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
-            prestige: CL.LOW,
-            security: CL.LOW,
-            crime: CL.HIGH,
-        }))
+                population: CL.LOW,
+                economy: CL.LOW,
+                industry: CL.LOW,
+                taxes: CL.HIGH
+            },
+            {
+                army: CL.VERY_HIGH,
+                navy: CL.HIGH,
+                taxes: CL.HIGH
+            },
+            {
+                prestige: CL.LOW,
+                security: CL.LOW,
+            }
+        )
     }
 
     determineOutcome() {

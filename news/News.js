@@ -62,7 +62,15 @@ class News {
      * @param {NewsEffectParams|null} [multiplyFailBy]
      * @param {NewsEffectParams|null} [multiplyCancelBy]
     */
-    addEffect(startEffect, multiplyCompleteBy, multiplyFailBy, multiplyCancelBy) {
+    addEffect(startEffect, multiplyCompleteBy, multiplyFailBy, multiplyCancelBy, forTargetPlanet = false) {
+        if (forTargetPlanet && this.targetPlanet) {
+            startEffect.planet = this.targetPlanet
+            startEffect.targetPlanet = this.planet
+        }
+        else {
+            startEffect.planet = this.planet
+            startEffect.targetPlanet = this.targetPlanet
+        }
         const fx = new NewsEffect(startEffect)
         this.startEffects.push(fx)
         this.completeEffects.push(fx.getInverse())
@@ -71,6 +79,13 @@ class News {
         if (multiplyCompleteBy) this.completeEffects[this.completeEffects.length-1].multiply(multiplyCompleteBy)
         if (multiplyFailBy) this.failEffects[this.failEffects.length-1].multiply(multiplyFailBy)
         if (multiplyCancelBy) this.cancelEffects[this.cancelEffects.length-1].multiply(multiplyCancelBy)
+    }
+
+    addPlanetEffect(startEffect, multiplyCompleteBy, multiplyFailBy, multiplyCancelBy) {
+        return this.addEffect(startEffect, multiplyCompleteBy, multiplyFailBy, multiplyCancelBy, false)
+    }
+    addTargetPlanetEffect(startEffect, multiplyCompleteBy, multiplyFailBy, multiplyCancelBy) {
+        return this.addEffect(startEffect, multiplyCompleteBy, multiplyFailBy, multiplyCancelBy, true)
     }
 
     /**

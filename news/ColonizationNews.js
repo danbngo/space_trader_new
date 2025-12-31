@@ -8,41 +8,33 @@ class ColonizationNews extends News {
             NT.COLONIZATION, planet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    population: CL.LOW,
-                    inflation: CL.HIGH,
-                    navy: CL.VERY_LOW, // ships sent to colonize
-                    reserves: CL.LOW,
-                    cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.METAL, CL.VERY_HIGH], [CARGO_TYPES.ISOTOPES, CL.EXTREMELY_HIGH]])),
-                    wealth: CL.LOW, // funding colonization
-                    taxes: CL.HIGH
-                })
-            })
-        ]
-
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            economy: CL.HIGH,
-            industry: CL.HIGH,
-            territory: CL.HIGH,
-            population: CL.NO_REGRESSION,
-            navy: CL.LOW,
-            wealth: CL.LOW,
-            taxes: CL.HIGH,
-            prestige: CL.HIGH
-        }))
-
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
-            population: CL.NO_REGRESSION,
-            navy: CL.NO_REGRESSION,
-            wealth: CL.NO_REGRESSION,
-            prestige: CL.SLIGHTLY_LOW,
-            taxes: CL.SLIGHTLY_HIGH,
-        }))
+                navy: CL.VERY_LOW,
+                population: CL.LOW,
+                reserves: CL.LOW,
+                taxes: CL.HIGH,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.METAL, CL.VERY_HIGH], [CARGO_TYPES.ISOTOPES, CL.EXTREMELY_HIGH]])),
+            },
+            {
+                navy: CL.LOW,
+                population: CL.LOW,
+                wealth: CL.HIGH,
+                taxes: CL.SLIGHTLY_HIGH,
+                prestige: CL.HIGH,
+                economy: CL.HIGH,
+                industry: CL.HIGH,
+                territory: CL.HIGH,
+            },
+            {
+                navy: CL.VERY_LOW,
+                population: CL.LOW,
+                reserves: CL.LOW,
+                taxes: CL.SLIGHTLY_HIGH,
+                prestige: CL.SLIGHTLY_LOW,
+            }
+        )
    }
 
     determineOutcome() {

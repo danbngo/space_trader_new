@@ -8,37 +8,31 @@ class EnvironmentalDisasterNews extends News {
             NT.ENVIRONMENTAL_DISASTER, planet
         )
 
-        this.startEffects = [
-            new NewsEffect({
+        this.addEffect(
+            {
                 planet: this.planet,
-                civilizationMultipliers: new Civilization({
-                    industry: CL.LOW,
-                    reserves: CL.LOW,
-                    population: CL.SLIGHTLY_LOW,
-                    wealth: CL.SLIGHTLY_LOW,
-                    inflation: CL.SLIGHTLY_HIGH,
-                    economy: CL.SLIGHTLY_LOW,
-                    cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WATER, CL.VERY_HIGH], [CARGO_TYPES.MEDICINE, CL.VERY_HIGH]])),
-                })
-            })
-        ]
-
-        this.completeEffects = this.startEffects.map(effect => effect.getInverse())
-        this.completeEffects[0].civilizationMultipliers.multiply(new Civilization({
-            culture: CL.HIGH,
-            reserves: CL.SLIGHTLY_LOW,
-            wealth: CL.SLIGHTLY_LOW,
-        }))
-
-        this.failEffects = this.startEffects.map(effect => effect.getInverse())
-        this.failEffects[0].civilizationMultipliers.multiply(new Civilization({
-            industry: CL.VERY_LOW,
-            reserves: CL.LOW,
-            population: CL.LOW,
-            wealth: CL.SLIGHTLY_LOW,
-            inflation: CL.SLIGHTLY_HIGH,
-            economy: CL.LOW,
-        }))
+                industry: CL.LOW,
+                reserves: CL.LOW,
+                population: CL.SLIGHTLY_LOW,
+                wealth: CL.SLIGHTLY_LOW,
+                inflation: CL.SLIGHTLY_HIGH,
+                economy: CL.SLIGHTLY_LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WATER, CL.VERY_HIGH], [CARGO_TYPES.MEDICINE, CL.VERY_HIGH]])),
+            },
+            {
+                culture: CL.HIGH,
+                reserves: CL.SLIGHTLY_LOW,
+                wealth: CL.SLIGHTLY_LOW,
+            },
+            {
+                industry: CL.VERY_LOW,
+                reserves: CL.LOW,
+                population: CL.LOW,
+                wealth: CL.SLIGHTLY_LOW,
+                inflation: CL.SLIGHTLY_HIGH,
+                economy: CL.LOW,
+            }
+        )
     }
 
     determineOutcome() {
