@@ -10,7 +10,6 @@ class FestivalNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 wealth: CL.LOW,
                 crime: CL.HIGH,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.HOLOCUBES, CL.VERY_HIGH], [CARGO_TYPES.DRUGS, CL.ASTRONOMICAL]])),

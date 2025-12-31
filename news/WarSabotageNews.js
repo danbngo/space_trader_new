@@ -10,7 +10,6 @@ class WarSabotageNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 security: CL.LOW,
             },
             {

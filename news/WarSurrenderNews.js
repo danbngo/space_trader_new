@@ -9,9 +9,7 @@ class WarSurrenderNews extends News {
         )
 
         this.addPlanetEffect(
-            {
-                planet: this.planet
-            },
+            {},
             {
                 prestige: CL.HIGH,
                 territory: CL.SLIGHTLY_HIGH,

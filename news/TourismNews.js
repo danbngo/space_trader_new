@@ -9,7 +9,6 @@ class TourismNews extends News {
         )
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 wealth: CL.LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([
                     [CARGO_TYPES.METAL, 2],

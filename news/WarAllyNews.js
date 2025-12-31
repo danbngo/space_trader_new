@@ -8,10 +8,7 @@ class WarAllyNews extends News {
             NT.WAR_ALLY, planet, targetPlanet
         )
         
-        this.addPlanetEffect(
-            {
-                planet: this.planet
-            },
+        this.addPlanetEffect({},
             {
                 prestige: CL.NO_REGRESSION
             },

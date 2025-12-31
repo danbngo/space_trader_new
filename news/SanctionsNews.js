@@ -10,7 +10,6 @@ class SanctionsNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 reserves: CL.LOW,
                 economy: CL.LOW,
             },

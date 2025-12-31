@@ -3,14 +3,13 @@ class LudditismNews extends News {
         super(
             `${coloredName(planet)} embraces a return-to-soil movement, rejecting advanced ships for a simpler life!`,
             `${coloredName(planet)}'s people have completed their transition to a more pastoral life!`,
-            `${coloredName(planet)}'s luddite movement collapses as technological needs overwhelm ideology!`,
+            `${coloredName(planet)}'s luddite movement collapses as imminent threats overwhelm ideology!`,
             ``,
             NT.LUDDITISM, planet
         )
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 technology: CL.VERY_LOW,
                 education: CL.SLIGHTLY_LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([
@@ -38,7 +37,7 @@ class LudditismNews extends News {
         for (const p of gs.system.planets) {
             if (p !== this.planet) {
                 const rel = p.c.relationships.get(this.planet)
-                if (rel === RELATIONSHIP_TYPES.TENSE || rel === RELATIONSHIP_TYPES.WAR) {
+                if (rel === RELATIONSHIP_TYPES.WAR) {
                     return true
                 }
             }
@@ -58,9 +57,7 @@ class LudditismNews extends News {
         //more likely if high tech and population pressure
         const ratingsValid = p.c.technology > CL.HIGH && p.c.industry > CL.MEDIUM
         //must not be at engaged in or targeted by any hostile acts
-        const interferingEvent =
-            News.planetHasAnyNews(planet, [NT.LUDDITISM, ...NT_DANGEROUS]) ||
-            News.planetHasAnyNewsTargeting(planet, NT_DANGEROUS) 
+        const interferingEvent = News.planetHasAnyNews(p, NT_DANGEROUS) || News.planetHasAnyNewsTargeting(p, NT_DANGEROUS) 
         return ratingsValid && !interferingEvent
     }
 }

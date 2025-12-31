@@ -46,24 +46,101 @@ class Market extends Building {
 
     calcCargoAvailabilityModifier(ct = CARGO_TYPES_ALL[0]) {
         const civ = this.planet.civilization
+        const climate = this.planet.climate
         
         // Each cargo type has different production/availability based on civilization attributes
+        if (ct == CARGO_TYPES.FOOD) {
+            // Food production based on territory, population, and favorable climate
+            // Earthlike planets with water oceans produce more food
+            let foodModifier = 0.5 + (civ.territory * 0.8) + (civ.economy * 0.5)
+            
+            // Ocean type affects food production
+            if (climate.oceanType === PLANET_OCEAN_TYPES.WATER) {
+                foodModifier *= 1.8  // Water oceans enable fishing and agriculture
+            } else if (climate.oceanType === PLANET_OCEAN_TYPES.BRINE) {
+                foodModifier *= 1.3  // Brine can support some aquaculture
+            } else if (climate.oceanType === PLANET_OCEAN_TYPES.SUBSURFACE_WATER) {
+                foodModifier *= 1.2  // Subsurface water can be used for hydroponics
+            }
+            
+            // Atmosphere type affects food production
+            if (climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.OXYGEN_NITROGEN) {
+                foodModifier *= 1.5  // Breathable atmosphere ideal for farming
+            } else if (climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.CARBONACEOUS_DIOXIDE) {
+                foodModifier *= 0.8  // CO2 atmosphere requires greenhouses
+            }
+            
+            // Geology affects soil quality
+            if (climate.geologyType === PLANET_GEOLOGY_TYPES.SILICATE_IRON || 
+                climate.geologyType === PLANET_GEOLOGY_TYPES.GRANITE) {
+                foodModifier *= 1.3  // Good soil composition
+            } else if (climate.geologyType === PLANET_GEOLOGY_TYPES.BASALTIC) {
+                foodModifier *= 1.4  // Volcanic soil is very fertile
+            }
+            
+            return foodModifier
+        }
+        
         if (ct == CARGO_TYPES.METAL) {
             // Industrial planets produce more metal
             // Higher industry and economy = more metal production
-            return 0.5 + (civ.industry * 1.8) + (civ.economy * 0.5)
+            let metalModifier = 0.5 + (civ.industry * 1.8) + (civ.economy * 0.5)
+            
+            // Geology type affects metal availability
+            const climate = this.planet.climate
+            if (climate.geologyType === PLANET_GEOLOGY_TYPES.METALLIC) {
+                metalModifier *= 2.0  // Metallic composition = abundant metal
+            } else if (climate.geologyType === PLANET_GEOLOGY_TYPES.SILICATE_IRON) {
+                metalModifier *= 1.5  // Iron-rich geology
+            } else if (climate.geologyType === PLANET_GEOLOGY_TYPES.CARBONACEOUS) {
+                metalModifier *= 0.7  // Carbon-rich = less metal
+            } else if (climate.geologyType === PLANET_GEOLOGY_TYPES.WATER_ICE || 
+                       climate.geologyType === PLANET_GEOLOGY_TYPES.METHANE_ICE ||
+                       climate.geologyType === PLANET_GEOLOGY_TYPES.NITROGEN_ICE) {
+                metalModifier *= 0.3  // Ice planets = very little metal
+            }
+            
+            return metalModifier
         }
         
         if (ct == CARGO_TYPES.WATER) {
             // Water availability based on reserves and infrastructure
             // Higher reserves and territory = more water sources
-            return 0.5 + (civ.reserves * 1.5) + (civ.territory * 0.3)
+            let waterModifier = 0.5 + (civ.reserves * 1.5) + (civ.territory * 0.3)
+            
+            // Ocean and geology types dramatically affect water availability
+            const climate = this.planet.climate
+            if (climate.oceanType === PLANET_OCEAN_TYPES.WATER) {
+                waterModifier *= 2.5  // Abundant liquid water
+            } else if (climate.oceanType === PLANET_OCEAN_TYPES.SUBSURFACE_WATER) {
+                waterModifier *= 1.8  // Hidden water requires extraction
+            } else if (climate.oceanType === PLANET_OCEAN_TYPES.BRINE) {
+                waterModifier *= 1.2  // Salty water can be desalinated
+            }
+            
+            if (climate.geologyType === PLANET_GEOLOGY_TYPES.WATER_ICE) {
+                waterModifier *= 2.0  // Ice can be melted for water
+            } else if (climate.geologyType === PLANET_GEOLOGY_TYPES.MIXED_ICE) {
+                waterModifier *= 1.5  // Some water ice available
+            }
+            
+            return waterModifier
         }
         
         if (ct == CARGO_TYPES.ISOTOPES) {
             // Scientific production - high tech civilizations produce isotopes
             // Technology and industry enable isotope production
-            return 0.3 + (civ.technology * 1.5) + (civ.industry * 0.8)
+            let isotopeModifier = 0.3 + (civ.technology * 1.5) + (civ.industry * 0.8)
+            
+            // Gas giant atmospheres contain useful isotopes
+            const climate = this.planet.climate
+            if (climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.HYDROGEN_HELIUM) {
+                isotopeModifier *= 2.0  // Gas giants rich in isotopes
+            } else if (climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.METHANE) {
+                isotopeModifier *= 1.3  // Methane atmospheres have some isotopes
+            }
+            
+            return isotopeModifier
         }
         
         if (ct == CARGO_TYPES.NANITES) {
@@ -107,8 +184,29 @@ class Market extends Building {
 
     calcClimateBasedPriceModifier(ct = CARGO_TYPES_ALL[0]) {
         const planetType = this.planet.planetType
+        const climate = this.planet.climate
         
         // Climate-based price adjustments based on planet type
+        
+        // Food is expensive on inhospitable worlds
+        if (ct === CARGO_TYPES.FOOD) {
+            if (planetType === PLANET_TYPES.GAS_GIANT || planetType === PLANET_TYPES.GAS_DWARF) {
+                return 3.0  // 200% more expensive - no surface for farming
+            }
+            if (planetType === PLANET_TYPES.ICE_GIANT || planetType === PLANET_TYPES.ICE_DWARF) {
+                return 2.5  // 150% more expensive - frozen wasteland
+            }
+            // Breathable atmosphere makes food cheaper
+            if (climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.OXYGEN_NITROGEN) {
+                return 0.7  // 30% cheaper with breathable air
+            }
+            // Toxic atmospheres make food expensive
+            if (climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.SULFURIC_ACID ||
+                climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.SULFUR_DIOXIDE) {
+                return 2.0  // 100% more expensive
+            }
+        }
+        
         // Gas giants have abundant isotopes
         if (planetType === PLANET_TYPES.GAS_GIANT || planetType === PLANET_TYPES.GAS_DWARF) {
             if (ct === CARGO_TYPES.ISOTOPES) return 0.5  // 50% cheaper isotopes
@@ -136,6 +234,31 @@ class Market extends Building {
         const civ = this.planet.civilization
         
         // Each cargo type has different demand based on civilization attributes
+        if (ct == CARGO_TYPES.FOOD) {
+            // Food demand based on population and inability to produce locally
+            // Higher population = higher demand
+            let foodDemand = 0.8 + (civ.population * 1.2)
+            
+            const climate = this.planet.climate
+            // Harsh environments increase food demand (can't produce locally)
+            if (climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.NONE ||
+                climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.SULFURIC_ACID ||
+                climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.SULFUR_DIOXIDE) {
+                foodDemand *= 1.8  // Must import all food
+            }
+            
+            if (climate.geologyType === PLANET_GEOLOGY_TYPES.METALLIC ||
+                climate.geologyType === PLANET_GEOLOGY_TYPES.WATER_ICE ||
+                climate.geologyType === PLANET_GEOLOGY_TYPES.NITROGEN_ICE) {
+                foodDemand *= 1.5  // Poor soil = higher food prices
+            }
+            
+            // Lower reserves means food scarcity
+            foodDemand += (1.0 / Math.max(0.5, civ.reserves)) * 0.5
+            
+            return foodDemand
+        }
+        
         if (ct == CARGO_TYPES.METAL) {
             // Industrial planets need more metal for manufacturing
             // Higher industry = higher demand = higher prices

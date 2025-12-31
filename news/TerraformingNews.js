@@ -10,7 +10,6 @@ class TerraformingNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 education: CL.LOW,
                 wealth: CL.LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([

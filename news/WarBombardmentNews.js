@@ -18,7 +18,6 @@ class WarBombardmentNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 prestige: CL.HIGH,
                 military: CL.SLIGHTLY_LOW
             },

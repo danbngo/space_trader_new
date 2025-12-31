@@ -10,7 +10,6 @@ class ExplorationNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 education: CL.LOW,
                 technology: CL.LOW,
                 wealth: CL.LOW,

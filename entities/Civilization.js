@@ -175,6 +175,24 @@ class Civilization {
     static areOpposingGovernments(p1 = new Planet(), p2 = new Planet()) {
         return (p1.c.governmentType.opposingType === p2.c.governmentType || p2.c.governmentType.opposingType === p1.c.governmentType)
     }
+    static getPlanetsAtWarWith(planet = new Planet()) {
+        const atWarPlanets = []
+        for (const [otherPlanet, relationship] of planet.c.relationships.entries()) {
+            if (relationship === RELATIONSHIP_TYPES.WAR) {
+                atWarPlanets.push(otherPlanet)
+            }
+        }
+        return atWarPlanets
+    }
+    static getPlanetsTenseOrAtWarWith(planet = new Planet()) {
+        const tenseOrAtWarPlanets = []
+        for (const [otherPlanet, relationship] of planet.c.relationships.entries()) {
+            if (relationship === RELATIONSHIP_TYPES.WAR || relationship === RELATIONSHIP_TYPES.TENSE) {
+                tenseOrAtWarPlanets.push(otherPlanet)
+            }
+        }
+        return tenseOrAtWarPlanets
+    }
 }
 
 

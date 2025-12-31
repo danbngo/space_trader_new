@@ -10,7 +10,6 @@ class WarOffensiveNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 military: CL.LOW,
             },
             {

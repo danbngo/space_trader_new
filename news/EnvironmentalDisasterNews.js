@@ -10,7 +10,6 @@ class EnvironmentalDisasterNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 industry: CL.LOW,
                 reserves: CL.LOW,
                 population: CL.SLIGHTLY_LOW,

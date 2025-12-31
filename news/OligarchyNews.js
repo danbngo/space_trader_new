@@ -10,7 +10,6 @@ class OligarchyNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 economy: CL.SLIGHTLY_LOW,
                 wealth: CL.LOW
             },

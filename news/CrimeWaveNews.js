@@ -10,15 +10,15 @@ class CrimeWaveNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
-                security: CL.LOW,
-                crime: CL.VERY_HIGH,
+                security: CL.HIGH,
+                crime: CL.HIGH,
                 corruption: CL.HIGH,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.EXTREMELY_LOW], [CARGO_TYPES.DRUGS, CL.EXTREMELY_LOW]])),
             },
             {
-                security: CL.HIGH,
-                crime: CL.LOW,
+                security: CL.SLIGHTLY_HIGH,
+                crime: CL.SLIGHTLY_LOW,
+                corruption: CL.SLIGHTLY_LOW,
             },
             {
                 security: CL.LOW,

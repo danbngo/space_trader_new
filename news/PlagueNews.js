@@ -10,7 +10,6 @@ class PlagueNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 population: CL.VERY_LOW,
                 education: CL.VERY_LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([

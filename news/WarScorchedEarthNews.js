@@ -10,7 +10,6 @@ class WarScorchedEarthNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 territory: CL.LOW,
                 industry: CL.LOW,
             },

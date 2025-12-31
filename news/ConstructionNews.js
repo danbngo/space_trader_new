@@ -12,20 +12,23 @@ class ConstructionNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 reserves: CL.LOW,
                 economy: CL.SLIGHTLY_HIGH,
                 industry: CL.SLIGHTLY_HIGH,
+                taxes: CL.HIGH,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.METAL, CL.EXTREMELY_HIGH], [CARGO_TYPES.NANITES, CL.ASTRONOMICAL]])),
             },
             {
                 reserves: CL.LOW,
+                taxes: CL.SLIGHTLY_HIGH,
                 economy: CL.HIGH,
                 industry: CL.HIGH,
                 buildingsEnabled,
             },
             {
                 reserves: CL.LOW,
+                taxes: CL.HIGH,
+                inflation: CL.SLIGHTLY_HIGH,
             }
         )
     }

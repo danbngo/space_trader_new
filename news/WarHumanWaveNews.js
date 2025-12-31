@@ -10,7 +10,6 @@ class WarHumanWaveNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 population: CL.VERY_LOW,
                 education: CL.LOW
             },

@@ -15,7 +15,6 @@ class RevolutionNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 governmentType: GT.ANARCHY ? null : GT.ANARCHY,
                 buildingsDisabled: courthouseBuilding ? [courthouseBuilding] : [],
                 military: CL.VERY_LOW,

@@ -10,7 +10,6 @@ class MilitaryBuildupNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 wealth: CL.LOW,
                 reserves: CL.LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([
@@ -19,7 +18,8 @@ class MilitaryBuildupNews extends News {
                 ]))
             },
             {
-                military: CL.EXTREMELY_HIGH,
+                army: CL.EXTREMELY_HIGH,
+                mavy: CL.EXTREMELY_HIGH,
                 education: CL.HIGH,
                 wealth: CL.NO_REGRESSION,
             },
@@ -38,23 +38,11 @@ class MilitaryBuildupNews extends News {
     isValid() {
         const {planet: p} = this
         //dont do it if military is already big
-        const ratingsValid = (p.c.military < CL.MEDIUM) && (p.c.prestige < CL.VERY_HIGH)
+        const ratingsValid = (p.c.army < CL.MEDIUM) && (p.c.prestige < CL.VERY_HIGH)
         //dont do it if no government are tense with us or vice versa
-        let politicsValid = false
-        for (const p of gs.system.planets) {
-            if (p !== planet) {
-                const relationship = p.c.relationships.get(p)
-                const relationship2 = p.c.relationships.get(planet)
-                if (relationship == RELATIONSHIP_TYPES.TENSE || relationship2 == RELATIONSHIP_TYPES.TENSE) {
-                    politicsValid = true
-                    break
-                }
-            }
-        }
-        //planet must not already be in anarchy or puppet state
-        const validGov = p.c.governmentType != GT.ANARCHY && p.c.governmentType != GT.PUPPET_STATE
+        let politicsValid = Civilization.getPlanetsTenseOrAtWarWith(p).length > 0
         //removed most requirements for this, even juntas do this on a whim
-        const interferingEvent = News.planetHasAnyNews(planet, [NT.MILITARY_BUILDUP]) 
-        return ratingsValid && validGov && !interferingEvent
+        const interferingEvent = News.planetHasAnyNews(p, [NT.MILITARY_BUILDUP]) 
+        return ratingsValid && politicsValid && !interferingEvent
     }
 }

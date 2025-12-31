@@ -10,7 +10,6 @@ class StockMarketCrashNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 economy: CL.VERY_LOW,
                 wealth: CL.EXTREMELY_LOW,
             },

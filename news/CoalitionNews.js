@@ -10,7 +10,6 @@ class CoalitionNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 prestige: CL.LOW,
             },
             {

@@ -45,7 +45,6 @@ class PolicyChangeNews extends News {
 
         // Base effects with variation based on policy flavor
         const baseParams = {
-            planet: this.planet,
             prestige: CL.LOW,
         }
 

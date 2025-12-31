@@ -10,7 +10,6 @@ class ForeignAidNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 reserves: CL.HIGH,
                 wealth: CL.HIGH,
                 prestige: CL.SLIGHTLY_LOW,

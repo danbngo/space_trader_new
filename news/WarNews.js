@@ -12,7 +12,6 @@ class WarNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 newRelationship: RELATIONSHIP_TYPES.WAR,
                 military: CL.SLIGHTLY_HIGH,
                 reserves: CL.LOW,

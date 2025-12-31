@@ -10,7 +10,6 @@ class TensionsNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 newRelationship: RELATIONSHIP_TYPES.TENSE,
                 military: CL.SLIGHTLY_HIGH,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.VERY_HIGH]]))

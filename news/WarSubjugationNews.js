@@ -10,7 +10,6 @@ class WarSubjugationNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 newRelationship: RELATIONSHIP_TYPES.SOVEREIGN,
                 territory: CL.VERY_HIGH,
                 prestige: CL.VERY_HIGH

@@ -10,7 +10,6 @@ class ForcedLaborNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 industry: CL.VERY_HIGH,
                 population: CL.LOW,
                 prestige: CL.LOW,

@@ -10,18 +10,24 @@ class CivilStrifeNews extends News {
 
         this.addPlanetEffect(
             {
+                army: CL.SLIGHTLY_LOW,
                 security: CL.VERY_LOW,
-                crime: CL.HIGH,
+                economy: CL.LOW,
+                industry: CL.VERY_LOW,
                 prestige: CL.SLIGHTLY_LOW,
+                crime: CL.HIGH,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.VERY_HIGH]])),
             },
             {
-                security: CL.HIGH,
+                culture: CL.SLIGHTLY_HIGH,
             },
             {
+                army: CL.SLIGHTLY_LOW,
                 security: CL.LOW,
                 crime: CL.SLIGHTLY_HIGH,
                 prestige: CL.LOW,
+                culture: CL.LOW,
+                corruption: CL.SLIGHTLY_HIGH,
             }
         )
     }

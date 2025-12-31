@@ -13,22 +13,34 @@ class CivilWarNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
+                territory: CL.SLIGHTLY_LOW,
                 army: CL.VERY_LOW,
                 security: CL.VERY_LOW,
                 economy: CL.VERY_LOW,
+                industry: CL.VERY_LOW,
+                reserves: CL.LOW,
+                prestige: CL.LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.ASTRONOMICAL], [CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_HIGH]])),
             },
             {
                 governmentType,
+                culture: CL.SLIGHTLY_LOW,
+                corruption: CL.SLIGHTLY_HIGH,
             },
             {
                 buildingsDisabled,
                 governmentType,
                 population: CL.VERY_LOW,
+                territory: CL.SLIGHTLY_LOW,
                 army: CL.LOW,
                 security: CL.LOW,
                 economy: CL.LOW,
+                industry: CL.LOW,
+                reserves: CL.LOW,
+                crime: CL.HIGH,
+                wealth: CL.LOW,
+                prestige: CL.LOW,
+                taxes: CL.HIGH,
             }
         )
     }

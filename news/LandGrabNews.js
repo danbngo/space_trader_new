@@ -10,10 +10,8 @@ class LandGrabNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
-                targetPlanet: this.targetPlanet,
-                army: CL.LOW,
                 navy: CL.LOW,
+                army: CL.LOW,
                 prestige: CL.SLIGHTLY_LOW,
             },
             {
@@ -21,8 +19,8 @@ class LandGrabNews extends News {
                 prestige: News.clHalfRegression(CL.SLIGHTLY_LOW),
             },
             {
-                army: CL.NO_REGRESSION,
                 navy: CL.NO_REGRESSION,
+                army: CL.NO_REGRESSION,
                 prestige: CL.VERY_LOW,
             },
             {
@@ -40,13 +38,13 @@ class LandGrabNews extends News {
                 prestige: CL.NO_REGRESSION,
             },
             {
-                army: News.clHalfRegression(CL.LOW),
                 navy: News.clHalfRegression(CL.LOW),
+                army: News.clHalfRegression(CL.LOW),
                 prestige: CL.HIGH,
             },
             {
-                army: News.clHalfRegression(CL.LOW),
                 navy: News.clHalfRegression(CL.LOW),
+                army: News.clHalfRegression(CL.LOW),
                 territory: News.clHalfRegression(CL.LOW),
             }
         )
@@ -62,21 +60,20 @@ class LandGrabNews extends News {
     determineOutcome() {
         const {planet: p, targetPlanet: tp} = this
         // Expansion fails if target resists successfully
-        const resistanceProbability = (tp.militaryPower / p.militaryPower) * 0.35
+        const resistanceProbability = (tp.c.navy / p.c.navy) * 0.35
         this.rollOutcome(1 - resistanceProbability)
     }
 
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         //aggressor needs high military and low territory, victim needs territory to take
-        const ratingsValid = (p.c.military > CL.SLIGHTLY_HIGH) && (p.c.territory < CL.HIGH) && (targetPlanet.c.territory > CL.SLIGHTLY_LOW)
+        const ratingsValid = (p.c.navy > CL.SLIGHTLY_HIGH) && (p.c.territory < CL.HIGH) && (tp.c.territory > CL.SLIGHTLY_LOW)
         //aggressor must have at least 1.5x the military of victim
-        const militaryValid = p.c.military >= targetPlanet.c.military * CL.HIGH
+        const militaryValid = p.c.navy >= tp.c.navy * CL.HIGH
         //both must have tensions with each other
-        const relationships = [p.c.relationships.get(targetPlanet), targetPlanet.c.relationships.get(planet)]
-        const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.TENSE || rel == RELATIONSHIP_TYPES.WAR)
+        const relationshipsValid = Civilization.areTenseOrAtWar(p, tp)
         const interferingEvent =
-            News.hasAnyNewsBidirectional(planet, targetPlanet, [NT.LAND_GRAB])
+            News.hasAnyNewsBidirectional(p, tp, NT_COOPERATIVE)
         return ratingsValid && militaryValid && relationshipsValid && !interferingEvent
     }
 }

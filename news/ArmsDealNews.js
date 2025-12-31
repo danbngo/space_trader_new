@@ -10,11 +10,14 @@ class ArmsDealNews extends News {
 
         this.addPlanetEffect(
             {
-                reserves: CL.LOW
+                taxes: CL.HIGH
             },
             {
                 army: CL.HIGH,
                 navy: CL.HIGH,
+                reserves: CL.HIGH,
+                technology: CL.SLIGHTLY_HIGH,
+                taxes: CL.VERY_HIGH
             },
             {
                 prestige: CL.SLIGHTLY_LOW
@@ -25,6 +28,8 @@ class ArmsDealNews extends News {
             {},
             {
                 wealth: CL.HIGH,
+                navy: CL.LOW,
+                army: CL.LOW
             }
         )
     }

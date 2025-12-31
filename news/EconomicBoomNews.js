@@ -10,7 +10,6 @@ class EconomicBoomNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 economy: CL.EXTREMELY_HIGH,
                 wealth: CL.EXTREMELY_HIGH,
                 reserves: CL.VERY_HIGH,

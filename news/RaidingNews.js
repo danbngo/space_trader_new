@@ -10,7 +10,6 @@ class RaidingNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 reserves: CL.VERY_HIGH,
                 territory: CL.SLIGHTLY_HIGH,
                 prestige: CL.SLIGHTLY_LOW
@@ -72,7 +71,7 @@ class RaidingNews extends News {
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         // More likely if military is high and goods are low
-        const ratingsValid = p.c.military > 1.25 && (planet.settlement.market.baseCargo.average/MARKET_AVERAGE_CARGO_PER_TYPE < 0.5 || planet.settlement.cryme < 0.5)
+        const ratingsValid = p.c.military > 1.25 && (planet.c.reserves/MARKET_AVERAGE_CARGO_PER_TYPE < 0.5 || planet.settlement.cryme < 0.5)
         // Both parties must be at least TENSE (TENSE or WAR)
         const relationships = [p.c.relationships.get(targetPlanet), tp.c.relationships.get(planet)]
         const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.TENSE || rel == RELATIONSHIP_TYPES.WAR)

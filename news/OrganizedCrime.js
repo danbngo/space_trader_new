@@ -10,7 +10,6 @@ class OrganizedCrimeNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 security: CL.LOW,
                 crime: CL.VERY_HIGH,
                 corruption: CL.VERY_HIGH

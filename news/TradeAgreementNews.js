@@ -10,7 +10,6 @@ class TradeAgreementNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 reserves: CL.HIGH,
                 economy: CL.SLIGHTLY_HIGH,
                 wealth: CL.HIGH

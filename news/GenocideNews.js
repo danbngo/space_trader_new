@@ -10,7 +10,6 @@ class GenocideNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 population: CL.LOW,
                 prestige: CL.LOW,
                 education: CL.LOW,

@@ -11,7 +11,7 @@ function createLootCargoTable(playerCargo = new CountsMap(), loot = new CountsMa
     ]
     for (const ct of CARGO_TYPES_ALL) {
         rows.push([
-            ct.name,
+            `${ct.symbol} ${ct.name}`,
             ''+loot.getAmount(ct),
             ''+playerCargo.getAmount(ct),
         ])

@@ -10,7 +10,7 @@ function createCargoTable(cargo = new CountsMap(), onSelectCargoType = (ct = CAR
     ]
     for (const ct of CARGO_TYPES_ALL) {
         rows.push([
-            ct.name,
+            `${ct.symbol} ${ct.name}`,
             ''+cargo.getAmount(ct),
         ])
     }

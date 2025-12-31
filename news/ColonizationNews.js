@@ -10,20 +10,26 @@ class ColonizationNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
+                navy: CL.VERY_LOW,
                 population: CL.LOW,
                 reserves: CL.LOW,
+                taxes: CL.HIGH,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.METAL, CL.VERY_HIGH], [CARGO_TYPES.ISOTOPES, CL.EXTREMELY_HIGH]])),
             },
             {
+                navy: CL.LOW,
                 population: CL.LOW,
-                reserves: CL.HIGH,
+                wealth: CL.HIGH,
+                prestige: CL.HIGH,
+                economy: CL.HIGH,
                 industry: CL.HIGH,
                 territory: CL.HIGH,
             },
             {
+                navy: CL.VERY_LOW,
                 population: CL.LOW,
                 reserves: CL.LOW,
+                taxes: CL.SLIGHTLY_HIGH,
                 prestige: CL.SLIGHTLY_LOW,
             }
         )

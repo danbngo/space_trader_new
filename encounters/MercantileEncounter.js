@@ -31,11 +31,11 @@ class MercantileEncounter extends NeutralsEncounter {
                 gs.fleet.cargo.increment(ct, -sellAmount)
                 gs.credits += finalSale
                 showModal(fleetName, 
-                    `You sold ${sellAmount} units of ${coloredName(ct)} for ${totalPrice}CR${officersShare ? ` (-${officersShare}CR for officers)` : ''}.<br/>
+                    `You sold ${sellAmount} units of ${ct.symbol} ${coloredName(ct)} for ${totalPrice}CR${officersShare ? ` (-${officersShare}CR for officers)` : ''}.<br/>
                     The ${fleetName} thank you and tell you to come again!<br/>`, [['Continue', ()=>this.endEncounter()]])
             }
 
-            msg += `They offer to buy ${sellAmount} ${coloredName(ct)} for ${pricePerUnit}CR each (total: ${totalPrice}CR).<br/>`
+            msg += `They offer to buy ${sellAmount} ${ct.symbol} ${coloredName(ct)} for ${pricePerUnit}CR each (total: ${totalPrice}CR).<br/>`
             msg += `Price vs. Market: ${roundToPlaces(100*pricePerUnit/ct.value,2)}%<br/>`
             msg += `Your amount after sale: ${gs.fleet.cargo.getAmount(ct) - sellAmount}<br/>`
             msg += `Sale Price: ${finalSale}CR ${officersShare ? `(-${officersShare}CR for officers)` : ''}<br/>`
@@ -69,7 +69,7 @@ class MercantileEncounter extends NeutralsEncounter {
             const buyAmount = rng(maxBuyAmount, 1)
             const pricePerUnit = Math.ceil(ct.value * rng(1.5, 0.75, false))
             const totalPrice = pricePerUnit * buyAmount
-            msg += `They offer to sell you ${buyAmount} ${coloredName(ct)} for ${pricePerUnit}CR each (total: ${totalPrice}CR).<br/>`
+            msg += `They offer to sell you ${buyAmount} ${ct.symbol} ${coloredName(ct)} for ${pricePerUnit}CR each (total: ${totalPrice}CR).<br/>`
 
             if (gs.credits < totalPrice) {
                 msg += `The ${fleetName} shake their heads pityingly upon realizing you cannot afford their offer.<br/>`
@@ -84,7 +84,7 @@ class MercantileEncounter extends NeutralsEncounter {
                     gs.fleet.cargo.increment(ct, buyAmount)
                     gs.credits -= totalPrice
                     showModal(fleetName, 
-                        `You bought ${buyAmount} units of ${coloredName(ct)} for ${totalPrice}CR.<br/>
+                        `You bought ${buyAmount} units of ${ct.symbol} ${coloredName(ct)} for ${totalPrice}CR.<br/>
                         The merchants thank you and tell you to come again!<br/>`, [['Continue', ()=>this.endEncounter()]])
                 }
             }

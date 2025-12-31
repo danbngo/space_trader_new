@@ -10,7 +10,6 @@ class SurplusNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 reserves: CL.EXTREMELY_HIGH,
                 industry: CL.HIGH,
             },
@@ -33,7 +32,7 @@ class SurplusNews extends News {
     isValid() {
         const {planet: p} = this
         //we needed to be resource scarce to be looking for them so hard
-        const ratingsValid = planet.settlement.market.baseCargo.average/MARKET_AVERAGE_CARGO_PER_TYPE < CL.LOW
+        const ratingsValid = planet.c.reserves/MARKET_AVERAGE_CARGO_PER_TYPE < CL.LOW
         //more for flavor than anything, irl you could find goodies at any time
         const interferingEvent = News.planetHasAnyNews(planet, [NT.SURPLUS, NT.DEPRESSION, NT.SCARCITY])
         return ratingsValid && !interferingEvent

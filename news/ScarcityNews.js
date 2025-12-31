@@ -10,7 +10,6 @@ class ScarcityNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 population: CL.LOW,
                 reserves: CL.EXTREMELY_LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WATER, CL.ASTRONOMICAL]]))

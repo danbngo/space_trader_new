@@ -10,7 +10,6 @@ class ImmigrationNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 targetPlanet: this.targetPlanet,
                 population: CL.HIGH,
                 economy: CL.SLIGHTLY_HIGH,
@@ -47,10 +46,7 @@ class ImmigrationNews extends News {
     }
 
     shouldCancel() {
-        const rel1 = this.planet.c.relationships.get(this.targetPlanet)
-        const rel2 = this.targetPlanet.c.relationships.get(this.planet)
-        return rel1 === RELATIONSHIP_TYPES.TENSE || rel1 === RELATIONSHIP_TYPES.WAR ||
-               rel2 === RELATIONSHIP_TYPES.TENSE || rel2 === RELATIONSHIP_TYPES.WAR
+        return Civilization.areTenseOrAtWar(this.planet, this.targetPlanet)
     }
 
     determineOutcome() {

@@ -10,7 +10,6 @@ class EnslavementNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 targetPlanet: this.targetPlanet,
                 industry: CL.SLIGHTLY_HIGH,
                 population: CL.SLIGHTLY_HIGH,

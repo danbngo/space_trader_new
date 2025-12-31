@@ -10,7 +10,6 @@ class InvestmentNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 targetPlanet: this.targetPlanet,
                 wealth: CL.LOW,
                 reserves: CL.VERY_LOW,
@@ -62,12 +61,11 @@ class InvestmentNews extends News {
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         //need to have sufficient economy of our own
-        const ratingsValid = p.c.wealth >= CL.SLIGHTLY_HIGH || p.settlement.market.baseCargo.average/MARKET_AVERAGE_CARGO_PER_TYPE > CL.SLIGHTLY_HIGH
+        const ratingsValid = p.c.wealth >= CL.SLIGHTLY_HIGH || p.c.reserves/MARKET_AVERAGE_CARGO_PER_TYPE > CL.SLIGHTLY_HIGH
         //our economy should be larger than theirs
-        const transferValid = p.c.economy > tp.c.economy && p.settlement.bank.baseCredits > tp.settlement.bank.baseCredits && p.settlement.market.baseCargo.average > tp.settlement.market.baseCargo.average
+        const transferValid = p.c.economy > tp.c.economy && p.c.wealth > tp.c.wealth && p.c.reserves > tp.c.reserves
         //both planets must be neutral or allies
-        const relationships = [p.c.relationships.get(tp), tp.c.relationships.get(p)]
-        const relationshipsValid = relationships.every(rel => rel == RELATIONSHIP_TYPES.NEUTRAL || rel == RELATIONSHIP_TYPES.ALLY)
+        const relationshipsValid = Civilization.areAlliesOrNeutral(p, tp)
         //removed most of the requirements for this, can we not have like a marshall plan??
         const interferingEvent = 
             News.hasNews(NT.INVESTMENT, p, tp)

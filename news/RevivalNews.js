@@ -10,7 +10,6 @@ class RevivalNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 education: CL.LOW,
                 crime: CL.LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([

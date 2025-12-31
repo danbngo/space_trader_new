@@ -16,7 +16,7 @@ function createMarketCargoTable(blackMarket = false, playerCargo = new CountsMap
     const cargoTypes = blackMarket ? CARGO_TYPES_ALL.filter(ct=>ct.illegal) : CARGO_TYPES_ALL.filter(ct=>(!ct.illegal))
     for (const ct of cargoTypes) {
         rows.push([
-            ct.name,
+            `${ct.symbol} ${ct.name}`,
             statColorSpan(marketCargo.getAmount(ct), marketCargo.getAmount(ct)/MARKET_AVERAGE_CARGO_PER_TYPE),
             statColorSpan(buyPrices.getAmount(ct), ct.value/buyPrices.getAmount(ct)),
             playerCargo.getAmount(ct),

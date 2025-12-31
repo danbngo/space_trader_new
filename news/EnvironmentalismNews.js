@@ -10,7 +10,6 @@ class EnvironmentalismNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 industry: CL.EXTREMELY_LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.NANITES, CL.EXTREMELY_LOW], [CARGO_TYPES.METAL, CL.EXTREMELY_LOW]])),
             },

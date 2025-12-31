@@ -10,7 +10,6 @@ class DisarmamentNews extends News {
 
         this.addPlanetEffect(
             {
-                planet: this.planet,
                 army: CL.LOW,
                 navy: CL.LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_LOW], [CARGO_TYPES.WEAPONS, CL.EXTREMELY_LOW]])),
