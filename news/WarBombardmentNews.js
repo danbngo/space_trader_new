@@ -34,8 +34,8 @@ class WarBombardmentNews extends News {
                 economy: CL.SLIGHTLY_LOW,
                 industry: CL.SLIGHTLY_LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([
-                    [CARGO_TYPES.METAL, CL.HIGH],
-                    [CARGO_TYPES.NANITES, CL.HIGH],
+                    [CARGO_TYPES.WATER, CL.ASTRONOMICAL],
+                    [CARGO_TYPES.FOOD, CL.ASTRONOMICAL],
                     [CARGO_TYPES.MEDICINE, CL.ASTRONOMICAL]
                 ]))
             },

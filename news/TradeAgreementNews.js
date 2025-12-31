@@ -3,7 +3,7 @@ class TradeAgreementNews extends News {
         super(
             `${coloredName(planet)} and ${coloredName(targetPlanet)} sign an expansive trade agreement, benefitting both planets!`,
             `${coloredName(planet)} and ${coloredName(targetPlanet)}'s trade agreement has lapsed!`,
-            `Trade negotiations between ${coloredName(planet)} and ${coloredName(targetPlanet)} collapse due to economic instability!`,
+            ``,
             `Rising tensions force ${coloredName(planet)} and ${coloredName(targetPlanet)} to suspend trade agreement!`,
             NT.TRADE_AGREEMENT, planet, targetPlanet
         )
@@ -18,10 +18,7 @@ class TradeAgreementNews extends News {
                 economy: CL.SLIGHTLY_HIGH,
                 wealth: CL.SLIGHTLY_HIGH
             },
-            {
-                economy: CL.LOW,
-                wealth: CL.LOW
-            },
+            {},
             {
                 reserves: CL.SLIGHTLY_HIGH,
                 economy: CL.SLIGHTLY_HIGH,
@@ -39,10 +36,7 @@ class TradeAgreementNews extends News {
                 economy: CL.SLIGHTLY_HIGH,
                 wealth: CL.SLIGHTLY_HIGH
             },
-            {
-                economy: CL.LOW,
-                wealth: CL.LOW
-            },
+            {},
             {
                 reserves: CL.SLIGHTLY_HIGH,
                 economy: CL.SLIGHTLY_HIGH,

@@ -1,26 +1,33 @@
 class TourismNews extends News {
     constructor(planet = new Planet()) {
         super(
-            `${planet.name} turns one of its moons into a resort to attract tourists from across the system!`,
-            `${coloredName(planet)} completes its lunar resort, attracting a rush of lucrative tourism!`,
-            `${coloredName(planet)}'s lunar resort project fails to attract tourists!`,
+            `${planet.name} has begun building lush attractions and resorts to attract tourists from across the system!`,
+            `${coloredName(planet)} completes its attractions and resorts, attracting a rush of lucrative tourism!`,
+            `${coloredName(planet)}'s push to attract tourism fails due to crime and safety concerns!`,
             ``,
             NT.TOURISM, planet
         )
         this.addPlanetEffect(
             {
-                wealth: CL.LOW,
+                taxes: CL.HIGH,
                 cargoPriceMultipliers: new CountsMap(new Map([
-                    [CARGO_TYPES.METAL, 2],
-                    [CARGO_TYPES.NANITES, 2]
+                    [CARGO_TYPES.METAL, CL.HIGH],
+                    [CARGO_TYPES.HOLOCUBES, CL.HIGH]
                 ]))
             },
             {
-                wealth: 1.5 / 0.7,
-                culture: CL.SLIGHTLY_HIGH,
+                taxes: CL.SLIGHTLY_HIGH,
+                economy: CL.VERY_HIGH,
+                culture: CL.HIGH,
+                inflation: CL.SLIGHTLY_HIGH,
+                crime: CL.SLIGHTLY_HIGH,
+                prestige: CL.SLIGHTLY_HIGH,
+                wealth: CL.HIGH
             },
             {
-                wealth: CL.NO_REGRESSION,
+                taxes: CL.SLIGHTLY_HIGH,
+                crime: CL.SLIGHTLY_HIGH,
+                corruption: CL.SLIGHTLY_HIGH,
                 prestige: CL.LOW
             }
         )
@@ -29,18 +36,22 @@ class TourismNews extends News {
     determineOutcome() {
         const {planet: p} = this
         // Tourism succeeds unless planet has low prestige or poor economy
-        this.rollOutcome(1 - (1 - p.c.prestige) * (1 - p.c.economy) * 0.3)
+        this.rollOutcome((p.c.prestige+p.c.wealth+p.c.territory)*p.c.security/3 / (p.c.crime), CL.MEDIUM)
+    }
+
+    shouldCancel() {
+        const {planet: p} = this
+        // Tourism cancelled if any dangerous event threatens the planet
+        return News.planetHasAnyNews(p, NT_DANGEROUS)
     }
 
     isValid() {
         const {planet: p} = this
-        //more likely to try this out if we need money
-        const ratingsValid = p.c.wealth < CL.LOW
+        //more likely to try this out if we need economy
+        const ratingsValid = (p.c.economy < CL.MEDIUM) || (p.c.culture < CL.MEDIUM)
         const interferingEvent = 
-            News.planetHasAnyNews(planet, [NT.TOURISM, ...NT_ECONOMY_PREVENTING]) ||
-            News.planetHasAnyNewsTargeting(planet, NT_ECONOMY_PREVENTING) ||
-            News.planetHasAnyNews(planet, NT_DANGEROUS) ||
-            News.planetHasAnyNewsTargeting(planet, NT_DANGEROUS)
+            News.planetHasAnyNews(p, [...NT_DANGEROUS, ...NT_ECONOMY_PREVENTING]) ||
+            News.planetHasAnyNewsTargeting(p, [...NT_DANGEROUS, ...NT_ECONOMY_PREVENTING])
         return ratingsValid && !interferingEvent
     }
 }

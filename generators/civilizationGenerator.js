@@ -70,9 +70,28 @@ function generateCivilization(planet = new Planet()) {
         races.set(selectedRaces[i], weights[i] / totalWeight)
     }
 
+    // Generate random religion demographics from star system religions
+    const religions = new CountsMap()
+    if (RELIGIONS && RELIGIONS.length > 0) {
+        const numReligions = Math.min(rng(RELIGIONS.length, 1), RELIGIONS.length)
+        const selectedReligions = rndMembers(RELIGIONS, numReligions, true)
+        
+        // Generate random weights for religions
+        const religionWeights = []
+        for (let i = 0; i < selectedReligions.length; i++) {
+            religionWeights.push(Math.random() * 10 + 1)
+        }
+        
+        // Normalize to sum to 1.0
+        const totalReligionWeight = religionWeights.reduce((sum, w) => sum + w, 0)
+        for (let i = 0; i < selectedReligions.length; i++) {
+            religions.setAmount(selectedReligions[i], religionWeights[i] / totalReligionWeight)
+        }
+    }
+
     return new Civilization({
         planet, governmentType, cargoPriceMultipliers, technology, education, territory, population,
          army, navy, industry, economy, security, culture, prestige, corruption, crime, policies,
-         wealth, reserves, inflation, taxes, races
+         wealth, reserves, inflation, taxes, races, religions
     })
 }

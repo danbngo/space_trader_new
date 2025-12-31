@@ -34,6 +34,31 @@ function showPlanetDemographicsMenu(planet = new Planet()) {
     msg += `<u>Territory</u><br/>`
     msg += `🗺️ Territorial Reach: ${describeTerritory(civilization.territory)}<br/>`
     
+    msg += `<br/>`
+    
+    // Religious Demographics
+    msg += `<u>Religious Demographics</u><br/>`
+    if (civilization.religions && civilization.religions.counts.size > 0) {
+        // Sort religions by proportion (highest first)
+        const sortedReligions = Array.from(civilization.religions.counts.entries())
+            .sort((a, b) => b[1] - a[1])
+        
+        for (const [religion, proportion] of sortedReligions) {
+            const percentage = (proportion * 100).toFixed(1)
+            const barWidth = Math.floor(proportion * 30) // Max 30 characters wide
+            const bar = '█'.repeat(barWidth) + '░'.repeat(30 - barWidth)
+            msg += `✦ ${colorSpan(religion.name, religion.color)}: ${percentage}%<br/>`
+            msg += `<span style="opacity: 0.6; font-family: monospace;">${bar}</span><br/>`
+            // Show traits
+            if (religion.traits && religion.traits.length > 0) {
+                const traitStr = religion.traits.map(t => colorSpan(t.name, t.color)).join(', ')
+                msg += `<span style="font-size: 0.85em; opacity: 0.8; margin-left: 1em;">Traits: ${traitStr}</span><br/>`
+            }
+        }
+    } else {
+        msg += `<span style="opacity: 0.6;">No organized religions present</span><br/>`
+    }
+    
     showPlanetModal(planet, `${coloredName(planet)} - Demographics`, msg, [
         ["Society", () => showPlanetSocietyMenu(planet)],
         ["Back", () => showPlanetMenu(planet)]
