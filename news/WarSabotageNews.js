@@ -1,9 +1,9 @@
 class WarSabotageNews extends News {
     constructor(planet = new Planet(), targetPlanet = new Planet()) {
         super(
-            `${coloredName(planet)} launches covert sabotage operations against ${coloredName(targetPlanet)}!`,
-            `${coloredName(planet)}'s sabotage campaign against ${coloredName(targetPlanet)} concludes!`,
-            '',
+            `${coloredName(planet)} launches a black ops campaign against ${coloredName(targetPlanet)}, going behind enemy lines!`,
+            `${coloredName(planet)}'s sabotage campaign against ${coloredName(targetPlanet)} concludes in a terrific series of bombings!`,
+            `${coloredName(planet)}'s saboteurs are swiftly rounded up by ${coloredName(targetPlanet)}'s counter-spies and executed!`,
             `${coloredName(planet)}'s sabotage operations against ${coloredName(targetPlanet)} are called off!`,
             NT.WAR_SABOTAGE, planet, targetPlanet
         )
@@ -12,26 +12,42 @@ class WarSabotageNews extends News {
 
         this.addPlanetEffect(
             {
-                security: CL.LOW,
+                security: CL.SLIGHTLY_LOW,
+                wealth: CL.SLIGHTLY_LOW
             },
             {
-                security: CL.NO_REGRESSION,
+                security: CL.SLIGHTLY_LOW,
+                wealth: CL.SLIGHTLY_LOW
             },
-            {},
-            {}
+            {
+                security: CL.SLIGHTLY_LOW,
+                wealth: CL.SLIGHTLY_LOW
+            },
+            {
+                wealth: CL.SLIGHTLY_LOW
+            }
         )
 
         this.addTargetPlanetEffect(
             {
-                buildingsDisabled,
-                industry: CL.LOW
+                industry: CL.SLIGHTLY_LOW,
+                economy: CL.SLIGHTLY_LOW,
+                security: CL.SLIGHTLY_LOW,
+                crime: CL.SLIGHTLY_HIGH,
+                technology: CL.SLIGHTLY_LOW
             },
             {
-                industry: CL.SLIGHTLY_HIGH
+                buildingsDisabled,
+                industry: CL.LOW,
+                economy: CL.LOW,
+                security: CL.VERY_LOW,
+                crime: CL.SLIGHTLY_HIGH,
+                technology: CL.LOW,
+                navy: CL.SLIGHTLY_LOW
             },
             {},
             {
-                industry: CL.SLIGHTLY_HIGH
+                security: CL.SLIGHTLY_HIGH
             }
         )
     }
@@ -45,9 +61,7 @@ class WarSabotageNews extends News {
         // Must be at war
         const relationshipValid = Civilization.areAtWar(p, tp)
         // Requires high security to conduct sabotage
-        const securityValid = (p.c.security > CL.MEDIUM) && (p.c.security/tp.c.security > CL.HIGH)
-        // Can't have sabotage already
-        const interferingEvent = News.hasNews(NT.WAR_SABOTAGE, p, tp)
-        return relationshipValid && securityValid && !interferingEvent
+        const securityValid = (p.c.security > CL.MEDIUM) && (p.c.security/tp.c.security > CL.MEDIUM)
+        return relationshipValid && securityValid
     }
 }

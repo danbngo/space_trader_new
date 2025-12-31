@@ -36,6 +36,7 @@ const NEWS_TYPE_CLASSES = [
     [NT.GENOCIDE, GenocideNews],
     [NT.IMMIGRATION, ImmigrationNews],
     [NT.INDUSTRIAL_ACCIDENT, IndustrialAccidentNews],
+    [NT.INQUISITION, InquisitionNews],
     [NT.BANKRUPTCY, BankruptcyNews],
     [NT.LAND_GRAB, LandGrabNews],
     [NT.INVESTMENT, InvestmentNews],
@@ -92,13 +93,26 @@ function generateNews(attemptsRemaining = 100, weights = []) {//only needs to be
     const planet = rndMember(planets)
     const targetPlanet = rndMember(planets.filter(p=>(p !== planet)))
     
-    // Use weighted selection based on news type weights, with 3x multiplier for favorite govs
+    // Use weighted selection based on news type weights, with 3x multiplier for favorite govs and policies
     if (weights.length == 0) weights = NEWS_TYPE_CLASSES.map(([newsType, cls]) => {
         let weight = newsType.weight || 1
+        
         // Triple the weight if this planet's government is a favorite for this news type
         if (newsType.favoriteGovs.includes(planet.c.governmentType)) {
             weight *= 3
         }
+        
+        // Check if any of the planet's policies favor or forbid this news type
+        const policies = planet.c.policies.all
+        for (const policy of policies) {
+            if (policy.favoriteNewsTypes.includes(newsType)) {
+                weight *= 3
+            }
+            if (policy.forbiddenNewsTypes.includes(newsType)) {
+                weight = 0
+            }
+        }
+        
         return weight
     })
     const index = rndIndexWeighted(weights)

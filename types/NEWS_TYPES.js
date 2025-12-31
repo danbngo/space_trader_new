@@ -71,6 +71,7 @@ const NT = {
     GENOCIDE: new NewsType('Genocide', NF.WAR, 1, 5, 15, 1, [GT.ANARCHY, GT.DEMOCRACY], [GT.POLICE_STATE, GT.ARISTOCRACY], []),
     IMMIGRATION: new NewsType('Immigration', NF.CULTURE, 1, 5, 10, 1, [], [GT.DEMOCRACY, GT.CORPORATISM], [GT.POLICE_STATE, GT.COMMUNISM]),
     INDUSTRIAL_ACCIDENT: new NewsType('Industrial Accident', NF.HEALTH_HAZARD, 1, 2, 5, 1, [], [GT.CORPORATISM], []),
+    INQUISITION: new NewsType('Inquisition', NF.OPPRESSION, 1, 5, 12, 1, [GT.DEMOCRACY, GT.ANARCHY], [GT.THEOCRACY, GT.POLICE_STATE], []),
     BANKRUPTCY: new NewsType('Bankruptcy', NF.ECONOMY, 1, 3, 8, 1, [GT.COMMUNISM], [GT.CORPORATISM, GT.DEMOCRACY], []),
     LAND_GRAB: new NewsType('Imperialism', NF.POLITICS, 1, 10, 30, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.ARISTOCRACY, GT.POLICE_STATE, GT.THEOCRACY], []),
     INVESTMENT: new NewsType('Investment', NF.ECONOMY, 1, 5, 10, 1, [], [GT.CORPORATISM], []),
