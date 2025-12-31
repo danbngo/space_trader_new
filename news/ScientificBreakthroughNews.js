@@ -1,9 +1,9 @@
 class ScientificBreakthroughNews extends News {
     constructor(planet = new Planet()) {
         super(
-            `${coloredName(planet)} begins work on a major scientific project!`,
-            `${coloredName(planet)} completes their scientific project, unlocking a major new ships!`,
-            `${coloredName(planet)}'s scientific project fails to yield results!`,
+            `${coloredName(planet)} begins work on a major scientific project, hoping to uncover new mysteries of the universe!`,
+            `${coloredName(planet)} completes their scientific project, allowing their society to make a leap forward!`,
+            `${coloredName(planet)}'s scientific project suffers setback after setback, wasting resources!`,
             ``,
             NT.SCIENTIFIC_BREAKTHROUGH, planet
         )

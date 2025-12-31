@@ -426,23 +426,6 @@ class News {
         return [news, possibleWarNews, possibleHostileNews]
     }
 
-    /**
-     * Gets all enabled (destroyable) buildings on a planet.
-     * @param {Planet} targetPlanet - The planet to check.
-     * @returns {Building[]} Array of enabled buildings.
-     */
-    static calcDestroyableBuildings = (targetPlanet = new Planet())=> {
-        return targetPlanet.s.buildings.filter(b => b.enabled);
-    }
-
-    /**
-     * Gets all disabled (repairable) buildings on a planet.
-     * @param {Planet} targetPlanet - The planet to check.
-     * @returns {Building[]} Array of disabled buildings.
-     */
-    static calcRepairableBuildings = (targetPlanet = new Planet())=> {
-        return targetPlanet.s.buildings.filter(b => !b.enabled);
-    }
 
     /**
      * Rolls for failure based on success chance and difficulty modifier.

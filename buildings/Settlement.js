@@ -58,4 +58,10 @@ class Settlement {
     get buildings() {
         return [this.academy, this.armory, this.bank, this.blackMarket, this.casino, this.courthouse, this.cyberSurgeon, this.guild, this.market, this.outfitter, this.palace, this.shipyard, this.tavern, this.temple]
     }
+    get destroyableBuildings() {
+        return this.buildings.filter(b=>(b.enabled))
+    }
+    get fixableBuildings() {
+        return this.buildings.filter(b=>!b.enabled)
+    }
 }

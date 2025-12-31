@@ -3,61 +3,71 @@ class WarBombardmentNews extends News {
         super(
             `${coloredName(planet)} brings in its heavy bombers and commences orbital bombardment of ${coloredName(targetPlanet)}!`,
             `${coloredName(planet)}'s orbital bombardment of ${coloredName(targetPlanet)} has forced their surrender!`,
-            '',
+            `${coloredName(planet)}'s bombers are repelled by ${coloredName(targetPlanet)}'s fighters and orbital defenses!`,
             `${coloredName(planet)}'s bombardment of ${coloredName(targetPlanet)} is halted by peace treaty!`,
             NT.BOMBARDMENT, planet, targetPlanet
         )
 
-        const buildingsToDisable = [];
-        const numBuildings = Math.floor(Math.random() * 3) + 1; // 1-3 buildings
-        const enabledBuildings = targetPlanet.settlement.buildings.filter(b => b.enabled);
-        for (let i = 0; i < Math.min(numBuildings, enabledBuildings.length); i++) {
-            const building = rndMember(enabledBuildings.filter(b => b.enabled && !buildingsToDisable.includes(b)));
-            if (building) buildingsToDisable.push(building);
-        }
+        const buildingsToDisable = rndMembers(this.planet.settlement.destroyableBuildings);
 
         this.addPlanetEffect(
             {
-                prestige: CL.HIGH,
-                military: CL.SLIGHTLY_LOW
+                navy: CL.LOW,
+                reserves: CL.SLIGHTLY_LOW,
             },
-            {},
-            {},
             {
-                prestige: CL.NO_REGRESSION,
-            }
+                navy: CL.SLIGHTLY_LOW,
+                reserves: CL.SLIGHTLY_LOW,
+                prestige: CL.HIGH
+            },
+            {
+                navy: CL.LOW,
+                reserves: CL.SLIGHTLY_LOW,
+            },
         )
 
         this.addTargetPlanetEffect(
             {
-                population: CL.LOW,
-                military: CL.EXTREMELY_LOW,
-                technology: CL.LOW,
-                buildingsDisabled: buildingsToDisable,
+                population: CL.SLIGHTLY_LOW,
+                military: CL.SLIGHTLY_LOW,
+                navy: CL.SLIGHTLY_LOW,
+                economy: CL.SLIGHTLY_LOW,
+                industry: CL.SLIGHTLY_LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([
-                    [CARGO_TYPES.WATER, 2],
-                    [CARGO_TYPES.MEDICINE, 2]
+                    [CARGO_TYPES.METAL, CL.HIGH],
+                    [CARGO_TYPES.NANITES, CL.HIGH],
+                    [CARGO_TYPES.MEDICINE, CL.ASTRONOMICAL]
                 ]))
             },
             {
-                population: CL.NO_REGRESSION,
-                military: CL.NO_REGRESSION,
-                technology: CL.NO_REGRESSION,
-                buildingsEnabled: [],
+                population: CL.LOW,
+                military: CL.EXTREMELY_LOW,
+                navy: CL.LOW,
+                technology: CL.LOW, //back to the stone age!
+                education: CL.LOW,
+                economy: CL.LOW,
+                industry: CL.LOW,
+                buildingsDisabled: buildingsToDisable,
                 forcePeace: true
             },
             {},
             {
-                population: CL.SLIGHTLY_HIGH,
-                military: CL.SLIGHTLY_HIGH,
-                security: CL.SLIGHTLY_HIGH,
-                forcePeace: true
+                population: CL.SLIGHTLY_LOW,
+                military: CL.SLIGHTLY_LOW,
+                navy: CL.SLIGHTLY_LOW,
+                economy: CL.SLIGHTLY_LOW,
+                industry: CL.SLIGHTLY_LOW,
             }
         )
     }
 
     shouldCancel() {
         return !Civilization.areAtWar(this.planet, this.targetPlanet)
+    }
+
+    determineOutcome() {
+        this.rollOutcome(this.planet.c.navy * this.planet.c.technology * this.planet.c.reserves
+            / this.targetPlanet.c.navy / this.targetPlanet.c.technology, CL.SLIGHTLY_HIGH)
     }
 
     isValid() {
