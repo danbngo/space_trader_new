@@ -43,10 +43,12 @@ function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
         ? captain.implants.map(i => colorSpan(i.implantType.name, i.implantType.color) + ` (${roundToPlaces(i.quality*100, 1)}%)`).join(', ')
         : colorSpan('(None)', COLORS.Gray)
 
+    const raceText = captain.race ? `${captain.race.icon} ${colorSpan(captain.race.name, captain.race.color)}` : 'Human'
+
     showModal(
         `Captain Overview`,
         ce({children:[
-            `Name: ${name} | Credits ${credits}`,
+            `Name: ${name} | Race: ${raceText} | Credits ${credits}`,
             `Level: ${level} | Exp.: ${expPoints} | To Next Lvl: ${expToNextLevel}`,
             `Skill Points: ${colorSpan(String(skillPoints), skillPoints > 0 ? COLORS.Green : '')}`,
             skillTable,

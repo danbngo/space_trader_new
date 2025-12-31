@@ -26,7 +26,7 @@ class PlagueNews extends News {
                 reserves: CL.SLIGHTLY_LOW
             },
             {
-                population: CL.VERY_LOW,
+                population: CL.EXTREMELY_LOW,
                 industry: CL.VERY_LOW,
                 economy: CL.VERY_LOW,
                 army: CL.LOW,

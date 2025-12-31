@@ -27,6 +27,9 @@ function generateOfficer(planet = new Planet(), withImplants = false, reputation
     const credits = 0
     const officer = new Officer(generateOfficerName(planet), credits)
     
+    // Assign random race
+    officer.race = rndMember(RACES_ALL)
+    
     // Level up to target level
     for (let i = 0; i < level; i++) {
         officer.levelUp(false) // Don't auto-improve skills during leveling

@@ -1,31 +1,30 @@
 class RaidingNews extends News {
     constructor(planet = new Planet(), targetPlanet = new Planet()) {
         super(
-            `${coloredName(planet)} sends raiding parties to take riches and goods from ${coloredName(targetPlanet)}! Plundered goods flood their markets!`,
+            `${coloredName(planet)} sends raiding parties deep into ${coloredName(targetPlanet)}, seeking riches and plunder!`,
             `${coloredName(planet)} ceases its raiding operations against ${coloredName(targetPlanet)}, having satiated its hunger for riches!`,
-            `${coloredName(targetPlanet)} repels ${coloredName(planet)}'s raiders, inflicting heavy losses!`,
+            `${coloredName(planet)}'s raiders are repelled by ${coloredName(targetPlanet)} after taking heavy losses!`,
             `Peace treaty sees ${coloredName(planet)} end its raids on ${coloredName(targetPlanet)}!`,
             NT.RAIDING, planet, targetPlanet
         )
 
         this.addPlanetEffect(
             {
-                reserves: CL.SLIGHTLY_HIGH,
-                wealth: CL.SLIGHTLY_HIGH,
-                territory: CL.SLIGHTLY_HIGH,
                 prestige: CL.SLIGHTLY_LOW,
                 navy: CL.SLIGHTLY_LOW,
-                army: CL.SLIGHTLY_LOW
+                army: CL.LOW
             },
             {
+                territory: CL.SLIGHTLY_HIGH,
                 reserves: CL.HIGH,
-                wealth: CL.HIGH,
-                territory: CL.HIGH,
+                wealth: CL.VERY_HIGH,
                 prestige: CL.SLIGHTLY_LOW,
-                army: CL.SLIGHTLY_LOW
+                army: CL.SLIGHTLY_LOW,
+                inflation: CL.VERY_LOW,
+                taxes: CL.VERY_LOW
             },
             {
-                prestige: CL.VERY_LOW,
+                prestige: CL.LOW,
                 navy: CL.SLIGHTLY_LOW,
                 army: CL.LOW
             },
@@ -41,7 +40,6 @@ class RaidingNews extends News {
                 security: CL.SLIGHTLY_LOW,
                 economy: CL.SLIGHTLY_LOW,
                 prestige: CL.SLIGHTLY_LOW,
-                army: CL.SLIGHTLY_LOW
             },
             {
                 reserves: CL.LOW,
@@ -53,7 +51,6 @@ class RaidingNews extends News {
             },
             {
                 prestige: CL.HIGH,
-                military: CL.SLIGHTLY_LOW,
                 culture: CL.SLIGHTLY_HIGH,
             },
         )
@@ -64,13 +61,13 @@ class RaidingNews extends News {
     }
 
     determineOutcome() {
-        this.rollOutcome((this.planet.c.military/this.targetPlanet.c.military), CL.MEDIUM)
+        this.rollOutcome((this.planet.c.army/this.targetPlanet.c.military), CL.MEDIUM)
     }
 
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         // More likely if military is high and goods are low
-        const ratingsValid = p.c.army > 1.25 && (p.c.reserves/MARKET_AVERAGE_CARGO_PER_TYPE < 0.5 || p.c.crime < 0.5)
+        const ratingsValid = p.c.army > CL.SLIGHTLY_HIGH && p.c.navy > CL.SLIGHTLY_HIGH && p.c.wealth < CL.MEDIUM && tp.c.military > CL.HIGH
         const relationshipsValid = Civilization.areAtWar(p, tp)
         return ratingsValid && relationshipsValid
     }

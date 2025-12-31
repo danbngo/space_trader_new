@@ -7,13 +7,15 @@
 function createOfficersTable(officers = [new Officer()], onSelectOfficer = (officer = new Officer())=>{}) {
     if (officers.length == 0) return `(None)`
     const rows = [
-        ['Name', 'Piloting', 'Age', 'Level', 'CR Share', ...SKILLS_ALL]
+        ['Name', 'Race', 'Piloting', 'Age', 'Level', 'CR Share', ...SKILLS_ALL]
     ]
     for (const officer of officers) {
         const assignedShip = gs.fleet.getAssignedShip(officer)
         const shipName = assignedShip ? assignedShip.name : colorSpan('(None)', COLORS.Gray)
+        const raceDisplay = officer.race ? `${officer.race.icon} ${officer.race.name}` : 'Human'
         rows.push([
             officer.name,
+            raceDisplay,
             shipName,
             ''+officer.age,
             ''+statColorSpan(officer.level, officer.level/5),
@@ -54,6 +56,8 @@ function showOfficersMenu(officers = gs.fleet.officers, tab = 'roster') {
         const assignedShip = gs.fleet.getAssignedShip(officer)
         const pilotingText = assignedShip ? assignedShip.name : colorSpan('(None)', COLORS.Gray)
         
+        const raceText = officer.race ? `${officer.race.icon} ${colorSpan(officer.race.name, officer.race.color)}` : 'Human'
+        
         const buttons = [
             ['Fire', ()=>showFireOfficerModal(officer), gs.fleet.numPilots <= gs.fleet.ships.length],
             ["Close", () => closeModal()],
@@ -61,6 +65,7 @@ function showOfficersMenu(officers = gs.fleet.officers, tab = 'roster') {
         
         const infoPanel = ce({children: [
             `<b>${officer.name}</b> (Level ${officer.level})<br/>`,
+            `<b>Race:</b> ${raceText}<br/>`,
             `<b>Piloting:</b> ${pilotingText}<br/>`,
             `<b>Skills:</b> `,
             SKILLS_ALL.map(sk => `${sk}: ${officer.skills.getAmount(sk)}`).join(', '),

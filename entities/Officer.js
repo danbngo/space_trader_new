@@ -43,6 +43,8 @@ class Officer {
         this.perks = [];
         /** @type {number} */
         this.age = 25; // Default age
+        /** @type {Race} */
+        this.race = RACES.HUMAN; // Default race
         /** @type {Map<EquipmentSlot, Equipment>} */
         this.equipment = new Map();
     }
