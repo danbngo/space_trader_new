@@ -2,8 +2,8 @@ class WarScorchedEarthNews extends News {
     constructor(planet = new Planet(), targetPlanet = new Planet()) {
         super(
             `${coloredName(planet)} adopts a scorched earth policy, destroying territory to blunt ${coloredName(targetPlanet)}'s advance!`,
-            `${coloredName(planet)}'s scorched earth campaign ends, leaving devastation in its wake!`,
-            ``,
+            `${coloredName(planet)}'s scorched earth campaign causes ${coloredName(targetPlanet)}'s forces to suffer massive losses from attrition!`,
+            `${coloredName(planet)}'s scorched earth campaign fails as ${coloredName(targetPlanet)}'s forces are too well-supplied!`,
             `Peace treaty halts ${coloredName(planet)}'s scorched earth policy mid-execution!`,
             NT.WAR_SCORCHED_EARTH, planet, targetPlanet
         )
@@ -12,26 +12,34 @@ class WarScorchedEarthNews extends News {
             {
                 territory: CL.LOW,
                 industry: CL.LOW,
+                economy: CL.SLIGHTLY_LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.FOOD, CL.EXTREMELY_HIGH], [CARGO_TYPES.WATER, CL.EXTREMELY_HIGH]]))
             },
             {
-                territory: CL.NO_REGRESSION,
+                territory: CL.LOW,
+                industry: CL.LOW,
+                economy: CL.SLIGHTLY_LOW,
             },
-            {},
             {
-                territory: CL.SLIGHTLY_HIGH,
+                territory: CL.LOW,
+                industry: CL.LOW,
+                economy: CL.SLIGHTLY_LOW,
+            },
+            {
+                territory: CL.LOW,
             }
         )
 
         this.addTargetPlanetEffect(
             {
-                military: CL.SLIGHTLY_LOW,
+                army: CL.SLIGHTLY_LOW,
             },
             {
-                military: CL.NO_REGRESSION,
+                army: CL.VERY_LOW,
             },
-            {},
-            {}
+            {
+                army: CL.SLIGHTLY_LOW,
+            },
         )
     }
 
@@ -40,7 +48,7 @@ class WarScorchedEarthNews extends News {
     }
 
     determineOutcome() {
-        // Scorched earth always completes (no rollOutcome needed)
+        this.rollOutcome(this.planet.c.territory*this.planet.c.army / this.targetPlanet.c.military / this.targetPlanet.c.economy, CL.LOW)
     }
 
     isValid() {
@@ -50,8 +58,6 @@ class WarScorchedEarthNews extends News {
         const territoryValid = p.c.territory > CL.HIGH
         // we need to be desperate
         const militaryValid = p.c.military/tp.c.military < CL.SLIGHTLY_LOW
-        // Can't have scorched earth already
-        const interferingEvent = News.hasNews(NT.WAR_SCORCHED_EARTH, p, tp)
-        return militaryValid && relationshipValid && territoryValid && !interferingEvent
+        return militaryValid && relationshipValid && territoryValid
     }
 }
