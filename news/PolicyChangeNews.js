@@ -8,24 +8,24 @@ class PolicyChangeNews extends News {
         let validPolicies = []
         let currentPolicy = null
 
-        const p = planet
+        const pl = planet
         
         switch(categoryToChange) {
             case 'economic':
-                validPolicies = ECONOMIC_POLICIES.filter(p => !p.forbiddenGovs.includes(p.c.governmentType))
-                currentPolicy = p.c.policies.economic
+                validPolicies = ECONOMIC_POLICIES.filter(p => !p.forbiddenGovs.includes(pl.c.governmentType))
+                currentPolicy = pl.c.policies.economic
                 break
             case 'labor':
-                validPolicies = LABOR_POLICIES.filter(p => !p.forbiddenGovs.includes(p.c.governmentType))
-                currentPolicy = p.c.policies.labor
+                validPolicies = LABOR_POLICIES.filter(p => !p.forbiddenGovs.includes(pl.c.governmentType))
+                currentPolicy = pl.c.policies.labor
                 break
             case 'social':
-                validPolicies = SOCIAL_POLICIES.filter(p => !p.forbiddenGovs.includes(p.c.governmentType))
-                currentPolicy = p.c.policies.social
+                validPolicies = SOCIAL_POLICIES.filter(p => !p.forbiddenGovs.includes(pl.c.governmentType))
+                currentPolicy = pl.c.policies.social
                 break
             case 'foreign':
-                validPolicies = FOREIGN_POLICIES.filter(p => !p.forbiddenGovs.includes(p.c.governmentType))
-                currentPolicy = p.c.policies.foreign
+                validPolicies = FOREIGN_POLICIES.filter(p => !p.forbiddenGovs.includes(pl.c.governmentType))
+                currentPolicy = pl.c.policies.foreign
                 break
         }
         
@@ -51,15 +51,20 @@ class PolicyChangeNews extends News {
         }
 
         if (newPolicy.flavor === NF.ECONOMY) {
-            baseParams.inflation = CL.MEDIUM
+            baseParams.economy = CL.SLIGHTLY_LOW
+            baseParams.inflation = CL.SLIGHTLY_HIGH
         } else if (newPolicy.flavor === NF.LABOR) {
-            baseParams.economy = CL.MEDIUM
+            baseParams.industry = CL.SLIGHTLY_LOW
+            baseParams.reserves = CL.SLIGHTLY_LOW
         } else if (newPolicy.flavor === NF.CULTURE) {
-            baseParams.culture = CL.MEDIUM
-            baseParams.crime = CL.MEDIUM
+            baseParams.culture = CL.SLIGHTLY_LOW
+            baseParams.prestige = CL.SLIGHTLY_LOW
         } else if (newPolicy.flavor === NF.POLITICS) {
-            baseParams.prestige = CL.MEDIUM
+            baseParams.crime = CL.SLIGHTLY_HIGH
+            baseParams.corruption = CL.SLIGHTLY_HIGH
         }
+
+        const invertedBaseParams = new Civilization(baseParams).getInverse()
 
         this.addPlanetEffect(
             baseParams,
@@ -81,10 +86,8 @@ class PolicyChangeNews extends News {
                     }
                 }
             },
-            {
-                prestige: CL.SLIGHTLY_LOW,
-                economy: CL.SLIGHTLY_LOW
-            }
+            invertedBaseParams,
+            baseParams //retain bad effects
         )
     }
 
@@ -97,13 +100,13 @@ class PolicyChangeNews extends News {
 
     isValid() {
         const {planet: p} = this
-        // More likely during stable times with decent prestige
-        const ratingsValid = p.c.prestige > CL.LOW && p.c.security > CL.LOW
+        // cultures with higher culture, education more prone to change
+        const ratingsValid = p.c.culture > CL.HIGH || p.c.education > CL.HIGH &&
+        //something needs to be going bad
+            (p.c.economy < CL.LOW || p.c.industry < CL.LOW || p.c.security < CL.LOW || p.c.taxes > CL.HIGH || p.c.culture < CL.LOW || p.c.corruption > CL.HIGH || p.c.crime > CL.HIGH || p.c.prestige < CL.LOW || p.c.wealth < CL.LOW)
         
         // Can't change policy during major upheaval
-        const interferingEvent = News.planetHasAnyNews(planet, [
-            NT.REVOLUTION, NT.CIVIL_WAR, NT.COUP_DETAT, NT.POLICY_CHANGE, NT.WAR
-        ]) || News.hasNewsTargeting(NT.WAR, planet)
+        const interferingEvent = News.planetHasAnyNews(p, NT_GOVERNANCE_PREVENTING) || News.planetHasAnyNewsTargeting(p, NT_WARLIKE)
         
         return ratingsValid && !interferingEvent
     }
