@@ -13,6 +13,7 @@ class ReligionRevivalNews extends News {
                 culture: CL.SLIGHTLY_HIGH,
                 population: CL.SLIGHTLY_HIGH,
                 education: CL.SLIGHTLY_LOW,
+                corruption: CL.SLIGHTLY_LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([
                     [CARGO_TYPES.HOLOCUBES, CL.VERY_HIGH],
                     [CARGO_TYPES.ISOTOPES, CL.EXTREMELY_LOW]
@@ -22,21 +23,22 @@ class ReligionRevivalNews extends News {
                 population: CL.HIGH,
                 education: CL.SLIGHTLY_LOW,
                 culture: CL.VERY_HIGH,
+                corruption: CL.EXTREMELY_LOW,
             },
             {
                 population: CL.SLIGHTLY_HIGH,
                 education: CL.SLIGHTLY_LOW,
                 culture: CL.LOW,
                 security: CL.LOW,
-                corruption: CL.HIGH
+                corruption: CL.SLIGHTLY_HIGH
             }
         )
     }
 
     isValid() {
         const {planet: p} = this
-        //tends to happen when culture is at a low point
-        const ratingsValid = p.c.culture < CL.LOW
+        //tends to happen when culture is at a low point or corruption is very high
+        const ratingsValid = p.c.culture < CL.LOW || p.c.corruption > CL.VERY_HIGH
         return ratingsValid
     }
 

@@ -48,7 +48,8 @@ class ResearchAgreementNews extends News {
     }
 
     determineOutcome() {
-        this.rollOutcome(this.planet.c.education*this.targetPlanet.c.education*this.planet.c.taxes*this.targetPlanet.c.taxes/this.planet.c.technology/this.targetPlanet.c.technology, CL.MEDIUM)
+        this.rollOutcome(this.planet.c.education * this.targetPlanet.c.education*this.planet.c.taxes * this.targetPlanet.c.taxes
+            / this.planet.c.technology / this.targetPlanet.c.technology, CL.MEDIUM)
     }
 
     isValid() {

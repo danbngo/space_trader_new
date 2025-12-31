@@ -45,7 +45,7 @@ class RevolutionNews extends News {
     determineOutcome() {
         const {planet: p} = this
         // Higher culture, lower military helps
-        this.rollOutcome((p.c.culture * p.c.education / p.c.army / p.c.security) / 2)
+        this.rollOutcome((p.c.culture * p.c.education * p.c.population / p.c.army / p.c.security), CL.MEDIUM)
     }
 
     shouldCancel() {
@@ -57,7 +57,7 @@ class RevolutionNews extends News {
     isValid() {
         const {planet: p} = this
         //a generally robust economy/govt less prone to this
-        const ratingsValid = p.c.security < CL.MEDIUM || p.c.military < CL.MEDIUM || p.c.prestige < CL.MEDIUM || p.c.crime > CL.MEDIUM || p.c.security < CL.MEDIUM || p.c.economy < CL.MEDIUM
+        const ratingsValid = p.c.score < CL.SLIGHTLY_LOW
         //planet must not be puppet state (anarcy is fine otherwise how do we get back out of it)
         const interferingEvent =
             News.planetHasAnyNews(p, NT_GOVERNANCE_PREVENTING) ||
