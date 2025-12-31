@@ -91,6 +91,13 @@ class Civilization {
         this.taxes = taxes; //tax rate applied to most transactions (0 to MAX_TAX_RATE)
     }
 
+    get score() {
+        const positives = (this.technology + this.education + this.economy + this.industry + this.security + this.culture + this.prestige
+            + this.army + this.navy + this.wealth + this.reserves) / 11
+        const negatives = (this.corruption + this.crime + this.inflation + this.taxes) / 4
+        return positives/negatives
+    }
+
     get taxRate() {
         return this.taxes * MAX_TAX_RATE / 2 //this.taxes ranges from 0-2
     }

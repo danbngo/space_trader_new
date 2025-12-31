@@ -94,16 +94,15 @@ class PolicyChangeNews extends News {
     determineOutcome() {
         const {planet: p} = this
         // Higher prestige, culture, and stability make policy changes more likely to succeed
-        const successProbability = (p.c.prestige + p.c.culture + p.c.security) / 3
+        const successProbability = (p.c.prestige + p.c.culture + p.c.security + p.c.taxes) / 4
         this.rollOutcome(successProbability, CL.MEDIUM)
     }
 
     isValid() {
         const {planet: p} = this
         // cultures with higher culture, education more prone to change
-        const ratingsValid = p.c.culture > CL.HIGH || p.c.education > CL.HIGH &&
         //something needs to be going bad
-            (p.c.economy < CL.LOW || p.c.industry < CL.LOW || p.c.security < CL.LOW || p.c.taxes > CL.HIGH || p.c.culture < CL.LOW || p.c.corruption > CL.HIGH || p.c.crime > CL.HIGH || p.c.prestige < CL.LOW || p.c.wealth < CL.LOW)
+        const ratingsValid = p.c.culture > CL.HIGH || p.c.education > CL.HIGH && p.c.score < CL.MEDIUM
         
         // Can't change policy during major upheaval
         const interferingEvent = News.planetHasAnyNews(p, NT_GOVERNANCE_PREVENTING) || News.planetHasAnyNewsTargeting(p, NT_WARLIKE)

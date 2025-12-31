@@ -16,13 +16,15 @@ class LudditismNews extends News {
                     [CARGO_TYPES.NANITES, CL.EXTREMELY_LOW],
                     [CARGO_TYPES.ISOTOPES, CL.EXTREMELY_LOW],
                     [CARGO_TYPES.HOLOCUBES, CL.VERY_LOW]
-                ]))
+                ])),
+                taxes: CL.LOW
             },
             {
                 technology: CL.VERY_LOW,
                 education: CL.SLIGHTLY_LOW,
                 population: CL.HIGH,
                 crime: CL.LOW,
+                taxes: CL.VERY_LOW
             },
             {
                 technology: CL.NO_REGRESSION,

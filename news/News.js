@@ -82,10 +82,10 @@ class News {
     }
 
     addPlanetEffect(startEffect, multiplyCompleteBy, multiplyFailBy, multiplyCancelBy) {
-        return this.addPlanetEffect(startEffect, multiplyCompleteBy, multiplyFailBy, multiplyCancelBy, false)
+        return this.addEffect(startEffect, multiplyCompleteBy, multiplyFailBy, multiplyCancelBy, false)
     }
     addTargetPlanetEffect(startEffect, multiplyCompleteBy, multiplyFailBy, multiplyCancelBy) {
-        return this.addPlanetEffect(startEffect, multiplyCompleteBy, multiplyFailBy, multiplyCancelBy, true)
+        return this.addEffect(startEffect, multiplyCompleteBy, multiplyFailBy, multiplyCancelBy, true)
     }
 
     /**
@@ -454,6 +454,42 @@ class News {
         const roll = Math.random()
         const didFail = (2*roll*successChance) < difficultyModifier
         if (didFail) this.failed = true
+    }
+
+    /**
+     * Changes a planet's government type and randomizes compatible policies.
+     * @param {Planet} targetPlanet - The planet to change government for.
+     * @param {GovernmentType} newGovernmentType - The new government type.
+     */
+    static changeGovernment(targetPlanet = new Planet(), newGovernmentType) {
+        if (!targetPlanet.civilization || targetPlanet.civilization.governmentType == newGovernmentType) return
+        
+        // Change the government type
+        targetPlanet.civilization.governmentType = newGovernmentType
+        
+        // Filter policies by what's valid for the new government
+        const validEconomicPolicies = ECONOMIC_POLICIES.filter(p => !p.forbiddenGovs.includes(newGovernmentType))
+        const validLaborPolicies = LABOR_POLICIES.filter(p => !p.forbiddenGovs.includes(newGovernmentType))
+        const validSocialPolicies = SOCIAL_POLICIES.filter(p => !p.forbiddenGovs.includes(newGovernmentType))
+        const validForeignPolicies = FOREIGN_POLICIES.filter(p => !p.forbiddenGovs.includes(newGovernmentType))
+        
+        // Helper to select a policy, weighted towards favorites
+        const selectPolicy = (validPolicies) => {
+            const favoritePolicies = validPolicies.filter(p => p.favoriteGovs.includes(newGovernmentType))
+            // 60% chance to pick a favorite if available, otherwise pick randomly from all valid
+            if (favoritePolicies.length > 0 && Math.random() < 0.6) {
+                return rndMember(favoritePolicies)
+            }
+            return rndMember(validPolicies)
+        }
+        
+        // Randomize new policies compatible with the government
+        targetPlanet.civilization.policies = new Policies(
+            selectPolicy(validEconomicPolicies),
+            selectPolicy(validLaborPolicies),
+            selectPolicy(validSocialPolicies),
+            selectPolicy(validForeignPolicies)
+        )
     }
 }
 

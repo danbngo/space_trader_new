@@ -3,20 +3,18 @@ class RevolutionNews extends News {
         const governmentType = rndMember(GT_ALL.filter(g => g !== planet.c.governmentType && g !== GT.PUPPET_STATE));
         
         super(
-            planet.c.governmentType != GT.ANARCHY ? `${coloredName(planet)}'s people have deposed the government and begin a glorious revolution!` :
-            `${coloredName(planet)}'s people clamor for a government to take the reigns and end the anarchy they live in!`,
+            planet.c.governmentType != GT.ANARCHY ? `${coloredName(planet)}'s people have flooded the streets of the capital and begin a glorious revolution!` :
+            `${coloredName(planet)}'s people have flooded the streets of the capital, clamoring for a government to take the reigns and end the anarchy they live in!`,
             `${coloredName(planet)} stabilizes under new government: ${coloredName(governmentType)}!`,
-            `${coloredName(planet)}'s revolution fails! Chaos reigns!`,
+            `${coloredName(planet)}'s revolution fails! The regime gathers its forces and flattens the unruly masses with an iron fist!`,
             '',
             NT.REVOLUTION, planet
         )
 
-        const courthouseBuilding = this.planet.settlement.courthouse;
-
+        //todo: make this event and ones like it destroy a random sampling of buildings
         this.addPlanetEffect(
             {
                 governmentType: GT.ANARCHY ? null : GT.ANARCHY,
-                buildingsDisabled: courthouseBuilding ? [courthouseBuilding] : [],
                 military: CL.VERY_LOW,
                 security: CL.VERY_LOW,
                 crime: CL.VERY_HIGH,
@@ -24,26 +22,30 @@ class RevolutionNews extends News {
             },
             {
                 governmentType,
-                military: (rng(0.5, 1.5, false) + 1) / 2,
-                security: (rng(0.5, 1.5, false) + 1) / 2,
-                prestige: (rng(0.5, 1.5, false) + 1) / 2
+                military: rng(0.5,2,false),
+                navy: rng(0.5,2,false),
+                economy: rng(0.5,2,false),
+                security: rng(0.5,2,false),
+                education: rng(0.5,2,false),
+                corruption: rng(0.5,2,false),
+                culture: rng(0.5,2,false),
+                taxes: rng(0.5,2,false),
             },
             {
                 governmentType: GT.ANARCHY,
-                buildingsEnabled: [],
-                military: CL.NO_REGRESSION,
-                security: CL.NO_REGRESSION,
-                crime: CL.NO_REGRESSION,
-                prestige: CL.VERY_LOW,
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.NO_REGRESSION]]))
+                military: CL.LOW,
+                security: CL.LOW,
+                culture: CL.LOW,
+                prestige: CL.LOW,
+                corruption: CL.HIGH
             }
         )
     }
 
     determineOutcome() {
         const {planet: p} = this
-        // Higher military and prestige = more likely to succeed
-        this.rollOutcome((p.c.military + p.c.prestige) / 2)
+        // Higher culture, lower military helps
+        this.rollOutcome((p.c.culture * p.c.education / p.c.army / p.c.security) / 2)
     }
 
     shouldCancel() {

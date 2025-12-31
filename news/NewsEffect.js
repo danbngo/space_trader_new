@@ -110,7 +110,8 @@ class NewsEffect extends Civilization {
 
         if (planet && planet.civilization) {
             const {civilization} = planet
-            civilization.governmentType = governmentType || civilization.governmentType;
+
+            News.changeGovernment(planet, governmentType || civilization.governmentType)
 
             civilization.multiply(this);
            

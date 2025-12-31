@@ -3,37 +3,35 @@ class MilitaryBuildupNews extends News {
         super(
             `${coloredName(planet)} begins a massive military buildup!`,
             `${coloredName(planet)}'s military buildup is complete! They host a grand military parade!`,
-            `${coloredName(planet)}'s military buildup collapses due to economic constraints!`,
+            `${coloredName(planet)}'s military buildup collapses due to corruption and economic constraints!`,
             ``,
             NT.MILITARY_BUILDUP, planet
         )
 
         this.addPlanetEffect(
             {
-                wealth: CL.LOW,
-                reserves: CL.LOW,
+                reserves: CL.SLIGHTLY_LOW,
+                taxes: CL.HIGH,
                 cargoPriceMultipliers: new CountsMap(new Map([
                     [CARGO_TYPES.WEAPONS, CL.VERY_HIGH],
                     [CARGO_TYPES.ANTIMATTER, 2]
                 ]))
             },
             {
-                army: CL.EXTREMELY_HIGH,
-                mavy: CL.EXTREMELY_HIGH,
-                education: CL.HIGH,
-                wealth: CL.NO_REGRESSION,
+                army: CL.VERY_HIGH,
+                mavy: CL.VERY_HIGH,
+                reserves: CL.LOW,
+                taxes: CL.HIGH,
             },
             {
-                wealth: CL.NO_REGRESSION,
-                prestige: CL.LOW
+                reserves: CL.SLIGHTLY_LOW,
+                taxes: CL.SLIGHTLY_HIGH,
             }
         )
     }
 
     determineOutcome() {
-        const {planet: p} = this
-        // Buildup succeeds unless economy collapses during the process
-        this.rollOutcome(p.c.economy * 0.65 + 0.35)
+        this.rollOutcome((this.planet.c.taxes+this.planet.c.army+this.planet.c.culture)/3, CL.LOW)
     }
     isValid() {
         const {planet: p} = this

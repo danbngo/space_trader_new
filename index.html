@@ -41,11 +41,12 @@
     <script src="types/NEWS_FLAVORS.js"></script>
     <script src="types/NEWS_TYPES.js"></script>
     <script src="types/FACTION_TYPES.js"></script>
-    <script src="types/ENCOUNTER_TYPES.js"></script>
     <script src="types/RELATIONSHIP_TYPES.js"></script>
     <script src="types/POLICY_TYPES.js"></script>
     <script src="types/RELIGION_TRAITS.js"></script>
     <script src="types/PERK_TYPES.js"></script>
+    <script src="types/EQUIPMENT_SLOTS.js"></script>
+    <script src="types/EQUIPMENT_TYPES.js"></script>
     <script src="geom/Rectangle.js"></script>
     <script src="geom/Ellipse.js"></script>
     <script src="geom/Triangle.js"></script>
@@ -55,6 +56,7 @@
     <script src="classes/CountsMap.js"></script>
     <script src="classes/Loop.js"></script>
     <script src="classes/Route.js"></script>
+    <script src="classes/Equipment.js"></script>
     <script src="classes/GameState.js"></script>
     <script src="space/SpaceObject.js"></script>
     <script src="space/BackgroundStar.js"></script>
@@ -62,6 +64,7 @@
     <script src="space/Star.js"></script>
     <script src="space/Climate.js"></script>
     <script src="space/Planet.js"></script>
+    <script src="space/Moon.js"></script>
     <script src="space/AsteroidBelt.js"></script>
     <script src="space/Asteroid.js"></script>
     <script src="space/StarSystem.js"></script>
@@ -87,6 +90,11 @@
     <!-- Encounter type implementations -->
     <script src="encounters/EncounterAI.js"></script>
     <script src="encounters/Encounter.js"></script>
+    <script src="encounters/HazardEncounter.js"></script>
+    <script src="encounters/FleetEncounter.js"></script>
+    <script src="encounters/NeutralsEncounter.js"></script>
+    <script src="encounters/MercantileEncounter.js"></script>
+    <script src="encounters/AuthoritiesEncounter.js"></script>
     <script src="encounters/MinersEncounter.js"></script>
     <script src="encounters/TouristsEncounter.js"></script>
     <script src="encounters/ColonistsEncounter.js"></script>
@@ -98,7 +106,6 @@
     <script src="encounters/SoldiersEncounter.js"></script>
     <script src="encounters/BountyHuntersEncounter.js"></script>
     <script src="encounters/AbandonedShipEncounter.js"></script>
-    <script src="encounters/HazardEncounter.js"></script>
     <script src="encounters/AsteroidsEncounter.js"></script>
     <script src="encounters/AsteroidsStormEncounter.js"></script>
     <script src="encounters/AsteroidsCalmEncounter.js"></script>
@@ -111,6 +118,7 @@
     <script src="encounters/MagnetoidsEncounter.js"></script>
     <script src="encounters/MagnetoidsStormEncounter.js"></script>
     <script src="encounters/MagnetoidsCalmEncounter.js"></script>
+    <script src="types/ENCOUNTER_TYPES.js"></script>
     <script src="buildings/BankLoan.js"></script>
     <script src="buildings/ShipyardState.js"></script>
     <script src="buildings/Building.js"></script>
@@ -122,6 +130,9 @@
     <script src="buildings/Academy.js"></script>
     <script src="buildings/CyberSurgeon.js"></script>
     <script src="buildings/Palace.js"></script>
+    <script src="buildings/Armory.js"></script>
+    <script src="buildings/Outfitter.js"></script>
+    <script src="buildings/Temple.js"></script>
     <script src="buildings/Settlement.js"></script>
     <script src="news/News.js"></script>
     <script src="news/NewsEffect.js"></script>
@@ -153,7 +164,6 @@
     <script src="news/ImmigrationNews.js"></script>
     <script src="news/InvestmentNews.js"></script>
     <script src="news/LandGrabNews.js"></script>
-    <script src="news/IsolationismNews.js"></script>
     <script src="news/LudditismNews.js"></script>
     <script src="news/MilitaryBuildupNews.js"></script>
     <script src="news/OligarchyNews.js"></script>
@@ -213,6 +223,7 @@
     <script src="generators/shipGenerator.js"></script>
     <script src="generators/fleetGenerator.js"></script>
     <script src="generators/officerGenerator.js"></script>
+    <script src="generators/equipmentGenerator.js"></script>
     <script src="generators/religionGenerator.js"></script>
     <script src="generators/contractGenerator.js"></script>
     <script src="generators/newsGenerator.js"></script>
@@ -240,6 +251,8 @@
     <script src="menus/captainMenu.js"></script>
     <script src="menus/contractsMenu.js"></script>
     <script src="menus/palaceMenu.js"></script>
+    <script src="menus/armoryMenu.js"></script>
+    <script src="menus/outfitterMenu.js"></script>
     <script src="menus/encounterMenu.js"></script>
     <script src="menus/eventMenu.js"></script>
     <script src="menus/titleMenu.js"></script>
