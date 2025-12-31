@@ -8,6 +8,8 @@ class IndustrialAccidentNews extends News {
             NT.INDUSTRIAL_ACCIDENT, planet
         )
 
+        const buildingsToDisable = rndMembers(this.planet.settlement.destroyableBuildings);
+
         this.addPlanetEffect(
             {
                 population: CL.SLIGHTLY_LOW,
@@ -23,6 +25,7 @@ class IndustrialAccidentNews extends News {
                 culture: CL.SLIGHTLY_HIGH,
             },
             {
+                buildingsDisabled: buildingsToDisable,
                 population: CL.LOW,
                 economy: CL.LOW,
                 industry: CL.VERY_LOW,

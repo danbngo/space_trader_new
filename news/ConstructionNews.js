@@ -8,7 +8,7 @@ class ConstructionNews extends News {
             NT.CONSTRUCTION, planet
         )
 
-        const buildingsEnabled = rndMembers(News.calcRepairableBuildings(planet), rng(3,1), true);
+        const buildingsEnabled = rndMembers(planet.settlement.fixableBuildings, rng(3,1), true);
 
         this.addPlanetEffect(
             {
@@ -42,7 +42,7 @@ class ConstructionNews extends News {
     isValid() {
         const {planet: p} = this
         //must be missing at least one building OR industry is low and credits are high
-        const buildingsValid = News.calcRepairableBuildings(p).length > 0
+        const buildingsValid = p.settlement.fixableBuildings.length > 0
         const ratingsValid = p.c.industry < CL.LOW && (p.c.reserves > CL.SLIGHTLY_HIGH || p.c.wealth > CL.SLIGHTLY_HIGH)
         const interferingEvent = News.planetHasAnyNewsTargeting(p, NT_DANGEROUS) || News.planetHasAnyNews(p, NT_ECONOMY_PREVENTING)
         return (buildingsValid || ratingsValid) && !interferingEvent

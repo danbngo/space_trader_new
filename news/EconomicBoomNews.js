@@ -8,6 +8,8 @@ class EconomicBoomNews extends News {
             NT.ECONOMIC_BOOM, planet
         )
 
+        const buildingsEnabled = rndMembers(planet.settlement.fixableBuildings, rng(3,1), true);
+
         this.addPlanetEffect(
             {
                 economy: CL.EXTREMELY_HIGH,
@@ -17,6 +19,7 @@ class EconomicBoomNews extends News {
                 taxes: CL.LOW,
             },
             {
+                buildingsEnabled,
                 economy: CL.HIGH,
                 wealth: CL.EXTREMELY_HIGH,
                 reserves: CL.VERY_HIGH,

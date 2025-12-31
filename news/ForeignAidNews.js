@@ -8,6 +8,8 @@ class ForeignAidNews extends News {
             NT.FOREIGN_AID, planet, targetPlanet
         )
 
+        const buildingsEnabled = rndMembers(planet.settlement.fixableBuildings, rng(3,1), true);
+
         this.addPlanetEffect(
             {
                 reserves: CL.HIGH,
@@ -16,6 +18,7 @@ class ForeignAidNews extends News {
                 inflation: CL.HIGH,
             },
             {
+                buildingsEnabled,
                 reserves: CL.HIGH,
                 wealth: CL.HIGH,
                 economy: CL.HIGH,

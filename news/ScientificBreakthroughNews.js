@@ -3,7 +3,7 @@ class ScientificBreakthroughNews extends News {
         super(
             `${coloredName(planet)} begins work on a major scientific project, hoping to uncover new mysteries of the universe!`,
             `${coloredName(planet)} completes their scientific project, allowing their society to make a leap forward!`,
-            `${coloredName(planet)}'s scientific project suffers setback after setback, wasting resources!`,
+            `${coloredName(planet)}'s scientific project suffers setback after setback, and is terminated!`,
             ``,
             NT.SCIENTIFIC_BREAKTHROUGH, planet
         )
@@ -11,31 +11,36 @@ class ScientificBreakthroughNews extends News {
         this.addPlanetEffect(
             {
                 wealth: CL.LOW,
-                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ISOTOPES, 2]]))
+                taxes: CL.HIGH,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ISOTOPES, CL.ASTRONOMICAL]]))
             },
             {
-                technology: CL.HIGH,
-                education: CL.SLIGHTLY_HIGH,
+                wealth: CL.LOW,
+                taxes: CL.HIGH,
+                technology: CL.VERY_HIGH,
+                army: CL.SLIGHTLY_HIGH,
+                navy: CL.SLIGHTLY_HIGH,
+                culture: CL.SLIGHTLY_HIGH,
+                industry: CL.SLIGHTLY_HIGH,
+                education: CL.HIGH,
+                prestige: CL.SLIGHTLY_HIGH
             },
             {
-                wealth: CL.NO_REGRESSION,
-                prestige: CL.LOW
+                wealth: CL.LOW,
+                taxes: CL.HIGH,
             }
         )
     }
 
     determineOutcome() {
         const {planet: p} = this
-        // Research succeeds based on education quality and economy
-        this.rollOutcome(p.c.education * 0.6 + p.c.economy * 0.3 + 0.1)
+        this.rollOutcome(p.c.technology * p.c.education * p.c.taxes / p.c.corruption, CL.SLIGHTLY_HIGH)
     }
 
     isValid() {
         const {planet: p} = this
-        //needs money. wont bother if we're already at the top
-        const ratingsValid = planet.settlement.market.baseCredits/MARKET_AVERAGE_CREDITS > CL.MEDIUM && p.c.technology < CL.EXTREMELY_HIGH
+        const ratingsValid = p.c.wealth > CL.SLIGHTLY_HIGH && p.c.taxes > CL.LOW
         //hard times dont block it, may actually accelerate technological progress
-        const interferingEvent = News.hasNews(NT.SCIENTIFIC_BREAKTHROUGH, planet)
-        return ratingsValid && !interferingEvent
+        return ratingsValid
     }
 }

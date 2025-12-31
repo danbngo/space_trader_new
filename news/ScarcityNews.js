@@ -39,7 +39,6 @@ class ScarcityNews extends News {
     }
 
     determineOutcome() {
-        const {planet: p} = this
         //basically good planning and economic connection mitigate it
         this.rollOutcome((this.planet.c.economy + this.planet.c.prestige + this.planet.c.reserves)/3
             / this.planet.c.population / this.planet.c.industry, CL.SLIGHTLY_LOW)
