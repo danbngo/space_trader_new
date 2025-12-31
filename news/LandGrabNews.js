@@ -1,9 +1,9 @@
 class LandGrabNews extends News {
     constructor(planet = new Planet(), targetPlanet = new Planet()) {
         super(
-            `${coloredName(planet)}'s navies are infringing on ${coloredName(targetPlanet)}'s territory in a blatant land grab!`,
-            `${coloredName(planet)}'s aggressive expansion against ${coloredName(targetPlanet)} finally grinds to a halt!`,
-            `${coloredName(targetPlanet)} repels ${coloredName(planet)}'s navies from their borders!`,
+            `${coloredName(planet)} is aggressively pushing into to disputed territories that are claimed by both it and ${coloredName(targetPlanet)}!`,
+            `${coloredName(planet)} has wrested control of several asteroids and other small bodies from ${coloredName(targetPlanet)}!`,
+            `${coloredName(targetPlanet)} repels ${coloredName(planet)}'s ships from the disputed territories!`,
             `Peace treaty forces ${coloredName(planet)} to abandon their border incursions into ${coloredName(targetPlanet)}!`,
             NT.LAND_GRAB, planet, targetPlanet
         )
@@ -16,51 +16,37 @@ class LandGrabNews extends News {
             },
             {
                 territory: CL.HIGH,
-                prestige: News.clHalfRegression(CL.SLIGHTLY_LOW),
+                navy: CL.SLIGHTLY_LOW,
+                army: CL.SLIGHTLY_LOW,
             },
             {
-                navy: CL.NO_REGRESSION,
-                army: CL.NO_REGRESSION,
                 prestige: CL.VERY_LOW,
             },
-            {
-                territory: News.clHalfRegression(CL.HIGH),
-            }
         )
 
         this.addTargetPlanetEffect(
             {
                 prestige: CL.LOW,
+                territory: CL.SLIGHTLY_LOW,
+                navy: CL.LOW,
+                army: CL.LOW,
             },
             {
+                prestige: CL.LOW,
                 territory: CL.LOW,
-                prestige: CL.NO_REGRESSION,
             },
             {
-                navy: News.clHalfRegression(CL.LOW),
-                army: News.clHalfRegression(CL.LOW),
                 prestige: CL.HIGH,
-            },
-            {
-                navy: News.clHalfRegression(CL.LOW),
-                army: News.clHalfRegression(CL.LOW),
-                territory: News.clHalfRegression(CL.LOW),
             }
         )
     }
 
     shouldCancel() {
-        const {planet: p, targetPlanet: tp} = this
-        // Cancel if peace declared
-        const rel = p.c.relationships.get(tp)
-        return rel === RELATIONSHIP_TYPES.NEUTRAL || rel === RELATIONSHIP_TYPES.ALLY
+        return Civilization.areAlliesOrNeutral(this.planet, this.targetPlanet)
     }
 
     determineOutcome() {
-        const {planet: p, targetPlanet: tp} = this
-        // Expansion fails if target resists successfully
-        const resistanceProbability = (tp.c.navy / p.c.navy) * 0.35
-        this.rollOutcome(1 - resistanceProbability)
+        this.rollOutcome((this.planet.c.navy + this.planet.c.army) / (this.targetPlanet.c.navy + this.targetPlanet.c.army), CL.SLIGHTLY_HIGH)
     }
 
     isValid() {

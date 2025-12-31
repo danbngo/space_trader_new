@@ -9,10 +9,12 @@ class BackgroundMap extends BaseMap {
         this.outerRadius = 20
         this.innerRadius = 3
 
-        this.bgStars = generateBackgroundStars(this.outerRadius, 5000)
+        this.bgStars = generateBackgroundStars(this.outerRadius, 500)
+        this.starTrails = new Map() // Store trail history externally
 
         for (const bgStar of this.bgStars) {
             bgStar.reset()
+            this.starTrails.set(bgStar, [])
         }
 
         this.refresh()
@@ -34,9 +36,26 @@ class BackgroundMap extends BaseMap {
     }
 
     rebuildCanvas() {
-        const {bgStars, cvs} = this
+        const {bgStars, cvs, starTrails} = this
         cvs.clear()
-        bgStars.forEach( (bgStar, index) => {
+        
+        // Draw trails first (so they appear behind stars)
+        bgStars.forEach((bgStar, starIndex) => {
+            const trail = starTrails.get(bgStar)
+            if (trail && trail.length > 1) {
+                for (let i = 1; i < trail.length; i++) {
+                    const curr = trail[i]
+                    const prev = trail[i - 1]
+                    const fadeFactor = i / trail.length
+                    const trailAlpha = bgStar.color[3] * fadeFactor * 0.3
+                    const trailColor = [...bgStar.color.slice(0, 3), trailAlpha]
+                    cvs.addLine(`trail_${starIndex}_${i}`, prev.x, prev.y, curr.x, curr.y, trailColor, bgStar.radius * 0.5)
+                }
+            }
+        })
+        
+        // Draw stars
+        bgStars.forEach((bgStar, index) => {
             cvs.addPixel(bgStar.x, bgStar.y, bgStar.color, bgStar.radius)
         });
         cvs.recalculateDrawOrder()
@@ -48,9 +67,19 @@ class BackgroundMap extends BaseMap {
     }
 
     refreshBackground(year = 0) {
-        const {bgStars, cvs} = this
+        const {bgStars, cvs, starTrails} = this
+        const trailLength = 5
+        
         bgStars.forEach( (bgStar, index) => {
             bgStar.twinkle(year)
+
+            // Store previous position in trail history
+            const trail = starTrails.get(bgStar) || []
+            trail.push({x: bgStar.x, y: bgStar.y})
+            if (trail.length > trailLength) {
+                trail.shift()
+            }
+            starTrails.set(bgStar, trail)
 
             bgStar.x *= 1.01
             bgStar.y *= 1.01
@@ -60,18 +89,25 @@ class BackgroundMap extends BaseMap {
                 const [x,y] = rotatePoint(distance, 0, 0, 0, Math.PI*4*Math.random())
                 bgStar.x = x
                 bgStar.y = y
+                starTrails.set(bgStar, []) // Clear trail on reset
             }
+
+            // Calculate brightness multiplier based on distance from center
+            const distanceFromCenter = calcDistance(0, 0, bgStar.x, bgStar.y)
+            const normalizedDistance = distanceFromCenter / this.outerRadius
+            const brightnessFactor = normalizedDistance * 4 // Ranges from 0.3 to 1.0
 
             const pixel = cvs.pixels[index]
             pixel.x = bgStar.x
             pixel.y = bgStar.y
-            pixel.a = bgStar.color[3]
+            pixel.color[3] = bgStar.color[3] * brightnessFactor
         });
     }
 
     tick() {
         const currentTime = Date.now()
         this.refreshBackground(currentTime/200000) //hack to make stars twinkle at a reasonable speed
+        this.rebuildCanvas() // Rebuild to update trails
         this.refreshCanvas()
 
         requestAnimationFrame(()=>this.tick())
