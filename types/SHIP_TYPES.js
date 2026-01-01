@@ -7,6 +7,7 @@
  * @class ShipType
  * @classdesc Represents a type of ship with specific attributes.
  * @property {string} name - The name of the ship type.
+ * @property {string} description - A description of the ship type.
  * @property {string} shape - The shape of the ship (from SHAPES enum).
  * @property {number} hull - The hull strength of the ship.
  * @property {number} shields - The shield strength of the ship.
@@ -19,6 +20,7 @@
  * @property {number} maxActionsPerTurn - The maximum number of actions the ship can perform per turn.
  * @constructor
  * @param {string} name - The name of the ship type.
+ * @param {string} description - A description of the ship type.
  * @param {SHAPES} shape - The shape of the ship.
  * @param {number} hull - The hull strength of the ship.
  * @param {number} shields - The shield strength of the ship.
@@ -32,8 +34,9 @@
  * @returns {ShipType} The created ShipType instance.
  */
 class ShipType {
-    constructor(name = '', shape, hull = 1, shields = 1, lasers = 1, engine = 1, cargoSpace = 1, radars = 1, modules = [], moduleSlots = 0, maxActionsPerTurn = SHIP_NUM_MOVES_PER_TURN) {
+    constructor(name = '', description = '', shape, hull = 1, shields = 1, lasers = 1, engine = 1, cargoSpace = 1, radars = 1, modules = [], moduleSlots = 0, maxActionsPerTurn = SHIP_NUM_MOVES_PER_TURN) {
         this.name = name
+        this.description = description
         this.shape = shape;
         this.hull = hull
         this.shields = shields
@@ -51,28 +54,33 @@ class ShipType {
 }
 
 const SHIP_TYPES = {
-    SHUTTLE: new ShipType('Shuttle', SHAPES.FilledTriangle, 0.1, 0.1, 0.1, 1, 1, 1, [SHIP_MODULE_TYPES.BOOSTER], 1),
-    PASSENGER_SHIP: new ShipType('Passenger Ship', SHAPES.FilledTriangle, 2, 0.5, 0.1, 1, 2, 0.5, [], 1),
-    FREIGHTER: new ShipType('Freighter', SHAPES.FilledTriangle, 1, 0.25, 0.1, 1, 4, 0.5, [], 2),
-    BLOCKADE_RUNNER: new ShipType('Blockade Runner', SHAPES.FilledTriangle, 1.5, 1, 0.5, 3, 2, 1, [SHIP_MODULE_TYPES.CLOAK], 2),
-    SCOUT: new ShipType('Scout', SHAPES.FilledTriangle, 0.5, 0.5, 0.5, 3, 0.5, 3, [SHIP_MODULE_TYPES.BOOSTER], 2),
-    DESTROYER: new ShipType('Destroyer', SHAPES.FilledTriangle, 2, 2, 4, 1, 0.5, 2, [SHIP_MODULE_TYPES.EMP_PULSE], 3),
-    BATTLESHIP: new ShipType('Battleship', SHAPES.FilledTriangle, 4, 4, 3, 0.5, 1, 1, [SHIP_MODULE_TYPES.WARHEAD], 3),
-    FIGHTER: new ShipType('Fighter', SHAPES.FilledTriangle, 1, 2, 2, 1, 0.1, 1, [SHIP_MODULE_TYPES.BLINK], 2),
-    MINING_SHIP: new ShipType('Mining Ship', SHAPES.FilledTriangle, 2, 0.5, 1, 0.5, 2, 0.5, [SHIP_MODULE_TYPES.MAGNETIZE], 1),
-    GUARD_SHIP: new ShipType('Guard Ship', SHAPES.FilledTriangle, 1, 1.5, 1.5, 0.5, 0.25, 1.5, [SHIP_MODULE_TYPES.SMOKE_BOMB], 2),
-    PATROL_SHIP: new ShipType('Patrol Ship', SHAPES.FilledTriangle, 1.5, 1.5, 1.5, 2, 0.25, 2, [SHIP_MODULE_TYPES.MAGNETIZE], 2),
+    COURIER_SHIP: new ShipType('Courier Ship', 'Fast, lightly-armored vessel designed for rapid message and package delivery across star systems.', SHAPES.FilledTriangle, 0.1, 0.1, 0.1, 2, 1, 1, [SHIP_MODULE_TYPES.BOOSTER], 2),
+    FIRE_SHIP: new ShipType('Fire Ship', 'Ship that can detonate itself, causing massive area damage.', SHAPES.FilledTriangle, 0.1, 0.5, 0.5, 1.5, 0.5, 0.5, [SHIP_MODULE_TYPES.DETONATE], 2),
+    PASSENGER_SHIP: new ShipType('Passenger Ship', 'Civilian transport designed to carry passengers in comfort with moderate cargo space.', SHAPES.FilledTriangle, 2, 0.5, 0.1, 1, 2, 0.5, [], 1),
+    SUPPLY_SHIP: new ShipType('Supply Ship', 'Nimble cargo vessel specializing in quick resupply runs with decent cargo capacity.', SHAPES.FilledTriangle, 0.5, 0.1, 0.1, 2, 3, 0.5, [], 1),
+    TANKER: new ShipType('Tanker', 'Massive bulk hauler with enormous cargo holds designed to transport liquids and gases.', SHAPES.FilledTriangle, 1.5, 0.25, 0.1, 1, 5, 1, [], 2),
+    BLOCKADE_RUNNER: new ShipType('Blockade Runner', 'Sleek smuggler ship equipped with cloaking technology for evading detection and patrols.', SHAPES.FilledTriangle, 1, 1, 0.5, 3, 2, 1, [SHIP_MODULE_TYPES.CLOAK], 1),
+    SCOUT: new ShipType('Scout', 'Long-range reconnaissance vessel with powerful sensors and high speed for exploration.', SHAPES.FilledTriangle, 0.5, 0.5, 0.5, 3, 0.5, 3, [SHIP_MODULE_TYPES.BOOSTER], 1),
+    FIGHTER: new ShipType('Fighter', 'Agile combat craft with blink drive, designed for hit-and-run attacks and dogfighting.', SHAPES.FilledTriangle, 0.5, 1, 1.5, 2, 0.1, 1, [SHIP_MODULE_TYPES.BLINK], 1),
+    FRIGATE: new ShipType('Frigate', 'Well-balanced warship with solid defenses, firepower, and speed for versatile combat.', SHAPES.FilledTriangle, 2, 3, 1.5, 3, 1, 1, [], 2),
+    DESTROYER: new ShipType('Destroyer', 'Heavy weapons platform equipped with warheads, trading speed for devastating firepower.', SHAPES.FilledTriangle, 2, 1, 4, 1, 0.5, 3, [SHIP_MODULE_TYPES.WARHEAD], 2),
+    JAMMER: new ShipType('Jammer', 'Electronic warfare vessel designed to disrupt enemy sensors and communications.', SHAPES.FilledTriangle, 2, 2, 1, 1, 0.1, 2, [SHIP_MODULE_TYPES.EMP_PULSE], 2),
+    BATTLESHIP: new ShipType('Battleship', 'Massive capital ship with warhead launchers, heavy armor, and shields for fleet engagements.', SHAPES.FilledTriangle, 4, 4, 3, 1, 2, 1.5, [SHIP_MODULE_TYPES.WARHEAD], 3),
+    TUG_SHIP: new ShipType('Tug Ship', 'Heavy-duty vessel designed for towing and maneuvering larger ships or objects in space.', SHAPES.FilledTriangle, 2, 0.5, 0.5, 2, 1, 1, [SHIP_MODULE_TYPES.MAGNETIZE], 1),
+    DRILLING_RIG: new ShipType('Drilling Rig', 'Industrial vessel with a heavy drill for asteroid mining and resource extraction.', SHAPES.FilledTriangle, 3, 0.1, 1, 0.5, 3, 0.5, [SHIP_MODULE_TYPES.DRILL], 2),
+    ESCORT_SHIP: new ShipType('Escort Ship', 'Defensive support vessel with smoke bombs and strong shields to protect allied ships.', SHAPES.FilledTriangle, 1, 1.5, 1.5, 0.5, 0.25, 1.5, [SHIP_MODULE_TYPES.SMOKE_BOMB], 2),
+    INTERCEPTOR: new ShipType('Interceptor', 'Fast pursuit craft with magnetic grapples for capturing or disabling enemy vessels.', SHAPES.FilledTriangle, 1.5, 1.5, 1.5, 2, 0.25, 2, [SHIP_MODULE_TYPES.MAGNETIZE], 2),
 }
 
 const SHIP_TYPES_ALL = Object.values(SHIP_TYPES)
 
-const STARTING_SHIP_TYPE = new ShipType('Starting Ship', SHAPES.FilledTriangle, 1, 1, 1, 1, 1, 1, [], 1, 1)
+const STARTING_SHIP_TYPE = new ShipType('Starting Ship', 'A basic ship with balanced capabilities suitable for beginning your journey.', SHAPES.FilledTriangle, 1, 1, 1, 1, 1, 1, [], 1, 1)
 
 const ASTEROID_SHIP_TYPES = {
-    ASTEROID: new ShipType('Asteroid', SHAPES.FilledOval, 0.4, 0, 0, 5, 0.5, 1, [SHIP_MODULE_TYPES.MAGNETIZE], 0, 1),
-    CRYOID: new ShipType('Cryoid', SHAPES.FilledOval, 0.6, 0, 0, 4, 0.5, 1, [SHIP_MODULE_TYPES.SMOKE_BOMB], 0, 1),
-    PLASMOID: new ShipType('Plasmoid', SHAPES.FilledCircle, 0.5, 0.5, 0, 6, 0.5, 1, [SHIP_MODULE_TYPES.BOOSTER], 0, 1),
-    MAGNETOID: new ShipType('Magnetoid', SHAPES.FilledCircle, 0.4, 0.3, 0, 5, 0.5, 1, [SHIP_MODULE_TYPES.MAGNETIZE], 0, 1),
+    ASTEROID: new ShipType('Asteroid', 'Rocky space debris drifting through the void, can be mined for valuable minerals.', SHAPES.FilledOval, 0.4, 0, 0, 5, 0.5, 1, [SHIP_MODULE_TYPES.MAGNETIZE], 0, 1),
+    CRYOID: new ShipType('Cryoid', 'Frozen comet fragment containing water ice, leaves a freezing vapor trail when destroyed.', SHAPES.FilledOval, 0.6, 0, 0, 4, 0.5, 1, [SHIP_MODULE_TYPES.SMOKE_BOMB], 0, 1),
+    PLASMOID: new ShipType('Plasmoid', 'Energetic plasma sphere moving at high velocity, highly volatile and dangerous.', SHAPES.FilledCircle, 0.5, 0.5, 0, 6, 0.5, 1, [SHIP_MODULE_TYPES.BOOSTER], 0, 1),
+    MAGNETOID: new ShipType('Magnetoid', 'Magnetically-charged metallic fragment that can disrupt ship systems and pull objects.', SHAPES.FilledCircle, 0.4, 0.3, 0, 5, 0.5, 1, [SHIP_MODULE_TYPES.MAGNETIZE], 0, 1),
 }
 
 const ASTEROID_SHIP_TYPES_ALL = Object.values(ASTEROID_SHIP_TYPES)

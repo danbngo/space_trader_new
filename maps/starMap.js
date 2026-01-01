@@ -28,7 +28,7 @@ class StarMap extends BaseMap {
             this.selectObject(waypoint)
         }
 
-        this.rebuildCanvas()
+        this.handleCanvasObjects()
         this.refresh()
         this.selectObject(autoSelectObject || gs.fleet)
         if (StarMap.lastZoom) this.adjustZoom(StarMap.lastZoom/this.cvs.zoom)
@@ -48,12 +48,11 @@ class StarMap extends BaseMap {
     }
 
     refresh() {
-        console.log('STARMAP REFRESH CALLED')
+        //console.log('STARMAP REFRESH CALLED')
         this.refreshControls();
         this.refreshInfoBar();
         this.refreshObjectPane();
-        this.refreshBackground(gs.year)
-        this.refreshCanvas(true);
+        this.handleCanvasObjects();
     }
 
     refreshControls() {
@@ -65,28 +64,9 @@ class StarMap extends BaseMap {
                 ce({tag:'button', classNames: [(this.paused && !gs.location) || (!this.paused && gs.location) ? 'highlighted' : null] , innerHTML:this.paused ? '▶' : '⏸', onClick: () => this.togglePause()}),
                 ce({tag:'button', innerHTML:'+', onClick: () => this.adjustZoom(1.33)}),
                 ce({tag:'button', innerHTML:'-', onClick: () => this.adjustZoom(0.66)}),
-                ce({tag:'button', classNames: [gs.captain.skillPoints > 0 ? 'highlighted' : null], innerHTML:'?', onClick: () => this.openAssistant()}),
+                ce({tag:'button', classNames: [gs.captain.skillPoints > 0 ? 'highlighted' : null], innerHTML:'?', onClick: () => showAssistantMenu()}),
             ]
         })
-    }
-
-    openAssistant() {
-        this.togglePause(true)
-        const hasSkillPoints = gs.captain.skillPoints > 0
-        const hasPerkPoints = gs.captain.numPerkPoints > 0
-        const hasContracts = gs.contracts && gs.contracts.length > 0
-        showModal(`Assistant`, 'How can I help you captain?', [
-            ['Trade', ()=>showTradeInfoSellMenu()],
-            ['Ships', ()=>showShipsMenu()],
-            ['Cargo', ()=>showCargoMenu()],
-            ['Officers', ()=>showOfficersMenu()],
-            ['Contracts', ()=>showContractsMenu(), false, hasContracts ? 'highlighted' : null],
-            ['Captain', ()=>showCaptainSkillsMenu(), false, hasSkillPoints ? 'highlighted' : null],
-            ['News', ()=>showNewsTimelineMenu(null, ()=>this.openAssistant())],
-            ['Religions', ()=>showReligionsMenu(()=>this.openAssistant())],
-            ['Politics', ()=>showPoliticsMenu(()=>this.openAssistant())],
-            ['Cancel', ()=>closeModal()],
-        ])
     }
 
     refreshInfoBar() {
@@ -122,224 +102,299 @@ class StarMap extends BaseMap {
         })
     }
 
-    rebuildCanvas() {
-        console.log('REBUILDING STAR MAP CANVAS')
+    handleCanvasObjects() {
+        this.handleCanvasBackgroundStars()
+        this.handleCanvasAsteroids()
+        this.handleCanvasOrbits()
+        this.handleCanvasStars()
+        this.handleCanvasPlanets()
+        this.handleCanvasAnomalies()
+        this.handleCanvasFleets()
+        this.handleCanvasWaypoint()
+        this.cvs.redraw(true)
+    }
+
+    handleCanvasBackgroundStars() {
         const {starSystem, cvs} = this
-        const {stars, planets, dwarfPlanets, fleets, backgroundStars, asteroids, anomalies} = starSystem
+        const {backgroundStars} = starSystem
+        
+        backgroundStars.forEach((bgStar, index) => {
+            bgStar.twinkle(gs.year)
+            if (!cvs.pixels[index]) {
+                cvs.addPixel(bgStar.x, bgStar.y, bgStar.color, bgStar.radius)
+            }
+            cvs.pixels[index].a = bgStar.color[3]
+        })
+    }
+
+    handleCanvasAsteroids() {
+        const {starSystem, cvs} = this
+        const {backgroundStars, asteroids} = starSystem
+        const numBackgroundStars = backgroundStars.length
+        
+        asteroids.forEach((asteroid, index) => {
+            const pixelIndex = numBackgroundStars + index
+            if (!cvs.pixels[pixelIndex]) {
+                cvs.addPixel(asteroid.x, asteroid.y, asteroid.color, asteroid.radius)
+            }
+            const pixel = cvs.pixels[pixelIndex]
+            pixel.x = asteroid.x
+            pixel.y = asteroid.y
+        })
+    }
+
+    handleCanvasOrbits() {
+        const {starSystem, cvs} = this
+        const {stars, planets, dwarfPlanets} = starSystem
         const allPlanets = [...planets, ...dwarfPlanets]
-        //const routes = [gs.fleet.route]
-        const orbitingBodies = [...stars, ...allPlanets].filter(b=>(b.orbit))
+        const orbitingBodies = [...stars, ...allPlanets].filter(b => b.orbit)
 
-        cvs.clear()
+        orbitingBodies.forEach((orbitingBody) => {
+            const id = `orbit${orbitingBody.uuid}`
+            let cvsObject = cvs.getObject(id)
+            
+            if (!cvsObject) {
+                cvsObject = cvs.addEmptyCircle(id, orbitingBody.parent.x, orbitingBody.parent.y, orbitingBody.orbit.radius, 1, orbitingBody.color, 0.25)
+            }
+            
+            cvsObject.x = orbitingBody.parent.x
+            cvsObject.y = orbitingBody.parent.y
+        })
+    }
 
-        backgroundStars.forEach( (bgStar, index) => {
-            cvs.addPixel(bgStar.x, bgStar.y, bgStar.color, bgStar.radius)
-        });
+    handleCanvasStars() {
+        const {starSystem, cvs} = this
+        const {stars} = starSystem
 
-        asteroids.forEach( (asteroid, index) => {
-            cvs.addPixel(asteroid.x, asteroid.y, asteroid.color, asteroid.radius)
-        });
+        stars.forEach((body) => {
+            const id = `star${body.uuid}`
+            let cvsObject = cvs.getObject(id)
+            
+            if (!cvsObject) {
+                cvsObject = cvs.addFilledCircle(id, body.x, body.y, body.radius/EARTH_RADII_PER_AU * 25, 12, body.color, () => this.selectObject(body))
+            }
+            
+            cvsObject.x = body.x
+            cvsObject.y = body.y
+            cvsObject.strokeColor = (body == this.selectedObject) ? COLORS.Green : COLORS.Black
+        })
+    }
 
-        // Render anomalies
-        if (anomalies) {
-            anomalies.forEach( (anomaly, index) => {
-                const anomalyObj = cvs.addEmptyCircle(`anomaly${index}`, anomaly.x, anomaly.y, anomaly.radius * 10, 2, anomaly.color, 1, ()=>this.selectObject(anomaly))
-                const labelObj = cvs.addText(`anomalylabel${index}`, anomaly.x, anomaly.y, 0, -24, anomaly.name, anomaly.color, DEFAULT_FONT_SIZE, 2, ()=>this.selectObject(anomaly))
-                labelObj.visible = false
-                const objs = [anomalyObj, labelObj]
+    handleCanvasPlanets() {
+        const {starSystem, cvs} = this
+        const {planets, dwarfPlanets} = starSystem
+        const allPlanets = [...planets, ...dwarfPlanets]
+
+        allPlanets.forEach((body) => {
+            const planetId = `planet${body.uuid}`
+            const labelId = `planetlabel${body.uuid}`
+            
+            let planetObj = cvs.getObject(planetId)
+            let labelObj = cvs.getObject(labelId)
+            
+            // Create objects if they don't exist
+            if (!planetObj) {
+                planetObj = cvs.addFilledCircle(planetId, body.x, body.y, body.radius/EARTH_RADII_PER_AU * 150, 8, body.color, () => this.selectObject(body))
+                labelObj = cvs.addText(labelId, body.x, body.y, 0, -32, body.name, body.color, DEFAULT_FONT_SIZE, 2, () => this.selectObject(body))
+                
+                const objs = [planetObj, labelObj]
                 for (const obj of objs) {
-                    obj.onHover = ()=>{
+                    obj.onHover = () => {
                         labelObj.visible = true
                         for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
                     }
-                    obj.onEndHover = ()=>{
+                    obj.onHoverEnd = () => {
+                        labelObj.visible = false
+                        for (const obj3 of objs) obj3.strokeColor = (body == this.selectedObject) ? COLORS.Green : COLORS.Black
+                    }
+                    obj.onHoverEnd()
+                }
+            }
+            
+            // Update positions and selection state
+            planetObj.x = body.x
+            planetObj.y = body.y
+            labelObj.x = body.x
+            labelObj.y = body.y
+            
+            if (body == this.selectedObject) {
+                planetObj.strokeColor = COLORS.Green
+                labelObj.strokeColor = COLORS.Green
+            }
+        })
+    }
+
+    handleCanvasAnomalies() {
+        const {starSystem, cvs} = this
+        const {anomalies} = starSystem
+        
+        if (!anomalies) return
+
+        // Track existing anomaly UUIDs
+        const existingAnomalyIds = new Set()
+        
+        anomalies.forEach((anomaly) => {
+            existingAnomalyIds.add(`anomaly${anomaly.uuid}`)
+            existingAnomalyIds.add(`anomalylabel${anomaly.uuid}`)
+            const anomalyId = `anomaly${anomaly.uuid}`
+            const labelId = `anomalylabel${anomaly.uuid}`
+            
+            let anomalyObj = cvs.getObject(anomalyId)
+            let labelObj = cvs.getObject(labelId)
+            
+            // Create objects if they don't exist
+            if (!anomalyObj) {
+                anomalyObj = cvs.addEmptyCircle(anomalyId, anomaly.x, anomaly.y, anomaly.radius * 10, 2, anomaly.color, 1, () => this.selectObject(anomaly))
+                labelObj = cvs.addText(labelId, anomaly.x, anomaly.y, 0, -24, anomaly.name, anomaly.color, DEFAULT_FONT_SIZE, 2, () => this.selectObject(anomaly))
+                labelObj.visible = false
+                
+                const objs = [anomalyObj, labelObj]
+                for (const obj of objs) {
+                    obj.onHover = () => {
+                        labelObj.visible = true
+                        for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
+                    }
+                    obj.onEndHover = () => {
                         labelObj.visible = false
                         for (const obj2 of objs) obj2.strokeColor = undefined
                     }
                 }
-            });
-        }
-
-        orbitingBodies.forEach( (orbitingBody, index) => {
-            console.log('rebuilding an orbit')
-            cvs.addEmptyCircle(`orbit${index}`, orbitingBody.parent.x, orbitingBody.parent.y, orbitingBody.orbit.radius, 1, orbitingBody.color, 0.25)
-        });
+            }
+            
+            // Update positions and selection state
+            anomalyObj.x = anomaly.x
+            anomalyObj.y = anomaly.y
+            labelObj.x = anomaly.x
+            labelObj.y = anomaly.y
+            
+            if (anomaly == this.selectedObject) {
+                anomalyObj.strokeColor = COLORS.Green
+                labelObj.strokeColor = COLORS.Green
+            }
+        })
         
-        stars.forEach((body,index)=>{
-            //for fun, make bodies a bit bigger so they're visually different sizes instead of all being min size
-            const starObj = cvs.addFilledCircle(`star${index}`, body.x, body.y, body.radius/EARTH_RADII_PER_AU * 25, 12, body.color, ()=>this.selectObject(body))
-        })
-
-        allPlanets.forEach((body,index)=>{
-            const planetObj = cvs.addFilledCircle(`planet${index}`, body.x, body.y, body.radius/EARTH_RADII_PER_AU * 150, 8, body.color, ()=>this.selectObject(body))
-            const labelObj = cvs.addText(`planetlabel${index}`, body.x, body.y, 0, -32, body.name, body.color, DEFAULT_FONT_SIZE, 2, ()=>this.selectObject(body))
-            const objs = [planetObj, labelObj]
-            for (const obj of objs) {
-                obj.onHover = ()=>{
-                    labelObj.visible = true
-                    for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
-                }
-                obj.onHoverEnd = ()=>{
-                    labelObj.visible = false
-                    for (const obj3 of objs) obj3.strokeColor = (body == this.selectedObject) ? COLORS.Green : COLORS.Black
-                }
-                obj.onHoverEnd()
+        // Remove canvas objects for anomalies that no longer exist
+        for (const [id, obj] of cvs.objectMap.entries()) {
+            if (id.startsWith('anomaly') && !existingAnomalyIds.has(id)) {
+                cvs.deleteObject(id)
             }
-        })
-
-        fleets.forEach((fleet, index)=>{
-            const fleetAngle = fleet.route ? fleet.route.path.angle : -Math.PI/2
-            const fleetObj = cvs.addFilledTriangle(`fleet${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU, fleet.radius/EARTH_RADII_PER_AU, 12, fleet.color, fleetAngle, ()=>this.selectObject(fleet))
-            cvs.addLine(`fleetpath${index}`, 0, 0, 0, 0, fleet.color, 1)
-            cvs.addFilledTriangle(`fleetthruster${index}`, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU*0.5, fleet.radius/EARTH_RADII_PER_AU*0.5, 6, COLORS.Orange)
-            const labelObj = cvs.addText(`fleetlabel${index}`, fleet.x, fleet.y, 0, -32, fleet.name, fleet.color, DEFAULT_FONT_SIZE, 2, ()=>this.selectObject(fleet),)
-            const objs = [fleetObj, labelObj]
-            for (const obj of objs) {
-                obj.onHover = ()=>{
-                    labelObj.visible = true
-                    for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
-                }
-                obj.onHoverEnd = ()=>{
-                    labelObj.visible = false
-                    for (const obj3 of objs) obj3.strokeColor = (fleet == this.selectedObject) ? COLORS.Green : COLORS.Black
-                }
-                obj.onHoverEnd()
-            }
-        })
-
-        // Add waypoint marker (upside-down triangle for clicked coordinates)
-        cvs.addFilledTriangle('waypointMarker', 0, 0, 0, 0, 12, COLORS.Targeting, Math.PI/2)
-
-        cvs.recalculateDrawOrder()
+        }
     }
 
-    refreshCanvas(forceRedraw = true) {
-        const {cvs, starSystem} = this
-        const {stars, planets, dwarfPlanets, fleets, asteroids, anomalies} = starSystem
-        const allPlanets = [...planets, ...dwarfPlanets]
-        const orbitingBodies = [...stars, ...allPlanets].filter(b=>(b.orbit))
+    handleCanvasFleets() {
+        const {starSystem, cvs} = this
+        const {fleets} = starSystem
 
-        orbitingBodies.forEach( (orbitingBody, index) => {
-            const cvsObject = cvs.getObject(`orbit${index}`)
-            cvsObject.x = orbitingBody.parent.x
-            cvsObject.y = orbitingBody.parent.y
-        });
-
-        stars.forEach((body,index)=>{
-            const cvsObject = cvs.getObject(`star${index}`)
-            if (body == this.selectedObject) cvsObject.strokeColor = COLORS.Green
-            cvsObject.x = body.x
-            cvsObject.y = body.y
-        })
-
-        allPlanets.forEach((body,index)=>{
-            let cvsObject = cvs.getObject(`planet${index}`)
-            cvsObject.x = body.x
-            cvsObject.y = body.y
-
-            Object.assign(cvsObject, {x: body.x, y:body.y})
-
-            cvsObject = cvs.getObject(`planetlabel${index}`)
-            if (body == this.selectedObject) cvsObject.strokeColor = COLORS.Green
-            cvsObject.x = body.x
-            cvsObject.y = body.y
-        })
-
-        // Update anomalies
-        if (anomalies) {
-            anomalies.forEach((anomaly, index)=>{
-                let cvsObject = cvs.getObject(`anomaly${index}`)
-                if (cvsObject) {
-                    if (anomaly == this.selectedObject) cvsObject.strokeColor = COLORS.Green
-                    cvsObject.x = anomaly.x
-                    cvsObject.y = anomaly.y
-
-                    cvsObject = cvs.getObject(`anomalylabel${index}`)
-                    if (cvsObject) {
-                        if (anomaly == this.selectedObject) cvsObject.strokeColor = COLORS.Green
-                        cvsObject.x = anomaly.x
-                        cvsObject.y = anomaly.y
-                    }
-                }
-            })
-        }
-
-        fleets.forEach((fleet, index)=>{
+        // Track existing fleet UUIDs
+        const existingFleetIds = new Set()
+        
+        fleets.forEach((fleet) => {
+            existingFleetIds.add(`fleet${fleet.uuid}`)
+            existingFleetIds.add(`fleetlabel${fleet.uuid}`)
+            existingFleetIds.add(`fleetpath${fleet.uuid}`)
+            existingFleetIds.add(`fleetthruster${fleet.uuid}`)
+            const fleetId = `fleet${fleet.uuid}`
+            const labelId = `fleetlabel${fleet.uuid}`
+            const pathId = `fleetpath${fleet.uuid}`
+            const thrusterId = `fleetthruster${fleet.uuid}`
+            
+            let fleetObj = cvs.getObject(fleetId)
+            let labelObj = cvs.getObject(labelId)
+            let pathObj = cvs.getObject(pathId)
+            let thrusterObj = cvs.getObject(thrusterId)
+            
             const fleetAngle = fleet.route ? fleet.route.path.angle : -Math.PI/2
-
-            let cvsObject = cvs.getObject(`fleet${index}`)
-            if (fleet == this.selectedObject) cvsObject.strokeColor = COLORS.Green
-            cvsObject.x = fleet.x
-            cvsObject.y = fleet.y
-            cvsObject.angle = fleetAngle
-
-            cvsObject = cvs.getObject(`fleetlabel${index}`)
+            const isPlayerFleet = fleet === gs.fleet
+            
+            // Create objects if they don't exist
+            if (!fleetObj) {
+                fleetObj = cvs.addFilledTriangle(fleetId, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU, fleet.radius/EARTH_RADII_PER_AU, 12, fleet.color, fleetAngle, () => this.selectObject(fleet))
+                pathObj = cvs.addLine(pathId, 0, 0, 0, 0, fleet.color, 1)
+                thrusterObj = cvs.addFilledTriangle(thrusterId, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU*0.5, fleet.radius/EARTH_RADII_PER_AU*0.5, 6, COLORS.Orange)
+                labelObj = cvs.addText(labelId, fleet.x, fleet.y, 0, -32, fleet.name, fleet.color, DEFAULT_FONT_SIZE, 2, () => this.selectObject(fleet))
+                
+                labelObj.visible = isPlayerFleet
+                
+                const objs = [fleetObj, labelObj]
+                for (const obj of objs) {
+                    obj.onHover = () => {
+                        labelObj.visible = true
+                        for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
+                    }
+                    obj.onHoverEnd = () => {
+                        labelObj.visible = isPlayerFleet
+                        for (const obj3 of objs) obj3.strokeColor = (fleet == this.selectedObject) ? COLORS.Green : COLORS.Black
+                    }
+                    if (!isPlayerFleet) obj.onHoverEnd()
+                }
+            }
+            
+            // Update fleet position and angle
+            fleetObj.x = fleet.x
+            fleetObj.y = fleet.y
+            fleetObj.angle = fleetAngle
+            fleetObj.strokeColor = (fleet == this.selectedObject) ? COLORS.Green : COLORS.Black
+            
+            // Update label
             if (fleet.location || !fleet.route) {
-                cvsObject.visible = false
+                labelObj.visible = false
+            } else {
+                labelObj.visible = isPlayerFleet
+                labelObj.x = fleet.x
+                labelObj.y = fleet.y
             }
-            else {
-                cvsObject.visible = true
-                cvsObject.x = fleet.x
-                cvsObject.y = fleet.y
-            }
-
-            cvsObject = cvs.getObject(`fleetpath${index}`)
-            if (!fleet.route) cvsObject.visible = false
-            else {
+            
+            // Update path
+            if (!fleet.route) {
+                pathObj.visible = false
+            } else {
                 let {startX, startY, toX, toY} = fleet.route.path
-                cvsObject.visible = true
-                cvsObject.x = startX
-                cvsObject.y = startY
-                cvsObject.x2 = toX
-                cvsObject.y2 = toY
+                pathObj.visible = true
+                pathObj.x = startX
+                pathObj.y = startY
+                pathObj.x2 = toX
+                pathObj.y2 = toY
             }
-
-            cvsObject = cvs.getObject(`fleetthruster${index}`)
+            
+            // Update thruster
             if (fleet.location || !fleet.route) {
-                cvsObject.visible = false
-            }
-            else {
-                const [screenOffsetX, screenOffsetY] = rotatePoint(10, 0, 0, 0, fleetAngle-Math.PI)
-                cvsObject.angle = fleetAngle - Math.PI
-                cvsObject.visible = true
-                cvsObject.x = fleet.x
-                cvsObject.y = fleet.y
-                cvsObject.screenOffsetX = screenOffsetX
-                cvsObject.screenOffsetY = screenOffsetY
+                thrusterObj.visible = false
+            } else {
+                const [screenOffsetX, screenOffsetY] = rotatePoint(10, 0, 0, 0, fleetAngle - Math.PI)
+                thrusterObj.angle = fleetAngle - Math.PI
+                thrusterObj.visible = true
+                thrusterObj.x = fleet.x
+                thrusterObj.y = fleet.y
+                thrusterObj.screenOffsetX = screenOffsetX
+                thrusterObj.screenOffsetY = screenOffsetY
             }
         })
+        
+        // Remove canvas objects for fleets that no longer exist
+        for (const [id, obj] of cvs.objectMap.entries()) {
+            if ((id.startsWith('fleet') || id.startsWith('fleetthruster') || id.startsWith('fleetpath') || id.startsWith('fleetlabel')) && !existingFleetIds.has(id)) {
+                cvs.deleteObject(id)
+            }
+        }
+    }
 
-        // Update waypoint marker
-        const waypointMarker = cvs.getObject('waypointMarker')
+    handleCanvasWaypoint() {
+        const {cvs} = this
+        const waypointId = 'waypointMarker'
+        
+        let waypointMarker = cvs.getObject(waypointId)
+        
+        if (!waypointMarker) {
+            waypointMarker = cvs.addFilledTriangle(waypointId, 0, 0, 0, 0, 12, COLORS.Targeting, Math.PI/2)
+        }
+        
         if (this.selectedObject && this.selectedObject.isWaypoint) {
             waypointMarker.visible = true
             waypointMarker.x = this.selectedObject.x
             waypointMarker.y = this.selectedObject.y
-            
-            // Bobbing animation: full cycle every 2 seconds
-            //const bobCycle = (Date.now() % 2000) / 2000 // 0 to 1 over 2 seconds
-            //const bobOffset = Math.sin(bobCycle * Math.PI * 2) * 5 // -10 to +10 pixels
-            //waypointMarker.screenOffsetY = bobOffset
         } else {
             waypointMarker.visible = false
         }
-
-        cvs.redraw(forceRedraw)
-    }
-
-    refreshBackground(year = 0) {
-        const {starSystem, cvs} = this
-        const {backgroundStars, asteroids} = starSystem
-        backgroundStars.forEach( (bgStar, index) => {
-            bgStar.twinkle(year)
-            cvs.pixels[index].a = bgStar.color[3]
-        });
-        const numBackgroundStars = backgroundStars.length
-        asteroids.forEach( (asteroid, index) => {
-            const pixel = cvs.pixels[numBackgroundStars + index]
-            pixel.x = asteroid.x
-            pixel.y = asteroid.y
-        });
     }
 
     refreshObjectPane() {
@@ -453,9 +508,8 @@ class StarMap extends BaseMap {
         gs.year += elapsedYears
         gs.system.refreshPositions()
 
-        this.refreshBackground(gs.year)
         this.refreshInfoBar()
-        this.refreshCanvas()
+        this.handleCanvasObjects()
 
         //pause if player reached his destination
         if (!playerWasDocked && gs.location) {

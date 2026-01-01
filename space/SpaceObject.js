@@ -8,6 +8,7 @@ class SpaceObject {
         this.y = y;
         this.parent = null;
         this.children = [];
+        this.uuid = generateUUID('sobj_');
     }
     addChildren(children = []) {
         for (const child of children) {

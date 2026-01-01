@@ -20,11 +20,11 @@ function generateFleetCargo(fleet = new Fleet(), fleetType = FLEET_TYPES_ALL[0])
 /**
  * Generates a complete fleet with ships and cargo.
  * @param {FleetType} fleetType - The type of fleet to generate.
- * @param {FactionType|null} faction - The faction the fleet belongs to.
+ * @param {FactionType|null} factionType - The faction the fleet belongs to.
  * @param {Planet} planet - The planet the fleet is associated with.
  * @returns {Fleet} The generated fleet.
  */
-function generateFleet(fleetType = FLEET_TYPES_ALL[0], faction = null, planet = new Planet()) {
+function generateFleet(fleetType = FLEET_TYPES_ALL[0], factionType = null, planet = new Planet()) {
     const ships = []
     const populationMod = planet ? planet.c.population : 1
     const numShips = Math.ceil(0.1 + rng(fleetType.minShips*populationMod, fleetType.maxShips*populationMod))
@@ -37,7 +37,7 @@ function generateFleet(fleetType = FLEET_TYPES_ALL[0], faction = null, planet = 
         console.log({ fleetType, planet, numShips, populationMod})
         throw new Error('generateFleet: No ships generated for fleetType '+fleetType.name)
     }
-    const fleet = new Fleet(`${planet ? planet.ianName+' ' : ''}${fleetType.name}`, fleetType, faction, planet ? planet.color : COLORS.DarkGray, planet.x, planet.y)
+    const fleet = new Fleet(`${planet ? planet.ianName+' ' : ''}${fleetType.name}`, fleetType, factionType, planet ? planet.color : COLORS.DarkGray, planet.x, planet.y)
     ships.forEach(s=>fleet.addShip(s))
     
     fleet.cargo = generateFleetCargo(fleet, fleetType)
@@ -72,6 +72,9 @@ async function addFleetActivity(numYears = 2, progress = {completePercentage: 0}
         currentWeek++
         weeksSinceYield++
         
+        // Increment game year during simulation
+        gs.year += YEARS_PER_WEEK
+        
         // Spawn fleets from planets
         const fleetCountBefore = gs.system.fleets.length
         checkForFleetSpawning(DAYS_PER_WEEK)
@@ -82,7 +85,7 @@ async function addFleetActivity(numYears = 2, progress = {completePercentage: 0}
         
         // Reposition planets every 4 weeks (once per month)
         if (w % 4 === 0) {
-            gs.system.refreshPositions(gs.year + w * YEARS_PER_WEEK)
+            gs.system.refreshPositions(gs.year)
         }
         
         // Update progress and yield control for smooth UI

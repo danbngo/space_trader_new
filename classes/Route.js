@@ -10,7 +10,8 @@ class Route {
         //run simu
         const naiveDistance = calcDistance(fleet.x, fleet.y, destination.x, destination.y)
         const naiveTravelTime = naiveDistance/fleet.speed
-        const {toX, toY, endYear} = Route.estimateTravelTimeToOrbitingBody(startYear, fleet, destination, 100, naiveTravelTime*2+1)
+        //add one extra day
+        const {toX, toY, endYear} = Route.estimateTravelTimeToOrbitingBody(startYear, fleet, destination, 100, naiveTravelTime*2+.1/365)
         this.fleet = fleet
         this.destination = destination
         this.startYear = startYear

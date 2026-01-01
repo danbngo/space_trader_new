@@ -82,7 +82,7 @@ class FleetAI {
     }
 
     isNearHome() {
-        return this.isNearby(this.home) && this.voyageYearsRemaining <= 0
+        return this.isNearby(this.home) && !this.destination
     }
 
     isNearTarget() {
@@ -91,7 +91,7 @@ class FleetAI {
 
     isNearby(object = new SpaceObject()) {
         if (!this.fleet.route || this.fleet.route.destination !== object) return false;
-        return calcDistance(this.fleet.x, this.fleet.y, object.x, object.y) < 0.1 // Within 0.01 AU
+        return calcDistance(this.fleet.x, this.fleet.y, object.x, object.y) < 0.2 // Within 0.01 AU
     }
 
     resumeVoyage() {
@@ -104,11 +104,14 @@ class FleetAI {
      * Called when fleet arrives at destination.
      */
     onNearHome() {
+        console.log('🏠', `${this.fleet.name+' '+this.fleet.uuid} has returned home to ${this.home.name+' '+this.home.uuid}.`)
         gs.system.removeFleet(this.fleet)
     }
 
     onNearDestination() {
+        console.log('🛬', `${this.fleet.name+' '+this.fleet.uuid} has arrived at destination ${this.destination.name+' '+this.destination.uuid}.`)
         this.destination = null
+        this.route = null
         this.resetVoyageDuration()
     }
 
@@ -117,6 +120,7 @@ class FleetAI {
     }
 
     fightTarget() {
+        console.log('⚔️', `${this.fleet.name+' '+this.fleet.uuid} is engaging ${this.target.name+' '+this.target.uuid}!`)
         //chance to win is based on our fleet combat scores
         const ourScore = this.fleet.combatRating
         const theirScore = this.target.combatRating
@@ -126,6 +130,8 @@ class FleetAI {
             // Winner takes cargo from loser
             this.transferCargo(this.target, this.fleet)
             gs.system.removeFleet(this.target)
+            this.target = null
+            this.route = null
             return true
         }
         else {
@@ -163,7 +169,7 @@ class FleetAI {
         }
         
         if (transferred > 0) {
-            console.log(`💰 ${toFleet.name} seized ${transferred} units of cargo from ${fromFleet.name}`);
+            console.log(`💰 ${toFleet.name+' '+toFleet.uuid} seized ${transferred} units of cargo from ${fromFleet.name+' '+fromFleet.uuid}`);
         }
     }
     /**
