@@ -58,7 +58,7 @@ class CivilWarNews extends News {
     isValid() {
         const {planet: p} = this
         //this one really hurts, lets do it if army/security is too high
-        const ratingsValid = (p.c.army > CL.VERY_HIGH || p.c.security > CL.VERY_HIGH) && p.c.culture < CL.LOW
+        const ratingsValid = (p.c.army > CL.MEDIUM || p.c.security > CL.MEDIUM) && p.c.culture < CL.LOW
         const interferingEvent =
             News.planetHasAnyNews(p, NT.GOVERNANCE_PREVENTING) ||
             News.planetHasAnyNewsTargeting(p, NT_WARLIKE)

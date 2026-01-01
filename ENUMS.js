@@ -60,6 +60,7 @@ const COLORS = Object.freeze({
     DarkRed: [139,0,0,1], // rgba(139,0,0,1)
     Cyan: [0,255,255,1], // rgba(0,255,255,1)
     Blue: [0,0,255,1], // rgba(0,0,255,1)
+    DarkYellow: [128,128,0,1], // rgba(128,128,0,1)
     Yellow: [255,255,0,1], // rgba(255,255,0,1)
     LightYellow: [255,255,150,1], // rgba(255,255,150,1)
     Green: [0,255,0,1], // rgba(0,255,0,1)

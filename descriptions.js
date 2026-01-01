@@ -163,24 +163,24 @@ function describeReserves(reservesRating = 0) {
 }
 
 function describeCrime(crimeRating = 0) {
-    const incidents = Math.round(Math.pow(10, crimeRating) * 1000)
-    return `${statColorSpan(describeLargeNumber(incidents), crimeRating, true)} incidents/year`
+    const incarcerationRate = roundToPlaces(crimeRating / 16 * 100, 1) // 8x = 50%
+    return `${statColorSpan(`${incarcerationRate}% incarceration rate`, crimeRating)}`
 }
 
 function describeCorruption(corruptionRating = 0) {
     const corruptionIndex = Math.round(corruptionRating * 50)
-    return `${statColorSpan(`${corruptionIndex} corruption index`, corruptionRating, true)}`
+    return `${statColorSpan(`${corruptionIndex} corruption index`, corruptionRating)}`
 }
 
 function describeInflation(inflationRating = 0) {
-    const inflationRate = roundToPlaces((inflationRating - 1) * 100, 1)
-    const sign = inflationRate > 0 ? '+' : ''
-    return `${statColorSpan(`${sign}${inflationRate}% annual`, inflationRating, inflationRating < 1)}`
+    const inflationRate = roundToPlaces(Math.abs(inflationRating - 1) * 100, 1)
+    const direction = inflationRating > 1 ? 'inflation' : inflationRating < 1 ? 'deflation' : 'stable'
+    return `${statColorSpan(`${inflationRate}% ${direction}`, inflationRating)}`
 }
 
 function describeTaxes(taxesRating = 0) {
     const taxRate = roundToPlaces(taxesRating * MAX_TAX_RATE / 2 * 100, 1)
-    return `${statColorSpan(`${taxRate}% tax rate`, taxesRating, true)}`
+    return `${statColorSpan(`${taxRate}% tax rate`, taxesRating)}`
 }
 
 function describePrestige(prestigeRating = 0) {

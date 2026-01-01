@@ -63,7 +63,7 @@ class ForeignAidNews extends News {
         //recipient must have poor economy
         const economyValid = p.c.economy < CL.LOW && p.c.industry < CL.LOW && p.c.wealth < CL.LOW
         //recipient can't be hated
-        const prestigeValid = p.c.prestige > CL.LOW
+        //const prestigeValid = p.c.prestige > CL.LOW - if we're neutral thats fine already
         //donor must have more wealth/reserves/economy than recipient
         const donorValid = tp.c.reserves > p.c.reserves && tp.c.wealth > p.c.wealth && tp.c.economy > p.c.economy
         //donor must have enough to spare
@@ -71,6 +71,6 @@ class ForeignAidNews extends News {
         //planets must be neutral or allied
         const relationshipValid = Civilization.areAlliesOrNeutral(p, tp)
         const interferingEvent = News.planetHasAnyNews(p, NT_ECONOMY_BOOSTING) || News.hasAnyNewsBidirectional(p, tp, NT_COOPERATION_PREVENTING)
-        return economyValid && prestigeValid && donorValid && donorCapable && relationshipValid && !interferingEvent
+        return economyValid && donorValid && donorCapable && relationshipValid && !interferingEvent
     }
 }

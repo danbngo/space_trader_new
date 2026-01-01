@@ -59,9 +59,9 @@ class ReligiousConversionNews extends News {
         if (tp.c.stateReligion === p.c.stateReligion) return false
         
         const religionPresence = tp.c.religions.getAmount(p.c.stateReligion) || 0
-        const highPresence = religionPresence > 0.3
+        const highPresence = religionPresence > CL.LOW
         const relationshipsValid = Civilization.areAlliesOrNeutral(p, tp)
-        const interferingEvent = News.hasNews(NT.RELIGIOUS_CONVERSION, p, tp)
+        const interferingEvent = News.hasAnyNewsBidirectional(p, tp, NT_COOPERATION_PREVENTING)
         
         return highPresence && relationshipsValid && !interferingEvent
     }

@@ -9,10 +9,10 @@ function equipmentGenerator(planet, slot = null) {
     const tech = planet.civilization ? planet.civilization.technology : 1.0;
     const quality = Math.max(0.5, tech * rng(0.8, 1.2, false));
     const name = `${equipmentType.name} Mk${Math.round(quality * 10)}`;
-    return new Equipment({
+    return new Equipment(
         planet,
         name,
         equipmentType,
         quality
-    });
+    );
 }

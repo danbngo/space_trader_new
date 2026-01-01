@@ -108,7 +108,8 @@ class PolicyChangeNews extends News {
         const {planet: p} = this
         // cultures with higher culture, education more prone to change
         //something needs to be going bad
-        const ratingsValid = p.c.culture > CL.HIGH || p.c.education > CL.HIGH && p.c.score < CL.MEDIUM
+        //relaxed all ratings requirements, doesnt make sense...
+        const ratingsValid = p.c.score < CL.MEDIUM //(p.c.culture > CL.MEDIUM || p.c.education > CL.MEDIUM) && p.c.score < CL.MEDIUM
         
         // Can't change policy during major upheaval
         const interferingEvent = News.planetHasAnyNews(p, NT_GOVERNANCE_PREVENTING) || News.planetHasAnyNewsTargeting(p, NT_WARLIKE)

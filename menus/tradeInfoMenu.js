@@ -65,11 +65,15 @@ function showTradeInfoSellMenu(ct = CARGO_TYPES_ALL[0]) {
         showStarMap(planet)
     }
 
-    const options = []
+    const dropdownOptions = []
     for (const cto of CARGO_TYPES_ALL) {
         const amt = fleet.cargo.getAmount(cto)
-        options.push([`${coloredName(cto)}: ${amt}`, ()=>showTradeInfoSellMenu(cto), (ct == cto)])
+        dropdownOptions.push([`${coloredName(cto)}: ${amt}`, ()=>showTradeInfoSellMenu(cto), (ct == cto)])
     }
+
+    const options = []
+    options.push(createDropdown(dropdownOptions, true, 0))
+
     options.push(
         ce({tag:'br'}),
         ["Buy Info", () => showTradeInfoBuyMenu(ct)],

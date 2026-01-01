@@ -24,6 +24,9 @@ function assessPlanets() {
     //list how many times specific news events occurred
     const totalNews = gs.system.news.length
     const activeNews = gs.system.news.filter(n=>(n.started && !n.ended)).length
+    const completedNews = gs.system.news.filter(n=>(n.ended && !n.cancelled && !n.failed)).length
+    const cancelledNews = gs.system.news.filter(n=>(n.ended && n.cancelled)).length
+    const failedNews = gs.system.news.filter(n=>(n.ended && n.failed)).length
     const newsTotalsPerType = {}
     const newsTotalPercentsPerType = {}
     const activeNewsTotalsPerType = {}
@@ -78,15 +81,15 @@ function assessPlanets() {
         activeNewsTotalPercentsPerType[newsTypeName] = percent.toFixed(2) + '%'
     }
     for (const [newsTypeName, count] of Object.entries(succeededNewsTotalsPerType)) {
-        const percent = (count / totalNews) * 100
+        const percent = (count / completedNews) * 100
         succeededNewsTotalPercentsPerType[newsTypeName] = percent.toFixed(2) + '%'
     }
     for (const [newsTypeName, count] of Object.entries(failedNewsTotalsPerType)) {
-        const percent = (count / totalNews) * 100
+        const percent = (count / failedNews) * 100
         failedNewsTotalPercentsPerType[newsTypeName] = percent.toFixed(2) + '%'
     }
     for (const [newsTypeName, count] of Object.entries(cancelledNewsTotalsPerType)) {
-        const percent = (count / totalNews) * 100
+        const percent = (count / cancelledNews) * 100
         cancelledNewsTotalPercentsPerType[newsTypeName] = percent.toFixed(2) + '%'
     }
     console.log('-----News Totals Per Type:------', newsTotalsPerType)

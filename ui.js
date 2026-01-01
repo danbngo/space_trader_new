@@ -375,3 +375,114 @@ function attachMouseWheelHandler(element = ce(), callback = (direction = 1)=>{})
     element.addEventListener("DOMMouseScroll", handler, { passive: false });
 }
 
+
+function createDropdown(buttons = [], dropUpwards = false, selectedIndex = null) {
+    if (!buttons || buttons.length === 0) return ce()
+    
+    let currentSelectedIndex = selectedIndex !== null ? selectedIndex : 0
+    const selectedBtnData = buttons[currentSelectedIndex]
+    const [initialLabel] = selectedBtnData
+    
+    // Create the label element (what shows when dropdown is closed)
+    const labelElement = ce({
+        classNames: ['gameButton'],
+        innerHTML: initialLabel
+    })
+    
+    // Create the dropdown container
+    const dropdownContainer = ce({
+        classNames: ['dropdown-container'],
+        style: {
+            position: 'relative',
+            display: 'inline-block'
+        }
+    })
+    
+    // Create the items container (what shows when dropdown is open)
+    const itemsContainer = ce({
+        classNames: ['dropdown-items'],
+        style: {
+            position: 'absolute',
+            display: 'none',
+            zIndex: '1000',
+            left: '0',
+            width: '100%',
+            ...(dropUpwards ? { bottom: '100%' } : { top: '100%' })
+        }
+    })
+    
+    // Function to update dropdown state
+    const updateDropdown = (newIndex) => {
+        currentSelectedIndex = newIndex
+        const [newLabel, newHandler] = buttons[newIndex]
+        labelElement.innerHTML = newLabel
+        
+        // Update all button states
+        itemsContainer.childNodes.forEach((btn, index) => {
+            if (index === newIndex) {
+                btn.classList.add('disabled')
+            } else {
+                btn.classList.remove('disabled')
+            }
+        })
+        
+        // Call the handler if it exists
+        if (newHandler) newHandler()
+        
+        // Close dropdown
+        itemsContainer.style.display = 'none'
+    }
+    
+    // Create dropdown items
+    buttons.forEach((btnData, index) => {
+        if (!btnData) return
+        
+        const [label, handler, disabled, classNames] = btnData
+        const btn = ce({
+            tag: 'div',
+            classNames: ['gameButton'],
+            innerHTML: label
+        })
+        
+        // Add custom class names if provided
+        if (classNames) {
+            if (Array.isArray(classNames)) {
+                classNames.forEach(cn => cn && btn.classList.add(cn))
+            } else {
+                btn.classList.add(classNames)
+            }
+        }
+        
+        // Disable if it's the currently selected item
+        if (index === currentSelectedIndex) {
+            btn.classList.add('disabled')
+        }
+        
+        // Handle clicks on dropdown items
+        btn.onclick = (e) => {
+            e.stopPropagation()
+            if (!btn.classList.contains('disabled')) {
+                updateDropdown(index)
+            }
+        }
+        
+        itemsContainer.appendChild(btn)
+    })
+    
+    // Toggle dropdown when label is clicked
+    labelElement.onclick = (e) => {
+        e.stopPropagation()
+        const isOpen = itemsContainer.style.display === 'block'
+        itemsContainer.style.display = isOpen ? 'none' : 'block'
+    }
+    
+    // Close dropdown when clicking outside
+    document.addEventListener('click', () => {
+        itemsContainer.style.display = 'none'
+    })
+    
+    dropdownContainer.appendChild(labelElement)
+    dropdownContainer.appendChild(itemsContainer)
+    
+    return dropdownContainer
+}

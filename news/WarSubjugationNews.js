@@ -73,7 +73,9 @@ class WarSubjugationNews extends News {
         //planet must be at war with the target
         const relationshipValid = Civilization.areAtWar(p, tp)
         const interferingEvent = News.hasAnyNewsBidirectional(p, tp, NT_COOPERATIVE)
-        return ratingsValid && relationshipValid && !interferingEvent
+        // Cannot subjugate if target has active planetary defense platform
+        const hasDefensePlatform = News.planetHasAnyNews(tp, [NT.PLANETARY_DEFENSE])
+        return ratingsValid && relationshipValid && !interferingEvent && !hasDefensePlatform
     }
 
 }

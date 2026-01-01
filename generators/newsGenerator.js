@@ -8,6 +8,7 @@ const NEWS_TYPE_CLASSES = [
     [NT.ADDICTION, AddictionNews],
     [NT.ALLIANCE, AllianceNews],
     [NT.ARMS_DEAL, ArmsDealNews],
+    [NT.BLOCKADE, BlockadeNews],
     [NT.CIVIL_STRIFE, CivilStrifeNews],
     [NT.CIVIL_WAR, CivilWarNews],
     [NT.COALITION, CoalitionNews],
@@ -25,7 +26,6 @@ const NEWS_TYPE_CLASSES = [
     [NT.ECONOMIC_BOOM, EconomicBoomNews],
     [NT.BLOCKADE, BlockadeNews],
     [NT.CLONING, CloningNews],
-    [NT.ENSLAVEMENT, EnslavementNews],
     [NT.EUGENICS, EugenicsNews],
     [NT.ENVIRONMENTAL_DISASTER, EnvironmentalDisasterNews],
     [NT.ENVIRONMENTALISM, EnvironmentalismNews],
@@ -35,6 +35,10 @@ const NEWS_TYPE_CLASSES = [
     [NT.FOREIGN_AID, ForeignAidNews],
     [NT.GENOCIDE, GenocideNews],
     [NT.IMMIGRATION, ImmigrationNews],
+    [NT.REFUGEES, RefugeesNews],
+    [NT.DEPORTATION, DeportationNews],
+    [NT.ASYLUM_POLICY, AsylumPolicyNews],
+    [NT.DIASPORA_RETURNS, DiasporaReturnsNews],
     [NT.INDUSTRIAL_ACCIDENT, IndustrialAccidentNews],
     [NT.RELIGION_INQUISITION, ReligionInquisitionNews],
     [NT.BANKRUPTCY, BankruptcyNews],
@@ -45,6 +49,10 @@ const NEWS_TYPE_CLASSES = [
     [NT.OLIGARCHY, OligarchyNews],
     [NT.ORGANIZED_CRIME, OrganizedCrimeNews],
     [NT.PLAGUE, PlagueNews],
+    [NT.LIFE_EXTENSION, LifeExtensionNews],
+    [NT.BIOWEAPON, BioweaponNews],
+    [NT.PLAGUE_SPREAD, PlagueSpreadNews],
+    [NT.PLAGUE_VACCINE, PlagueVaccineNews],
     [NT.RAIDING, RaidingNews],
     [NT.RESEARCH_AGREEMENT, ResearchAgreementNews],
     [NT.RELIGION_REVIVAL, ReligionRevivalNews],
@@ -58,8 +66,45 @@ const NEWS_TYPE_CLASSES = [
     [NT.SANCTIONS, SanctionsNews],
     [NT.SCARCITY, ScarcityNews],
     [NT.SCIENTIFIC_BREAKTHROUGH, ScientificBreakthroughNews],
+    [NT.COLONY_SHIP, ColonyShipNews],
+    [NT.MEGA_AI, MegaAINews],
+    [NT.ADVANCED_NANITES, AdvancedNanitesNews],
+    [NT.SPACE_STATION, SpaceStationNews],
     [NT.STOCK_MARKET_CRASH, StockMarketCrashNews],
     [NT.SURPLUS, SurplusNews],
+    [NT.PLANETARY_DEFENSE, PlanetaryDefenseNews],
+    [NT.SPACE_ELEVATOR, SpaceElevatorNews],
+    [NT.ANTIMATTER_GRID, AntimatterGridNews],
+    [NT.MEGACITY, MegacityNews],
+    [NT.LABOR_STRIKES, LaborStrikesNews],
+    [NT.AUTOMATION_CRISIS, AutomationCrisisNews],
+    [NT.ARTIFACTS_DISCOVERED, ArtifactsDiscoveredNews],
+    [NT.ALIEN_LIFE_DISCOVERED, AlienLifeDiscoveredNews],
+    [NT.RUINS_DISCOVERED, RuinsDiscoveredNews],
+    [NT.INDOCTRINATION_PROGRAM, IndoctrinationProgramNews],
+    [NT.BRAIN_DRAIN, BrainDrainNews],
+    [NT.PHILOSOPHICAL_DEBATES, PhilosophicalDebatesNews],
+    [NT.KNOWLEDGE_CODEX, KnowledgeCodexNews],
+    [NT.PROPAGANDA_CAMPAIGN, PropagandaCampaignNews],
+    [NT.SOLAR_HARVESTERS, SolarHarvestersNews],
+    [NT.EXPERIMENTAL_ENERGY, ExperimentalEnergyNews],
+    [NT.BLACK_MARKET, BlackMarketNews],
+    [NT.GUNBOAT_DIPLOMACY, GunboatDiplomacyNews],
+    [NT.OPPRESSED_MINORITY, OppressedMinorityNews],
+    [NT.SPY_NETWORK, SpyNetworkNews],
+    [NT.SURVEILLANCE_NETWORK, SurveillanceNetworkNews],
+    [NT.WAR_CODE_BREAK, WarCodeBreakNews],
+    [NT.WAR_CONVERT_INDUSTRY, WarConvertIndustryNews],
+    [NT.DISASTER_FLARE, DisasterFlareNews],
+    [NT.DISASTER_ASTEROID, DisasterAsteroidNews],
+    [NT.DISASTER_VOLCANO, DisasterVolcanoNews],
+    [NT.DISASTER_EARTHQUAKES, DisasterEarthquakesNews],
+    [NT.DISASTER_GREENHOUSE, DisasterGreenhouseNews],
+    [NT.DISASTER_STORM, DisasterStormNews],
+    [NT.DISASTER_TSUNAMI, DisasterTsunamiNews],
+    [NT.PIRATE_HAVEN, PirateHavenNews],
+    [NT.PIRATE_ARMADA, PirateArmadaNews],
+    [NT.MUTATIONS, MutationsNews],
     [NT.TERRORISM, TerrorismNews],
     [NT.TENSIONS, TensionsNews],
     [NT.TERRAFORMING, TerraformingNews],
@@ -162,9 +207,13 @@ function generateMetaNews(newsTypesAttempted = []) {
 async function addHistory(startYear = 3000, endYear = 3000, progress = {completePercentage: 0}) {
     const totalYears = endYear - startYear
     let currentYear = startYear
+    let daysSinceYield = 0
+    const YIELD_EVERY_DAYS = 30 // Yield control every 30 days to keep animations smooth
     
     for (let y = startYear; y < endYear; y += 1/365) {
         gs.year = y
+        daysSinceYield++
+        
         if (Math.random() < NEWS_CHANCE_PER_DAY) {
             const news = generateNews()
             if (!news) continue
@@ -177,12 +226,18 @@ async function addHistory(startYear = 3000, endYear = 3000, progress = {complete
         }*/
         News.processNews(1/365)
         
-        // Update progress every year and yield control to browser
+        // Update progress and yield control more frequently for smooth animations
+        if (daysSinceYield >= YIELD_EVERY_DAYS) {
+            daysSinceYield = 0
+            progress.completePercentage = ((y - startYear) / totalYears) * 100
+            // Yield control to allow UI updates and animations
+            await new Promise(resolve => setTimeout(resolve, 0))
+        }
+        
+        // Also update progress every year
         if (Math.floor(y) > currentYear) {
             currentYear = Math.floor(y)
             progress.completePercentage = ((y - startYear) / totalYears) * 100
-            // Yield control to allow UI updates
-            await new Promise(resolve => setTimeout(resolve, 0))
         }
     }
     progress.completePercentage = 100

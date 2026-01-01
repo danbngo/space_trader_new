@@ -65,6 +65,8 @@ class WarInvasionNews extends News {
         const relationshipsValid = Civilization.areAtWar(p, tp)
         // Attacker must have ship AND ground advantage to launch invasion
         const militaryValid = (p.c.navy > tp.c.navy) && (p.c.army > tp.c.army)
-        return relationshipsValid && militaryValid
+        // Cannot invade if target has active planetary defense platform
+        const hasDefensePlatform = News.planetHasAnyNews(tp, [NT.PLANETARY_DEFENSE])
+        return relationshipsValid && militaryValid && !hasDefensePlatform
     }
 }

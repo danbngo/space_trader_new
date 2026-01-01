@@ -52,11 +52,13 @@ async function startNewGame() {
     })
     progressBarContainer.appendChild(progressBarBg)
     progressBarContainer.appendChild(progressText)
+
+    const HISTORY_NUM_YEARS = 100
     
     showModal(
         'Loading Game',
         ce({children: [
-            'Generating 100 years of galactic history...',
+            `Generating ${HISTORY_NUM_YEARS} years of galactic history...`,
             progressBarContainer
         ]}),
         []
@@ -76,7 +78,7 @@ async function startNewGame() {
         }
     }, 50)
     
-    await addHistory(GAME_START_YEAR - 100, GAME_START_YEAR, progress)
+    await addHistory(GAME_START_YEAR - HISTORY_NUM_YEARS, GAME_START_YEAR, progress)
     
     clearInterval(progressUpdateInterval)
 

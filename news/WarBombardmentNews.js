@@ -75,6 +75,8 @@ class WarBombardmentNews extends News {
         //our military must be significantly stronger than theirs and navy must be MUCH stronger
         const navyAdvantage = p.c.navy/tp.c.navy > CL.HIGH
         const relationshipsValid = Civilization.areAtWar(p, tp)
-        return navyAdvantage && relationshipsValid
+        // Cannot bombard if target has active planetary defense platform
+        const hasDefensePlatform = News.planetHasAnyNews(tp, [NT.PLANETARY_DEFENSE])
+        return navyAdvantage && relationshipsValid && !hasDefensePlatform
     }
 }

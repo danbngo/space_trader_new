@@ -120,10 +120,10 @@ class Civilization {
             if (modifier == null || modifier == undefined || isNaN(modifier) || modifier == 1) continue;
             this[cr.id] *= civMultipliers[cr.id];
         }
-        for (const [ct, mod] of civMultipliers.cargoPriceMultipliers.counts) {
+        if (civMultipliers.cargoPriceMultipliers) for (const [ct, mod] of civMultipliers.cargoPriceMultipliers.counts) {
             this.cargoPriceMultipliers.multiply(ct, mod)
         }
-        for (const [st, mod] of civMultipliers.skillPriceMultipliers.counts) {
+        if (civMultipliers.skillPriceMultipliers) for (const [st, mod] of civMultipliers.skillPriceMultipliers.counts) {
             this.skillPriceMultipliers.multiply(st, mod)
         }
     }
@@ -131,8 +131,8 @@ class Civilization {
     getInverse() {
         const inverseEffect = new Civilization({
             planet: this.planet,
-            cargoPriceMultipliers: this.cargoPriceMultipliers.calcInvertedMultipliers(),
-            skillPriceMultipliers: this.skillPriceMultipliers.calcInvertedMultipliers(),
+            cargoPriceMultipliers: this.cargoPriceMultipliers ? this.cargoPriceMultipliers.calcInvertedMultipliers() : undefined,
+            skillPriceMultipliers: this.skillPriceMultipliers ? this.skillPriceMultipliers.calcInvertedMultipliers() : undefined,
         });
         for (const cr of CIVILIZATION_RATINGS_ALL) {
             inverseEffect[cr.id] = 1 / this[cr.id];
@@ -148,11 +148,17 @@ class Civilization {
             if (withCiv[cr.id] !== undefined && withCiv[cr.id] !== null && withCiv[cr.id] !== 1.0)
             this[cr.id] = withCiv[cr.id];
         }
-        for (const [ct, mod] of withCiv.cargoPriceMultipliers.counts) {
+        if (withCiv.cargoPriceMultipliers) {
+            if (!this.cargoPriceMultipliers) this.cargoPriceMultipliers = new CountsMap()
+            for (const [ct, mod] of withCiv.cargoPriceMultipliers.counts) {
             this.cargoPriceMultipliers.counts.set(ct, mod)
+            }
         }
-        for (const [st, mod] of withCiv.skillPriceMultipliers.counts) {
-            this.skillPriceMultipliers.counts.set(st, mod)
+        if (withCiv.skillPriceMultipliers) {
+            if (!this.skillPriceMultipliers) this.skillPriceMultipliers = new CountsMap()
+            for (const [st, mod] of withCiv.skillPriceMultipliers.counts) {
+                this.skillPriceMultipliers.counts.set(st, mod)
+            }
         }
     }
 

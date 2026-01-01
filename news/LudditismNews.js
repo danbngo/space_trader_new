@@ -46,7 +46,7 @@ class LudditismNews extends News {
 
     determineOutcome() {
         //this is fairly hard to pull off
-        this.rollOutcome((this.planet.c.industry*this.targetPlanet.c.culture*this.planet.c.technology*this.planet.c.economy), CL.HIGH)
+        this.rollOutcome((this.planet.c.industry*this.planet.c.culture*this.planet.c.technology*this.planet.c.economy), CL.HIGH)
     }
 
     isValid() {

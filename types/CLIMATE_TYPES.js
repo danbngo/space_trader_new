@@ -35,6 +35,7 @@ class OceanCoverage extends ClimateValue {}
 class GeologicalActivity extends ClimateValue {}
 class Magnetosphere extends ClimateValue {}
 class RadiationLevel extends ClimateValue {}
+class AsteroidImpact extends ClimateValue {}
 
 const ATMOSPHERIC_PRESSURES = Object.freeze({
     NONE: new AtmosphericPressure("None", 0),
@@ -147,3 +148,19 @@ const RADIATION_LEVELS = Object.freeze({
 })
 
 const RADIATION_LEVELS_ALL = Object.values(RADIATION_LEVELS)
+
+const ASTEROID_IMPACTS = Object.freeze({
+    NONE: new AsteroidImpact("None", 0),
+    EXTREMELY_LOW: new AsteroidImpact("Pristine", 8/16),
+    VERY_LOW: new AsteroidImpact("Rare", 8/12),
+    LOW: new AsteroidImpact("Occasional", 8/10),
+    SLIGHTLY_LOW: new AsteroidImpact("Infrequent", 8/9),
+    MEDIUM: new AsteroidImpact("Regular", 1),
+    SLIGHTLY_HIGH: new AsteroidImpact("Frequent", 9/8),
+    HIGH: new AsteroidImpact("Common", 10/8),
+    VERY_HIGH: new AsteroidImpact("Constant", 12/8),
+    EXTREMELY_HIGH: new AsteroidImpact("Unrelenting", 16/8),
+    DEVASTATING: new AsteroidImpact("Devastating", 32/8),
+})
+
+const ASTEROID_IMPACTS_ALL = Object.values(ASTEROID_IMPACTS)

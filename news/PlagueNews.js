@@ -43,6 +43,8 @@ class PlagueNews extends News {
         const {planet: p} = this
         //happens when population is getting out of hand AND either too interconnected, too dumb, or too little medicine
         const ratingsValid = p.c.population > CL.VERY_LOW && (p.c.economy > CL.HIGH || p.c.education < CL.SLIGHTLY_HIGH || p.c.technology > CL.HIGH)
-        return ratingsValid
+        // Cannot occur if planet has active plague vaccine
+        const hasVaccine = News.planetHasAnyNews(p, [NT.PLAGUE_VACCINE])
+        return ratingsValid && !hasVaccine
     }
 }

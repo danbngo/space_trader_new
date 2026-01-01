@@ -11,7 +11,7 @@ class ArmsDealNews extends News {
         this.addPlanetEffect(
             {
                 taxes: CL.HIGH,
-                cargoPriceModifiers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.VERY_HIGH], [CARGO_TYPES.WEAPONS, CL.VERY_HIGH]])),
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.VERY_HIGH], [CARGO_TYPES.WEAPONS, CL.VERY_HIGH]])),
             },
             {
                 army: CL.HIGH,

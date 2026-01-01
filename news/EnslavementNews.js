@@ -62,11 +62,11 @@ class EnslavementNews extends News {
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         // More likely if economy/industry AND population is low (seeking economic boost)
-        const ratingsValid = (p.c.economy < CL.LOW || p.c.industry < CL.LOW) && p.c.population < CL.SLIGHTLY_LOW
+        const ratingsValid = (p.c.economy < CL.SLIGHTLY_LOW || p.c.industry < CL.SLIGHTLY_LOW) && p.c.population < CL.SLIGHTLY_LOW
         // Target must have population to steal
         const targetValid = tp.c.population > CL.LOW
         // our military must be stronger than theirs
-        const militaryValid = (p.c.army + p.c.navy) / (tp.c.army + tp.c.navy) > CL.HIGH
+        const militaryValid = p.c.military/tp.c.military > CL.HIGH
         const relationshipsValid = Civilization.areTenseOrAtWar(p, tp)
         const interferingEvent = News.hasAnyNewsBidirectional(p, tp, NT_COOPERATIVE)
         return ratingsValid && targetValid && militaryValid && relationshipsValid && !interferingEvent

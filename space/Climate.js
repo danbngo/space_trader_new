@@ -8,6 +8,7 @@ class Climate {
      * @param {GeologicalActivity} geologicalActivity - The geological activity level (from GEOLOGICAL_ACTIVITIES)
      * @param {Magnetosphere} magnetosphere - The magnetosphere strength (from MAGNETOSPHERES)
      * @param {RadiationLevel} radiationLevel - The radiation level (from RADIATION_LEVELS)
+     * @param {AsteroidImpact} asteroidImpact - The asteroid impact frequency (from ASTEROID_IMPACTS)
      * @param {PlanetAtmosphereType} atmosphereType - The atmospheric composition
      * @param {PlanetOceanType} oceanType - The ocean/liquid composition (can be null)
      * @param {PlanetGeologyType} geologyType - The geological composition (can be null for gas giants)
@@ -20,6 +21,7 @@ class Climate {
         geologicalActivity = GEOLOGICAL_ACTIVITIES.NONE,
         magnetosphere = MAGNETOSPHERES.NONE,
         radiationLevel = RADIATION_LEVELS.NONE,
+        asteroidImpact = ASTEROID_IMPACTS.NONE,
         atmosphereType = null,
         oceanType = null,
         geologyType = null
@@ -38,6 +40,8 @@ class Climate {
         this.magnetosphere = magnetosphere
         /** @type {RadiationLevel} */
         this.radiationLevel = radiationLevel
+        /** @type {AsteroidImpact} */
+        this.asteroidImpact = asteroidImpact
         /** @type {PlanetAtmosphereType} */
         this.atmosphereType = atmosphereType
         /** @type {PlanetOceanType} */
@@ -79,6 +83,10 @@ class Climate {
         
         if (this.radiationLevel !== RADIATION_LEVELS.NONE) {
             parts.push(`Radiation: ${this.radiationLevel.name.toLowerCase()}`)
+        }
+        
+        if (this.asteroidImpact !== ASTEROID_IMPACTS.NONE) {
+            parts.push(`Asteroid impacts: ${this.asteroidImpact.name.toLowerCase()}`)
         }
         
         return parts.length > 0 ? parts.join(', ') : 'No significant climate data'

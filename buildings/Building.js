@@ -19,10 +19,10 @@ class Building {
         this.credits = 1
         /** @type {boolean} */
         this.enabled = true
-        this.normalize()
+        //this.normalize() //danmod this causes errors because the extending child class tries to use ITS normalize function instead of the one below
     }
     normalize() {
-        this.credits = this.buildingType.baseCredits * this.planet.c.wealth * this.planet.c.inflation
+        this.credits = Math.round(this.buildingType.baseCredits * this.planet.c.wealth * this.planet.c.inflation)
     }
     get rake() {
         const corruption = this.planet.c.corruption

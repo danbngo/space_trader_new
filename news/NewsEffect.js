@@ -203,14 +203,14 @@ class NewsEffect extends Civilization {
             }
 
 
-            for (const building of buildingsDisabled) {
+            if (buildingsDisabled) for (const building of buildingsDisabled) {
                 msg += `${colorSpan(`- ${building.buildingType.name} destroyed`, COLORS.Red)}<br/>`
             }
-            for (const building of buildingsEnabled) {
+            if (buildingsEnabled) for (const building of buildingsEnabled) {
                 msg += `${colorSpan(`- ${building.buildingType.name} built`, COLORS.Green)}<br/>`
             }
 
-            for (const [cargoType, modifier] of cargoPriceMultipliers.counts) {
+            if (cargoPriceMultipliers) for (const [cargoType, modifier] of cargoPriceMultipliers.counts) {
                 msg += `- Demand for ${cargoType.name}: ${civilization.cargoPriceMultipliers.getAmount(cargoType)}x ➜ ${civilization.cargoPriceMultipliers.getAmount(cargoType)*modifier}x.<br/>`
             }
 
