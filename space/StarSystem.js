@@ -19,8 +19,9 @@ class StarSystem extends SpaceObject {
      * @param {Asteroid[]} asteroids - The asteroids in the star system.
      * @param {BackgroundStar[]} backgroundStars - The background stars for visual effect.
      * @param {Religion[]} religions - The religions in the star system.
+     * @param {Anomaly[]} anomalies - The anomalies in the star system.
      */
-    constructor(name = "Unnamed", color = COLORS.White, radius = 0, x = 0, y = 0, barycenter = null, stars = [], planets = [], dwarfPlanets = [], fleets = [], asteroidBelts = [], asteroids = [], backgroundStars = [], religions = []) {
+    constructor(name = "Unnamed", color = COLORS.White, radius = 0, x = 0, y = 0, barycenter = null, stars = [], planets = [], dwarfPlanets = [], fleets = [], asteroidBelts = [], asteroids = [], backgroundStars = [], religions = [], anomalies = []) {
         console.log('instantiating star system w name:', name, 'stars:', stars, 'planets:', planets, 'dwarf planets:', dwarfPlanets, 'fleets:', fleets);
         super(name, color, radius, x, y)
         /** @type {SpaceObject} */
@@ -49,6 +50,8 @@ class StarSystem extends SpaceObject {
         this.simpleNews = []
         /** @type {Religion[]} */
         this.religions = religions
+        /** @type {Anomaly[]} */
+        this.anomalies = anomalies
     }
 
     /**
@@ -88,12 +91,13 @@ class StarSystem extends SpaceObject {
             //if route not started yet, do nothing
             if (year <= fleet.route.startYear) continue
             //check if route completed, if so arrive at destination and dock
-            if (year >= fleet.route.endYear) {
+            if (year >= fleet.route.endYear && fleet == gs.fleet) {
+                //only dock if player fleet near the destination, otherwise its handled by ai
                 if (fleet.route.destination instanceof Planet) fleet.dock(fleet.route.destination)
                 else {
                     fleet.route = undefined
                     fleet.location = undefined
-                    if (fleet == gs.fleet && currentMap && currentMap.togglePause) currentMap.togglePause(true)
+                    if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
                     if (currentMap && currentMap.selectObject && fleet == gs.fleet) currentMap.selectObject(fleet)
                 }
                 continue
@@ -104,5 +108,10 @@ class StarSystem extends SpaceObject {
             fleet.x = fx
             fleet.y = fy
         }
+    }
+
+    removeFleet(fleet) {
+        console.log(`🗑️ Removing fleet ${fleet.name} (mission complete)`)
+        this.fleets.splice(gs.system.fleets.indexOf(fleet), 1)
     }
 }

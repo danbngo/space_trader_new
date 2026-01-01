@@ -103,6 +103,24 @@ const FACTION_TYPES = {
         COLORS.Cyan,
         'Researchers and explorers seeking knowledge and studying the mysteries of the universe.'
     ),
+    PILGRIMS: new FactionType(
+        'Pilgrims',
+        '🙏',
+        COLORS.White,
+        'Devout travelers making religious journeys to holy sites and sacred worlds.'
+    ),
+    INQUISITORS: new FactionType(
+        'Inquisitors',
+        '⚖️',
+        COLORS.Purple,
+        'Religious enforcers tasked with rooting out heresy and maintaining doctrinal purity.'
+    ),
+    MISSIONARIES: new FactionType(
+        'Missionaries',
+        '✝️',
+        COLORS.LightYellow,
+        'Evangelists spreading their faith to new worlds and converting non-believers.'
+    ),
 }
 
 const FACTION_TYPES_ALL = Object.values(FACTION_TYPES)

@@ -10,4 +10,11 @@ class PoliceFleetAI extends FleetAI {
     calcDestination() {
         return rndMember([...gs.system.planets].filter(p=>(p !== this.home)))
     }
+    onNearTarget() {
+        if (this.target instanceof Fleet) {
+            if (Math.random() > 0.5) {
+                this.fightTarget();
+            }
+        }
+    }
 }

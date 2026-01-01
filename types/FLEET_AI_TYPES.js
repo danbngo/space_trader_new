@@ -30,6 +30,9 @@ const FLEET_AI_TYPES = {
     COLONIST: new FleetAIType('Colonist AI', ColonistFleetAI, FLEET_TYPES.COLONISTS),
     SCIENTIST: new FleetAIType('Scientist AI', ScientistFleetAI, FLEET_TYPES.SCIENTISTS),
     SLAVER: new FleetAIType('Slaver AI', SlaverFleetAI, FLEET_TYPES.SLAVERS),
+    PILGRIM: new FleetAIType('Pilgrim AI', PilgrimFleetAI, FLEET_TYPES.PILGRIMS),
+    INQUISITOR: new FleetAIType('Inquisitor AI', InquisitorFleetAI, FLEET_TYPES.INQUISITORS),
+    MISSIONARY: new FleetAIType('Missionary AI', MissionaryFleetAI, FLEET_TYPES.MISSIONARIES),
 }
 
 const FLEET_AI_TYPES_ALL = Object.values(FLEET_AI_TYPES)

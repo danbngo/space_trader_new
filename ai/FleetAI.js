@@ -14,16 +14,18 @@ class FleetAI {
         this.home = home;
         /** @type {SpaceObject} */
         this.destination = this.calcDestination();
+        if (!this.destination) throw new Error('fleetAI must have a destination!!')
         /** @type {any} */
         this.target = null
         this.voyageYearsRemaining = Infinity
         this.resetVoyageDuration()
+        if (!Number.isFinite(this.voyageYearsRemaining)) throw new Error('fleetAI must have a finite voyage duration!!')
+        console.log('created fleet AI with props:', {fleet: this.fleet, home: this.home, destination: this.destination, voyageYearsRemaining: this.voyageYearsRemaining})
     }
     /**
      * Updates AI behavior each game tick.
      */
     tick(elapsedYears = 1) {
-        if (!this.fleet || !this.destination) return;
         this.voyageYearsRemaining -= elapsedYears;
         if (this.isNearHome()) {
             this.onNearHome()
@@ -37,15 +39,14 @@ class FleetAI {
             this.onNearTarget();
             return
         }
-        else {
-            if (this.voyageYearsRemaining > 0) {
+        else if (this.voyageYearsRemaining > 0) {
+            //ships that pursue other ships will continuously check for closer targets
+            if (!this.target || Number.isFinite(this.fleet.fleetType.targetMaxDistance)) { 
                 const validTargets = this.calcValidTargets()
-                if (!this.target || !validTargets.includes(this.target)) { 
-                    const target = this.findNearest(validTargets, Infinity);
-                    if (target) {
-                        this.setTarget(target);
-                        return
-                    }
+                const target = this.findNearest(validTargets, this.fleet.fleetType.targetMaxDistance || Infinity);
+                if (target && target !== this.target) {
+                    this.setTarget(target);
+                    return
                 }
             }
         }
@@ -103,7 +104,7 @@ class FleetAI {
      * Called when fleet arrives at destination.
      */
     onNearHome() {
-        this.removeFleet()
+        gs.system.removeFleet(this.fleet)
     }
 
     onNearDestination() {
@@ -115,9 +116,55 @@ class FleetAI {
         //override in subclass
     }
 
-    removeFleet() {
-        console.log(`🗑️ Removing fleet ${this.fleet.name} (mission complete)`)
-        gs.system.fleets.splice(gs.system.fleets.indexOf(this.fleet), 1)
+    fightTarget() {
+        //chance to win is based on our fleet combat scores
+        const ourScore = this.fleet.combatRating
+        const theirScore = this.target.combatRating
+        const totalScore = ourScore + theirScore
+        const roll = rng(totalScore, 1)
+        if (roll <= ourScore) {
+            // Winner takes cargo from loser
+            this.transferCargo(this.target, this.fleet)
+            gs.system.removeFleet(this.target)
+            return true
+        }
+        else {
+            // Loser's cargo is taken by winner
+            this.transferCargo(this.fleet, this.target)
+            gs.system.removeFleet(this.fleet)
+            return false
+        }
+    }
+
+    /**
+     * Transfer cargo from one fleet to another (up to available space)
+     * @param {Fleet} fromFleet - Fleet to take cargo from
+     * @param {Fleet} toFleet - Fleet to transfer cargo to
+     */
+    transferCargo(fromFleet, toFleet) {
+        if (!fromFleet.cargo || fromFleet.cargo.total === 0) return;
+        
+        const availableSpace = toFleet.availableCargoSpace;
+        if (availableSpace <= 0) return;
+        
+        // Transfer cargo up to available space
+        const cargoTypes = fromFleet.cargo.counts.keys();
+        let transferred = 0;
+        
+        for (const cargoType of cargoTypes) {
+            if (transferred >= availableSpace) break;
+            
+            const amount = fromFleet.cargo.getAmount(cargoType);
+            const toTransfer = Math.min(amount, availableSpace - transferred);
+            
+            fromFleet.cargo.increment(cargoType, -toTransfer);
+            toFleet.cargo.increment(cargoType, toTransfer);
+            transferred += toTransfer;
+        }
+        
+        if (transferred > 0) {
+            console.log(`💰 ${toFleet.name} seized ${transferred} units of cargo from ${fromFleet.name}`);
+        }
     }
     /**
      * Finds nearest object of a given type.

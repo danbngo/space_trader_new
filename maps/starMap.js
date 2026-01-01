@@ -125,7 +125,7 @@ class StarMap extends BaseMap {
     rebuildCanvas() {
         console.log('REBUILDING STAR MAP CANVAS')
         const {starSystem, cvs} = this
-        const {stars, planets, dwarfPlanets, fleets, backgroundStars, asteroids} = starSystem
+        const {stars, planets, dwarfPlanets, fleets, backgroundStars, asteroids, anomalies} = starSystem
         const allPlanets = [...planets, ...dwarfPlanets]
         //const routes = [gs.fleet.route]
         const orbitingBodies = [...stars, ...allPlanets].filter(b=>(b.orbit))
@@ -139,6 +139,26 @@ class StarMap extends BaseMap {
         asteroids.forEach( (asteroid, index) => {
             cvs.addPixel(asteroid.x, asteroid.y, asteroid.color, asteroid.radius)
         });
+
+        // Render anomalies
+        if (anomalies) {
+            anomalies.forEach( (anomaly, index) => {
+                const anomalyObj = cvs.addEmptyCircle(`anomaly${index}`, anomaly.x, anomaly.y, anomaly.radius * 10, 2, anomaly.color, 1, ()=>this.selectObject(anomaly))
+                const labelObj = cvs.addText(`anomalylabel${index}`, anomaly.x, anomaly.y, 0, -24, anomaly.name, anomaly.color, DEFAULT_FONT_SIZE, 2, ()=>this.selectObject(anomaly))
+                labelObj.visible = false
+                const objs = [anomalyObj, labelObj]
+                for (const obj of objs) {
+                    obj.onHover = ()=>{
+                        labelObj.visible = true
+                        for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
+                    }
+                    obj.onEndHover = ()=>{
+                        labelObj.visible = false
+                        for (const obj2 of objs) obj2.strokeColor = undefined
+                    }
+                }
+            });
+        }
 
         orbitingBodies.forEach( (orbitingBody, index) => {
             console.log('rebuilding an orbit')
@@ -195,7 +215,7 @@ class StarMap extends BaseMap {
 
     refreshCanvas(forceRedraw = true) {
         const {cvs, starSystem} = this
-        const {stars, planets, dwarfPlanets, fleets, asteroids} = starSystem
+        const {stars, planets, dwarfPlanets, fleets, asteroids, anomalies} = starSystem
         const allPlanets = [...planets, ...dwarfPlanets]
         const orbitingBodies = [...stars, ...allPlanets].filter(b=>(b.orbit))
 
@@ -224,6 +244,25 @@ class StarMap extends BaseMap {
             cvsObject.x = body.x
             cvsObject.y = body.y
         })
+
+        // Update anomalies
+        if (anomalies) {
+            anomalies.forEach((anomaly, index)=>{
+                let cvsObject = cvs.getObject(`anomaly${index}`)
+                if (cvsObject) {
+                    if (anomaly == this.selectedObject) cvsObject.strokeColor = COLORS.Green
+                    cvsObject.x = anomaly.x
+                    cvsObject.y = anomaly.y
+
+                    cvsObject = cvs.getObject(`anomalylabel${index}`)
+                    if (cvsObject) {
+                        if (anomaly == this.selectedObject) cvsObject.strokeColor = COLORS.Green
+                        cvsObject.x = anomaly.x
+                        cvsObject.y = anomaly.y
+                    }
+                }
+            })
+        }
 
         fleets.forEach((fleet, index)=>{
             const fleetAngle = fleet.route ? fleet.route.path.angle : -Math.PI/2

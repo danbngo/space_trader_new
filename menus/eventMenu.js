@@ -7,6 +7,7 @@ function checkForEvents(elapsedYears = 1) {
     const elapsedDays = elapsedYears*365
     if (checkGameOver()) return
     checkForNews()
+    checkForAnomalies(elapsedDays)
     checkForFleetSpawning(elapsedDays)
     tickNPCFleets(elapsedYears)
     if (checkForEncounter(elapsedDays)) return
@@ -32,6 +33,29 @@ function checkForNews(elapsedDays = 1) {
 function checkForExpiredNews() {
 
 }
+
+/**
+ * Checks if anomalies should spawn and creates them if conditions are met.
+ * @param {number} elapsedDays - Days that have elapsed.
+ * @returns {boolean} Whether an anomaly was spawned.
+ */
+function checkForAnomalies(elapsedDays = 1) {
+    if (!gs.system.anomalies) gs.system.anomalies = [];
+    
+    // Don't spawn if at max capacity
+    if (gs.system.anomalies.length >= MAX_NUM_ANOMALIES) return false;
+    
+    // Check if anomaly should spawn based on chance
+    if (!calcOccurrencesPerTimespan(ANOMALY_CHANCE_PER_DAY, elapsedDays)) return false;
+    
+    // Generate and add anomaly
+    const anomaly = generateAnomaly();
+    gs.system.anomalies.push(anomaly);
+    console.log(`✨ Anomaly detected: ${anomaly.name} at (${anomaly.x.toFixed(1)}, ${anomaly.y.toFixed(1)})`);
+    
+    return true;
+}
+
 /**
  * Checks if a space encounter should occur.
  * @param {number} elapsedDays - Days that have elapsed.
@@ -410,6 +434,18 @@ function checkForFleetSpawning(elapsedDays = 1) {
         // Slavers (influenced by crime and corruption, only in highly corrupt systems)
         if (c.crime > 0.7 && c.corruption > 0.5) {
             spawnChances.push({ type: FLEET_TYPES.SLAVERS, faction: FACTION_TYPES.SLAVERS, weight: (c.crime + c.corruption) * 0.01 })
+        }
+        
+        // Religious fleets (only spawn if planet has a state religion)
+        if (c.stateReligion) {
+            // Pilgrims (influenced by culture and faith, travel to same religion planets)
+            spawnChances.push({ type: FLEET_TYPES.PILGRIMS, faction: FACTION_TYPES.PILGRIMS, weight: c.culture * 0.02 })
+            
+            // Inquisitors (influenced by security and navy, patrol same religion planets)
+            spawnChances.push({ type: FLEET_TYPES.INQUISITORS, faction: FACTION_TYPES.INQUISITORS, weight: (c.security + c.navy) * 0.015 })
+            
+            // Missionaries (influenced by culture and missionary zeal, spread faith to other planets)
+            spawnChances.push({ type: FLEET_TYPES.MISSIONARIES, faction: FACTION_TYPES.MISSIONARIES, weight: c.culture * 0.025 })
         }
         
         // Roll for each potential fleet type
