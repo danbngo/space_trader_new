@@ -263,7 +263,7 @@ class CanvasWrapper {
         // Trigger onHover for newly hovered objects
         for (const obj of currentlyHovered) {
             if (!this.hoveredObjects.includes(obj)) {
-                console.log('firing onhover for', obj.id)
+                //console.log('firing onhover for', obj.id)
                 obj.onHover(obj);
                 shouldRedraw = true;
             }
@@ -272,7 +272,7 @@ class CanvasWrapper {
         // Trigger onHoverEnd for objects no longer hovered
         for (const obj of this.hoveredObjects) {
             if (!currentlyHovered.includes(obj)) {
-                console.log('firing onhoverend for', obj.id)
+                //console.log('firing onhoverend for', obj.id)
                 obj.onHoverEnd?.(obj);
                 shouldRedraw = true;
             }

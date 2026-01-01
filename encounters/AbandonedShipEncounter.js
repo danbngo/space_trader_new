@@ -28,7 +28,7 @@ class AbandonedShipEncounter extends PiratesEncounter {
 
     pirateAmbush() {
         // Generate pirate ships
-        const pirateFleet = generateFleet(FLEET_TYPES.PIRATES, this.planet)
+        const pirateFleet = generateFleet(FLEET_TYPES.PIRATES, FACTION_TYPES.PIRATES, this.planet)
         pirateFleet.captain = new Officer(`Pirate Captain`, 0)
         pirateFleet.captain.credits = rng(FLEET_TYPES.PIRATES.maxCredits, 0)
         

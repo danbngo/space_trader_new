@@ -256,7 +256,7 @@ class CanvasObject {
     }
     
     asImage(size = 0, strokeColor = undefined) {
-        console.log('drawing canvasobj as image:',size,strokeColor,this)
+        //console.log('drawing canvasobj as image:',size,strokeColor,this)
         const diameter = size*2
         const c = document.createElement("canvas");
         c.width = c.height = diameter;

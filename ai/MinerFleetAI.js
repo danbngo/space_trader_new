@@ -6,7 +6,7 @@
 class MinerFleetAI extends FleetAI {
     calcValidTargets() {
         //introduce some fuzz so ship will move around
-        return gs.system.asteroids.filter(a=>(Math.random() < .2))
+        return gs.system.asteroids.filter(a=>(calcDistance(this.fleet.x, this.fleet.y, a.x, a.y) > 0.1))
     }
     calcDestination() {
         return rndMember([...gs.system.planets].filter(p=>(p !== this.home)))
