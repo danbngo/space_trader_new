@@ -49,7 +49,7 @@ class Route {
         /** @type {[number, number] | undefined} */
         let endPosition;
 
-        console.log('estimating travel time to an orbiting body:',startYear,fleet,planet,samples,maxYears)
+        //console.log('estimating travel time to an orbiting body:',startYear,fleet,planet,samples,maxYears)
 
         for (let i = 0; i < samples; i++) {
             const t = (i / samples) * maxYears; // future year offset

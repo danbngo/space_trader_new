@@ -73,16 +73,12 @@ class Fleet extends SpaceObject {
     }
 
     get totalSkills() {
-        console.log('getting total skills',this)
         const totalSkills = new CountsMap();
         for (const skill of SKILLS_ALL) {
-            console.log('checking skill:',skill)
             for (const officer of this.officers) {
                 totalSkills.increment(skill, officer.skills.getAmount(skill))
-                console.log('added officer skill:',officer.name,skill,officer.skills.getAmount(skill))
             }
         }
-        console.log('returning total skills:',totalSkills.counts)
         return totalSkills
     }
 

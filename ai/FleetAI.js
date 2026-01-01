@@ -16,7 +16,8 @@ class FleetAI {
         this.destination = this.calcDestination();
         /** @type {any} */
         this.target = null
-        this.voyageYearsRemaining = rng(this.fleet.fleetType.voyageMaxYears, this.fleet.fleetType.voyageMinYears);
+        this.voyageYearsRemaining = Infinity
+        this.resetVoyageDuration()
     }
     /**
      * Updates AI behavior each game tick.
@@ -59,6 +60,10 @@ class FleetAI {
         return rndMember(gs.system.planets.filter(p=>(p !== this.home)))
     }
 
+    resetVoyageDuration() {
+        this.voyageYearsRemaining = rng(this.fleet.fleetType.voyageMaxYears, this.fleet.fleetType.voyageMinYears);
+    }
+
     setTarget(target) {
         this.target = target
         this.fleet.route = new Route(this.fleet, target)
@@ -69,7 +74,7 @@ class FleetAI {
      * @returns {boolean}
      */
     isNearDestination() {
-        return this.isNearby(this.destination)
+        return this.destination && this.isNearby(this.destination)
     }
 
     isNearHome() {
@@ -77,7 +82,7 @@ class FleetAI {
     }
 
     isNearTarget() {
-        return this.isNearby(this.target)
+        return this.target && this.isNearby(this.target)
     }
 
     isNearby(object = new SpaceObject()) {
@@ -100,6 +105,7 @@ class FleetAI {
 
     onNearDestination() {
         this.destination = null
+        this.resetVoyageDuration()
     }
 
     onNearTarget() {

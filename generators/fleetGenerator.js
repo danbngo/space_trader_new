@@ -4,7 +4,7 @@
  * @param {FleetType} fleetType - The type of fleet determining cargo types.
  * @returns {CountsMap} The generated cargo inventory.
  */
-function generateFleetCargo(fleet = new Fleet(), fleetType = rndMember(FLEET_TYPES_ALL)) {
+function generateFleetCargo(fleet = new Fleet(), fleetType = FLEET_TYPES_ALL[0]) {
     const cargo = new CountsMap()
     const maxCargo = fleet.totalCargoSpace
     //non-repeating is set to false to allow weighted cargo types
@@ -23,7 +23,7 @@ function generateFleetCargo(fleet = new Fleet(), fleetType = rndMember(FLEET_TYP
  * @param {Planet} planet - The planet the fleet is associated with.
  * @returns {Fleet} The generated fleet.
  */
-function generateFleet(fleetType = rndMember(FLEET_TYPES_ALL), planet = new Planet()) {
+function generateFleet(fleetType = FLEET_TYPES_ALL[0], planet = new Planet()) {
     const ships = []
     const populationMod = planet ? planet.c.population : 1
     const numShips = Math.ceil(0.1 + rng(fleetType.minShips*populationMod, fleetType.maxShips*populationMod))

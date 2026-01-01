@@ -359,7 +359,7 @@ function checkForFleetSpawning(elapsedDays = 1) {
         if (maxFleets <= 0) continue
         
         // Count existing fleets from this planet
-        const existingFleets = gs.system.fleets.filter(f => f.fleetAI && f.fleetAI.homePlanet === planet)
+        const existingFleets = gs.system.fleets.filter(f => f.fleetAI && f.fleetAI.home === planet)
         if (existingFleets.length >= maxFleets) continue
         
         // Check policies that prevent certain fleet types
