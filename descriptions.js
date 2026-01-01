@@ -31,7 +31,8 @@ function coloredName(obj = new SpaceObject()) {
     if (obj instanceof Effect) name = obj.effectType.name
     if (obj instanceof Fleet) return obj.planet ? `${coloredIanName(obj.planet)} ${obj.name}` : obj.name
 
-    return `${colorSpan(name, obj.color ? obj.color : '')}`
+    // @ts-ignore
+    return `${obj.symbol ? obj.symbol+' ' : ''}${colorSpan(name, obj.color ? obj.color : '')}`
 }
 
 function coloredIanName(obj = new Planet()) {
@@ -163,17 +164,17 @@ function describeReserves(reservesRating = 0) {
 }
 
 function describeCrime(crimeRating = 0) {
-    const incarcerationRate = roundToPlaces(crimeRating / 16 * 100, 1) // 8x = 50%
+    const incarcerationRate = roundToPlaces(crimeRating / 2000 * 100, 1) // 8x = 50%
     return `${statColorSpan(`${incarcerationRate}% incarceration rate`, crimeRating)}`
 }
 
 function describeCorruption(corruptionRating = 0) {
-    const corruptionIndex = Math.round(corruptionRating * 50)
+    const corruptionIndex = Math.round(corruptionRating * 100)
     return `${statColorSpan(`${corruptionIndex} corruption index`, corruptionRating)}`
 }
 
 function describeInflation(inflationRating = 0) {
-    const inflationRate = roundToPlaces(Math.abs(inflationRating - 1) * 100, 1)
+    const inflationRate = roundToPlaces(inflationRating * 10, 1)
     const direction = inflationRating > 1 ? 'inflation' : inflationRating < 1 ? 'deflation' : 'stable'
     return `${statColorSpan(`${inflationRate}% ${direction}`, inflationRating)}`
 }

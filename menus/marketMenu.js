@@ -97,9 +97,13 @@ function showMarketMenu(market = new Market()) {
         const marketAffordableAmount = Math.floor(market.credits/sellPrice)
         const sellableAmount = Math.min(playerAmount, marketAffordableAmount)
         console.log({playerAmount,marketAmount,buyPrice,sellPrice,playerAffordableAmount,buyableAmount,marketAffordableAmount,sellableAmount})
+        
+        const canBuy = isDocked && buyableAmount > 0
+        const canSell = isDocked && sellableAmount > 0
+        
         const buttons = [
-            ...(isDocked && buyableAmount > 0 ? [['Buy', ()=>showBuyCargoSlider(ct, buyableAmount, buyPrice)]] : []),
-            ...(isDocked && sellableAmount > 0 ? [['Sell', ()=>showSellCargoSlider(ct, sellableAmount, sellPrice)]] : []),
+            ['Buy', ()=>showBuyCargoSlider(ct, buyableAmount, buyPrice), !canBuy],
+            ['Sell', ()=>showSellCargoSlider(ct, sellableAmount, sellPrice), !canSell],
             ['Back', ()=>showPlanetMenu(planet)],
         ]
         refreshPanelButtons('market_panel', buttons)
@@ -117,6 +121,8 @@ function showMarketMenu(market = new Market()) {
             +` | Sell Fee: ${statColorSpan(roundToPlaces(100*planet.c.corruption/(planet.c.corruption+1), 2), 2/(planet.c.corruption+1))}%`,
             (gs.fleet.totalSkills.getAmount(SKILLS.Barter) > 0) ? `Fee After Barter | ${statColorSpan(roundToPlaces(100*(1+market.rake) - 100, 2), 2/(1+market.rake))}% Buy`
             +` | ${statColorSpan(roundToPlaces(100*market.rake/(market.rake+1), 2), 2/(market.rake+1))}% Sell` : '',
+            planet.civilization ? `Inflation: ${statColorSpan(roundToPlaces(100*planet.c.inflation, 2), 2/(1+planet.c.inflation))}%`
+            +` | Tax Rate: ${statColorSpan(roundToPlaces(100*planet.c.taxes, 2), 2/(1+planet.c.taxes))}%` : '',
         ]
     })
 
@@ -131,4 +137,10 @@ function showMarketMenu(market = new Market()) {
             return nextMarket ? showMarketMenu(nextMarket) : showPlanetMenu(nextPlanet);
         }
     );
+    
+    // Auto-select first cargo type
+    const cargoTypes = blackMarket ? CARGO_TYPES_ALL.filter(ct=>ct.illegal) : CARGO_TYPES_ALL.filter(ct=>(!ct.illegal))
+    if (cargoTypes.length > 0) {
+        onSelectCargoType(cargoTypes[0])
+    }
 }

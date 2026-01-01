@@ -95,6 +95,16 @@ const RELIGION_TRAITS = {
         'Provides aid to the needy. Increases population happiness and reduces crime.',
         COLORS.Pink
     ),
+    ATHEISTIC: new ReligionTrait(
+        'Atheistic',
+        'Rejects supernatural beliefs entirely. Increases technology and education but reduces culture.',
+        COLORS.Gray
+    ),
+    AGNOSTIC: new ReligionTrait(
+        'Agnostic',
+        'Questions the nature of divinity. Promotes critical thinking and scientific inquiry.',
+        COLORS.LightGray
+    ),
 }
 
 const RELIGION_TRAITS_ALL = Object.values(RELIGION_TRAITS)

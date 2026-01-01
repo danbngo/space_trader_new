@@ -84,21 +84,24 @@ function generateReligion() {
     ];
     
     const color = rndMember(colorChoices);
-    const icon = getUnusedReligionSymbol();
+    const symbol = getUnusedReligionSymbol();
     
-    return new Religion(name, traits, color, icon);
+    return new Religion(name, traits, color, symbol);
 }
 
 /**
  * Generates multiple religions for the star system.
- * @param {number} count - Number of religions to generate (default 1-3).
+ * @param {number} count - Number of religions to generate (default 2-4).
  * @returns {Religion[]} Array of generated religions.
  */
-function generateReligions(count = rng(3, 1)) {
+function generateReligions(count = rng(4, 2)) {
     // Reset used symbols for new system generation
     usedReligionSymbols = [];
     
-    const religions = [];
+    // Always include ATHEISM
+    const religions = [RELIGION_ATHEISM];
+    
+    // Generate additional random religions
     for (let i = 0; i < count; i++) {
         religions.push(generateReligion());
     }

@@ -1,11 +1,26 @@
 function showPlanetModal(planet = new Planet(), title = '', msg = '', options = [], modalId = '', onNavigate = (nextPlanet)=>{}) {
     // Create title with navigation arrows
-    // Navigate within same planet type (dwarf or regular)
-    const isDwarf = isDwarfPlanet(planet);
-    const planetList = isDwarf ? gs.system.dwarfPlanets : gs.system.planets;
+    // Navigate within same planet type (dwarf, regular, or moons)
+    let planetList;
+    
+    // Check if this is a moon (has a parent with children)
+    if (gs.system.planets.includes(planet)) {
+        // Navigate through the moons of the parent planet
+        planetList = gs.system.planets;
+    } 
+    // Check if it's a dwarf planet
+    else if (gs.system.dwarfPlanets.includes(planet)) {
+        planetList = gs.system.dwarfPlanets;
+    } 
+    // Otherwise it's a moon
+    else {
+        planetList = planet.parent.children.filter(c=>(c instanceof Moon));
+    }
+    
     const currentIndex = planetList.indexOf(planet);
-    const prevPlanet = planetList[currentIndex - 1] || planetList[planetList.length - 1];
-    const nextPlanet = planetList[currentIndex + 1] || planetList[0];
+    const prevPlanet = planetList[currentIndex - 1] || planetList[planetList.length - 1] || planet;
+    const nextPlanet = planetList[currentIndex + 1] || planetList[0] || planet;
+    console.log('showing planet modal:',{planet, planetList, currentIndex, prevPlanet, nextPlanet});
     
     const titleEl = ce({
         style: {

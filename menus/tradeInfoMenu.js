@@ -11,7 +11,17 @@ function createTradeInfoBuyTable(ct = CARGO_TYPES_ALL[0], onSelectPlanet = (p = 
     const rows = [
         ['Planet', 'Buy Price', 'Market Amt.', 'Distance', 'ETA']
     ]
-    for (const planet of planets) {
+    
+    // Sort planets by buy price (lowest first)
+    const sortedPlanets = [...planets].sort((a, b) => {
+        const marketA = illegal ? a.settlement?.blackMarket : a.settlement?.market
+        const marketB = illegal ? b.settlement?.blackMarket : b.settlement?.market
+        const priceA = marketA ? marketA.calcCargoBuyPrices().getAmount(ct) : Infinity
+        const priceB = marketB ? marketB.calcCargoBuyPrices().getAmount(ct) : Infinity
+        return priceA - priceB
+    })
+    
+    for (const planet of sortedPlanets) {
         const market = illegal ? planet.settlement.blackMarket : planet.settlement.market
         const buyPrice = market ? market.calcCargoBuyPrices().getAmount(ct) : -1
         const route = new Route(fleet, planet)
@@ -26,7 +36,7 @@ function createTradeInfoBuyTable(ct = CARGO_TYPES_ALL[0], onSelectPlanet = (p = 
             ''+statColorSpan(describeTimespan(route.travelTime), distScore),
         ])
     }
-    return createTable(rows, (rowIndex = 0)=>onSelectPlanet(planets[rowIndex]))
+    return createTable(rows, (rowIndex = 0)=>onSelectPlanet(sortedPlanets[rowIndex]))
 }
 /**
  * Creates a table showing sell prices for a cargo type across all planets.
@@ -41,7 +51,17 @@ function createTradeInfoSellTable(ct = CARGO_TYPES_ALL[0], onSelectPlanet = (p =
     const rows = [
         ['Planet', 'Sell Price', 'Market CR', 'Distance', 'ETA']
     ]
-    for (const planet of planets) {
+    
+    // Sort planets by sell price (highest first)
+    const sortedPlanets = [...planets].sort((a, b) => {
+        const marketA = illegal ? a.settlement?.blackMarket : a.settlement?.market
+        const marketB = illegal ? b.settlement?.blackMarket : b.settlement?.market
+        const priceA = marketA ? marketA.calcCargoSellPrices().getAmount(ct) : -Infinity
+        const priceB = marketB ? marketB.calcCargoSellPrices().getAmount(ct) : -Infinity
+        return priceB - priceA  // Descending order
+    })
+    
+    for (const planet of sortedPlanets) {
         const market = illegal ? planet.settlement.blackMarket : planet.settlement.market
         const sellPrice = market ? market.calcCargoSellPrices().getAmount(ct) : -1
         const route = new Route(fleet, planet)
@@ -55,7 +75,7 @@ function createTradeInfoSellTable(ct = CARGO_TYPES_ALL[0], onSelectPlanet = (p =
             ''+statColorSpan(describeTimespan(route.travelTime), distScore),
         ])
     }
-    return createTable(rows, (rowIndex = 0)=>onSelectPlanet(planets[rowIndex]))
+    return createTable(rows, (rowIndex = 0)=>onSelectPlanet(sortedPlanets[rowIndex]))
 }
 
 function showTradeInfoSellMenu(ct = CARGO_TYPES_ALL[0]) {
@@ -71,14 +91,13 @@ function showTradeInfoSellMenu(ct = CARGO_TYPES_ALL[0]) {
         dropdownOptions.push([`${coloredName(cto)}: ${amt}`, ()=>showTradeInfoSellMenu(cto), (ct == cto)])
     }
 
-    const options = []
-    options.push(createDropdown(dropdownOptions, true, 0))
+    const dropdown = new Dropdown(dropdownOptions, true, CARGO_TYPES_ALL.indexOf(ct)).container
 
-    options.push(
-        ce({tag:'br'}),
+    const options = [
+        dropdown,
         ["Buy Info", () => showTradeInfoBuyMenu(ct)],
         ["Close", () => closeModal()],
-    )
+    ]
 
     showModal(
         `Trade Info - Sell ${coloredName(ct)}`,
@@ -97,15 +116,18 @@ function showTradeInfoBuyMenu(ct = CARGO_TYPES_ALL[0]) {
         showStarMap(planet)
     }
 
-    const options = []
+    const dropdownOptions = []
     for (const cto of CARGO_TYPES_ALL) {
-        options.push([`${coloredName(cto)}`, ()=>showTradeInfoBuyMenu(cto), (ct == cto)])
+        dropdownOptions.push([`${coloredName(cto)}`, ()=>showTradeInfoBuyMenu(cto), (ct == cto)])
     }
-    options.push(
-        ce({tag:'br'}),
+
+    const dropdown = new Dropdown(dropdownOptions, true, CARGO_TYPES_ALL.indexOf(ct)).container
+
+    const options = [
+        dropdown,
         ["Sell Info", () => showTradeInfoSellMenu(ct)],
         ["Close", () => closeModal()],
-    )
+    ]
 
     showModal(
         `Trade Info - Buy ${coloredName(ct)}`,

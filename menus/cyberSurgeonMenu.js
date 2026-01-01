@@ -60,6 +60,8 @@ function showCyberSurgeonBuyMenu(cyberSurgeon = new CyberSurgeon()) {
             `Your credits: ${gs.credits} | Your Crew: Captain + ${fleet.officers.length} Officers`,
             `Buy Fee: ${statColorSpan(roundToPlaces(100*planet.c.corruption, 2), 2/(1+planet.c.corruption))}%`,
             (gs.fleet.totalSkills.getAmount(SKILLS.Barter) > 0) ? `Fee After Barter | ${statColorSpan(roundToPlaces(100*(1+cyberSurgeon.rake) - 100, 2), 2/(1+cyberSurgeon.rake))}% Buy` : '',
+            planet.civilization ? `Inflation: ${statColorSpan(roundToPlaces(100*planet.c.inflation, 2), 2/(1+planet.c.inflation))}%`
+            +` | Tax Rate: ${statColorSpan(roundToPlaces(100*planet.c.taxes, 2), 2/(1+planet.c.taxes))}%` : '',
         ]}),
         [
             ["Back", () => leave()],
@@ -67,6 +69,11 @@ function showCyberSurgeonBuyMenu(cyberSurgeon = new CyberSurgeon()) {
         `cyber_surgeon_panel`,
         (nextPlanet) => nextPlanet.settlement?.cyberSurgeon ? showCyberSurgeonBuyMenu(nextPlanet.s.cyberSurgeon) : showPlanetMenu(nextPlanet)
     );
+    
+    // Auto-select first implant
+    if (cyberSurgeon.implants.length > 0) {
+        onSelectImplant(cyberSurgeon.implants[0])
+    }
 }
 
 function showCyberSurgeonInstallImplantMenu(cyberSurgeon = new CyberSurgeon(), implant = new CyberImplant(), selectedOfficer = null) {

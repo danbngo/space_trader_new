@@ -38,7 +38,7 @@ class DisasterGreenhouseNews extends News {
     isValid() {
         const {planet: p} = this
         // Only affects planets with very high industry or already warm temperatures
-        const climateValid = (p.c.industry >= CL.VERY_HIGH) || (p.climate.temperature && p.climate.temperature.value >= TEMPERATURES.SLIGHTLY_HIGH.value && p.c.industry >= CL.HIGH)
+        const climateValid = (p.c.industry >= CL.HIGH) || (p.climate.temperature && p.climate.temperature.value >= TEMPERATURES.SLIGHTLY_HIGH.value && p.c.industry >= CL.SLIGHTLY_HIGH)
         
         // Needs atmosphere and settlement
         const atmosphereValid = p.climate.atmosphericPressure && p.climate.atmosphericPressure.value > ATMOSPHERIC_PRESSURES.VERY_LOW.value

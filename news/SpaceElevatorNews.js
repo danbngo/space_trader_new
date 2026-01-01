@@ -60,9 +60,9 @@ class SpaceElevatorNews extends News {
         // Must have at least one moon
         const hasMoons = p.children && p.children.length > 0
         // Requires high tech and industry
-        const ratingsValid = p.c.technology > CL.HIGH
-            && p.c.industry > CL.SLIGHTLY_HIGH
-            && p.c.wealth > CL.SLIGHTLY_HIGH
+        const ratingsValid = p.c.technology > CL.MEDIUM
+            && p.c.industry > CL.MEDIUM
+            && p.c.wealth > CL.MEDIUM
             && p.c.reserves > CL.SLIGHTLY_LOW
         return hasMoons && ratingsValid
     }

@@ -90,4 +90,9 @@ function showGuildMenu(guild = new Guild()) {
         `guild_hire_panel`,
         (nextPlanet) => nextPlanet.settlement?.guild ? showGuildMenu(nextPlanet.settlement.guild) : showPlanetMenu(nextPlanet)
     );
+    
+    // Auto-select first officer
+    if (guild.officers.length > 0) {
+        onSelectGuildOfficer(guild.officers[0])
+    }
 }

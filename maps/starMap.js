@@ -76,14 +76,13 @@ class StarMap extends BaseMap {
         const hasPerkPoints = gs.captain.numPerkPoints > 0
         const hasContracts = gs.contracts && gs.contracts.length > 0
         showModal(`Assistant`, 'How can I help you captain?', [
-            ['Trade Info', ()=>showTradeInfoSellMenu()],
-            ['Ships Manifest', ()=>showShipsMenu()],
-            ['Cargo Manifest', ()=>showCargoMenu()],
-            ['Officer Roster', ()=>showOfficersMenu()],
+            ['Trade', ()=>showTradeInfoSellMenu()],
+            ['Ships', ()=>showShipsMenu()],
+            ['Cargo', ()=>showCargoMenu()],
+            ['Officers', ()=>showOfficersMenu()],
             ['Contracts', ()=>showContractsMenu(), false, hasContracts ? 'highlighted' : null],
-            ['Captain Overview', ()=>showCaptainSkillsMenu(), false, hasSkillPoints ? 'highlighted' : null],
-            ['Perks', ()=>showCaptainPerksMenu(), false, hasPerkPoints ? 'highlighted' : null],
-            ['Galactic News', ()=>showNewsTimelineMenu(null, ()=>this.openAssistant())],
+            ['Captain', ()=>showCaptainSkillsMenu(), false, hasSkillPoints ? 'highlighted' : null],
+            ['News', ()=>showNewsTimelineMenu(null, ()=>this.openAssistant())],
             ['Religions', ()=>showReligionsMenu(()=>this.openAssistant())],
             ['Cancel', ()=>closeModal()],
         ])

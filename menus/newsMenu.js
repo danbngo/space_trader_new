@@ -55,7 +55,16 @@ function showNewsTimelineMenu(planet = null, backFunction = null, activeOnly = t
     const buttons = []
     const toggleLabel = activeOnly ? "Show Historical" : "Show Active Only"
     buttons.push([toggleLabel, () => showNewsTimelineMenu(planet, backFunction, !activeOnly)])
-    buttons.push(["Back", backBtn])
+    
+    // Add planet submenu buttons if planet is specified
+    if (planet) {
+        buttons.push(["Climate", () => showPlanetClimateMenu(planet)])
+        buttons.push(["Society", () => showPlanetSocietyMenu(planet), !planet.civilization])
+        buttons.push(["Demographics", () => showPlanetDemographicsMenu(planet), !planet.civilization])
+        buttons.push(["Back", () => showPlanetMenu(planet)])
+    } else {
+        buttons.push(["Back", backBtn])
+    }
    
     showModal(title, msg, buttons)
 }

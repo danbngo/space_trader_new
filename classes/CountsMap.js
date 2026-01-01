@@ -8,7 +8,7 @@ class CountsMap {
     /**
      * @param {Map<any,number>} counts - A map of items to their counts.
      */
-    constructor(counts = new Map([[{},0]])) {
+    constructor(counts = new Map()) {
         /** @type {Map<any,number>} */
         this.counts = counts
     }
@@ -152,5 +152,25 @@ class CountsMap {
             }
         }
         return inverted
+    }
+
+    /**
+     * Returns the key with the highest value in the map.
+     * @returns {any|null} The key with the highest value, or null if empty.
+     */
+    calcHighestValue() {
+        if (this.counts.size === 0) return null
+        
+        let maxKey = null
+        let maxValue = -Infinity
+        
+        for (const [key, value] of this.counts) {
+            if (value > maxValue) {
+                maxValue = value
+                maxKey = key
+            }
+        }
+        
+        return maxKey
     }
 }

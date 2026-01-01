@@ -51,7 +51,7 @@ class DeportationNews extends News {
         const relationshipsValid = Civilization.areTense(p, tp)
         
         // Target must have population to deport, source must have capacity
-        const ratingsValid = tp.c.population > CL.LOW && (tp.c.culture < CL.HIGH || tp.c.economy < CL.HIGH)
+        const ratingsValid = tp.c.population > CL.LOW && (tp.c.culture < CL.VERY_HIGH || tp.c.economy < CL.VERY_HIGH)
         
         const interferingEvent = News.hasAnyNewsBidirectional(p, tp, [NT.IMMIGRATION, NT.REFUGEES, NT.DEPORTATION, NT.ASYLUM_POLICY])
         return relationshipsValid && ratingsValid && !interferingEvent

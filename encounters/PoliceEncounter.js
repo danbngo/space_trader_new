@@ -21,7 +21,7 @@ class PoliceEncounter extends AuthoritiesEncounter {
                 ['Attack', ()=>this.showPlayerAttackFleetModal(-5, 2, false)],
             ])
         }
-        if (Math.random()*gs.captain.calcInfamyForPlanet(this.planet) > 50 && gs.captain.calcBountyForPlanet(this.planet) > 0) {
+        if (FameLevel.hasInfamyLevel(gs.captain, this.planet, INFAMY_LEVELS.NOTORIOUS) && gs.captain.calcBountyForPlanet(this.planet) > 0) {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} activate their sirens the instant you pass by!<br/>It seems your bad reputation has preceded you.`, [
                 ['View', ()=>closeModal()],
                 ['Surrender', ()=>this.onSurrender()],

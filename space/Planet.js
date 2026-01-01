@@ -11,8 +11,8 @@ class Planet extends OrbitingObject {
      * @param {number} y - The y-coordinate of the planet.
      * @param {Orbit} orbit - The orbit of the planet.
      * @param {PlanetType} planetType - The type of the planet.
-     * @param {Settlement} settlement - The settlement on the planet.
-     * @param {Civilization} civilization - The civilization of the planet.
+     * @param {Settlement|null} settlement - The settlement on the planet.
+     * @param {Civilization|null} civilization - The civilization of the planet.
      * @param {Climate} climate - The climate of the planet.
      * @param {PlanetFeatureType[]} features - Unique features of the planet.
      * @param {number} dayLength - The length of one day in Earth days.
@@ -21,9 +21,9 @@ class Planet extends OrbitingObject {
         super(name, color, radius, x, y, orbit);
         /** @type {PlanetType} */
         this.planetType = planetType
-        /** @type {Settlement} */
+        /** @type {Settlement|null} */
         this.settlement = settlement
-        /** @type {Civilization} */
+        /** @type {Civilization|null} */
         this.civilization = civilization
         /** @type {Climate} */
         this.climate = climate || new Climate()

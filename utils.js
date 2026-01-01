@@ -353,12 +353,3 @@ function rndRound(fraction = 0.5) {
     const remainder = fraction - lower;
     return lower + (Math.random() < remainder ? 1 : 0);
 }
-
-//takes a map with [key,number] and returns [key,1/number]
-/*function invertMultiplierMap(map = new Map()) {
-    const inverted = new Map()
-    for (const [key, value] of map) {
-        inverted.set(key, 1 / value)
-    }
-    return inverted
-}*/

@@ -4,24 +4,25 @@
  */
 class Settlement {
     /**
-     * @param {Planet} planet - The planet this settlement is on.
-     * @param {SettlementType} settlementType - The type of settlement.
-     * @param {Shipyard} shipyard - The shipyard building.
-     * @param {Market} market - The market building.
-     * @param {Market} blackMarket - The black market building.
-     * @param {Guild} guild - The guild building.
-     * @param {Bank} bank - The bank building.
-     * @param {Courthouse} courthouse - The courthouse building.
-     * @param {Academy} academy - The academy building.
-     * @param {Academy} tavern - The tavern building.
-     * @param {CyberSurgeon} cyberSurgeon - The cyber surgeon building.
-     * @param {Palace} palace - The palace building.
-     * @param {Temple} temple - The temple building.
-     * @param {Armory} armory - The armory building.
-     * @param {Outfitter} outfitter - The outfitter building.
-     * @param {Casino} casino - The casino building.
+     * @param {Object} params - The settlement parameters.
+     * @param {Planet} params.planet - The planet this settlement is on.
+     * @param {SettlementType} params.settlementType - The type of settlement.
+     * @param {Shipyard} params.shipyard - The shipyard building.
+     * @param {Market} params.market - The market building.
+     * @param {Market} params.blackMarket - The black market building.
+     * @param {Guild} params.guild - The guild building.
+     * @param {Bank} params.bank - The bank building.
+     * @param {Courthouse} params.courthouse - The courthouse building.
+     * @param {Academy} params.academy - The academy building.
+     * @param {Academy} params.tavern - The tavern building.
+     * @param {CyberSurgeon} params.cyberSurgeon - The cyber surgeon building.
+     * @param {Palace} params.palace - The palace building.
+     * @param {Temple} params.temple - The temple building.
+     * @param {Armory} params.armory - The armory building.
+     * @param {Outfitter} params.outfitter - The outfitter building.
+     * @param {Casino} params.casino - The casino building.
      */
-    constructor(planet = new Planet(), settlementType = null, shipyard = null, market = null, blackMarket = null, guild = null, bank = null, courthouse = null, academy = null, tavern = null, cyberSurgeon = null, palace = null, temple = null, armory = null, outfitter = null, casino = null) {
+    constructor({planet = new Planet(), settlementType = null, shipyard = null, market = null, blackMarket = null, guild = null, bank = null, courthouse = null, academy = null, tavern = null, cyberSurgeon = null, palace = null, temple = null, armory = null, outfitter = null, casino = null}) {
         /** @type {Planet} */
         this.planet = planet;
         /** @type {SettlementType} */

@@ -1,8 +1,27 @@
+const buildingHandlerMapping = [
+    {type: BUILDING_TYPES.SHIPYARD, prop: 'shipyard', menu: (b) => showShipyardBuyMenu(b)},
+    {type: BUILDING_TYPES.MARKET, prop: 'market', menu: (b) => showMarketMenu(b)},
+    {type: BUILDING_TYPES.BLACK_MARKET, prop: 'blackMarket', menu: (b) => showMarketMenu(b)},
+    {type: BUILDING_TYPES.GUILD, prop: 'guild', menu: (b) => showGuildMenu(b)},
+    {type: BUILDING_TYPES.BANK, prop: 'bank', menu: (b) => showBankMenu(b)},
+    {type: BUILDING_TYPES.COURTHOUSE, prop: 'courthouse', menu: (b) => showCourthouseMenu(b)},
+    {type: BUILDING_TYPES.ACADEMY, prop: 'academy', menu: (b) => showAcademyMenu(b)},
+    {type: BUILDING_TYPES.TAVERN, prop: 'tavern', menu: (b) => showAcademyMenu(b)},
+    {type: BUILDING_TYPES.CYBER_SURGEON, prop: 'cyberSurgeon', menu: (b) => showCyberSurgeonBuyMenu(b)},
+    {type: BUILDING_TYPES.PALACE, prop: 'palace', menu: (b) => showPalaceMenu(b)},
+    {type: BUILDING_TYPES.TEMPLE, prop: 'temple', menu: (b) => showModal("Temple", "The temple is quiet and serene.", [["Close", () => showPlanetMenu(b)]])},
+    {type: BUILDING_TYPES.CASINO, prop: 'casino', menu: (b) => showCasinoMenu(b)},
+    {type: BUILDING_TYPES.ARMORY, prop: 'armory', menu: (b) => showArmoryMenu(b)},
+    {type: BUILDING_TYPES.OUTFITTER, prop: 'outfitter', menu: (b) => showOutfitterMenu(b)},
+]
+
+
 /**
  * Displays the main planet menu with access to all buildings.
  * @param {Planet} planet - The planet to interact with.
  */
 function showPlanetMenu(planet = new Planet()) {
+    console.log('opening planet menu for:',planet)
     const isDocked = gs.location == planet
     const {settlement} = planet
 
@@ -23,83 +42,30 @@ function showPlanetMenu(planet = new Planet()) {
         }
     }
 
-        if (isDocked) {
-        console.log('1')
+    if (isDocked) {
         const damagedShips = gs.fleet.ships.filter(s=>s.isDamaged())
-        console.log('2:',damagedShips,gs.fleet.ships)
         if (damagedShips.length > 0) msg += colorSpan(`Your ships receive complementary repairs courtesy of the dock's nanite swarm.<br/>`, COLORS.LightGreen)
         for (const s of damagedShips) s.repairHull()
     }
 
     const options = []
-    const blockedBuildings = planet.civilization.governmentType.blockedBuildings || []
     
-    if (settlement.shipyard) {
-        const isBlocked = blockedBuildings.includes(BUILDING_TYPES.SHIPYARD)
-        options.push(["Shipyard", () => showShipyardBuyMenu(settlement.shipyard), isBlocked]);
+    // Iterate through all buildings
+    if (settlement) for (const {type, prop, menu} of buildingHandlerMapping) {
+        const building = settlement[prop]
+        if (building) {
+            const access = type.canAccess(planet, isDocked)
+            if (access.canShow) {
+                options.push([type.name, () => menu(building), access.isDisabled])
+            }
+        }
     }
-    if (settlement.market) {
-        const isBlocked = blockedBuildings.includes(BUILDING_TYPES.MARKET)
-        options.push(["Market", () => showMarketMenu(settlement.market), isBlocked]);
-    }
-    if (settlement.blackMarket) {
-        const isBlocked = blockedBuildings.includes(BUILDING_TYPES.BLACK_MARKET)
-        options.push(["Black Market", () => showMarketMenu(settlement.blackMarket), isBlocked]);
-    }
-    if (settlement.guild) {
-        const isBlocked = blockedBuildings.includes(BUILDING_TYPES.GUILD)
-        options.push(["Guild", () => showGuildMenu(settlement.guild), isBlocked]);
-    }
-    if (settlement.bank) {
-        const isBlocked = blockedBuildings.includes(BUILDING_TYPES.BANK)
-        options.push(["Bank", () => showBankMenu(settlement.bank), isBlocked]);
-    }
-    if (settlement.courthouse) {
-        const isBlocked = blockedBuildings.includes(BUILDING_TYPES.COURTHOUSE)
-        options.push(["Courthouse", () => showCourthouseMenu(settlement.courthouse), isBlocked]);
-    }
-    if (settlement.academy) {
-        const isBlocked = blockedBuildings.includes(BUILDING_TYPES.ACADEMY)
-        options.push(["Academy", () => showAcademyMenu(settlement.academy), isBlocked]);
-    }
-    if (settlement.tavern) {
-        const isBlocked = false // No building type for tavern yet
-        options.push(["Tavern", () => showAcademyMenu(settlement.tavern), isBlocked]);
-    }
-    if (settlement.cyberSurgeon) {
-        const isBlocked = blockedBuildings.includes(BUILDING_TYPES.CYBER_SURGEON)
-        options.push(["Cyber Surgeon", () => showCyberSurgeonBuyMenu(settlement.cyberSurgeon), isBlocked]);
-    }
-    if (settlement.palace) {
-        const hasBounty = gs.captain.calcBountyForPlanet(planet) > 0
-        const hasInfamy = gs.captain.calcInfamyForPlanet(planet) > 0
-        const playerRank = gs.captain.ranks.get(planet) || RANK_TYPES.NO_RANK
-        const isElite = playerRank === RANK_TYPES.ELITE
-        const isBlocked = blockedBuildings.includes(BUILDING_TYPES.PALACE)
-        const canEnter = !hasBounty && (!hasInfamy || isElite) && !isBlocked
-        options.push(["Palace", () => showPalaceMenu(settlement.palace), !isDocked || !canEnter]);
-    }
-    if (settlement.temple) {
-        const isBlocked = blockedBuildings.includes(BUILDING_TYPES.TEMPLE)
-        options.push(["Temple", () => showModal("Temple", "The temple is quiet and serene.", [["Close", () => showPlanetMenu(planet)]]), isBlocked]);
-    }
-    if (settlement.casino) {
-        const isBlocked = blockedBuildings.includes(BUILDING_TYPES.CASINO)
-        options.push(["Casino", () => showCasinoMenu(settlement.casino), isBlocked]);
-    }
-    if (settlement.armory) {
-        const isBlocked = blockedBuildings.includes(BUILDING_TYPES.ARMORY)
-        options.push(["Armory", () => showArmoryMenu(settlement.armory), isBlocked]);
-    }
-    if (settlement.outfitter) {
-        const isBlocked = blockedBuildings.includes(BUILDING_TYPES.OUTFITTER)
-        options.push(["Outfitter", () => showOutfitterMenu(settlement.outfitter), isBlocked]);
-    }
+    
     options.push(ce({tag:'br'}));
-    options.push(["News", () => showNewsTimelineMenu(planet, () => showPlanetMenu(planet))]);
-    options.push([`Overview`, () => showPlanetSocietyMenu(planet)]);
+    //options.push(["News", () => showNewsTimelineMenu(planet, () => showPlanetMenu(planet))]);
+    options.push([`Info`, () => planet.civilization ? showPlanetSocietyMenu(planet) : showPlanetClimateMenu(planet)]);
     if (planet.children && planet.children.length > 0) {
-        options.push(["Moons", () => showMoonsMenu(planet)]);
+        options.push(["Moons", () => showPlanetMenu(planet.children[0])]);
     }
     options.push([isDocked ? "Depart" : "Stop Scanning", () => closeModal()]);
     showPlanetModal(planet, `${coloredName(planet)}`, msg, options, 'planet_menu', (nextPlanet) => showPlanetMenu(nextPlanet));
@@ -127,14 +93,21 @@ function showMoonsMenu(planet = new Planet()) {
  */
 function showPlanetSocietyMenu(planet = new Planet()) {
     const {civilization, settlement} = planet
-    const {governmentType, policies} = civilization
     
-    // Build overview section
-    let overviewContent = `<u>Overview</u><br/>`
-    overviewContent += `Government: ${coloredName(governmentType)}<br/>`
-    if (settlement && settlement.settlementType) {
-        overviewContent += `Settlement: ${colorSpan(settlement.settlementType.name, settlement.settlementType.color)}<br/>`
-    }
+    let content
+    
+    // Check if civilization exists
+    if (!civilization) {
+        content = ce({children: ['No civilization detected on this planet.']})
+    } else {
+        const {governmentType, policies} = civilization
+        
+        // Build overview section
+        let overviewContent = `<u>Overview</u><br/>`
+        overviewContent += `Government: ${coloredName(governmentType)}<br/>`
+        if (settlement && settlement.settlementType) {
+            overviewContent += `Settlement: ${colorSpan(settlement.settlementType.name, settlement.settlementType.color)}<br/>`
+        }
     
     // Build policies section
     let policiesContent = `<u>Policies</u><br/>`
@@ -144,7 +117,7 @@ function showPlanetSocietyMenu(planet = new Planet()) {
     policiesContent += `${policies.foreign.flavor.symbol} Foreign: ${colorSpan(policies.foreign.name, policies.foreign.color)}<br/>`
     
     // Build left ratings column
-    const leftColumnRatings = ['population', 'territory', 'army', 'navy', 'industry', 'economy', 'security', 'culture']
+    const leftColumnRatings = ['population', 'territory', 'army', 'navy', 'industry', 'economy', 'security', 'culture', 'technology']
     let leftRatingsContent = ''
     for (const ratingName of leftColumnRatings) {
         const rating = CIVILIZATION_RATINGS_ALL.find(r => r.name.toLowerCase() === ratingName)
@@ -164,6 +137,7 @@ function showPlanetSocietyMenu(planet = new Planet()) {
                 case 'economy': displayValue = describeEconomy(value); break;
                 case 'security': displayValue = describeSecurity(value); break;
                 case 'culture': displayValue = describeCulture(value); break;
+                case 'technology': displayValue = describeTechnology(value); break;
             }
             
             leftRatingsContent += `${rating.symbol} ${rating.name}: ${displayValue}<br/>`
@@ -171,7 +145,7 @@ function showPlanetSocietyMenu(planet = new Planet()) {
     }
     
     // Build right ratings column
-    const rightColumnRatings = ['technology', 'education', 'wealth', 'reserves', 'crime', 'corruption', 'inflation', 'taxes', 'prestige']
+    const rightColumnRatings = ['education', 'wealth', 'reserves', 'crime', 'corruption', 'inflation', 'taxes', 'prestige']
     let rightRatingsContent = ''
     for (const ratingName of rightColumnRatings) {
         const rating = CIVILIZATION_RATINGS_ALL.find(r => r.name.toLowerCase() === ratingName)
@@ -183,7 +157,6 @@ function showPlanetSocietyMenu(planet = new Planet()) {
             
             // Use specific describe functions where available
             switch(ratingName) {
-                case 'technology': displayValue = describeTechnology(value); break;
                 case 'education': displayValue = describeEducation(value); break;
                 case 'wealth': displayValue = describeWealth(value); break;
                 case 'reserves': displayValue = describeReserves(value); break;
@@ -198,23 +171,42 @@ function showPlanetSocietyMenu(planet = new Planet()) {
         }
     }
     
-    // Create layout using createColumnLayout
-    const topSection = createColumnLayout([overviewContent, policiesContent])
-    const hr = ce({tag: 'hr', style: {margin: '20px 0', border: `1px solid ${rgbArrayToString(COLORS.Gray)}`}})
-    const ratingsHeader = ce({children: ['<u>Ratings</u>']})
-    const ratingsSection = createColumnLayout([leftRatingsContent, rightRatingsContent])
-    
-    const content = ce({
-        children: [topSection, hr, ratingsHeader, ratingsSection]
-    })
+        // Create layout using createColumnLayout
+        const topSection = createColumnLayout([overviewContent, policiesContent])
+        const hr = ce({tag: 'hr', style: {margin: '20px 0', border: `1px solid ${rgbArrayToString(COLORS.Gray)}`}})
+        const ratingsHeader = ce({children: ['<u>Ratings</u>']})
+        const ratingsSection = createColumnLayout([leftRatingsContent, rightRatingsContent])
+        
+        content = ce({
+            children: [topSection, hr, ratingsHeader, ratingsSection]
+        })
+    }
     
     showPlanetModal(planet, `${coloredName(planet)} - Society`, content, [
-        ["Demographics", () => showPlanetDemographicsMenu(planet)],
+        ["Demographics", () => showPlanetDemographicsMenu(planet), !civilization],
         ["Climate", () => showPlanetClimateMenu(planet)],
+        ["News", () => showNewsTimelineMenu(planet, () => showPlanetSocietyMenu(planet))],
         ["Back", () => showPlanetMenu(planet)]
     ], 'planet_society', (nextPlanet) => showPlanetSocietyMenu(nextPlanet));
 }
 
+function scoreEarthlikeValue(planetValue = 1, earthValue = 1) {
+    // Calculate ratio and use log scale for symmetric scoring
+    // 1.0 = perfect (Earth-like), values further from 1.0 are worse
+    // 0.5x and 2x both return 0.5, 0.25x and 4x both return 0.25
+    const ratio = planetValue / earthValue
+    if (ratio <= 0) return 0
+    
+    // Use logarithmic distance from 1.0
+    // log2(ratio) gives us: -1 for 0.5x, 0 for 1x, 1 for 2x
+    const logDistance = Math.abs(Math.log2(ratio))
+    
+    // Convert to 0-1 score where 0 distance = 1.0, distance of 2 (4x or 0.25x) = 0.25
+    // Using exponential decay: score = 2^(-logDistance)
+    const score = Math.pow(2, -logDistance)
+    
+    return score*4
+}
 /**
  * Displays detailed climate and physical information about a planet.
  * @param {Planet} planet - The planet to display climate information for.
@@ -226,11 +218,11 @@ function showPlanetClimateMenu(planet = new Planet()) {
     // Build left column: Physical Properties and Composition
     let leftContent = `<u>Physical Properties</u><br/>`
     leftContent += `Type: ${coloredName(planet.planetType)}<br/>`
-    leftContent += `Radius: ${roundToPlaces(planet.radius, 2)} Earth radii<br/>`
-    leftContent += `Day Length: ${roundToPlaces(planet.dayLength, 2)} Earth days<br/>`
+    leftContent += `Radius: ${statColorSpan(roundToPlaces(planet.radius, 2) + ' Earth radii', scoreEarthlikeValue(planet.radius, EARTH.radius))}<br/>`
+    leftContent += `Day Length: ${statColorSpan(roundToPlaces(planet.dayLength, 2) + ' Earth days', scoreEarthlikeValue(planet.dayLength, EARTH.dayLength))}<br/>`
     if (planet.orbit) {
-        leftContent += `Orbital Distance: ${roundToPlaces(planet.orbit.radius, 2)} AU<br/>`
-        leftContent += `Orbital Period: ${roundToPlaces(planet.orbit.calcPeriod(), 2)} years<br/>`
+        leftContent += `Orbital Distance: ${statColorSpan(roundToPlaces(planet.orbit.radius, 2) + ' AU', scoreEarthlikeValue(planet.orbit.radius, EARTH.orbit.radius))}<br/>`
+        leftContent += `Orbital Period: ${statColorSpan(roundToPlaces(planet.orbit.calcPeriod(), 2) + ' years', scoreEarthlikeValue(planet.orbit.calcPeriod(), EARTH.orbit.calcPeriod()))}<br/>`
     }
     leftContent += `<br/>`
     
@@ -277,7 +269,9 @@ function showPlanetClimateMenu(planet = new Planet()) {
     })
     
     showPlanetModal(planet, `${coloredName(planet)} - Climate`, content, [
-        ["Society", () => showPlanetSocietyMenu(planet)],
+        ["Society", () => showPlanetSocietyMenu(planet), !planet.civilization],
+        ["Demographics", () => showPlanetDemographicsMenu(planet), !planet.civilization],
+        ["News", () => showNewsTimelineMenu(planet, () => showPlanetClimateMenu(planet))],
         ["Back", () => showPlanetMenu(planet)]
     ], 'planet_climate', (nextPlanet) => showPlanetClimateMenu(nextPlanet));
 }

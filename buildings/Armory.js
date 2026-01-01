@@ -1,7 +1,7 @@
 // Armory building: sells weapons and armor
 class Armory extends Building {
-    constructor(planet = new Planet()) {
-        super(planet, BUILDING_TYPES.ARMORY);
+    constructor(planet = new Planet(), moon = null) {
+        super(planet, BUILDING_TYPES.ARMORY, moon);
         this.inventory = [];
         this.normalize();
     }

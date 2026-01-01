@@ -24,13 +24,14 @@ function showReligionsMenu(backFunction = () => closeModal()) {
 
     // List each religion with its traits
     for (const religion of religions) {
+        console.log('religion:',religion)
         const religionSection = ce({
             style: 'border-left: 3px solid ' + rgbArrayToString(religion.color) + '; padding-left: 15px; margin-bottom: 15px;',
             children: [
                 ce({
                     tag: 'div',
                     style: 'font-weight: bold; margin-bottom: 5px; font-size: 1.1em;',
-                    children: [religion.icon + ' ', colorSpan(religion.name, religion.color)]
+                    children: [religion.symbol + ' ', colorSpan(religion.name, religion.color)]
                 })
             ]
         })
@@ -43,6 +44,7 @@ function showReligionsMenu(backFunction = () => closeModal()) {
             religionSection.appendChild(traitsHeader)
 
             for (const trait of religion.traits) {
+                console.log('trait:',trait)
                 const traitEl = ce({
                     style: 'margin-left: 10px; margin-bottom: 5px;',
                     children: [

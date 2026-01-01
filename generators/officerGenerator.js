@@ -45,6 +45,11 @@ function generateOfficer(planet = new Planet(), withImplants = false, reputation
         }
     }
     
+    // Default to AGNOSTICISM if no religion was assigned
+    if (!officer.religion) {
+        officer.religion = RELIGION_AGNOSTICISM
+    }
+    
     // Level up to target level
     for (let i = 0; i < level; i++) {
         officer.levelUp(false) // Don't auto-improve skills during leveling

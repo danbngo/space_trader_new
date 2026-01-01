@@ -44,7 +44,7 @@ class TerraformingNews extends News {
 
     isValid() {
         const {planet: p} = this
-        const ratingsValid = (p.c.education > CL.HIGH || p.c.technology > CL.HIGH) && p.c.taxes > CL.MEDIUM
+        const ratingsValid = (p.c.education > CL.SLIGHTLY_HIGH || p.c.technology > CL.SLIGHTLY_HIGH) && p.c.taxes > CL.SLIGHTLY_LOW
         // Planet must not already have this event
         const interferingEvent = News.planetHasAnyNews(p, NT_ECONOMY_PREVENTING)
         return ratingsValid && !interferingEvent

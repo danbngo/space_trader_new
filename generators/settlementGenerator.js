@@ -134,9 +134,9 @@ function generateSettlement(planet = new Planet()) {
     const outfitter = new Outfitter(planet, getRandomMoon())
 
     // Dwarf planets have much lower chance of having buildings (95% disabled vs 80% for others)
-    const disableChance = isDwarfPlanet(planet) ? 0.95 : 0.8
+    const disableChance = !(gs.system.planets.includes(planet)) ? 0.8 : 0.2
     const buildings = [shipyard, market, blackMarket, guild, bank, courthouse, academy, tavern, cyberSurgeon, palace, temple, casino, armory, outfitter]
     for (const building of buildings) if (Math.random() < disableChance) building.enabled = false
 
-    return new Settlement(planet, settlementType, shipyard, market, blackMarket, guild, bank, courthouse, academy, tavern, cyberSurgeon, palace, temple, casino, armory, outfitter)
+    return new Settlement({planet, settlementType, shipyard, market, blackMarket, guild, bank, courthouse, academy, tavern, cyberSurgeon, palace, temple, casino, armory, outfitter})
 }

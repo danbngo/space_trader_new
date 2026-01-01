@@ -51,7 +51,7 @@ class BlockadeNews extends News {
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         //need to have enough ships for it
-        const ratingsValid = p.c.navy > CL.MEDIUM && (p.c.navy/tp.c.navy > CL.HIGH)
+        const ratingsValid = p.c.navy > CL.SLIGHTLY_LOW && (p.c.navy/tp.c.navy > CL.MEDIUM)
         //cant be anarchic or puppet state
         //planet must already be hostile to the target planet
         const relationshipValid = Civilization.areTenseOrAtWar(p, tp)

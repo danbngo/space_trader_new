@@ -46,7 +46,7 @@ class PirateArmadaNews extends News {
     isValid() {
         const {planet: p} = this
         // Requires existing navy and some pirate activity (crime/low security)
-        const ratingsValid = p.c.navy > CL.MEDIUM && (p.c.crime > CL.SLIGHTLY_HIGH || p.c.security < CL.SLIGHTLY_HIGH)
+        const ratingsValid = p.c.navy > CL.SLIGHTLY_LOW && (p.c.crime > CL.MEDIUM || p.c.security < CL.MEDIUM)
         
         // Can't already have major pirate events
         const interferingEvent = News.planetHasAnyNews(p, [NT.PIRATE_ARMADA, NT.PIRATE_HAVEN])

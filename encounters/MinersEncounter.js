@@ -14,7 +14,7 @@ class MinersEncounter extends NeutralsEncounter {
                 ['Sneak Attack', ()=>this.showPlayerAttackNeutralsModal(true)],
             ])
         }
-        else if (Math.random() * gs.captain.calcInfamyForPlanet(this.planet) > 200) {
+        else if (FameLevel.hasInfamyLevel(gs.captain, this.planet, INFAMY_LEVELS.VILIFIED)) {
             showModal(coloredName(this.fleet), 'The miners have heard of your fearsome deeds and start fleeing immediately!', [
                 ['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],

@@ -6,14 +6,40 @@
  */
 function createCargoTable(cargo = new CountsMap(), onSelectCargoType = (ct = CARGO_TYPES_ALL[0])=>{}) {
     const rows = [
-        ['Cargo Type', 'Amount']
+        ['Cargo Type', 'Amount', 'Cargo Space %']
     ]
     for (const ct of CARGO_TYPES_ALL) {
+        const amount = cargo.getAmount(ct)
+        const percentage = (amount / gs.fleet.totalCargoSpace) * 100
+        
+        const progressBar = new ProgressBar({
+            id: `cargo_${ct.name.replace(/\s+/g, '_')}`,
+            label: '',
+            value: percentage,
+            fillColor: rgbArrayToString(ct.color),
+            showPercentage: true,
+            width: 20
+        })
+        
+        const bar = progressBar.container
+        
         rows.push([
-            `${ct.symbol} ${ct.name}`,
-            ''+cargo.getAmount(ct),
+            coloredName(ct),
+            cargo.getAmount(ct),
+            bar,
         ])
     }
+    const totalBar = new ProgressBar({
+            id: 'cargo_all',
+            label: '',
+            value: (cargo.total / gs.fleet.totalCargoSpace) * 100,
+            fillColor: rgbArrayToString(COLORS.LightGray),
+    })
+    rows.push([
+        'All',
+        cargo.total,
+        totalBar.container
+    ])
     return createTable(rows, (rowIndex = 0)=>onSelectCargoType(CARGO_TYPES_ALL[rowIndex]))
 }
 

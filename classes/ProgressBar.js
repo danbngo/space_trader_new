@@ -1,14 +1,9 @@
 /**
- * A reusable progress bar component that can be used for both dynamic progress tracking
- * (with elapsed time) and static data visualization (without time).
+ * A reusable progress bar component for static data visualization.
  * 
- * @example Dynamic usage (with elapsed time):
- * const progressBar = new ProgressBar({id: 'loading', label: 'Loading'})
- * progressBar.update(50, 2.5) // 50%, 2.5 seconds elapsed
- * 
- * @example Static usage (no time):
+ * @example Static usage:
  * const progressBar = new ProgressBar({id: 'race_human', label: 'Humans', value: 75})
- * // Shows 75% immediately, no time display
+ * // Shows 75% immediately
  */
 class ProgressBar {
     /**
@@ -16,38 +11,37 @@ class ProgressBar {
      * @param {Object} options - Configuration options
      * @param {string} options.id - Unique identifier for the progress bar
      * @param {string} options.label - Text label to show (e.g., "Generating history" or "Humans")
-     * @param {number} [options.value=0] - Initial value (0-100), for static bars
-     * @param {number} [options.height=30] - Height of the progress bar in pixels
+     * @param {number} [options.value=0] - Initial value (0-100)
      * @param {string} [options.fillColor] - Color for the fill (defaults to COLORS.Green)
      * @param {string} [options.bgColor] - Color for the background (defaults to COLORS.DarkGray)
      * @param {string} [options.borderColor] - Color for the border (defaults to COLORS.White)
-     * @param {boolean} [options.showTime=false] - Whether to show elapsed time (for dynamic progress)
      * @param {boolean} [options.showPercentage=true] - Whether to show percentage value
+     * @param {string} [options.suffix='%'] - The suffix to display after the value (e.g., '%', 'kg', or '')
+     * @param {string} [options.minLabelWidth] - Minimum width for the label (e.g., '12em') for alignment
+     * @param {number} [options.width=20] - Number of characters in the ASCII bar visualization
      */
     constructor(options) {
         const {
             id,
             label,
             value = 0,
-            height = 30,
             fillColor = rgbArrayToString(COLORS.Green),
             bgColor = rgbArrayToString(COLORS.DarkGray),
             borderColor = rgbArrayToString(COLORS.White),
-            showTime = false,
-            showPercentage = true
+            showPercentage = true,
+            suffix = '%',
+            minLabelWidth = null,
+            width = 20
         } = options
 
-        this.id = id
         this.label = label
-        this.height = height
         this.fillColor = fillColor
         this.bgColor = bgColor
         this.borderColor = borderColor
-        this.showTime = showTime
         this.showPercentage = showPercentage
-
-        this.fillId = `${id}_fill`
-        this.textId = `${id}_text`
+        this.suffix = suffix
+        this.minLabelWidth = minLabelWidth
+        this.width = width
 
         this._createElements()
         
@@ -62,24 +56,20 @@ class ProgressBar {
      * @private
      */
     _createElements() {
-        this.fillElement = ce({
-            id: this.fillId,
-            style: `width: 0%; height: ${this.height}px; background-color: ${this.fillColor}; transition: width 0.1s;`
-        })
-
-        this.bgElement = ce({
-            style: `width: 100%; height: ${this.height}px; background-color: ${this.bgColor}; border: 2px solid ${this.borderColor};`,
-            children: [this.fillElement]
-        })
-
         this.textElement = ce({
-            id: this.textId,
-            style: `text-align: center; margin-top: 10px; color: ${rgbArrayToString(COLORS.White)};`,
+            classNames: ['progressBar-text'],
+            style: `color: ${rgbArrayToString(COLORS.White)};${this.minLabelWidth ? ` min-width: ${this.minLabelWidth};` : ''}`,
             children: [this._formatText(0)]
         })
 
+        this.percentageElement = ce({
+            classNames: ['progressBar-percentage'],
+            children: this.showPercentage ? [`${Math.round(0)}${this.suffix}`] : ['']
+        })
+
         this.container = ce({
-            children: [this.bgElement, this.textElement]
+            classNames: ['progressBar-container'],
+            children: [this.textElement, this.percentageElement]
         })
     }
 
@@ -87,19 +77,18 @@ class ProgressBar {
      * Formats the text display based on options
      * @private
      * @param {number} percentage - Progress percentage (0-100)
-     * @param {number} [elapsedSeconds] - Elapsed time in seconds (optional)
      * @returns {string} Formatted text
      */
-    _formatText(percentage, elapsedSeconds) {
+    _formatText(percentage) {
         let text = this.label
         
-        if (this.showPercentage) {
-            text += `: ${Math.round(percentage)}%`
-        }
+        // Add ASCII progress bar visualization
+        const barLength = this.width
+        const filledLength = Math.round((percentage / 100) * barLength)
+        const emptyLength = barLength - filledLength
+        const asciiBar = '[' + '█'.repeat(filledLength) + '░'.repeat(emptyLength) + ']'
         
-        if (this.showTime && elapsedSeconds !== undefined) {
-            text += ` (${elapsedSeconds.toFixed(1)}s)`
-        }
+        text += ' ' + asciiBar
         
         return text
     }
@@ -107,31 +96,25 @@ class ProgressBar {
     /**
      * Updates the progress bar display
      * @param {number} percentage - Progress percentage (0-100)
-     * @param {number} [elapsedSeconds] - Elapsed time in seconds (optional, for dynamic progress)
      */
-    update(percentage, elapsedSeconds) {
-        const fillEl = document.getElementById(this.fillId)
-        const textEl = document.getElementById(this.textId)
-        
-        if (fillEl) {
-            fillEl.style.width = Math.min(100, Math.max(0, percentage)) + '%'
+    update(percentage) {
+        if (this.textElement) {
+            this.textElement.textContent = this._formatText(percentage)
         }
         
-        if (textEl) {
-            textEl.textContent = this._formatText(percentage, elapsedSeconds)
+        if (this.percentageElement && this.showPercentage) {
+            this.percentageElement.textContent = `${Math.round(percentage)}${this.suffix}`
         }
     }
 
     /**
      * Gets the internal DOM elements (for advanced usage)
-     * @returns {{container: HTMLElement, fill: HTMLElement, text: HTMLElement, bg: HTMLElement}}
+     * @returns {{container: HTMLElement, text: HTMLElement}}
      */
     getElements() {
         return {
             container: this.container,
-            fill: document.getElementById(this.fillId),
-            text: document.getElementById(this.textId),
-            bg: this.bgElement
+            text: this.textElement,
         }
     }
 }

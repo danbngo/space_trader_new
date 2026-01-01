@@ -11,8 +11,8 @@
 }
 
 .ui-table-cell {
+    text-align: left !important;
     padding: 8px 8px;
-    border: 1px solid #444;
 }
 
 .ui-table-row:hover {

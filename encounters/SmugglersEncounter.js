@@ -14,7 +14,7 @@ class SmugglersEncounter extends MercantileEncounter {
                 ['Sneak Attack', ()=>this.showPlayerAttackFleetModal(1, 0, true)],
             ])
         }
-        else if (Math.random() * gs.captain.calcFameForPlanet(this.planet) > 100) {
+        else if (FameLevel.hasFameLevel(gs.captain, this.planet, FAME_LEVELS.LOVED)) {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} have heard of your hostility towards the criminal community and quickly flee!`, [
                 ['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],

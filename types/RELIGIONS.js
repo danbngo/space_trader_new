@@ -1,3 +1,4 @@
+
 /**
  * Represents a religion in the game world.
  * @class Religion
@@ -7,9 +8,9 @@ class Religion {
      * @param {string} name - The name of the religion.
      * @param {ReligionTrait[]} traits - The traits that define this religion's characteristics.
      * @param {number[]} color - The color associated with this religion.
-     * @param {string} icon - The symbol/icon representing this religion.
+     * @param {string} symbol - The symbol/symbol representing this religion.
      */
-    constructor(name = 'Unnamed Faith', traits = [], color = COLORS.White, icon = '✦') {
+    constructor(name = 'Unnamed Faith', traits = [], color = COLORS.White, symbol = '✦') {
         /** @type {string} */
         this.name = name;
         /** @type {ReligionTrait[]} */
@@ -17,7 +18,7 @@ class Religion {
         /** @type {number[]} */
         this.color = color;
         /** @type {string} */
-        this.icon = icon;
+        this.symbol = symbol;
     }
 
     /**
@@ -41,3 +42,18 @@ class Religion {
         return `${colorSpan(this.name, this.color)} - Traits: ${traitNames}`;
     }
 }
+
+
+const RELIGION_ATHEISM = new Religion(
+    'Atheism',
+    [RELIGION_TRAITS.MATERIALIST, RELIGION_TRAITS.RATIONALIST],
+    COLORS.Gray,
+    '∅'
+);
+
+const RELIGION_AGNOSTICISM = new Religion(
+    'Agnosticism',
+    [RELIGION_TRAITS.TOLERANT, RELIGION_TRAITS.RATIONALIST],
+    COLORS.LightGray,
+    '?'
+);

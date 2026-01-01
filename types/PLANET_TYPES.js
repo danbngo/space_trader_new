@@ -28,12 +28,3 @@ const PLANET_TYPES = Object.freeze({
 });
 
 const PLANET_TYPES_ALL = Object.values(PLANET_TYPES)
-
-/**
- * Checks if a planet is a dwarf planet (small outpost with minimal services).
- * @param {Planet} planet - The planet to check.
- * @returns {boolean} True if planet is a dwarf type.
- */
-function isDwarfPlanet(planet) {
-    return planet.planetType === PLANET_TYPES.GAS_DWARF || planet.planetType === PLANET_TYPES.ICE_DWARF
-}

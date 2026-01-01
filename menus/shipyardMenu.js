@@ -152,6 +152,8 @@ function showShipyardBuyMenu(shipyard = new Shipyard()) {
             `Local Ship Quality: ${roundToPlaces(100*shipyard.planet.c.technology, 2)}%`,
             `Buy Fee: ${statColorSpan(roundToPlaces(100*planet.c.corruption, 2), 2/(1+planet.c.corruption))}%`,
             (gs.fleet.totalSkills.getAmount(SKILLS.Barter) > 0) ? `Fee After Barter | ${statColorSpan(roundToPlaces(100*(1+shipyard.rake) - 100, 2), 2/(1+shipyard.rake))}% Buy` : '',
+            planet.civilization ? `Inflation: ${statColorSpan(roundToPlaces(100*planet.c.inflation, 2), 2/(1+planet.c.inflation))}%`
+            +` | Tax Rate: ${statColorSpan(roundToPlaces(100*planet.c.taxes, 2), 2/(1+planet.c.taxes))}%` : '',
         ]}),
         [
             ["Buy Modules", ()=>showShipyardBuyModulesMenu(shipyard)],
@@ -161,6 +163,11 @@ function showShipyardBuyMenu(shipyard = new Shipyard()) {
         `shipyard_buy_panel`,
         (nextPlanet) => nextPlanet.settlement?.shipyard ? showShipyardBuyMenu(nextPlanet.settlement.shipyard) : showPlanetMenu(nextPlanet)
     );
+    
+    // Auto-select first ship
+    if (shipyard.ships.length > 0) {
+        onSelectShipyardShip(shipyard.ships[0])
+    }
 }
 
 function showShipyardSellMenu(shipyard = new Shipyard()) {

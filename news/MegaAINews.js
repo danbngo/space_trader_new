@@ -55,9 +55,9 @@ class MegaAINews extends News {
     isValid() {
         const {planet: p} = this
         // Requires extremely high tech and education
-        const ratingsValid = p.c.technology > CL.HIGH 
-            && p.c.education > CL.HIGH
-            && p.c.wealth > CL.SLIGHTLY_HIGH
+        const ratingsValid = p.c.technology > CL.SLIGHTLY_HIGH 
+            && p.c.education > CL.SLIGHTLY_HIGH
+            && p.c.wealth > CL.MEDIUM
         const interferingEvent = News.planetHasAnyNewsTargeting(p, NT_ECONOMY_PREVENTING) || News.planetHasAnyNews(p, NT_ECONOMY_PREVENTING)
         return ratingsValid && !interferingEvent
     }

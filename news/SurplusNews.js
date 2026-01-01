@@ -30,7 +30,7 @@ class SurplusNews extends News {
     isValid() {
         const {planet: p} = this
         //we needed to be resource scarce to be looking for them so hard
-        const ratingsValid = p.c.reserves < CL.SLIGHTLY_LOW
+        const ratingsValid = p.c.reserves < CL.MEDIUM
         //more for flavor than anything, irl you could find goodies at any time
         const interferingEvent = News.planetHasAnyNews(p, [NT.SURPLUS, NT.DEPRESSION, NT.SCARCITY])
         return ratingsValid && !interferingEvent

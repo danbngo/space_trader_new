@@ -43,7 +43,7 @@ function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
         ? captain.implants.map(i => colorSpan(i.implantType.name, i.implantType.color) + ` (${roundToPlaces(i.quality*100, 1)}%)`).join(', ')
         : colorSpan('(None)', COLORS.Gray)
 
-    const raceText = captain.race ? `${captain.race.icon} ${colorSpan(captain.race.name, captain.race.color)}` : 'Human'
+    const raceText = captain.race ? `${captain.race.symbol} ${colorSpan(captain.race.name, captain.race.color)}` : 'Human'
 
     showModal(
         `Captain Overview`,
@@ -97,6 +97,8 @@ function showCaptainPerksMenu(captain = gs.captain, selectedPerk = null) {
         const canAfford = numPerkPoints >= perkCost
         const meetsLevel = level >= perk.minLevel
         const canTake = !alreadyHas && canAfford && meetsLevel
+
+        console.log({canTake, meetsLevel, canAfford, perkCost, alreadyHas})
         
         let reasonText = ''
         if (alreadyHas) reasonText = 'You already have this perk.'
@@ -126,8 +128,8 @@ function showCaptainPerksMenu(captain = gs.captain, selectedPerk = null) {
         ? perks.map(p => colorSpan(p.name, p.color)).join(', ')
         : colorSpan('(None)', COLORS.Gray)
 
-    // Build available perks table
-    const availablePerks = PERK_TYPES_ALL.filter(p => !perks.includes(p))
+    // Build available perks table - only show perks that meet level requirement
+    const availablePerks = PERK_TYPES_ALL.filter(p => !perks.includes(p) && level >= p.minLevel)
     const availablePerkRows = [
         ['Perk', 'Min Level', 'Description'],
         ...availablePerks.map(pk => {
@@ -226,11 +228,11 @@ function showCaptainReputationMenu() {
     
     const factionTable = createTable(factionTableRows)
 
-    // Create side-by-side layout for ranks and faction reputation
-    const ranksAndFactionContainer = createColumnLayout([
+    // Create side-by-side layout for planetary and factional reputation
+    const reputationContainer = createColumnLayout([
         ce({children: [
-            ce({children: ['<b>Planetary Ranks</b>']}),
-            ranksTable
+            ce({children: ['<b>Planetary Reputation</b>']}),
+            reputationTable
         ]}),
         ce({children: [
             ce({children: ['<b>Factional Reputation</b>']}),
@@ -241,11 +243,12 @@ function showCaptainReputationMenu() {
     showModal(
         `Captain Reputation`,
         ce({children: [
-            ce({children: ['<b>Planetary Reputation</b>']}),
-            reputationTable,
-            ranksAndFactionContainer,
+            ce({children: ['<b>Planetary Ranks</b>']}),
+            ranksTable,
+            reputationContainer,
         ]}),
         [
+            ["Perks", () => showCaptainPerksMenu(captain), false, captain.numPerkPoints > 0 ? 'highlighted' : null],
             ["Skills", () => showCaptainSkillsMenu(captain)],
             ["Close", () => closeModal()],
         ],

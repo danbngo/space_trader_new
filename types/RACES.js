@@ -6,16 +6,16 @@ class Race {
     /**
      * @param {string} name - The name of the race.
      * @param {number[]} color - The color associated with this race.
-     * @param {string} icon - The icon/emoji for this race.
+     * @param {string} symbol - The symbol/emoji for this race.
      * @param {string} description - A description of the race.
      */
-    constructor(name = '', color = COLORS.White, icon = '👤', description = '') {
+    constructor(name = '', color = COLORS.White, symbol = '👤', description = '') {
         /** @type {string} */
         this.name = name
         /** @type {number[]} */
         this.color = color
         /** @type {string} */
-        this.icon = icon
+        this.symbol = symbol
         /** @type {string} */
         this.description = description
     }

@@ -41,15 +41,10 @@ function generateFleet(fleetType = rndMember(FLEET_TYPES_ALL), planet = new Plan
     
     fleet.cargo = generateFleetCargo(fleet, fleetType)
     
-    // Assign faction based on fleet type
-    if (fleetType === FLEET_TYPES.MINERS) fleet.faction = FACTION_TYPES.MINERS
-    else if (fleetType === FLEET_TYPES.MERCHANTS) fleet.faction = FACTION_TYPES.MERCHANTS
-    else if (fleetType === FLEET_TYPES.SMUGGLERS) fleet.faction = FACTION_TYPES.SMUGGLERS
-    else if (fleetType === FLEET_TYPES.PIRATES) fleet.faction = FACTION_TYPES.PIRATES
-    else if (fleetType === FLEET_TYPES.POLICE) fleet.faction = FACTION_TYPES.POLICE
-    else if (fleetType === FLEET_TYPES.SOLDIERS) fleet.faction = FACTION_TYPES.SOLDIERS
-    else if (fleetType === FLEET_TYPES.BOUNTY_HUNTERS) fleet.faction = FACTION_TYPES.BOUNTY_HUNTERS
-    else if (fleetType === FLEET_TYPES.TOURISTS) fleet.faction = FACTION_TYPES.TOURISTS
+    // Assign faction from fleet type
+    if (fleetType.faction) {
+        fleet.faction = fleetType.faction
+    }
 
     // Assign AI to fleet
     const fleetAIType = getFleetAITypeForFleetType(fleetType)
@@ -66,4 +61,46 @@ function generateFleet(fleetType = rndMember(FLEET_TYPES_ALL), planet = new Plan
     return fleet
 }
 
+/**
+ * Simulates fleet activity over a period to populate the map with active fleets.
+ * @param {number} numYears - Number of years to simulate fleet activity.
+ * @param {Object} progress - Progress tracking object with completePercentage property.
+ */
+async function addFleetActivity(numYears = 2, progress = {completePercentage: 0}) {
+    let weeksSinceYield = 0
+    const YIELD_EVERY_WEEKS = 5 // Yield control every 5 weeks
+    const WEEKS_PER_YEAR = 52
+    const YEARS_PER_WEEK = 1 / WEEKS_PER_YEAR
+    const DAYS_PER_WEEK = 7
+    const totalWeeks = numYears * WEEKS_PER_YEAR
+    let currentWeek = 0
+    
+    for (let w = 0; w < totalWeeks; w++) {
+        currentWeek++
+        weeksSinceYield++
+        
+        // Spawn fleets from planets
+        checkForFleetSpawning(DAYS_PER_WEEK)
+        
+        // Tick NPC fleet AI (move fleets around)
+        tickNPCFleets(YEARS_PER_WEEK)
+        
+        // Reposition planets every 4 weeks (once per month)
+        if (w % 4 === 0) {
+            gs.system.refreshPositions(gs.year + w * YEARS_PER_WEEK)
+        }
+        
+        // Update progress and yield control for smooth UI
+        if (weeksSinceYield >= YIELD_EVERY_WEEKS) {
+            weeksSinceYield = 0
+            progress.completePercentage = (currentWeek / totalWeeks) * 100
+            await new Promise(resolve => setTimeout(resolve, 0))
+        }
+    }
+    
+    // Final update to 100%
+    progress.completePercentage = 100
+    
+    console.log(`Fleet activity simulation complete: ${numYears} years, ${gs.system.fleets.length} fleets active`)
+}
 

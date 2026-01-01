@@ -70,8 +70,8 @@ class TerrorismNews extends News {
 
     isValid() {
         const {planet: p, targetPlanet: tp} = this
-        // Terrorist state must be weaker militarily than victim but stronger in espionage and already have low prestige
-        const militaryValid = (p.c.military < tp.c.military) && (p.c.prestige < CL.MEDIUM) && (p.c.security > tp.c.security)
+        // Terrorist state must be weaker militarily than victim OR have low prestige, and victim must have lower security
+        const militaryValid = (p.c.military < tp.c.military || p.c.prestige < CL.HIGH) && (tp.c.security < CL.SLIGHTLY_HIGH)
         const relationshipsValid = Civilization.areTenseOrAtWar(p, tp)
         return militaryValid && relationshipsValid
     }

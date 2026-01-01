@@ -55,9 +55,9 @@ class MegacityNews extends News {
     isValid() {
         const {planet: p} = this
         // Requires growing population pressure and resources
-        const ratingsValid = p.c.population > CL.HIGH
-            && p.c.economy > CL.SLIGHTLY_HIGH
-            && p.c.wealth > CL.SLIGHTLY_HIGH
+        const ratingsValid = p.c.population > CL.SLIGHTLY_HIGH
+            && p.c.economy > CL.MEDIUM
+            && p.c.wealth > CL.MEDIUM
             && p.c.reserves > CL.SLIGHTLY_LOW
         return ratingsValid
     }

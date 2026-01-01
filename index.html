@@ -23,9 +23,13 @@
     <script src="keyboardInput.js"></script>
     <script src="CONSTS.js"></script>
     <script src="ENUMS.js"></script>
+    <script src="types/FAME_LEVEL.js"></script>
+    <script src="types/FACTION_TYPES.js"></script>
     <script src="types/PLANET_TYPES.js"></script>
     <script src="types/PLANET_FEATURE_TYPES.js"></script>
     <script src="types/PLANET_ATMOSPHERE_TYPES.js"></script>
+    <script src="types/RELIGION_TRAITS.js"></script>
+    <script src="types/RELIGIONS.js"></script>
     <script src="types/PLANET_OCEAN_TYPES.js"></script>
     <script src="types/PLANET_GEOLOGY_TYPES.js"></script>
     <script src="types/CIVILIZATION_RATINGS.js"></script>
@@ -43,10 +47,8 @@
     <script src="types/GOVERNMENT_TYPES.js"></script>
     <script src="types/NEWS_FLAVORS.js"></script>
     <script src="types/NEWS_TYPES.js"></script>
-    <script src="types/FACTION_TYPES.js"></script>
     <script src="types/RELATIONSHIP_TYPES.js"></script>
     <script src="types/POLICY_TYPES.js"></script>
-    <script src="types/RELIGION_TRAITS.js"></script>
     <script src="types/PERK_TYPES.js"></script>
     <script src="types/RACES.js"></script>
     <script src="types/EQUIPMENT_SLOTS.js"></script>
@@ -63,6 +65,7 @@
     <script src="classes/Route.js"></script>
     <script src="classes/Equipment.js"></script>
     <script src="classes/ProgressBar.js"></script>
+    <script src="classes/Dropdown.js"></script>
     <script src="classes/GameState.js"></script>
     <script src="space/SpaceObject.js"></script>
     <script src="space/BackgroundStar.js"></script>
@@ -92,7 +95,6 @@
     <script src="ai/SlaverFleetAI.js"></script>
     <script src="types/FLEET_AI_TYPES.js"></script>
     <script src="entities/Civilization.js"></script>
-    <script src="entities/Religion.js"></script>
     <script src="entities/Contract.js"></script>
     <!-- Encounter type implementations -->
     <script src="encounters/EncounterAI.js"></script>
@@ -147,6 +149,9 @@
     <script src="news/NewsEffect.js"></script>
     <script src="news/AddictionNews.js"></script>
     <script src="news/AllianceNews.js"></script>
+    <script src="news/AllianceReligiousNews.js"></script>
+    <script src="news/AllianceGovernmentNews.js"></script>
+    <script src="news/AllianceEthnicNews.js"></script>
     <script src="news/ArmsDealNews.js"></script>
     <script src="news/BankruptcyNews.js"></script>
     <script src="news/WarBombardmentNews.js"></script>
@@ -248,6 +253,10 @@
     <script src="news/PirateArmadaNews.js"></script>
     <script src="news/MutationsNews.js"></script>
     <script src="news/TensionsNews.js"></script>
+    <script src="news/TensionsReligiousNews.js"></script>
+    <script src="news/TensionsEthnicNews.js"></script>
+    <script src="news/TensionsEconomicNews.js"></script>
+    <script src="news/TensionsBordersNews.js"></script>
     <script src="news/TerrorismNews.js"></script>
     <script src="news/TerraformingNews.js"></script>
     <script src="news/TourismNews.js"></script>
@@ -304,7 +313,7 @@
     <script src="gfx/CanvasObject.js"></script>
     <script src="gfx/CanvasWrapper.js"></script>
     <script src="menus/menuUtils.js"></script>
-    <script src="menus/assistantMenu.js"></script>
+    <script src="menus/religionsMenu.js"></script>
     <script src="menus/planetMenu.js"></script>
     <script src="menus/demographicsMenu.js"></script>
     <script src="menus/guildMenu.js"></script>

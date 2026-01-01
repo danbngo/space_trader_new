@@ -18,7 +18,6 @@ body {
     font-style: normal;
 }
 
-
 html, body {
     height: 100%;
     margin: 0;
@@ -55,6 +54,30 @@ li {
 
 .gameColumn {
     flex: 1;
+}
+
+/* Progress Bar styling */
+.progressBar-container {
+    margin: 0;
+    padding: 0;
+    align-items: center;
+    gap: 0.5em;
+}
+
+.progressBar-text {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+}
+
+.progressBar-percentage {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    margin-left: 1rem;
+    width: 4em;
+    text-align: left;
 }
 
 /* Slider styling - cyan theme */

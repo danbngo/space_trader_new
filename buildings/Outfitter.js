@@ -1,7 +1,7 @@
 // Outfitter building: sells tools and headgear
 class Outfitter extends Building {
-    constructor(planet = new Planet()) {
-        super(planet, BUILDING_TYPES.OUTFITTER);
+    constructor(planet = new Planet(), moon = null) {
+        super(planet, BUILDING_TYPES.OUTFITTER, moon);
         this.inventory = [];
         this.normalize();
     }

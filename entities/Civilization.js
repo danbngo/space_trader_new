@@ -24,7 +24,7 @@
  * @property {number} [inflation] - Higher costs for everything but also higher sales prices in market
  * @property {number} [taxes] - Tax rate applied to most transactions (0 to MAX_TAX_RATE).
  * @property {CountsMap} [religions] - Religious representation on this planet (Religion -> adherent population ratio).
- * @property {Map<Race, number>} [races] - Racial demographics of this civilization (Race -> population proportion).
+ * @property {CountsMap} [races] - Racial demographics of this civilization (Race -> population proportion).
  * @property {Religion|null} [stateReligion] - The official state religion of this civilization (if any).
  */
 
@@ -41,7 +41,7 @@ class Civilization {
         technology = 1.0, education = 1.0, territory = 1, population = 1, industry = 1,
         economy = 1, security = 1, culture = 1, prestige = 1, policies = new Policies(),
         navy = 1, army = 1, corruption = 1, crime = 1, wealth = 1, reserves = 1, inflation = 1, taxes = 1,
-        religions = new CountsMap(), races = new Map(), stateReligion = null
+        religions = new CountsMap(), races = new CountsMap(), stateReligion = null
     } = {}) {
         /** @type {Planet} */
         this.planet = planet;
@@ -57,7 +57,7 @@ class Civilization {
         this.skillPriceMultipliers = skillPriceMultipliers
         /** @type {CountsMap} */
         this.religions = religions
-        /** @type {Map<Race, number>} */
+        /** @type {CountsMap} */
         this.races = races
         /** @type {Religion|null} */
         this.stateReligion = stateReligion
@@ -169,7 +169,7 @@ class Civilization {
             cargoPriceMultipliers: this.cargoPriceMultipliers.clone(),
             skillPriceMultipliers: this.skillPriceMultipliers.clone(),
             religions: this.religions.clone(),
-            races: new Map(this.races),
+            races: this.races.clone(),
             stateReligion: this.stateReligion,
             governmentType: this.governmentType,
         })

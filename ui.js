@@ -19,11 +19,15 @@ function refreshPanelButtons (panelId = '', buttons) {
     if (!panel) throw new Error(`Panel with id '${panelId}' not found for refreshPanelButtons`);
     const buttonsEl = panel.querySelector(".panel-buttons")
     removeChildren(buttonsEl)
-    if (buttons) buttons.forEach((btnData) => {
+    if (buttons) buttons.forEach((btnData, index) => {
         console.log('btnData:',btnData)
         if (!btnData) return
         if (btnData instanceof HTMLElement) {
             buttonsEl.appendChild(btnData)
+            // Apply float:right to last element
+            if (index === buttons.length - 1) {
+                btnData.style.float = 'right'
+            }
             return
         }
         const [label, handler, disabled, classNames] = btnData
@@ -31,13 +35,20 @@ function refreshPanelButtons (panelId = '', buttons) {
         btn.classList.add('gameButton');
         btn.innerHTML = label;
         // @ts-ignore
-        btn.onclick = handler;
+        btn.onclick = ()=>{
+            if (btn.classList.contains('disabled')) return
+            handler()
+        }
         if (classNames) {
             if (Array.isArray(classNames)) {
                 classNames.forEach(cn => cn && btn.classList.add(cn))
             } else {
                 btn.classList.add(classNames)
             }
+        }
+        // Apply float:right to last button
+        if (index === buttons.length - 1) {
+            btn.style.float = 'right'
         }
         buttonsEl.appendChild(btn);
         if (disabled) {console.log('gonna disable a btn:',btn); btn.classList.add('disabled')}
@@ -229,7 +240,11 @@ function ce({tag = 'div', id = '', innerHTML = '', children = [], parent = undef
     if (children && children.length > 0) for (const child of children) if (child !== undefined && child !== null) el.appendChild(child instanceof HTMLElement ? child : ce({innerHTML: child}))
     if (parent) parent.appendChild(el)
     if (classNames && classNames.length > 0) for (const className of classNames) if (className && className.length > 0) el.classList.add(className)
-    if (onClick) el.onclick = onClick
+    if (onClick) el.onclick = ()=>{
+        console.log('got here with classlist:',el.classList)
+        if (el.classList.contains('disabled')) return
+        onClick()
+    }
     if (style) applyStyle(el, effectiveStyle)
     if (disabled && (el instanceof HTMLButtonElement || el instanceof HTMLInputElement)) el.disabled = true
     return el
@@ -242,7 +257,7 @@ function applyStyle(element, style = {}) {
 }
 
 // utils.js or tableUtil.js
-function createTable(rows = [ce()], onSelectRow = (index = 0)=>{}, firstSelectedIndex = 0) {
+function createTable(rows = [ce()], onSelectRow = null, firstSelectedIndex = onSelectRow ? 0 : null) {
     const table = document.createElement("table");
     table.className = "ui-table";
 
@@ -256,6 +271,7 @@ function createTable(rows = [ce()], onSelectRow = (index = 0)=>{}, firstSelected
         const isFirstSelected = (index) === firstSelectedIndex
 
         const onRowClicked = ()=>{
+            if (!onSelectRow) return
             if (selectedRow) selectedRow.classList.remove('selected')
             tr.classList.add('selected')
             selectedRow = tr
@@ -376,157 +392,15 @@ function attachMouseWheelHandler(element = ce(), callback = (direction = 1)=>{})
 }
 
 
-function createDropdown(buttons = [], dropUpwards = false, selectedIndex = null) {
-    if (!buttons || buttons.length === 0) return ce()
-    
-    let currentSelectedIndex = selectedIndex !== null ? selectedIndex : 0
-    const selectedBtnData = buttons[currentSelectedIndex]
-    const [initialLabel] = selectedBtnData
-    
-    // Create the label element (what shows when dropdown is closed)
-    const labelElement = ce({
-        classNames: ['gameButton'],
-        innerHTML: initialLabel
-    })
-    
-    // Create the dropdown container
-    const dropdownContainer = ce({
-        classNames: ['dropdown-container'],
-        style: {
-            position: 'relative',
-            display: 'inline-block'
-        }
-    })
-    
-    // Create the items container (what shows when dropdown is open)
-    const itemsContainer = ce({
-        classNames: ['dropdown-items'],
-        style: {
-            position: 'absolute',
-            display: 'none',
-            zIndex: '1000',
-            left: '0',
-            backgroundColor: '#000',
-            ...(dropUpwards ? { bottom: '100%' } : { top: '100%' })
-        }
-    })
-    
-    // Function to update dropdown state
-    const updateDropdown = (newIndex) => {
-        currentSelectedIndex = newIndex
-        const [newLabel, newHandler] = buttons[newIndex]
-        
-        // Update label immediately
-        labelElement.innerHTML = newLabel
-        
-        // Update all button states
-        itemsContainer.childNodes.forEach((btn, index) => {
-            if (index === newIndex) {
-                btn.classList.add('disabled')
-            } else {
-                btn.classList.remove('disabled')
-            }
-        })
-        
-        // Close dropdown
-        itemsContainer.style.display = 'none'
-        
-        // Call the handler after updating UI (use setTimeout to ensure UI updates first)
-        if (newHandler) {
-            setTimeout(() => newHandler(), 0)
-        }
-    }
-    
-    // Create dropdown items
-    const dropdownButtons = []
-    buttons.forEach((btnData, index) => {
-        if (!btnData) return
-        
-        const [label, handler, disabled, classNames] = btnData
-        const btn = ce({
-            tag: 'div',
-            classNames: ['gameButton'],
-            innerHTML: label,
-            style: {
-                margin: '0',
-                width: '100%',
-                boxSizing: 'border-box'
-            }
-        })
-        
-        // Add custom class names if provided
-        if (classNames) {
-            if (Array.isArray(classNames)) {
-                classNames.forEach(cn => cn && btn.classList.add(cn))
-            } else {
-                btn.classList.add(classNames)
-            }
-        }
-        
-        // Disable if it's the currently selected item
-        if (index === currentSelectedIndex) {
-            btn.classList.add('disabled')
-        }
-        
-        // Handle clicks on dropdown items
-        btn.onclick = (e) => {
-            e.stopPropagation()
-            if (!btn.classList.contains('disabled')) {
-                updateDropdown(index)
-            }
-        }
-        
-        dropdownButtons.push(btn)
-        itemsContainer.appendChild(btn)
-    })
-    
-    // Measure the widest button after they're all added to the DOM
-    // Temporarily make container visible to measure
-    dropdownContainer.appendChild(labelElement)
-    dropdownContainer.appendChild(itemsContainer)
-    itemsContainer.style.display = 'block'
-    itemsContainer.style.visibility = 'hidden'
-    
-    // Add to body temporarily to measure
-    document.body.appendChild(dropdownContainer)
-    
-    let maxWidth = labelElement.offsetWidth
-    dropdownButtons.forEach(btn => {
-        maxWidth = Math.max(maxWidth, btn.offsetWidth)
-    })
-    
-    // Apply the max width to all elements
-    labelElement.style.width = maxWidth + 'px'
-    itemsContainer.style.width = maxWidth + 'px'
-    
-    // Hide the dropdown again
-    itemsContainer.style.display = 'none'
-    itemsContainer.style.visibility = 'visible'
-    document.body.removeChild(dropdownContainer)
-    
-    // Toggle dropdown when label is clicked
-    labelElement.onclick = (e) => {
-        e.stopPropagation()
-        const isOpen = itemsContainer.style.display === 'block'
-        itemsContainer.style.display = isOpen ? 'none' : 'block'
-    }
-    
-    // Close dropdown when clicking outside
-    document.addEventListener('click', () => {
-        itemsContainer.style.display = 'none'
-    })
-    
-    return dropdownContainer
-}
 
 function createColumnLayout(columnItems = []) {
     const children = columnItems.map(item => ce({
-        className: 'gameColumn',
+        classNames: ['gameColumn'],
         children: [item]
     }))
 
     return ce({
-        className: 'gameColumns',
+        classNames: ['gameColumns'],
         children: children
     })
 }

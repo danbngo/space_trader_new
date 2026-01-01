@@ -62,10 +62,10 @@ class AntimatterGridNews extends News {
     isValid() {
         const {planet: p} = this
         // Requires very high tech and good safety standards
-        const ratingsValid = p.c.technology > CL.VERY_HIGH
-            && p.c.security > CL.SLIGHTLY_HIGH
-            && p.c.wealth > CL.SLIGHTLY_HIGH
-            && p.c.reserves > CL.SLIGHTLY_HIGH
+        const ratingsValid = p.c.technology > CL.HIGH
+            && p.c.security > CL.MEDIUM
+            && p.c.wealth > CL.MEDIUM
+            && p.c.reserves > CL.SLIGHTLY_LOW
         return ratingsValid
     }
 }

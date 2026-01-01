@@ -7,6 +7,9 @@
 const NEWS_TYPE_CLASSES = [
     [NT.ADDICTION, AddictionNews],
     [NT.ALLIANCE, AllianceNews],
+    [NT.ALLIANCE_RELIGIOUS, AllianceReligiousNews],
+    [NT.ALLIANCE_GOVERNMENT, AllianceGovernmentNews],
+    [NT.ALLIANCE_ETHNIC, AllianceEthnicNews],
     [NT.ARMS_DEAL, ArmsDealNews],
     [NT.BLOCKADE, BlockadeNews],
     [NT.CIVIL_STRIFE, CivilStrifeNews],
@@ -107,6 +110,10 @@ const NEWS_TYPE_CLASSES = [
     [NT.MUTATIONS, MutationsNews],
     [NT.TERRORISM, TerrorismNews],
     [NT.TENSIONS, TensionsNews],
+    [NT.TENSIONS_RELIGIOUS, TensionsReligiousNews],
+    [NT.TENSIONS_ETHNIC, TensionsEthnicNews],
+    [NT.TENSIONS_ECONOMIC, TensionsEconomicNews],
+    [NT.TENSIONS_BORDERS, TensionsBordersNews],
     [NT.TERRAFORMING, TerraformingNews],
     [NT.TOURISM, TourismNews],
     [NT.TRADE_AGREEMENT, TradeAgreementNews],
@@ -139,7 +146,7 @@ const META_NEWS_TYPE_CLASSES_ARRAY = Object.freeze(META_NEWS_TYPE_CLASSES.map(pa
  */
 function generateNews(attemptsRemaining = 100, weights = []) {//only needs to be computed once) {
     // Exclude dwarf planets - they are small outposts that don't trigger major news events
-    const planets = PLANETS.filter(p => !isDwarfPlanet(p))
+    const planets = gs.system.planets
     if (planets.length === 0) return null // No valid planets
     const planet = rndMember(planets)
     const targetPlanet = rndMember(planets.filter(p=>(p !== planet)))

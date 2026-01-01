@@ -151,6 +151,8 @@ function showOutfitterMenu(outfitter = new Outfitter()) {
             `<br/><b>Your Equipment (Tools & Headgear):</b><br/>`,
             createPlayerEquipmentTable(),
             `<br/>Your Credits: ${gs.credits}CR`,
+            planet.civilization ? `<br/>Inflation: ${statColorSpan(roundToPlaces(100*planet.c.inflation, 2), 2/(1+planet.c.inflation))}%`
+            +` | Tax Rate: ${statColorSpan(roundToPlaces(100*planet.c.taxes, 2), 2/(1+planet.c.taxes))}%` : '',
         ]
     })
 
@@ -165,4 +167,9 @@ function showOutfitterMenu(outfitter = new Outfitter()) {
             return nextOutfitter ? showOutfitterMenu(nextOutfitter) : showPlanetMenu(nextPlanet);
         }
     );
+    
+    // Auto-select first equipment
+    if (outfitter.inventory.length > 0) {
+        onSelectEquipment(outfitter.inventory[0])
+    }
 }

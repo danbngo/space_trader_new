@@ -119,9 +119,9 @@ class SpaceStationNews extends News {
     isValid() {
         const {planet: p} = this
         // Check if initiator planet is suitable
-        const ratingsValid = p.c.technology > CL.HIGH 
-            && p.c.education > CL.HIGH
-            && p.c.wealth > CL.SLIGHTLY_HIGH
+        const ratingsValid = p.c.technology > CL.SLIGHTLY_HIGH 
+            && p.c.education > CL.SLIGHTLY_HIGH
+            && p.c.wealth > CL.MEDIUM
         
         // Need at least 2 other planets to participate
         if (!ratingsValid || this.partners.length < 2) return false

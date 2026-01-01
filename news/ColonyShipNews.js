@@ -45,11 +45,11 @@ class ColonyShipNews extends News {
     isValid() {
         const {planet: p} = this
         // Requires very high tech, education, and sufficient resources
-        const ratingsValid = p.c.technology > CL.VERY_HIGH 
-            && p.c.education > CL.HIGH 
-            && p.c.wealth > CL.SLIGHTLY_HIGH 
-            && p.c.reserves > CL.SLIGHTLY_HIGH
-            && p.c.industry > CL.SLIGHTLY_HIGH
+        const ratingsValid = p.c.technology > CL.HIGH 
+            && p.c.education > CL.SLIGHTLY_HIGH 
+            && p.c.wealth > CL.MEDIUM 
+            && p.c.reserves > CL.SLIGHTLY_LOW
+            && p.c.industry > CL.MEDIUM
         return ratingsValid
     }
 }

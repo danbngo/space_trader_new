@@ -24,55 +24,55 @@ class FactionType {
 
 const FACTION_TYPES = {
     MINERS: new FactionType(
-        'Miners Guild',
+        'Miners',
         '⛏️',
         COLORS.Brown,
         'Independent miners extracting resources from asteroid belts and planetary surfaces.'
     ),
     MERCHANTS: new FactionType(
-        'Merchant League',
+        'Merchants',
         '💰',
         COLORS.Yellow,
         'Lawful traders moving legal goods between settled worlds.'
     ),
     SMUGGLERS: new FactionType(
-        'Smuggler Syndicate',
+        'Smugglers',
         '📦',
-        hexToRgba('#ff9900'),
+        COLORS.DarkOrange,
         'Black market traders dealing in illicit and restricted cargo.'
     ),
     PIRATES: new FactionType(
-        'Pirate Clans',
+        'Pirates',
         '☠️',
         COLORS.LightRed,
         'Ruthless outlaws who prey on merchant vessels and settlements.'
     ),
     POLICE: new FactionType(
-        'System Police',
+        'Police',
         '👮',
         COLORS.LightBlue,
         'Law enforcement maintaining order and security in civilized space.'
     ),
     SOLDIERS: new FactionType(
-        'Planetary Defense Forces',
+        'Military',
         '⚔️',
         COLORS.LightGreen,
         'Military forces protecting planets and enforcing government authority.'
     ),
     BOUNTY_HUNTERS: new FactionType(
-        'Bounty Hunters Guild',
+        'Bounty Hunters',
         '🎯',
         hexToRgba('#ff6600'),
         'Professional trackers and hunters who capture criminals for profit.'
     ),
     TOURISTS: new FactionType(
-        'Tourist Bureau',
+        'Tourists',
         '🎭',
         COLORS.LightOrange,
         'Pleasure cruisers and sightseers traveling the galaxy for leisure.'
     ),
     SLAVERS: new FactionType(
-        'Slaver Cartels',
+        'Slavers',
         '⛓️',
         COLORS.DarkRed,
         'Ruthless criminals who capture and enslave crews. They are feared throughout the galaxy.'
@@ -82,6 +82,12 @@ const FACTION_TYPES = {
         '🏘️',
         COLORS.LightGreen,
         'Settlers traveling to establish new colonies. They prefer to avoid trouble and focus on their mission.'
+    ),
+    SCIENTISTS: new FactionType(
+        'Scientists',
+        '🔬',
+        COLORS.Cyan,
+        'Researchers and explorers seeking knowledge and studying the mysteries of the universe.'
     ),
 }
 

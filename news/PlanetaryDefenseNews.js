@@ -43,9 +43,9 @@ class PlanetaryDefenseNews extends News {
     isValid() {
         const {planet: p} = this
         // Requires decent tech, military, and resources
-        const ratingsValid = p.c.technology > CL.SLIGHTLY_HIGH 
-            && p.c.navy > CL.SLIGHTLY_HIGH
-            && p.c.wealth > CL.SLIGHTLY_HIGH
+        const ratingsValid = p.c.technology > CL.MEDIUM 
+            && p.c.navy > CL.MEDIUM
+            && p.c.wealth > CL.MEDIUM
             && p.c.reserves > CL.SLIGHTLY_LOW
         return ratingsValid
     }

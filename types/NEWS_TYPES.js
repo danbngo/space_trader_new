@@ -40,6 +40,9 @@ class NewsType {
 const NT = {
     ADDICTION: new NewsType('Addiction', NF.HEALTH_HAZARD, 3, 8, 1, [], [], [GT.POLICE_STATE]),
     ALLIANCE: new NewsType('Alliance', NF.GEOPOLITICS, 10, 40, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.DEMOCRACY], []), //two neutral planets become allies
+    ALLIANCE_RELIGIOUS: new NewsType('Religious Alliance', NF.GEOPOLITICS, 10, 40, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.THEOCRACY, GT.DEMOCRACY], []), //two neutral planets with same state religion
+    ALLIANCE_GOVERNMENT: new NewsType('Political Alliance', NF.GEOPOLITICS, 10, 40, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.DEMOCRACY, GT.ARISTOCRACY], []), //two neutral planets with same government type
+    ALLIANCE_ETHNIC: new NewsType('Ethnic Alliance', NF.GEOPOLITICS, 10, 40, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.DEMOCRACY], []), //two neutral planets with same majority ethnicity
     ARMS_DEAL: new NewsType('Arms Deal', NF.GEOPOLITICS, 2, 5, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.CORPORATISM], []), //one planet sends military equipment to another
     CIVIL_STRIFE: new NewsType('Civil Strife', NF.UNREST, 3, 8, 1, [GT.POLICE_STATE], [], []),
     CIVIL_WAR: new NewsType('Civil War', NF.UNREST, 3, 15, 1, [GT.ANARCHY, GT.PUPPET_STATE], [], []),
@@ -140,6 +143,10 @@ const NT = {
     MUTATIONS: new NewsType('Mutations', NF.HEALTH_HAZARD, 5, 15, 1, [], [], []),
     TERRORISM: new NewsType('Terrorism', NF.CRIME, 5, 15, 1, [GT.DEMOCRACY, GT.PUPPET_STATE], [GT.POLICE_STATE, GT.THEOCRACY, GT.ANARCHY], [GT.POLICE_STATE]),
     TENSIONS: new NewsType('Tensions', NF.GEOPOLITICS, 5, 40, 1, [GT.PUPPET_STATE, GT.ANARCHY], [], []), //two neutral planets have relations changed to hostile
+    TENSIONS_RELIGIOUS: new NewsType('Religious Tensions', NF.GEOPOLITICS, 5, 40, 1, [GT.PUPPET_STATE, GT.ANARCHY], [], []), //two neutral planets with different state religions and majority religions
+    TENSIONS_ETHNIC: new NewsType('Ethnic Tensions', NF.GEOPOLITICS, 5, 40, 1, [GT.PUPPET_STATE, GT.ANARCHY], [], []), //two neutral planets with different majority races
+    TENSIONS_ECONOMIC: new NewsType('Economic Tensions', NF.GEOPOLITICS, 5, 40, 1, [GT.PUPPET_STATE, GT.ANARCHY], [], []), //the two strongest economies clash
+    TENSIONS_BORDERS: new NewsType('Border Tensions', NF.GEOPOLITICS, 5, 40, 1, [GT.PUPPET_STATE, GT.ANARCHY], [], []), //two nearby planets with large territories
     TERRAFORMING: new NewsType('Terraforming', NF.SCIENCE, 5, 40, 1, [], [GT.TECHNOCRACY, GT.CORPORATISM], []), //two neutral planets have relations changed to hostile
     TOURISM: new NewsType('Tourism', NF.CULTURE, 3, 8, 1, [], [GT.DEMOCRACY, GT.CORPORATISM], []),
     TRADE_AGREEMENT: new NewsType('Trade Agreement', NF.GEOPOLITICS, 10, 20, 1, [], [GT.CORPORATISM, GT.DEMOCRACY], []), //two neutral or allied planets have improved trade relations
@@ -160,8 +167,10 @@ const NT = {
 const NT_ALL = Object.values(NT)
 //dont include tensions below, not hostile enough
 const NT_WARLIKE = [NT.WAR, NT.WAR_ALLY, NT.WAR_BOMBARDMENT, NT.WAR_HUMAN_WAVE, NT.WAR_INVASION, NT.WAR_OFFENSIVE, NT.WAR_SABOTAGE, NT.WAR_SCORCHED_EARTH, NT.WAR_SUBJUGATION, NT.WAR_SURRENDER]
-const NT_COOPERATION_PREVENTING = [...NT_WARLIKE, NT.BLOCKADE, NT.TENSIONS, NT.COUP_DETAT, NT.PLAGUE, NT.PLAGUE_SPREAD, NT.DEPORTATION]
-const NT_COOPERATIVE = [NT.ALLIANCE, NT.TRADE_AGREEMENT, NT.RESEARCH_AGREEMENT, NT.INVESTMENT, NT.ARMS_DEAL, NT.SPACE_STATION]
+const NT_TENSIONS_ALL = [NT.TENSIONS, NT.TENSIONS_RELIGIOUS, NT.TENSIONS_ETHNIC, NT.TENSIONS_ECONOMIC, NT.TENSIONS_BORDERS]
+const NT_ALLIANCE_ALL = [NT.ALLIANCE, NT.ALLIANCE_RELIGIOUS, NT.ALLIANCE_GOVERNMENT, NT.ALLIANCE_ETHNIC]
+const NT_COOPERATION_PREVENTING = [...NT_WARLIKE, NT.BLOCKADE, ...NT_TENSIONS_ALL, NT.COUP_DETAT, NT.PLAGUE, NT.PLAGUE_SPREAD, NT.DEPORTATION]
+const NT_COOPERATIVE = [...NT_ALLIANCE_ALL, NT.TRADE_AGREEMENT, NT.RESEARCH_AGREEMENT, NT.INVESTMENT, NT.ARMS_DEAL, NT.SPACE_STATION]
 const NT_MARTIAL = [...NT_WARLIKE, NT.MILITARY_BUILDUP, NT.BLOCKADE, NT.CIVIL_WAR, NT.ARMS_DEAL, NT.COUP_DETAT]
 const NT_DANGEROUS = [...NT_WARLIKE, NT.CIVIL_WAR, NT.CIVIL_STRIFE, NT.COUP_DETAT, NT.PLAGUE, NT.PLAGUE_SPREAD, NT.ENVIRONMENTAL_DISASTER]
 const NT_ECONOMY_PREVENTING = [NT.DEPRESSION, NT.SCARCITY, NT.PLAGUE, NT.ENVIRONMENTAL_DISASTER, NT.BLOCKADE, NT.STOCK_MARKET_CRASH, NT.LABOR_STRIKES]

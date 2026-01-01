@@ -6,7 +6,7 @@
 function generateCivilization(planet = new Planet()) {
     const governmentType = rndMember(GT_ALL.filter(gt => gt != GT.PUPPET_STATE))
     // Dwarf planets are small outposts with reduced stats (0.25x)
-    const dwarfMultiplier = isDwarfPlanet(planet) ? 0.25 : 1.0
+    const dwarfMultiplier = !(gs.system.planets.includes(planet)) ? 1 : 0.25
     const technology = rng(4,1,false)/2 * dwarfMultiplier
     const education = rng(4,1,false)/2 * dwarfMultiplier
     const population = rng(8,1,false)/4 * dwarfMultiplier
@@ -59,7 +59,7 @@ function generateCivilization(planet = new Planet()) {
     )
 
     // Generate random race demographics
-    const races = new Map()
+    const races = new CountsMap()
     const numRaces = rng(3, 1) // 1-3 races present
     const selectedRaces = rndMembers(RACES_ALL, numRaces, true)
     
@@ -72,8 +72,11 @@ function generateCivilization(planet = new Planet()) {
     // Normalize to sum to 1.0
     const totalWeight = weights.reduce((sum, w) => sum + w, 0)
     for (let i = 0; i < selectedRaces.length; i++) {
-        races.set(selectedRaces[i], weights[i] / totalWeight)
+        races.setAmount(selectedRaces[i], weights[i] / totalWeight)
     }
+    
+    // Ensure normalized
+    races.normalize()
 
     // Generate random religion demographics from star system religions
     const religions = new CountsMap()
@@ -98,6 +101,13 @@ function generateCivilization(planet = new Planet()) {
             }
         }
         
+        // Add AGNOSTICISM and ATHEISM to the mix
+        selectedReligions.push(RELIGION_AGNOSTICISM)
+        religionWeights.push(Math.random() * 3 + 1) // 1-4 weight for agnostics
+        
+        selectedReligions.push(RELIGION_ATHEISM)
+        religionWeights.push(Math.random() * 3 + 1) // 1-4 weight for atheists
+        
         // Normalize to sum to 1.0
         const totalReligionWeight = religionWeights.reduce((sum, w) => sum + w, 0)
         for (let i = 0; i < selectedReligions.length; i++) {
@@ -109,7 +119,7 @@ function generateCivilization(planet = new Planet()) {
     }
 
     return new Civilization({
-        planet, governmentType, cargoPriceMultipliers, technology, education, territory, population,
+        planet, governmentType, cargoPriceMultipliers, skillPriceMultipliers, technology, education, territory, population,
          army, navy, industry, economy, security, culture, prestige, corruption, crime, policies,
          wealth, reserves, inflation, taxes, races, religions, stateReligion
     })

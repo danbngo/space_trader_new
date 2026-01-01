@@ -13,7 +13,7 @@ function createAcademyHireOfficerMenu(officers = [new Officer()], academy = new 
     for (const officer of officers) {
         const hirePrice = academy.calcHirePrice(officer)
         const implantCount = officer.implants.length
-        const raceDisplay = officer.race ? `${officer.race.icon} ${officer.race.name}` : 'Human'
+        const raceDisplay = officer.race ? `${officer.race.symbol} ${officer.race.name}` : 'Human'
         rows.push([
             officer.name,
             raceDisplay,
@@ -103,7 +103,7 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0],
         const infamyText = officer.infamy.total > 0 
             ? `<br/><b>Infamy:</b> ${officer.infamy.total} (${coloredName(officer.infamy.keys[0])})`
             : ''
-        const raceText = officer.race ? `${officer.race.icon} ${colorSpan(officer.race.name, officer.race.color)}` : 'Human'
+        const raceText = officer.race ? `${officer.race.symbol} ${colorSpan(officer.race.name, officer.race.color)}` : 'Human'
         
         showModal(
             `Hire ${officer.name}?`,
@@ -191,5 +191,11 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0],
 
     if (selectedSkill && !showHiring) {
         onSelectSkill(selectedSkill);
+    } else if (!showHiring && SKILLS_ALL.length > 0) {
+        // Auto-select first skill if showing training and no skill selected
+        onSelectSkill(SKILLS_ALL[0]);
+    } else if (showHiring && !selectedSkill && academy.officers.length > 0) {
+        // Auto-select first officer if showing hiring and no selection
+        onSelectOfficer(academy.officers[0]);
     }
 }
