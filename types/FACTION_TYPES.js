@@ -11,14 +11,18 @@
  * @property {string} symbol - The symbol representing the faction.
  * @property {number[]} color - The color associated with the faction.
  * @property {string} description - A brief description of the faction.
+ * @property {boolean} criminal
+ * @property {boolean} authority
  * @constructor
  */
 class FactionType {
-    constructor(name = '', symbol = '', color = COLORS.White, description = '') {
+    constructor(name = '', symbol = '', color = COLORS.White, description = '', criminal = false, authority = false) {
         this.name = name;
         this.symbol = symbol;
         this.color = color;
         this.description = description;
+        this.criminal = criminal;
+        this.authority = authority;
     }
 }
 
@@ -39,25 +43,33 @@ const FACTION_TYPES = {
         'Smugglers',
         '📦',
         COLORS.DarkOrange,
-        'Black market traders dealing in illicit and restricted cargo.'
+        'Black market traders dealing in illicit and restricted cargo.',
+        true,  // criminal
+        false  // authority
     ),
     PIRATES: new FactionType(
         'Pirates',
         '☠️',
         COLORS.LightRed,
-        'Ruthless outlaws who prey on merchant vessels and settlements.'
+        'Ruthless outlaws who prey on merchant vessels and settlements.',
+        true,  // criminal
+        false  // authority
     ),
     POLICE: new FactionType(
         'Police',
         '👮',
         COLORS.LightBlue,
-        'Law enforcement maintaining order and security in civilized space.'
+        'Law enforcement maintaining order and security in civilized space.',
+        false, // criminal
+        true   // authority
     ),
     SOLDIERS: new FactionType(
         'Military',
         '⚔️',
         COLORS.LightGreen,
-        'Military forces protecting planets and enforcing government authority.'
+        'Military forces protecting planets and enforcing government authority.',
+        false, // criminal
+        true   // authority
     ),
     BOUNTY_HUNTERS: new FactionType(
         'Bounty Hunters',
@@ -75,7 +87,9 @@ const FACTION_TYPES = {
         'Slavers',
         '⛓️',
         COLORS.DarkRed,
-        'Ruthless criminals who capture and enslave crews. They are feared throughout the galaxy.'
+        'Ruthless criminals who capture and enslave crews. They are feared throughout the galaxy.',
+        true,  // criminal
+        false  // authority
     ),
     COLONISTS: new FactionType(
         'Colonists',

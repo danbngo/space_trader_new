@@ -8,8 +8,9 @@ class Race {
      * @param {number[]} color - The color associated with this race.
      * @param {string} symbol - The symbol/emoji for this race.
      * @param {string} description - A description of the race.
+     * @param {number} weight - The selection weight for this race (higher = more common).
      */
-    constructor(name = '', color = COLORS.White, symbol = '👤', description = '') {
+    constructor(name = '', color = COLORS.White, symbol = '👤', description = '', weight = 1) {
         /** @type {string} */
         this.name = name
         /** @type {number[]} */
@@ -18,6 +19,8 @@ class Race {
         this.symbol = symbol
         /** @type {string} */
         this.description = description
+        /** @type {number} */
+        this.weight = weight
     }
 }
 
@@ -26,25 +29,29 @@ const RACES = {
         'Human',
         COLORS.Tan,
         '👤',
-        'Baseline humanity, unmodified and unaugmented. Versatile and adaptable.'
+        'Baseline humanity, unmodified and unaugmented. Versatile and adaptable.',
+        2 // 2x more common than other races
     ),
     ANDROID: new Race(
         'Android',
         COLORS.LightBlue,
         '🤖',
-        'Fully synthetic beings with artificial intelligence. Precise and logical.'
+        'Fully synthetic beings with artificial intelligence. Precise and logical.',
+        1
     ),
     CYBORG: new Race(
         'Cyborg',
         COLORS.Silver,
         '⚙️',
-        'Humans extensively augmented with cybernetic implants. Enhanced strength and processing.'
+        'Humans extensively augmented with cybernetic implants. Enhanced strength and processing.',
+        1
     ),
     POSTHUMAN: new Race(
         'Posthuman',
         COLORS.Purple,
         '🧬',
-        'Genetically modified humans with enhanced traits. Superior intellect and longevity.'
+        'Genetically modified humans with enhanced traits. Superior intellect and longevity.',
+        1
     ),
 }
 

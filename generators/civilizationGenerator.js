@@ -61,12 +61,28 @@ function generateCivilization(planet = new Planet()) {
     // Generate random race demographics
     const races = new CountsMap()
     const numRaces = rng(3, 1) // 1-3 races present
-    const selectedRaces = rndMembers(RACES_ALL, numRaces, true)
     
-    // Generate random weights
+    // Use weighted selection based on race.weight property
+    const selectedRaces = []
+    for (let i = 0; i < numRaces; i++) {
+        // Create weighted pool
+        const weightedPool = []
+        for (const race of RACES_ALL) {
+            // Skip if already selected (unless it's the first selection)
+            if (i > 0 && selectedRaces.includes(race)) continue
+            // Add race multiple times based on weight
+            for (let w = 0; w < race.weight; w++) {
+                weightedPool.push(race)
+            }
+        }
+        selectedRaces.push(rndMember(weightedPool))
+    }
+    
+    // Generate random population weights for selected races
     const weights = []
     for (let i = 0; i < selectedRaces.length; i++) {
-        weights.push(Math.random() * 10 + 1) // Random weight between 1-11
+        // Base random weight, then multiply by race weight for population distribution
+        weights.push((Math.random() * 10 + 1) * selectedRaces[i].weight)
     }
     
     // Normalize to sum to 1.0

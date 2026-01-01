@@ -95,14 +95,14 @@ const RELIGION_TRAITS = {
         'Provides aid to the needy. Increases population happiness and reduces crime.',
         COLORS.Pink
     ),
-    ATHEISTIC: new ReligionTrait(
-        'Atheistic',
-        'Rejects supernatural beliefs entirely. Increases technology and education but reduces culture.',
+    MATERIALIST: new ReligionTrait(
+        'Materialist',
+        'Focuses on the material world and scientific understanding. Increases technology and education.',
         COLORS.Gray
     ),
-    AGNOSTIC: new ReligionTrait(
-        'Agnostic',
-        'Questions the nature of divinity. Promotes critical thinking and scientific inquiry.',
+    RATIONALIST: new ReligionTrait(
+        'Rationalist',
+        'Values reason and logic over faith. Promotes critical thinking and scientific inquiry.',
         COLORS.LightGray
     ),
 }

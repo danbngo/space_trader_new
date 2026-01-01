@@ -8,15 +8,18 @@
 class Fleet extends SpaceObject {
     /**
      * @param {string} name - The name of the fleet.
+     * @param {FleetType} fleetType - The type of fleet
      * @param {number[]} color - The color of the fleet.
      * @param {number} x - The x-coordinate of the fleet's position.
      * @param {number} y - The y-coordinate of the fleet's position.
      * @param {Planet} planet - The planet the fleet starts at.
      */
-    constructor(name = "Unnamed", color = COLORS.White, x = 0, y = 0, planet = null) {
+    constructor(name = "Unnamed", fleetType = FLEET_TYPES_ALL[0], color = COLORS.White, x = 0, y = 0, planet = null) {
         super(name, color, FLEET_RADIUS, x, y);
         /** @type {Planet} */
         this.planet = planet;
+        /** @type {FleetType} */
+        this.fleetType = fleetType;
         /** @type {Ship} */
         this.flagship = null;
         /** @type {Ship[]} */
@@ -37,6 +40,8 @@ class Fleet extends SpaceObject {
         this.faction = null;
         /** @type {FleetAI} */
         this.fleetAI = null;
+        /** @type {number} */
+        this.angle = 0 //danmod this is temporary should get rid of it later
     }
 
     dock(planet) {

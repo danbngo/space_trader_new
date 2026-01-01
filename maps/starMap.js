@@ -84,6 +84,7 @@ class StarMap extends BaseMap {
             ['Captain', ()=>showCaptainSkillsMenu(), false, hasSkillPoints ? 'highlighted' : null],
             ['News', ()=>showNewsTimelineMenu(null, ()=>this.openAssistant())],
             ['Religions', ()=>showReligionsMenu(()=>this.openAssistant())],
+            ['Politics', ()=>showPoliticsMenu(()=>this.openAssistant())],
             ['Cancel', ()=>closeModal()],
         ])
     }
@@ -96,8 +97,8 @@ class StarMap extends BaseMap {
         const endYear = route?.endYear
         const yearsRemaining = describeTimespan(endYear-year)
 
-        /** @param {Planet|Waypoint} destination */
-        const planetLink = (destination)=> {
+        /** @param {SpaceObject|Waypoint} destination */
+        const destinationLink = (destination)=> {
             return ce({innerHTML: coloredName(destination), onClick: ()=>this.selectObject(destination), style: {color: colorArrToRgbaString(destination.color)}, classNames:['clickable-text']})
         }
 
@@ -111,11 +112,11 @@ class StarMap extends BaseMap {
                     style: {display:'flex', gap:'6px', paddingBottom:'8px'},
                     children: [
                         `→`,
-                        planetLink(destination),
+                        destinationLink(destination),
                         ` | Distance: ${distance} AU | ETA: ${yearsRemaining}`
                     ]
                 })
-                : location ? planetLink(location)
+                : location ? destinationLink(location)
                 : '(Space)',
             ]
         })

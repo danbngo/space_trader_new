@@ -5,81 +5,111 @@
 class FleetAI {
     /**
      * @param {Fleet} fleet - The fleet controlled by this AI.
-     * @param {Planet} homePlanet - The planet this fleet originated from.
-     * @param {Planet} destinationPlanet - The primary destination planet.
+     * @param {SpaceObject} home - The planet this fleet originated from.
      */
-    constructor(fleet = null, homePlanet = null, destinationPlanet = null) {
+    constructor(fleet = null, home = null) {
         /** @type {Fleet} */
         this.fleet = fleet;
-        /** @type {Planet} */
-        this.homePlanet = homePlanet;
-        /** @type {Planet} */
-        this.destinationPlanet = destinationPlanet;
         /** @type {SpaceObject} */
-        this.destination = destinationPlanet;
-        /** @type {boolean} */
-        this.shouldRemove = false;
+        this.home = home;
+        /** @type {SpaceObject} */
+        this.destination = this.calcDestination();
         /** @type {any} */
         this.target = null
+        this.voyageYearsRemaining = rng(this.fleet.fleetType.voyageMaxYears, this.fleet.fleetType.voyageMinYears);
     }
-
     /**
      * Updates AI behavior each game tick.
-     * @param {number} elapsedYears - Time elapsed since last tick.
      */
-    tick(elapsedYears = 0) {
+    tick(elapsedYears = 1) {
         if (!this.fleet || !this.destination) return;
-        
-        // Move fleet towards destination
-        this.moveTowardsDestination(elapsedYears);
-        
-        // Check if arrived at destination
-        if (this.hasArrivedAtDestination()) {
-            this.onArrival();
+        this.voyageYearsRemaining -= elapsedYears;
+        if (this.isNearHome()) {
+            this.onNearHome()
+            return
+        }
+        else if (this.isNearDestination()) {
+            this.onNearDestination();
+            return
+        }
+        else if (this.isNearTarget()) {
+            this.onNearTarget();
+            return
+        }
+        else {
+            if (this.voyageYearsRemaining > 0) {
+                const target = this.calcTarget()
+                if (target && (!this.fleet.route  || this.fleet.route.destination !== target)) {
+                    this.setTarget(target);
+                    return
+                }
+            }
+        }
+        if (!this.fleet.route) {
+            this.resumeVoyage()
         }
     }
+    /** @returns {Fleet|SpaceObject|null} */
+    calcTarget() {        
+        //override in subclasses
+        return null
+    }
+    /** @returns {SpaceObject|null} */
+    calcDestination() {
+        return rndMember(gs.system.planets.filter(p=>(p !== this.home)))
+    }
 
-    /**
-     * Moves fleet towards its current destination.
-     * @param {number} elapsedYears - Time elapsed.
-     */
-    moveTowardsDestination(elapsedYears = 0) {
-        if (!this.fleet || !this.destination) return;
-        
-        const dx = this.destination.x - this.fleet.x;
-        const dy = this.destination.y - this.fleet.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        
-        if (distance > 0.001) {
-            const speed = this.fleet.speed * elapsedYears;
-            const moveDistance = Math.min(speed, distance);
-            
-            this.fleet.x += (dx / distance) * moveDistance;
-            this.fleet.y += (dy / distance) * moveDistance;
-        }
+    setTarget(target) {
+        this.target = target
+        this.fleet.route = new Route(this.fleet, target)
     }
 
     /**
      * Checks if fleet has arrived at destination.
      * @returns {boolean}
      */
-    hasArrivedAtDestination() {
-        if (!this.fleet || !this.destination) return false;
-        
-        const dx = this.destination.x - this.fleet.x;
-        const dy = this.destination.y - this.fleet.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        
-        return distance < 0.01; // Within 0.01 AU
+    isNearDestination() {
+        return this.isNearby(this.destination)
+    }
+
+    isNearHome() {
+        return this.isNearby(this.home) && this.voyageYearsRemaining <= 0
+    }
+
+    isNearTarget() {
+        return this.isNearby(this.target)
+    }
+
+    isNearby(object = new SpaceObject()) {
+        if (!this.fleet.route || this.fleet.route.destination !== object) return false;
+        return calcDistance(this.fleet.x, this.fleet.y, object.x, object.y) < 0.1 // Within 0.01 AU
+    }
+
+    resumeVoyage() {
+        this.target = null
+        if (this.destination) this.fleet.route = new Route(this.fleet, this.destination)
+        else this.fleet.route = new Route(this.fleet, this.home)
     }
 
     /**
      * Called when fleet arrives at destination.
      */
-    onArrival() {
-        // Override in subclasses
+    onNearHome() {
+        this.removeFleet()
     }
 
+    onNearDestination() {
+        this.destination = null
+    }
+
+    onNearTarget() {
+        //override in subclass
+    }
+
+    removeFleet() {
+        console.log(`🗑️ Removing fleet ${this.fleet.name} (mission complete)`)
+        gs.system.fleets.splice(gs.system.fleets.indexOf(this.fleet), 1)
+    }
     /**
      * Finds nearest object of a given type.
      * @param {SpaceObject[]} objects - Array of space objects to search.
@@ -102,7 +132,6 @@ class FleetAI {
                 nearestDist = dist;
             }
         }
-        
         return nearest;
     }
 }

@@ -257,6 +257,13 @@ function applyStyle(element, style = {}) {
 }
 
 // utils.js or tableUtil.js
+/**
+ * @function createTable
+ * @param {any[][]} rows - 2D array representing table rows and cells.
+ * @param {(rowIndex: number) => void} onSelectRow - Callback when a row is selected.
+ * @param {number|null} firstSelectedIndex - Index of the row to be initially selected.
+ * @returns {HTMLTableElement} - The created table element.
+ */
 function createTable(rows = [ce()], onSelectRow = null, firstSelectedIndex = onSelectRow ? 0 : null) {
     const table = document.createElement("table");
     table.className = "ui-table";

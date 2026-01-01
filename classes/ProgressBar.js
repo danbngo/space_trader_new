@@ -10,7 +10,7 @@ class ProgressBar {
      * Creates a new progress bar
      * @param {Object} options - Configuration options
      * @param {string} options.id - Unique identifier for the progress bar
-     * @param {string} options.label - Text label to show (e.g., "Generating history" or "Humans")
+     * @param {string} [options.label] - Text label to show (e.g., "Generating history" or "Humans")
      * @param {number} [options.value=0] - Initial value (0-100)
      * @param {string} [options.fillColor] - Color for the fill (defaults to COLORS.Green)
      * @param {string} [options.bgColor] - Color for the background (defaults to COLORS.DarkGray)
@@ -23,7 +23,7 @@ class ProgressBar {
     constructor(options) {
         const {
             id,
-            label,
+            label = '',
             value = 0,
             fillColor = rgbArrayToString(COLORS.Green),
             bgColor = rgbArrayToString(COLORS.DarkGray),

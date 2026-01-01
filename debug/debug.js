@@ -126,7 +126,7 @@ function assessPlanetGroup(planets, groupName, includeNews = true) {
         }
 
         const newsTypesThatNeverHappened = Object.keys(newsTotalsPerType).filter(ntName => newsTotalsPerType[ntName] === 0)
-        console.log('!!!News types that never happened:', newsTypesThatNeverHappened.join(" | "))
+        //console.log('!!!News types that never happened:', newsTypesThatNeverHappened.join(" | "))
         console.log('')
 
         console.log('Total News Events Ever:', totalNews)
@@ -213,4 +213,8 @@ function assessPlanetGroup(planets, groupName, includeNews = true) {
     console.log('  Cargo Price Modifier (Normalized):', (averageCargoPriceModifier / MARKET_AVERAGE_CARGO_PRICE_MODIFIER).toFixed(4))
     console.log('  Skill Price Modifier (Normalized):', (averageSkillPriceModifier / ACADEMY_AVERAGE_SKILL_PRICE_MODIFIER).toFixed(4))
     console.log('')
+
+    console.log('-----------------------')
+    console.log('FINAL SOLAR SYSTEM STATE:')
+    console.log(gs.system)
 }

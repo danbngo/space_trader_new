@@ -36,7 +36,7 @@ function generateFleet(fleetType = rndMember(FLEET_TYPES_ALL), planet = new Plan
         console.log({ fleetType, planet, numShips, populationMod})
         throw new Error('generateFleet: No ships generated for fleetType '+fleetType.name)
     }
-    const fleet = new Fleet(fleetType.name, planet ? planet.color : COLORS.DarkGray, 0, 0)
+    const fleet = new Fleet(fleetType.name, fleetType, planet ? planet.color : COLORS.DarkGray, planet.x, planet.y)
     ships.forEach(s=>fleet.addShip(s))
     
     fleet.cargo = generateFleetCargo(fleet, fleetType)
@@ -49,13 +49,7 @@ function generateFleet(fleetType = rndMember(FLEET_TYPES_ALL), planet = new Plan
     // Assign AI to fleet
     const fleetAIType = getFleetAITypeForFleetType(fleetType)
     if (fleetAIType) {
-        // Pick a random destination planet (or null for miners who target asteroids)
-        let destinationPlanet = null
-        if (fleetType !== FLEET_TYPES.MINERS) {
-            const allPlanets = [...PLANETS, ...DWARF_PLANETS].filter(p => p !== planet)
-            destinationPlanet = allPlanets.length > 0 ? rndMember(allPlanets) : null
-        }
-        fleet.fleetAI = new fleetAIType.aiClass(fleet, planet, destinationPlanet)
+        fleet.fleetAI = new fleetAIType.aiClass(fleet, planet)
     }
 
     return fleet
@@ -67,6 +61,7 @@ function generateFleet(fleetType = rndMember(FLEET_TYPES_ALL), planet = new Plan
  * @param {Object} progress - Progress tracking object with completePercentage property.
  */
 async function addFleetActivity(numYears = 2, progress = {completePercentage: 0}) {
+    console.log(`Starting fleet activity simulation: ${numYears} years (${numYears * 52} weeks)`)
     let weeksSinceYield = 0
     const YIELD_EVERY_WEEKS = 5 // Yield control every 5 weeks
     const WEEKS_PER_YEAR = 52
@@ -74,13 +69,17 @@ async function addFleetActivity(numYears = 2, progress = {completePercentage: 0}
     const DAYS_PER_WEEK = 7
     const totalWeeks = numYears * WEEKS_PER_YEAR
     let currentWeek = 0
+    let fleetsSpawned = 0
+    const initialFleetCount = gs.system.fleets.length
     
     for (let w = 0; w < totalWeeks; w++) {
         currentWeek++
         weeksSinceYield++
         
         // Spawn fleets from planets
+        const fleetCountBefore = gs.system.fleets.length
         checkForFleetSpawning(DAYS_PER_WEEK)
+        fleetsSpawned += (gs.system.fleets.length - fleetCountBefore)
         
         // Tick NPC fleet AI (move fleets around)
         tickNPCFleets(YEARS_PER_WEEK)
@@ -101,6 +100,11 @@ async function addFleetActivity(numYears = 2, progress = {completePercentage: 0}
     // Final update to 100%
     progress.completePercentage = 100
     
-    console.log(`Fleet activity simulation complete: ${numYears} years, ${gs.system.fleets.length} fleets active`)
+    console.log(`Fleet activity simulation complete:`)
+    console.log(`  Duration: ${numYears} years (${totalWeeks} weeks)`)
+    console.log(`  Fleets spawned: ${fleetsSpawned}`)
+    console.log(`  Starting fleets: ${initialFleetCount}`)
+    console.log(`  Final active fleets: ${gs.system.fleets.length}`)
+    console.log(`  Net change: +${gs.system.fleets.length - initialFleetCount} fleets`)
 }
 

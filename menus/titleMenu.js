@@ -85,7 +85,7 @@ async function startNewGame() {
     
     // Show new modal for fleet activity simulation
     const FLEET_ACTIVITY_YEARS = 2
-    const activityProgressBar = new ProgressBar({id: 'fleet_activity_progress', label: 'Fleet Activity', value: 0})
+    const activityProgressBar = new ProgressBar({id: 'fleet_activity_progress', value: 0, width: 50})
     const activityElapsedTimeElement = ce({tag: 'div', id: 'fleet_elapsed_time', children: ['Elapsed time: 0.0s']})
     
     showModal(
@@ -104,6 +104,7 @@ async function startNewGame() {
     await new Promise(resolve => setTimeout(resolve, 10))
     
     // Simulate fleet activity with progress tracking
+    console.log('Beginning fleet activity simulation...')
     const activityProgress = {completePercentage: 0}
     const activityStartTime = performance.now()
     
@@ -118,6 +119,7 @@ async function startNewGame() {
     
     await addFleetActivity(FLEET_ACTIVITY_YEARS, activityProgress)
     
+    console.log('Fleet activity simulation finished')
     clearInterval(activityProgressInterval)
     closeModal()
 
@@ -151,7 +153,7 @@ async function startNewGame() {
     gs.fleet.autoAssignPilots()
 
     // Add player's fleet to system
-    gs.system.fleets = [gs.fleet];
+    gs.system.fleets.push(gs.fleet);
     // Initial planet setup
     gs.fleet.dock(rndMember(gs.system.planets));
 

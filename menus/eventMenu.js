@@ -440,12 +440,5 @@ function tickNPCFleets(elapsedYears = 1) {
         if (!fleet.fleetAI) continue
         
         fleet.fleetAI.tick(elapsedYears)
-        
-        // Remove fleets that have completed their missions
-        // (For now, just remove fleets that have arrived home - we can expand this later)
-        if (fleet.fleetAI.shouldRemove) {
-            console.log(`🗑️ Removing fleet ${fleet.name} (mission complete)`)
-            gs.system.fleets.splice(i, 1)
-        }
     }
 }

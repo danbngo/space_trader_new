@@ -3,7 +3,7 @@
 class Route {
     /**
      * @param {Fleet} fleet
-     * @param {Planet|Waypoint} destination
+     * @param {SpaceObject|Waypoint} destination
      * @param {number} startYear
      */
     constructor(fleet = new Fleet(), destination = new Planet(), startYear = gs.year) {
@@ -31,7 +31,7 @@ class Route {
      * 
      * @param {number} startYear 
      * @param {Fleet} fleet 
-     * @param {Planet|Waypoint} planet 
+     * @param {SpaceObject|Waypoint} planet 
      * @param {number} [samples] 
      * @param {number} [maxYears] 
      * @returns {{bestYearOffset: number, endPosition: [number, number], toX: number, toY: number, endYear: number, debug: Array}}  
