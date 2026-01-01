@@ -133,3 +133,11 @@ const CL = Object.freeze({
     NO_REGRESSION: 1,
     MEDIUM: 1
 })
+
+
+const CHASE_DISTANCES = Object.freeze({
+    NEAR: 2,
+    MEDIUM: 4,
+    FAR: 8,
+    EXTREME: 16
+})

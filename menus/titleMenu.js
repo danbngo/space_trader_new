@@ -84,7 +84,7 @@ async function startNewGame() {
     closeModal()
     
     // Show new modal for fleet activity simulation
-    const FLEET_ACTIVITY_YEARS = 0.1
+    const FLEET_ACTIVITY_YEARS = 2
     const activityProgressBar = new ProgressBar({id: 'fleet_activity_progress', value: 0, width: 50})
     const activityElapsedTimeElement = ce({tag: 'div', id: 'fleet_elapsed_time', children: ['Elapsed time: 0.0s']})
     
@@ -142,7 +142,8 @@ async function startNewGame() {
     // Create fleet
     gs.fleet = new Fleet(
         "Player Fleet",
-        FLEET_TYPES.ABANDONED_SHIP,
+        PLAYER_FLEET_TYPE,
+        PLAYER_FACTION_TYPE,
         COLORS.LightGray,
         0, 0,
     )

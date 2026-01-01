@@ -93,7 +93,7 @@ class StarSystem extends SpaceObject {
                 else {
                     fleet.route = undefined
                     fleet.location = undefined
-                    if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
+                    if (fleet == gs.fleet && currentMap && currentMap.togglePause) currentMap.togglePause(true)
                     if (currentMap && currentMap.selectObject && fleet == gs.fleet) currentMap.selectObject(fleet)
                 }
                 continue

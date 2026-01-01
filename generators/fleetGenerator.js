@@ -20,10 +20,11 @@ function generateFleetCargo(fleet = new Fleet(), fleetType = FLEET_TYPES_ALL[0])
 /**
  * Generates a complete fleet with ships and cargo.
  * @param {FleetType} fleetType - The type of fleet to generate.
+ * @param {FactionType|null} faction - The faction the fleet belongs to.
  * @param {Planet} planet - The planet the fleet is associated with.
  * @returns {Fleet} The generated fleet.
  */
-function generateFleet(fleetType = FLEET_TYPES_ALL[0], planet = new Planet()) {
+function generateFleet(fleetType = FLEET_TYPES_ALL[0], faction = null, planet = new Planet()) {
     const ships = []
     const populationMod = planet ? planet.c.population : 1
     const numShips = Math.ceil(0.1 + rng(fleetType.minShips*populationMod, fleetType.maxShips*populationMod))
@@ -36,16 +37,11 @@ function generateFleet(fleetType = FLEET_TYPES_ALL[0], planet = new Planet()) {
         console.log({ fleetType, planet, numShips, populationMod})
         throw new Error('generateFleet: No ships generated for fleetType '+fleetType.name)
     }
-    const fleet = new Fleet(fleetType.name, fleetType, planet ? planet.color : COLORS.DarkGray, planet.x, planet.y)
+    const fleet = new Fleet(`${planet ? planet.ianName+' ' : ''}${fleetType.name}`, fleetType, faction, planet ? planet.color : COLORS.DarkGray, planet.x, planet.y)
     ships.forEach(s=>fleet.addShip(s))
     
     fleet.cargo = generateFleetCargo(fleet, fleetType)
     
-    // Assign faction from fleet type
-    if (fleetType.faction) {
-        fleet.faction = fleetType.faction
-    }
-
     // Assign AI to fleet
     const fleetAIType = getFleetAITypeForFleetType(fleetType)
     if (fleetAIType) {

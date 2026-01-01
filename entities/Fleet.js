@@ -9,12 +9,13 @@ class Fleet extends SpaceObject {
     /**
      * @param {string} name - The name of the fleet.
      * @param {FleetType} fleetType - The type of fleet
+     * @param {FactionType|null} faction - The faction the fleet belongs to.
      * @param {number[]} color - The color of the fleet.
      * @param {number} x - The x-coordinate of the fleet's position.
      * @param {number} y - The y-coordinate of the fleet's position.
      * @param {Planet} planet - The planet the fleet starts at.
      */
-    constructor(name = "Unnamed", fleetType = FLEET_TYPES_ALL[0], color = COLORS.White, x = 0, y = 0, planet = null) {
+    constructor(name = "Unnamed", fleetType = FLEET_TYPES_ALL[0], faction = null, color = COLORS.White, x = 0, y = 0, planet = null) {
         super(name, color, FLEET_RADIUS, x, y);
         /** @type {Planet} */
         this.planet = planet;
@@ -36,8 +37,8 @@ class Fleet extends SpaceObject {
         this.location = null;
         /** @type {Route} */
         this.route = null //could be Route class
-        /** @type {FactionType} */
-        this.faction = null;
+        /** @type {FactionType|null} */
+        this.faction = faction;
         /** @type {FleetAI} */
         this.fleetAI = null;
         /** @type {number} */

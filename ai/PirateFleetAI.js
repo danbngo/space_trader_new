@@ -4,9 +4,8 @@
  * @extends FleetAI
  */
 class PirateFleetAI extends FleetAI {
-    calcTarget() {
-        const merchantFleets = (gs.system.fleets || []).filter(f => (f !== this.fleet && !f.faction.criminal && !f.faction.authority));
-        return this.findNearest(merchantFleets, 12);
+    calcValidTargets() {
+        return gs.system.fleets.filter(f => (f !== this.fleet && !f.faction.criminal && !f.faction.authority));
     }
     calcDestination() {
         return rndMember([...gs.system.dwarfPlanets].filter(p=>(p !== this.home)))

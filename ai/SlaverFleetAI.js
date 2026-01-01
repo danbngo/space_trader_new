@@ -4,9 +4,8 @@
  * @extends FleetAI
  */
 class SlaverFleetAI extends FleetAI {
-    calcTarget() {
-        const vulnerableFleets = (gs.system.fleets || []).filter(f => (f !== this.fleet && !f.faction.authority && !f.faction.criminal));
-        return this.findNearest(vulnerableFleets, 10);
+    calcValidTargets() {
+        return gs.system.fleets.filter(f => (f !== this.fleet && !f.faction.authority && !f.faction.criminal));
     }
     calcDestination() {
         return rndMember([...gs.system.dwarfPlanets].filter(p=>(p !== this.home)))

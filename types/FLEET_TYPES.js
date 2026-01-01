@@ -9,13 +9,12 @@ class FleetType {
      * @param {ShipType[]} shipTypes - The types of ships this fleet can contain.
      * @param {number} minShips - The minimum number of ships in this fleet type.
      * @param {number} maxShips - The maximum number of ships in this fleet type.
-     * @param {number} voyageMinYears - The minimum voyage years for this fleet type.
-     * @param {number} voyageMaxYears - The maximum voyage years for this fleet type.
      * @param {number} maxCredits - The maximum credits this fleet can carry.
      * @param {CargoType[]} cargoTypes - The types of cargo this fleet can carry.
-     * @param {FactionType|null} faction - The faction this fleet type belongs to.
+     * @param {number} voyageMinYears - The minimum voyage years for this fleet type.
+     * @param {number} voyageMaxYears - The maximum voyage years for this fleet type.
      */
-    constructor(name = '', shipTypes = [], minShips = 1, maxShips = 1, voyageMinYears = 1, voyageMaxYears = 5, maxCredits = 1, cargoTypes = [], faction = null) {
+    constructor(name = '', shipTypes = [], minShips = 1, maxShips = 1, maxCredits = 1, cargoTypes = [], voyageMinYears = 1, voyageMaxYears = 5, targetMaxDistance = Infinity) {
         /** @type {string} */
         this.name = name
         /** @type {ShipType[]} */
@@ -29,43 +28,50 @@ class FleetType {
         /** @type {number} */
         this.voyageMaxYears = voyageMaxYears
         /** @type {number} */
+        this.targetMaxDistance = targetMaxDistance
+        /** @type {number} */
         this.maxCredits = maxCredits
         /** @type {CargoType[]} */
         this.cargoTypes = cargoTypes
-        /** @type {FactionType|null} */
-        this.faction = faction
+    }
+}
+
+class PseudoFleetType extends FleetType {
+    constructor(name = '', shipTypes = [], minShips = 1, maxShips = 1, cargoTypes = []) {
+        super(name, shipTypes, minShips, maxShips, 0, cargoTypes, 0, 0)
     }
 }
 
 const FLEET_TYPES = {
-    POLICE: new FleetType('Police', [SHIP_TYPES.PATROL_SHIP], 1, 5, 2, 6, 500, [], FACTION_TYPES.POLICE),
-    PIRATES: new FleetType('Pirates', [SHIP_TYPES.FIGHTER, SHIP_TYPES.BATTLESHIP, SHIP_TYPES.SCOUT], 1, 5, 3, 8, 10000, CARGO_TYPES_ALL, FACTION_TYPES.PIRATES),
-    MERCHANTS: new FleetType('Merchants', [SHIP_TYPES.FREIGHTER, SHIP_TYPES.GUARD_SHIP], 1, 5, 4, 10, 10000, CARGO_TYPES_ALL.filter(ct=>(!ct.illegal)), FACTION_TYPES.MERCHANTS),
-    MINERS: new FleetType('Miners', [SHIP_TYPES.MINING_SHIP], 1, 3, 2, 5, 10000, [CARGO_TYPES.FOOD, CARGO_TYPES.WATER, CARGO_TYPES.METAL, CARGO_TYPES.ISOTOPES], FACTION_TYPES.MINERS),
-    BOUNTY_HUNTERS: new FleetType('Bounty Hunters', [SHIP_TYPES.DESTROYER, SHIP_TYPES.SCOUT], 1, 3, 3, 10, 2500, [], FACTION_TYPES.BOUNTY_HUNTERS),
-    SMUGGLERS: new FleetType('Smugglers', [SHIP_TYPES.BLOCKADE_RUNNER], 1, 3, 3, 8, 5000, [CARGO_TYPES.DRUGS, CARGO_TYPES.ANTIMATTER, CARGO_TYPES.WEAPONS], FACTION_TYPES.SMUGGLERS),
-    SLAVERS: new FleetType('Slavers', [SHIP_TYPES.FIGHTER, SHIP_TYPES.DESTROYER], 2, 4, 3, 7, 7000, [], FACTION_TYPES.SLAVERS),
-    SOLDIERS: new FleetType('Soldiers', [SHIP_TYPES.BATTLESHIP, SHIP_TYPES.DESTROYER, SHIP_TYPES.SCOUT, SHIP_TYPES.FIGHTER], 3, 7, 4, 12, 500, [CARGO_TYPES.WEAPONS], FACTION_TYPES.SOLDIERS),
-    //SCOUTING_PARTY: new FleetType('Scouting Party', [SHIP_TYPES.SCOUT], 1, 3, []),
-    TOURISTS: new FleetType('Tourists', [SHIP_TYPES.PASSENGER_SHIP, SHIP_TYPES.GUARD_SHIP], 1, 3, 5, 15, 10000, [], FACTION_TYPES.TOURISTS),
-    COLONISTS: new FleetType('Colonists', [SHIP_TYPES.PASSENGER_SHIP, SHIP_TYPES.GUARD_SHIP], 1, 3, 10, 20, 4000, [], FACTION_TYPES.COLONISTS),
-    SCIENTISTS: new FleetType('Scientists', [SHIP_TYPES.SCOUT], 1, 3, 3, 8, 3000, [CARGO_TYPES.RELICS, CARGO_TYPES.ISOTOPES, CARGO_TYPES.NANITES], FACTION_TYPES.SCIENTISTS),
-    //EXPLORERS: new FleetType('Explorers', [SHIP_TYPES.SCOUT, SHIP_TYPES.SHUTTLE], 1, 3, [CARGO_TYPES.MEDICINE, CARGO_TYPES.HOLOCUBES, CARGO_TYPES.NANITES]),
-    ABANDONED_SHIP: new FleetType('Abandoned Ship', [SHIP_TYPES.FREIGHTER, SHIP_TYPES.MINING_SHIP, SHIP_TYPES.PASSENGER_SHIP, SHIP_TYPES.BLOCKADE_RUNNER], 1, 1, 0, 0, 5000, CARGO_TYPES_ALL, null),
-    ASTEROIDS_STORM: new FleetType('Asteroid Storm', [ASTEROID_SHIP_TYPES.ASTEROID], 30, 50, 0, 0, 0, [CARGO_TYPES.FOOD, CARGO_TYPES.METAL, CARGO_TYPES.WATER, CARGO_TYPES.METAL, CARGO_TYPES.WATER, CARGO_TYPES.METAL, CARGO_TYPES.WATER, CARGO_TYPES.ISOTOPES], null),
-    ASTEROIDS_CALM: new FleetType('Asteroid Field', [ASTEROID_SHIP_TYPES.ASTEROID], 10, 20, 0, 0, 0, [CARGO_TYPES.FOOD, CARGO_TYPES.METAL, CARGO_TYPES.WATER, CARGO_TYPES.METAL, CARGO_TYPES.WATER, CARGO_TYPES.METAL, CARGO_TYPES.WATER, CARGO_TYPES.ISOTOPES], null),
-    CRYOIDS_STORM: new FleetType('Cryoid Storm', [ASTEROID_SHIP_TYPES.CRYOID], 30, 50, 0, 0, 0, [CARGO_TYPES.FOOD, CARGO_TYPES.METAL, CARGO_TYPES.WATER, CARGO_TYPES.WATER, CARGO_TYPES.WATER, CARGO_TYPES.ISOTOPES], null),
-    CRYOIDS_CALM: new FleetType('Cryoid Field', [ASTEROID_SHIP_TYPES.CRYOID], 10, 20, 0, 0, 0, [CARGO_TYPES.FOOD, CARGO_TYPES.METAL, CARGO_TYPES.WATER, CARGO_TYPES.WATER, CARGO_TYPES.WATER, CARGO_TYPES.ISOTOPES], null),
-    PLASMOIDS_STORM: new FleetType('Plasmoid Storm', [ASTEROID_SHIP_TYPES.PLASMOID], 30, 50, 0, 0, 0, [CARGO_TYPES.ANTIMATTER], null),
-    PLASMOIDS_CALM: new FleetType('Plasmoid Field', [ASTEROID_SHIP_TYPES.PLASMOID], 10, 20, 0, 0, 0, [CARGO_TYPES.ANTIMATTER], null),
-    MAGNETOIDS_STORM: new FleetType('Magnetoid Storm', [ASTEROID_SHIP_TYPES.MAGNETOID], 30, 50, 0, 0, 0, [CARGO_TYPES.ISOTOPES], null),
-    MAGNETOIDS_CALM: new FleetType('Magnetoid Field', [ASTEROID_SHIP_TYPES.MAGNETOID], 10, 20, 0, 0, 0, [CARGO_TYPES.ISOTOPES], null),
+    SOLDIERS: new FleetType('Soldiers', [SHIP_TYPES.BATTLESHIP, SHIP_TYPES.DESTROYER, SHIP_TYPES.SCOUT, SHIP_TYPES.FIGHTER], 3, 7, 500, [CARGO_TYPES.WEAPONS], 4, 12, CHASE_DISTANCES.NEAR),
+    POLICE: new FleetType('Police', [SHIP_TYPES.PATROL_SHIP], 1, 5, 500, [], 2, 6, CHASE_DISTANCES.FAR),
+    BOUNTY_HUNTERS: new FleetType('Bounty Hunters', [SHIP_TYPES.DESTROYER, SHIP_TYPES.SCOUT], 1, 3, 2500, [], 3, 10, CHASE_DISTANCES.FAR),
+
+    PIRATES: new FleetType('Pirates', [SHIP_TYPES.FIGHTER, SHIP_TYPES.BATTLESHIP, SHIP_TYPES.SCOUT], 1, 5, 10000, CARGO_TYPES_ALL, 3, 8, CHASE_DISTANCES.NEAR),
+    SLAVERS: new FleetType('Slavers', [SHIP_TYPES.FIGHTER, SHIP_TYPES.DESTROYER], 2, 4, 7000, [], 3, 7, CHASE_DISTANCES.NEAR),
+
+    MERCHANTS: new FleetType('Merchants', [SHIP_TYPES.FREIGHTER, SHIP_TYPES.GUARD_SHIP], 1, 5, 10000, CARGO_TYPES_ALL.filter(ct=>(!ct.illegal)), 4, 10),
+    MINERS: new FleetType('Miners', [SHIP_TYPES.MINING_SHIP], 1, 3, 10000, [CARGO_TYPES.FOOD, CARGO_TYPES.WATER, CARGO_TYPES.METAL, CARGO_TYPES.ISOTOPES], 2, 5, Infinity),
+    TOURISTS: new FleetType('Tourists', [SHIP_TYPES.PASSENGER_SHIP, SHIP_TYPES.GUARD_SHIP], 1, 3, 10000, [], 5, 15),
+    COLONISTS: new FleetType('Colonists', [SHIP_TYPES.PASSENGER_SHIP, SHIP_TYPES.GUARD_SHIP], 1, 3, 4000, [], 10, 20),
+    SCIENTISTS: new FleetType('Scientists', [SHIP_TYPES.SCOUT], 1, 3, 3000, [CARGO_TYPES.RELICS, CARGO_TYPES.ISOTOPES, CARGO_TYPES.NANITES], 3, 8),
+
+    SMUGGLERS: new FleetType('Smugglers', [SHIP_TYPES.BLOCKADE_RUNNER], 1, 3, 5000, [CARGO_TYPES.DRUGS, CARGO_TYPES.ANTIMATTER, CARGO_TYPES.WEAPONS], 3, 8),
+}
+
+const PSEUDO_FLEET_TYPES = {
+    ABANDONED_SHIP: new PseudoFleetType('Abandoned Ship', [SHIP_TYPES.FREIGHTER, SHIP_TYPES.MINING_SHIP, SHIP_TYPES.PASSENGER_SHIP, SHIP_TYPES.BLOCKADE_RUNNER], 1, 1, CARGO_TYPES_ALL),
+    ASTEROIDS_STORM: new PseudoFleetType('Asteroid Storm', [ASTEROID_SHIP_TYPES.ASTEROID], 30, 50, [CARGO_TYPES.FOOD, CARGO_TYPES.METAL, CARGO_TYPES.WATER, CARGO_TYPES.METAL, CARGO_TYPES.WATER, CARGO_TYPES.METAL, CARGO_TYPES.WATER, CARGO_TYPES.ISOTOPES]),
+    ASTEROIDS_CALM: new PseudoFleetType('Asteroid Field', [ASTEROID_SHIP_TYPES.ASTEROID], 10, 20, [CARGO_TYPES.FOOD, CARGO_TYPES.METAL, CARGO_TYPES.WATER, CARGO_TYPES.METAL, CARGO_TYPES.WATER, CARGO_TYPES.METAL, CARGO_TYPES.WATER, CARGO_TYPES.ISOTOPES]),
+    CRYOIDS_STORM: new PseudoFleetType('Cryoid Storm', [ASTEROID_SHIP_TYPES.CRYOID], 30, 50, [CARGO_TYPES.FOOD, CARGO_TYPES.METAL, CARGO_TYPES.WATER, CARGO_TYPES.WATER, CARGO_TYPES.WATER, CARGO_TYPES.ISOTOPES]),
+    CRYOIDS_CALM: new PseudoFleetType('Cryoid Field', [ASTEROID_SHIP_TYPES.CRYOID], 10, 20, [CARGO_TYPES.FOOD, CARGO_TYPES.METAL, CARGO_TYPES.WATER, CARGO_TYPES.WATER, CARGO_TYPES.WATER, CARGO_TYPES.ISOTOPES]),
+    PLASMOIDS_STORM: new PseudoFleetType('Plasmoid Storm', [ASTEROID_SHIP_TYPES.PLASMOID], 30, 50, [CARGO_TYPES.ANTIMATTER]),
+    PLASMOIDS_CALM: new PseudoFleetType('Plasmoid Field', [ASTEROID_SHIP_TYPES.PLASMOID], 10, 20, [CARGO_TYPES.ANTIMATTER]),
+    MAGNETOIDS_STORM: new PseudoFleetType('Magnetoid Storm', [ASTEROID_SHIP_TYPES.MAGNETOID], 30, 50, [CARGO_TYPES.ISOTOPES]),
+    MAGNETOIDS_CALM: new PseudoFleetType('Magnetoid Field', [ASTEROID_SHIP_TYPES.MAGNETOID], 10, 20, [CARGO_TYPES.ISOTOPES]),
     // Legacy names for backward compatibility
-    ASTEROIDS: new FleetType('Asteroids', [ASTEROID_SHIP_TYPES.ASTEROID], 30, 50, 0, 0, 0, [CARGO_TYPES.FOOD, CARGO_TYPES.METAL, CARGO_TYPES.WATER, CARGO_TYPES.METAL, CARGO_TYPES.WATER, CARGO_TYPES.METAL, CARGO_TYPES.WATER, CARGO_TYPES.ISOTOPES], null),
-    CRYOIDS: new FleetType('Cryoids', [ASTEROID_SHIP_TYPES.CRYOID], 30, 50, 0, 0, 0, [CARGO_TYPES.FOOD, CARGO_TYPES.METAL, CARGO_TYPES.WATER, CARGO_TYPES.WATER, CARGO_TYPES.WATER, CARGO_TYPES.ISOTOPES], null),
-    PLASMOIDS: new FleetType('Plasmoids', [ASTEROID_SHIP_TYPES.PLASMOID], 30, 50, 0, 0, 0, [CARGO_TYPES.ANTIMATTER], null),
-    MAGNETOIDS: new FleetType('Magnetoids', [ASTEROID_SHIP_TYPES.MAGNETOID], 30, 50, 0, 0, 0, [CARGO_TYPES.ISOTOPES], null),
 }
 
 const FLEET_TYPES_ALL = Object.values(FLEET_TYPES)
 
+const PLAYER_FLEET_TYPE = new FleetType('Player Fleet', [], 0, 0, 0, [], 0, 0)

@@ -369,54 +369,54 @@ function checkForFleetSpawning(elapsedDays = 1) {
         const spawnChances = []
         
         // Miners (influenced by industry)
-        spawnChances.push({ type: FLEET_TYPES.MINERS, weight: c.industry * 0.05 })
+        spawnChances.push({ type: FLEET_TYPES.MINERS, faction: FACTION_TYPES.MINERS, weight: c.industry * 0.05 })
         
         // Merchants (influenced by economy, blocked by isolationism)
         if (!hasIsolationism) {
-            spawnChances.push({ type: FLEET_TYPES.MERCHANTS, weight: c.economy * 0.05 })
+            spawnChances.push({ type: FLEET_TYPES.MERCHANTS, faction: FACTION_TYPES.MERCHANTS, weight: c.economy * 0.05 })
         }
         
         // Police (influenced by security and navy)
-        spawnChances.push({ type: FLEET_TYPES.POLICE, weight: (c.security + c.navy) * 0.03 })
+        spawnChances.push({ type: FLEET_TYPES.POLICE, faction: FACTION_TYPES.POLICE, weight: (c.security + c.navy) * 0.03 })
         
         // Soldiers (influenced by army, blocked by isolationism)
         if (!hasIsolationism) {
-            spawnChances.push({ type: FLEET_TYPES.SOLDIERS, weight: c.army * 0.02 })
+            spawnChances.push({ type: FLEET_TYPES.SOLDIERS, faction: FACTION_TYPES.SOLDIERS, weight: c.army * 0.02 })
         }
         
         // Pirates (influenced by crime, reduced by security)
         if (c.crime > c.security * 0.5) {
-            spawnChances.push({ type: FLEET_TYPES.PIRATES, weight: (c.crime / c.security) * 0.02 })
+            spawnChances.push({ type: FLEET_TYPES.PIRATES, faction: FACTION_TYPES.PIRATES, weight: (c.crime / c.security) * 0.02 })
         }
         
         // Smugglers (influenced by crime and corruption)
         if (c.crime > 0.3 || c.corruption > 0.3) {
-            spawnChances.push({ type: FLEET_TYPES.SMUGGLERS, weight: (c.crime + c.corruption) * 0.025 })
+            spawnChances.push({ type: FLEET_TYPES.SMUGGLERS, faction: FACTION_TYPES.SMUGGLERS, weight: (c.crime + c.corruption) * 0.025 })
         }
         
         // Bounty Hunters (influenced by crime)
         if (c.crime > 0.4) {
-            spawnChances.push({ type: FLEET_TYPES.BOUNTY_HUNTERS, weight: c.crime * 0.015 })
+            spawnChances.push({ type: FLEET_TYPES.BOUNTY_HUNTERS, faction: FACTION_TYPES.BOUNTY_HUNTERS, weight: c.crime * 0.015 })
         }
         
         // Tourists (influenced by culture)
-        spawnChances.push({ type: FLEET_TYPES.TOURISTS, weight: c.culture * 0.03 })
+        spawnChances.push({ type: FLEET_TYPES.TOURISTS, faction: FACTION_TYPES.TOURISTS, weight: c.culture * 0.03 })
         
         // Colonists (influenced by population and expansion desire)
         if (c.population > 0.5) {
-            spawnChances.push({ type: FLEET_TYPES.COLONISTS, weight: c.population * 0.01 })
+            spawnChances.push({ type: FLEET_TYPES.COLONISTS, faction: FACTION_TYPES.COLONISTS, weight: c.population * 0.01 })
         }
         
         // Slavers (influenced by crime and corruption, only in highly corrupt systems)
         if (c.crime > 0.7 && c.corruption > 0.5) {
-            spawnChances.push({ type: FLEET_TYPES.SLAVERS, weight: (c.crime + c.corruption) * 0.01 })
+            spawnChances.push({ type: FLEET_TYPES.SLAVERS, faction: FACTION_TYPES.SLAVERS, weight: (c.crime + c.corruption) * 0.01 })
         }
         
         // Roll for each potential fleet type
-        for (const { type, weight } of spawnChances) {
+        for (const { type, faction, weight } of spawnChances) {
             if (calcOccurrencesPerTimespan(weight, elapsedDays)) {
                 // Spawn the fleet
-                const fleet = generateFleet(type, planet)
+                const fleet = generateFleet(type, faction, planet)
                 fleet.color = planet.color
                 fleet.x = planet.x
                 fleet.y = planet.y

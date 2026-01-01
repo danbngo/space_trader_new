@@ -106,3 +106,5 @@ const FACTION_TYPES = {
 }
 
 const FACTION_TYPES_ALL = Object.values(FACTION_TYPES)
+
+const PLAYER_FACTION_TYPE = new FactionType('Player Faction', '🚀', COLORS.LightGray, 'The faction representing the player.')

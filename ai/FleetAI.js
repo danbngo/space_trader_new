@@ -39,10 +39,13 @@ class FleetAI {
         }
         else {
             if (this.voyageYearsRemaining > 0) {
-                const target = this.calcTarget()
-                if (target && (!this.fleet.route  || this.fleet.route.destination !== target)) {
-                    this.setTarget(target);
-                    return
+                const validTargets = this.calcValidTargets()
+                if (!this.target || !validTargets.includes(this.target)) { 
+                    const target = this.findNearest(validTargets, Infinity);
+                    if (target) {
+                        this.setTarget(target);
+                        return
+                    }
                 }
             }
         }
@@ -50,10 +53,10 @@ class FleetAI {
             this.resumeVoyage()
         }
     }
-    /** @returns {Fleet|SpaceObject|null} */
-    calcTarget() {        
+    /** @returns {Fleet[]|SpaceObject[]} */
+    calcValidTargets() {        
         //override in subclasses
-        return null
+        return []
     }
     /** @returns {SpaceObject|null} */
     calcDestination() {
@@ -123,7 +126,7 @@ class FleetAI {
      * @returns {SpaceObject|null}
      */
     findNearest(objects = [], maxDistance = Infinity) {
-        if (!this.fleet) return null;
+        if (!this.fleet || objects.length == 0) return null;
         
         let nearest = null;
         let nearestDist = maxDistance;

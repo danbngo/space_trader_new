@@ -4,9 +4,8 @@
  * @extends FleetAI
  */
 class ScientistFleetAI extends FleetAI {
-    calcTarget() {
-        const phenomena = gs.system.asteroids.filter(a=>a.parent.beltType == ASTEROID_BELT_TYPES.Icy && Math.random() < .2)
-        return this.findNearest(phenomena, 10);
+    calcValidTargets() {
+        return gs.system.asteroids.filter(a=>a.parent.beltType == ASTEROID_BELT_TYPES.Icy && Math.random() < .2)
     }
     calcDestination() {
         return rndMember([...gs.system.planets].filter(p=>(p !== this.home)))
