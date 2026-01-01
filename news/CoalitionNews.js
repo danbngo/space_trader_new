@@ -44,7 +44,7 @@ class CoalitionNews extends News {
     isValid() {
         const {planet: p} = this
         //more likely if REALLY REALLY high territory and military
-        const ratingsValid = p.c.territory > CL.HIGH && (p.c.army > CL.VERY_HIGH || p.c.navy > CL.VERY_HIGH)
+        const ratingsValid = p.c.territory > CL.HIGH && (p.c.army > CL.HIGH || p.c.navy > CL.HIGH)
         const [badNews] = News.calcRelationshipWorseningNews(p)
         const canFormCoalition = badNews.length >= 2
         return ratingsValid && canFormCoalition

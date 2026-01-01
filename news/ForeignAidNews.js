@@ -67,7 +67,7 @@ class ForeignAidNews extends News {
         //donor must have more wealth/reserves/economy than recipient
         const donorValid = tp.c.reserves > p.c.reserves && tp.c.wealth > p.c.wealth && tp.c.economy > p.c.economy
         //donor must have enough to spare
-        const donorCapable = tp.c.reserves > CL.HIGH && tp.c.wealth > CL.HIGH
+        const donorCapable = tp.c.reserves > CL.MEDIUM && tp.c.wealth > CL.MEDIUM
         //planets must be neutral or allied
         const relationshipValid = Civilization.areAlliesOrNeutral(p, tp)
         const interferingEvent = News.planetHasAnyNews(p, NT_ECONOMY_BOOSTING) || News.hasAnyNewsBidirectional(p, tp, NT_COOPERATION_PREVENTING)

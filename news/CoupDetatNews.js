@@ -78,8 +78,8 @@ class CoupDetatNews extends News {
 
     isValid() {
         const {planet: p, targetPlanet: tp} = this
-        // Aggressor must have high prestige, target must have lowER prestige
-        const ratingsValid = (p.c.prestige > CL.HIGH) && (p.c.security > CL.MEDIUM) && (p.c.security > tp.c.security)
+        // Aggressor must have high security, target must have lower security
+        const ratingsValid = (p.c.security > CL.SLIGHTLY_HIGH) && (p.c.security > tp.c.security)
         const relationshipsValid = Civilization.areTenseOrAtWar(p, tp)
         const interferingEvent = News.planetHasAnyNews(tp, NT_CRIME_PREVENTING)
         return ratingsValid && relationshipsValid && !interferingEvent

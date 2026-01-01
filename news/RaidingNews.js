@@ -72,7 +72,7 @@ class RaidingNews extends News {
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         // More likely if military is high and goods are low
-        const ratingsValid = p.c.military > CL.SLIGHTLY_HIGH && p.c.wealth < CL.MEDIUM && tp.c.military > CL.HIGH
+        const ratingsValid = p.c.military > CL.SLIGHTLY_HIGH && p.c.wealth < CL.MEDIUM && (p.c.military/tp.c.military) > CL.SLIGHTLY_HIGH
         const relationshipsValid = Civilization.areTenseOrAtWar(p, tp)
         return ratingsValid && relationshipsValid
     }

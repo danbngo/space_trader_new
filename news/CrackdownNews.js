@@ -38,9 +38,8 @@ class CrackdownNews extends News {
 
     isValid() {
         const {planet: p} = this
-        const crimeValid = (p.c.corruption > CL.HIGH || p.c.crime > CL.HIGH)
-        const securityValid = p.c.security < CL.HIGH
+        const ratingsValid = (p.c.corruption > CL.HIGH || p.c.crime > CL.HIGH)
         const interferingEvent = News.planetHasAnyNews(p, NT_CRIME_PREVENTING)
-        return crimeValid && securityValid && !interferingEvent
+        return ratingsValid && !interferingEvent
     }
 }

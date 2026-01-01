@@ -89,14 +89,13 @@ class ReligiousTurmoilNews extends News {
 
     isValid() {
         const {planet: p} = this
-        // Check if multiple religions have comparable ratios (within 20% of each other)
+        // Check if at least 2 religions have at least 0.1 proportion
         if (!p.c.religions || p.c.religions.counts.size < 2) return false
         
-        const proportions = Array.from(p.c.religions.counts.values()).sort((a, b) => b - a)
-        if (proportions.length < 2) return false
+        const proportions = Array.from(p.c.religions.counts.values())
+        const significantReligions = proportions.filter(prop => prop >= 0.1)
         
-        // Top two religions must be within 20% of each other
-        const hasCompetingFaiths = (proportions[0] - proportions[1]) < 0.2
+        const hasCompetingFaiths = significantReligions.length >= 2
         const interferingEvent = News.planetHasAnyNews(p, [...NT_GOVERNANCE_PREVENTING, NT.RELIGIOUS_TURMOIL])
         
         return hasCompetingFaiths && !interferingEvent

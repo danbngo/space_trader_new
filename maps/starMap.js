@@ -84,6 +84,7 @@ class StarMap extends BaseMap {
             ['Captain Overview', ()=>showCaptainSkillsMenu(), false, hasSkillPoints ? 'highlighted' : null],
             ['Perks', ()=>showCaptainPerksMenu(), false, hasPerkPoints ? 'highlighted' : null],
             ['Galactic News', ()=>showNewsTimelineMenu(null, ()=>this.openAssistant())],
+            ['Religions', ()=>showReligionsMenu(()=>this.openAssistant())],
             ['Cancel', ()=>closeModal()],
         ])
     }

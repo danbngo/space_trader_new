@@ -1,4 +1,34 @@
 /**
+ * Available symbols for religions. Will be assigned to religions as they are generated.
+ */
+const RELIGION_SYMBOLS = [
+    '✦', '☨', '✡', '☪', '☸', '☯', '✚', '⛤', '⛧', '☥',
+    '♰', '☩', '♱', '✟', '⚛', '☬', '🕉', '⛏', '⚕', '☀',
+    '🌙', '⭐', '✶', '✴', '✵', '✷', '✸', '❂', '✹', '❋',
+    '✺', '✻', '✼', '❃', '❊', '❉', '🔱', '⚜', '☄', '💫'
+];
+
+/**
+ * Tracks which symbols have been used for religions.
+ */
+let usedReligionSymbols = [];
+
+/**
+ * Gets an unused religion symbol from the available list.
+ * @returns {string} An unused symbol, or a random one if all are used.
+ */
+function getUnusedReligionSymbol() {
+    const available = RELIGION_SYMBOLS.filter(s => !usedReligionSymbols.includes(s));
+    if (available.length === 0) {
+        // All symbols used, just return a random one
+        return rndMember(RELIGION_SYMBOLS);
+    }
+    const symbol = rndMember(available);
+    usedReligionSymbols.push(symbol);
+    return symbol;
+}
+
+/**
  * Generates a procedural name for a religion.
  * @returns {string} The generated religion name.
  */
@@ -54,8 +84,9 @@ function generateReligion() {
     ];
     
     const color = rndMember(colorChoices);
+    const icon = getUnusedReligionSymbol();
     
-    return new Religion(name, traits, color);
+    return new Religion(name, traits, color, icon);
 }
 
 /**
@@ -64,6 +95,9 @@ function generateReligion() {
  * @returns {Religion[]} Array of generated religions.
  */
 function generateReligions(count = rng(3, 1)) {
+    // Reset used symbols for new system generation
+    usedReligionSymbols = [];
+    
     const religions = [];
     for (let i = 0; i < count; i++) {
         religions.push(generateReligion());

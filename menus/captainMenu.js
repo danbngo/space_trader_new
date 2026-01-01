@@ -227,19 +227,16 @@ function showCaptainReputationMenu() {
     const factionTable = createTable(factionTableRows)
 
     // Create side-by-side layout for ranks and faction reputation
-    const ranksAndFactionContainer = ce({
-        style: 'display: flex; gap: 2em; margin-top: 20px;',
-        children: [
-            ce({style: 'flex: 1;', children: [
-                ce({children: ['<b>Planetary Ranks</b>']}),
-                ranksTable
-            ]}),
-            ce({style: 'flex: 1;', children: [
-                ce({children: ['<b>Factional Reputation</b>']}),
-                factionTable
-            ]})
-        ]
-    })
+    const ranksAndFactionContainer = createColumnLayout([
+        ce({children: [
+            ce({children: ['<b>Planetary Ranks</b>']}),
+            ranksTable
+        ]}),
+        ce({children: [
+            ce({children: ['<b>Factional Reputation</b>']}),
+            factionTable
+        ]})
+    ])
 
     showModal(
         `Captain Reputation`,

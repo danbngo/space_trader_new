@@ -1,15 +1,15 @@
 /**
  * Displays information about all religions in the star system.
- * @param {Planet} planet - The planet from which the menu is accessed (for back navigation).
+ * @param {Function} backFunction - Function to call when back button is pressed.
  */
-function showReligionsMenu(planet = null) {
+function showReligionsMenu(backFunction = () => closeModal()) {
     const religions = RELIGIONS || []
     
     if (religions.length === 0) {
         showModal(
             'Religions Database',
             'No organized religions detected in this star system.',
-            [["Back", () => planet ? showAssistantMenu(planet) : closeModal()]]
+            [["Back", backFunction]]
         )
         return
     }
@@ -30,7 +30,7 @@ function showReligionsMenu(planet = null) {
                 ce({
                     tag: 'div',
                     style: 'font-weight: bold; margin-bottom: 5px; font-size: 1.1em;',
-                    children: ['✦ ', colorSpan(religion.name, religion.color)]
+                    children: [religion.icon + ' ', colorSpan(religion.name, religion.color)]
                 })
             ]
         })
@@ -70,23 +70,6 @@ function showReligionsMenu(planet = null) {
     showModal(
         'Religions Database',
         contentContainer,
-        [["Back", () => planet ? showAssistantMenu(planet) : closeModal()]]
-    )
-}
-
-/**
- * Shows the assistant/computer menu with various information access options.
- * @param {Planet} planet - The planet from which the assistant is accessed.
- */
-function showAssistantMenu(planet = new Planet()) {
-    const msg = `Welcome to the ${coloredName(planet)} information terminal. What would you like to access?`
-    
-    showModal(
-        'Assistant',
-        msg,
-        [
-            ["Religions", () => showReligionsMenu(planet)],
-            ["Back", () => showPlanetMenu(planet)]
-        ]
+        [["Back", backFunction]]
     )
 }

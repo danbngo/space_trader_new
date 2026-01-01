@@ -44,7 +44,7 @@ class ForcedLaborNews extends News {
     isValid() {
         const {planet: p} = this
         // More likely if industry is low (trying to industrialize)
-        const ratingsValid = p.c.industry < CL.LOW && p.c.corruption > CL.SLIGHTLY_HIGH
+        const ratingsValid = (p.c.industry < CL.SLIGHTLY_LOW) && (p.c.corruption > CL.MEDIUM)
         return ratingsValid
     }
 }

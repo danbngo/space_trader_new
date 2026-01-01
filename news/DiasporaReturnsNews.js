@@ -40,13 +40,8 @@ class DiasporaReturnsNews extends News {
     isValid() {
         const {planet: p} = this
         // Must have high score and no dangerous events
-        const highScore = p.c.score > CL.HIGH
-        const noDangerousEvents = !News.planetHasAnyNews(p, NT_DANGEROUS)
-        
-        // Must have economic capacity
-        const ratingsValid = p.c.economy > CL.SLIGHTLY_HIGH && p.c.population < CL.VERY_HIGH
-        
-        const interferingEvent = News.planetHasAnyNews(p, [NT.IMMIGRATION, NT.REFUGEES, NT.DEPORTATION, NT.ASYLUM_POLICY, NT.DIASPORA_RETURNS])
-        return highScore && noDangerousEvents && ratingsValid && !interferingEvent
+        const ratingsValid = p.c.score > CL.MEDIUM && p.c.population < CL.HIGH
+        const interferingEvent = News.planetHasAnyNews(p, NT_DANGEROUS)
+        return ratingsValid && !interferingEvent
     }
 }

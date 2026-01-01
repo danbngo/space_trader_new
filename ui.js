@@ -518,3 +518,15 @@ function createDropdown(buttons = [], dropUpwards = false, selectedIndex = null)
     
     return dropdownContainer
 }
+
+function createColumnLayout(columnItems = []) {
+    const children = columnItems.map(item => ce({
+        className: 'gameColumn',
+        children: [item]
+    }))
+
+    return ce({
+        className: 'gameColumns',
+        children: children
+    })
+}

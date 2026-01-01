@@ -52,7 +52,7 @@ class RefugeesNews extends News {
         // Source must have a dangerous event ongoing and low score
         const hasDangerousEvent = News.planetHasAnyNews(p, NT_DANGEROUS)
         const lowScore = p.c.score < CL.MEDIUM
-        const sourceValid = hasDangerousEvent && lowScore && p.c.population > CL.LOW
+        const sourceValid = hasDangerousEvent && lowScore
         
         // Must not be at war, target must have capacity
         const relationshipsValid = !Civilization.areAtWar(p, tp)

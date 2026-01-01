@@ -87,11 +87,11 @@ function showPlanetDemographicsMenu(planet = new Planet()) {
                 children: ['✦ ', colorSpan(religion.name, religion.color), `: ${percentage}%`]
             })
             const progressBar = new ProgressBar({
-                id: `religion_${religion.name.replace(/\s+/g, '_')}`,
+                id: `religion_${(religion.name || '').replace(/\s+/g, '_')}`,
                 label: '',
                 value: parseFloat(percentage),
                 height: 20,
-                fillColor: religion.color,
+                fillColor: rgbArrayToString(religion.color),
                 showPercentage: false
             })
             const barContainer = ce({

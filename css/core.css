@@ -48,6 +48,15 @@ li {
     text-decoration: underline;
 }
 
+.gameColumns {
+    display: flex;
+    gap: 3em;
+}
+
+.gameColumn {
+    flex: 1;
+}
+
 /* Slider styling - cyan theme */
 input[type="range"] {
     position: relative;

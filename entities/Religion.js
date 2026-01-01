@@ -7,14 +7,17 @@ class Religion {
      * @param {string} name - The name of the religion.
      * @param {ReligionTrait[]} traits - The traits that define this religion's characteristics.
      * @param {number[]} color - The color associated with this religion.
+     * @param {string} icon - The symbol/icon representing this religion.
      */
-    constructor(name = 'Unnamed Faith', traits = [], color = COLORS.White) {
+    constructor(name = 'Unnamed Faith', traits = [], color = COLORS.White, icon = '✦') {
         /** @type {string} */
         this.name = name;
         /** @type {ReligionTrait[]} */
         this.traits = traits;
         /** @type {number[]} */
         this.color = color;
+        /** @type {string} */
+        this.icon = icon;
     }
 
     /**

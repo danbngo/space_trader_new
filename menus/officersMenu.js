@@ -7,15 +7,17 @@
 function createOfficersTable(officers = [new Officer()], onSelectOfficer = (officer = new Officer())=>{}) {
     if (officers.length == 0) return `(None)`
     const rows = [
-        ['Name', 'Race', 'Piloting', 'Age', 'Level', 'CR Share', ...SKILLS_ALL]
+        ['Name', 'Race', 'Religion', 'Piloting', 'Age', 'Level', 'CR Share', ...SKILLS_ALL]
     ]
     for (const officer of officers) {
         const assignedShip = gs.fleet.getAssignedShip(officer)
         const shipName = assignedShip ? assignedShip.name : colorSpan('(None)', COLORS.Gray)
         const raceDisplay = officer.race ? `${officer.race.icon} ${officer.race.name}` : 'Human'
+        const religionDisplay = officer.religion ? `${officer.religion.icon} ${officer.religion.name}` : ''
         rows.push([
             officer.name,
             raceDisplay,
+            religionDisplay,
             shipName,
             ''+officer.age,
             ''+statColorSpan(officer.level, officer.level/5),

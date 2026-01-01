@@ -96,7 +96,6 @@ function showPlanetMenu(planet = new Planet()) {
         options.push(["Outfitter", () => showOutfitterMenu(settlement.outfitter), isBlocked]);
     }
     options.push(ce({tag:'br'}));
-    options.push(["Assistant", () => showAssistantMenu(planet)]);
     options.push(["News", () => showNewsTimelineMenu(planet, () => showPlanetMenu(planet))]);
     options.push([`Overview`, () => showPlanetSocietyMenu(planet)]);
     if (planet.children && planet.children.length > 0) {
@@ -129,46 +128,24 @@ function showMoonsMenu(planet = new Planet()) {
 function showPlanetSocietyMenu(planet = new Planet()) {
     const {civilization, settlement} = planet
     const {governmentType, policies} = civilization
-    let msg = ''
     
-    // Create two-column layout for Overview and Policies
-    msg += `<div style="display: flex; gap: 2em;">`
-    
-    // Left column: Overview
-    msg += `<div style="flex: 1;">`
-    msg += `<u>Overview</u><br/>`
-    msg += `Government: ${coloredName(governmentType)}<br/>`
-    
-    // Settlement type
+    // Build overview section
+    let overviewContent = `<u>Overview</u><br/>`
+    overviewContent += `Government: ${coloredName(governmentType)}<br/>`
     if (settlement && settlement.settlementType) {
-        msg += `Settlement: ${colorSpan(settlement.settlementType.name, settlement.settlementType.color)}<br/>`
+        overviewContent += `Settlement: ${colorSpan(settlement.settlementType.name, settlement.settlementType.color)}<br/>`
     }
-    msg += `</div>` // Close left column
     
-    // Right column: Policies
-    msg += `<div style="flex: 1;">`
-    msg += `<u>Policies</u><br/>`
-    msg += `${policies.economic.flavor.symbol} Economic: ${colorSpan(policies.economic.name, policies.economic.color)}<br/>`
-    msg += `${policies.labor.flavor.symbol} Labor: ${colorSpan(policies.labor.name, policies.labor.color)}<br/>`
-    msg += `${policies.social.flavor.symbol} Social: ${colorSpan(policies.social.name, policies.social.color)}<br/>`
-    msg += `${policies.foreign.flavor.symbol} Foreign: ${colorSpan(policies.foreign.name, policies.foreign.color)}<br/>`
-    msg += `</div>` // Close right column
-    msg += `</div>` // Close two-column layout
+    // Build policies section
+    let policiesContent = `<u>Policies</u><br/>`
+    policiesContent += `${policies.economic.flavor.symbol} Economic: ${colorSpan(policies.economic.name, policies.economic.color)}<br/>`
+    policiesContent += `${policies.labor.flavor.symbol} Labor: ${colorSpan(policies.labor.name, policies.labor.color)}<br/>`
+    policiesContent += `${policies.social.flavor.symbol} Social: ${colorSpan(policies.social.name, policies.social.color)}<br/>`
+    policiesContent += `${policies.foreign.flavor.symbol} Foreign: ${colorSpan(policies.foreign.name, policies.foreign.color)}<br/>`
     
-    msg += `<hr style="margin: 20px 0; border: 1px solid ${rgbArrayToString(COLORS.Gray)};" />`
-    
-    // Ratings section in its own two-column layout
-    msg += `<u>Ratings</u><br/>`
-    msg += `<div style="display: flex; gap: 2em;">`
-    
-    // Split ratings into two columns
+    // Build left ratings column
     const leftColumnRatings = ['population', 'territory', 'army', 'navy', 'industry', 'economy', 'security', 'culture']
-    const rightColumnRatings = ['technology', 'education', 'wealth', 'reserves', 'crime', 'corruption', 'inflation', 'taxes', 'prestige']
-    
-    msg += `<div style="display: flex; gap: 2em;">`
-    
-    // Left ratings column
-    msg += `<div>`
+    let leftRatingsContent = ''
     for (const ratingName of leftColumnRatings) {
         const rating = CIVILIZATION_RATINGS_ALL.find(r => r.name.toLowerCase() === ratingName)
         if (!rating) continue
@@ -189,13 +166,13 @@ function showPlanetSocietyMenu(planet = new Planet()) {
                 case 'culture': displayValue = describeCulture(value); break;
             }
             
-            msg += `${rating.symbol} ${rating.name}: ${displayValue}<br/>`
+            leftRatingsContent += `${rating.symbol} ${rating.name}: ${displayValue}<br/>`
         }
     }
-    msg += `</div>`
     
-    // Right ratings column
-    msg += `<div>`
+    // Build right ratings column
+    const rightColumnRatings = ['technology', 'education', 'wealth', 'reserves', 'crime', 'corruption', 'inflation', 'taxes', 'prestige']
+    let rightRatingsContent = ''
     for (const ratingName of rightColumnRatings) {
         const rating = CIVILIZATION_RATINGS_ALL.find(r => r.name.toLowerCase() === ratingName)
         if (!rating) continue
@@ -217,14 +194,21 @@ function showPlanetSocietyMenu(planet = new Planet()) {
                 case 'prestige': displayValue = describePrestige(value); break;
             }
             
-            msg += `${rating.symbol} ${rating.name}: ${displayValue}<br/>`
+            rightRatingsContent += `${rating.symbol} ${rating.name}: ${displayValue}<br/>`
         }
     }
-    msg += `</div>`
-    msg += `</div>` // Close ratings columns
-    msg += `</div>` // Close ratings two-column layout
     
-    showPlanetModal(planet, `${coloredName(planet)} - Society`, msg, [
+    // Create layout using createColumnLayout
+    const topSection = createColumnLayout([overviewContent, policiesContent])
+    const hr = ce({tag: 'hr', style: {margin: '20px 0', border: `1px solid ${rgbArrayToString(COLORS.Gray)}`}})
+    const ratingsHeader = ce({children: ['<u>Ratings</u>']})
+    const ratingsSection = createColumnLayout([leftRatingsContent, rightRatingsContent])
+    
+    const content = ce({
+        children: [topSection, hr, ratingsHeader, ratingsSection]
+    })
+    
+    showPlanetModal(planet, `${coloredName(planet)} - Society`, content, [
         ["Demographics", () => showPlanetDemographicsMenu(planet)],
         ["Climate", () => showPlanetClimateMenu(planet)],
         ["Back", () => showPlanetMenu(planet)]
@@ -238,56 +222,61 @@ function showPlanetSocietyMenu(planet = new Planet()) {
 function showPlanetClimateMenu(planet = new Planet()) {
     const {climate} = planet
     const {temperature, atmosphericPressure, gravity, oceanCoverage, geologicalActivity, magnetosphere, radiationLevel, asteroidImpact} = climate
-    let msg = ''
     
-    // Physical properties
-    msg += `<u>Physical Properties</u><br/>`
-    msg += `Type: ${coloredName(planet.planetType)}<br/>`
-    msg += `Radius: ${roundToPlaces(planet.radius, 2)} Earth radii<br/>`
-    msg += `Day Length: ${roundToPlaces(planet.dayLength, 2)} Earth days<br/>`
+    // Build left column: Physical Properties and Composition
+    let leftContent = `<u>Physical Properties</u><br/>`
+    leftContent += `Type: ${coloredName(planet.planetType)}<br/>`
+    leftContent += `Radius: ${roundToPlaces(planet.radius, 2)} Earth radii<br/>`
+    leftContent += `Day Length: ${roundToPlaces(planet.dayLength, 2)} Earth days<br/>`
     if (planet.orbit) {
-        msg += `Orbital Distance: ${roundToPlaces(planet.orbit.radius, 2)} AU<br/>`
-        msg += `Orbital Period: ${roundToPlaces(planet.orbit.calcPeriod(), 2)} years<br/>`
+        leftContent += `Orbital Distance: ${roundToPlaces(planet.orbit.radius, 2)} AU<br/>`
+        leftContent += `Orbital Period: ${roundToPlaces(planet.orbit.calcPeriod(), 2)} years<br/>`
     }
-    msg += `<br/>`
-    
-    // Climate properties
-    msg += `<u>Climate Data</u><br/>`
-    msg += `Temperature: ${temperature.coloredName}<br/>`
-    msg += `Atmosphere: ${atmosphericPressure.coloredName}<br/>`
-    msg += `Gravity: ${gravity.coloredName}<br/>`
-    msg += `Ocean Coverage: ${oceanCoverage.coloredName}<br/>`
-    msg += `Geological Activity: ${geologicalActivity.coloredName}<br/>`
-    msg += `Magnetosphere: ${magnetosphere.coloredName}<br/>`
-    msg += `Radiation Level: ${radiationLevel.coloredName}<br/>`
-    msg += `Asteroid Impacts: ${asteroidImpact.coloredName}<br/>`
+    leftContent += `<br/>`
     
     // Composition
-    msg += `<br/>`
-    msg += `<u>Composition</u><br/>`
+    leftContent += `<u>Composition</u><br/>`
     if (planet.climate.atmosphereType) {
-        msg += `Atmosphere: ${colorSpan(planet.climate.atmosphereType.name, planet.climate.atmosphereType.color)}<br/>`
-        msg += `<span style="font-size: 0.9em; opacity: 0.8;">${planet.climate.atmosphereType.description}</span><br/>`
+        leftContent += `Atmosphere: ${colorSpan(planet.climate.atmosphereType.name, planet.climate.atmosphereType.color)}<br/>`
     }
     if (planet.climate.oceanType) {
-        msg += `Ocean: ${colorSpan(planet.climate.oceanType.name, planet.climate.oceanType.color)}<br/>`
-        msg += `<span style="font-size: 0.9em; opacity: 0.8;">${planet.climate.oceanType.description}</span><br/>`
+        leftContent += `Ocean: ${colorSpan(planet.climate.oceanType.name, planet.climate.oceanType.color)}<br/>`
     }
     if (planet.climate.geologyType) {
-        msg += `Geology: ${colorSpan(planet.climate.geologyType.name, planet.climate.geologyType.color)}<br/>`
-        msg += `<span style="font-size: 0.9em; opacity: 0.8;">${planet.climate.geologyType.description}</span><br/>`
+        leftContent += `Geology: ${colorSpan(planet.climate.geologyType.name, planet.climate.geologyType.color)}<br/>`
     }
     
-    // Planet features
+    // Build right column: Climate Data
+    let rightContent = `<u>Climate Data</u><br/>`
+    rightContent += `Temperature: ${temperature.coloredName}<br/>`
+    rightContent += `Atmosphere: ${atmosphericPressure.coloredName}<br/>`
+    rightContent += `Gravity: ${gravity.coloredName}<br/>`
+    rightContent += `Ocean Coverage: ${oceanCoverage.coloredName}<br/>`
+    rightContent += `Geological Activity: ${geologicalActivity.coloredName}<br/>`
+    rightContent += `Magnetosphere: ${magnetosphere.coloredName}<br/>`
+    rightContent += `Radiation Level: ${radiationLevel.coloredName}<br/>`
+    rightContent += `Asteroid Impacts: ${asteroidImpact.coloredName}<br/>`
+    
+    // Create column layout
+    const columnLayout = createColumnLayout([leftContent, rightContent])
+    
+    // Planet features (outside the columns)
+    const features = ce({children: []})
     if (planet.features && planet.features.length > 0) {
-        msg += `<br/>`
-        msg += `<u>Notable Features</u><br/>`
+        features.appendChild(ce({tag: 'br'}))
+        features.appendChild(ce({children: ['<u>Notable Features</u><br/>']}))
         for (const feature of planet.features) {
-            msg += `${colorSpan('●', feature.color)} ${colorSpan(feature.name, feature.color)}: ${feature.description}<br/>`
+            features.appendChild(ce({
+                children: [`${colorSpan('●', feature.color)} ${colorSpan(feature.name, feature.color)}: ${feature.description}<br/>`]
+            }))
         }
     }
     
-    showPlanetModal(planet, `${coloredName(planet)} - Climate`, msg, [
+    const content = ce({
+        children: [columnLayout, features]
+    })
+    
+    showPlanetModal(planet, `${coloredName(planet)} - Climate`, content, [
         ["Society", () => showPlanetSocietyMenu(planet)],
         ["Back", () => showPlanetMenu(planet)]
     ], 'planet_climate', (nextPlanet) => showPlanetClimateMenu(nextPlanet));

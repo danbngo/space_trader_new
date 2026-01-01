@@ -46,7 +46,7 @@ class GenocideNews extends News {
 
     isValid() {
         const {planet: p} = this
-        const ratingsValid = p.c.army > CL.MEDIUM && p.c.security < CL.VERY_LOW && p.c.corruption > CL.HIGH
+        const ratingsValid = p.c.army > CL.MEDIUM && p.c.security < CL.MEDIUM && p.c.corruption > CL.MEDIUM
         return (ratingsValid)
     }
 }

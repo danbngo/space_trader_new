@@ -38,11 +38,11 @@ class MilitaryBuildupNews extends News {
     isValid() {
         const {planet: p} = this
         //dont do it if military is already big
-        const ratingsValid = (p.c.army < CL.MEDIUM) && (p.c.prestige < CL.VERY_HIGH) && (p.c.industry > CL.MEDIUM)
+        const ratingsValid = (p.c.army < CL.HIGH)
         //dont do it if no government are tense with us or vice versa
         let politicsValid = Civilization.getPlanetsTenseOrAtWarWith(p).length > 0
         //removed most requirements for this, even juntas do this on a whim
-        const interferingEvent = News.planetHasAnyNews(p, [NT.MILITARY_BUILDUP]) 
+        const interferingEvent = News.planetHasAnyNews(p, NT_ECONOMY_PREVENTING)
         return ratingsValid && politicsValid && !interferingEvent
     }
 }
