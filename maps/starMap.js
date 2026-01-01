@@ -124,9 +124,10 @@ class StarMap extends BaseMap {
     rebuildCanvas() {
         console.log('REBUILDING STAR MAP CANVAS')
         const {starSystem, cvs} = this
-        const {stars, planets, fleets, backgroundStars, asteroids} = starSystem
+        const {stars, planets, dwarfPlanets, fleets, backgroundStars, asteroids} = starSystem
+        const allPlanets = [...planets, ...dwarfPlanets]
         //const routes = [gs.fleet.route]
-        const orbitingBodies = [...stars, ...planets].filter(b=>(b.orbit))
+        const orbitingBodies = [...stars, ...allPlanets].filter(b=>(b.orbit))
 
         cvs.clear()
 
@@ -148,7 +149,7 @@ class StarMap extends BaseMap {
             const starObj = cvs.addFilledCircle(`star${index}`, body.x, body.y, body.radius/EARTH_RADII_PER_AU * 25, 12, body.color, ()=>this.selectObject(body))
         })
 
-        planets.forEach((body,index)=>{
+        allPlanets.forEach((body,index)=>{
             const planetObj = cvs.addFilledCircle(`planet${index}`, body.x, body.y, body.radius/EARTH_RADII_PER_AU * 150, 8, body.color, ()=>this.selectObject(body))
             const labelObj = cvs.addText(`planetlabel${index}`, body.x, body.y, 0, -32, body.name, body.color, DEFAULT_FONT_SIZE, 2, ()=>this.selectObject(body))
             const objs = [planetObj, labelObj]
@@ -193,8 +194,9 @@ class StarMap extends BaseMap {
 
     refreshCanvas(forceRedraw = true) {
         const {cvs, starSystem} = this
-        const {stars, planets, fleets, asteroids} = starSystem
-        const orbitingBodies = [...stars, ...planets].filter(b=>(b.orbit))
+        const {stars, planets, dwarfPlanets, fleets, asteroids} = starSystem
+        const allPlanets = [...planets, ...dwarfPlanets]
+        const orbitingBodies = [...stars, ...allPlanets].filter(b=>(b.orbit))
 
         orbitingBodies.forEach( (orbitingBody, index) => {
             const cvsObject = cvs.getObject(`orbit${index}`)
@@ -209,7 +211,7 @@ class StarMap extends BaseMap {
             cvsObject.y = body.y
         })
 
-        planets.forEach((body,index)=>{
+        allPlanets.forEach((body,index)=>{
             let cvsObject = cvs.getObject(`planet${index}`)
             cvsObject.x = body.x
             cvsObject.y = body.y
@@ -313,7 +315,8 @@ class StarMap extends BaseMap {
         ce({parent:container, tag:'h3', innerHTML: coloredName(obj), onClick: ()=>this.selectObject(obj),
             style: {filter: `drop-shadow(1px 0 0 ${colorArrToRgbaString(COLORS.Green)}) drop-shadow(0 1px 0 ${colorArrToRgbaString(COLORS.Green)})  drop-shadow(0 -0.5px 0 ${colorArrToRgbaString(COLORS.Green)})  drop-shadow(-0.5px 0 0 ${colorArrToRgbaString(COLORS.Green)})`}
         })
-        const cvsId = obj instanceof Planet ? `planet${this.starSystem.planets.indexOf(obj)}`
+        const allPlanets = [...this.starSystem.planets, ...this.starSystem.dwarfPlanets]
+        const cvsId = obj instanceof Planet ? `planet${allPlanets.indexOf(obj)}`
             : obj instanceof Star ? `star${this.starSystem.stars.indexOf(obj)}` 
             : obj instanceof Fleet ? `fleet${this.starSystem.fleets.indexOf(obj)}`
             : ''

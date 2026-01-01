@@ -1,8 +1,11 @@
 function showPlanetModal(planet = new Planet(), title = '', msg = '', options = [], modalId = '', onNavigate = (nextPlanet)=>{}) {
     // Create title with navigation arrows
-    const currentIndex = gs.system.planets.indexOf(planet);
-    const prevPlanet = gs.system.planets[currentIndex - 1] || gs.system.planets[gs.system.planets.length - 1];
-    const nextPlanet = gs.system.planets[currentIndex + 1] || gs.system.planets[0];
+    // Navigate within same planet type (dwarf or regular)
+    const isDwarf = isDwarfPlanet(planet);
+    const planetList = isDwarf ? gs.system.dwarfPlanets : gs.system.planets;
+    const currentIndex = planetList.indexOf(planet);
+    const prevPlanet = planetList[currentIndex - 1] || planetList[planetList.length - 1];
+    const nextPlanet = planetList[currentIndex + 1] || planetList[0];
     
     const titleEl = ce({
         style: {

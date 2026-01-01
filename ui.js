@@ -406,7 +406,7 @@ function createDropdown(buttons = [], dropUpwards = false, selectedIndex = null)
             display: 'none',
             zIndex: '1000',
             left: '0',
-            width: '100%',
+            backgroundColor: '#000',
             ...(dropUpwards ? { bottom: '100%' } : { top: '100%' })
         }
     })
@@ -415,6 +415,8 @@ function createDropdown(buttons = [], dropUpwards = false, selectedIndex = null)
     const updateDropdown = (newIndex) => {
         currentSelectedIndex = newIndex
         const [newLabel, newHandler] = buttons[newIndex]
+        
+        // Update label immediately
         labelElement.innerHTML = newLabel
         
         // Update all button states
@@ -426,14 +428,17 @@ function createDropdown(buttons = [], dropUpwards = false, selectedIndex = null)
             }
         })
         
-        // Call the handler if it exists
-        if (newHandler) newHandler()
-        
         // Close dropdown
         itemsContainer.style.display = 'none'
+        
+        // Call the handler after updating UI (use setTimeout to ensure UI updates first)
+        if (newHandler) {
+            setTimeout(() => newHandler(), 0)
+        }
     }
     
     // Create dropdown items
+    const dropdownButtons = []
     buttons.forEach((btnData, index) => {
         if (!btnData) return
         
@@ -441,7 +446,12 @@ function createDropdown(buttons = [], dropUpwards = false, selectedIndex = null)
         const btn = ce({
             tag: 'div',
             classNames: ['gameButton'],
-            innerHTML: label
+            innerHTML: label,
+            style: {
+                margin: '0',
+                width: '100%',
+                boxSizing: 'border-box'
+            }
         })
         
         // Add custom class names if provided
@@ -466,8 +476,33 @@ function createDropdown(buttons = [], dropUpwards = false, selectedIndex = null)
             }
         }
         
+        dropdownButtons.push(btn)
         itemsContainer.appendChild(btn)
     })
+    
+    // Measure the widest button after they're all added to the DOM
+    // Temporarily make container visible to measure
+    dropdownContainer.appendChild(labelElement)
+    dropdownContainer.appendChild(itemsContainer)
+    itemsContainer.style.display = 'block'
+    itemsContainer.style.visibility = 'hidden'
+    
+    // Add to body temporarily to measure
+    document.body.appendChild(dropdownContainer)
+    
+    let maxWidth = labelElement.offsetWidth
+    dropdownButtons.forEach(btn => {
+        maxWidth = Math.max(maxWidth, btn.offsetWidth)
+    })
+    
+    // Apply the max width to all elements
+    labelElement.style.width = maxWidth + 'px'
+    itemsContainer.style.width = maxWidth + 'px'
+    
+    // Hide the dropdown again
+    itemsContainer.style.display = 'none'
+    itemsContainer.style.visibility = 'visible'
+    document.body.removeChild(dropdownContainer)
     
     // Toggle dropdown when label is clicked
     labelElement.onclick = (e) => {
@@ -480,9 +515,6 @@ function createDropdown(buttons = [], dropUpwards = false, selectedIndex = null)
     document.addEventListener('click', () => {
         itemsContainer.style.display = 'none'
     })
-    
-    dropdownContainer.appendChild(labelElement)
-    dropdownContainer.appendChild(itemsContainer)
     
     return dropdownContainer
 }

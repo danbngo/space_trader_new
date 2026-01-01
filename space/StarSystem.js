@@ -13,14 +13,15 @@ class StarSystem extends SpaceObject {
      * @param {SpaceObject} barycenter - The barycenter of the star system.
      * @param {Star[]} stars - The stars in the star system.
      * @param {Planet[]} planets - The planets in the star system.
+     * @param {Planet[]} dwarfPlanets - The dwarf planets in the star system.
      * @param {Fleet[]} fleets - The fleets in the star system.
      * @param {AsteroidBelt[]} asteroidBelts - The asteroid belts in the star system.
      * @param {Asteroid[]} asteroids - The asteroids in the star system.
      * @param {BackgroundStar[]} backgroundStars - The background stars for visual effect.
      * @param {Religion[]} religions - The religions in the star system.
      */
-    constructor(name = "Unnamed", color = COLORS.White, radius = 0, x = 0, y = 0, barycenter = null, stars = [], planets = [], fleets = [], asteroidBelts = [], asteroids = [], backgroundStars = [], religions = []) {
-        console.log('instantiating star system w name:', name, 'stars:', stars, 'planets:', planets, 'fleets:', fleets);
+    constructor(name = "Unnamed", color = COLORS.White, radius = 0, x = 0, y = 0, barycenter = null, stars = [], planets = [], dwarfPlanets = [], fleets = [], asteroidBelts = [], asteroids = [], backgroundStars = [], religions = []) {
+        console.log('instantiating star system w name:', name, 'stars:', stars, 'planets:', planets, 'dwarf planets:', dwarfPlanets, 'fleets:', fleets);
         super(name, color, radius, x, y)
         /** @type {SpaceObject} */
         this.barycenter = barycenter
@@ -28,6 +29,8 @@ class StarSystem extends SpaceObject {
         this.stars = stars
         /** @type {Planet[]} */
         this.planets = planets
+        /** @type {Planet[]} */
+        this.dwarfPlanets = dwarfPlanets
         /** @type {Fleet[]} */
         this.fleets = fleets
         /** @type {AsteroidBelt[]} */
@@ -39,6 +42,8 @@ class StarSystem extends SpaceObject {
         this.asteroids = asteroids
         /** @type {News[]} */
         this.news = [] //actual News class objects, used to build a timeline
+        /** @type {News[]} */
+        this.history = []
         /** @type {string[]} */
         this.newsFeed = [] //strings that have more detailed data
         this.simpleNews = []
@@ -52,7 +57,8 @@ class StarSystem extends SpaceObject {
     calcNearestPlanet(obj = new SpaceObject(), planets = this.planets) {
         let nearestDistance = Infinity
         let nearestPlanet = planets[0]
-        for (const planet of this.planets) {
+        const allPlanets = [...this.planets, ...this.dwarfPlanets]
+        for (const planet of allPlanets) {
             const dist = calcDistance(obj.x, obj.y, planet.x, planet.y)
             if (dist < nearestDistance) {
                 nearestDistance = dist
@@ -63,7 +69,7 @@ class StarSystem extends SpaceObject {
     }
 
     refreshPositions(year = gs.year) {
-        const objects = [...this.stars, ...this.planets, ...this.asteroids]
+        const objects = [...this.stars, ...this.planets, ...this.dwarfPlanets, ...this.asteroids]
         for (const obj of objects) {
             const [x, y] = obj.calcAbsPositionAtYear(year)
             obj.x = x

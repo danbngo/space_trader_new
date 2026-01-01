@@ -31,7 +31,7 @@ class CoalitionNews extends News {
         const {planet: p} = this
         // prestige, reducing military/territory gets you out of this
         const possibleBadNews = News.calcRelationshipWorseningNews(p)[0]
-        if (possibleBadNews.length < 3) return
+        if (possibleBadNews.length < 2) return
         this.rollOutcome(p.c.prestige/p.c.territory/p.c.army/p.c.navy, CL.HIGH)
     }
 
@@ -44,9 +44,9 @@ class CoalitionNews extends News {
     isValid() {
         const {planet: p} = this
         //more likely if REALLY REALLY high territory and military
-        const ratingsValid = p.c.territory > CL.VERY_HIGH && (p.c.army > CL.VERY_HIGH || p.c.navy > CL.VERY_HIGH)
+        const ratingsValid = p.c.territory > CL.HIGH && (p.c.army > CL.VERY_HIGH || p.c.navy > CL.VERY_HIGH)
         const [badNews] = News.calcRelationshipWorseningNews(p)
-        const canFormCoalition = badNews.length >= 3
+        const canFormCoalition = badNews.length >= 2
         return ratingsValid && canFormCoalition
     }
 }

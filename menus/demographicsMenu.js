@@ -4,14 +4,25 @@
  */
 function showPlanetDemographicsMenu(planet = new Planet()) {
     const {civilization} = planet
-    let msg = ''
     
-    msg += `<u>Population</u><br/>`
-    msg += `👥 Total Population: ${describePopulation(civilization.population)}<br/>`
-    msg += `<br/>`
+    const contentContainer = ce({style: 'display: flex; flex-direction: column; gap: 20px;'})
+    
+    // Population Section
+    const populationSection = ce({
+        children: [
+            ce({tag: 'div', style: 'text-decoration: underline; margin-bottom: 10px;', children: ['Population']}),
+            ce({children: [`👥 Total Population: ${describePopulation(civilization.population)}`]})
+        ]
+    })
+    contentContainer.appendChild(populationSection)
     
     // Racial Demographics
-    msg += `<u>Racial Demographics</u><br/>`
+    const racialDemographicsSection = ce({
+        children: [
+            ce({tag: 'div', style: 'text-decoration: underline; margin-bottom: 10px;', children: ['Racial Demographics']})
+        ]
+    })
+    
     if (civilization.races.size > 0) {
         // Sort races by proportion (highest first)
         const sortedRaces = Array.from(civilization.races.entries())
@@ -19,25 +30,50 @@ function showPlanetDemographicsMenu(planet = new Planet()) {
         
         for (const [race, proportion] of sortedRaces) {
             const percentage = (proportion * 100).toFixed(1)
-            const barWidth = Math.floor(proportion * 30) // Max 30 characters wide
-            const bar = '█'.repeat(barWidth) + '░'.repeat(30 - barWidth)
-            msg += `${race.icon} ${colorSpan(race.name, race.color)}: ${percentage}%<br/>`
-            msg += `<span style="opacity: 0.6; font-family: monospace;">${bar}</span><br/>`
+            const raceLabel = ce({
+                tag: 'div',
+                style: 'margin-bottom: 5px;',
+                children: [`${race.icon} `, colorSpan(race.name, race.color), `: ${percentage}%`]
+            })
+            const progressBar = new ProgressBar({
+                id: `race_${race.name.replace(/\s+/g, '_')}`,
+                label: '',
+                value: parseFloat(percentage),
+                height: 20,
+                fillColor: rgbArrayToString(race.color),
+                showPercentage: false
+            })
+            const barContainer = ce({
+                style: 'margin-bottom: 15px;',
+                children: [raceLabel, progressBar.container]
+            })
+            racialDemographicsSection.appendChild(barContainer)
         }
     } else {
-        msg += `<span style="opacity: 0.6;">No demographic data available</span><br/>`
+        racialDemographicsSection.appendChild(ce({
+            style: 'opacity: 0.6;',
+            children: ['No demographic data available']
+        }))
     }
     
-    msg += `<br/>`
+    contentContainer.appendChild(racialDemographicsSection)
     
-    // Territory
-    msg += `<u>Territory</u><br/>`
-    msg += `🗺️ Territorial Reach: ${describeTerritory(civilization.territory)}<br/>`
-    
-    msg += `<br/>`
+    // Territory Section
+    const territorySection = ce({
+        children: [
+            ce({tag: 'div', style: 'text-decoration: underline; margin-bottom: 10px;', children: ['Territory']}),
+            ce({children: [`🗺️ Territorial Reach: ${describeTerritory(civilization.territory)}`]})
+        ]
+    })
+    contentContainer.appendChild(territorySection)
     
     // Religious Demographics
-    msg += `<u>Religious Demographics</u><br/>`
+    const religiousDemographicsSection = ce({
+        children: [
+            ce({tag: 'div', style: 'text-decoration: underline; margin-bottom: 10px;', children: ['Religious Demographics']})
+        ]
+    })
+    
     if (civilization.religions && civilization.religions.counts.size > 0) {
         // Sort religions by proportion (highest first)
         const sortedReligions = Array.from(civilization.religions.counts.entries())
@@ -45,21 +81,36 @@ function showPlanetDemographicsMenu(planet = new Planet()) {
         
         for (const [religion, proportion] of sortedReligions) {
             const percentage = (proportion * 100).toFixed(1)
-            const barWidth = Math.floor(proportion * 30) // Max 30 characters wide
-            const bar = '█'.repeat(barWidth) + '░'.repeat(30 - barWidth)
-            msg += `✦ ${colorSpan(religion.name, religion.color)}: ${percentage}%<br/>`
-            msg += `<span style="opacity: 0.6; font-family: monospace;">${bar}</span><br/>`
-            // Show traits
-            if (religion.traits && religion.traits.length > 0) {
-                const traitStr = religion.traits.map(t => colorSpan(t.name, t.color)).join(', ')
-                msg += `<span style="font-size: 0.85em; opacity: 0.8; margin-left: 1em;">Traits: ${traitStr}</span><br/>`
-            }
+            const religionLabel = ce({
+                tag: 'div',
+                style: 'margin-bottom: 5px;',
+                children: ['✦ ', colorSpan(religion.name, religion.color), `: ${percentage}%`]
+            })
+            const progressBar = new ProgressBar({
+                id: `religion_${religion.name.replace(/\s+/g, '_')}`,
+                label: '',
+                value: parseFloat(percentage),
+                height: 20,
+                fillColor: religion.color,
+                showPercentage: false
+            })
+            const barContainer = ce({
+                style: 'margin-bottom: 10px;',
+                children: [religionLabel, progressBar.container]
+            })
+            barContainer.style.marginBottom = '15px'
+            religiousDemographicsSection.appendChild(barContainer)
         }
     } else {
-        msg += `<span style="opacity: 0.6;">No organized religions present</span><br/>`
+        religiousDemographicsSection.appendChild(ce({
+            style: 'opacity: 0.6;',
+            children: ['No organized religions present']
+        }))
     }
     
-    showPlanetModal(planet, `${coloredName(planet)} - Demographics`, msg, [
+    contentContainer.appendChild(religiousDemographicsSection)
+    
+    showPlanetModal(planet, `${coloredName(planet)} - Demographics`, contentContainer, [
         ["Society", () => showPlanetSocietyMenu(planet)],
         ["Back", () => showPlanetMenu(planet)]
     ], 'planet_demographics', (nextPlanet) => showPlanetDemographicsMenu(nextPlanet));

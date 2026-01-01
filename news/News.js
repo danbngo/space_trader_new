@@ -131,7 +131,6 @@ class News {
      */
     start() {
         if (this.started || this.ended) throw new Error('news cannot be started after ending or starting already!')
-        //console.log('started news event:',this)
         this.started = true
         //gs.system.newsFeed.push(this.startDescription)
         for (const fx of this.startEffects) {
@@ -377,28 +376,19 @@ class News {
      * @param {number} elapsedYears - Years elapsed since last update (default 0).
      */
     static processNews(elapsedYears = 0) {
-        //remove anything older than the threshold
-        const ancientHistory = []
         for (const news of gs.system.news) {
-            if (news.shouldCancel()) {
-                news.cancel()
-            }
-            if (news.shouldEnd()) {
-                news.end()
-            }
-            else {
-                if (!news.ended && news.started && news.ongo) news.ongo(elapsedYears)
-            }
-            if (news.ended && (gs.year - news.endedYear) >= NEWS_MAX_AGE) {
-                ancientHistory.push(news)
+            // Process active news
+            if (!news.ended && news.started) {
+                if (news.shouldCancel()) {
+                    news.cancel()
+                } else if (news.shouldEnd()) {
+                    news.end()
+                } else if (news.ongo) {
+                    news.ongo(elapsedYears)
+                }
             }
         }
-        if (!DEBUG_MODE_ENABLED) for (const oldNews of ancientHistory) {
-            const index = gs.system.news.indexOf(oldNews)
-            if (index > -1) {
-                gs.system.news.splice(index, 1)
-            }
-        }
+        
     }
 
     /**

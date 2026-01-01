@@ -30,6 +30,21 @@ function generateOfficer(planet = new Planet(), withImplants = false, reputation
     // Assign random race
     officer.race = rndMember(RACES_ALL)
     
+    // Assign religion based on planet's religious distribution
+    if (civilization.religions && civilization.religions.counts.size > 0) {
+        const religionEntries = Array.from(civilization.religions.counts.entries())
+        const totalWeight = religionEntries.reduce((sum, [_, weight]) => sum + weight, 0)
+        const roll = Math.random() * totalWeight
+        let cumulative = 0
+        for (const [religion, weight] of religionEntries) {
+            cumulative += weight
+            if (roll <= cumulative) {
+                officer.religion = religion
+                break
+            }
+        }
+    }
+    
     // Level up to target level
     for (let i = 0; i < level; i++) {
         officer.levelUp(false) // Don't auto-improve skills during leveling

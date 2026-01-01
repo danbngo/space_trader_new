@@ -7,10 +7,11 @@ function showNewsTimelineMenu(planet = null, backFunction = null, activeOnly = t
     // If no planet specified, show all news
         console.log('0a')
 
-    const relevantNews = planet 
-        ? gs.system.news.filter(news => (!news.planet || news.planet === planet || news.targetPlanet === planet))
-        : gs.system.news
+    const newsSource = activeOnly ? gs.system.news : [...gs.system.news, ...gs.system.history]
 
+    const relevantNews = planet 
+        ? newsSource.filter(news => (!news.planet || news.planet === planet || news.targetPlanet === planet))
+        : newsSource
         console.log('0b')
 
     // Filter by activeOnly if requested

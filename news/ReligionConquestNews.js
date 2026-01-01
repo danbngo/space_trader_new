@@ -8,7 +8,7 @@ class ReligionConquestNews extends News {
         ))
 
         super(
-            `${coloredName(planet)} rallies fellow ${coloredName(planet.c.stateReligion) || 'faithful'} worlds to oppose ${coloredName(targetPlanet)}!`,
+            `${coloredName(planet)} rallies fellow ${planet.c.stateReligion ? coloredName(planet.c.stateReligion) : 'atheistic'} worlds to oppose ${coloredName(targetPlanet)}!`,
             `${coloredName(planet)} successfully convinces other planets of the faith to take action against ${coloredName(targetPlanet)}!`,
             `${coloredName(planet)}'s religious coalition against ${coloredName(targetPlanet)} fails to materialize!`,
             ``,

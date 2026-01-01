@@ -34,32 +34,20 @@ async function startNewGame() {
     gs.system.refreshPositions(gs.year)
 
     // Show loading modal with progress bar
-    const progressBarContainer = ce({
-        style: 'width: 400px; margin: 20px auto;'
+    const progressBar = new ProgressBar({
+        id: 'history_progress',
+        label: 'Generating history',
+        height: 30,
+        showTime: true
     })
-    const progressBarFill = ce({
-        id: 'history_progress_bar',
-        style: 'width: 0%; height: 30px; background-color: ' + rgbArrayToString(COLORS.Green) + '; transition: width 0.1s;'
-    })
-    const progressBarBg = ce({
-        style: 'width: 100%; height: 30px; background-color: ' + rgbArrayToString(COLORS.DarkGray) + '; border: 2px solid ' + rgbArrayToString(COLORS.White) + ';',
-        children: [progressBarFill]
-    })
-    const progressText = ce({
-        id: 'history_progress_text',
-        style: 'text-align: center; margin-top: 10px; color: ' + rgbArrayToString(COLORS.White) + ';',
-        children: ['Generating history: 0%']
-    })
-    progressBarContainer.appendChild(progressBarBg)
-    progressBarContainer.appendChild(progressText)
 
-    const HISTORY_NUM_YEARS = 100
+    const HISTORY_NUM_YEARS = 200
     
     showModal(
         'Loading Game',
         ce({children: [
             `Generating ${HISTORY_NUM_YEARS} years of galactic history...`,
-            progressBarContainer
+            progressBar.container
         ]}),
         []
     )
@@ -69,13 +57,11 @@ async function startNewGame() {
     
     // Generate history with progress tracking
     const progress = {completePercentage: 0}
+    const startTime = performance.now()
+    
     const progressUpdateInterval = setInterval(() => {
-        const progressBar = document.getElementById('history_progress_bar')
-        const progressTextEl = document.getElementById('history_progress_text')
-        if (progressBar && progressTextEl) {
-            progressBar.style.width = progress.completePercentage + '%'
-            progressTextEl.textContent = 'Generating history: ' + Math.round(progress.completePercentage) + '%'
-        }
+        const elapsedSeconds = (performance.now() - startTime) / 1000
+        progressBar.update(progress.completePercentage, elapsedSeconds)
     }, 50)
     
     await addHistory(GAME_START_YEAR - HISTORY_NUM_YEARS, GAME_START_YEAR, progress)

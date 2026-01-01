@@ -45,6 +45,8 @@ class Officer {
         this.age = 25; // Default age
         /** @type {Race} */
         this.race = RACES.HUMAN; // Default race
+        /** @type {Religion|null} */
+        this.religion = null; // Religion affiliation
         /** @type {Map<EquipmentSlot, Equipment>} */
         this.equipment = new Map();
     }

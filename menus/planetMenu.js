@@ -96,6 +96,7 @@ function showPlanetMenu(planet = new Planet()) {
         options.push(["Outfitter", () => showOutfitterMenu(settlement.outfitter), isBlocked]);
     }
     options.push(ce({tag:'br'}));
+    options.push(["Assistant", () => showAssistantMenu(planet)]);
     options.push(["News", () => showNewsTimelineMenu(planet, () => showPlanetMenu(planet))]);
     options.push([`Overview`, () => showPlanetSocietyMenu(planet)]);
     if (planet.children && planet.children.length > 0) {
@@ -130,10 +131,10 @@ function showPlanetSocietyMenu(planet = new Planet()) {
     const {governmentType, policies} = civilization
     let msg = ''
     
-    // Create two-column layout
+    // Create two-column layout for Overview and Policies
     msg += `<div style="display: flex; gap: 2em;">`
     
-    // Left column: Overview and Ratings
+    // Left column: Overview
     msg += `<div style="flex: 1;">`
     msg += `<u>Overview</u><br/>`
     msg += `Government: ${coloredName(governmentType)}<br/>`
@@ -142,19 +143,32 @@ function showPlanetSocietyMenu(planet = new Planet()) {
     if (settlement && settlement.settlementType) {
         msg += `Settlement: ${colorSpan(settlement.settlementType.name, settlement.settlementType.color)}<br/>`
     }
-    msg += `<br/>`
+    msg += `</div>` // Close left column
     
-    // Ratings header
+    // Right column: Policies
+    msg += `<div style="flex: 1;">`
+    msg += `<u>Policies</u><br/>`
+    msg += `${policies.economic.flavor.symbol} Economic: ${colorSpan(policies.economic.name, policies.economic.color)}<br/>`
+    msg += `${policies.labor.flavor.symbol} Labor: ${colorSpan(policies.labor.name, policies.labor.color)}<br/>`
+    msg += `${policies.social.flavor.symbol} Social: ${colorSpan(policies.social.name, policies.social.color)}<br/>`
+    msg += `${policies.foreign.flavor.symbol} Foreign: ${colorSpan(policies.foreign.name, policies.foreign.color)}<br/>`
+    msg += `</div>` // Close right column
+    msg += `</div>` // Close two-column layout
+    
+    msg += `<hr style="margin: 20px 0; border: 1px solid ${rgbArrayToString(COLORS.Gray)};" />`
+    
+    // Ratings section in its own two-column layout
     msg += `<u>Ratings</u><br/>`
+    msg += `<div style="display: flex; gap: 2em;">`
     
     // Split ratings into two columns
     const leftColumnRatings = ['population', 'territory', 'army', 'navy', 'industry', 'economy', 'security', 'culture']
     const rightColumnRatings = ['technology', 'education', 'wealth', 'reserves', 'crime', 'corruption', 'inflation', 'taxes', 'prestige']
     
-    msg += `<div style="display: flex; gap: 1em;">`
+    msg += `<div style="display: flex; gap: 2em;">`
     
     // Left ratings column
-    msg += `<div style="flex: 1;">`
+    msg += `<div>`
     for (const ratingName of leftColumnRatings) {
         const rating = CIVILIZATION_RATINGS_ALL.find(r => r.name.toLowerCase() === ratingName)
         if (!rating) continue
@@ -181,7 +195,7 @@ function showPlanetSocietyMenu(planet = new Planet()) {
     msg += `</div>`
     
     // Right ratings column
-    msg += `<div style="flex: 1;">`
+    msg += `<div>`
     for (const ratingName of rightColumnRatings) {
         const rating = CIVILIZATION_RATINGS_ALL.find(r => r.name.toLowerCase() === ratingName)
         if (!rating) continue
@@ -208,18 +222,7 @@ function showPlanetSocietyMenu(planet = new Planet()) {
     }
     msg += `</div>`
     msg += `</div>` // Close ratings columns
-    msg += `</div>` // Close left column
-    
-    // Right column: Policies
-    msg += `<div style="flex: 1;">`
-    msg += `<u>Policies</u><br/>`
-    msg += `${policies.economic.flavor.symbol} Economic: ${colorSpan(policies.economic.name, policies.economic.color)}<br/>`
-    msg += `${policies.labor.flavor.symbol} Labor: ${colorSpan(policies.labor.name, policies.labor.color)}<br/>`
-    msg += `${policies.social.flavor.symbol} Social: ${colorSpan(policies.social.name, policies.social.color)}<br/>`
-    msg += `${policies.foreign.flavor.symbol} Foreign: ${colorSpan(policies.foreign.name, policies.foreign.color)}<br/>`
-    msg += `</div>` // Close right column
-    
-    msg += `</div>` // Close two-column layout
+    msg += `</div>` // Close ratings two-column layout
     
     showPlanetModal(planet, `${coloredName(planet)} - Society`, msg, [
         ["Demographics", () => showPlanetDemographicsMenu(planet)],

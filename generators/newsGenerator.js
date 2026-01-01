@@ -207,28 +207,33 @@ function generateMetaNews(newsTypesAttempted = []) {
 async function addHistory(startYear = 3000, endYear = 3000, progress = {completePercentage: 0}) {
     const totalYears = endYear - startYear
     let currentYear = startYear
-    let daysSinceYield = 0
-    const YIELD_EVERY_DAYS = 30 // Yield control every 30 days to keep animations smooth
+    let weeksSinceYield = 0
+    const YIELD_EVERY_WEEKS = 10 // Yield control every 10 weeks (balance between speed and smoothness)
+    const WEEKS_PER_YEAR = 52
+    const YEARS_PER_WEEK = 1 / WEEKS_PER_YEAR
     
-    for (let y = startYear; y < endYear; y += 1/365) {
+    for (let y = startYear; y < endYear; y += YEARS_PER_WEEK) {
         gs.year = y
-        daysSinceYield++
+        weeksSinceYield++
         
-        if (Math.random() < NEWS_CHANCE_PER_DAY) {
-            const news = generateNews()
-            if (!news) continue
-            news.start()
+        // Process news 7 times per week (once per day equivalent)
+        for (let day = 0; day < 7; day++) {
+            if (Math.random() < NEWS_CHANCE_PER_DAY) {
+                const news = generateNews()
+                if (!news) continue
+                news.start()
+            }
         }
-        /*if (Math.random() < META_NEWS_CHANCE_PER_DAY) {
+        /*if (Math.random() < META_NEWS_CHANCE_PER_DAY * 7) {
             const news = generateMetaNews()
             if (!news) continue
             news.start()
         }*/
-        News.processNews(1/365)
+        News.processNews(YEARS_PER_WEEK)
         
         // Update progress and yield control more frequently for smooth animations
-        if (daysSinceYield >= YIELD_EVERY_DAYS) {
-            daysSinceYield = 0
+        if (weeksSinceYield >= YIELD_EVERY_WEEKS) {
+            weeksSinceYield = 0
             progress.completePercentage = ((y - startYear) / totalYears) * 100
             // Yield control to allow UI updates and animations
             await new Promise(resolve => setTimeout(resolve, 0))

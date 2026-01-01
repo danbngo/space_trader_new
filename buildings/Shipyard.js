@@ -23,7 +23,6 @@ class Shipyard extends Building {
         return this.planet.c.navy * SHIPYARD_AVERAGE_NUM_MODULES
     }
     normalize(clearExisting = false) {
-        console.log('normalizing shipyard:',this,clearExisting)
         super.normalize()
         if (clearExisting) {
             this.ships = []

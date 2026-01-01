@@ -57,6 +57,7 @@ function showOfficersMenu(officers = gs.fleet.officers, tab = 'roster') {
         const pilotingText = assignedShip ? assignedShip.name : colorSpan('(None)', COLORS.Gray)
         
         const raceText = officer.race ? `${officer.race.icon} ${colorSpan(officer.race.name, officer.race.color)}` : 'Human'
+        const religionText = officer.religion ? `✦ ${colorSpan(officer.religion.name, officer.religion.color)}` : colorSpan('(None)', COLORS.Gray)
         
         const buttons = [
             ['Fire', ()=>showFireOfficerModal(officer), gs.fleet.numPilots <= gs.fleet.ships.length],
@@ -66,6 +67,7 @@ function showOfficersMenu(officers = gs.fleet.officers, tab = 'roster') {
         const infoPanel = ce({children: [
             `<b>${officer.name}</b> (Level ${officer.level})<br/>`,
             `<b>Race:</b> ${raceText}<br/>`,
+            `<b>Religion:</b> ${religionText}<br/>`,
             `<b>Piloting:</b> ${pilotingText}<br/>`,
             `<b>Skills:</b> `,
             SKILLS_ALL.map(sk => `${sk}: ${officer.skills.getAmount(sk)}`).join(', '),
@@ -148,8 +150,8 @@ function showOfficersMenu(officers = gs.fleet.officers, tab = 'roster') {
                     `<b>${slot.name}:</b> ${equippedText} `,
                     ce({
                         tag: 'button',
-                        innerText: equipped ? 'Unequip' : 'Equip',
-                        onclick: equipped ? () => unequipItem(officer, slot) : () => showEquipModal(officer, slot)
+                        innerHTML: equipped ? 'Unequip' : 'Equip',
+                        onClick: equipped ? () => unequipItem(officer, slot) : () => showEquipModal(officer, slot)
                     }),
                     '<br/>'
                 ]}))

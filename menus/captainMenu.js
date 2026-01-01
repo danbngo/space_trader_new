@@ -93,14 +93,15 @@ function showCaptainPerksMenu(captain = gs.captain, selectedPerk = null) {
     function onSelectPerk(perk = PERK_TYPES_ALL[0]) {
         console.log('on select perk:', perk)
         const alreadyHas = perks.includes(perk)
-        const canAfford = numPerkPoints > 0
+        const perkCost = 1 // Use perk cost if it exists, default to 1
+        const canAfford = numPerkPoints >= perkCost
         const meetsLevel = level >= perk.minLevel
         const canTake = !alreadyHas && canAfford && meetsLevel
         
         let reasonText = ''
         if (alreadyHas) reasonText = 'You already have this perk.'
         else if (!meetsLevel) reasonText = `Requires level ${perk.minLevel}.`
-        else if (!canAfford) reasonText = 'You need a perk point.'
+        else if (!canAfford) reasonText = `You need ${perkCost} perk point${perkCost > 1 ? 's' : ''}.`
 
         const buttons = [
             ['Take', () => {
@@ -225,15 +226,27 @@ function showCaptainReputationMenu() {
     
     const factionTable = createTable(factionTableRows)
 
+    // Create side-by-side layout for ranks and faction reputation
+    const ranksAndFactionContainer = ce({
+        style: 'display: flex; gap: 2em; margin-top: 20px;',
+        children: [
+            ce({style: 'flex: 1;', children: [
+                ce({children: ['<b>Planetary Ranks</b>']}),
+                ranksTable
+            ]}),
+            ce({style: 'flex: 1;', children: [
+                ce({children: ['<b>Factional Reputation</b>']}),
+                factionTable
+            ]})
+        ]
+    })
+
     showModal(
         `Captain Reputation`,
         ce({children: [
             ce({children: ['<b>Planetary Reputation</b>']}),
             reputationTable,
-            ce({style: 'margin-top: 20px;', children: ['<b>Factional Reputation</b>']}),
-            factionTable,
-            ce({style: 'margin-top: 20px;', children: ['<b>Planetary Ranks</b>']}),
-            ranksTable,
+            ranksAndFactionContainer,
         ]}),
         [
             ["Skills", () => showCaptainSkillsMenu(captain)],
