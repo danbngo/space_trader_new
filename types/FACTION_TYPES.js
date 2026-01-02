@@ -150,55 +150,7 @@ const FACTION_TYPES = {
         'Missionaries',
         '✝️',
         COLORS.LightYellow,
-        'Evangelists spreading their faith to new worlds and converting non-believers.',
-        false,
-        false,
-        [FLEET_TYPES.MISSIONARIES]
-    ),
-    DIPLOMATS: new FactionType(
-        'Diplomats',
-        '🤝',
-        COLORS.LightBlue,
-        'Official envoys and ambassadors negotiating treaties and maintaining diplomatic relations.',
-        false,
-        false,
-        [FLEET_TYPES.DIPLOMATS]
-    ),
-    SALVAGERS: new FactionType(
-        'Salvagers',
-        '🔧',
-        COLORS.Orange,
-        'Scavengers who recover valuable materials from wrecks and abandoned stations.',
-        false,
-        false,
-        [FLEET_TYPES.SALVAGERS]
-    ),
-    TAX_COLLECTORS: new FactionType(
-        'Tax Collectors',
-        '💰',
-        COLORS.Gold,
-        'Government agents collecting taxes and enforcing financial regulations.',
-        false,
-        false,
-        [FLEET_TYPES.TAX_COLLECTORS]
-    ),
-    REBELS: new FactionType(
-        'Rebels',
-        '⚔️',
-        COLORS.Red,
-        'Revolutionary forces fighting against established authority and seeking to overthrow the current regime.',
-        false,
-        true,
-        [FLEET_TYPES.REBELS]
-    ),
-    REFUGEES: new FactionType(
-        'Refugees',
-        '🏃',
-        COLORS.Brown,
-        'Displaced populations fleeing war, persecution, or catastrophe, seeking sanctuary.',
-        false,
-        false,
-        [FLEET_TYPES.REFUGEES]
+        'Evangelists spreading their faith to new worlds and converting non-believers.'
     ),
 }
 
