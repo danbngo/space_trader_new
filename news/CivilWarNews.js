@@ -8,7 +8,7 @@ class CivilWarNews extends News {
             NT.CIVIL_WAR, planet
         )
 
-        const buildingsDisabled = rndMembers(this.planet.settlement.destroyableBuildings, rng(3, 1), true)
+        const buildingsDamaged = rndMembers(this.planet.settlement.damagableBuildings, rng(3, 1), true)
         const governmentType = Math.random() > .5 ? this.planet.c.governmentType : rndMember(GT_ALL.filter(g => g !== GT.PUPPET_STATE))
 
         this.addPlanetEffect(
@@ -27,7 +27,7 @@ class CivilWarNews extends News {
                 culture: CL.SLIGHTLY_HIGH,
             },
             {
-                buildingsDisabled,
+                buildingsDamaged,
                 governmentType,
                 population: CL.VERY_LOW,
                 territory: CL.SLIGHTLY_LOW,

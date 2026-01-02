@@ -8,7 +8,7 @@ class DisasterAsteroidNews extends News {
             NT.DISASTER_ASTEROID, planet
         )
 
-        const buildingsToDisable = rndMembers(this.planet.settlement.destroyableBuildings, Math.min(5, this.planet.settlement.destroyableBuildings.length), true);
+        const buildingsToDisable = rndMembers(this.planet.settlement.damagableBuildings, Math.min(5, this.planet.settlement.damagableBuildings.length), true);
 
         this.addPlanetEffect(
             {
@@ -21,7 +21,7 @@ class DisasterAsteroidNews extends News {
                 technology: CL.SLIGHTLY_LOW
             },
             {
-                buildingsDisabled: buildingsToDisable,
+                buildingsDamaged: buildingsToDisable,
                 population: CL.VERY_HIGH,
                 territory: CL.HIGH,
                 economy: CL.HIGH,

@@ -3,8 +3,8 @@
  * @typedef {CivilizationParams & {
  *   targetPlanet?: Planet|null,
  *   newRelationship?: RelationshipType|null,
- *   buildingsDisabled?: Building[],
- *   buildingsEnabled?: Building[],
+ *   buildingsDamaged?: Building[],
+ *   buildingsImproved?: Building[],
  *   relationsReset?: boolean,
  *   forcePeace?: boolean,
  *   forceWithdrawal?: boolean,
@@ -25,8 +25,8 @@ class NewsEffect extends Civilization {
         targetPlanet = null,
         governmentType = null,
         newRelationship = null,
-        buildingsDisabled = [],
-        buildingsEnabled = [],
+        buildingsDamaged = [],
+        buildingsImproved = [],
         relationsReset = false,
         forcePeace = false,
         forceWithdrawal = false,
@@ -89,9 +89,9 @@ class NewsEffect extends Civilization {
         /** @type {RelationshipType|null} */
         this.newRelationship = newRelationship;
         /** @type {Building[]} */
-        this.buildingsDisabled = buildingsDisabled;
+        this.buildingsDamaged = buildingsDamaged;
         /** @type {Building[]} */
-        this.buildingsEnabled = buildingsEnabled;
+        this.buildingsImproved = buildingsImproved;
         /** @type {boolean} */
         this.relationsReset = relationsReset;
         /** @type {boolean} */
@@ -105,7 +105,7 @@ class NewsEffect extends Civilization {
 
     apply(elapsedYears = 0) {
         const {planet, targetPlanet, governmentType, newRelationship, 
-            buildingsDisabled, buildingsEnabled, relationsReset, forcePeace, forceWithdrawal, onApply} = this;
+            buildingsDamaged, buildingsImproved, relationsReset, forcePeace, forceWithdrawal, onApply} = this;
         this.fired = true;
 
         if (planet && planet.civilization) {
@@ -136,11 +136,11 @@ class NewsEffect extends Civilization {
             if (targetPlanet && newRelationship) {
                 civilization.relationships.set(targetPlanet, newRelationship);
             }
-            for (const building of buildingsDisabled) {
-                building.enabled = false;
+            for (const building of buildingsDamaged) {
+                building.level = Math.max(0, building.level-1)
             }
-            for (const building of buildingsEnabled) {
-                building.enabled = true;
+            for (const building of buildingsImproved) {
+                building.level = building.level+1
             }
         }
 
@@ -157,8 +157,8 @@ class NewsEffect extends Civilization {
             newRelationship: null,
             onApply: null,
             //newRelationship: this.oldRelationship, //MUST be handled through onApply as relationships can evolve mid-event
-            buildingsDisabled: this.buildingsEnabled,
-            buildingsEnabled: this.buildingsDisabled,
+            buildingsDamaged: this.buildingsImproved,
+            buildingsImproved: this.buildingsDamaged,
             relationsReset: false, //this cant be undone.
         });
         return inverseEffect
@@ -172,8 +172,8 @@ class NewsEffect extends Civilization {
             targetPlanet: this.targetPlanet,
             governmentType: this.governmentType,
             newRelationship: this.newRelationship,
-            buildingsDisabled: [...this.buildingsDisabled],
-            buildingsEnabled: [...this.buildingsEnabled],
+            buildingsDamaged: [...this.buildingsDamaged],
+            buildingsImproved: [...this.buildingsImproved],
             relationsReset: this.relationsReset,
             forcePeace: this.forcePeace,
             forceWithdrawal: this.forceWithdrawal,
@@ -186,7 +186,7 @@ class NewsEffect extends Civilization {
             return `${label}: ${describeRating(rating, invertColor)} ➜ ${describeRating(newRating, invertColor)}.<br/>`
         }
 
-        const {planet, targetPlanet, governmentType, newRelationship, buildingsDisabled, buildingsEnabled,
+        const {planet, targetPlanet, governmentType, newRelationship, buildingsDamaged, buildingsImproved,
             relationsReset, forcePeace} = this;
         
         let msg = ''
@@ -203,10 +203,10 @@ class NewsEffect extends Civilization {
             }
 
 
-            if (buildingsDisabled) for (const building of buildingsDisabled) {
+            if (buildingsDamaged) for (const building of buildingsDamaged) {
                 msg += `${colorSpan(`- ${building.buildingType.name} destroyed`, COLORS.Red)}<br/>`
             }
-            if (buildingsEnabled) for (const building of buildingsEnabled) {
+            if (buildingsImproved) for (const building of buildingsImproved) {
                 msg += `${colorSpan(`- ${building.buildingType.name} built`, COLORS.Green)}<br/>`
             }
 

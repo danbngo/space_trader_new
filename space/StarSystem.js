@@ -111,7 +111,7 @@ class StarSystem extends SpaceObject {
     }
 
     removeFleet(fleet) {
-        console.log(`🗑️ Removing fleet ${fleet.name} (mission complete)`)
+        //console.log(`🗑️ Removing fleet ${fleet.name} (mission complete)`)
         this.fleets.splice(gs.system.fleets.indexOf(fleet), 1)
     }
 }

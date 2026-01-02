@@ -20,7 +20,7 @@ class FleetAI {
         this.voyageYearsRemaining = Infinity
         this.resetVoyageDuration()
         if (!Number.isFinite(this.voyageYearsRemaining)) throw new Error('fleetAI must have a finite voyage duration!!')
-        console.log('created fleet AI with props:', {fleet: this.fleet, home: this.home, destination: this.destination, voyageYearsRemaining: this.voyageYearsRemaining})
+        //console.log('created fleet AI with props:', {fleet: this.fleet, home: this.home, destination: this.destination, voyageYearsRemaining: this.voyageYearsRemaining})
     }
     /**
      * Updates AI behavior each game tick.
@@ -104,12 +104,14 @@ class FleetAI {
      * Called when fleet arrives at destination.
      */
     onNearHome() {
-        console.log('🏠', `${this.fleet.name+' '+this.fleet.uuid} has returned home to ${this.home.name+' '+this.home.uuid}.`)
+        //console.log('🏠', `${this.fleet.name+' '+this.fleet.uuid} has returned home to ${this.home.name+' '+this.home.uuid}.`)
+        this.route = null
+        this.destination = null
         gs.system.removeFleet(this.fleet)
     }
 
     onNearDestination() {
-        console.log('🛬', `${this.fleet.name+' '+this.fleet.uuid} has arrived at destination ${this.destination.name+' '+this.destination.uuid}.`)
+        //console.log('🛬', `${this.fleet.name+' '+this.fleet.uuid} has arrived at destination ${this.destination.name+' '+this.destination.uuid}.`)
         this.destination = null
         this.route = null
         this.resetVoyageDuration()
@@ -120,7 +122,7 @@ class FleetAI {
     }
 
     fightTarget() {
-        console.log('⚔️', `${this.fleet.name+' '+this.fleet.uuid} is engaging ${this.target.name+' '+this.target.uuid}!`)
+        //console.log('⚔️', `${this.fleet.name+' '+this.fleet.uuid} is engaging ${this.target.name+' '+this.target.uuid}!`)
         //chance to win is based on our fleet combat scores
         const ourScore = this.fleet.combatRating
         const theirScore = this.target.combatRating
@@ -169,7 +171,7 @@ class FleetAI {
         }
         
         if (transferred > 0) {
-            console.log(`💰 ${toFleet.name+' '+toFleet.uuid} seized ${transferred} units of cargo from ${fromFleet.name+' '+fromFleet.uuid}`);
+            //console.log(`💰 ${toFleet.name+' '+toFleet.uuid} seized ${transferred} units of cargo from ${fromFleet.name+' '+fromFleet.uuid}`);
         }
     }
     /**

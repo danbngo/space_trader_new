@@ -19,6 +19,7 @@ const NEWS_CHANCE_PER_DAY = 1/30;
 const META_NEWS_CHANCE_PER_DAY = 1/365;
 const ANOMALY_CHANCE_PER_DAY = 1/30;
 const MAX_NUM_ANOMALIES = 3;
+const FLEET_SPAWN_CHANCE_PER_DAY = 1/365
 
 //combat distances = miles, time = seconds
 const ENCOUNTER_SHIP_MAX_SPAWN_DISTANCE_RATIO = 0.5

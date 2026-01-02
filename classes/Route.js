@@ -11,7 +11,7 @@ class Route {
         const naiveDistance = calcDistance(fleet.x, fleet.y, destination.x, destination.y)
         const naiveTravelTime = naiveDistance/fleet.speed
         //add one extra day
-        const {toX, toY, endYear} = Route.estimateTravelTimeToOrbitingBody(startYear, fleet, destination, 100, naiveTravelTime*2+.1/365)
+        const {toX, toY, endYear} = Route.estimateTravelTimeToOrbitingBody(startYear, fleet, destination, 100, naiveTravelTime*10+1/365)
         this.fleet = fleet
         this.destination = destination
         this.startYear = startYear
@@ -64,7 +64,6 @@ class Route {
             const dist = Math.sqrt(dx * dx + dy * dy);
             const travelTime = dist / speed;
 
-
             if (travelTime > t) {
                 //dont consider this a valid route if fleet couldn't make it there in time
                 continue
@@ -78,7 +77,17 @@ class Route {
             }
         }
 
-        if (!endPosition) throw new Error('couldnt find a valid route!')
+        if (!endPosition) {
+            console.log({
+                fleet: fleet,
+                speed: fleet.speed,
+                planet: planet,
+                endPosition: endPosition,
+                bestYearOffset: bestYearOffset,
+                results: results
+            })
+            throw new Error('couldnt find a valid route!')
+        }
 
         return {
             bestYearOffset,

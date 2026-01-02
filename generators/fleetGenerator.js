@@ -25,6 +25,7 @@ function generateFleetCargo(fleet = new Fleet(), fleetType = FLEET_TYPES_ALL[0])
  * @returns {Fleet} The generated fleet.
  */
 function generateFleet(fleetType = FLEET_TYPES_ALL[0], factionType = null, planet = new Planet()) {
+    console.log('generating a fleet:',fleetType.name,factionType.name,planet.name)
     const ships = []
     const populationMod = planet ? planet.c.population : 1
     const numShips = Math.ceil(0.1 + rng(fleetType.minShips*populationMod, fleetType.maxShips*populationMod))
@@ -37,7 +38,7 @@ function generateFleet(fleetType = FLEET_TYPES_ALL[0], factionType = null, plane
         console.log({ fleetType, planet, numShips, populationMod})
         throw new Error('generateFleet: No ships generated for fleetType '+fleetType.name)
     }
-    const fleet = new Fleet(`${planet ? planet.ianName+' ' : ''}${fleetType.name}`, fleetType, factionType, planet ? planet.color : COLORS.DarkGray, planet.x, planet.y)
+    const fleet = new Fleet(`${planet ? planet.ianName+' ' : ''}${fleetType.name}`, planet, fleetType, factionType, planet ? planet.color : COLORS.DarkGray, planet.x, planet.y)
     ships.forEach(s=>fleet.addShip(s))
     
     fleet.cargo = generateFleetCargo(fleet, fleetType)
@@ -68,6 +69,16 @@ async function addFleetActivity(numYears = 2, progress = {completePercentage: 0}
     let fleetsSpawned = 0
     const initialFleetCount = gs.system.fleets.length
     
+    // Pre-calculate max fleets per planet (optimization for simulation loop)
+    const planetMaxFleets = new Map()
+    for (const planet of gs.system.planets) {
+        if (planet.civilization) {
+            planetMaxFleets.set(planet, calculateMaxFleetsForPlanet(planet))
+        }
+    }
+
+    console.log('Pre-calculated max fleets per planet for simulation:', planetMaxFleets)
+    
     for (let w = 0; w < totalWeeks; w++) {
         currentWeek++
         weeksSinceYield++
@@ -75,9 +86,9 @@ async function addFleetActivity(numYears = 2, progress = {completePercentage: 0}
         // Increment game year during simulation
         gs.year += YEARS_PER_WEEK
         
-        // Spawn fleets from planets
+        // Spawn fleets from planets (using pre-calculated max fleets for performance)
         const fleetCountBefore = gs.system.fleets.length
-        checkForFleetSpawning(DAYS_PER_WEEK)
+        checkForFleetSpawning(DAYS_PER_WEEK, planetMaxFleets)
         fleetsSpawned += (gs.system.fleets.length - fleetCountBefore)
         
         // Tick NPC fleet AI (move fleets around)

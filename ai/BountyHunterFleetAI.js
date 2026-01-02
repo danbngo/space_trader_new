@@ -8,7 +8,7 @@ class BountyHunterFleetAI extends FleetAI {
         return rndMember([...gs.system.planets, ...gs.system.dwarfPlanets].filter(p=>(p !== this.home)))
     }
     calcValidTargets() {
-        return gs.system.fleets.filter(f => (f !== this.fleet && f.faction.criminal))
+        return gs.system.fleets.filter(f => (f !== this.fleet && f.factionType.criminal))
     }
     onNearTarget() {
         if (this.target instanceof Fleet) {

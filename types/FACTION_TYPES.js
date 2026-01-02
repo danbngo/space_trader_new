@@ -50,19 +50,19 @@ const FACTION_TYPES = {
     SMUGGLERS: new FactionType(
         'Smugglers',
         '📦',
-        COLORS.DarkOrange,
+        COLORS.DarkGray,
         'Black market traders dealing in illicit and restricted cargo.',
-        true,  // criminal
-        false, // authority
+        true,  
+        false, 
         [FLEET_TYPES.SMUGGLERS]
     ),
     PIRATES: new FactionType(
         'Pirates',
         '☠️',
-        COLORS.LightRed,
+        COLORS.Red,
         'Ruthless outlaws who prey on merchant vessels and settlements.',
-        true,  // criminal
-        false, // authority
+        true,  
+        false, 
         [FLEET_TYPES.PIRATES]
     ),
     POLICE: new FactionType(
@@ -70,32 +70,32 @@ const FACTION_TYPES = {
         '👮',
         COLORS.LightBlue,
         'Law enforcement maintaining order and security in civilized space.',
-        false, // criminal
-        true,  // authority
+        false, 
+        true,  
         [FLEET_TYPES.POLICE]
     ),
     SOLDIERS: new FactionType(
         'Military',
         '⚔️',
-        COLORS.LightGreen,
+        COLORS.Green,
         'Military forces protecting planets and enforcing government authority.',
-        false, // criminal
-        true,  // authority
+        false, 
+        true,  
         [FLEET_TYPES.SOLDIERS]
     ),
     BOUNTY_HUNTERS: new FactionType(
         'Bounty Hunters',
         '🎯',
-        hexToRgba('#ff6600'),
+        COLORS.DarkBlue,
         'Professional trackers and hunters who capture criminals for profit.',
         false,
-        false,
+        true,
         [FLEET_TYPES.BOUNTY_HUNTERS]
     ),
     TOURISTS: new FactionType(
         'Tourists',
         '🎭',
-        COLORS.LightOrange,
+        COLORS.LightYellow,
         'Pleasure cruisers and sightseers traveling the galaxy for leisure.',
         false,
         false,
@@ -106,14 +106,14 @@ const FACTION_TYPES = {
         '⛓️',
         COLORS.DarkRed,
         'Ruthless criminals who capture and enslave crews. They are feared throughout the galaxy.',
-        true,  // criminal
-        false, // authority
+        true,  
+        false, 
         [FLEET_TYPES.SLAVERS]
     ),
     COLONISTS: new FactionType(
         'Colonists',
         '🏘️',
-        COLORS.LightGreen,
+        COLORS.Magenta,
         'Settlers traveling to establish new colonies. They prefer to avoid trouble and focus on their mission.',
         false,
         false,
@@ -131,7 +131,7 @@ const FACTION_TYPES = {
     PILGRIMS: new FactionType(
         'Pilgrims',
         '🙏',
-        COLORS.White,
+        COLORS.LightPurple,
         'Devout travelers making religious journeys to holy sites and sacred worlds.',
         false,
         false,
@@ -140,17 +140,65 @@ const FACTION_TYPES = {
     INQUISITORS: new FactionType(
         'Inquisitors',
         '⚖️',
-        COLORS.Purple,
+        COLORS.DarkPurple,
         'Religious enforcers tasked with rooting out heresy and maintaining doctrinal purity.',
         false,
-        false,
+        true,
         [FLEET_TYPES.INQUISITORS]
     ),
     MISSIONARIES: new FactionType(
         'Missionaries',
         '✝️',
-        COLORS.LightYellow,
-        'Evangelists spreading their faith to new worlds and converting non-believers.'
+        COLORS.Purple,
+        'Evangelists spreading their faith to new worlds and converting non-believers.',
+        false,
+        false,
+        [FLEET_TYPES.MISSIONARIES]
+    ),
+    DIPLOMATS: new FactionType(
+        'Diplomats',
+        '🤝',
+        COLORS.White,
+        'Official envoys and ambassadors negotiating treaties and maintaining diplomatic relations.',
+        false,
+        false,
+        [FLEET_TYPES.DIPLOMATS]
+    ),
+    SALVAGERS: new FactionType(
+        'Salvagers',
+        '🔧',
+        COLORS.Orange,
+        'Scavengers who recover valuable materials from wrecks and abandoned stations.',
+        false,
+        false,
+        [FLEET_TYPES.SALVAGERS]
+    ),
+    TAX_COLLECTORS: new FactionType(
+        'Tax Collectors',
+        '💰',
+        COLORS.DarkYellow,
+        'Government agents collecting taxes and enforcing financial regulations.',
+        false,
+        false,
+        [FLEET_TYPES.TAX_COLLECTORS]
+    ),
+    REBELS: new FactionType(
+        'Rebels',
+        '⚔️',
+        COLORS.DarkMagenta,
+        'Revolutionary forces fighting against established authority and seeking to overthrow the current regime.',
+        false,
+        true,
+        [FLEET_TYPES.REBELS]
+    ),
+    REFUGEES: new FactionType(
+        'Refugees',
+        '🏃',
+        COLORS.LightMagenta,
+        'Displaced populations fleeing war, persecution, or catastrophe, seeking sanctuary.',
+        false,
+        false,
+        [FLEET_TYPES.REFUGEES]
     ),
 }
 

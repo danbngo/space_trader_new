@@ -8,7 +8,7 @@ class WarInvasionNews extends News {
             NT.WAR_INVASION, planet, targetPlanet
         )
 
-        const buildingsDisabled = rndMembers(targetPlanet.settlement.destroyableBuildings, 1, true)
+        const buildingsDamaged = rndMembers(targetPlanet.settlement.damagableBuildings, 1, true)
 
         this.addPlanetEffect(
             {
@@ -36,7 +36,7 @@ class WarInvasionNews extends News {
                 territory: CL.SLIGHTLY_LOW
             },
             {
-                buildingsDisabled,
+                buildingsDamaged,
                 army: CL.LOW,
                 population: CL.LOW,
                 economy: CL.LOW,

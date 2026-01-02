@@ -562,7 +562,7 @@ class Encounter {
         console.log('showPlayerRefuseSurrenderModal', { fameMultiplier, bountyMultiplier });
         const fleetName = coloredName(gs.encounter.fleet)
         const planet = gs.encounter.planet
-        const faction = gs.encounter.fleet.faction
+        const faction = gs.encounter.fleet.factionType
         const bounty = 100 * bountyMultiplier
         const fame = fameMultiplier > 0 ? 1 * fameMultiplier : 0
         const infamy = fameMultiplier < 0 ? 1 * Math.abs(fameMultiplier) : 0
@@ -588,7 +588,7 @@ class Encounter {
         console.log('showPlayerDidSurrenderModal', { fameLossMultiplier });
         const fleetName = coloredName(gs.encounter.fleet)
         const planet = gs.encounter.planet
-        const faction = gs.encounter.fleet.faction
+        const faction = gs.encounter.fleet.factionType
         const fameLoss = fameLossMultiplier < 0 ? 5 * fameLossMultiplier : 0
         const infamyLoss = fameLossMultiplier < 0 ? 5 * fameLossMultiplier : 0
 
@@ -608,7 +608,7 @@ class Encounter {
         console.log('showPlayerAttackFleetModal', { fameMultiplier, bountyMultiplier });
         const fleetName = coloredName(gs.encounter.fleet)
         const planet = gs.encounter.planet
-        const faction = gs.encounter.fleet.faction
+        const faction = gs.encounter.fleet.factionType
         const fame = fameMultiplier > 0 ? 1 * fameMultiplier : 0
         const infamy = fameMultiplier < 0 ? 1 * Math.abs(fameMultiplier) : 0
         const bounty = 1000 * bountyMultiplier

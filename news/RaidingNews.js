@@ -8,7 +8,7 @@ class RaidingNews extends News {
             NT.RAIDING, planet, targetPlanet
         )
 
-        const buildingsToDisable = rndMembers(this.targetPlanet.settlement.destroyableBuildings, 1);
+        const buildingsToDisable = rndMembers(this.targetPlanet.settlement.damagableBuildings, 1);
 
         this.addPlanetEffect(
             {
@@ -46,7 +46,7 @@ class RaidingNews extends News {
                 prestige: CL.SLIGHTLY_LOW,
             },
             {
-                buildingsDisabled: buildingsToDisable,
+                buildingsDamaged: buildingsToDisable,
                 reserves: CL.LOW,
                 wealth: CL.LOW,
                 security: CL.LOW,

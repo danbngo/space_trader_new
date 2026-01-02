@@ -8,7 +8,7 @@ class WarBombardmentNews extends News {
             NT.BOMBARDMENT, planet, targetPlanet
         )
 
-        const buildingsToDisable = rndMembers(this.planet.settlement.destroyableBuildings);
+        const buildingsToDisable = rndMembers(this.planet.settlement.damagableBuildings);
 
         this.addPlanetEffect(
             {
@@ -47,7 +47,7 @@ class WarBombardmentNews extends News {
                 education: CL.LOW,
                 economy: CL.LOW,
                 industry: CL.LOW,
-                buildingsDisabled: buildingsToDisable,
+                buildingsDamaged: buildingsToDisable,
                 forcePeace: true
             },
             {},

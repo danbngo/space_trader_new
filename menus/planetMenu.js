@@ -54,7 +54,10 @@ function showPlanetMenu(planet = new Planet()) {
     if (settlement) for (const {type, prop, menu} of buildingHandlerMapping) {
         const building = settlement[prop]
         if (building) {
-            const access = type.canAccess(planet, isDocked)
+            const access = 
+                building.permitted ? {canShow:false, canAccess: false} :
+                type.canAccess(planet, isDocked)
+            if (building.damaged) access.canAccess = false
             if (access.canShow) {
                 options.push([type.name, () => menu(building), access.isDisabled])
             }

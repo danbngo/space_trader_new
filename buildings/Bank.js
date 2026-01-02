@@ -24,7 +24,7 @@ class Bank extends Building {
         return Math.ceil( loanAmount * Math.pow(0.01*loanDuration, 1/(1+this.planet.c.corruption)) )
     }
     calcLoanMaxAmount(officer = new Officer()) {
-        let maxLoanAmount = Math.pow(officer.level, 1.5) * 5000
+        let maxLoanAmount = Math.pow(officer.level, 1.5) * 5000 * this.level
         maxLoanAmount += officer.fame.total*10 - officer.infamy.total*10
         maxLoanAmount += this.playerBalance
         maxLoanAmount -= officer.bounty.total

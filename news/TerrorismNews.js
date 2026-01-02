@@ -8,7 +8,7 @@ class TerrorismNews extends News {
             NT.TERRORISM, planet, targetPlanet
         )
 
-        const buildingsDisabled = rndMembers(targetPlanet.settlement.destroyableBuildings, 1, true)
+        const buildingsDamaged = rndMembers(targetPlanet.settlement.damagableBuildings, 1, true)
 
         this.addPlanetEffect(
             {
@@ -36,7 +36,7 @@ class TerrorismNews extends News {
 
         this.addTargetPlanetEffect(
             {
-                buildingsDisabled,
+                buildingsDamaged,
                 security: CL.LOW,
                 culture: CL.SLIGHTLY_LOW,
                 economy: CL.SLIGHTLY_LOW,

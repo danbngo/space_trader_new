@@ -9,7 +9,7 @@ class SoldierFleetAI extends FleetAI {
             if (f === this.fleet) return false;
             
             // Attack criminals
-            if (f.faction.criminal) return true;
+            if (f.factionType.criminal) return true;
             
             // Attack fleets from planets we're at war with
             if (this.fleet.planet && this.fleet.planet.civilization && f.planet && f.planet.civilization) {

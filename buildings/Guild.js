@@ -21,10 +21,10 @@ class Guild extends Building {
         return Math.round(basePrice * (1 + this.planet.c.taxes))
     }
     get baseNumOfficers() {
-        return GUILD_AVERAGE_NUM_OFFICERS*this.planet.c.army
+        return GUILD_AVERAGE_NUM_OFFICERS*this.planet.c.army*this.level
     }
     get baseNumContracts() {
-        return Math.round(GUILD_AVERAGE_NUM_CONTRACTS*this.planet.c.economy)
+        return Math.round(GUILD_AVERAGE_NUM_CONTRACTS*this.planet.c.economy*this.level)
     }
     normalize(clearExisting = false) {
         super.normalize()

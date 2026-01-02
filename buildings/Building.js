@@ -17,8 +17,8 @@ class Building {
         this.moon = moon
         /** @type {number} */
         this.credits = 1
-        /** @type {boolean} */
-        this.enabled = true
+        this.level = 1
+        this.permitted = true;
         //this.normalize() //danmod this causes errors because the extending child class tries to use ITS normalize function instead of the one below
     }
     normalize() {
@@ -28,5 +28,8 @@ class Building {
         const corruption = this.planet.c.corruption
         const barterSkill = gs.fleet.totalSkills.getAmount(SKILLS.Barter)
         return corruption / (1 + barterSkill / 50)
+    }
+    get damaged() {
+        return this.level <= 0
     }
 }

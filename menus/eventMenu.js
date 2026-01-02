@@ -47,7 +47,7 @@ function checkForAnomalies(elapsedDays = 1) {
     // Generate and add anomaly
     const anomaly = generateAnomaly();
     gs.system.anomalies.push(anomaly);
-    console.log(`✨ Anomaly detected: ${anomaly.name} at (${anomaly.x.toFixed(1)}, ${anomaly.y.toFixed(1)})`);
+    //console.log(`✨ Anomaly detected: ${anomaly.name} at (${anomaly.x.toFixed(1)}, ${anomaly.y.toFixed(1)})`);
     
     return true;
 }
@@ -61,7 +61,7 @@ function checkDebtCollections(elapsedDays = 1) {
     const baseChance = Math.pow(BANK_BOUNTY_CHANCE_PER_DAY, 1/(elapsedDays))
     if (Math.random() > baseChance) return
 
-    console.log('🚨 DEBT COLLECTION TRIGGERED', { outstandingDebts, baseChance });
+    //console.log('🚨 DEBT COLLECTION TRIGGERED', { outstandingDebts, baseChance });
     const totalDebts = gs.captain.calcTotalDebts(true)
     const convertedAmt = Math.min(totalDebts, 100 + rng( Math.ceil(totalDebts/3), Math.ceil(totalDebts/6) ))
     const fees = Math.ceil(convertedAmt * 0.5)
@@ -91,55 +91,38 @@ function payDebtsRandomly(officer = new Officer(), amount = 0) {
 /**
  * Checks if planets should spawn new NPC fleets based on their civilization stats.
  * @param {number} elapsedDays - Days that have elapsed.
+ * @param {Map<Planet, CountsMap>} planetMaxFleets - Optional pre-calculated max fleets per planet (for performance during simulation).
  */
-function checkForFleetSpawning(elapsedDays = 1) {
+function checkForFleetSpawning(elapsedDays = 1, planetMaxFleets = null) {
     if (!gs.system || !gs.system.planets) return
     
     const allPlanets = [...gs.system.planets]
-    
     for (const planet of allPlanets) {
         if (!planet.civilization) continue
-        
-        const c = planet.civilization
 
-        const maxNumFleetsPerFaction = new CountsMap()
-        for (const factionType of FACTION_TYPES_ALL) {
-            let maxNumFleets = c.population
-            //modify based on policies
-            for (const p of c.policies.all) {
-                if (p.factionSpawnModifiers && p.factionSpawnModifiers.has(factionType)) {
-                    maxNumFleets += p.factionSpawnModifiers.get(factionType)
-                }
+        // Calculate existing fleet counts per faction for this planet
+        const existingNumFleetsPerFaction = new Map()
+        for (const fleet of gs.system.fleets) {
+            if (fleet.planet !== planet) continue
+            const faction = fleet.factionType
+            if (!existingNumFleetsPerFaction.has(faction)) {
+                existingNumFleetsPerFaction.set(faction, 0)
             }
-            maxNumFleetsPerFaction.setAmount(factionType, maxNumFleets)
+            existingNumFleetsPerFaction.set(faction, existingNumFleetsPerFaction.get(faction)+1)
         }
 
-        maxNumFleetsPerFaction.multiply(FACTION_TYPES.MINERS, c.industry/c.reserves)
-        maxNumFleetsPerFaction.multiply(FACTION_TYPES.SCIENTISTS, c.technology*c.education)
-        maxNumFleetsPerFaction.multiply(FACTION_TYPES.PIRATES, c.crime)
-        maxNumFleetsPerFaction.multiply(FACTION_TYPES.MERCHANTS, c.economy)
-        maxNumFleetsPerFaction.multiply(FACTION_TYPES.SOLDIERS, c.navy)
-        maxNumFleetsPerFaction.multiply(FACTION_TYPES.PILGRIMS, c.wealth)
-        maxNumFleetsPerFaction.multiply(FACTION_TYPES.INQUISITORS, 1/c.corruption)
-        maxNumFleetsPerFaction.multiply(FACTION_TYPES.MISSIONARIES, c.prestige*c.education)
-        maxNumFleetsPerFaction.multiply(FACTION_TYPES.TOURISTS, c.wealth)
-        maxNumFleetsPerFaction.multiply(FACTION_TYPES.SMUGGLERS, c.taxes*c.corruption)
-        maxNumFleetsPerFaction.multiply(FACTION_TYPES.BOUNTY_HUNTERS, c.security*c.crime)
-        maxNumFleetsPerFaction.multiply(FACTION_TYPES.SLAVERS, c.corruption/c.population)
-        maxNumFleetsPerFaction.multiply(FACTION_TYPES.COLONISTS, c.population/c.economy)
-        maxNumFleetsPerFaction.multiply(FACTION_TYPES.DIPLOMATS, c.prestige)
-        maxNumFleetsPerFaction.multiply(FACTION_TYPES.SALVAGERS, c.inflation/c.reserves)
-        maxNumFleetsPerFaction.multiply(FACTION_TYPES.TAX_COLLECTORS, c.taxes)
-        maxNumFleetsPerFaction.multiply(FACTION_TYPES.REBELS, 1/(c.security*c.culture))
-        maxNumFleetsPerFaction.multiply(FACTION_TYPES.REFUGEES, 1/c.score)
+        // Use pre-calculated max fleets if provided, otherwise calculate dynamically
+        const maxNumFleetsPerFaction = planetMaxFleets && planetMaxFleets.has(planet)
+            ? planetMaxFleets.get(planet)
+            : calculateMaxFleetsForPlanet(planet)
 
-        for (const ft of [FACTION_TYPES.PILGRIMS, FACTION_TYPES.INQUISITORS, FACTION_TYPES.MISSIONARIES]) {
-            maxNumFleetsPerFaction.multiply(ft, c.stateReligion ? 1+c.religions.getAmount(c.stateReligion) : 0)
-        }
-
-        // Roll for each potential fleet type
+        // Spawn fleets based on calculated weights
         for (const [faction, weight] of maxNumFleetsPerFaction.counts) {
-            if (calcOccurrencesPerTimespan(weight, elapsedDays)) {
+            const numExisting = existingNumFleetsPerFaction.get(faction) || 0
+            if ((numExisting >= weight)) {
+                continue
+            }
+            if (calcOccurrencesPerTimespan(FLEET_SPAWN_CHANCE_PER_DAY, weight/(1+numExisting)*elapsedDays)) {
                 // Spawn the fleet
                 const fleetType = rndMember(faction.fleetTypes)
                 const fleet = generateFleet(fleetType, faction, planet)
@@ -147,7 +130,7 @@ function checkForFleetSpawning(elapsedDays = 1) {
                 fleet.x = planet.x
                 fleet.y = planet.y
                 gs.system.fleets.push(fleet)
-                console.log(`✨ Spawned ${fleetType.name} fleet from ${planet.name}`, fleet)
+                //console.log(`✨ Spawned ${fleetType.name} fleet from ${planet.name}`, fleet)
             }
         }
     }

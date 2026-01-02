@@ -8,7 +8,7 @@ class DisasterVolcanoNews extends News {
             NT.DISASTER_VOLCANO, planet
         )
 
-        const buildingsToDisable = rndMembers(this.planet.settlement.destroyableBuildings, Math.min(3, this.planet.settlement.destroyableBuildings.length), true);
+        const buildingsToDisable = rndMembers(this.planet.settlement.damagableBuildings, Math.min(3, this.planet.settlement.damagableBuildings.length), true);
 
         this.addPlanetEffect(
             {
@@ -21,7 +21,7 @@ class DisasterVolcanoNews extends News {
                 population: CL.SLIGHTLY_LOW
             },
             {
-                buildingsDisabled: buildingsToDisable,
+                buildingsDamaged: buildingsToDisable,
                 population: CL.HIGH,
                 industry: CL.SLIGHTLY_HIGH,
                 culture: CL.SLIGHTLY_LOW,

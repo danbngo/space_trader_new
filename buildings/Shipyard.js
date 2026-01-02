@@ -17,10 +17,10 @@ class Shipyard extends Building {
         this.normalize(true)
     }
     get baseNumShips() {
-        return this.planet.c.navy * SHIPYARD_AVERAGE_NUM_SHIPS
+        return this.planet.c.navy * SHIPYARD_AVERAGE_NUM_SHIPS * this.level
     }
     get baseNumModules() {
-        return this.planet.c.navy * SHIPYARD_AVERAGE_NUM_MODULES
+        return this.planet.c.navy * SHIPYARD_AVERAGE_NUM_MODULES * this.level
     }
     normalize(clearExisting = false) {
         super.normalize()

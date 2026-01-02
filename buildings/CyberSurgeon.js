@@ -15,7 +15,7 @@ class CyberSurgeon extends Building {
         this.normalize(true)
     }
     get baseNumImplants() {
-        return this.planet.c.technology * CYBER_SURGEON_AVERAGE_NUM_IMPLANTS
+        return this.planet.c.technology * CYBER_SURGEON_AVERAGE_NUM_IMPLANTS * this.level
     }
     normalize(clearExisting = false) {
         super.normalize()

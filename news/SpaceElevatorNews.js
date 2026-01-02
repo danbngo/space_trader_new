@@ -8,7 +8,7 @@ class SpaceElevatorNews extends News {
             NT.SPACE_ELEVATOR, planet
         )
 
-        const buildingsDisabled = rndMembers(planet.settlement.destroyableBuildings, Math.min(3, planet.settlement.destroyableBuildings.length), true)
+        const buildingsDamaged = rndMembers(planet.settlement.damagableBuildings, Math.min(3, planet.settlement.damagableBuildings.length), true)
 
         this.addPlanetEffect(
             {
@@ -33,7 +33,7 @@ class SpaceElevatorNews extends News {
                 ]))
             },
             {
-                buildingsDisabled,
+                buildingsDamaged,
                 population: CL.LOW,
                 economy: CL.LOW,
                 industry: CL.LOW,

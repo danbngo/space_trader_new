@@ -8,7 +8,7 @@ class InvestmentNews extends News {
             NT.INVESTMENT, planet, targetPlanet
         )
 
-        const buildingsEnabled = rndMembers(targetPlanet.settlement.fixableBuildings, rng(3,1), true);
+        const buildingsImproved = rndMembers(targetPlanet.settlement.improvableBuildings, rng(3,1), true);
 
         this.addPlanetEffect(
             {
@@ -35,7 +35,7 @@ class InvestmentNews extends News {
                 econommy: CL.SLIGHTLY_HIGH
             },
             {
-                buildingsEnabled,
+                buildingsImproved,
                 wealth: CL.HIGH,
                 inflation: CL.HIGH,
                 industry: CL.VERY_HIGH,

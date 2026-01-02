@@ -33,6 +33,11 @@ const FLEET_AI_TYPES = {
     PILGRIM: new FleetAIType('Pilgrim AI', PilgrimFleetAI, FLEET_TYPES.PILGRIMS),
     INQUISITOR: new FleetAIType('Inquisitor AI', InquisitorFleetAI, FLEET_TYPES.INQUISITORS),
     MISSIONARY: new FleetAIType('Missionary AI', MissionaryFleetAI, FLEET_TYPES.MISSIONARIES),
+    DIPLOMAT: new FleetAIType('Diplomat AI', DiplomatFleetAI, FLEET_TYPES.DIPLOMATS),
+    SALVAGER: new FleetAIType('Salvager AI', SalvagerFleetAI, FLEET_TYPES.SALVAGERS),
+    TAX_COLLECTOR: new FleetAIType('Tax Collector AI', TaxCollectorFleetAI, FLEET_TYPES.TAX_COLLECTORS),
+    REBEL: new FleetAIType('Rebel AI', RebelFleetAI, FLEET_TYPES.REBELS),
+    REFUGEE: new FleetAIType('Refugee AI', RefugeeFleetAI, FLEET_TYPES.REFUGEES),
 }
 
 const FLEET_AI_TYPES_ALL = Object.values(FLEET_AI_TYPES)

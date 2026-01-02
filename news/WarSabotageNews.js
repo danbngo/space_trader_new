@@ -8,7 +8,7 @@ class WarSabotageNews extends News {
             NT.WAR_SABOTAGE, planet, targetPlanet
         )
 
-        const buildingsDisabled = rndMembers(targetPlanet.settlement.destroyableBuildings, 1, true)
+        const buildingsDamaged = rndMembers(targetPlanet.settlement.damagableBuildings, 1, true)
 
         this.addPlanetEffect(
             {
@@ -37,7 +37,7 @@ class WarSabotageNews extends News {
                 technology: CL.SLIGHTLY_LOW
             },
             {
-                buildingsDisabled,
+                buildingsDamaged,
                 industry: CL.LOW,
                 economy: CL.LOW,
                 security: CL.VERY_LOW,

@@ -5,7 +5,7 @@
  */
 class PirateFleetAI extends FleetAI {
     calcValidTargets() {
-        return gs.system.fleets.filter(f => (f !== this.fleet && !f.faction.criminal && !f.faction.authority));
+        return gs.system.fleets.filter(f => (f !== this.fleet && !f.factionType.criminal && !f.factionType.authority));
     }
     calcDestination() {
         return rndMember([...gs.system.dwarfPlanets].filter(p=>(p !== this.home)))

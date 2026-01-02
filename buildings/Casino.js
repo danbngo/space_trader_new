@@ -21,7 +21,7 @@ class Casino extends Building {
         super.normalize()
         // Number of prizes based on corruption (more corrupt = more prizes)
         const corruption = this.planet.civilization ? this.planet.civilization.corruption : 1.0
-        const numPrizes = Math.max(3, Math.round(5 + corruption * 10))
+        const numPrizes = Math.max(3, Math.round((5 + corruption * 10) * this.level))
         
         this.prizes = generateCasinoPrizes(this.planet, numPrizes)
         this.currentPrizeIndex = 0

@@ -8,7 +8,7 @@ class EnvironmentalDisasterNews extends News {
             NT.ENVIRONMENTAL_DISASTER, planet
         )
 
-        const buildingsToDisable = rndMembers(this.planet.settlement.destroyableBuildings);
+        const buildingsToDisable = rndMembers(this.planet.settlement.damagableBuildings);
 
         this.addPlanetEffect(
             {
@@ -23,7 +23,7 @@ class EnvironmentalDisasterNews extends News {
                 corruption: CL.SLIGHTLY_LOW,
             },
             {
-                buildingsDisabled: buildingsToDisable,
+                buildingsDamaged: buildingsToDisable,
                 industry: CL.VERY_LOW,
                 reserves: CL.LOW,
                 population: CL.LOW,

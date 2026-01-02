@@ -24,7 +24,7 @@ class Academy extends Building {
         return Math.ceil(baseCost * skillModifier * (1 + this.planet.c.corruption) * this.planet.c.inflation)
     }
     calcCanUpgradeSkill(officer = new Officer(), targetLevel = 1) {
-        return this.planet.c.education * officer.level >= targetLevel
+        return this.planet.c.education * this.level * officer.level >= targetLevel
     }
     calcHirePrice(officer = new Officer()) {
         const basePrice = Math.round(officer.value * (1+this.planet.c.corruption) * this.planet.c.inflation / (this.isTavern ? this.planet.c.crime : this.planet.c.army))
@@ -35,7 +35,7 @@ class Academy extends Building {
         return Math.round(basePrice * (1 + this.planet.c.taxRate))
     }
     get baseNumOfficers() {
-        return GUILD_AVERAGE_NUM_OFFICERS * (this.isTavern ? this.planet.c.crime : this.planet.c.army) * this.planet.c.population
+        return GUILD_AVERAGE_NUM_OFFICERS * (this.isTavern ? this.planet.c.crime : this.planet.c.army) * this.planet.c.population * this.level
     }
     normalize(clearExisting = false) {
         super.normalize()

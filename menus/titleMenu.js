@@ -13,6 +13,126 @@ function showTitleScreen() {
         ]
     );
 }
+
+/**
+ * Simulates galactic history with progress tracking.
+ * @param {number} numYears - Number of years of history to generate.
+ */
+async function simulateHistory(numYears) {
+    const progressBar = new ProgressBar({
+        id: 'history_progress',
+        label: '',
+        width: 50,
+    })
+
+    const elapsedTimeElement = ce({
+        id: 'elapsed_time',
+        style: 'text-align: center; margin-top: 10px;',
+        children: ['Elapsed time: 0.0s']
+    })
+
+    const activeNewsCountElement = ce({
+        tag: 'div',
+        id: 'active_news_count',
+        style: 'text-align: center; margin-top: 5px;',
+        children: ['Active News Events: 0']
+    })
+    
+    showModal(
+        'Loading Game',
+        ce({children: [
+            `Generating ${numYears} years of galactic history...`,
+            ce({tag:'br'}),
+            progressBar.container,
+            ce({tag:'br'}),
+            elapsedTimeElement,
+            activeNewsCountElement
+        ]}),
+        []
+    )
+    
+    // Wait a frame to ensure modal is displayed
+    await new Promise(resolve => setTimeout(resolve, 10))
+    
+    // Generate history with progress tracking
+    const progress = {completePercentage: 0}
+    const startTime = performance.now()
+    
+    const progressUpdateInterval = setInterval(() => {
+        const elapsedSeconds = (performance.now() - startTime) / 1000
+        progressBar.update(progress.completePercentage)
+        const elapsedEl = document.getElementById('elapsed_time')
+        if (elapsedEl) {
+            elapsedEl.textContent = `Elapsed time: ${elapsedSeconds.toFixed(1)}s`
+        }
+        const newsCountEl = document.getElementById('active_news_count')
+        if (newsCountEl) {
+            newsCountEl.textContent = `Active News Events: ${gs.system.news ? gs.system.news.length : 0}`
+        }
+    }, 50)
+    
+    await addHistory(GAME_START_YEAR - numYears, GAME_START_YEAR, progress)
+    
+    clearInterval(progressUpdateInterval)
+    closeModal()
+}
+
+/**
+ * Simulates fleet activity with progress tracking.
+ * @param {number} numYears - Number of years of fleet activity to simulate.
+ */
+async function simulateFleetActivity(numYears) {
+    const activityProgressBar = new ProgressBar({id: 'fleet_activity_progress', value: 0, width: 50})
+    const activityElapsedTimeElement = ce({tag: 'div', id: 'fleet_elapsed_time', children: ['Elapsed time: 0.0s']})
+    const activeFleetCountElement = ce({tag: 'div', id: 'active_fleet_count', style: 'text-align: center; margin-top: 5px;', children: ['Active Fleets: 0']})
+    const activeAnomalyCountElement = ce({tag: 'div', id: 'active_anomaly_count', style: 'text-align: center; margin-top: 5px;', children: ['Active Anomalies: 0']})
+    
+    showModal(
+        'Generating Fleet Activity',
+        ce({children: [
+            `Simulating ${numYears} years of fleet movement...`,
+            ce({tag:'br'}),
+            activityProgressBar.container,
+            ce({tag:'br'}),
+            activityElapsedTimeElement,
+            activeFleetCountElement,
+            activeAnomalyCountElement
+        ]}),
+        []
+    )
+    
+    // Wait a frame to ensure modal is displayed
+    await new Promise(resolve => setTimeout(resolve, 10))
+    
+    // Simulate fleet activity with progress tracking
+    console.log('Beginning fleet activity simulation...')
+    const activityProgress = {completePercentage: 0}
+    const activityStartTime = performance.now()
+    
+    const activityProgressInterval = setInterval(() => {
+        const elapsedSeconds = (performance.now() - activityStartTime) / 1000
+        activityProgressBar.update(activityProgress.completePercentage)
+        const elapsedEl = document.getElementById('fleet_elapsed_time')
+        if (elapsedEl) {
+            elapsedEl.textContent = `Elapsed time: ${elapsedSeconds.toFixed(1)}s`
+        }
+        const fleetCountEl = document.getElementById('active_fleet_count')
+        if (fleetCountEl) {
+            fleetCountEl.textContent = `Active Fleets: ${gs.system.fleets.length}`
+        }
+        const anomalyCountEl = document.getElementById('active_anomaly_count')
+        if (anomalyCountEl) {
+            anomalyCountEl.textContent = `Active Anomalies: ${gs.system.anomalies ? gs.system.anomalies.length : 0}`
+        }
+    }, 50)
+    
+    await addFleetActivity(numYears, activityProgress)
+    
+    console.log('Fleet activity simulation finished')
+    clearInterval(activityProgressInterval)
+    closeModal()
+}
+
 /**
  * Initializes and starts a new game with default settings.
  */
@@ -35,93 +155,13 @@ async function startNewGame() {
 
     gs.system.refreshPositions(gs.year)
 
-    // Show loading modal with progress bar
-    const progressBar = new ProgressBar({
-        id: 'history_progress',
-        label: '',
-        width: 50,
-    })
-
-    const elapsedTimeElement = ce({
-        id: 'elapsed_time',
-        style: 'text-align: center; margin-top: 10px;',
-        children: ['Elapsed time: 0.0s']
-    })
-
+    // Simulate history
     const HISTORY_NUM_YEARS = 10
+    await simulateHistory(HISTORY_NUM_YEARS)
     
-    showModal(
-        'Loading Game',
-        ce({children: [
-            `Generating ${HISTORY_NUM_YEARS} years of galactic history...`,
-            ce({tag:'br'}),
-            progressBar.container,
-            ce({tag:'br'}),
-            elapsedTimeElement
-        ]}),
-        []
-    )
-    
-    // Wait a frame to ensure modal is displayed
-    await new Promise(resolve => setTimeout(resolve, 10))
-    
-    // Generate history with progress tracking
-    const progress = {completePercentage: 0}
-    const startTime = performance.now()
-    
-    const progressUpdateInterval = setInterval(() => {
-        const elapsedSeconds = (performance.now() - startTime) / 1000
-        progressBar.update(progress.completePercentage)
-        const elapsedEl = document.getElementById('elapsed_time')
-        if (elapsedEl) {
-            elapsedEl.textContent = `Elapsed time: ${elapsedSeconds.toFixed(1)}s`
-        }
-    }, 50)
-    
-    await addHistory(GAME_START_YEAR - HISTORY_NUM_YEARS, GAME_START_YEAR, progress)
-    
-    clearInterval(progressUpdateInterval)
-    closeModal()
-    
-    // Show new modal for fleet activity simulation
+    // Simulate fleet activity
     const FLEET_ACTIVITY_YEARS = 2
-    const activityProgressBar = new ProgressBar({id: 'fleet_activity_progress', value: 0, width: 50})
-    const activityElapsedTimeElement = ce({tag: 'div', id: 'fleet_elapsed_time', children: ['Elapsed time: 0.0s']})
-    
-    showModal(
-        'Generating Fleet Activity',
-        ce({children: [
-            `Simulating ${FLEET_ACTIVITY_YEARS} years of fleet movement...`,
-            ce({tag:'br'}),
-            activityProgressBar.container,
-            ce({tag:'br'}),
-            activityElapsedTimeElement
-        ]}),
-        []
-    )
-    
-    // Wait a frame to ensure modal is displayed
-    await new Promise(resolve => setTimeout(resolve, 10))
-    
-    // Simulate fleet activity with progress tracking
-    console.log('Beginning fleet activity simulation...')
-    const activityProgress = {completePercentage: 0}
-    const activityStartTime = performance.now()
-    
-    const activityProgressInterval = setInterval(() => {
-        const elapsedSeconds = (performance.now() - activityStartTime) / 1000
-        activityProgressBar.update(activityProgress.completePercentage)
-        const elapsedEl = document.getElementById('fleet_elapsed_time')
-        if (elapsedEl) {
-            elapsedEl.textContent = `Elapsed time: ${elapsedSeconds.toFixed(1)}s`
-        }
-    }, 50)
-    
-    await addFleetActivity(FLEET_ACTIVITY_YEARS, activityProgress)
-    
-    console.log('Fleet activity simulation finished')
-    clearInterval(activityProgressInterval)
-    closeModal()
+    await simulateFleetActivity(FLEET_ACTIVITY_YEARS)
 
     // Create captain
     const captain = new Officer("Captain", STARTING_CREDITS);
@@ -142,6 +182,7 @@ async function startNewGame() {
     // Create fleet
     gs.fleet = new Fleet(
         "Player Fleet",
+        null,
         PLAYER_FLEET_TYPE,
         PLAYER_FACTION_TYPE,
         COLORS.LightGray,
