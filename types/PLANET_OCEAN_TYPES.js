@@ -28,7 +28,7 @@ const PLANET_OCEAN_TYPES = Object.freeze({
     LIQUID_NITROGEN: new PlanetOceanType("Liquid Nitrogen", "Pools of liquid nitrogen at extremely low temperatures", COLORS.LightBlue),
     MOLTEN_LAVA: new PlanetOceanType("Molten Lava Seas", "Vast oceans of molten rock on the surface", COLORS.Red),
     SULFURIC_ACID: new PlanetOceanType("Sulfuric Acid", "Pools of concentrated sulfuric acid", COLORS.Yellow),
-    BRINE: new PlanetOceanType("Briny Ocean", "Salty water with high concentrations of dissolved minerals", COLORS.Cyan),
+    BRINE: new PlanetOceanType("Briny Ocean", "Salty water with high concentrations of dissolved minerals", COLORS.LightGreen),
 });
 
 const PLANET_OCEAN_TYPES_ALL = Object.values(PLANET_OCEAN_TYPES);

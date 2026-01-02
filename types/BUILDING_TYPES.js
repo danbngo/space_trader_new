@@ -26,7 +26,7 @@ class BuildingType {
     
     /**
      * Check if player meets reputation requirements for this building
-     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to check reputation for
+     * @param {Planet} planet - The planet to check reputation for
      * @returns {boolean} True if player meets at least one requirement
      */
     meetsReputationRequirement(planet) {
@@ -41,7 +41,7 @@ class BuildingType {
     
     /**
      * Check if player can access this building (reputation + special conditions)
-     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to check access for
+     * @param {Planet} planet - The planet to check access for
      * @param {boolean} isDocked - Whether the player is docked at the planet
      * @returns {Object} {canShow: boolean, isDisabled: boolean}
      */
@@ -78,7 +78,7 @@ const BUILDING_TYPES = {
     ACADEMY: new BuildingType('Academy', COLORS.Green, 10*1000, FAME_LEVELS.REPUTABLE),
     TAVERN: new BuildingType('Tavern', COLORS.Orange, 5*1000, FAME_LEVELS.UNKNOWN, INFAMY_LEVELS.DISREPUTABLE),
     COURTHOUSE: new BuildingType('Court House', COLORS.Brown, 10*1000, FAME_LEVELS.UNKNOWN, INFAMY_LEVELS.UNKNOWN, FAME_LEVELS.UNKNOWN, 1),
-    CYBER_SURGEON: new BuildingType('Cyber Surgeon', COLORS.Cyan, 15*1000, FAME_LEVELS.UNKNOWN, INFAMY_LEVELS.NOTORIOUS),
+    CYBER_SURGEON: new BuildingType('Cyber Surgeon', COLORS.DarkCyan, 15*1000, FAME_LEVELS.UNKNOWN, INFAMY_LEVELS.NOTORIOUS),
     PALACE: new BuildingType('Palace', COLORS.Gold, 10*1000, FAME_LEVELS.LEGENDARY),
     TEMPLE: new BuildingType('Temple', COLORS.White, 5*1000, FAME_LEVELS.REPUTABLE),
     ARMORY: new BuildingType('Armory', COLORS.DarkGray, 12*1000, FAME_LEVELS.UNKNOWN, INFAMY_LEVELS.DISLIKED),

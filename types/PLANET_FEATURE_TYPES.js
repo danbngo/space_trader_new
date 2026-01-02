@@ -27,7 +27,7 @@ const PLANET_FEATURE_TYPES = Object.freeze({
     FAINT_RINGS: new PlanetFeatureType("Faint Rings", "Barely visible rings of dust and debris", COLORS.Gray),
     
     // Axial Properties
-    EXTREME_AXIAL_TILT: new PlanetFeatureType("Extreme Axial Tilt", "Planet rotates on its side, causing extreme seasonal variations", COLORS.Cyan),
+    EXTREME_AXIAL_TILT: new PlanetFeatureType("Extreme Axial Tilt", "Planet rotates on its side, causing extreme seasonal variations", COLORS.LightCyan),
     RETROGRADE_ROTATION: new PlanetFeatureType("Retrograde Rotation", "Planet rotates backwards compared to its orbit", COLORS.Purple),
     RAPID_ROTATION: new PlanetFeatureType("Rapid Rotation", "Extremely fast rotation causes flattened poles", COLORS.Yellow),
     TIDALLY_LOCKED: new PlanetFeatureType("Tidally Locked", "One face always points toward its star", COLORS.Orange),
@@ -55,7 +55,7 @@ const PLANET_FEATURE_TYPES = Object.freeze({
     // Unique Features
     TROJAN_ASTEROIDS: new PlanetFeatureType("Trojan Asteroids", "Asteroids trapped in the planet's orbital Lagrange points", COLORS.Gray),
     LARGE_SATELLITE: new PlanetFeatureType("Large Moon", "Exceptionally large natural satellite", COLORS.LightGray),
-    BINARY_SYSTEM: new PlanetFeatureType("Binary Planet", "Two similarly-sized bodies orbit each other", COLORS.Cyan),
+    BINARY_SYSTEM: new PlanetFeatureType("Binary Planet", "Two similarly-sized bodies orbit each other", COLORS.Magenta),
     ELONGATED_SHAPE: new PlanetFeatureType("Elongated Shape", "Rapid rotation has stretched the planet into an oval", COLORS.White),
     
     // Chemical Composition

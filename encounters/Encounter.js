@@ -7,7 +7,7 @@
 class Encounter {
     /**
      * @param {EncounterType} encounterType - The type of encounter.
-     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet where the encounter occurs.
+     * @param {Planet} planet - The planet where the encounter occurs.
      * @param {Fleet} fleet - The enemy fleet.
      * @param {Effect[]} effects - Environmental effects active in the encounter.
      */
@@ -15,7 +15,7 @@ class Encounter {
         console.log('Encounter.constructor', { encounterType, planet, fleet });
         /** @type {EncounterType} */
         this.encounterType = encounterType;
-        /** @type {Planet | DwarfPlanet | SpaceStation} */
+        /** @type {Planet} */
         this.planet = planet;
         /** @type {Fleet} */
         this.fleet = fleet;

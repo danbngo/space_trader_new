@@ -80,7 +80,7 @@ class Officer {
 
     /**
      * Grants infamy on a specific planet.
-     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to gain infamy on.
+     * @param {Planet} planet - The planet to gain infamy on.
      * @param {number} amount - The amount of infamy to grant (can be negative).
      * @returns {string} Message describing the infamy change.
      */
@@ -94,7 +94,7 @@ class Officer {
 
     /**
      * Grants fame on a specific planet.
-     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to gain fame on.
+     * @param {Planet} planet - The planet to gain fame on.
      * @param {number} amount - The amount of fame to grant (can be negative).
      * @returns {string} Message describing the fame change.
      */
@@ -136,7 +136,7 @@ class Officer {
 
     /**
      * Calculates total infamy for a planet (planet-specific + global average).
-     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to calculate infamy for.
+     * @param {Planet} planet - The planet to calculate infamy for.
      * @returns {number} The calculated infamy value.
      */
     calcInfamyForPlanet(planet = new Planet()) {
@@ -145,7 +145,7 @@ class Officer {
 
     /**
      * Calculates total fame for a planet (planet-specific + global average).
-     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to calculate fame for.
+     * @param {Planet} planet - The planet to calculate fame for.
      * @returns {number} The calculated fame value.
      */
     calcFameForPlanet(planet = new Planet()) {
@@ -154,7 +154,7 @@ class Officer {
     
     /**
      * Calculates net reputation for a planet (fame - infamy).
-     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to calculate reputation for.
+     * @param {Planet} planet - The planet to calculate reputation for.
      * @returns {number} The calculated reputation value.
      */
     calcReputationForPlanet(planet = new Planet()) {
@@ -163,7 +163,7 @@ class Officer {
 
     /**
      * Calculates total bounty for a planet (planet-specific + global average).
-     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to calculate bounty for.
+     * @param {Planet} planet - The planet to calculate bounty for.
      * @returns {number} The calculated bounty value.
      */
     calcBountyForPlanet(planet = new Planet()) {
@@ -172,7 +172,7 @@ class Officer {
 
     /**
      * Grants a bounty on a specific planet.
-     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to add bounty on.
+     * @param {Planet} planet - The planet to add bounty on.
      * @param {number} amount - The amount of bounty to add (can be negative).
      * @returns {string} Message describing the bounty change.
      */

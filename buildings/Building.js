@@ -4,12 +4,12 @@
  */
 class Building {
     /**
-     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet this building is on.
+     * @param {Planet} planet - The planet this building is on.
      * @param {BuildingType} buildingType - The type of building.
      * @param {Moon} moon - The moon this building is on (null if on planet surface).
      */
     constructor(planet = new Planet(), buildingType = BUILDING_TYPES_ALL[0], moon = null) {
-        /** @type {Planet | DwarfPlanet | SpaceStation} */
+        /** @type {Planet} */
         this.planet = planet
         /** @type {BuildingType} */
         this.buildingType = buildingType

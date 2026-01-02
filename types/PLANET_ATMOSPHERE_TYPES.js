@@ -26,7 +26,7 @@ const PLANET_ATMOSPHERE_TYPES = Object.freeze({
     OXYGEN_NITROGEN: new PlanetAtmosphereType("Oxygen-Nitrogen", "Breathable atmosphere dominated by nitrogen and oxygen", COLORS.LightBlue),
     CARBONACEOUS_DIOXIDE: new PlanetAtmosphereType("Carbon Dioxide", "Dense CO₂ atmosphere, often with greenhouse heating", COLORS.Orange),
     HYDROGEN_HELIUM: new PlanetAtmosphereType("Hydrogen-Helium", "Primordial atmosphere of light gases typical of gas giants", COLORS.Yellow),
-    METHANE: new PlanetAtmosphereType("Methane", "Methane-rich atmosphere giving a blue-green appearance", COLORS.Cyan),
+    METHANE: new PlanetAtmosphereType("Methane", "Methane-rich atmosphere giving a blue-green appearance", COLORS.LightGreen),
     NITROGEN: new PlanetAtmosphereType("Nitrogen", "Nitrogen-dominated atmosphere", COLORS.Blue),
     SULFURIC_ACID: new PlanetAtmosphereType("Sulfuric Acid Clouds", "Thick clouds of sulfuric acid droplets", COLORS.Yellow),
     SULFUR_DIOXIDE: new PlanetAtmosphereType("Sulfur Dioxide", "TBA", COLORS.Yellow),

@@ -21,7 +21,7 @@ function generateFleetCargo(fleet = new Fleet(), fleetType = FLEET_TYPES_ALL[0])
  * Generates a complete fleet with ships and cargo.
  * @param {FleetType} fleetType - The type of fleet to generate.
  * @param {FactionType|null} factionType - The faction the fleet belongs to.
- * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet the fleet is associated with.
+ * @param {Planet} planet - The planet the fleet is associated with.
  * @returns {Fleet} The generated fleet.
  */
 function generateFleet(fleetType = FLEET_TYPES_ALL[0], factionType = null, planet = new Planet()) {

@@ -51,7 +51,7 @@ class CyberImplant {
 }
 
 const CYBER_IMPLANT_TYPES = {
-    NEURAL_LINK: new CyberImplantType('Neural Link', COLORS.Cyan, 'Direct brain-computer interface for enhanced cognitive processing', 5000),
+    NEURAL_LINK: new CyberImplantType('Neural Link', COLORS.DarkCyan, 'Direct brain-computer interface for enhanced cognitive processing', 5000),
     REFLEX_BOOSTER: new CyberImplantType('Reflex Booster', COLORS.Yellow, 'Augmented nervous system for faster reaction times', 4000),
     OCULAR_IMPLANT: new CyberImplantType('Ocular Implant', COLORS.Green, 'Enhanced vision with targeting overlay and threat detection', 3500),
     CARDIO_ENHANCER: new CyberImplantType('Cardio Enhancer', COLORS.Red, 'Synthetic heart augmentation for improved endurance', 3000),

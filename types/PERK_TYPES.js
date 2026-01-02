@@ -30,7 +30,7 @@ const PERK_TYPES = {
     
     HARDENED: new PerkType('Hardened', COLORS.Gray, 'Reduces damage taken from all sources by 10%.', 3),
     SHARPSHOOTER: new PerkType('Sharpshooter', COLORS.Red, 'Increases laser accuracy and damage by 15%.', 4),
-    ACE_PILOT: new PerkType('Ace Pilot', COLORS.Cyan, 'Increases ship maneuverability and evasion.', 5),
+    ACE_PILOT: new PerkType('Ace Pilot', COLORS.Blue, 'Increases ship maneuverability and evasion.', 5),
     ENGINEER: new PerkType('Engineer', COLORS.Orange, 'Repairs hull 20% faster and more efficiently.', 3),
     NEGOTIATOR: new PerkType('Negotiator', COLORS.Green, 'Improves prices when trading and hiring.', 6),
     TACTICIAN: new PerkType('Tactician', COLORS.Purple, 'Grants combat initiative bonus in encounters.', 8),

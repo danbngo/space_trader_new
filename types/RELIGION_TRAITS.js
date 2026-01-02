@@ -68,7 +68,7 @@ const RELIGION_TRAITS = {
     SYNCRETIC: new ReligionTrait(
         'Syncretic',
         'Absorbs elements from other faiths. Reduces religious conflicts and improves relations.',
-        COLORS.Cyan
+        COLORS.LightGreen
     ),
     HIERARCHICAL: new ReligionTrait(
         'Hierarchical',

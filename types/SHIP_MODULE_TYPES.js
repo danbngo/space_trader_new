@@ -7,7 +7,7 @@ class ShipModuleType {
     /**
      * @param {string} name - The name of the module type.
      * @param {number[]} color - The color associated with this module type.
-     * @param {MOVE_TYPES} moveType - The move type this module enables (if any).
+     * @param {MoveType} moveType - The move type this module enables (if any).
      * @param {string} description - A description of what the module does.
      * @param {number} value - The base value/price of this module type.
      * @param {number} cooldown - The cooldown in turns before the module can be used again.
@@ -17,7 +17,7 @@ class ShipModuleType {
         this.name = name
         /** @type {number[]} */
         this.color = color;
-        /** @type {MOVE_TYPES} */
+        /** @type {MoveType} */
         this.moveType = moveType
         /** @type {string} */
         this.description = description

@@ -24,7 +24,7 @@ class AnomalyType {
 const ANOMALY_TYPES = Object.freeze({
     QUANTUM_FLUCTUATION: new AnomalyType("Quantum Fluctuation", COLORS.Purple, "A localized distortion in spacetime fabric"),
     DARK_MATTER_CLOUD: new AnomalyType("Dark Matter Cloud", COLORS.DarkGray, "A dense concentration of mysterious dark matter"),
-    TEMPORAL_RIFT: new AnomalyType("Temporal Rift", COLORS.Cyan, "A tear in the fabric of space-time"),
+    TEMPORAL_RIFT: new AnomalyType("Temporal Rift", COLORS.DarkCyan, "A tear in the fabric of space-time"),
     EXOTIC_PARTICLES: new AnomalyType("Exotic Particles", COLORS.Green, "Unusual subatomic particles not found elsewhere"),
     GRAVITATIONAL_WAVE: new AnomalyType("Gravitational Wave", COLORS.Blue, "Ripples in spacetime from distant cosmic events"),
     ENERGY_VORTEX: new AnomalyType("Energy Vortex", COLORS.Red, "A swirling concentration of pure energy"),

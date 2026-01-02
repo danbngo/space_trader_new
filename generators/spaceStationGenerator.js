@@ -58,30 +58,30 @@ function generateStationClimate(distanceFromSun = 1.0, asteroidBelts = [], stati
     // Temperature based on distance from sun
     let temperature
     if (distanceFromSun < 0.5) {
-        temperature = TEMPERATURES.SCORCHING
+        temperature = TEMPERATURES.EXTREMELY_HIGH
     } else if (distanceFromSun < 1.5) {
-        temperature = TEMPERATURES.TEMPERATE
+        temperature = TEMPERATURES.HIGH
     } else if (distanceFromSun < 3.0) {
-        temperature = TEMPERATURES.COLD
+        temperature = TEMPERATURES.LOW
     } else {
-        temperature = TEMPERATURES.FROZEN
+        temperature = TEMPERATURES.EXTREMELY_LOW
     }
     
     // Most stations have controlled atmosphere
-    const atmosphericPressure = ATMOSPHERIC_PRESSURES.STANDARD
+    const atmosphericPressure = ATMOSPHERIC_PRESSURES.MEDIUM
     
     // Artificial gravity varies by station type
     let gravity
     if (stationType === SETTLEMENT_TYPES.O_NEILL_CYLINDER || 
         stationType === SETTLEMENT_TYPES.STANFORD_TORUS ||
         stationType === SETTLEMENT_TYPES.BERNAL_SPHERE) {
-        gravity = GRAVITIES.STANDARD
+        gravity = GRAVITIES.MEDIUM
     } else if (stationType === SETTLEMENT_TYPES.ROTATING_DRUM ||
                stationType === SETTLEMENT_TYPES.SPOKED_WHEEL ||
                stationType === SETTLEMENT_TYPES.HABITAT_RING) {
-        gravity = GRAVITIES.LIGHT
+        gravity = GRAVITIES.LOW
     } else {
-        gravity = GRAVITIES.VERY_LIGHT
+        gravity = GRAVITIES.EXTREMELY_LOW
     }
     
     // Ocean coverage - only certain station types might have artificial water features
@@ -90,7 +90,7 @@ function generateStationClimate(distanceFromSun = 1.0, asteroidBelts = [], stati
     if (stationType === SETTLEMENT_TYPES.O_NEILL_CYLINDER || 
         stationType === SETTLEMENT_TYPES.BERNAL_SPHERE) {
         if (Math.random() < 0.3) { // 30% chance of having water features
-            oceanCoverage = OCEAN_COVERAGES.SHALLOW_SEAS
+            oceanCoverage = OCEAN_COVERAGES.MEDIUM
             oceanType = PLANET_OCEAN_TYPES.WATER
         }
     }
@@ -103,7 +103,7 @@ function generateStationClimate(distanceFromSun = 1.0, asteroidBelts = [], stati
     let magnetosphere = MAGNETOSPHERES.NONE
     if (stationType === SETTLEMENT_TYPES.BERNAL_SPHERE || 
         stationType === SETTLEMENT_TYPES.O_NEILL_CYLINDER) {
-        magnetosphere = MAGNETOSPHERES.WEAK
+        magnetosphere = MAGNETOSPHERES.LOW
     }
     
     // Radiation level based on distance and nearby asteroid belts
@@ -115,25 +115,25 @@ function generateStationClimate(distanceFromSun = 1.0, asteroidBelts = [], stati
     for (const belt of asteroidBelts) {
         const distanceToBelt = Math.abs(distanceFromSun - belt.orbit.radius)
         if (distanceToBelt < 0.5) {
-            radiationLevel = RADIATION_LEVELS.MODERATE
+            radiationLevel = RADIATION_LEVELS.MEDIUM
             break
         }
     }
     
     // Asteroid impact risk based on proximity to belts
-    let asteroidImpact = ASTEROID_IMPACTS.RARE
+    let asteroidImpact = ASTEROID_IMPACTS.LOW
     for (const belt of asteroidBelts) {
         const distanceToBelt = Math.abs(distanceFromSun - belt.orbit.radius)
         if (distanceToBelt < 0.2) {
-            asteroidImpact = ASTEROID_IMPACTS.FREQUENT
+            asteroidImpact = ASTEROID_IMPACTS.VERY_HIGH
             break
         } else if (distanceToBelt < 0.5) {
-            asteroidImpact = ASTEROID_IMPACTS.OCCASIONAL
+            asteroidImpact = ASTEROID_IMPACTS.MEDIUM
         }
     }
     
     // Atmosphere type - stations typically have breathable air
-    const atmosphereType = PLANET_ATMOSPHERE_TYPES.NITROGEN_OXYGEN
+    const atmosphereType = PLANET_ATMOSPHERE_TYPES.OXYGEN_NITROGEN
     
     return new Climate(
         temperature,

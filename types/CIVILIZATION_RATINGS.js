@@ -20,7 +20,7 @@ const CIVILIZATION_RATINGS = {
     INDUSTRY: new CivilizationRating('Industry', '🏭', COLORS.LightGray, 'Rating affecting merchants, miners, and ship availability.'),
     ECONOMY: new CivilizationRating('Economy', '💰', COLORS.Gold, 'Rating affecting merchants, smugglers, and market cargo availability.'),
     CULTURE: new CivilizationRating('Culture', '🎭', COLORS.Purple, 'Cultural development. More tourists and entertainment.'),
-    TECHNOLOGY: new CivilizationRating('Technology', '🔬', COLORS.Cyan, 'Quality rating of ships produced by this civilization.'),
+    TECHNOLOGY: new CivilizationRating('Technology', '🔬', COLORS.LightCyan, 'Quality rating of ships produced by this civilization.'),
     EDUCATION: new CivilizationRating('Education', '📚', COLORS.LightBlue, 'Quality rating of officers from this civilization. Affects academy training.'),
     CORRUPTION: new CivilizationRating('Corruption', '💸', COLORS.DarkGray, 'Higher rakes and transaction fees. Lower black market prices.'),
     CRIME: new CivilizationRating('Crime', '🔫', COLORS.Red, 'More crime events and black market activity.'),

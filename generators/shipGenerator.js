@@ -1,6 +1,6 @@
 /**
  * Generates a ship with stats based on planet quality and ship type.
- * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet determining ship quality.
+ * @param {Planet} planet - The planet determining ship quality.
  * @param {ShipType} shipType - The type of ship to generate.
  * @returns {Ship} The generated ship.
  */

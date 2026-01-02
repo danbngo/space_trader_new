@@ -1,7 +1,7 @@
 
 /**
  * @typedef {Object} CivilizationParams
- * @property {Planet | DwarfPlanet | SpaceStation} [planet] - The planet this civilization belongs to.
+ * @property {Planet} [planet] - The planet this civilization belongs to.
  * @property {GovernmentType} [governmentType] - The type of government of the civilization.
  * @property {Policies} [policies] - The active policies for this civilization.
  * @property {CountsMap} [cargoPriceMultipliers] - Multipliers for cargo prices specific to this civilization.
@@ -43,7 +43,7 @@ class Civilization {
         navy = 1, army = 1, corruption = 1, crime = 1, wealth = 1, reserves = 1, inflation = 1, taxes = 1,
         religions = new CountsMap(), races = new CountsMap(), stateReligion = null
     } = {}) {
-        /** @type {Planet | DwarfPlanet | SpaceStation} */
+        /** @type {Planet} */
         this.planet = planet;
         /** @type {GovernmentType} */
         this.governmentType = governmentType; //many effects!
@@ -192,8 +192,8 @@ class Civilization {
 
     /**
      * Checks if two planets have tense diplomatic relations.
-     * @param {Planet | DwarfPlanet | SpaceStation} p1 - First planet.
-     * @param {Planet | DwarfPlanet | SpaceStation} p2 - Second planet.
+     * @param {Planet} p1 - First planet.
+     * @param {Planet} p2 - Second planet.
      * @returns {boolean} True if relations are tense.
      */
     static areTense(p1 = new Planet(), p2 = new Planet()) {
@@ -201,8 +201,8 @@ class Civilization {
     }
     /**
      * Checks if two planets are at war.
-     * @param {Planet | DwarfPlanet | SpaceStation} p1 - First planet.
-     * @param {Planet | DwarfPlanet | SpaceStation} p2 - Second planet.
+     * @param {Planet} p1 - First planet.
+     * @param {Planet} p2 - Second planet.
      * @returns {boolean} True if at war.
      */
     static areAtWar(p1 = new Planet(), p2 = new Planet()) {
@@ -210,8 +210,8 @@ class Civilization {
     }
     /**
      * Checks if two planets are allies.
-     * @param {Planet | DwarfPlanet | SpaceStation} p1 - First planet.
-     * @param {Planet | DwarfPlanet | SpaceStation} p2 - Second planet.
+     * @param {Planet} p1 - First planet.
+     * @param {Planet} p2 - Second planet.
      * @returns {boolean} True if allied.
      */
     static areAllies(p1 = new Planet(), p2 = new Planet()) {
@@ -219,8 +219,8 @@ class Civilization {
     }
     /**
      * Checks if two planets are neutral.
-     * @param {Planet | DwarfPlanet | SpaceStation} p1 - First planet.
-     * @param {Planet | DwarfPlanet | SpaceStation} p2 - Second planet.
+     * @param {Planet} p1 - First planet.
+     * @param {Planet} p2 - Second planet.
      * @returns {boolean} True if neutral.
      */
     static areNeutral(p1 = new Planet(), p2 = new Planet()) {
@@ -228,8 +228,8 @@ class Civilization {
     }
     /**
      * Checks if two planets are either tense or at war.
-     * @param {Planet | DwarfPlanet | SpaceStation} p1 - First planet.
-     * @param {Planet | DwarfPlanet | SpaceStation} p2 - Second planet.
+     * @param {Planet} p1 - First planet.
+     * @param {Planet} p2 - Second planet.
      * @returns {boolean} True if tense or at war.
      */
     static areTenseOrAtWar(p1 = new Planet(), p2 = new Planet()) {
@@ -237,8 +237,8 @@ class Civilization {
     }
     /**
      * Checks if two planets are either allies or neutral.
-     * @param {Planet | DwarfPlanet | SpaceStation} p1 - First planet.
-     * @param {Planet | DwarfPlanet | SpaceStation} p2 - Second planet.
+     * @param {Planet} p1 - First planet.
+     * @param {Planet} p2 - Second planet.
      * @returns {boolean} True if allied or neutral.
      */
     static areAlliesOrNeutral(p1 = new Planet(), p2 = new Planet()) {
@@ -246,8 +246,8 @@ class Civilization {
     }
     /**
      * Checks if two planets have opposing government types.
-     * @param {Planet | DwarfPlanet | SpaceStation} p1 - First planet.
-     * @param {Planet | DwarfPlanet | SpaceStation} p2 - Second planet.
+     * @param {Planet} p1 - First planet.
+     * @param {Planet} p2 - Second planet.
      * @returns {boolean} True if governments oppose each other.
      */
     static areOpposingGovernments(p1 = new Planet(), p2 = new Planet()) {
@@ -255,8 +255,8 @@ class Civilization {
     }
     /**
      * Gets all planets that are at war with the given planet.
-     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to check.
-     * @returns {Array<Planet | DwarfPlanet | SpaceStation>} Array of planets at war.
+     * @param {Planet} planet - The planet to check.
+     * @returns {Array<Planet>} Array of planets at war.
      */
     static getPlanetsAtWarWith(planet = new Planet()) {
         const atWarPlanets = []
@@ -269,8 +269,8 @@ class Civilization {
     }
     /**
      * Gets all planets that are tense or at war with the given planet.
-     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to check.
-     * @returns {Array<Planet | DwarfPlanet | SpaceStation>} Array of planets with hostile relations.
+     * @param {Planet} planet - The planet to check.
+     * @returns {Array<Planet>} Array of planets with hostile relations.
      */
     static getPlanetsTenseOrAtWarWith(planet = new Planet()) {
         const tenseOrAtWarPlanets = []

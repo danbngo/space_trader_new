@@ -82,7 +82,7 @@ const SETTLEMENT_TYPES = Object.freeze({
     ORBITAL_PLATFORM: new SettlementType(
         "Orbital Platform",
         "Space stations orbiting inhospitable worlds, serving as trade hubs and resource processing centers",
-        COLORS.Gray
+        COLORS.DarkGray
     ),
     
     // Space Station Types - orbital habitats and structures
@@ -107,7 +107,7 @@ const SETTLEMENT_TYPES = Object.freeze({
     SPOKED_WHEEL: new SettlementType(
         "Spoked Wheel",
         "A classic wheel design with spokes connecting the hub to the rim",
-        COLORS.LightBlue
+        COLORS.DarkBlue
     ),
     
     BERNAL_SPHERE: new SettlementType(
@@ -143,14 +143,14 @@ const SETTLEMENT_TYPES = Object.freeze({
     CRYSTAL_PALACE: new SettlementType(
         "Crystal Palace",
         "A geometric station with transparent sections and solar arrays",
-        COLORS.Cyan
+        COLORS.White
     ),
     
     // For ice giant planets with frozen surface layers
     ICE_CITY: new SettlementType(
         "Ice City",
         "Settlements built within or beneath thick ice sheets, utilizing geothermal energy from the planet's core",
-        COLORS.Cyan
+        COLORS.LightBlue
     ),
     
     // For volcanic/geologically active worlds

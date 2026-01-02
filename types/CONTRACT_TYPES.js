@@ -35,7 +35,7 @@ const CONTRACT_TYPES = {
     DESTROY_PIRATES: new ContractType('Destroy Pirates', COLORS.Red, 'Hunt down and eliminate pirate vessels in the region.'),
     BOUNTY_HUNT: new ContractType('Bounty Hunt', COLORS.DarkRed, 'Track and capture a specific criminal target.'),
     ESCORT_CONVOY: new ContractType('Escort Convoy', COLORS.Blue, 'Protect merchant ships from hostile encounters.'),
-    PATROL_SECTOR: new ContractType('Patrol Sector', COLORS.Cyan, 'Maintain security in a designated space sector.'),
+    PATROL_SECTOR: new ContractType('Patrol Sector', COLORS.DarkCyan, 'Maintain security in a designated space sector.'),
     
     // Quest Types - Exploration
     SURVEY_MISSION: new ContractType('Survey Mission', COLORS.Green, 'Explore and report on uncharted space regions.'),

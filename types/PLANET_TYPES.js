@@ -23,8 +23,8 @@ const PLANET_TYPES = Object.freeze({
   TERRESTRIAL: new PlanetType("Terrestrial", COLORS.Brown),
   GAS_GIANT: new PlanetType("Gas Giant", COLORS.Orange),
   GAS_DWARF: new PlanetType("Gas Dwarf", COLORS.LightOrange),
-  ICE_GIANT: new PlanetType("Ice Giant", COLORS.Cyan),
-  ICE_DWARF: new PlanetType("Ice Dwarf", COLORS.LightBlue),
+  ICE_GIANT: new PlanetType("Ice Giant", COLORS.LightBlue),
+  ICE_DWARF: new PlanetType("Ice Dwarf", COLORS.Blue),
 });
 
 const PLANET_TYPES_ALL = Object.values(PLANET_TYPES)

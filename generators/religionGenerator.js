@@ -78,7 +78,7 @@ function generateReligion() {
     
     // Generate a color (prefer brighter colors for religions)
     const colorChoices = [
-        COLORS.White, COLORS.Yellow, COLORS.Cyan, COLORS.Magenta,
+        COLORS.White, COLORS.Yellow, COLORS.LightMagenta, COLORS.Magenta,
         COLORS.LightGreen, COLORS.LightBlue, COLORS.Orange, COLORS.Purple,
         COLORS.Pink, COLORS.LightOrange, hexToRgba('#gold'), hexToRgba('#silver')
     ];

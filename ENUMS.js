@@ -2,7 +2,7 @@
 /** @typedef {'Attack'|'Escape'|'Asteroid'} CombatStrategyType */
 /** @typedef {'FilledCircle'|'EmptyCircle'|'FilledTriangle'|'EmptyTriangle'|'Text'|'Line'|'FilledOval'|'EmptyOval'|'FilledRectangle'} ShapeType */
 /** @typedef {'Pilot'|'Stealth'|'Barter'|'Engineer'|'Salvage'} SkillType */
-/** @typedef {'Move'|'Laser'|'Ram'|'Recharge'|'Wait'|'Blink'|'Booster'|'Cloak'|'Warhead'|'EMPPulse'|'Magnetize'|'SmokeBomb'} MoveType */
+/** @typedef {'Move'|'Laser'|'Ram'|'Recharge'|'Wait'|'Blink'|'Booster'|'Cloak'|'Warhead'|'EMPPulse'|'Magnetize'|'SmokeBomb'|'Drill'|'Detonate'} MoveType */
 /** @typedef {'FaceOff'|'Storm'} FormationType */
 /** @typedef {'Ship'|'Asteroid'} AIType */
 /** @typedef {'Rocky'|'Icy'|'Plasma'} AsteroidBeltType */
@@ -59,6 +59,8 @@ const COLORS = Object.freeze({
     Red: [255,0,0,1], // rgba(255,0,0,1)
     DarkRed: [180,0,0,1], // rgba(180,0,0,1)
     Cyan: [0,255,255,1], // rgba(0,255,255,1)
+    DarkCyan: [0,180,180,1], // rgba(0,180,180,1)
+    LightCyan: [150,255,255,1], // rgba(150,255,255,1)
     Blue: [50,100,255,1], // rgba(50,100,255,1)
     DarkYellow: [180,180,0,1], // rgba(180,180,0,1)
     Yellow: [255,255,0,1], // rgba(255,255,0,1)

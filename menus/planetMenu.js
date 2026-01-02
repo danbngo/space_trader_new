@@ -18,7 +18,7 @@ const buildingHandlerMapping = [
 
 /**
  * Displays the main planet menu with access to all buildings.
- * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to interact with.
+ * @param {Planet} planet - The planet to interact with.
  */
 function showPlanetMenu(planet = new Planet()) {
     console.log('opening planet menu for:',planet)
@@ -68,7 +68,8 @@ function showPlanetMenu(planet = new Planet()) {
     //options.push(["News", () => showNewsTimelineMenu(planet, () => showPlanetMenu(planet))]);
     options.push([`Info`, () => planet.civilization ? showPlanetSocietyMenu(planet) : showPlanetClimateMenu(planet)]);
     if (planet.children && planet.children.length > 0) {
-        options.push(["Moons", () => showPlanetMenu(planet.children[0])]);
+        const firstChild = planet.children[0];
+        if (firstChild && firstChild instanceof Moon) options.push(["Moons", () => showPlanetMenu(firstChild)]);
     }
     options.push([isDocked ? "Depart" : "Stop Scanning", () => closeModal()]);
     showPlanetModal(planet, `${coloredName(planet)}`, msg, options, 'planet_menu', (nextPlanet) => showPlanetMenu(nextPlanet));
@@ -76,14 +77,14 @@ function showPlanetMenu(planet = new Planet()) {
 
 /**
  * Displays a menu listing all moons of a planet.
- * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet whose moons to display.
+ * @param {Planet} planet - The planet whose moons to display.
  */
 function showMoonsMenu(planet = new Planet()) {
     let msg = `${coloredName(planet)} has ${planet.children.length} major moon${planet.children.length > 1 ? 's' : ''}:<br/><br/>`
     
     const options = []
     for (const moon of planet.children) {
-        options.push([moon.name, () => showPlanetMenu(moon)])
+        if (moon instanceof Moon) options.push([moon.name, () => showPlanetMenu(moon)])
     }
     options.push(ce({tag:'br'}))
     options.push(["Back", () => showPlanetMenu(planet)])
@@ -92,7 +93,7 @@ function showMoonsMenu(planet = new Planet()) {
 }
 /**
  * Displays detailed information about a planet's civilization and statistics.
- * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to display information for.
+ * @param {Planet} planet - The planet to display information for.
  */
 function showPlanetSocietyMenu(planet = new Planet()) {
     const {civilization, settlement} = planet
@@ -212,7 +213,7 @@ function scoreEarthlikeValue(planetValue = 1, earthValue = 1) {
 }
 /**
  * Displays detailed climate and physical information about a planet.
- * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to display climate information for.
+ * @param {Planet} planet - The planet to display climate information for.
  */
 function showPlanetClimateMenu(planet = new Planet()) {
     const {climate} = planet

@@ -151,3 +151,58 @@ function tickNPCFleets(elapsedYears = 1) {
         fleet.fleetAI.tick(elapsedYears)
     }
 }
+
+
+/**
+ * Calculates the maximum allowed fleets per faction for a given planet.
+ * @param {Planet} planet - The planet to calculate fleet limits for.
+ * @returns {CountsMap} A CountsMap with faction -> max fleet count.
+ */
+function calculateMaxFleetsForPlanet(planet) {
+    if (!planet || !planet.civilization) return new CountsMap()
+    
+    const c = planet.civilization
+    const maxNumFleetsPerFaction = new CountsMap()
+    
+    for (const factionType of FACTION_TYPES_ALL) {
+        let maxNumFleets = c.population
+        //modify based on policies
+        for (const p of c.policies.all) {
+            if (p.factionSpawnModifiers && p.factionSpawnModifiers.has(factionType)) {
+                maxNumFleets *= p.factionSpawnModifiers.get(factionType)
+            }
+        }
+        maxNumFleetsPerFaction.setAmount(factionType, maxNumFleets)
+    }
+    // Apply civilization-specific multipliers to max fleet counts
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.MINERS, c.industry/c.reserves)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.SCIENTISTS, c.technology*c.education)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.PIRATES, c.crime)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.MERCHANTS, c.economy)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.SOLDIERS, c.navy)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.PILGRIMS, c.wealth)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.INQUISITORS, 1/c.corruption)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.MISSIONARIES, c.prestige*c.education)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.TOURISTS, c.wealth)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.SMUGGLERS, c.taxes*c.corruption)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.BOUNTY_HUNTERS, c.security*c.crime)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.SLAVERS, c.corruption/c.population)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.COLONISTS, c.population/c.economy)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.DIPLOMATS, c.prestige)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.SALVAGERS, c.inflation/c.reserves)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.TAX_COLLECTORS, c.taxes)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.REBELS, c.army/(c.security*c.culture))
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.REFUGEES, 1/c.score)
+    
+    // Apply religion-based multipliers
+    for (const ft of [FACTION_TYPES.PILGRIMS, FACTION_TYPES.INQUISITORS, FACTION_TYPES.MISSIONARIES]) {
+        maxNumFleetsPerFaction.multiply(ft, c.stateReligion ? 0.5+c.religions.getAmount(c.stateReligion) : 0)
+    }
+
+    //sqrt the values to make them more reasonable
+    for (const [key,value] of maxNumFleetsPerFaction.counts) {
+        maxNumFleetsPerFaction.setAmount(key, Math.sqrt(value))
+    }
+    
+    return maxNumFleetsPerFaction
+}

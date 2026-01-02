@@ -98,7 +98,7 @@ const SATURN_L5 = new LagrangePoint(
 // Uranus Lagrange Points
 const URANUS_L1 = new LagrangePoint(
     "Uranus L1",
-    COLORS.Cyan,
+    COLORS.LightBlue,
     0.01,
     LagrangePoint.calculateLagrangeOrbit(URANUS, 1, SOL),
     URANUS,
@@ -107,7 +107,7 @@ const URANUS_L1 = new LagrangePoint(
 
 const URANUS_L2 = new LagrangePoint(
     "Uranus L2",
-    COLORS.Cyan,
+    COLORS.LightBlue,
     0.01,
     LagrangePoint.calculateLagrangeOrbit(URANUS, 2, SOL),
     URANUS,
@@ -116,7 +116,7 @@ const URANUS_L2 = new LagrangePoint(
 
 const URANUS_L3 = new LagrangePoint(
     "Uranus L3",
-    COLORS.Cyan,
+    COLORS.LightBlue,
     0.01,
     LagrangePoint.calculateLagrangeOrbit(URANUS, 3, SOL),
     URANUS,
@@ -125,7 +125,7 @@ const URANUS_L3 = new LagrangePoint(
 
 const URANUS_L4 = new LagrangePoint(
     "Uranus L4",
-    COLORS.Cyan,
+    COLORS.LightBlue,
     0.01,
     LagrangePoint.calculateLagrangeOrbit(URANUS, 4, SOL),
     URANUS,
@@ -134,7 +134,7 @@ const URANUS_L4 = new LagrangePoint(
 
 const URANUS_L5 = new LagrangePoint(
     "Uranus L5",
-    COLORS.Cyan,
+    COLORS.LightBlue,
     0.01,
     LagrangePoint.calculateLagrangeOrbit(URANUS, 5, SOL),
     URANUS,

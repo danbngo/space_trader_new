@@ -55,6 +55,7 @@ const ASTEROID_BELT = new AsteroidBelt("Asteroid Belt", ASTEROID_BELT_TYPES.Rock
 const TROJANS = new AsteroidBelt("Trojan Asteroids", ASTEROID_BELT_TYPES.Rocky, hexToRgba('#bbbb88'), 0.5, new Orbit(5.2, 0.25), [ENCOUNTER_TYPES.ASTEROIDS_CALM, ENCOUNTER_TYPES.ASTEROIDS_STORM], [EFFECT_TYPES.DEBRIS_CLOUD])
 const GREEKS = new AsteroidBelt("Greek Asteroids", ASTEROID_BELT_TYPES.Rocky, hexToRgba('#bbbb88'), 0.5, new Orbit(5.2, -0.25), [ENCOUNTER_TYPES.ASTEROIDS_CALM, ENCOUNTER_TYPES.ASTEROIDS_STORM], [EFFECT_TYPES.DEBRIS_CLOUD])
 const KUIPER_BELT = new AsteroidBelt("Kuiper Belt", ASTEROID_BELT_TYPES.Icy, hexToRgba('#bbbbdd'), 50*4/5, new Orbit(50), [ENCOUNTER_TYPES.CRYOIDS_CALM, ENCOUNTER_TYPES.CRYOIDS_STORM], [EFFECT_TYPES.ICE_CLOUD])
+const ASTEROID_BELTS_ALL = [CORONA, ASTEROID_BELT, TROJANS, GREEKS, KUIPER_BELT]
 
 const ASTEROIDS = generateAsteroids(ASTEROID_BELT, COLORS.Brown, 500, 3, 0.2)
 const KUIPER_ASTEROIDS = generateAsteroids(KUIPER_BELT, COLORS.LightBlue, 5000, 5, 2/5)
@@ -62,17 +63,15 @@ const TROJAN_ASTEROIDS = generateAsteroids(TROJANS, COLORS.Gray, 100, 2, 0.1, JU
 const GREEK_ASTEROIDS = generateAsteroids(GREEKS, COLORS.Gray, 100, 2, 0.1, JUPITER.orbit.progressOffset - 0.15, 0.1)
 const SOLAR_FLARES = generateAsteroids(CORONA, COLORS.LightOrange, 100, 0.1, 0.25)
 
-const ALL_ASTEROIDS = [...ASTEROIDS, ...KUIPER_ASTEROIDS, ...TROJAN_ASTEROIDS, ...GREEK_ASTEROIDS, ...SOLAR_FLARES]
+const ASTEROIDS_ALL = [...ASTEROIDS, ...KUIPER_ASTEROIDS, ...TROJAN_ASTEROIDS, ...GREEK_ASTEROIDS, ...SOLAR_FLARES]
 
-SOL.addChildren(ALL_ASTEROIDS)
+SOL.addChildren(ASTEROIDS_ALL)
 
 const BACKGROUND_STARS = generateBackgroundStars(SOLAR_SYSTEM_RADIUS_IN_AU, 5000)
 
-// Generate religions for the star system (1-3 religions)
-const RELIGIONS = generateReligions()
-
-// Generate space stations (3-5 stations at Lagrange points)
-const SPACE_STATIONS = generateSpaceStations(rng(5, 3), ALL_LAGRANGE_POINTS, [CORONA, ASTEROID_BELT, TROJANS, GREEKS, KUIPER_BELT])
+// Religions and space stations will be initialized in titleMenu.js before game start
+const RELIGIONS = []
+const SPACE_STATIONS = []
 
 const SOLAR_SYSTEM = new StarSystem(
     'Sol System',
@@ -81,11 +80,11 @@ const SOLAR_SYSTEM = new StarSystem(
     SOL, [SOL],
     PLANETS,
     DWARF_PLANETS,
-    SPACE_STATIONS,
     [],
-    [CORONA, ASTEROID_BELT, TROJANS, GREEKS, KUIPER_BELT], [...ALL_ASTEROIDS],
+    [],
+    [CORONA, ASTEROID_BELT, TROJANS, GREEKS, KUIPER_BELT], [...ASTEROIDS_ALL],
     BACKGROUND_STARS,
-    RELIGIONS
+    []
 );
 
 console.log("Generated solar system:", SOLAR_SYSTEM)

@@ -122,7 +122,7 @@ const FACTION_TYPES = {
     SCIENTISTS: new FactionType(
         'Scientists',
         '🔬',
-        COLORS.Cyan,
+        COLORS.LightCyan,
         'Researchers and explorers seeking knowledge and studying the mysteries of the universe.',
         false,
         false,

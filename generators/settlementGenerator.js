@@ -118,13 +118,13 @@ function determinePlanetSettlementType(planet) {
 
 /**
  * Generates a complete settlement with all buildings for a planet.
- * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to generate settlement for.
+ * @param {Planet} planet - The planet to generate settlement for.
  * @returns {Settlement} The generated settlement.
  */
 function generateSettlement(planet) {
     // Determine settlement type based on planet characteristics
     const settlementType = 
-        planet instanceof Planet || planet instanceof DwarfPlanet ? determinePlanetSettlementType(planet) :
+        planet.objectType == OBJECT_TYPES.PLANET || planet.objectType == OBJECT_TYPES.DWARF_PLANET ? determinePlanetSettlementType(planet) :
         determineSpaceStationSettlementType(planet)
     
     // Get moons for this planet (children that are Moon instances)
@@ -153,9 +153,9 @@ function generateSettlement(planet) {
     const outfitter = new Outfitter(planet, getRandomMoon())
 
     // Dwarf planets have much lower chance of having buildings (95% disabled vs 80% for others)
-    const disableChance = !(gs.system.planets.includes(planet)) ? 0.8 : 0.2
+    const disableChance = planet.objectType == OBJECT_TYPES.PLANET ? 0.8 : planet.objectType == OBJECT_TYPES.DWARF_PLANET ? 0.4 : 0.2
     const buildings = [shipyard, market, blackMarket, guild, bank, courthouse, academy, tavern, cyberSurgeon, palace, temple, casino, armory, outfitter]
-    for (const building of buildings) if (Math.random() < disableChance) building.enabled = false
+    for (const building of buildings) if (Math.random() < disableChance) building.permitted = false
 
     return new Settlement({planet, settlementType, shipyard, market, blackMarket, guild, bank, courthouse, academy, tavern, cyberSurgeon, palace, temple, casino, armory, outfitter})
 }

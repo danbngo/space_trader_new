@@ -8,7 +8,7 @@ class BankLoan {
      * @param {number} interest - The interest amount on the loan.
      * @param {number} term - The term duration of the loan in years.
      * @param {number} startYear - The year when the loan was taken.
-     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet where this loan was taken.
+     * @param {Planet} planet - The planet where this loan was taken.
      */
     constructor(principal = 0, interest = 0, term = 0, startYear = gs.year, planet = null) {
         /** @type {number} */

@@ -140,6 +140,11 @@ async function startNewGame() {
     gs = new GameState()
     gs.year = GAME_START_YEAR
     gs.system = SOLAR_SYSTEM
+    gs.system.religions = generateReligions()
+    gs.system.spaceStations = generateSpaceStations(rng(5, 3), ALL_LAGRANGE_POINTS, ASTEROID_BELTS_ALL)
+    
+    console.log("Generated religions:", RELIGIONS)
+    console.log("Generated space stations:", SPACE_STATIONS)
 
     // Generate civilizations and settlements for all planets and dwarf planets
     const allPlanets = [...gs.system.planets, ...gs.system.dwarfPlanets]

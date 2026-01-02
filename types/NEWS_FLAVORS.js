@@ -20,7 +20,7 @@ const NF = Object.freeze({
     PEACE: new NewsFlavor('Peace', '🕊️', COLORS.LightBlue, 3),
     WAR: new NewsFlavor('War', '💥', COLORS.DarkRed, 50),
     CRIME: new NewsFlavor('Crime', '🦹🏻‍♂️', COLORS.DarkYellow, 2),
-    EXPLORATION: new NewsFlavor('Exploration', '🪐', COLORS.Cyan, 1),
+    EXPLORATION: new NewsFlavor('Exploration', '🪐', COLORS.DarkGreen, 1),
     HEALTH_HAZARD: new NewsFlavor('Health Hazard', '☣️', COLORS.LightGray, 2),
     DISASTER: new NewsFlavor('Disaster', '🌪️', COLORS.Orange, 4),
     RELIGION: new NewsFlavor('Religion', '⛪', COLORS.Brown, 2),

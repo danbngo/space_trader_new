@@ -8,7 +8,7 @@
 class Fleet extends SpaceObject {
     /**
      * @param {string} name - The name of the fleet.
-     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet the fleet starts at.
+     * @param {Planet} planet - The planet the fleet starts at.
      * @param {FleetType} fleetType - The type of fleet
      * @param {FactionType|null} factionType - The faction the fleet belongs to.
      * @param {number[]} color - The color of the fleet.
@@ -47,7 +47,7 @@ class Fleet extends SpaceObject {
 
     /**
      * Docks the fleet at a planet, setting location and stopping travel.
-     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to dock at.
+     * @param {Planet} planet - The planet to dock at.
      */
     dock(planet) {
         this.location = planet

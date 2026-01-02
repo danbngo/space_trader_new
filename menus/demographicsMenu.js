@@ -1,6 +1,6 @@
 /**
  * Displays demographic information about a planet's population.
- * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to display demographics for.
+ * @param {Planet} planet - The planet to display demographics for.
  */
 function showPlanetDemographicsMenu(planet = new Planet()) {
     const {civilization} = planet

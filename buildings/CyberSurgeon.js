@@ -5,7 +5,7 @@
  */
 class CyberSurgeon extends Building {
     /**
-     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet this cyber surgeon is on.
+     * @param {Planet} planet - The planet this cyber surgeon is on.
      * @param {Moon} moon - The moon this building is on (null if on planet surface).
      */
     constructor(planet = new Planet(), moon = null) {
@@ -40,7 +40,7 @@ class CyberSurgeon extends Building {
 
 /**
  * Generates a cybernetic implant with quality based on planet.
- * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet determining implant quality.
+ * @param {Planet} planet - The planet determining implant quality.
  * @param {CyberImplantType} implantType - The type of implant to generate.
  * @returns {CyberImplant} The generated cybernetic implant.
  */
