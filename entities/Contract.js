@@ -5,7 +5,7 @@
 class Contract {
     /**
      * @param {ContractType} contractType - The type of contract.
-     * @param {Planet} planet - The planet where the contract originates.
+     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet where the contract originates.
      * @param {Planet} [targetPlanet] - The destination planet (if applicable).
      * @param {number} [expirationDate] - When the contract expires (game time).
      * @param {CargoType} [cargoType] - The type of cargo involved (if applicable).

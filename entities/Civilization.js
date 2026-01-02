@@ -1,7 +1,7 @@
 
 /**
  * @typedef {Object} CivilizationParams
- * @property {Planet} [planet] - The planet this civilization belongs to.
+ * @property {Planet | DwarfPlanet | SpaceStation} [planet] - The planet this civilization belongs to.
  * @property {GovernmentType} [governmentType] - The type of government of the civilization.
  * @property {Policies} [policies] - The active policies for this civilization.
  * @property {CountsMap} [cargoPriceMultipliers] - Multipliers for cargo prices specific to this civilization.
@@ -43,7 +43,7 @@ class Civilization {
         navy = 1, army = 1, corruption = 1, crime = 1, wealth = 1, reserves = 1, inflation = 1, taxes = 1,
         religions = new CountsMap(), races = new CountsMap(), stateReligion = null
     } = {}) {
-        /** @type {Planet} */
+        /** @type {Planet | DwarfPlanet | SpaceStation} */
         this.planet = planet;
         /** @type {GovernmentType} */
         this.governmentType = governmentType; //many effects!
@@ -112,7 +112,10 @@ class Civilization {
         return (this.army + this.navy)/2
     }
 
-    /** @param {CivilizationParams} civMultipliers */
+    /**
+     * Multiplies this civilization's ratings by another civilization's ratings.
+     * @param {CivilizationParams} civMultipliers - The multipliers to apply.
+     */
     multiply(civMultipliers) {
         for (const cr of CIVILIZATION_RATINGS_ALL) {
             //if (cr.id === 'cargoPriceMultipliers' || cr.id === 'skillPriceMultipliers') continue;
@@ -128,6 +131,10 @@ class Civilization {
         }
     }
     
+    /**
+     * Creates a new Civilization with inverted multipliers (for removing effects).
+     * @returns {Civilization} A civilization with inverse multipliers.
+     */
     getInverse() {
         const inverseEffect = new Civilization({
             planet: this.planet,
@@ -140,6 +147,10 @@ class Civilization {
         return inverseEffect
     }
 
+    /**
+     * Overwrites this civilization's values with another civilization's non-default values.
+     * @param {Civilization} withCiv - The civilization to copy values from.
+     */
     overwrite(withCiv = new Civilization()) {
         if (withCiv.planet) this.planet = withCiv.planet
         if (withCiv.governmentType) this.governmentType = withCiv.governmentType
@@ -179,27 +190,74 @@ class Civilization {
         return clone
     }
 
+    /**
+     * Checks if two planets have tense diplomatic relations.
+     * @param {Planet | DwarfPlanet | SpaceStation} p1 - First planet.
+     * @param {Planet | DwarfPlanet | SpaceStation} p2 - Second planet.
+     * @returns {boolean} True if relations are tense.
+     */
     static areTense(p1 = new Planet(), p2 = new Planet()) {
         return (p1.c.relationships.get(p2) === RELATIONSHIP_TYPES.TENSE || p2.c.relationships.get(p1) === RELATIONSHIP_TYPES.TENSE)
     }
+    /**
+     * Checks if two planets are at war.
+     * @param {Planet | DwarfPlanet | SpaceStation} p1 - First planet.
+     * @param {Planet | DwarfPlanet | SpaceStation} p2 - Second planet.
+     * @returns {boolean} True if at war.
+     */
     static areAtWar(p1 = new Planet(), p2 = new Planet()) {
         return (p1.c.relationships.get(p2) === RELATIONSHIP_TYPES.WAR || p2.c.relationships.get(p1) === RELATIONSHIP_TYPES.WAR)
     }
+    /**
+     * Checks if two planets are allies.
+     * @param {Planet | DwarfPlanet | SpaceStation} p1 - First planet.
+     * @param {Planet | DwarfPlanet | SpaceStation} p2 - Second planet.
+     * @returns {boolean} True if allied.
+     */
     static areAllies(p1 = new Planet(), p2 = new Planet()) {
         return (p1.c.relationships.get(p2) === RELATIONSHIP_TYPES.ALLY && p2.c.relationships.get(p1) === RELATIONSHIP_TYPES.ALLY)
     }
+    /**
+     * Checks if two planets are neutral.
+     * @param {Planet | DwarfPlanet | SpaceStation} p1 - First planet.
+     * @param {Planet | DwarfPlanet | SpaceStation} p2 - Second planet.
+     * @returns {boolean} True if neutral.
+     */
     static areNeutral(p1 = new Planet(), p2 = new Planet()) {
         return (p1.c.relationships.get(p2) === RELATIONSHIP_TYPES.NEUTRAL && p2.c.relationships.get(p1) === RELATIONSHIP_TYPES.NEUTRAL)
     }
+    /**
+     * Checks if two planets are either tense or at war.
+     * @param {Planet | DwarfPlanet | SpaceStation} p1 - First planet.
+     * @param {Planet | DwarfPlanet | SpaceStation} p2 - Second planet.
+     * @returns {boolean} True if tense or at war.
+     */
     static areTenseOrAtWar(p1 = new Planet(), p2 = new Planet()) {
         return Civilization.areTense(p1, p2) || Civilization.areAtWar(p1, p2)
     }
+    /**
+     * Checks if two planets are either allies or neutral.
+     * @param {Planet | DwarfPlanet | SpaceStation} p1 - First planet.
+     * @param {Planet | DwarfPlanet | SpaceStation} p2 - Second planet.
+     * @returns {boolean} True if allied or neutral.
+     */
     static areAlliesOrNeutral(p1 = new Planet(), p2 = new Planet()) {
         return Civilization.areAllies(p1, p2) || Civilization.areNeutral(p1, p2)
     }
+    /**
+     * Checks if two planets have opposing government types.
+     * @param {Planet | DwarfPlanet | SpaceStation} p1 - First planet.
+     * @param {Planet | DwarfPlanet | SpaceStation} p2 - Second planet.
+     * @returns {boolean} True if governments oppose each other.
+     */
     static areOpposingGovernments(p1 = new Planet(), p2 = new Planet()) {
         return (p1.c.governmentType.opposingType === p2.c.governmentType || p2.c.governmentType.opposingType === p1.c.governmentType)
     }
+    /**
+     * Gets all planets that are at war with the given planet.
+     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to check.
+     * @returns {Array<Planet | DwarfPlanet | SpaceStation>} Array of planets at war.
+     */
     static getPlanetsAtWarWith(planet = new Planet()) {
         const atWarPlanets = []
         for (const [otherPlanet, relationship] of planet.c.relationships.entries()) {
@@ -209,6 +267,11 @@ class Civilization {
         }
         return atWarPlanets
     }
+    /**
+     * Gets all planets that are tense or at war with the given planet.
+     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to check.
+     * @returns {Array<Planet | DwarfPlanet | SpaceStation>} Array of planets with hostile relations.
+     */
     static getPlanetsTenseOrAtWarWith(planet = new Planet()) {
         const tenseOrAtWarPlanets = []
         for (const [otherPlanet, relationship] of planet.c.relationships.entries()) {
@@ -221,7 +284,17 @@ class Civilization {
 }
 
 
+/**
+ * Represents the active policies of a civilization.
+ * @class Policies
+ */
 class Policies {
+    /**
+     * @param {PolicyType} economic - Economic policy.
+     * @param {PolicyType} labor - Labor policy.
+     * @param {PolicyType} social - Social policy.
+     * @param {PolicyType} foreign - Foreign policy.
+     */
     constructor(economic = ECONOMIC_POLICIES[0], labor = LABOR_POLICIES[0], social = SOCIAL_POLICIES[0], foreign = FOREIGN_POLICIES[0]) {
         /** @type {PolicyType} */
         this.economic = economic
@@ -237,6 +310,10 @@ class Policies {
         return [this.economic, this.labor, this.social, this.foreign]
     }
 
+    /**
+     * Creates a copy of this Policies object.
+     * @returns {Policies} A cloned Policies object.
+     */
     clone() {
         return new Policies(this.economic, this.labor, this.social, this.foreign)
     }

@@ -237,10 +237,10 @@ class StarMap extends BaseMap {
             
             let stationObj = cvs.getObject(stationId)
             let labelObj = cvs.getObject(labelId)
-            
+             
             // Create objects if they don't exist
             if (!stationObj) {
-                stationObj = cvs.addFilledRectangle(stationId, station.x, station.y, 10, 10, 6, station.color, () => this.selectObject(station))
+                stationObj = cvs.addFilledRectangle(stationId, station.x, station.y, station.radius, station.radius, 6, station.color, station.angle, () => this.selectObject(station))
                 labelObj = cvs.addText(labelId, station.x, station.y, 0, -24, station.name, station.color, DEFAULT_FONT_SIZE, 2, () => this.selectObject(station))
                 
                 const objs = [stationObj, labelObj]

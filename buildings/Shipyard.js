@@ -5,7 +5,7 @@
  */
 class Shipyard extends Building {
     /**
-     * @param {Planet} planet - The planet this shipyard is on.
+     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet this shipyard is on.
      * @param {Moon} moon - The moon this building is on (null if on planet surface).
      */
     constructor(planet = new Planet(), moon = null) {
@@ -76,7 +76,7 @@ class Shipyard extends Building {
 
 /**
  * Generates a ship module with quality based on planet.
- * @param {Planet} planet - The planet determining module quality.
+ * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet determining module quality.
  * @param {ShipModuleType} moduleType - The type of module to generate.
  * @returns {ShipModule} The generated ship module.
  */

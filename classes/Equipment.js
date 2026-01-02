@@ -1,7 +1,7 @@
 // Equipment class
 class Equipment {
     /**
-     * @param {Planet} planet
+     * @param {Planet | DwarfPlanet | SpaceStation} planet
      * @param {string} name
      * @param {EquipmentType} equipmentType
      * @param {number} quality

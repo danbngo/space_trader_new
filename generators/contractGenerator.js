@@ -1,6 +1,6 @@
 /**
  * Generates a random contract for the guild.
- * @param {Planet} planet - The planet where the contract originates.
+ * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet where the contract originates.
  * @returns {Contract} The generated contract.
  */
 function generateContract(planet = new Planet()) {

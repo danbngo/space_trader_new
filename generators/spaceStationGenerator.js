@@ -6,14 +6,12 @@
  * @returns {SpaceStation}
  */
 function generateSpaceStation(name = "Station", lagrangePoint, asteroidBelts = []) {
-    const stationType = rndMember(SPACE_STATION_TYPES_ALL)
+    const stationType = determineSpaceStationSettlementType(null) // Station not created yet, function doesn't use parameter
     const color = stationType.color
     const radius = 0.001 // Small radius for stations
     
     // Copy orbit from lagrange point
     const orbit = lagrangePoint.orbit.clone()
-    
-    const [x, y] = orbit.calcAbsPosition()
     
     // Generate climate based on distance and type
     const distanceFromSun = orbit.radius
@@ -23,8 +21,8 @@ function generateSpaceStation(name = "Station", lagrangePoint, asteroidBelts = [
     const dayLength = rng(24, 1, false) / 24 // 1-24 hours converted to Earth days
     
     // Some stations might have artificial magnetosphere
-    const magnetosphereRadius = stationType === SPACE_STATION_TYPES.BERNAL_SPHERE || 
-                                 stationType === SPACE_STATION_TYPES.O_NEILL_CYLINDER
+    const magnetosphereRadius = stationType === SETTLEMENT_TYPES.BERNAL_SPHERE || 
+                                 stationType === SETTLEMENT_TYPES.O_NEILL_CYLINDER
         ? 0.001 
         : 0
     
@@ -46,8 +44,6 @@ function generateSpaceStation(name = "Station", lagrangePoint, asteroidBelts = [
     // Must be done after station is created so they can reference it
     station.civilization = generateCivilization(station)
     station.settlement = generateSettlement(station)
-    station.x = x
-    station.y = y
     return station
 }
 
@@ -55,7 +51,7 @@ function generateSpaceStation(name = "Station", lagrangePoint, asteroidBelts = [
  * Generates climate for a space station based on location and type.
  * @param {number} distanceFromSun - Distance from the sun in AU.
  * @param {AsteroidBelt[]} asteroidBelts - Asteroid belts in the system.
- * @param {SpaceStationType} stationType - The type of space station.
+ * @param {SettlementType} stationType - The structural type of space station.
  * @returns {Climate}
  */
 function generateStationClimate(distanceFromSun = 1.0, asteroidBelts = [], stationType) {
@@ -76,13 +72,13 @@ function generateStationClimate(distanceFromSun = 1.0, asteroidBelts = [], stati
     
     // Artificial gravity varies by station type
     let gravity
-    if (stationType === SPACE_STATION_TYPES.O_NEILL_CYLINDER || 
-        stationType === SPACE_STATION_TYPES.STANFORD_TORUS ||
-        stationType === SPACE_STATION_TYPES.BERNAL_SPHERE) {
+    if (stationType === SETTLEMENT_TYPES.O_NEILL_CYLINDER || 
+        stationType === SETTLEMENT_TYPES.STANFORD_TORUS ||
+        stationType === SETTLEMENT_TYPES.BERNAL_SPHERE) {
         gravity = GRAVITIES.STANDARD
-    } else if (stationType === SPACE_STATION_TYPES.ROTATING_DRUM ||
-               stationType === SPACE_STATION_TYPES.SPOKED_WHEEL ||
-               stationType === SPACE_STATION_TYPES.HABITAT_RING) {
+    } else if (stationType === SETTLEMENT_TYPES.ROTATING_DRUM ||
+               stationType === SETTLEMENT_TYPES.SPOKED_WHEEL ||
+               stationType === SETTLEMENT_TYPES.HABITAT_RING) {
         gravity = GRAVITIES.LIGHT
     } else {
         gravity = GRAVITIES.VERY_LIGHT
@@ -91,8 +87,8 @@ function generateStationClimate(distanceFromSun = 1.0, asteroidBelts = [], stati
     // Ocean coverage - only certain station types might have artificial water features
     let oceanCoverage = OCEAN_COVERAGES.NONE
     let oceanType = null
-    if (stationType === SPACE_STATION_TYPES.O_NEILL_CYLINDER || 
-        stationType === SPACE_STATION_TYPES.BERNAL_SPHERE) {
+    if (stationType === SETTLEMENT_TYPES.O_NEILL_CYLINDER || 
+        stationType === SETTLEMENT_TYPES.BERNAL_SPHERE) {
         if (Math.random() < 0.3) { // 30% chance of having water features
             oceanCoverage = OCEAN_COVERAGES.SHALLOW_SEAS
             oceanType = PLANET_OCEAN_TYPES.WATER
@@ -105,8 +101,8 @@ function generateStationClimate(distanceFromSun = 1.0, asteroidBelts = [], stati
     
     // Magnetosphere depends on station design
     let magnetosphere = MAGNETOSPHERES.NONE
-    if (stationType === SPACE_STATION_TYPES.BERNAL_SPHERE || 
-        stationType === SPACE_STATION_TYPES.O_NEILL_CYLINDER) {
+    if (stationType === SETTLEMENT_TYPES.BERNAL_SPHERE || 
+        stationType === SETTLEMENT_TYPES.O_NEILL_CYLINDER) {
         magnetosphere = MAGNETOSPHERES.WEAK
     }
     

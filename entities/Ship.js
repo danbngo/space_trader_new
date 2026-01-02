@@ -140,14 +140,27 @@ class Ship {
         return 1 + AVERAGE_SHIP_RAM_DMG * Math.pow(this.maxMoveDistance/AVERAGE_SHIP_MOVE_DISTANCE * this.mass/AVERAGE_SHIP_MASS, 0.5);
     }
 
+    /**
+     * Checks if the ship's hull is damaged.
+     * @returns {boolean} True if hull is below maximum.
+     */
     isDamaged() {
         return this.hull[0] < this.hull[1]
     }
 
+    /**
+     * Repairs the ship's hull.
+     * @param {number} amt - Amount of hull to repair (defaults to full repair).
+     */
     repairHull(amt = this.hull[1]) {
         this.hull[0] = Math.min(this.hull[0]+amt, this.hull[1])
     }
     
+    /**
+     * Restores the ship's shields.
+     * @param {number} amt - Amount of shields to restore (defaults to full restore).
+     * @returns {number} The actual amount of shields restored.
+     */
     restoreShields(amt = this.shields[1]) {
         const beforeShields = this.shields[0]
         this.shields[0] = Math.min(this.shields[0]+amt, this.shields[1])
@@ -155,6 +168,11 @@ class Ship {
         return actualRecharge
     }
 
+    /**
+     * Rotates the ship by adding to its current angle.
+     * @param {number} delta - The angle to add (in radians).
+     * @returns {number} The new normalized angle.
+     */
     incrementAngle(delta = 0) {
         this.angle += delta
         // Normalize to 0 to 2π range
@@ -165,6 +183,9 @@ class Ship {
         return this.angle
     }
 
+    /**
+     * Resets all combat-related variables to initial state.
+     */
     resetCombatVars() {
         //this.restoreShields() //looks weird visually
         this.angle = Math.PI*2;
@@ -177,6 +198,9 @@ class Ship {
         this.resetActions()
     }
 
+    /**
+     * Resets action points at the start of a new turn.
+     */
     resetActions() {
         this.actionsRemaining = this.maxActionsPerTurn;
         
@@ -191,6 +215,10 @@ class Ship {
         // }
     }
 
+    /**
+     * Consumes one action point.
+     * @returns {Array} Array of pseudo-actions (currently empty).
+     */
     spendAction() {
         const pseudoActions = []
         this.actionsRemaining = Math.max(0, this.actionsRemaining - 1)
@@ -200,6 +228,9 @@ class Ship {
         return pseudoActions
     }
 
+    /**
+     * Sets the ship to disabled state (hull = 0).
+     */
     setDisabled() {
         this.hull[0] = 0
         const recordedAngle = this.angle
@@ -211,7 +242,14 @@ class Ship {
         return this.hull[0] <= 0
     }
 
-    /** @returns {[number, number, boolean]} */
+    /**
+     * Applies damage to the ship, reducing shields first then hull.
+     * @param {number} dmg - The amount of damage to apply.
+     * @param {boolean} bypassShields - Whether to ignore shields.
+     * @param {boolean} dontHurtHull - Whether to prevent hull damage.
+     * @param {Ship} sourceShip - The ship that caused the damage.
+     * @returns {[number, number, boolean]} [hullDamage, shieldDamage, disabled]
+     */
     takeDamage(dmg = 0, bypassShields = false, dontHurtHull = false, sourceShip = null) {
         console.log('applying dmg to ship:',this,dmg,bypassShields)
         if (this.disabled) return [0, 0, false]
@@ -240,11 +278,21 @@ class Ship {
         return [hullDamage, shieldDamage, disabled]
     }
 
+    /**
+     * Recharges shields based on engine power.
+     * @returns {number} The amount of shields recharged.
+     */
     rechargeShields() {
         const rechargeAmt = 1 + rng(this.engine/2)
         return this.restoreShields(rechargeAmt)
     }
 
+    /**
+     * Calculates the attack areas for laser weapons (two triangles).
+     * @param {number} overrideX - Override x position (defaults to ship.x).
+     * @param {number} overrideY - Override y position (defaults to ship.y).
+     * @returns {Triangle[]} Array of two targeting triangles.
+     */
     calcLaserAreas(overrideX = this.x, overrideY = this.y) {
         const attackRange = 1+this.maxAttackDistance
         const targetingAngle = this.angle+Math.PI/2
@@ -257,6 +305,12 @@ class Ship {
         return [targetingTriangle1, targetingTriangle2]
     }
 
+    /**
+     * Calculates the movement area for this ship (ellipse).
+     * @param {number} overrideX - Override x position (defaults to ship.x).
+     * @param {number} overrideY - Override y position (defaults to ship.y).
+     * @returns {Ellipse} The movement area.
+     */
     calcMoveArea(overrideX = this.x, overrideY = this.y) {
         const targetingAngle = this.angle
         const moveRange = 1+this.maxMoveDistance
@@ -267,6 +321,12 @@ class Ship {
         return ellipse
     }
 
+    /**
+     * Calculates the bomb/warhead area (circle in front of ship).
+     * @param {number} overrideX - Override x position (defaults to ship.x).
+     * @param {number} overrideY - Override y position (defaults to ship.y).
+     * @returns {Circle} The bomb area.
+     */
     calcBombArea(overrideX = this.x, overrideY = this.y) {
         const targetingAngle = this.angle
         const attackRange = this.maxAttackDistance/2
@@ -275,6 +335,12 @@ class Ship {
         return new Circle(cx, cy, attackRange)
     }
 
+    /**
+     * Calculates the beam weapon area (triangle in front of ship).
+     * @param {number} overrideX - Override x position (defaults to ship.x).
+     * @param {number} overrideY - Override y position (defaults to ship.y).
+     * @returns {Triangle} The beam area.
+     */
     calcBeamArea(overrideX = this.x, overrideY = this.y) {
         const attackRange = 1+this.maxAttackDistance
         const targetingAngle = this.angle
@@ -284,6 +350,12 @@ class Ship {
         return targetingTriangle
     }
 
+    /**
+     * Calculates the EMP pulse area (circle centered on ship).
+     * @param {number} overrideX - Override x position (defaults to ship.x).
+     * @param {number} overrideY - Override y position (defaults to ship.y).
+     * @returns {Circle} The pulse area.
+     */
     calcPulseArea(overrideX = this.x, overrideY = this.y) {
         // EMP pulse is centered on the ship and has radius = maxAttackDistance * 2
         const pulseRadius = this.maxAttackDistance/2

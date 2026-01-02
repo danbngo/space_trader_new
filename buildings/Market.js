@@ -5,7 +5,7 @@
  */
 class Market extends Building {
     /**
-     * @param {Planet} planet - The planet this market is on.
+     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet this market is on.
      * @param {boolean} blackMarket - Whether this is a black market (illegal goods).
      * @param {Moon} moon - The moon this building is on (null if on planet surface).
      */

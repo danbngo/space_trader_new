@@ -7,7 +7,7 @@ class News {
      * @param {string} startedName - The name/description of the event when it starts.
      * @param {string} endedName - The name/description of the event when it ends.
      * @param {NewsType} newsType - The type of news event.
-     * @param {Planet} planet - The planet where the event originates.
+     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet where the event originates.
      * @param {Planet|null} targetPlanet - The target planet affected by the event (if any).
      */
     constructor(startedName = '', endedName = '', failedName = '', cancelledName = '', newsType = NT_ALL[0], planet = new Planet(), targetPlanet = null) {
@@ -239,8 +239,8 @@ class News {
     /**
      * Checks if any active news events match the specified criteria.
      * @param {NewsType} newsType - The type of news to check for.
-     * @param {Planet|null} planet - The origin planet (null for any planet).
-     * @param {Planet|null} targetPlanet - The target planet (null for any target).
+     * @param {Planet | DwarfPlanet | SpaceStation | null} planet - The origin planet (null for any planet).
+     * @param {Planet | DwarfPlanet | SpaceStation | null} targetPlanet - The target planet (null for any target).
      * @returns {boolean} True if matching news exists.
      */
     static hasNews(newsType = NT_ALL[0], planet = null, targetPlanet = null) {
@@ -249,7 +249,7 @@ class News {
 
     /**
      * Gets all news events originating from a planet matching any of the specified types.
-     * @param {Planet} planet - The origin planet.
+     * @param {Planet | DwarfPlanet | SpaceStation} planet - The origin planet.
      * @param {NewsType[]} newsTypes - Array of news types to check for.
      * @returns {News[]} Array of matching news events.
      */
@@ -262,7 +262,7 @@ class News {
     }
     /**
      * Gets all news events targeting a planet matching any of the specified types.
-     * @param {Planet} planet - The target planet.
+     * @param {Planet | DwarfPlanet | SpaceStation} planet - The target planet.
      * @param {NewsType[]} newsTypes - Array of news types to check for.
      * @returns {News[]} Array of matching news events.
      */
@@ -275,7 +275,7 @@ class News {
     }
     /**
      * Checks if a planet has any active news events of the specified types as the origin.
-     * @param {Planet} planet - The origin planet.
+     * @param {Planet | DwarfPlanet | SpaceStation} planet - The origin planet.
      * @param {NewsType[]} newsTypes - Array of news types to check for.
      * @returns {boolean} True if matching news exists.
      */
@@ -286,7 +286,7 @@ class News {
     }
     /**
      * Checks if a planet is targeted by any active news events of the specified types.
-     * @param {Planet} planet - The target planet.
+     * @param {Planet | DwarfPlanet | SpaceStation} planet - The target planet.
      * @param {NewsType[]} newsTypes - Array of news types to check for.
      * @returns {boolean} True if matching news exists.
      */
@@ -308,8 +308,8 @@ class News {
 
     /**
      * Checks if there is a news event of a specific type between two planets in either direction.
-     * @param {Planet} planetA - The first planet.
-     * @param {Planet} planetB - The second planet.
+     * @param {Planet | DwarfPlanet | SpaceStation} planetA - The first planet.
+     * @param {Planet | DwarfPlanet | SpaceStation} planetB - The second planet.
      * @param {NewsType} newsType - The type of news to check for.
      * @returns {boolean} True if matching news exists in either direction.
      */
@@ -318,8 +318,8 @@ class News {
     }
     /**
      * Checks if there are any news events of the specified types between two planets in either direction.
-     * @param {Planet} planetA - The first planet.
-     * @param {Planet} planetB - The second planet.
+     * @param {Planet | DwarfPlanet | SpaceStation} planetA - The first planet.
+     * @param {Planet | DwarfPlanet | SpaceStation} planetB - The second planet.
      * @param {NewsType[]} newsTypes - Array of news types to check for.
      * @returns {boolean} True if matching news exists in either direction.
      */
@@ -352,7 +352,7 @@ class News {
 
     /**
      * Forces all hostile or cooperative news events originating from a planet to end immediately.
-     * @param {Planet} planet - The planet to withdraw from foreign activity.
+     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to withdraw from foreign activity.
      */
     static forceWithdrawal(planet = new Planet()) {
         //all hostile or cooperative acts FROM this planet expire immediately

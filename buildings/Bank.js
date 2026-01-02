@@ -5,7 +5,7 @@
  */
 class Bank extends Building {
     /**
-     * @param {Planet} planet - The planet this bank is on.
+     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet this bank is on.
      * @param {Moon} moon - The moon this building is on (null if on planet surface).
      */
     constructor(planet = new Planet(), moon = null) {

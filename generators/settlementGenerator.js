@@ -1,9 +1,26 @@
 /**
+ * Determines the settlement type for a space station.
+ * @param {SpaceStation} station - The space station to analyze.
+ * @returns {SettlementType} The appropriate settlement type for the station.
+ */
+function determineSpaceStationSettlementType(station) {
+    // Only use space station settlement types
+    const spaceStationTypes = [
+        SETTLEMENT_TYPES.TORUS_STATION, SETTLEMENT_TYPES.ROTATING_DRUM, 
+        SETTLEMENT_TYPES.TETHERED_STATION, SETTLEMENT_TYPES.SPOKED_WHEEL,
+        SETTLEMENT_TYPES.BERNAL_SPHERE, SETTLEMENT_TYPES.O_NEILL_CYLINDER,
+        SETTLEMENT_TYPES.STANFORD_TORUS, SETTLEMENT_TYPES.MODULAR_STATION,
+        SETTLEMENT_TYPES.HABITAT_RING, SETTLEMENT_TYPES.CRYSTAL_PALACE
+    ]
+    return rndMember(spaceStationTypes)
+}
+
+/**
  * Determines the most appropriate settlement type for a planet based on its characteristics.
- * @param {Planet} planet - The planet to analyze.
+ * @param {Planet | DwarfPlanet} planet - The planet to analyze.
  * @returns {SettlementType} The most appropriate settlement type.
  */
-function determineSettlementType(planet = new Planet()) {
+function determinePlanetSettlementType(planet) {
     const climate = planet.climate
     const planetType = planet.planetType
     
@@ -101,12 +118,14 @@ function determineSettlementType(planet = new Planet()) {
 
 /**
  * Generates a complete settlement with all buildings for a planet.
- * @param {Planet} planet - The planet to generate settlement for.
+ * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to generate settlement for.
  * @returns {Settlement} The generated settlement.
  */
-function generateSettlement(planet = new Planet()) {
+function generateSettlement(planet) {
     // Determine settlement type based on planet characteristics
-    const settlementType = determineSettlementType(planet)
+    const settlementType = 
+        planet instanceof Planet || planet instanceof DwarfPlanet ? determinePlanetSettlementType(planet) :
+        determineSpaceStationSettlementType(planet)
     
     // Get moons for this planet (children that are Moon instances)
     const planetMoons = planet.children ? planet.children.filter(child => child instanceof Moon) : []

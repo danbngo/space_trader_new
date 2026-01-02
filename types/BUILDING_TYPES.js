@@ -26,7 +26,7 @@ class BuildingType {
     
     /**
      * Check if player meets reputation requirements for this building
-     * @param {Planet} planet - The planet to check reputation for
+     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to check reputation for
      * @returns {boolean} True if player meets at least one requirement
      */
     meetsReputationRequirement(planet) {
@@ -41,7 +41,7 @@ class BuildingType {
     
     /**
      * Check if player can access this building (reputation + special conditions)
-     * @param {Planet} planet - The planet to check access for
+     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to check access for
      * @param {boolean} isDocked - Whether the player is docked at the planet
      * @returns {Object} {canShow: boolean, isDisabled: boolean}
      */

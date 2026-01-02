@@ -356,7 +356,7 @@ function rndRound(fraction = 0.5) {
 
 /**
  * Calculates the maximum allowed fleets per faction for a given planet.
- * @param {Planet} planet - The planet to calculate fleet limits for.
+ * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to calculate fleet limits for.
  * @returns {CountsMap} A CountsMap with faction -> max fleet count.
  */
 function calculateMaxFleetsForPlanet(planet) {

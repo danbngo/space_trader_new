@@ -85,6 +85,67 @@ const SETTLEMENT_TYPES = Object.freeze({
         COLORS.Gray
     ),
     
+    // Space Station Types - orbital habitats and structures
+    TORUS_STATION: new SettlementType(
+        "Torus Station",
+        "A ring-shaped station that rotates to generate artificial gravity",
+        COLORS.Gray
+    ),
+    
+    ROTATING_DRUM: new SettlementType(
+        "Rotating Drum",
+        "A cylindrical station that spins along its central axis",
+        COLORS.LightGray
+    ),
+    
+    TETHERED_STATION: new SettlementType(
+        "Tethered Station",
+        "Two masses connected by a cable, spinning to create gravity",
+        COLORS.White
+    ),
+    
+    SPOKED_WHEEL: new SettlementType(
+        "Spoked Wheel",
+        "A classic wheel design with spokes connecting the hub to the rim",
+        COLORS.LightBlue
+    ),
+    
+    BERNAL_SPHERE: new SettlementType(
+        "Bernal Sphere",
+        "A spherical station that rotates to provide gravity on its inner surface",
+        COLORS.Blue
+    ),
+    
+    O_NEILL_CYLINDER: new SettlementType(
+        "O'Neill Cylinder",
+        "A massive cylindrical habitat with internal land area and artificial sun",
+        COLORS.Green
+    ),
+    
+    STANFORD_TORUS: new SettlementType(
+        "Stanford Torus",
+        "A large donut-shaped station capable of housing thousands",
+        COLORS.Orange
+    ),
+    
+    MODULAR_STATION: new SettlementType(
+        "Modular Station",
+        "A station built from interconnected modules and expandable sections",
+        COLORS.Yellow
+    ),
+    
+    HABITAT_RING: new SettlementType(
+        "Habitat Ring",
+        "Multiple rotating rings attached to a central non-rotating hub",
+        COLORS.Purple
+    ),
+    
+    CRYSTAL_PALACE: new SettlementType(
+        "Crystal Palace",
+        "A geometric station with transparent sections and solar arrays",
+        COLORS.Cyan
+    ),
+    
     // For ice giant planets with frozen surface layers
     ICE_CITY: new SettlementType(
         "Ice City",

@@ -8,7 +8,7 @@
 class Fleet extends SpaceObject {
     /**
      * @param {string} name - The name of the fleet.
-     * @param {Planet} planet - The planet the fleet starts at.
+     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet the fleet starts at.
      * @param {FleetType} fleetType - The type of fleet
      * @param {FactionType|null} factionType - The faction the fleet belongs to.
      * @param {number[]} color - The color of the fleet.
@@ -16,7 +16,7 @@ class Fleet extends SpaceObject {
      * @param {number} y - The y-coordinate of the fleet's position.
      */
     constructor(name = "Unnamed", planet = null, fleetType = FLEET_TYPES_ALL[0], factionType = null, color = COLORS.White, x = 0, y = 0) {
-        super(name, color, FLEET_RADIUS, x, y);
+        super(name, OBJECT_TYPES.FLEET, color, FLEET_RADIUS, x, y);
         /** @type {Planet} */
         this.planet = planet;
         /** @type {FleetType} */
@@ -45,6 +45,10 @@ class Fleet extends SpaceObject {
         this.angle = 0 //danmod this is temporary should get rid of it later
     }
 
+    /**
+     * Docks the fleet at a planet, setting location and stopping travel.
+     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to dock at.
+     */
     dock(planet) {
         this.location = planet
         this.x = planet.x
@@ -53,6 +57,12 @@ class Fleet extends SpaceObject {
         planet.addChildren([this])
     }
 
+    /**
+     * Calculates the total credit share owed to officers.
+     * @param {number} ofCR - The amount of credits to calculate share from.
+     * @param {boolean} rounded - Whether to round the result.
+     * @returns {number} The total share amount.
+     */
     calcTotalCRShare(ofCR = 1, rounded = true) {
         if (this.officers.length == 0 || isNaN(ofCR) || !ofCR || ofCR < 0) return 0
         const shareRatio = this.officers.reduce((total, officer) => total + officer.crShare, 0)
@@ -169,11 +179,19 @@ class Fleet extends SpaceObject {
         return this.officers.length + (this.captain !== undefined ? 1 : 0)
     }
 
+    /**
+     * Adds a ship to the fleet.
+     * @param {Ship} ship - The ship to add.
+     */
     addShip(ship = new Ship()) {
         if (!this.flagship) this.flagship = ship
         this.ships.push(ship)
         ship.fleet = this
     }
+    /**
+     * Adds an officer to the fleet.
+     * @param {Officer} officer - The officer to add.
+     */
     addOfficer(officer = new Officer()) {
         if (!this.captain) this.captain = officer
         this.officers.push(officer)

@@ -8,8 +8,6 @@ class StarSystem extends SpaceObject {
      * @param {string} name - The name of the star system.
      * @param {number[]} color - The color of the star system.
      * @param {number} radius - The radius of the star system.
-     * @param {number} x - The x-coordinate of the star system.
-     * @param {number} y - The y-coordinate of the star system.
      * @param {SpaceObject} barycenter - The barycenter of the star system.
      * @param {Star[]} stars - The stars in the star system.
      * @param {Planet[]} planets - The planets in the star system.
@@ -22,9 +20,9 @@ class StarSystem extends SpaceObject {
      * @param {Religion[]} religions - The religions in the star system.
      * @param {Anomaly[]} anomalies - The anomalies in the star system.
      */
-    constructor(name = "Unnamed", color = COLORS.White, radius = 0, x = 0, y = 0, barycenter = null, stars = [], planets = [], dwarfPlanets = [], spaceStations = [], fleets = [], asteroidBelts = [], asteroids = [], backgroundStars = [], religions = [], anomalies = []) {
+    constructor(name = "Unnamed", color = COLORS.White, radius = 0, barycenter = null, stars = [], planets = [], dwarfPlanets = [], spaceStations = [], fleets = [], asteroidBelts = [], asteroids = [], backgroundStars = [], religions = [], anomalies = []) {
         console.log('instantiating star system w name:', name, 'stars:', stars, 'planets:', planets, 'dwarf planets:', dwarfPlanets, 'space stations:', spaceStations, 'fleets:', fleets);
-        super(name, OBJECT_TYPES.ABSTRACT, color, radius, x, y)
+        super(name, OBJECT_TYPES.ABSTRACT, color, radius, 0, 0);
         /** @type {SpaceObject} */
         this.barycenter = barycenter
         /** @type {Star[]} */

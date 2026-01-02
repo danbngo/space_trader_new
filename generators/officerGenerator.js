@@ -1,6 +1,6 @@
 /**
  * Generates a procedural name for an officer.
- * @param {Planet} planet - The planet the officer is from.
+ * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet the officer is from.
  * @returns {string} The generated officer name.
  */
 function generateOfficerName(planet = new Planet()) {
@@ -15,7 +15,7 @@ function generateOfficerName(planet = new Planet()) {
 }
 /**
  * Generates an officer with skills based on planet quality.
- * @param {Planet} planet - The planet the officer is from.
+ * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet the officer is from.
  * @param {boolean} withImplants - Whether to generate cyber implants (for tavern hires).
  * @param {string|null} reputationType - 'fame' for guild officers, 'both' for tavern officers, null for none.
  * @returns {Officer} The generated officer.

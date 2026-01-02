@@ -6,24 +6,24 @@
 function generateCivilization(planet) {
     const governmentType = rndMember(GT_ALL.filter(gt => gt != GT.PUPPET_STATE))
     // Dwarf planets are small outposts with reduced stats (0.25x)
-    const dwarfMultiplier = !(gs.system.planets.includes(planet)) ? 1 : 0.25
-    const technology = rng(4,1,false)/2 * dwarfMultiplier
-    const education = rng(4,1,false)/2 * dwarfMultiplier
-    const population = rng(8,1,false)/4 * dwarfMultiplier
-    const territory = rng(8,1,false)/4 * dwarfMultiplier
-    const army = rng(8,1,false)/4 * dwarfMultiplier
-    const navy = rng(8,1,false)/4 * dwarfMultiplier
-    const security = rng(8,1,false)/4 * dwarfMultiplier
-    const economy = rng(8,1,false)/4 * dwarfMultiplier
-    const industry = rng(8,1,false)/4 * dwarfMultiplier
-    const culture = rng(8,1,false)/4 * dwarfMultiplier
-    const prestige = rng(8,1,false)/4 * dwarfMultiplier
-    const crime = rng(8,1,false)/4 * dwarfMultiplier
-    const corruption = rng(8,1,false)/4 * dwarfMultiplier
-    const wealth = rng(8,1,false)/4 * dwarfMultiplier
-    const reserves = rng(8,1,false)/4 * dwarfMultiplier
-    const inflation = rng(8,1,false)/4 * dwarfMultiplier
-    const taxes = rng(8,1,false)/4 * dwarfMultiplier
+    const multiplier = planet.objectType == OBJECT_TYPES.DWARF_PLANET ? 0.25 : planet.objectType == OBJECT_TYPES.SPACE_STATION ? 0.5 : 1.0
+    const technology = rng(4,1,false)/2 * 1
+    const education = rng(4,1,false)/2 * 1
+    const population = rng(8,1,false)/4 * multiplier
+    const territory = rng(8,1,false)/4 * multiplier
+    const army = rng(8,1,false)/4 * multiplier
+    const navy = rng(8,1,false)/4 * multiplier
+    const security = rng(8,1,false)/4 * multiplier
+    const economy = rng(8,1,false)/4 * multiplier
+    const industry = rng(8,1,false)/4 * multiplier
+    const culture = rng(8,1,false)/4 * 1
+    const prestige = rng(8,1,false)/4 * multiplier
+    const crime = rng(8,1,false)/4 * 1
+    const corruption = rng(8,1,false)/4 * 1
+    const wealth = rng(8,1,false)/4 * multiplier
+    const reserves = rng(8,1,false)/4 * multiplier
+    const inflation = rng(8,1,false)/4 * 1
+    const taxes = rng(8,1,false)/4 * 1
 
     const cargoPriceMultipliers = new CountsMap()
     for (const ct of CARGO_TYPES_ALL) {

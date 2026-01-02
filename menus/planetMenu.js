@@ -18,7 +18,7 @@ const buildingHandlerMapping = [
 
 /**
  * Displays the main planet menu with access to all buildings.
- * @param {Planet} planet - The planet to interact with.
+ * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to interact with.
  */
 function showPlanetMenu(planet = new Planet()) {
     console.log('opening planet menu for:',planet)
@@ -76,7 +76,7 @@ function showPlanetMenu(planet = new Planet()) {
 
 /**
  * Displays a menu listing all moons of a planet.
- * @param {Planet} planet - The planet whose moons to display.
+ * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet whose moons to display.
  */
 function showMoonsMenu(planet = new Planet()) {
     let msg = `${coloredName(planet)} has ${planet.children.length} major moon${planet.children.length > 1 ? 's' : ''}:<br/><br/>`
@@ -92,7 +92,7 @@ function showMoonsMenu(planet = new Planet()) {
 }
 /**
  * Displays detailed information about a planet's civilization and statistics.
- * @param {Planet} planet - The planet to display information for.
+ * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to display information for.
  */
 function showPlanetSocietyMenu(planet = new Planet()) {
     const {civilization, settlement} = planet
@@ -212,7 +212,7 @@ function scoreEarthlikeValue(planetValue = 1, earthValue = 1) {
 }
 /**
  * Displays detailed climate and physical information about a planet.
- * @param {Planet} planet - The planet to display climate information for.
+ * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to display climate information for.
  */
 function showPlanetClimateMenu(planet = new Planet()) {
     const {climate} = planet

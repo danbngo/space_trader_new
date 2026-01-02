@@ -51,6 +51,13 @@ class Officer {
         this.equipment = new Map();
     }
 
+    /**
+     * Grants experience points to the officer and handles level ups.
+     * @param {number} amount - The amount of experience to grant.
+     * @param {boolean} autoLevelUp - Whether to automatically level up when possible.
+     * @param {boolean} autoImproveSkills - Whether to automatically spend skill points.
+     * @returns {string} Message describing what happened.
+     */
     grantExperience(amount = 0, autoLevelUp = (this !== gs.captain), autoImproveSkills = (this !== gs.captain)) {
         let msg = ''
         this.expPoints += amount;
@@ -71,6 +78,12 @@ class Officer {
         return msg
     }
 
+    /**
+     * Grants infamy on a specific planet.
+     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to gain infamy on.
+     * @param {number} amount - The amount of infamy to grant (can be negative).
+     * @returns {string} Message describing the infamy change.
+     */
     grantInfamy(planet = new Planet(), amount = 1) {
         this.infamy.increment(planet, amount);
         if (this == gs.captain) {
@@ -79,6 +92,12 @@ class Officer {
         return ''
     }
 
+    /**
+     * Grants fame on a specific planet.
+     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to gain fame on.
+     * @param {number} amount - The amount of fame to grant (can be negative).
+     * @returns {string} Message describing the fame change.
+     */
     grantFame(planet = new Planet(), amount = 1) {
         this.fame.increment(planet, amount);
         if (this == gs.captain) {
@@ -87,6 +106,12 @@ class Officer {
         return ''
     }
 
+    /**
+     * Grants infamy with a specific faction.
+     * @param {FactionType} faction - The faction to gain infamy with.
+     * @param {number} amount - The amount of infamy to grant (can be negative).
+     * @returns {string} Message describing the infamy change.
+     */
     grantFactionInfamy(faction = FACTION_TYPES_ALL[0], amount = 1) {
         this.infamy.increment(faction, amount);
         if (this == gs.captain) {
@@ -95,6 +120,12 @@ class Officer {
         return ''
     }
 
+    /**
+     * Grants fame with a specific faction.
+     * @param {FactionType} faction - The faction to gain fame with.
+     * @param {number} amount - The amount of fame to grant (can be negative).
+     * @returns {string} Message describing the fame change.
+     */
     grantFactionFame(faction = FACTION_TYPES_ALL[0], amount = 1) {
         this.fame.increment(faction, amount);
         if (this == gs.captain) {
@@ -103,22 +134,48 @@ class Officer {
         return ''
     }
 
+    /**
+     * Calculates total infamy for a planet (planet-specific + global average).
+     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to calculate infamy for.
+     * @returns {number} The calculated infamy value.
+     */
     calcInfamyForPlanet(planet = new Planet()) {
         return Math.max(this.infamy.getAmount(planet), this.infamy.total / gs.system.planets.length)
     }
 
+    /**
+     * Calculates total fame for a planet (planet-specific + global average).
+     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to calculate fame for.
+     * @returns {number} The calculated fame value.
+     */
     calcFameForPlanet(planet = new Planet()) {
         return Math.max(this.fame.getAmount(planet), this.fame.total / gs.system.planets.length)
     }
     
+    /**
+     * Calculates net reputation for a planet (fame - infamy).
+     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to calculate reputation for.
+     * @returns {number} The calculated reputation value.
+     */
     calcReputationForPlanet(planet = new Planet()) {
         return this.calcFameForPlanet(planet) - this.calcInfamyForPlanet(planet)
     }
 
+    /**
+     * Calculates total bounty for a planet (planet-specific + global average).
+     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to calculate bounty for.
+     * @returns {number} The calculated bounty value.
+     */
     calcBountyForPlanet(planet = new Planet()) {
         return Math.max(this.bounty.getAmount(planet), this.bounty.total / gs.system.planets.length)
     }
 
+    /**
+     * Grants a bounty on a specific planet.
+     * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet to add bounty on.
+     * @param {number} amount - The amount of bounty to add (can be negative).
+     * @returns {string} Message describing the bounty change.
+     */
     grantBounty(planet = new Planet(), amount = 1) {
         this.bounty.increment(planet, amount);
         if (this == gs.captain) {
@@ -127,11 +184,21 @@ class Officer {
         return ''
     }
 
+    /**
+     * Calculates the skill points required to upgrade a specific skill.
+     * @param {SkillType} skill - The skill to calculate upgrade cost for.
+     * @param {boolean} rounded - Whether to round up the result.
+     * @returns {number} The number of skill points required.
+     */
     calcSkillPointsToUpgrade(skill = SKILLS_ALL[0], rounded = true) {
         const points = (1+this.skills.getAmount(skill)) / 1.5
         return rounded ? Math.ceil(points) : points
     }
 
+    /**
+     * Levels up the officer, consuming exp and granting skill/perk points.
+     * @param {boolean} autoImproveSkills - Whether to automatically spend skill points.
+     */
     levelUp(autoImproveSkills = false) {
         this.expPoints -= this.expToNextLevel;
         this.level++;
@@ -145,6 +212,9 @@ class Officer {
         }
     }
 
+    /**
+     * Automatically spends available skill points on random skills.
+     */
     autoImproveSkills() {
         let attempts = 100
         while (this.skillPoints > 0 && attempts-- > 0) {
@@ -179,6 +249,11 @@ class Officer {
         return 1 + Math.floor(this.level / CAPTAIN_LEVELS_PER_OFFICER)
     }
 
+    /**
+     * Calculates the total outstanding debt from all loans.
+     * @param {boolean} onlyOverdue - Whether to only count overdue loans.
+     * @returns {number} The total debt amount.
+     */
     calcTotalDebts(onlyOverdue = false) {
         return this.loans.filter(l=>(!onlyOverdue || l.overdue)).reduce((total, loan) => total + loan.outstandingBalance, 0)
     }

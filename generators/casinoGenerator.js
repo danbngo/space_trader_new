@@ -1,6 +1,6 @@
 /**
  * Generates casino prizes with high quality.
- * @param {Planet} planet - The planet the casino is on.
+ * @param {Planet | DwarfPlanet | SpaceStation} planet - The planet the casino is on.
  * @param {number} numPrizes - Number of prizes to generate.
  * @returns {Array<Ship|Equipment|CyberImplant>} Array of prizes.
  */
