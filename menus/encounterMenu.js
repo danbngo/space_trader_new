@@ -43,7 +43,7 @@ function checkForAsteroidBeltEncounters(elapsedDays = 1) {
     // Start the encounter
     if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
     const encounter = generateEncounter(encounterType, null, selectedBelt.effectTypes)
-    encounter.onStart()
+    encounter.startEncounter()
     return true
 }
 
@@ -75,7 +75,7 @@ function checkForPlanetEncounters(elapsedDays = 1) {
                 if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
                 const encounterType = rndMember([ENCOUNTER_TYPES.ASTEROIDS_CALM, ENCOUNTER_TYPES.ASTEROIDS_STORM])
                 const encounter = generateEncounter(encounterType, planet, [EFFECT_TYPES.DEBRIS_CLOUD])
-                encounter.onStart()
+                encounter.startEncounter()
                 return true
             }
         }
@@ -90,7 +90,7 @@ function checkForPlanetEncounters(elapsedDays = 1) {
                 if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
                 const encounterType = magnetosphereStrength > 1.2 ? ENCOUNTER_TYPES.MAGNETOIDS_STORM : ENCOUNTER_TYPES.MAGNETOIDS_CALM
                 const encounter = generateEncounter(encounterType, planet, [EFFECT_TYPES.ION_CLOUD, EFFECT_TYPES.PLASMA_TRAIL])
-                encounter.onStart()
+                encounter.startEncounter()
                 return true
             }
         }
@@ -109,7 +109,7 @@ function checkForPlanetEncounters(elapsedDays = 1) {
                 if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
                 const encounterType = Math.random() > 0.5 ? ENCOUNTER_TYPES.PLASMOIDS_STORM : ENCOUNTER_TYPES.PLASMOIDS_CALM
                 const encounter = generateEncounter(encounterType, null, [EFFECT_TYPES.ION_CLOUD, EFFECT_TYPES.PLASMA_TRAIL])
-                encounter.onStart()
+                encounter.startEncounter()
                 return true
             }
         }
@@ -121,7 +121,7 @@ function checkForPlanetEncounters(elapsedDays = 1) {
                 if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
                 const encounterType = Math.random() > 0.5 ? ENCOUNTER_TYPES.MAGNETOIDS_STORM : ENCOUNTER_TYPES.MAGNETOIDS_CALM
                 const encounter = generateEncounter(encounterType, null, [EFFECT_TYPES.ION_CLOUD, EFFECT_TYPES.PLASMA_TRAIL])
-                encounter.onStart()
+                encounter.startEncounter()
                 return true
             }
         }
@@ -191,7 +191,7 @@ function checkForPlanetEncounters(elapsedDays = 1) {
         if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
         const effectTypes = rollEncounterEffectTypes()
         const encounter = generateEncounter(selectedType, planet, effectTypes)
-        encounter.onStart()
+        encounter.startEncounter()
         return true
     }
     

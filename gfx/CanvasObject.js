@@ -234,16 +234,14 @@ class CanvasObject {
             break;
             
             case SHAPES.Text:
-            ctx.font = `${this.size}px Segoe UI Symbol, Arial, sans-serif`;
+            ctx.font = `${this.size}px "Google Sans Code"`;
             if (this.fontModifier) {
-                ctx.font = `${this.fontModifier} ${this.size}px Segoe UI Symbol, Arial, sans-serif`;
+                ctx.font = `${this.fontModifier} ${this.size}px "Google Sans Code"`;
             }
-
-            const text = this.textContent.replace(/\uFE0F/g, "")
             
             ctx.strokeStyle = ctx.strokeStyle || "black";
-            ctx.strokeText(text, 0, 0);
-            ctx.fillText(text, 0, 0);
+            ctx.strokeText(this.textContent, 0, 0);
+            ctx.fillText(this.textContent, 0, 0);
             break;
             
             case SHAPES.Line:

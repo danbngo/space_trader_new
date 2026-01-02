@@ -25,7 +25,7 @@ function generateFleetCargo(fleet = new Fleet(), fleetType = FLEET_TYPES_ALL[0])
  * @returns {Fleet} The generated fleet.
  */
 function generateFleet(fleetType = FLEET_TYPES_ALL[0], factionType = null, planet = new Planet()) {
-    console.log('generating a fleet:',fleetType.name,factionType.name,planet.name)
+    console.log('generating a fleet:',fleetType,factionType,planet)
     const ships = []
     const populationMod = planet ? planet.c.population : 1
     const numShips = Math.ceil(0.1 + rng(fleetType.minShips*populationMod, fleetType.maxShips*populationMod))
@@ -38,7 +38,7 @@ function generateFleet(fleetType = FLEET_TYPES_ALL[0], factionType = null, plane
         console.log({ fleetType, planet, numShips, populationMod})
         throw new Error('generateFleet: No ships generated for fleetType '+fleetType.name)
     }
-    const fleet = new Fleet(`${planet ? planet.ianName+' ' : ''}${fleetType.name}`, planet, fleetType, factionType, planet ? planet.color : COLORS.DarkGray, planet.x, planet.y)
+    const fleet = new Fleet(`${fleetType ? fleetType.name : ''}`, planet, fleetType, factionType, planet ? planet.color : COLORS.DarkGray, planet.x, planet.y)
     ships.forEach(s=>fleet.addShip(s))
     
     fleet.cargo = generateFleetCargo(fleet, fleetType)

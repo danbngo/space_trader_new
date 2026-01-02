@@ -507,16 +507,15 @@ class Encounter {
 
         /**
      * Initializes and starts a space encounter, positioning ships and setting up combat.
-     * @param {Encounter} encounter - The encounter to start.
      */
-    startEncounter(encounter = gs.encounter) {
-        console.log('startEncounter')
-        gs.encounter = encounter
-        encounter.positionShips()
+    startEncounter() {
+        console.log('startEncounter:',this)
+        gs.encounter = this
+        this.positionShips()
 
-        showModal(coloredName(encounter.fleet), encounter.encounterType.description, [['Ok', ()=>{
+        showModal(coloredName(this.fleet), this.encounterType.description, [['Ok', ()=>{
             showEncounterMap()
-            if (encounter.encounterType.aiType == AI_TYPES.Asteroid) encounter.onStart()
+            //if (this.encounterType.aiType == AI_TYPES.Asteroid) this.startEncounter()
         }]])
     }
     /**
@@ -560,9 +559,9 @@ class Encounter {
 
     showPlayerRefuseSurrenderModal(fameMultiplier = 0, bountyMultiplier = 0) {
         console.log('showPlayerRefuseSurrenderModal', { fameMultiplier, bountyMultiplier });
-        const fleetName = coloredName(gs.encounter.fleet)
-        const planet = gs.encounter.planet
-        const faction = gs.encounter.fleet.factionType
+        const fleetName = coloredName(this.fleet)
+        const planet = this.planet
+        const faction = this.fleet.factionType
         const bounty = 100 * bountyMultiplier
         const fame = fameMultiplier > 0 ? 1 * fameMultiplier : 0
         const infamy = fameMultiplier < 0 ? 1 * Math.abs(fameMultiplier) : 0
@@ -581,14 +580,14 @@ class Encounter {
             msg += `You bounty has risen by ${bounty}CR.<br/>`
             if (planet) msg += gs.captain.grantBounty(planet, bounty)
         }
-        showModal(coloredName(gs.encounter.fleet), msg, [['Continue', ()=>this.startCombat(false)]])
+        showModal(coloredName(this.fleet), msg, [['Continue', ()=>this.startCombat(false)]])
     }
 
     showPlayerDidSurrenderModal( fameLossMultiplier = 1) {
         console.log('showPlayerDidSurrenderModal', { fameLossMultiplier });
-        const fleetName = coloredName(gs.encounter.fleet)
-        const planet = gs.encounter.planet
-        const faction = gs.encounter.fleet.factionType
+        const fleetName = coloredName(this.fleet)
+        const planet = this.planet
+        const faction = this.fleet.factionType
         const fameLoss = fameLossMultiplier < 0 ? 5 * fameLossMultiplier : 0
         const infamyLoss = fameLossMultiplier < 0 ? 5 * fameLossMultiplier : 0
 
@@ -600,26 +599,26 @@ class Encounter {
             if (infamyLoss) msg += gs.captain.grantFactionInfamy(faction, infamyLoss)
         }
 
-        showModal(fleetName, msg, [['Continue', ()=>gs.encounter.onDefeat()]])
+        showModal(fleetName, msg, [['Continue', ()=>this.onDefeat()]])
     }
 
 
     showPlayerAttackFleetModal(fameMultiplier = 0, bountyMultiplier = 0, sneakAttack = false, onContinue = ()=>this.startCombat(true)) {
         console.log('showPlayerAttackFleetModal', { fameMultiplier, bountyMultiplier });
-        const fleetName = coloredName(gs.encounter.fleet)
-        const planet = gs.encounter.planet
-        const faction = gs.encounter.fleet.factionType
+        const fleetName = coloredName(this.fleet)
+        const planet = this.planet
+        const faction = this.fleet.factionType
         const fame = fameMultiplier > 0 ? 1 * fameMultiplier : 0
         const infamy = fameMultiplier < 0 ? 1 * Math.abs(fameMultiplier) : 0
         const bounty = 1000 * bountyMultiplier
 
         if (sneakAttack) {
             // Change formation to player encircling enemy
-            gs.encounter.encounterType.formationType = FORMATION_TYPES.PlayerEncircle
+            this.encounterType.formationType = FORMATION_TYPES.PlayerEncircle
             // Reposition ships for the new formation
-            gs.encounter.positionShips()
+            this.positionShips()
             // Drop shields after repositioning
-            for (const ship of gs.encounter.ships) ship.shields[0] = 0
+            for (const ship of this.ships) ship.shields[0] = 0
         }
 
         let msg = `You ${sneakAttack ? 'sneakily ' : ''}attack the ${fleetName}!<br/>`

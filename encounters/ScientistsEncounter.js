@@ -9,7 +9,7 @@ class ScientistsEncounter extends NeutralsEncounter {
         // Scientists are generally friendly and curious
         if (Math.random() * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > this.fleet.totalRadar) {
             showModal(fleetName, 'Your sensors detect a scientific expedition before they detect you.<br/>You approach cautiously.', [
-                ['View', ()=>closeModal()],
+                //['View', ()=>closeModal()],
                 ['Bypass', ()=>this.endEncounter()],
                 ['Hail', ()=>{
                     this.showGreeting()
@@ -34,7 +34,7 @@ class ScientistsEncounter extends NeutralsEncounter {
         const greeting = rndMember(greetings)
         
         showModal(fleetName, greeting, [
-            ['View', ()=>closeModal()],
+            //['View', ()=>closeModal()],
             ['Respond Kindly', ()=>{
                 showModal(fleetName, `The ${fleetName} seem pleased by your response and continue their work.`, [
                     ['Continue', ()=>this.endEncounter()]

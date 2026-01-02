@@ -6,7 +6,7 @@ class MerchantsEncounter extends MercantileEncounter {
     onStart() {
         if (Math.random() * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > this.fleet.totalRadar) {
             showModal(coloredName(this.fleet), 'Your long range sensors detect a merchant fleet before they detect you.<br/>You manage to approach them stealthily.', [
-                ['View', ()=>closeModal()],
+                //['View', ()=>closeModal()],
                 ['Bypass', ()=>this.endEncounter()],
                 ['Hail', ()=>{
                     this.onStart()
@@ -16,14 +16,14 @@ class MerchantsEncounter extends MercantileEncounter {
         }
         else if (FameLevel.hasInfamyLevel(gs.captain, this.planet, INFAMY_LEVELS.INFAMOUS)) {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} have heard of your fearsome deeds and start fleeing immediately!`, [
-                ['View', ()=>closeModal()],
+                //['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],
                 ['Attack', ()=>this.showPlayerAttackNeutralsModal()],
             ])
         }
         else if (Math.random() > .5) {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} eagerly invite you to trade. They claim to have the best prices in the sector!`, [
-                ['View', ()=>closeModal()],
+                //['View', ()=>closeModal()],
                 ['Trade', ()=>this.showTradeOfferModal()],
                 ['Ignore', ()=>this.endEncounter()],
                 ['Attack', ()=>this.showPlayerAttackNeutralsModal()],
@@ -31,7 +31,7 @@ class MerchantsEncounter extends MercantileEncounter {
         }
         else {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} ignore you nervously.`, [
-                ['View', ()=>closeModal()],
+                //['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],
                 ['Attack', ()=>this.showPlayerAttackNeutralsModal()],
             ])
