@@ -4,7 +4,7 @@ class FleetEncounter extends Encounter {
         const {enemyFleet, disabledPlayerShips, escapedPlayerShips, playerShips} = this
         
         // Award experience points for successfully escaping
-        const expGained = Math.round(AVERAGE_EXP_FROM_ESCAPING * (enemyFleet.combatRating / 10))
+        const expGained = Math.round(AVERAGE_EXP_FROM_ESCAPING * (enemyFleet.combatRating / this.playerFleet.combatRating))
         
         let msg = `You escaped from the ${coloredName(enemyFleet)}!<br/>`
         msg += gs.captain.grantExperience(expGained)
@@ -19,13 +19,13 @@ class FleetEncounter extends Encounter {
         showModal(this.encounterType.name, msg, [['Continue', ()=>this.endEncounter()]])
     }
 
-    showPlayerDefeatedEnemyModal(fameMultiplier = 0) {
-        console.log('showPlayerDefeatedEnemyModal', { fameMultiplier });
+    showPlayerDefeatedEnemyModal() {
+        console.log('showPlayerDefeatedEnemyModal');
         const {enemyFleet, disabledEnemyShips} = this
         const planet = this.planet
         const faction = this.fleet.factionType
-        const fame = fameMultiplier > 0 ? 5 * fameMultiplier : 0
-        const infamy = fameMultiplier < 0 ? 5 * Math.abs(fameMultiplier) : 0
+        const reputationMultiplier = faction.reputationMultiplier
+        const reputation = ENCOUNTER_BASE_REPUTATION_EFFECT_ON_VICTORY * reputationMultiplier
         const abandonedCargoCapacity = disabledEnemyShips.reduce( (total, ship) => {
             return total + ship.cargoSpace
         }, 0)
@@ -43,15 +43,13 @@ class FleetEncounter extends Encounter {
         const disabledPlayerShips = this.playerShips.filter(s=>s.disabled)
 
         // Award experience points based on enemy fleet strength
-        const expGained = Math.round(AVERAGE_EXP_FROM_COMBAT * (enemyFleet.combatRating / 10))
+        const expGained = Math.round(AVERAGE_EXP_FROM_COMBAT * (enemyFleet.combatRating / this.playerFleet.combatRating))
 
         let msg = `You defeated the ${coloredName(enemyFleet)}!<br/>`
         msg += gs.captain.grantExperience(expGained)
-        if (infamy && planet) msg += gs.captain.grantInfamy(planet, infamy)
-        if (fame && planet) msg += gs.captain.grantFame(planet, fame)
-        if (faction) {
-            if (infamy) msg += gs.captain.grantFactionInfamy(faction, infamy)
-            if (fame) msg += gs.captain.grantFactionFame(faction, fame)
+        if (reputation) {
+            if (planet) msg += gs.captain.grantReputation(planet, reputation)
+            if (faction) msg += gs.captain.grantReputation(faction, reputation)
         }
 
         if (disabledPlayerShips.length > 0) {
@@ -85,7 +83,7 @@ class FleetEncounter extends Encounter {
     }
 
     onSurrender() {
-        this.showPlayerDidSurrenderModal(1)
+        this.showPlayerDidSurrenderModal()
     }
 
 }

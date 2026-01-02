@@ -131,7 +131,7 @@ async function simulateFleetActivity(numYears) {
     await addFleetActivity(numYears, activityProgress)
     
     // Refresh positions one final time to ensure all objects are correctly positioned
-    gs.system.refreshPositions(gs.year)
+    gs.system.updatePositions(gs.year)
     
     console.log('Fleet activity simulation finished')
     clearInterval(activityProgressInterval)
@@ -182,14 +182,14 @@ async function startNewGame() {
         }
     }*/
 
-    gs.system.refreshPositions(gs.year)
+    gs.system.updatePositions(gs.year)
 
     // Simulate history
     const HISTORY_NUM_YEARS = 10
     await simulateHistory(HISTORY_NUM_YEARS)
     
     // Simulate fleet activity (daily ticks for better efficiency)
-    const FLEET_ACTIVITY_YEARS = 5
+    const FLEET_ACTIVITY_YEARS = 2
     await simulateFleetActivity(FLEET_ACTIVITY_YEARS)
 
     // Create captain

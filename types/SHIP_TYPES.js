@@ -77,10 +77,10 @@ const SHIP_TYPES_ALL = Object.values(SHIP_TYPES)
 const STARTING_SHIP_TYPE = new ShipType('Starting Ship', 'A basic ship with balanced capabilities suitable for beginning your journey.', SHAPES.FilledTriangle, 1, 1, 1, 1, 1, 1, [], 1, 1)
 
 const ASTEROID_SHIP_TYPES = {
-    ASTEROID: new ShipType('Asteroid', 'Rocky space debris drifting through the void, can be mined for valuable minerals.', SHAPES.FilledOval, 0.4, 0, 0, 5, 0.5, 1, [SHIP_MODULE_TYPES.MAGNETIZE], 0, 1),
-    CRYOID: new ShipType('Cryoid', 'Frozen comet fragment containing water ice, leaves a freezing vapor trail when destroyed.', SHAPES.FilledOval, 0.6, 0, 0, 4, 0.5, 1, [SHIP_MODULE_TYPES.SMOKE_BOMB], 0, 1),
-    PLASMOID: new ShipType('Plasmoid', 'Energetic plasma sphere moving at high velocity, highly volatile and dangerous.', SHAPES.FilledCircle, 0.5, 0.5, 0, 6, 0.5, 1, [SHIP_MODULE_TYPES.BOOSTER], 0, 1),
-    MAGNETOID: new ShipType('Magnetoid', 'Magnetically-charged metallic fragment that can disrupt ship systems and pull objects.', SHAPES.FilledCircle, 0.4, 0.3, 0, 5, 0.5, 1, [SHIP_MODULE_TYPES.MAGNETIZE], 0, 1),
+    ASTEROID: new ShipType('Asteroid', 'Rocky space debris drifting through the void, can be mined for valuable minerals.', SHAPES.FilledOval, 0.4, 0, 0, 8, 0.5, 1, [], 0, 1),
+    CRYOID: new ShipType('Cryoid', 'Frozen comet fragment containing water ice, leaves a freezing vapor trail when destroyed.', SHAPES.FilledOval, 0.6, 0, 0, 8, 0.5, 1, [SHIP_MODULE_TYPES.SMOKE_BOMB], 0, 1),
+    PLASMOID: new ShipType('Plasmoid', 'Energetic plasma sphere moving at high velocity, highly volatile and dangerous.', SHAPES.FilledCircle, 0.5, 0.5, 0, 8, 0.5, 1, [SHIP_MODULE_TYPES.BOOSTER], 0, 1),
+    MAGNETOID: new ShipType('Magnetoid', 'Magnetically-charged metallic fragment that can disrupt ship systems and pull objects.', SHAPES.FilledCircle, 0.4, 0.3, 0, 8, 0.5, 1, [SHIP_MODULE_TYPES.MAGNETIZE], 0, 1),
 }
 
 const ASTEROID_SHIP_TYPES_ALL = Object.values(ASTEROID_SHIP_TYPES)

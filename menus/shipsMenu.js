@@ -7,10 +7,21 @@
 function createShipsListMenu(ships = [new Ship()], onSelectShip = (s = new Ship())=>{}) {
     if (ships.length == 0) return `(None)`
     const rows = [
-        ['Ship Name', 'Pilot', 'Hull', 'Shields', 'Lasers', 'Engine', 'Cargo']
+        ['Ship Name', 'Pilot', 'Hull', 'Shields', 'Lasers', 'Engine', 'Cargo', 'Hull%']
     ]
     for (const ship of ships) {
         const pilotName = ship.pilot ? ship.pilot.name : colorSpan('(Unassigned)', COLORS.Gray)
+        const hullPercentage = (ship.hull[0] / ship.hull[1]) * 100
+        
+        const hullProgressBar = new ProgressBar({
+            id: `ship_hull_${ship.name.replace(/\s+/g, '_')}`,
+            label: '',
+            value: hullPercentage,
+            fillColor: rgbArrayToString(COLORS.Green),
+            showPercentage: true,
+            width: 20
+        })
+        
         rows.push([
             ship.name,
             pilotName,
@@ -19,6 +30,7 @@ function createShipsListMenu(ships = [new Ship()], onSelectShip = (s = new Ship(
             ''+ship.lasers,
             ''+ship.engine,
             ''+ship.cargoSpace,
+            hullProgressBar.container,
         ])
     }
     return createTable(rows, (rowIndex = 0)=>onSelectShip(ships[rowIndex]))

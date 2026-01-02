@@ -85,6 +85,14 @@ class Fleet extends SpaceObject {
         return this.ships.reduce((total, ship) => total + ship.engine, 0);
     }
 
+    get totalLasers() {
+        return this.ships.reduce((total, ship) => total + ship.lasers, 0);
+    }
+
+    get totalHull() {
+        return this.ships.reduce((total, ship) => total + ship.hull[0], 0);
+    }
+
     get totalSkills() {
         const totalSkills = new CountsMap();
         for (const skill of SKILLS_ALL) {

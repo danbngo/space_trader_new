@@ -11,41 +11,41 @@ class PoliceEncounter extends AuthoritiesEncounter {
                 ['Hail', ()=>{
                     this.onStart()
                 }],
-                ['Sneak Attack', ()=>this.showPlayerAttackFleetModal(-5, 2, true)],
+                ['Sneak Attack', ()=>this.showPlayerAttackFleetModal(true)],
             ])
         }
-        else if (Math.random()*gs.captain.calcReputationForPlanet(this.planet) > 200) {
+        else if (Math.random()*gs.captain.calcReputationForTarget(this.planet) > 200) {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} greet you respectfully, having heard of your good deeds.<br/>They don't even trouble you with the routine inspection.`, [
                 //['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackFleetModal(-5, 2, false)],
+                ['Attack', ()=>this.showPlayerAttackFleetModal(false)],
             ])
         }
         if (FameLevel.hasInfamyLevel(gs.captain, this.planet, INFAMY_LEVELS.NOTORIOUS) && gs.captain.calcBountyForPlanet(this.planet) > 0) {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} activate their sirens the instant you pass by!<br/>It seems your bad reputation has preceded you.`, [
                 //['View', ()=>closeModal()],
                 ['Surrender', ()=>this.onSurrender()],
-                ['Resist', ()=>this.showPlayerRefuseSurrenderModal(-5, 2)],
+                ['Resist', ()=>this.showPlayerRefuseSurrenderModal()],
             ])
         }
         else if (Math.random() < 0.5) {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} ships pull alongside your fleet and order you to submit to a routine inspection.`, [
                 //['View', ()=>closeModal()],
                 ['Accept', ()=>this.showPlayerPoliceInspectionModal()],
-                ['Resist', ()=>this.showPlayerRefuseSurrenderModal(-5, 2)],
+                ['Resist', ()=>this.showPlayerRefuseSurrenderModal()],
             ])
         }
         else {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} ships speed past your fleet, perhaps responding to some other incident.`, [
                 //['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackFleetModal(-5, 2, false)],
+                ['Attack', ()=>this.showPlayerAttackFleetModal(false)],
             ])
         }
     }
 
     onVictory() {
-        this.showPlayerDefeatedEnemyModal(-2)
+        this.showPlayerDefeatedEnemyModal()
     }
 
     onDefeat() {
@@ -53,7 +53,7 @@ class PoliceEncounter extends AuthoritiesEncounter {
     }
 
     onSurrender() {
-        this.showPlayerDidSurrenderModal(-1)
+        this.showPlayerDidSurrenderModal()
     }
 
     

@@ -11,21 +11,21 @@ class SoldiersEncounter extends AuthoritiesEncounter {
                 ['Hail', ()=>{
                     this.onStart()
                 }],
-                ['Sneak Attack', ()=>this.showPlayerAttackFleetModal(-10, 10, true)],
+                ['Sneak Attack', ()=>this.showPlayerAttackFleetModal(true)],
             ])
         }
-        else if (Math.random()*gs.captain.calcReputationForPlanet(this.planet) > 300 && gs.captain.calcBountyForPlanet(this.planet) > 0) {
+        else if (Math.random()*gs.captain.calcReputationForTarget(this.planet) > 300 && gs.captain.calcBountyForPlanet(this.planet) > 0) {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} salute you over comms, having heard of your good deeds.<br/>${FameLevel.hasInfamyLevel(gs.captain, this.planet, INFAMY_LEVELS.DISREPUTABLE) ? `In their view, the good you've done far outweighs the bad.` : ''}`, [
                 //['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],
                 ['Attack', ()=>this.showPlayerAttackFleetModal(-10, 10, false)],
             ])
         }
-        if (Math.random()*gs.captain.calcReputationForPlanet(this.planet) < 300 && gs.captain.calcBountyForPlanet(this.planet) > 0) {
+        if (Math.random()*gs.captain.calcReputationForTarget(this.planet) < 300 && gs.captain.calcBountyForPlanet(this.planet) > 0) {
             showModal(coloredName(this.fleet), `The $${coloredName(this.fleet)} ships power up their weapons the instant you pass by!<br/>You have grown so notorious that even the government considers you a threat!`, [
                 //['View', ()=>closeModal()],
                 ['Surrender', ()=>this.onSurrender()],
-                ['Resist', ()=>this.showPlayerRefuseSurrenderModal(-10, 10)],
+                ['Resist', ()=>this.showPlayerRefuseSurrenderModal()],
             ])
         }
         else {
@@ -38,7 +38,7 @@ class SoldiersEncounter extends AuthoritiesEncounter {
     }
 
     onVictory() {
-        this.showPlayerDefeatedEnemyModal(-4)
+        this.showPlayerDefeatedEnemyModal()
     }
 
     onDefeat() {
@@ -50,6 +50,6 @@ class SoldiersEncounter extends AuthoritiesEncounter {
     }
 
     onSurrender() {
-        this.showPlayerDidSurrenderModal(-1)
+        this.showPlayerDidSurrenderModal()
     }
 }

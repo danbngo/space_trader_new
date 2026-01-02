@@ -3,26 +3,40 @@
  * @class Dropdown
  */
 class Dropdown {
+    // Static property to track currently open dropdown
+    static currentlyOpenDropdown = null
+    
     /**
      * Creates a new dropdown
      * @param {Array} buttons - Array of button data [label, handler, disabled, classNames]
      * @param {boolean} dropUpwards - Whether dropdown opens upwards
      * @param {number|null} selectedIndex - Initially selected index
+     * @param {number|null} maxWidth - Optional maximum width in pixels
+     * @param {number} numColumns - Number of columns to display items in
      */
-    constructor(buttons = [], dropUpwards = false, selectedIndex = null) {
+    constructor(buttons = [], dropUpwards = false, selectedIndex = null, maxWidth = null, numColumns = 1) {
+        console.log('creating dropdown:',{buttons,dropUpwards,selectedIndex,maxWidth,numColumns})
+        this.container = ce()
         if (!buttons || buttons.length === 0) {
-            this.container = ce()
             return
         }
         
         this.buttons = buttons
         this.dropUpwards = dropUpwards
-        this.currentSelectedIndex = selectedIndex !== null ? selectedIndex : 0
+        this.maxWidth = maxWidth
+        this.numColumns = numColumns
+        this.currentSelectedIndex = selectedIndex !== null && !isNaN(selectedIndex) && selectedIndex >= 0 ? selectedIndex : 0
         this.dropdownButtons = []
+        this.isOpen = false
         
         this._createElements()
         this._setupEventListeners()
         this._measureAndApplyWidth()
+
+        //setTimeout(() => {
+        this.labelElement.style.width = Math.ceil(this.maxWidth)+'px'
+        for (const btn of this.dropdownButtons) btn.style.width = `${Math.round(100/this.numColumns)}%`
+        //}, 1)
     }
     
     /**
@@ -35,20 +49,19 @@ class Dropdown {
         
         // Create the label element (what shows when dropdown is closed)
         this.labelElement = ce({
-            classNames: ['gameButton'],
-            innerHTML: initialLabel
+            classNames: ['gameButton', 'dropdown-label'],
+            innerHTML: initialLabel,
         })
         
-        // Create the items container (what shows when dropdown is open)
+        // Create the items container that will be attached to body
         this.itemsContainer = ce({
             classNames: ['dropdown-items'],
             style: {
-                position: 'absolute',
+                position: 'fixed', // Use fixed positioning relative to viewport
                 display: 'none',
-                zIndex: '1000',
-                left: '0',
+                zIndex: '10000', // Very high z-index to appear above modals
                 backgroundColor: '#000',
-                ...(this.dropUpwards ? { bottom: '100%' } : { top: '100%' })
+                border: '1px solid #444'
             }
         })
         
@@ -64,8 +77,7 @@ class Dropdown {
                 style: {
                     whiteSpace: 'nowrap',
                     margin: '0',
-                    width: '100%',
-                    boxSizing: 'border-box'
+                    boxSizing: 'border-box',
                 }
             })
             
@@ -95,14 +107,15 @@ class Dropdown {
             this.itemsContainer.appendChild(btn)
         })
         
-        // Create the dropdown container
+        // Create the dropdown container (only contains label, items go to body)
         this.container = ce({
             classNames: ['dropdown-container'],
             style: {
+                width: Math.ceil(this.maxWidth)+'px',
                 position: 'relative',
                 display: 'inline-block'
             },
-            children: [this.labelElement, this.itemsContainer]
+            children: [this.labelElement]
         })
     }
     
@@ -114,15 +127,82 @@ class Dropdown {
         // Toggle dropdown when label is clicked
         this.labelElement.onclick = (e) => {
             e.stopPropagation()
-            const isOpen = this.itemsContainer.style.display === 'block'
-            this.itemsContainer.style.display = isOpen ? 'none' : 'block'
+            if (this.isOpen) {
+                this._closeDropdown()
+            } else {
+                this._openDropdown()
+            }
         }
         
         // Close dropdown when clicking outside
-        this.documentClickHandler = () => {
-            this.itemsContainer.style.display = 'none'
+        this.documentClickHandler = (e) => {
+            if (this.isOpen && !this.itemsContainer.contains(e.target) && !this.labelElement.contains(e.target)) {
+                this._closeDropdown()
+            }
         }
         document.addEventListener('click', this.documentClickHandler)
+        
+        // Close dropdown on scroll (optional, for better UX)
+        this.scrollHandler = () => {
+            if (this.isOpen) {
+                this._closeDropdown()
+            }
+        }
+        window.addEventListener('scroll', this.scrollHandler, true) // Use capture to catch all scroll events
+    }
+    
+    /**
+     * Opens the dropdown and positions it correctly
+     * @private
+     */
+    _openDropdown() {
+        // Close any currently open dropdown
+        if (Dropdown.currentlyOpenDropdown && Dropdown.currentlyOpenDropdown !== this) {
+            Dropdown.currentlyOpenDropdown._closeDropdown()
+        }
+        
+        // Attach items container to body
+        document.body.appendChild(this.itemsContainer)
+        
+        // Calculate position based on label's screen position
+        const labelRect = this.labelElement.getBoundingClientRect()
+        const itemsHeight = this.itemsContainer.offsetHeight
+        
+        // Position horizontally aligned with label
+        this.itemsContainer.style.left = labelRect.left + 'px'
+        this.itemsContainer.style.width = `${Math.round(this.maxWidth*this.numColumns)}px`//labelRect.width + 'px'
+        
+        // Position vertically (above or below based on dropUpwards setting)
+        if (this.dropUpwards) {
+            this.itemsContainer.style.top = (labelRect.top - itemsHeight) + 'px'
+            this.itemsContainer.style.bottom = 'auto'
+        } else {
+            this.itemsContainer.style.top = labelRect.bottom + 'px'
+            this.itemsContainer.style.bottom = 'auto'
+        }
+        
+        this.itemsContainer.style.display = 'block'
+        this.isOpen = true
+        
+        // Track this as the currently open dropdown
+        Dropdown.currentlyOpenDropdown = this
+    }
+    
+    /**
+     * Closes the dropdown
+     * @private
+     */
+    _closeDropdown() {
+        this.itemsContainer.style.display = 'none'
+        if (this.itemsContainer.parentNode === document.body) {
+            document.body.removeChild(this.itemsContainer)
+        }
+        this.isOpen = false
+        
+        // Clear the currently open dropdown reference if it's this one
+        if (Dropdown.currentlyOpenDropdown === this) {
+            Dropdown.currentlyOpenDropdown = null
+        }
     }
     
     /**
@@ -132,24 +212,34 @@ class Dropdown {
     _measureAndApplyWidth() {
         // Temporarily make container visible to measure
         this.itemsContainer.style.display = 'block'
+        this.itemsContainer.style.visibility = 'inline-block'
         this.itemsContainer.style.visibility = 'hidden'
+        this.itemsContainer.style.position = 'absolute'
         
         // Add to body temporarily to measure
-        document.body.appendChild(this.container)
+        document.body.appendChild(this.itemsContainer)
         
         let maxWidth = this.labelElement.offsetWidth
         this.dropdownButtons.forEach(btn => {
             maxWidth = Math.max(maxWidth, btn.offsetWidth)
         })
         
-        // Apply the max width to all elements
-        this.labelElement.style.width = maxWidth + 'px'
-        this.itemsContainer.style.width = maxWidth + 'px'
+        // Apply max-width constraint if specified
+        if (this.maxWidth && maxWidth > this.maxWidth) {
+            maxWidth = this.maxWidth
+        }
         
-        // Hide the dropdown again
+        // Apply the width to label and buttons
+        this.labelElement.style.width = maxWidth + 'px'
+        this.dropdownButtons.forEach(btn => {
+            btn.style.width = maxWidth + 'px'
+            btn.style.minWidth = maxWidth + 'px'
+        })
+        
+        // Hide the dropdown again and restore fixed positioning
         this.itemsContainer.style.display = 'none'
         this.itemsContainer.style.visibility = 'visible'
-        document.body.removeChild(this.container)
+        this.itemsContainer.style.position = 'fixed'
     }
     
     /**
@@ -174,7 +264,7 @@ class Dropdown {
         })
         
         // Close dropdown
-        this.itemsContainer.style.display = 'none'
+        this._closeDropdown()
         
         // Call the handler after updating UI (use setTimeout to ensure UI updates first)
         if (newHandler) {
@@ -183,11 +273,17 @@ class Dropdown {
     }
     
     /**
-     * Cleans up event listeners
+     * Cleans up event listeners and removes items container
      */
     destroy() {
         if (this.documentClickHandler) {
             document.removeEventListener('click', this.documentClickHandler)
+        }
+        if (this.scrollHandler) {
+            window.removeEventListener('scroll', this.scrollHandler, true)
+        }
+        if (this.itemsContainer.parentNode === document.body) {
+            document.body.removeChild(this.itemsContainer)
         }
     }
 }

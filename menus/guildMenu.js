@@ -47,13 +47,13 @@ function showGuildMenu(guild = new Guild()) {
 
     function showHireOfficerModal(officer = new Officer()) {
         const hirePrice = guild.calcHirePrice(officer)
-        const fameText = officer.fame.total > 0 
-            ? `<br/><b>Fame:</b> ${officer.fame.total} (${coloredName(officer.fame.keys[0])})`
+        const reputationText = officer.reputation.total !== 0 
+            ? `<br/><b>Reputation:</b> ${officer.reputation.total} (${coloredName(officer.reputation.keys[0])})`
             : ''
         
         showModal(
             `Hire ${officer.name}?`,
-            `Hire ${officer.name} for ${hirePrice} credits?<br/><br/><b>Level:</b> ${officer.level}<br/><b>Skills:</b> ${SKILLS_ALL.map(sk => `${sk}: ${officer.skills.getAmount(sk)}`).join(', ')}${fameText}`,
+            `Hire ${officer.name} for ${hirePrice} credits?<br/><br/><b>Level:</b> ${officer.level}<br/><b>Skills:</b> ${SKILLS_ALL.map(sk => `${sk}: ${officer.skills.getAmount(sk)}`).join(', ')}${reputationText}`,
             [
                 ['Hire', () => hireOfficer(officer)],
                 ['Cancel', () => rebuildMenu()],

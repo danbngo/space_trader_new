@@ -4,7 +4,7 @@ class AuthoritiesEncounter extends FleetEncounter {
         const fleetName = coloredName(this.fleet)
         const planet = this.planet
         const currentBounty = planet ? gs.captain.bounty.getAmount(planet) : gs.captain.bounty.total
-        const fineFromBounty = Math.ceil(Math.min(Math.max(currentBounty*Math.random(),100), currentBounty))
+        const fineFromBounty = Math.ceil(Math.min(Math.max(currentBounty * Math.random() * ENOCUNTER_MAX_BOUNTY_OR_JAIL_RATIO, 100), currentBounty * ENOCUNTER_MAX_BOUNTY_OR_JAIL_RATIO))
         const jailDays = Math.round(JAIL_DAYS_PER_1000CR_FINE*(fine+fineFromBounty)/1000) //1 day of jail time per 1000CR of fine
 
         let msg = ''
@@ -33,7 +33,7 @@ class AuthoritiesEncounter extends FleetEncounter {
     }
 
     onVictory() {
-        this.showPlayerDefeatedEnemyModal(-1)
+        this.showPlayerDefeatedEnemyModal()
     }
 
     onDefeat() {
@@ -45,7 +45,7 @@ class AuthoritiesEncounter extends FleetEncounter {
     }
 
     onSurrender() {
-        this.showPlayerDidSurrenderModal(-1)
+        this.showPlayerDidSurrenderModal()
     }
 
     

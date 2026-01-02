@@ -100,7 +100,7 @@ function showTradeInfoSellMenu(ct = CARGO_TYPES_ALL[0]) {
     ]
 
     showModal(
-        `Trade Info - Sell ${coloredName(ct)}`,
+        `Trade Info - Sell - `,
         ce({children:[
             createTradeInfoSellTable(ct, onSelectPlanet),
             `Your ${coloredName(ct)} Amount: ${fleet.cargo.getAmount(ct)}`,

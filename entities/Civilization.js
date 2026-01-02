@@ -161,8 +161,9 @@ class Civilization {
         }
         if (withCiv.cargoPriceMultipliers) {
             if (!this.cargoPriceMultipliers) this.cargoPriceMultipliers = new CountsMap()
+            console.log(withCiv.cargoPriceMultipliers)
             for (const [ct, mod] of withCiv.cargoPriceMultipliers.counts) {
-            this.cargoPriceMultipliers.counts.set(ct, mod)
+                this.cargoPriceMultipliers.counts.set(ct, mod)
             }
         }
         if (withCiv.skillPriceMultipliers) {

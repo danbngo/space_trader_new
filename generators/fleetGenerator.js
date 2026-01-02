@@ -40,7 +40,7 @@ function generateFleet(fleetType = FLEET_TYPES_ALL[0], factionType = null, plane
     }
     const fleet = new Fleet(`${fleetType ? fleetType.name : ''}`, planet,
         fleetType, factionType, planet ? planet.color : COLORS.DarkGray,
-        startAt.x, startAt.y)
+        startAt ? startAt.x : 0, startAt ? startAt.y : 0)
     ships.forEach(s=>fleet.addShip(s))
     
     fleet.cargo = generateFleetCargo(fleet, fleetType)
@@ -53,7 +53,7 @@ function generateFleet(fleetType = FLEET_TYPES_ALL[0], factionType = null, plane
 
     // Set cloak level if faction has cloaked flag
     if (factionType && factionType.cloaked) {
-        fleet.cloakLevel = 0.9
+        fleet.cloakLevel = 1.0
     }
 
     return fleet
@@ -103,7 +103,7 @@ async function addFleetActivity(numYears = 2, progress = {completePercentage: 0}
         
         // Reposition planets every 30 days (once per month)
         //if (d % 30 === 0) {
-            gs.system.refreshPositions(gs.year)
+            gs.system.updatePositions(gs.year)
         //}
         
         // Update progress and yield control for smooth UI

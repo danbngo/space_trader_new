@@ -25,6 +25,7 @@ const FLEET_AI_TYPES = {
     PIRATE: new FleetAIType('Pirate AI', PirateFleetAI, FLEET_TYPES.PIRATES),
     POLICE: new FleetAIType('Police AI', PoliceFleetAI, FLEET_TYPES.POLICE),
     SOLDIER: new FleetAIType('Soldier AI', SoldierFleetAI, FLEET_TYPES.SOLDIERS),
+    MERCENARY: new FleetAIType('Mercenary AI', MercenaryFleetAI, FLEET_TYPES.MERCENARIES),
     BOUNTY_HUNTER: new FleetAIType('Bounty Hunter AI', BountyHunterFleetAI, FLEET_TYPES.BOUNTY_HUNTERS),
     TOURIST: new FleetAIType('Tourist AI', TouristFleetAI, FLEET_TYPES.TOURISTS),
     COLONIST: new FleetAIType('Colonist AI', ColonistFleetAI, FLEET_TYPES.COLONISTS),

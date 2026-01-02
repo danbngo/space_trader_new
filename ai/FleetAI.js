@@ -54,6 +54,20 @@ class FleetAI {
         if (!this.fleet.route) {
             this.resumeVoyage()
         }
+        else {
+            //occasionally refresh route to ensure still valid and adjust to target's movement
+            if (Math.random() < 0.1) {
+                this.fleet.route.refresh()
+                if (!this.fleet.route.valid) {
+                    this.fleet.route = null
+                    this.target = null
+                    this.resumeVoyage()
+                }
+            }
+        }
+        if (this.fleet.factionType.cloaked) {
+            this.fleet.cloakLevel = Math.min(1.0, this.fleet.cloakLevel + (0.01 * elapsedYears));
+        }
     }
     /** @returns {Fleet[]|SpaceObject[]} */
     calcValidTargets() {        
@@ -70,8 +84,11 @@ class FleetAI {
     }
 
     setTarget(target) {
-        this.target = target
-        this.fleet.route = new Route(this.fleet, target)
+        const route = new Route(this.fleet, target)
+        if (route.valid) {
+            this.route = route
+            this.target = target
+        }
     }
 
     /**
@@ -91,8 +108,8 @@ class FleetAI {
     }
 
     isNearby(object = new SpaceObject(), elapsedYears = 1) {
-        const distMod = elapsedYears/MAX_FRAMES_PER_SECOND/STAR_MAP_YEARS_PER_MS
-        return calcDistance(this.fleet.x, this.fleet.y, object.x, object.y) < (0.25*distMod) // Within 0.01 AU
+        const distMod = elapsedYears/MAX_FRAMES_PER_SECOND/STAR_MAP_YEARS_PER_MS //during simus make ships able to collide easier
+        return calcDistance(this.fleet.x, this.fleet.y, object.x, object.y) < (FLEET_COLLISION_DISTANCE*distMod) // Within 0.01 AU
     }
 
     resumeVoyage() {
@@ -218,7 +235,7 @@ class FleetAI {
         for (const obj of objects) {
             const dx = obj.x - this.fleet.x;
             const dy = obj.y - this.fleet.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
+            const dist = Math.sqrt(dx * dx + dy * dy) * (obj instanceof Fleet ? 1-obj.cloakLevel : 1);
             
             if (dist < nearestDist) {
                 nearest = obj;

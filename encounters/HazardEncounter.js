@@ -4,7 +4,7 @@ class HazardEncounter extends Encounter {
         const {enemyFleet, disabledPlayerShips, escapedPlayerShips, playerShips} = this
         
         // Award experience points for successfully escaping
-        const expGained = Math.round(AVERAGE_EXP_FROM_ESCAPING * 0.5) // Half XP since hazards are easier to escape
+        const expGained = Math.round(AVERAGE_EXP_FROM_ESCAPING * 0.5 * (enemyFleet.combatRating / this.playerFleet.combatRating)) // Half XP since hazards are easier to escape
         
         let msg = `You escaped from the ${coloredName(enemyFleet)}!<br/>`
         msg += gs.captain.grantExperience(expGained)
@@ -97,7 +97,7 @@ class HazardEncounter extends Encounter {
     //simulates the player doing his best to escape the hazard, creates a random combat result basically
     autoNavigateHazard() {
         const {playerShips, enemyShips} = this
-        const maxDamage = enemyShips.reduce((sum, ship)=>sum + ship.hull[1]*ship.engine*0.001, 0);
+        const maxDamage = enemyShips.reduce((sum, ship)=>sum + ship.hull[1]*ship.engine*0.005, 0);
         const damage = rng(maxDamage, 0, true)
         console.log('gs.fleet.flagship hull before:', gs.fleet.flagship.hull[0], gs.fleet.flagship.hull[1]);
         this.damageRandomly(playerShips, damage)
@@ -119,14 +119,17 @@ class HazardEncounter extends Encounter {
         const {playerShips, enemyShips, enemyFleet} = this
         
         // Calculate light damage (10-20% of what manual mining would cause)
-        const maxDamage = enemyShips.reduce((sum, ship)=>sum + ship.hull[1]*ship.engine*0.001, 0);
+        const maxDamage = enemyShips.reduce((sum, ship)=>sum + ship.hull[1]*ship.engine*0.005, 0);
         const damage = rng(maxDamage * 0.2, maxDamage * 0.1, true)
         console.log('autoMineHazard - gs.fleet.flagship hull before:', gs.fleet.flagship.hull[0], gs.fleet.flagship.hull[1]);
         this.damageRandomly(playerShips, damage)
         
-        // Calculate moderate loot (30-50% of what's available)
-        const totalCargoSpace = enemyShips.reduce((sum, ship)=>sum + ship.cargoSpace, 0)
-        const cargoRatio = rng(0.5, 0.3, false)
+        // Calculate loot based on fleet combat score ratio
+        // At 1:1 ratio, mine 50% of available cargo
+        const playerScore = gs.fleet.totalLasers / AVERAGE_SHIP_LASERS
+        const enemyScore = enemyFleet.totalHull / AVERAGE_SHIP_HULL
+        const strengthRatio = playerScore / enemyScore
+        const cargoRatio = Math.min(0.9, Math.max(0.1, 0.5 * strengthRatio))
         const maxLootAmt = Math.ceil(enemyFleet.cargo.total * cargoRatio)
         const baseLootAmt = Math.ceil(maxLootAmt * 0.7) // 70% of max
         const lootAmt = Math.floor(weightedAvg([baseLootAmt, maxLootAmt], [50, gs.fleet.totalSkills.getAmount(SKILLS.Salvage)]))

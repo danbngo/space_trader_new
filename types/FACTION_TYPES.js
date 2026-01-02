@@ -15,10 +15,11 @@
  * @property {boolean} authority - Whether this faction is considered an authority.
  * @property {boolean} cloaked - Whether this faction is able to be cloaked.
  * @property {FleetType[]} fleetTypes - The types of fleets associated with this faction.
+ * @property {number} reputationMultiplier - Reputation change multiplier (positive = good faction, negative = bad faction, affects both victory and attack).
  * @constructor
  */
 class FactionType {
-    constructor(name = '', symbol = '', color = COLORS.White, description = '', criminal = false, authority = false, cloaked = false, fleetTypes = []) {
+    constructor(name = '', symbol = '', color = COLORS.White, description = '', criminal = false, authority = false, cloaked = false, fleetTypes = [], reputationMultiplier = 0) {
         this.name = name;
         this.symbol = symbol;
         this.color = color;
@@ -27,6 +28,7 @@ class FactionType {
         this.authority = authority;
         this.cloaked = cloaked;
         this.fleetTypes = fleetTypes;
+        this.reputationMultiplier = reputationMultiplier;
     }
 }
 
@@ -39,7 +41,8 @@ const FACTION_TYPES = {
         false,
         false,
         false,
-        [FLEET_TYPES.MINERS]
+        [FLEET_TYPES.MINERS],
+        -3  // reputationMultiplier (lose rep for attacking civilians)
     ),
     MERCHANTS: new FactionType(
         'Merchants',
@@ -49,7 +52,8 @@ const FACTION_TYPES = {
         false,
         false,
         false,
-        [FLEET_TYPES.MERCHANTS]
+        [FLEET_TYPES.MERCHANTS],
+        -4  // reputationMultiplier (lose more rep for attacking merchants)
     ),
     SMUGGLERS: new FactionType(
         'Smugglers',
@@ -59,7 +63,8 @@ const FACTION_TYPES = {
         true,  
         false, 
         true,
-        [FLEET_TYPES.SMUGGLERS]
+        [FLEET_TYPES.SMUGGLERS],
+        2  // reputationMultiplier (small gain for defeating criminals)
     ),
     PIRATES: new FactionType(
         'Pirates',
@@ -69,7 +74,8 @@ const FACTION_TYPES = {
         true,  
         false, 
         false,
-        [FLEET_TYPES.PIRATES]
+        [FLEET_TYPES.PIRATES],
+        5  // reputationMultiplier (good gain for defeating pirates)
     ),
     POLICE: new FactionType(
         'Police',
@@ -79,7 +85,8 @@ const FACTION_TYPES = {
         false, 
         true,  
         false,
-        [FLEET_TYPES.POLICE]
+        [FLEET_TYPES.POLICE],
+        -5  // reputationMultiplier (lose rep for attacking law enforcement)
     ),
     SOLDIERS: new FactionType(
         'Military',
@@ -89,7 +96,19 @@ const FACTION_TYPES = {
         false, 
         true,  
         false,
-        [FLEET_TYPES.SOLDIERS]
+        [FLEET_TYPES.SOLDIERS],
+        -6  // reputationMultiplier (highest loss for attacking military)
+    ),
+    MERCENARIES: new FactionType(
+        'Mercenaries',
+        '🗡️',
+        COLORS.DarkGreen,
+        'Professional soldiers-for-hire who fight for the highest bidder.',
+        false,
+        false,
+        false,
+        [FLEET_TYPES.MERCENARIES],
+        -2  // reputationMultiplier (slight loss, they're professionals)
     ),
     BOUNTY_HUNTERS: new FactionType(
         'Bounty Hunters',
@@ -99,7 +118,8 @@ const FACTION_TYPES = {
         false,
         false,
         true,
-        [FLEET_TYPES.BOUNTY_HUNTERS]
+        [FLEET_TYPES.BOUNTY_HUNTERS],
+        -3  // reputationMultiplier (lose rep if you're wanted)
     ),
     TOURISTS: new FactionType(
         'Tourists',
@@ -109,7 +129,8 @@ const FACTION_TYPES = {
         false,
         false,
         false,
-        [FLEET_TYPES.TOURISTS]
+        [FLEET_TYPES.TOURISTS],
+        -4  // reputationMultiplier (lose rep for attacking tourists)
     ),
     SLAVERS: new FactionType(
         'Slavers',
@@ -119,7 +140,8 @@ const FACTION_TYPES = {
         true,  
         false, 
         true,
-        [FLEET_TYPES.SLAVERS]
+        [FLEET_TYPES.SLAVERS],
+        8  // reputationMultiplier (highest gain for defeating slavers - heroes)
     ),
     COLONISTS: new FactionType(
         'Colonists',
@@ -129,7 +151,8 @@ const FACTION_TYPES = {
         false,
         false,
         false,
-        [FLEET_TYPES.COLONISTS]
+        [FLEET_TYPES.COLONISTS],
+        -4  // reputationMultiplier (lose rep for attacking settlers)
     ),
     SCIENTISTS: new FactionType(
         'Scientists',
@@ -139,7 +162,8 @@ const FACTION_TYPES = {
         false,
         false,
         false,
-        [FLEET_TYPES.SCIENTISTS]
+        [FLEET_TYPES.SCIENTISTS],
+        -3  // reputationMultiplier (lose rep for attacking scientists)
     ),
     PILGRIMS: new FactionType(
         'Pilgrims',
@@ -149,7 +173,8 @@ const FACTION_TYPES = {
         false,
         false,
         false,
-        [FLEET_TYPES.PILGRIMS]
+        [FLEET_TYPES.PILGRIMS],
+        -3  // reputationMultiplier (lose rep for attacking pilgrims)
     ),
     INQUISITORS: new FactionType(
         'Inquisitors',
@@ -159,7 +184,8 @@ const FACTION_TYPES = {
         false,
         true,
         false,
-        [FLEET_TYPES.INQUISITORS]
+        [FLEET_TYPES.INQUISITORS],
+        -5  // reputationMultiplier (lose rep for attacking religious authority)
     ),
     MISSIONARIES: new FactionType(
         'Missionaries',
@@ -169,7 +195,8 @@ const FACTION_TYPES = {
         false,
         false,
         false,
-        [FLEET_TYPES.MISSIONARIES]
+        [FLEET_TYPES.MISSIONARIES],
+        -3  // reputationMultiplier (lose rep for attacking missionaries)
     ),
     DIPLOMATS: new FactionType(
         'Diplomats',
@@ -179,7 +206,8 @@ const FACTION_TYPES = {
         false,
         false,
         false,
-        [FLEET_TYPES.DIPLOMATS]
+        [FLEET_TYPES.DIPLOMATS],
+        -5  // reputationMultiplier (lose significant rep for attacking diplomats)
     ),
     SALVAGERS: new FactionType(
         'Salvagers',
@@ -189,7 +217,8 @@ const FACTION_TYPES = {
         false,
         false,
         false,
-        [FLEET_TYPES.SALVAGERS]
+        [FLEET_TYPES.SALVAGERS],
+        -2  // reputationMultiplier (small loss for attacking salvagers)
     ),
     TAX_COLLECTORS: new FactionType(
         'Tax Collectors',
@@ -199,7 +228,8 @@ const FACTION_TYPES = {
         false,
         false,
         false,
-        [FLEET_TYPES.TAX_COLLECTORS]
+        [FLEET_TYPES.TAX_COLLECTORS],
+        -4  // reputationMultiplier (lose rep for attacking government agents)
     ),
     REBELS: new FactionType(
         'Rebels',
@@ -209,7 +239,8 @@ const FACTION_TYPES = {
         false,
         true,
         false,
-        [FLEET_TYPES.REBELS]
+        [FLEET_TYPES.REBELS],
+        1  // reputationMultiplier (slight gain - depends on perspective)
     ),
     REFUGEES: new FactionType(
         'Refugees',
@@ -219,7 +250,8 @@ const FACTION_TYPES = {
         false,
         false,
         false,
-        [FLEET_TYPES.REFUGEES]
+        [FLEET_TYPES.REFUGEES],
+        -5  // reputationMultiplier (lose significant rep for attacking refugees)
     ),
 }
 

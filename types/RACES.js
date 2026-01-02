@@ -27,7 +27,7 @@ class Race {
 const RACES = {
     HUMAN: new Race(
         'Human',
-        COLORS.Tan,
+        COLORS.LightMagenta,
         '👤',
         'Baseline humanity, unmodified and unaugmented. Versatile and adaptable.',
         2 // 2x more common than other races
@@ -41,14 +41,14 @@ const RACES = {
     ),
     CYBORG: new Race(
         'Cyborg',
-        COLORS.Silver,
+        COLORS.Gray,
         '⚙️',
         'Humans extensively augmented with cybernetic implants. Enhanced strength and processing.',
         1
     ),
     POSTHUMAN: new Race(
         'Posthuman',
-        COLORS.Purple,
+        COLORS.Green,
         '🧬',
         'Genetically modified humans with enhanced traits. Superior intellect and longevity.',
         1

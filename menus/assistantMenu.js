@@ -14,6 +14,7 @@ function showAssistantMenu() {
         ['Captain', ()=>showCaptainSkillsMenu(), false, hasSkillPoints || hasPerkPoints ? 'highlighted' : null],
         ['News', ()=>showNewsTimelineMenu(null, ()=>showAssistantMenu())],
         ['Religions', ()=>showReligionsMenu(()=>showAssistantMenu())],
+        ['Governments', ()=>showGovernmentsMenu(()=>showAssistantMenu())],
         ['Politics', ()=>showPoliticsMenu(()=>showAssistantMenu())],
         ['Cancel', ()=>{
             closeModal()

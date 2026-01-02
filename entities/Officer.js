@@ -14,10 +14,8 @@ class Officer {
         /** @type {number} */
         this.credits = credits;
         // Convert old number values to CountsMap if needed (for backwards compatibility)
-        /** @type {CountsMap} */
-        this.fame = new CountsMap()
-        /** @type {CountsMap} */
-        this.infamy = new CountsMap();
+        /** @type {CountsMap} Stores reputation for both planets and factions */
+        this.reputation = new CountsMap();
         /** @type {CountsMap} */
         this.bounty = new CountsMap();
         // If we received numbers, we can't assign them to a planet, so leave maps empty
@@ -79,86 +77,33 @@ class Officer {
     }
 
     /**
-     * Grants infamy on a specific planet.
-     * @param {Planet} planet - The planet to gain infamy on.
-     * @param {number} amount - The amount of infamy to grant (can be negative).
-     * @returns {string} Message describing the infamy change.
+     * Grants reputation on a specific planet or with a faction.
+     * @param {Planet|FactionType} target - The planet or faction to gain reputation with.
+     * @param {number} amount - The amount of reputation to grant (can be negative).
+     * @returns {string} Message describing the reputation change.
      */
-    grantInfamy(planet = new Planet(), amount = 1) {
-        this.infamy.increment(planet, amount);
+    grantReputation(target, amount = 1) {
+        this.reputation.increment(target, amount);
         if (this == gs.captain) {
-            return colorSpan(`You ${amount >= 0 ? 'gained' : 'lost'} ${Math.abs(amount)} infamy on ${coloredName(planet)}.<br/>`, amount >= 0 ? COLORS.LightRed : COLORS.LightGreen);
+            const targetName = target.name ? coloredName(target) : (target instanceof FactionType ? `${target.symbol} ${colorSpan(target.name, target.color)}` : target);
+            return colorSpan(`You ${amount >= 0 ? 'gained' : 'lost'} ${Math.abs(amount)} reputation with ${targetName}.<br/>`, amount >= 0 ? COLORS.LightGreen : COLORS.LightRed);
         }
         return ''
     }
 
-    /**
-     * Grants fame on a specific planet.
-     * @param {Planet} planet - The planet to gain fame on.
-     * @param {number} amount - The amount of fame to grant (can be negative).
-     * @returns {string} Message describing the fame change.
-     */
-    grantFame(planet = new Planet(), amount = 1) {
-        this.fame.increment(planet, amount);
-        if (this == gs.captain) {
-            return colorSpan(`You ${amount >= 0 ? 'gained' : 'lost'} ${Math.abs(amount)} fame on ${coloredName(planet)}.<br/>`, amount >= 0 ? COLORS.LightGreen : COLORS.LightRed);
-        }
-        return ''
-    }
+
+
+
+
+
 
     /**
-     * Grants infamy with a specific faction.
-     * @param {FactionType} faction - The faction to gain infamy with.
-     * @param {number} amount - The amount of infamy to grant (can be negative).
-     * @returns {string} Message describing the infamy change.
-     */
-    grantFactionInfamy(faction = FACTION_TYPES_ALL[0], amount = 1) {
-        this.infamy.increment(faction, amount);
-        if (this == gs.captain) {
-            return colorSpan(`You ${amount >= 0 ? 'gained' : 'lost'} ${Math.abs(amount)} infamy with ${faction.symbol} ${colorSpan(faction.name, faction.color)}.<br/>`, amount >= 0 ? COLORS.LightRed : COLORS.LightGreen);
-        }
-        return ''
-    }
-
-    /**
-     * Grants fame with a specific faction.
-     * @param {FactionType} faction - The faction to gain fame with.
-     * @param {number} amount - The amount of fame to grant (can be negative).
-     * @returns {string} Message describing the fame change.
-     */
-    grantFactionFame(faction = FACTION_TYPES_ALL[0], amount = 1) {
-        this.fame.increment(faction, amount);
-        if (this == gs.captain) {
-            return colorSpan(`You ${amount >= 0 ? 'gained' : 'lost'} ${Math.abs(amount)} fame with ${faction.symbol} ${colorSpan(faction.name, faction.color)}.<br/>`, amount >= 0 ? COLORS.LightGreen : COLORS.LightRed);
-        }
-        return ''
-    }
-
-    /**
-     * Calculates total infamy for a planet (planet-specific + global average).
-     * @param {Planet} planet - The planet to calculate infamy for.
-     * @returns {number} The calculated infamy value.
-     */
-    calcInfamyForPlanet(planet = new Planet()) {
-        return Math.max(this.infamy.getAmount(planet), this.infamy.total / gs.system.planets.length)
-    }
-
-    /**
-     * Calculates total fame for a planet (planet-specific + global average).
-     * @param {Planet} planet - The planet to calculate fame for.
-     * @returns {number} The calculated fame value.
-     */
-    calcFameForPlanet(planet = new Planet()) {
-        return Math.max(this.fame.getAmount(planet), this.fame.total / gs.system.planets.length)
-    }
-    
-    /**
-     * Calculates net reputation for a planet (fame - infamy).
-     * @param {Planet} planet - The planet to calculate reputation for.
+     * Calculates total reputation for a planet or faction (specific + global average).
+     * @param {Planet|FactionType} target - The planet or faction to calculate reputation for.
      * @returns {number} The calculated reputation value.
      */
-    calcReputationForPlanet(planet = new Planet()) {
-        return this.calcFameForPlanet(planet) - this.calcInfamyForPlanet(planet)
+    calcReputationForTarget(target) {
+        return Math.max(this.reputation.getAmount(target), this.reputation.total / (gs.system?.planets?.length || 20))
     }
 
     /**

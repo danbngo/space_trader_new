@@ -55,6 +55,7 @@ class NewsEffect extends Civilization {
 
     }) {
         super({
+            planet,
             cargoPriceMultipliers,
             skillPriceMultipliers,
             technology,
@@ -107,7 +108,6 @@ class NewsEffect extends Civilization {
         const {planet, targetPlanet, governmentType, newRelationship, 
             buildingsDamaged, buildingsImproved, relationsReset, forcePeace, forceWithdrawal, onApply} = this;
         this.fired = true;
-
         if (planet && planet.civilization) {
             const {civilization} = planet
 
@@ -135,6 +135,8 @@ class NewsEffect extends Civilization {
             }
             if (targetPlanet && newRelationship) {
                 civilization.relationships.set(targetPlanet, newRelationship);
+                targetPlanet.civilization.relationships.set(planet, newRelationship);
+                console.log('relationships set:',planet.name,targetPlanet.name,newRelationship)
             }
             for (const building of buildingsDamaged) {
                 building.level = Math.max(0, building.level-1)
@@ -144,7 +146,7 @@ class NewsEffect extends Civilization {
             }
         }
 
-        if (this.onApply) this.onApply(elapsedYears);
+        if (onApply) this.onApply(elapsedYears);
     }
 
     getInverse() {

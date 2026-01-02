@@ -8,7 +8,7 @@ class SpaceObject {
      * @param {string} name - The name of the space object.
      * @param {ObjectType} objectType - The type of object (from OBJECT_TYPES).
      * @param {number[]} color - The RGBA color array for the object.
-     * @param {number} radius - The radius of the object in appropriate units.
+     * @param {number} radius - The radius of the object in appropriate units (for planets, earth radii)
      * @param {number} x - The x-coordinate position.
      * @param {number} y - The y-coordinate position.
      */

@@ -13,7 +13,7 @@ class MagnetoidsStormEncounter extends HazardEncounter {
             ])
         }
         else {
-            showModal(coloredName(this.fleet), `You encounter a brutal ${coloredName(this.fleet)} storm! The magnetic interference is wreaking havoc on your systems.`, [
+            showModal(coloredName(this.fleet), `You encounter a brutal ${coloredName(this.fleet)}! The magnetic interference is wreaking havoc on your systems.`, [
                 //['View', ()=>closeModal()],
                 ['Auto-Navigate', ()=>this.autoNavigateHazard()],
                 ['Continue', ()=>this.startCombat(true)],

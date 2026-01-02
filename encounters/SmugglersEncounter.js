@@ -39,7 +39,7 @@ class SmugglersEncounter extends MercantileEncounter {
     }
 
     onVictory() {
-        this.showPlayerDefeatedEnemyModal(1)
+        this.showPlayerDefeatedEnemyModal()
     }
 
     onDefeat() {

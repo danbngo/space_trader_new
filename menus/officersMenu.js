@@ -5,7 +5,7 @@
  * @returns {HTMLTableElement|string} The officers table or "(None)" if no officers.
  */
 function createOfficersTable(officers = [new Officer()], onSelectOfficer = (officer = new Officer())=>{}) {
-    if (officers.length == 0) return `(None)`
+    if (officers.length == 0) return colorSpan('(No officers available)', COLORS.Gray)
     const rows = [
         ['Name', 'Age', 'Race', 'Religion', 'Piloting', 'Level', 'CR Share', ...SKILLS_ALL]
     ]
@@ -146,12 +146,12 @@ function showEquipmentMenu(officer = new Officer()) {
  * Displays the officers roster menu for managing hired officers.
  * @param {Officer[]} officers - Array of officers to display.
  */
-function showOfficersMenu(officers = gs.fleet.officers) {
-    const reloadMenu = ()=>showOfficersMenu(officers)
+function showOfficersMenu(officers = gs.fleet.officers.filter(o => o !== gs.captain)) {
+    const reloadMenu = ()=>showOfficersMenu(gs.fleet.officers.filter(o => o !== gs.captain))
 
     function fireOfficer(officer = new Officer()) {
         safeRemove(gs.fleet.officers, officer)
-        showOfficersMenu(officers) //DONT use reloadMenu here, wont reflect changes to ship list
+        showOfficersMenu(gs.fleet.officers.filter(o => o !== gs.captain)) //DONT use reloadMenu here, wont reflect changes to ship list
     }
 
     function showFireOfficerModal(officer = new Officer()) {

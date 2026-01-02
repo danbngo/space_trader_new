@@ -87,7 +87,7 @@ class AbandonedShipEncounter extends PiratesEncounter {
 
     onVictory() {
         // After defeating pirates, allow looting both pirate ships and abandoned ship
-        this.showPlayerDefeatedEnemyModal(1)
+        this.showPlayerDefeatedEnemyModal()
     }
 
     onDefeat() {

@@ -97,9 +97,10 @@ function generateCivilization(planet) {
     // Generate random religion demographics from star system religions
     const religions = new CountsMap()
     let stateReligion = null
-    if (RELIGIONS && RELIGIONS.length > 0) {
-        const numReligions = Math.min(rng(RELIGIONS.length, 1), RELIGIONS.length)
-        const selectedReligions = rndMembers(RELIGIONS, numReligions, true)
+    const systemReligions = gs && gs.system ? gs.system.religions : []
+    if (systemReligions && systemReligions.length > 0) {
+        const numReligions = Math.min(rng(systemReligions.length, 1), systemReligions.length)
+        const selectedReligions = rndMembers(systemReligions, numReligions, true)
         
         // Set state religion first (70% chance if religions exist)
         if (Math.random() < 0.7 && selectedReligions.length > 0) {
@@ -117,21 +118,14 @@ function generateCivilization(planet) {
             }
         }
         
-        // Add AGNOSTICISM and ATHEISM to the mix
-        selectedReligions.push(RELIGION_AGNOSTICISM)
-        religionWeights.push(Math.random() * 3 + 1) // 1-4 weight for agnostics
+        // Add agnostic/non-religious population to the mix (no RELIGION_AGNOSTICISM or RELIGION_ATHEISM constants)
+        // Just leave some percentage as non-religious by not adding up to 100%
         
-        selectedReligions.push(RELIGION_ATHEISM)
-        religionWeights.push(Math.random() * 3 + 1) // 1-4 weight for atheists
-        
-        // Normalize to sum to 1.0
+        // Normalize to percentages (0-100)
         const totalReligionWeight = religionWeights.reduce((sum, w) => sum + w, 0)
         for (let i = 0; i < selectedReligions.length; i++) {
-            religions.setAmount(selectedReligions[i], religionWeights[i] / totalReligionWeight)
+            religions.setAmount(selectedReligions[i], (religionWeights[i] / totalReligionWeight) * 100)
         }
-        
-        // Ensure normalized
-        religions.normalize()
     }
 
     return new Civilization({

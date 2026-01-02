@@ -34,19 +34,19 @@ class SlaversEncounter extends FleetEncounter {
                 ['Hail', ()=>{
                     this.onStart()
                 }],
-                ['Sneak Attack', ()=>this.showPlayerAttackFleetModal(5, 0, true)],
+                ['Sneak Attack', ()=>this.showPlayerAttackFleetModal(true)],
             ])
         }
         
-        else if (Math.random()*gs.captain.fame.getAmount(FACTION_TYPES.SLAVERS.name) > 250) {
+        else if (Math.random()*gs.captain.reputation.getAmount(FACTION_TYPES.SLAVERS) > 250) {
             // Friendly - they let you pass
             showModal('Recognized', `The ${coloredName(enemyFleet)} recognize you as an ally.<br/>They signal that you may pass freely.`,
             [
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackFleetModal(-5, 2, false)],
+                ['Attack', ()=>this.showPlayerAttackFleetModal(false)],
             ])
         }
-        else if (gs.captain.fame.getAmount(FACTION_TYPES.SLAVERS.name) > 0) {
+        else if (gs.captain.reputation.getAmount(FACTION_TYPES.SLAVERS) > 0) {
             // Neutral - they ignore you
             showModal('Ignored', `The ${coloredName(enemyFleet)} note your presence but choose to ignore you.`,
                 ['Continue', ()=>this.endEncounter()]
@@ -87,7 +87,7 @@ class SlaversEncounter extends FleetEncounter {
      */
     onVictory() {
         console.log('SlaversEncounter.onVictory')
-        this.showPlayerDefeatedEnemyModal(3)
+        this.showPlayerDefeatedEnemyModal()
     }
 
     /**
@@ -131,7 +131,7 @@ class SlaversEncounter extends FleetEncounter {
             }
             else {
                 const maxLootAmount = Math.min(canLootAmount, lootableCargoAmount)
-                const lootAmount = rng(maxLootAmount, maxLootAmount/2)
+                const lootAmount = rng(maxLootAmount * ENCOUNTER_MAX_LOSE_CARGO_RATIO, maxLootAmount * ENCOUNTER_MAX_LOSE_CARGO_RATIO / 2)
                 msg += `They take ${lootAmount} units of loot from your cargo bays.<br/>`
                 const looted = fleet.cargo.randomSubset(lootAmount)
                 fleet.cargo.subtractAmounts(looted)
@@ -143,7 +143,7 @@ class SlaversEncounter extends FleetEncounter {
             msg += `They note with contempt that you have ${gs.credits == 0 ? 'no' : 'barely any'} credits to steal!<br/>`
         }
         else {
-            const creditsStolen = rng(gs.credits, gs.credits/2, true)
+            const creditsStolen = rng(gs.credits * ENCOUNTER_MAX_LOSE_CREDITS_RATIO, gs.credits * ENCOUNTER_MAX_LOSE_CREDITS_RATIO / 2, true)
             msg += `They take ${creditsStolen} credits from you.<br/>`
             gs.credits -= creditsStolen
         }
@@ -151,7 +151,7 @@ class SlaversEncounter extends FleetEncounter {
         // Capture officers
         const officerCount = gs.fleet.officers.length
         if (officerCount > 0) {
-            const officersToCaptureCount = Math.max(1, Math.round(officerCount * rng(0.5, 0.33)))
+            const officersToCaptureCount = Math.max(1, Math.round(officerCount * rng(ENOCUNTER_MAX_LOSE_OFFICERS_RATIO, ENOCUNTER_MAX_LOSE_OFFICERS_RATIO * 0.66)))
             const capturedOfficers = []
             
             // Remove random officers

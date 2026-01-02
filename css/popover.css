@@ -1,0 +1,31 @@
+/* Popover styles */
+.popover-trigger {
+    position: relative;
+    cursor: help;
+}
+
+.popover {
+    position: fixed;
+    z-index: 100000;
+    background-color: #1a1a1a;
+    border: 1px solid #00ffff;
+    border-radius: 4px;
+    padding: 8px 12px;
+    color: #ffffff;
+    font-size: 0.9em;
+    max-width: 300px;
+    box-shadow: 0 4px 12px rgba(0, 255, 255, 0.3);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+.popover.visible {
+    opacity: 1;
+}
+
+.popover-content {
+    line-height: 1.4;
+}

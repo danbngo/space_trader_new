@@ -21,7 +21,6 @@ const buildingHandlerMapping = [
  * @param {Planet} planet - The planet to interact with.
  */
 function showPlanetMenu(planet = new Planet()) {
-    if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
     console.log('opening planet menu for:',planet)
     const isDocked = gs.location == planet
     const {settlement} = planet

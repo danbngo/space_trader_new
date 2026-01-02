@@ -510,7 +510,10 @@ class Encounter {
      */
     startEncounter() {
         console.log('startEncounter:',this)
+        if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
         gs.encounter = this
+        // Set encounter immunity for after this encounter ends
+        gs.encounterImmunityUntilYear = gs.year + (ENCOUNTER_IMMUNITY_DAYS / 365)
         this.positionShips()
 
         showModal(coloredName(this.fleet), this.encounterType.description, [['Ok', ()=>{
@@ -557,60 +560,52 @@ class Encounter {
         showModal(`Stranded`, msg, [['Continue', ()=>showPlanetMenu(nearestPlanet)]])
     }
 
-    showPlayerRefuseSurrenderModal(fameMultiplier = 0, bountyMultiplier = 0) {
-        console.log('showPlayerRefuseSurrenderModal', { fameMultiplier, bountyMultiplier });
+    showPlayerRefuseSurrenderModal() {
+        console.log('showPlayerRefuseSurrenderModal');
         const fleetName = coloredName(this.fleet)
         const planet = this.planet
         const faction = this.fleet.factionType
-        const bounty = 100 * bountyMultiplier
-        const fame = fameMultiplier > 0 ? 1 * fameMultiplier : 0
-        const infamy = fameMultiplier < 0 ? 1 * Math.abs(fameMultiplier) : 0
+        const reputationMultiplier = faction.reputationMultiplier
+        const reputation = ENCOUNTER_BASE_REPUTATION_EFFECT_ON_NO_SURRENDER * reputationMultiplier
+        const bounty = reputationMultiplier > 0 ? ENCOUNTER_BASE_FINE_ON_ATTACK * reputationMultiplier : 0
+        
         let msg = `You refuse to submit to the ${fleetName} demands, and the battle is joined!<br/>`
-        if (infamy > 0) {
-            msg += `Your defiance of the authorities causes you to gain ${infamy} infamy.<br/>`
-            if (planet) msg += gs.captain.grantInfamy(planet, infamy)
-            if (faction) msg += gs.captain.grantFactionInfamy(faction, infamy)
+        if (reputation) {
+            if (planet) msg += gs.captain.grantReputation(planet, reputation)
+            if (faction) msg += gs.captain.grantReputation(faction, reputation)
         }
-        if (fame > 0) {
-            msg += `Your fearlessness causes you to gain ${fame} fame.<br/>`
-            if (planet) msg += gs.captain.grantFame(planet, fame)
-            if (faction) msg += gs.captain.grantFactionFame(faction, fame)
-        }
-        if (bounty > 0) {
-            msg += `You bounty has risen by ${bounty}CR.<br/>`
-            if (planet) msg += gs.captain.grantBounty(planet, bounty)
+        if (bounty > 0 && planet) {
+            msg += gs.captain.grantBounty(planet, bounty)
         }
         showModal(coloredName(this.fleet), msg, [['Continue', ()=>this.startCombat(false)]])
     }
 
-    showPlayerDidSurrenderModal( fameLossMultiplier = 1) {
-        console.log('showPlayerDidSurrenderModal', { fameLossMultiplier });
+    showPlayerDidSurrenderModal() {
+        console.log('showPlayerDidSurrenderModal');
         const fleetName = coloredName(this.fleet)
         const planet = this.planet
         const faction = this.fleet.factionType
-        const fameLoss = fameLossMultiplier < 0 ? 5 * fameLossMultiplier : 0
-        const infamyLoss = fameLossMultiplier < 0 ? 5 * fameLossMultiplier : 0
+        const reputationMultiplier = faction.reputationMultiplier
+        const reputationShrink = ENCOUNTER_BASE_REPUTATION_SHRINK_ON_SURRENDER / Math.abs(reputationMultiplier || 1)
 
         let msg = `There's no other choice. You power your ships down and broadcast the universal signal for surrender.<br/>`
-        if (fameLoss && planet) msg += gs.captain.grantFame(planet, fameLoss)
-        if (infamyLoss && planet) msg += gs.captain.grantInfamy(planet, infamyLoss)
-        if (faction) {
-            if (fameLoss) msg += gs.captain.grantFactionFame(faction, fameLoss)
-            if (infamyLoss) msg += gs.captain.grantFactionInfamy(faction, infamyLoss)
+        if (reputationShrink) {
+            if (planet) msg += gs.captain.grantReputation(planet, gs.captain.reputation.getAmount(planet) > 0 ? -reputationShrink : reputationShrink)
+            if (faction) msg += gs.captain.grantReputation(faction, gs.captain.reputation.getAmount(faction) > 0 ? -reputationShrink : reputationShrink)
         }
 
-        showModal(fleetName, msg, [['Continue', ()=>this.onDefeat()]])
+        showModal(fleetName, msg, [['Continue', ()=>this.onSurrender()]])
     }
 
 
-    showPlayerAttackFleetModal(fameMultiplier = 0, bountyMultiplier = 0, sneakAttack = false, onContinue = ()=>this.startCombat(true)) {
-        console.log('showPlayerAttackFleetModal', { fameMultiplier, bountyMultiplier });
+    showPlayerAttackFleetModal(sneakAttack = false, onContinue = ()=>this.startCombat(true)) {
+        console.log('showPlayerAttackFleetModal', { sneakAttack });
         const fleetName = coloredName(this.fleet)
         const planet = this.planet
         const faction = this.fleet.factionType
-        const fame = fameMultiplier > 0 ? 1 * fameMultiplier : 0
-        const infamy = fameMultiplier < 0 ? 1 * Math.abs(fameMultiplier) : 0
-        const bounty = 1000 * bountyMultiplier
+        const reputationMultiplier = faction.reputationMultiplier
+        const reputation = ENCOUNTER_BASE_REPUTATION_EFFECT_ON_ATTACK * reputationMultiplier
+        const bounty = reputationMultiplier > 0 ? ENCOUNTER_BASE_FINE_ON_ATTACK * reputationMultiplier : 0
 
         if (sneakAttack) {
             // Change formation to player encircling enemy
@@ -623,14 +618,13 @@ class Encounter {
 
         let msg = `You ${sneakAttack ? 'sneakily ' : ''}attack the ${fleetName}!<br/>`
         if (sneakAttack) msg += `The ${fleetName} are caught with their shields down!<br/>`
-        if (infamy && planet) msg += gs.captain.grantInfamy(planet, infamy)
-        if (fame && planet) msg += gs.captain.grantFame(planet, fame)
-        if (bounty && planet) msg += gs.captain.grantBounty(planet, bounty)
-        if (faction) {
-            if (infamy) msg += gs.captain.grantFactionInfamy(faction, infamy)
-            if (fame) msg += gs.captain.grantFactionFame(faction, fame)
+        if (reputation) {
+            if (planet) msg += gs.captain.grantReputation(planet, reputation)
+            if (faction) msg += gs.captain.grantReputation(faction, reputation)
         }
-
+        if (bounty > 0 && planet) {
+            msg += gs.captain.grantBounty(planet, bounty)
+        }
 
         showModal(fleetName, msg, [['Continue', ()=>{
             onContinue()

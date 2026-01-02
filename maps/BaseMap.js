@@ -113,7 +113,7 @@ class BaseMap {
         const {backgroundStars} = starSystem
         backgroundStars.forEach((bgStar, index) => {
             bgStar.twinkle(year)
-            cvs.pixels[index].a = bgStar.a
+            cvs.pixels[index].a = bgStar.color[3]
         })
     }
     

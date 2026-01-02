@@ -74,7 +74,6 @@ function checkDebtCollections(elapsedDays = 1) {
     msg += `They have passed a portion of your debt, plus fees on to some rather ruthless collection agencies.<br/>`
     msg += `Your new bounty${bountyPlanet ? ` on ${coloredName(bountyPlanet)}` : ''}: ${bountyPlanet ? gs.captain.bounty.getAmount(bountyPlanet) : gs.captain.bounty.total}CR<br/>`
     msg += `Your new total overdue debt: ${outstandingDebts-convertedAmt}CR<br/>`
-    if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
     showModal('Bank: Collections', msg, [['Continue', ()=> closeModal()]])
     return true
 }
@@ -151,7 +150,7 @@ function calcRandomSpawnPlanet(fleetType, faction, planet) {
     }
     
     // Authority factions (or military/police specifically): always spawn at home planet
-    if (faction.authority || faction === FACTION_TYPES.SOLDIERS || faction === FACTION_TYPES.POLICE) {
+    if (faction.authority || faction === FACTION_TYPES.SOLDIERS || faction === FACTION_TYPES.POLICE || faction === FACTION_TYPES.MERCENARIES) {
         return planet
     }
     
@@ -207,6 +206,7 @@ function calculateMaxFleetsForPlanet(planet) {
     maxNumFleetsPerFaction.multiply(FACTION_TYPES.PIRATES, c.crime)
     maxNumFleetsPerFaction.multiply(FACTION_TYPES.MERCHANTS, c.economy)
     maxNumFleetsPerFaction.multiply(FACTION_TYPES.SOLDIERS, c.navy)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.MERCENARIES, c.navy * 0.6) // Mercenaries spawn 60% as often as soldiers
     maxNumFleetsPerFaction.multiply(FACTION_TYPES.PILGRIMS, c.wealth)
     maxNumFleetsPerFaction.multiply(FACTION_TYPES.INQUISITORS, 1/c.corruption)
     maxNumFleetsPerFaction.multiply(FACTION_TYPES.MISSIONARIES, c.prestige*c.education)

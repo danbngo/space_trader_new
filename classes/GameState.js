@@ -15,6 +15,10 @@ class GameState {
         this.encounter = null;
         /** @type {Contract[]} */
         this.contracts = [];
+        /** @type {number} */
+        this.encounterImmunityUntilYear = 0;
+        /** @type {number} */
+        this.encounterDeniedUntilYear = 0;
     }
 
     get captain() {
@@ -87,11 +91,10 @@ class GameState {
             cargoScore += (ct.value || 0) * (amt || 0);
         }
 
-        const fameScore = this.captain.fame.total * 10;
-        const infamyScore = this.captain.infamy.total * -10;
+        const reputationScore = this.captain.reputation.total * 5;
         const bountyScore = this.captain.bounty.total * -1;
 
-        const total = shipsScore + creditsScore + officerScore + fameScore + infamyScore + bountyScore + cargoScore;
-        return { total, shipsScore, creditsScore, officerScore, fameScore, infamyScore, bountyScore, cargoScore };
+        const total = shipsScore + creditsScore + officerScore + reputationScore + bountyScore + cargoScore;
+        return { total, shipsScore, creditsScore, officerScore, reputationScore, bountyScore, cargoScore };
     }
 }

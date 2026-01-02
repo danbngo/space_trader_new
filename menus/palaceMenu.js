@@ -7,7 +7,7 @@ function showPalaceMenu(palace = new Palace()) {
     const {fleet} = gs
     const isDocked = fleet.location == planet
     const hasBounty = gs.captain.calcBountyForPlanet(planet) > 0
-    const hasInfamy = gs.captain.calcInfamyForPlanet(planet) > 0
+    const hasInfamy = gs.captain.calcReputationForTarget(planet) < 0
     const playerRank = gs.captain.ranks.get(planet) || RANK_TYPES.NO_RANK
     const isElite = playerRank === RANK_TYPES.ELITE
     const canEnter = isDocked && !hasBounty && (!hasInfamy || isElite)

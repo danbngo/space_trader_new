@@ -97,17 +97,14 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0],
         const implantsText = officer.implants.length > 0 
             ? '<br/><b>Cybernetic Implants:</b><br/>' + officer.implants.map(i => colorSpan(i.implantType.name, i.implantType.color) + ` (${roundToPlaces(i.quality*100, 1)}%)`).join(', ')
             : ''
-        const fameText = officer.fame.total > 0 
-            ? `<br/><b>Fame:</b> ${officer.fame.total} (${coloredName(officer.fame.keys[0])})`
-            : ''
-        const infamyText = officer.infamy.total > 0 
-            ? `<br/><b>Infamy:</b> ${officer.infamy.total} (${coloredName(officer.infamy.keys[0])})`
+        const reputationText = officer.reputation.total !== 0 
+            ? `<br/><b>Reputation:</b> ${officer.reputation.total} (${coloredName(officer.reputation.keys[0])})`
             : ''
         const raceText = officer.race ? `${officer.race.symbol} ${colorSpan(officer.race.name, officer.race.color)}` : 'Human'
         
         showModal(
             `Hire ${officer.name}?`,
-            `Hire ${officer.name} for ${hirePrice} credits?<br/><br/><b>Race:</b> ${raceText}<br/><b>Level:</b> ${officer.level}<br/><b>Skills:</b> ${SKILLS_ALL.map(sk => `${sk}: ${officer.skills.getAmount(sk)}`).join(', ')}${implantsText}${fameText}${infamyText}`,
+            `Hire ${officer.name} for ${hirePrice} credits?<br/><br/><b>Race:</b> ${raceText}<br/><b>Level:</b> ${officer.level}<br/><b>Skills:</b> ${SKILLS_ALL.map(sk => `${sk}: ${officer.skills.getAmount(sk)}`).join(', ')}${implantsText}${reputationText}`,
             [
                 ['Hire', () => hireOfficer(officer)],
                 ['Cancel', () => reloadMenu(selectedSkill, true)],

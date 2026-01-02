@@ -4,7 +4,7 @@ class NeutralsEncounter extends FleetEncounter {
      * @override
      */
     onVictory() {
-        this.showPlayerDefeatedEnemyModal(-1)
+        this.showPlayerDefeatedEnemyModal()
     }
 
     /**
@@ -35,16 +35,17 @@ class NeutralsEncounter extends FleetEncounter {
         console.log('showPlayerDefeatedByNeutralsModal', { infamyLossMultiplier });
         const {enemyFleet, disabledPlayerShips} = this
         const planet = this.planet
-        const faction = this.fleet.faction
-        
-        const infamyLoss = 5 * infamyLossMultiplier
+        const faction = this.fleet.factionType
+        const reputationShrink = ENCOUNTER_BASE_REPUTATION_SHRINK_ON_DEFEAT
 
         let msg = ''
         msg += `The ${coloredName(enemyFleet)} seem shocked to have defeated you.<br/>`
         msg += `They quickly depart the scene in case there are other attackers nearby.<br/>`
 
-        if (infamyLoss && planet) msg += gs.captain.grantInfamy(planet, -infamyLoss)
-        if (infamyLoss && faction) msg += gs.captain.grantFactionInfamy(faction, -infamyLoss)
+        if (reputationShrink) {
+            if (planet) msg += gs.captain.grantReputation(planet, gs.captain.reputation.getAmount(planet) > 0 ? -reputationShrink : reputationShrink)
+            if (faction) msg += gs.captain.grantReputation(faction, gs.captain.reputation.getAmount(faction) > 0 ? -reputationShrink : reputationShrink)
+        }
         if (disabledPlayerShips.length > 0) {
             msg += `${disabledPlayerShips.length} of your ships were disabled in the fighting.<br/>`
             msg += this.loseCargoFromDisabledShips(disabledPlayerShips)
@@ -85,10 +86,10 @@ class NeutralsEncounter extends FleetEncounter {
     }
 
     showPlayerAttackNeutralsModal(sneakAttack = false) {
-        this.showPlayerAttackFleetModal(-1, -1, sneakAttack, ()=>{
+        this.showPlayerAttackFleetModal(sneakAttack, ()=>{
                 let combatAdvantage = gs.fleet.combatRating / gs.encounter.fleet.combatRating
                 //combat advantage should vary from 0.5 its original amount to 2x based on the player's infamy
-                combatAdvantage *= 2 - (75/(50 + gs.captain.calcInfamyForPlanet(gs.encounter.fleet.planet))) //approaches 2x as infamy increases
+                combatAdvantage *= 2 - (75/(50 + Math.abs(Math.min(0, gs.captain.calcReputationForTarget(gs.encounter.fleet.planet))))) //approaches 2x as reputation becomes more negative
                 if (combatAdvantage * Math.random() > 1.5) {
                     this.showNeutralsBribePlayerModal(gs.encounter.fleet.captain.credits)
                 }

@@ -72,7 +72,7 @@ class StarSystem extends SpaceObject {
         return [nearestPlanet, nearestDistance]
     }
 
-    refreshPositions(year = gs.year) {
+    updatePositions(year = gs.year) {
         const objects = [...this.stars, ...this.planets, ...this.dwarfPlanets, ...this.spaceStations, ...this.asteroids]
         for (const obj of objects) {
             const [x, y] = obj.calcAbsPositionAtYear(year)

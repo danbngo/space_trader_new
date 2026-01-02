@@ -3,7 +3,7 @@
  * @param {Function} backFunction - Function to call when back button is pressed.
  */
 function showReligionsMenu(backFunction = () => closeModal()) {
-    const religions = RELIGIONS || []
+    const religions = gs.system.religions
     
     if (religions.length === 0) {
         showModal(
@@ -14,64 +14,115 @@ function showReligionsMenu(backFunction = () => closeModal()) {
         return
     }
 
-    const contentContainer = ce({style: 'display: flex; flex-direction: column; gap: 20px;'})
-    
-    // Header
-    const header = ce({
-        children: [`There are ${religions.length} major organized religions in the ${gs.system.name} system:`]
-    })
-    contentContainer.appendChild(header)
-
-    // List each religion with its traits
-    for (const religion of religions) {
-        console.log('religion:',religion)
-        const religionSection = ce({
-            style: 'border-left: 3px solid ' + rgbArrayToString(religion.color) + '; padding-left: 15px; margin-bottom: 15px;',
-            children: [
-                ce({
-                    tag: 'div',
-                    style: 'font-weight: bold; margin-bottom: 5px; font-size: 1.1em;',
-                    children: [religion.symbol + ' ', colorSpan(religion.name, religion.color)]
-                })
-            ]
-        })
-
-        if (religion.traits && religion.traits.length > 0) {
-            const traitsHeader = ce({
-                style: 'margin-top: 10px; margin-bottom: 5px; opacity: 0.8;',
-                children: ['Doctrinal Traits:']
-            })
-            religionSection.appendChild(traitsHeader)
-
-            for (const trait of religion.traits) {
-                console.log('trait:',trait)
-                const traitEl = ce({
-                    style: 'margin-left: 10px; margin-bottom: 5px;',
-                    children: [
-                        `• ${colorSpan(trait.name, trait.color)}`,
-                        ce({
-                            tag: 'span',
-                            style: 'opacity: 0.7; font-size: 0.9em; margin-left: 5px;',
-                            children: [` - ${trait.description}`]
-                        })
-                    ]
-                })
-                religionSection.appendChild(traitEl)
-            }
-        } else {
-            const noTraits = ce({
-                style: 'margin-top: 5px; opacity: 0.6; font-style: italic;',
-                children: ['This faith has no documented doctrinal traits.']
-            })
-            religionSection.appendChild(noTraits)
+    // Calculate total system population
+    let totalSystemPopulation = 0
+    for (const planet of gs.system.planets) {
+        if (planet.c && planet.c.population) {
+            totalSystemPopulation += planet.c.population
         }
-
-        contentContainer.appendChild(religionSection)
     }
+
+    // Calculate each religion's total followers across all planets
+    const religionFollowers = new Map()
+    for (const religion of religions) {
+        let followers = 0
+        for (const planet of gs.system.planets) {
+            if (planet.c && planet.c.population && planet.c.religions) {
+                const religionPercent = planet.c.religions.getAmount(religion)
+                followers += planet.c.population * (religionPercent / 100)
+            }
+        }
+        religionFollowers.set(religion, followers)
+    }
+
+    // Split religions into two columns
+    const midpoint = Math.ceil(religions.length / 2)
+    const leftReligions = religions.slice(0, midpoint)
+    const rightReligions = religions.slice(midpoint)
+
+    // Create left column
+    const leftColumn = ce({style: 'display: flex; flex-direction: column; gap: 20px;'})
+    
+    // Create right column
+    const rightColumn = ce({style: 'display: flex; flex-direction: column; gap: 20px;'})
+    
+    // Populate left column
+    for (const religion of leftReligions) {
+        leftColumn.appendChild(createReligionSection(religion, religionFollowers, totalSystemPopulation))
+    }
+    
+    // Populate right column
+    for (const religion of rightReligions) {
+        rightColumn.appendChild(createReligionSection(religion, religionFollowers, totalSystemPopulation))
+    }
+
+    const columnLayout = createColumnLayout([leftColumn, rightColumn])
 
     showModal(
         'Religions Database',
-        contentContainer,
+        columnLayout,
         [["Back", backFunction]]
     )
+}
+
+/**
+ * Creates a religion section element with traits and faith reach
+ * @param {Religion} religion - The religion to display
+ * @param {Map} religionFollowers - Map of religion to follower count
+ * @param {number} totalSystemPopulation - Total population of the system
+ * @returns {HTMLElement} The religion section element
+ */
+function createReligionSection(religion, religionFollowers, totalSystemPopulation) {
+    const followers = religionFollowers.get(religion) || 0
+    const faithPercentage = totalSystemPopulation > 0 ? (followers / totalSystemPopulation) * 100 : 0
+    
+    const religionSection = ce({
+        style: 'border-left: 3px solid ' + rgbArrayToString(religion.color) + '; padding-left: 15px; margin-bottom: 15px;',
+        children: [
+            ce({
+                tag: 'div',
+                style: 'font-weight: bold; margin-bottom: 5px; font-size: 1.1em;',
+                children: [coloredName(religion)]
+            })
+        ]
+    })
+
+    if (religion.traits && religion.traits.length > 0) {
+        for (const trait of religion.traits) {
+            const traitEl = ce({
+                style: 'margin-left: 10px; margin-bottom: 5px;',
+                children: [
+                    `• ${colorSpan(trait.name, trait.color)}`,
+                ]
+            })
+            religionSection.appendChild(traitEl)
+        }
+    } else {
+        const noTraits = ce({
+            style: 'margin-top: 5px; opacity: 0.6; font-style: italic;',
+            children: ['This faith has no documented doctrinal traits.']
+        })
+        religionSection.appendChild(noTraits)
+    }
+
+    // Add faith reach progress bar
+    const faithProgressBar = new ProgressBar({
+        id: `religion_faith_${religion.name.replace(/\s+/g, '_')}`,
+        label: '',
+        value: faithPercentage,
+        fillColor: rgbArrayToString(religion.color),
+        showPercentage: true,
+        width: 40
+    })
+    
+    const faithReachContainer = ce({
+        style: 'margin-bottom: 8px;',
+        children: [
+            faithProgressBar.container
+        ]
+    })
+    religionSection.appendChild(faithReachContainer)
+    religionSection.appendChild(ce({tag:'br'}))
+    religionSection.appendChild(ce({tag:'br'}))
+    return religionSection
 }

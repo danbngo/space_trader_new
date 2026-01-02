@@ -44,19 +44,13 @@ function showPoliticsMenu(backFunction = () => closeModal()) {
             }
         }
         
-        // Get state religion
-        const stateReligion = c.stateReligion ? c.stateReligion.name : 'None'
-        
-        // Get majority ethnicity
-        const majorityEthnicity = c.races?.calcHighestValue()?.name || 'Unknown'
-        
         return [coloredName(planet),
             coloredName(c.governmentType),
             c.stateReligion ? coloredName(c.stateReligion) : 'None',
             c.races?.calcHighestValue() ? coloredName(c.races.calcHighestValue()) : 'Unknown',
-            alliances.length > 0 ? alliances.join(', ') : 'None',
-            tense.length > 0 ? tense.join(', ') : 'None',
-            atWar.length > 0 ? atWar.join(', ') : 'None'
+            statColorSpan(alliances.length, 1+alliances.length),
+            statColorSpan(tense.length, 1 / (1+tense.length)),
+            statColorSpan(atWar.length, 1 / (1+(atWar.length*2))),
         ]
     })
 

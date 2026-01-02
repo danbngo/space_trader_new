@@ -11,34 +11,34 @@ class PiratesEncounter extends FleetEncounter {
                 ['Hail', ()=>{
                     this.onStart()
                 }],
-                ['Sneak Attack', ()=>this.showPlayerAttackFleetModal(5, 0, true)],
+                ['Sneak Attack', ()=>this.showPlayerAttackFleetModal(true)],
             ])
         }
-        else if (Math.random() * gs.captain.calcReputationForPlanet(this.planet) > 200) {
+        else if (Math.random() * gs.captain.calcReputationForTarget(this.planet) > 200) {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} are in awe of your fearsome exploits! They broadcast a merry jig and salute you while you pass.`, [
                 //['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackFleetModal(5, 0)],
+                ['Attack', ()=>this.showPlayerAttackFleetModal(false)],
             ])
         }
         else if (Math.random() < 0.5) {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} fire warning shots at your ship!<br/>They demand you surrender and prepare to be boarded!`, [
                 //['View', ()=>closeModal()],
                 ['Surrender', ()=>this.onSurrender()],
-                ['Resist', ()=>this.showPlayerRefuseSurrenderModal(5, 0)],
+                ['Resist', ()=>this.showPlayerRefuseSurrenderModal()],
             ])
         }
         else {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} broadcast insults and jeers at your fleet, but let you pass regardless.`, [
                 //['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackFleetModal(5, 0)],
+                ['Attack', ()=>this.showPlayerAttackFleetModal(false)],
             ])
         }
     }
 
     onVictory() {
-        this.showPlayerDefeatedEnemyModal(1)
+        this.showPlayerDefeatedEnemyModal()
     }
 
     onDefeat() {
@@ -50,7 +50,7 @@ class PiratesEncounter extends FleetEncounter {
     }
 
     onSurrender() {
-        this.showPlayerDidSurrenderModal(1)
+        this.showPlayerDidSurrenderModal()
     }
 
     showPlayerDefeatedByPiratesModal() {
@@ -76,7 +76,7 @@ class PiratesEncounter extends FleetEncounter {
             }
             else {
                 const maxLootAmount = Math.min(canLootAmount, lootableCargoAmount)
-                const lootAmount = rng(maxLootAmount, maxLootAmount/2)
+                const lootAmount = rng(maxLootAmount * ENCOUNTER_MAX_LOSE_CARGO_RATIO, maxLootAmount * ENCOUNTER_MAX_LOSE_CARGO_RATIO / 2)
                 msg += `They take ${lootAmount} units of loot from your cargo bays.<br/>`
                 const looted = fleet.cargo.randomSubset(lootAmount)
                 fleet.cargo.subtractAmounts(looted)
@@ -87,7 +87,7 @@ class PiratesEncounter extends FleetEncounter {
             msg += `They note with contempt that you have ${gs.credits == 0 ? 'no' : 'barely any'} credits to steal!<br/>`
         }
         else {
-            const stolenCreditsAmount = rng(gs.credits*0.5, gs.credits*0.1)
+            const stolenCreditsAmount = rng(gs.credits * ENCOUNTER_MAX_LOSE_CREDITS_RATIO, gs.credits * ENCOUNTER_MAX_LOSE_CREDITS_RATIO / 2)
             msg += `They help themselves to ${stolenCreditsAmount} of your credits.<br/>`
         }
         msg += `The ${coloredName(enemyFleet)} sadronically thank you for your time and depart.<br/>`

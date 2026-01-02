@@ -5,7 +5,7 @@
  * @param {EffectType[]} effectTypes - Array of effect types for environmental hazards.
  * @returns {Encounter} The generated encounter.
  */
-function generateEncounter(encounterType = rndMember(ENCOUNTER_TYPES_ALL), planet = rndMember(PLANETS), effectTypes = []) {
+function generateEncounter(encounterType = rndMember(ENCOUNTER_TYPES_ALL), planet = null, effectTypes = []) {
     const {fleetType} = encounterType
     const fleet = generateFleet(fleetType, encounterType.faction, planet)
     fleet.captain = new Officer(`${encounterType.fleetType.name} Captain`, 0)

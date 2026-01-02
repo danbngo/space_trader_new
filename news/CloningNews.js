@@ -13,7 +13,7 @@ class CloningNews extends News {
                 population: CL.HIGH,
                 technology: CL.SLIGHTLY_HIGH,
                 prestige: CL.SLIGHTLY_LOW,
-                cargoPriceMultipliers: new Map([[CARGO_TYPES.ISOTOPES, CL.VERY_HIGH]]),
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ISOTOPES, CL.VERY_HIGH]])),
             },
             {
                 population: CL.VERY_HIGH,

@@ -89,14 +89,14 @@ function generateOfficer(planet = new Planet(), withImplants = false, reputation
         if (reputationType === 'fame' || reputationType === 'both') {
             const fame = rng(maxReputation, 0)
             if (fame > 0) {
-                officer.fame.increment(planet, fame)
+                officer.reputation.increment(planet, fame)
             }
         }
         
         if (reputationType === 'both') {
             const infamy = rng(maxReputation, 0)
             if (infamy > 0) {
-                officer.infamy.increment(planet, infamy)
+                officer.reputation.increment(planet, -infamy)
             }
         }
     }

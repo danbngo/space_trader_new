@@ -70,7 +70,7 @@ function showPlanetDemographicsMenu(planet = new Planet()) {
         }
         religiousDemographicsSection.appendChild(createTable(religionRows))
     } else {
-        religiousDemographicsSection.appendChild('(No organized religions present)')
+        religiousDemographicsSection.appendChild(ce({innerHTML:'(No organized religions present)'}))
     }
     
         // Use column layout: racial demographics on left, religious demographics on right

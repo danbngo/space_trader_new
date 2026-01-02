@@ -318,7 +318,10 @@ let currentModal = ce()
  * @param {string} id
 */
 function showModal(title = '', text = '', buttons = [['Continue', ()=>{}, false]], id = '', onClosePanel = null) {
-    if (currentMap) currentMap.refresh()
+    if (currentMap) {
+        currentMap.refresh()
+        if (currentMap.togglePause) currentMap.togglePause()
+    }
     // Close existing modal if open
     if (currentModal) closeModal();
     // Create overlay
@@ -410,4 +413,84 @@ function createColumnLayout(columnItems = []) {
         classNames: ['gameColumns'],
         children: children
     })
+}
+
+/**
+ * Creates a popover element that appears on hover
+ * @param {HTMLElement} element - The element that triggers the popover on hover
+ * @param {string|HTMLElement} popoverContent - The content to display in the popover
+ * @returns {HTMLElement} The original element with popover functionality
+ */
+function createPopoverElement(element, popoverContent) {
+    const popover = ce({
+        classNames: ['popover'],
+        children: [
+            ce({
+                classNames: ['popover-content'],
+                children: [popoverContent]
+            })
+        ]
+    })
+    
+    document.body.appendChild(popover)
+    
+    let showTimeout = null
+    
+    const updatePopoverPosition = (e) => {
+        const padding = 10
+        const mouseX = e.clientX
+        const mouseY = e.clientY
+        
+        let left = mouseX + padding
+        let top = mouseY + padding
+        
+        const popoverRect = popover.getBoundingClientRect()
+        const windowWidth = window.innerWidth
+        const windowHeight = window.innerHeight
+        
+        if (left + popoverRect.width > windowWidth) {
+            left = mouseX - popoverRect.width - padding
+        }
+        
+        if (top + popoverRect.height > windowHeight) {
+            top = mouseY - popoverRect.height - padding
+        }
+        
+        left = Math.max(padding, left)
+        top = Math.max(padding, top)
+        
+        popover.style.left = left + 'px'
+        popover.style.top = top + 'px'
+    }
+    
+    element.addEventListener('mouseenter', (e) => {
+        updatePopoverPosition(e)
+        showTimeout = setTimeout(() => {
+            popover.classList.add('visible')
+        }, 500)
+    })
+    
+    element.addEventListener('mousemove', (e) => {
+        updatePopoverPosition(e)
+    })
+    
+    element.addEventListener('mouseleave', () => {
+        if (showTimeout) {
+            clearTimeout(showTimeout)
+            showTimeout = null
+        }
+        popover.classList.remove('visible')
+    })
+    
+    const observer = new MutationObserver((mutations) => {
+        if (!document.body.contains(element)) {
+            popover.remove()
+            observer.disconnect()
+        }
+    })
+    observer.observe(document.body, { childList: true, subtree: true })
+    
+    element.classList.add('popover-trigger')
+    
+    return element
 }

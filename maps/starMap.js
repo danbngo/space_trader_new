@@ -57,6 +57,10 @@ class StarMap extends BaseMap {
 
     refreshControls() {
         this.controls.innerHTML = ""
+        
+        // Check if player is near an asteroid for mining
+        const nearbyBelt = checkNearbyAsteroid()
+        
         ce({
             parent:this.controls,
             classNames: ['starmap-buttons'],
@@ -64,6 +68,7 @@ class StarMap extends BaseMap {
                 ce({tag:'button', classNames: [(this.paused && !gs.location) || (!this.paused && gs.location) ? 'highlighted' : null] , innerHTML:this.paused ? '▶' : '⏸', onClick: () => this.togglePause()}),
                 ce({tag:'button', innerHTML:'+', onClick: () => this.adjustZoom(1.33)}),
                 ce({tag:'button', innerHTML:'-', onClick: () => this.adjustZoom(0.66)}),
+                nearbyBelt ? ce({tag:'button', innerHTML:'⛏️ Mine', onClick: () => startMining()}) : null,
                 ce({tag:'button', classNames: [gs.captain.skillPoints > 0 ? 'highlighted' : null], innerHTML:'?', onClick: () => showAssistantMenu()}),
             ]
         })
@@ -383,7 +388,7 @@ class StarMap extends BaseMap {
             fleetObj.y = fleet.y
             if (fleetAngle !== undefined) fleetObj.angle = fleetAngle
             fleetObj.strokeColor = (fleet == this.selectedObject) ? COLORS.Green : COLORS.Black
-            fleetObj.fillColor[3] = 1-fleet.cloakLevel
+            fleetObj.fillColor[3] = 1-(fleet.cloakLevel*0.95)
             
             // Update label
             if (fleet.location || !fleet.route) {
@@ -418,7 +423,7 @@ class StarMap extends BaseMap {
                 thrusterObj.y = fleet.y
                 thrusterObj.screenOffsetX = screenOffsetX
                 thrusterObj.screenOffsetY = screenOffsetY
-                thrusterObj.fillColor[3] = 1-fleet.cloakLevel
+                thrusterObj.fillColor[3] = 1-(fleet.cloakLevel*0.95)
             }
         })
         
@@ -486,6 +491,22 @@ class StarMap extends BaseMap {
             
             ce({parent:container, innerHTML:`Ships: ${activeShips}/${totalShips} active`})
             ce({parent:container, innerHTML:`Hull: ${roundToPlaces(totalHullPercent, 1)}%`})
+            
+            // Add Travel button for non-player fleets
+            if (obj !== gs.fleet) {
+                const distance = roundToPlaces(calcDistance(gs.fleet.x, gs.fleet.y, obj.x, obj.y), 2)
+                ce({parent:container, innerHTML:`Distance: ${distance} AU`})
+                
+                // Create test route to check if interception is possible
+                const testRoute = new Route(gs.fleet, obj, gs.year)
+                if (testRoute.valid) {
+                    const travelTime = testRoute.travelTime
+                    ce({parent:container, innerHTML:`ETA: ${describeTimespan(travelTime)}`})
+                    ce({parent:container, tag:'button', innerHTML:'Intercept', onClick:()=>this.setDestination(obj, true), disabled: gs.fleet.stranded})
+                } else {
+                    ce({parent:container, innerHTML:`Cannot intercept (too fast)`})
+                }
+            }
         }
         if (obj == gs.fleet) {
             if (gs.location) ce({parent:container, tag:'button', innerHTML:`Dock (${coloredName(gs.location)})`, onClick:()=>this.explore(gs.location)})
@@ -524,11 +545,22 @@ class StarMap extends BaseMap {
         if (planet instanceof Planet) showPlanetMenu(planet)
     }
 
-    /** @param {Planet | Waypoint} obj */
+    /** @param {Planet | Waypoint | Fleet} obj */
     setDestination(obj, unpause = false) {
         if (obj instanceof Planet) {
             gs.fleet.route = new Route(gs.fleet, obj)
             gs.fleet.location = undefined
+        } else if (obj instanceof Fleet) {
+            // Attempt to intercept another fleet
+            const interceptRoute = new Route(gs.fleet, obj)
+            if (interceptRoute.valid) {
+                gs.fleet.route = interceptRoute
+                gs.fleet.location = undefined
+            } else {
+                console.log('Cannot intercept fleet - target is too fast or too far')
+                // Don't assign route or move the player
+                return
+            }
         } else if (obj.isWaypoint) {
             // Create a route to arbitrary coordinates
             gs.fleet.route = new Route(gs.fleet, obj)
@@ -558,7 +590,7 @@ class StarMap extends BaseMap {
         const elapsedYears = elapsedMs * this.gameYearsPerMs;
 
         gs.year += elapsedYears
-        gs.system.refreshPositions()
+        gs.system.updatePositions()
 
         this.refreshInfoBar()
         this.handleCanvasObjects()
@@ -569,6 +601,9 @@ class StarMap extends BaseMap {
             showPlanetMenu(gs.location)
             return
         }
+
+        // Check for collision-based encounters
+        if (checkForCollisionEncounter()) return
 
         checkForEvents(elapsedYears)
 

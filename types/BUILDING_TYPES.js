@@ -58,7 +58,7 @@ class BuildingType {
         // Palace has special access requirements
         if (this === BUILDING_TYPES.PALACE) {
             const hasBounty = gs.captain.calcBountyForPlanet(planet) > 0
-            const hasInfamy = gs.captain.calcInfamyForPlanet(planet) > 0
+            const hasInfamy = gs.captain.calcReputationForTarget(planet) < 0
             const playerRank = gs.captain.ranks.get(planet) || RANK_TYPES.NO_RANK
             const isElite = playerRank === RANK_TYPES.ELITE
             const canEnter = !hasBounty && (!hasInfamy || isElite) && !isBlocked

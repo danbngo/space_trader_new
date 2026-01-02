@@ -1,7 +1,6 @@
 /** @typedef {'Victory'|'Defeat'|'Surrendered'|'Escaped'} EncounterResultType */
 /** @typedef {'Attack'|'Escape'|'Asteroid'} CombatStrategyType */
 /** @typedef {'FilledCircle'|'EmptyCircle'|'FilledTriangle'|'EmptyTriangle'|'Text'|'Line'|'FilledOval'|'EmptyOval'|'FilledRectangle'} ShapeType */
-/** @typedef {'Pilot'|'Stealth'|'Barter'|'Engineer'|'Salvage'} SkillType */
 /** @typedef {'Move'|'Laser'|'Ram'|'Recharge'|'Wait'|'Blink'|'Booster'|'Cloak'|'Warhead'|'EMPPulse'|'Magnetize'|'SmokeBomb'|'Drill'|'Detonate'} MoveType */
 /** @typedef {'FaceOff'|'Storm'} FormationType */
 /** @typedef {'Ship'|'Asteroid'} AIType */
@@ -34,20 +33,6 @@ const SHAPES = Object.freeze({
     EmptyOval: 'EmptyOval',
     FilledRectangle: 'FilledRectangle',
 })
-
-/** @enum {SkillType} */
-const SKILLS = Object.freeze({
-    Pilot: 'Pilot', //avoid hazards, fleet (not ships) goes faster
-    Stealth: 'Stealth', //avoid fleet encounters, sneak attacks
-    Barter: 'Barter', //lowers prices in markets, shipyards etc.
-    Engineer: 'Engineer', //gain some hull back after encounters, upgrade modules are more effective?
-    Salvage: 'Salvage', //gain more cargo after destroying asteroids, etc.
-    //Science: 'Science', //hmmm
-    //Doctor: 'Doctor', //your officers gain health during travel - add this later w/ more officer-specific content
-    //Leadership: 'Leadership' //lets you have more officers - would like a better system for this
-})
-
-const SKILLS_ALL = Object.values(SKILLS)
 
 /**
  * Color values as RGBA tuples
