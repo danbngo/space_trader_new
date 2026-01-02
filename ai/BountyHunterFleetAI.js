@@ -5,7 +5,7 @@
  */
 class BountyHunterFleetAI extends FleetAI {
     calcDestination() {
-        return rndMember([...gs.system.planets, ...gs.system.dwarfPlanets].filter(p=>(p !== this.home)))
+        return rndMember([...gs.system.planets, ...gs.system.dwarfPlanets, ...gs.system.spaceStations].filter(p=>(p !== this.origin)))
     }
     calcValidTargets() {
         const ourScore = this.fleet.combatRating

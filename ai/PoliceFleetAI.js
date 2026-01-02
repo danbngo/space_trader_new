@@ -13,7 +13,7 @@ class PoliceFleetAI extends FleetAI {
         })
     }
     calcDestination() {
-        return rndMember([...gs.system.planets].filter(p=>(p !== this.home)))
+        return rndMember([...gs.system.planets].filter(p=>(p !== this.origin)))
     }
     onNearTarget() {
         if (this.target instanceof Fleet && !this.target.location) {

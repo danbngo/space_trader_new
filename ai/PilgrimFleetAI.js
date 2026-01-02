@@ -11,11 +11,11 @@ class PilgrimFleetAI extends FleetAI {
     calcDestination() {
         // Travel to planets with the same state religion as home planet
         if (!this.fleet.planet || !this.fleet.planet.civilization || !this.fleet.planet.civilization.stateReligion) {
-            return rndMember([...gs.system.planets].filter(p => p !== this.home));
+            return rndMember([...gs.system.planets, ...gs.system.dwarfPlanets, ...gs.system.spaceStations].filter(p => p !== this.origin));
         }
         
         const homeReligion = this.fleet.planet.civilization.stateReligion;
-        const sameReligionPlanets = gs.system.planets.filter(p => 
+        const sameReligionPlanets = [...gs.system.planets, ...gs.system.dwarfPlanets, ...gs.system.spaceStations].filter(p => 
             p !== this.fleet.planet && 
             p.civilization && 
             p.civilization.stateReligion === homeReligion
@@ -26,6 +26,6 @@ class PilgrimFleetAI extends FleetAI {
         }
         
         // Fallback to any planet
-        return rndMember([...gs.system.planets].filter(p => p !== this.home));
+        return rndMember([...gs.system.planets, ...gs.system.dwarfPlanets, ...gs.system.spaceStations].filter(p => p !== this.origin));
     }
 }

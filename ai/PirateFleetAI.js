@@ -13,7 +13,7 @@ class PirateFleetAI extends FleetAI {
         })
     }
     calcDestination() {
-        return rndMember([...gs.system.dwarfPlanets].filter(p=>(p !== this.home)))
+        return rndMember([...gs.system.dwarfPlanets, ...gs.system.spaceStations].filter(p=>(p !== this.origin)))
     }
     onNearTarget() {
         if (this.target instanceof Fleet && !this.target.location) {

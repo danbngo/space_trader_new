@@ -32,14 +32,14 @@ class InquisitorFleetAI extends FleetAI {
     }
     
     calcDestination() {
-        // Travel to planets with the same state religion as home planet
+        // Travel to planets with the same state religion as origin planet
         if (!this.fleet.planet || !this.fleet.planet.civilization || !this.fleet.planet.civilization.stateReligion) {
-            return rndMember([...gs.system.planets].filter(p => p !== this.home));
+            return rndMember([...gs.system.planets].filter(p => p !== this.origin));
         }
         
         const homeReligion = this.fleet.planet.civilization.stateReligion;
         const sameReligionPlanets = gs.system.planets.filter(p => 
-            p !== this.home && 
+            p !== this.origin && 
             p.civilization && 
             p.civilization.stateReligion === homeReligion
         );
@@ -49,6 +49,6 @@ class InquisitorFleetAI extends FleetAI {
         }
         
         // Fallback to any planet
-        return rndMember([...gs.system.planets].filter(p => p !== this.home));
+        return rndMember([...gs.system.planets].filter(p => p !== this.origin));
     }
 }

@@ -23,7 +23,7 @@ class FleetEncounter extends Encounter {
         console.log('showPlayerDefeatedEnemyModal', { fameMultiplier });
         const {enemyFleet, disabledEnemyShips} = this
         const planet = this.planet
-        const faction = this.fleet.faction
+        const faction = this.fleet.factionType
         const fame = fameMultiplier > 0 ? 5 * fameMultiplier : 0
         const infamy = fameMultiplier < 0 ? 5 * Math.abs(fameMultiplier) : 0
         const abandonedCargoCapacity = disabledEnemyShips.reduce( (total, ship) => {

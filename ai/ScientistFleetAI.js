@@ -8,7 +8,7 @@ class ScientistFleetAI extends FleetAI {
         return [...(gs.system.anomalies || []), ...gs.system.asteroids.filter(a=>a.belt.beltType == ASTEROID_BELT_TYPES.Icy && Math.random() < .2)]
     }
     calcDestination() {
-        return rndMember([...gs.system.planets].filter(p=>(p !== this.home)))
+        return rndMember([...gs.system.planets].filter(p=>(p !== this.origin)))
     }
     
     onNearTarget() {

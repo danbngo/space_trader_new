@@ -68,7 +68,7 @@ class HazardEncounter extends Encounter {
         msg += this.conductRepairs()
 
         if (disabledEnemyShips.length > 0) {
-            msg += `You destroyed ${disabledEnemyShips.length} ${coloredName(enemyFleet)}!<br/>`
+            msg += `You destroyed ${disabledEnemyShips.length} of the hazards!<br/>`
             msg += `Your scanners reveal ${baseLootAmt} units of usable material amid the wreckage.<br/>`
             if (lootAmt > baseLootAmt) msg += `Your salvaging skills allow you to recover an additional ${lootAmt - baseLootAmt} units of usable material.<br/>`
         }

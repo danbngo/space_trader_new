@@ -5,12 +5,12 @@
  */
 class RebelFleetAI extends FleetAI {
     calcDestination() {
-        return rndMember([...gs.system.planets].filter(p=>(p !== this.home)))
+        return rndMember([...gs.system.planets, ...gs.system.dwarfPlanets, ...gs.system.spaceStations].filter(p=>(p !== this.origin)))
     }
     calcValidTargets() {
         const ourScore = this.fleet.combatRating
         return gs.system.fleets.filter(f => {
-            if (f === this.fleet || f.planet !== this.home || f.location) return false
+            if (f === this.fleet || f.planet !== this.origin || f.location) return false
             // Don't attack targets that are 2x stronger
             return f.combatRating <= ourScore * 2
         })

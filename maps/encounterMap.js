@@ -32,6 +32,8 @@ class EncounterMap extends BaseMap {
             [MOVE_TYPES.Blink, new BlinkActionHandler(this)],
             [MOVE_TYPES.Booster, new BoosterActionHandler(this)],
             [MOVE_TYPES.SmokeBomb, new SmokeBombActionHandler(this)],
+            [MOVE_TYPES.Drill, new DrillActionHandler(this)],
+            [MOVE_TYPES.Detonate, new DetonateActionHandler(this)],
         ])
         
         this.animatingAction = null
@@ -273,7 +275,7 @@ class EncounterMap extends BaseMap {
         effects.forEach( (effect, index) => {
             const cvsEffectObject = cvs.getObject(`effect${effect.uuid}`)
             if (!cvsEffectObject) {
-                this.addPlanetEffectCanvasObject(effect)
+                this.addEffectCanvasObject(effect)
                 return
             }
             if (effect.effectType.shape == SHAPES.FilledOval) {

@@ -24,7 +24,7 @@ class MissionaryFleetAI extends FleetAI {
     calcDestination() {
         // Travel to planets that DON'T have the same state religion as home planet
         if (!this.fleet.planet || !this.fleet.planet.civilization || !this.fleet.planet.civilization.stateReligion) {
-            return rndMember([...gs.system.planets].filter(p => p !== this.home));
+            return rndMember([...gs.system.planets, ...gs.system.dwarfPlanets, ...gs.system.spaceStations].filter(p => p !== this.origin));
         }
         
         const homeReligion = this.fleet.planet.civilization.stateReligion;
@@ -39,6 +39,6 @@ class MissionaryFleetAI extends FleetAI {
         }
         
         // Fallback to any planet
-        return rndMember([...gs.system.planets].filter(p => p !== this.home));
+        return rndMember([...gs.system.planets].filter(p => p !== this.origin));
     }
 }

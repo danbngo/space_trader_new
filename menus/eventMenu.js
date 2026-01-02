@@ -125,7 +125,8 @@ function checkForFleetSpawning(elapsedDays = 1, planetMaxFleets = null) {
             if (calcOccurrencesPerTimespan(FLEET_SPAWN_CHANCE_PER_DAY, weight/(1+numExisting)*elapsedDays)) {
                 // Spawn the fleet
                 const fleetType = rndMember(faction.fleetTypes)
-                const fleet = generateFleet(fleetType, faction, planet)
+                const spawnAt = calcRandomSpawnPlanet(fleetType, faction, planet)
+                const fleet = generateFleet(fleetType, faction, planet, spawnAt)
                 fleet.color = planet.color
                 fleet.x = planet.x
                 fleet.y = planet.y
@@ -133,6 +134,32 @@ function checkForFleetSpawning(elapsedDays = 1, planetMaxFleets = null) {
                 //console.log(`✨ Spawned ${fleetType.name} fleet from ${planet.name}`, fleet)
             }
         }
+    }
+}
+
+function calcRandomSpawnPlanet(fleetType, faction, planet) {
+    // Bounty hunters: spawn at any planet, dwarf planet, or space station
+    if (faction.cloaked) {
+        const options = [...gs.system.planets, ...gs.system.dwarfPlanets, ...gs.system.spaceStations]
+        return rndMember(options)
+    }
+    
+    // Criminal factions: spawn at dwarf planets, space stations, or home planet
+    if (faction.criminal) {
+        const options = [...gs.system.dwarfPlanets, planet, ...gs.system.spaceStations]
+        return rndMember(options)
+    }
+    
+    // Authority factions (or military/police specifically): always spawn at home planet
+    if (faction.authority || faction === FACTION_TYPES.SOLDIERS || faction === FACTION_TYPES.POLICE) {
+        return planet
+    }
+    
+    // Other factions: 50/50 chance to spawn at home or random planet (excluding dwarfs and stations)
+    if (Math.random() < 0.5) {
+        return planet
+    } else {
+        return rndMember(gs.system.planets.filter(p => p !== planet))
     }
 }
 

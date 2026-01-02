@@ -188,11 +188,12 @@ const NEPTUNE_L5 = new LagrangePoint(
 );
 
 // Array of all Lagrange points
+// only including L3, L4, L5 for now since good for gameplay
 const ALL_LAGRANGE_POINTS = [
-    JUPITER_L1, JUPITER_L2, JUPITER_L3, JUPITER_L4, JUPITER_L5,
-    SATURN_L1, SATURN_L2, SATURN_L3, SATURN_L4, SATURN_L5,
-    URANUS_L1, URANUS_L2, URANUS_L3, URANUS_L4, URANUS_L5,
-    NEPTUNE_L1, NEPTUNE_L2, NEPTUNE_L3, NEPTUNE_L4, NEPTUNE_L5
+    JUPITER_L3, JUPITER_L4, JUPITER_L5,
+    SATURN_L3, SATURN_L4, SATURN_L5,
+    URANUS_L3, URANUS_L4, URANUS_L5,
+    NEPTUNE_L3, NEPTUNE_L4, NEPTUNE_L5
 ];
 
 console.log("Generated Lagrange points:", ALL_LAGRANGE_POINTS.length);

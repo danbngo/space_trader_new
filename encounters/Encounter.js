@@ -515,7 +515,7 @@ class Encounter {
 
         showModal(coloredName(this.fleet), this.encounterType.description, [['Ok', ()=>{
             showEncounterMap()
-            //if (this.encounterType.aiType == AI_TYPES.Asteroid) this.startEncounter()
+            if (this.encounterType.aiType == AI_TYPES.Asteroid) this.onStart()
         }]])
     }
     /**

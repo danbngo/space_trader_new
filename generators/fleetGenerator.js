@@ -24,8 +24,8 @@ function generateFleetCargo(fleet = new Fleet(), fleetType = FLEET_TYPES_ALL[0])
  * @param {Planet} planet - The planet the fleet is associated with.
  * @returns {Fleet} The generated fleet.
  */
-function generateFleet(fleetType = FLEET_TYPES_ALL[0], factionType = null, planet = new Planet()) {
-    console.log('generating a fleet:',fleetType,factionType,planet)
+function generateFleet(fleetType = FLEET_TYPES_ALL[0], factionType = null, planet = new Planet(), startAt = planet) {
+    console.log('generating a fleet:',fleetType,factionType,planet,startAt)
     const ships = []
     const populationMod = planet ? planet.c.population : 1
     const numShips = Math.ceil(0.1 + rng(fleetType.minShips*populationMod, fleetType.maxShips*populationMod))
@@ -38,7 +38,9 @@ function generateFleet(fleetType = FLEET_TYPES_ALL[0], factionType = null, plane
         console.log({ fleetType, planet, numShips, populationMod})
         throw new Error('generateFleet: No ships generated for fleetType '+fleetType.name)
     }
-    const fleet = new Fleet(`${fleetType ? fleetType.name : ''}`, planet, fleetType, factionType, planet ? planet.color : COLORS.DarkGray, planet.x, planet.y)
+    const fleet = new Fleet(`${fleetType ? fleetType.name : ''}`, planet,
+        fleetType, factionType, planet ? planet.color : COLORS.DarkGray,
+        startAt.x, startAt.y)
     ships.forEach(s=>fleet.addShip(s))
     
     fleet.cargo = generateFleetCargo(fleet, fleetType)
@@ -46,7 +48,12 @@ function generateFleet(fleetType = FLEET_TYPES_ALL[0], factionType = null, plane
     // Assign AI to fleet
     const fleetAIType = getFleetAITypeForFleetType(fleetType)
     if (fleetAIType) {
-        fleet.fleetAI = new fleetAIType.aiClass(fleet, planet)
+        fleet.fleetAI = new fleetAIType.aiClass(fleet, startAt)
+    }
+
+    // Set cloak level if faction has cloaked flag
+    if (factionType && factionType.cloaked) {
+        fleet.cloakLevel = 0.9
     }
 
     return fleet
@@ -95,9 +102,9 @@ async function addFleetActivity(numYears = 2, progress = {completePercentage: 0}
         tickNPCFleets(YEARS_PER_DAY)
         
         // Reposition planets every 30 days (once per month)
-        if (d % 30 === 0) {
+        //if (d % 30 === 0) {
             gs.system.refreshPositions(gs.year)
-        }
+        //}
         
         // Update progress and yield control for smooth UI
         if (daysSinceYield >= YIELD_EVERY_DAYS) {

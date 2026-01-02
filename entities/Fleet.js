@@ -43,6 +43,8 @@ class Fleet extends SpaceObject {
         this.fleetAI = null;
         /** @type {number} */
         this.angle = 0 //danmod this is temporary should get rid of it later
+        /** @type {number} */
+        this.cloakLevel = 0; // 0 = visible, 1.0 = fully cloaked
     }
 
     /**

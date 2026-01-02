@@ -352,7 +352,7 @@ class StarMap extends BaseMap {
             let pathObj = cvs.getObject(pathId)
             let thrusterObj = cvs.getObject(thrusterId)
             
-            const fleetAngle = fleet.route ? fleet.route.path.angle : undefined//-Math.PI/2
+            const fleetAngle = fleet.route && fleet.route.path ? fleet.route.path.angle : undefined//-Math.PI/2
             const isPlayerFleet = fleet === gs.fleet
             
             // Create objects if they don't exist
@@ -383,6 +383,7 @@ class StarMap extends BaseMap {
             fleetObj.y = fleet.y
             if (fleetAngle !== undefined) fleetObj.angle = fleetAngle
             fleetObj.strokeColor = (fleet == this.selectedObject) ? COLORS.Green : COLORS.Black
+            fleetObj.fillColor[3] = 1-fleet.cloakLevel
             
             // Update label
             if (fleet.location || !fleet.route) {
@@ -394,7 +395,7 @@ class StarMap extends BaseMap {
             }
             
             // Update path (only show for player fleet or selected fleet)
-            const shouldShowPath = (fleet === gs.fleet || fleet === this.selectedObject) && fleet.route
+            const shouldShowPath = (fleet === gs.fleet || fleet === this.selectedObject) && fleet.route && fleet.route.path
             if (!shouldShowPath) {
                 pathObj.visible = false
             } else {
@@ -417,6 +418,7 @@ class StarMap extends BaseMap {
                 thrusterObj.y = fleet.y
                 thrusterObj.screenOffsetX = screenOffsetX
                 thrusterObj.screenOffsetY = screenOffsetY
+                thrusterObj.fillColor[3] = 1-fleet.cloakLevel
             }
         })
         
@@ -460,10 +462,10 @@ class StarMap extends BaseMap {
         ce({parent:container, tag:'h3', innerHTML: coloredName(obj), onClick: ()=>this.selectObject(obj),
             style: {filter: `drop-shadow(1px 0 0 ${colorArrToRgbaString(COLORS.Green)}) drop-shadow(0 1px 0 ${colorArrToRgbaString(COLORS.Green)})  drop-shadow(0 -0.5px 0 ${colorArrToRgbaString(COLORS.Green)})  drop-shadow(-0.5px 0 0 ${colorArrToRgbaString(COLORS.Green)})`}
         })
-        const allPlanets = [...this.starSystem.planets, ...this.starSystem.dwarfPlanets]
-        const cvsId = obj instanceof Planet ? `planet${allPlanets.indexOf(obj)}`
-            : obj instanceof Star ? `star${this.starSystem.stars.indexOf(obj)}` 
-            : obj instanceof Fleet ? `fleet${this.starSystem.fleets.indexOf(obj)}`
+        //const allPlanets = [...this.starSystem.planets, ...this.starSystem.dwarfPlanets]
+        const cvsId = obj instanceof Planet ? `planet${obj.uuid}`
+            : obj instanceof Star ? `star${obj.uuid}` 
+            : obj instanceof Fleet ? `fleet${obj.uuid}`
             : ''
         ce({parent:container, style: {margin: 'auto'}, onClick: ()=>this.selectObject(obj), children:[
             this.cvs.getObject(cvsId)?.asImage(25, COLORS.LightGreen) || null

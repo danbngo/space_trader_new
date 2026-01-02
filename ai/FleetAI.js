@@ -5,13 +5,13 @@
 class FleetAI {
     /**
      * @param {Fleet} fleet - The fleet controlled by this AI.
-     * @param {SpaceObject} home - The planet this fleet originated from.
+     * @param {SpaceObject} origin - The planet this fleet originated from.
      */
-    constructor(fleet = null, home = null) {
+    constructor(fleet = null, origin = null) {
         /** @type {Fleet} */
         this.fleet = fleet;
         /** @type {SpaceObject} */
-        this.home = home;
+        this.origin = origin;
         /** @type {SpaceObject} */
         this.destination = this.calcDestination();
         if (!this.destination) throw new Error('fleetAI must have a destination!!')
@@ -27,8 +27,8 @@ class FleetAI {
      */
     tick(elapsedYears = 1) {
         this.voyageYearsRemaining -= elapsedYears;
-        if (this.isNearHome(elapsedYears)) {
-            this.onNearHome()
+        if (this.isNearOrigin(elapsedYears)) {
+            this.onNearOrigin()
             return
         }
         else if (this.isNearDestination(elapsedYears)) {
@@ -62,7 +62,7 @@ class FleetAI {
     }
     /** @returns {SpaceObject|null} */
     calcDestination() {
-        return rndMember(gs.system.planets.filter(p=>(p !== this.home)))
+        return rndMember(gs.system.planets.filter(p=>(p !== this.origin)))
     }
 
     resetVoyageDuration() {
@@ -82,8 +82,8 @@ class FleetAI {
         return this.destination && this.isNearby(this.destination, elapsedYears)
     }
 
-    isNearHome(elapsedYears = 1) {
-        return this.isNearby(this.home, elapsedYears) && !this.destination
+    isNearOrigin(elapsedYears = 1) {
+        return this.isNearby(this.origin, elapsedYears) && !this.destination
     }
 
     isNearTarget(elapsedYears = 1) {
@@ -99,14 +99,14 @@ class FleetAI {
         this.target = null
         if (Math.random() < .9) return; //ships will "hang out" for a while before moving on
         if (this.destination && this.fleet.location != this.destination) this.fleet.route = new Route(this.fleet, this.destination)
-        else if (this.home && this.fleet.location != this.home) this.fleet.route = new Route(this.fleet, this.home)
+        else if (this.origin && this.fleet.location != this.origin) this.fleet.route = new Route(this.fleet, this.origin)
     }
 
     /**
      * Called when fleet arrives at destination.
      */
-    onNearHome() {
-        console.log('🏠', `${this.fleet.name+' '+this.fleet.uuid} has returned home to ${this.home.name+' '+this.home.uuid}.`)
+    onNearOrigin() {
+        console.log('🏠', `${this.fleet.name+' '+this.fleet.uuid} has returned home to ${this.origin.name+' '+this.origin.uuid}.`)
         this.route = null
         this.destination = null
         gs.system.removeFleet(this.fleet)
@@ -125,6 +125,9 @@ class FleetAI {
 
     fightTarget() {
         console.log('⚔️', `${this.fleet.name+' '+this.fleet.uuid} is engaging ${this.target.name+' '+this.target.uuid}!`)
+        // Reveal both fleets during combat
+        this.fleet.cloakLevel = 0
+        this.target.cloakLevel = 0
         //chance to win is based on our fleet combat scores
         const ourScore = this.fleet.combatRating
         const theirScore = this.target.combatRating

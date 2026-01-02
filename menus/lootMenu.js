@@ -72,7 +72,7 @@ function showLootMenu(loot = new CountsMap()) {
         const buttons = [
             ['Take', ()=>showTakeCargoSlider(ct, maxLootAmount), maxLootAmount == 0],
             ['Dump', ()=>showDumpCargoSlider(ct, playerAmount), playerAmount == 0],
-            ['Finish', ()=>this.endEncounter()],
+            ['Finish', ()=>gs.encounter.endEncounter()],
         ]
         refreshPanelButtons('loot_panel', buttons)
     }
@@ -87,7 +87,7 @@ function showLootMenu(loot = new CountsMap()) {
     showModal(
         `Loot Cargo`,
         infoContainer,
-        [['Continue', ()=>this.endEncounter()]],
+        [['Continue', ()=>gs.encounter.endEncounter()]],
         'loot_panel'
     );
 }

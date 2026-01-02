@@ -5,6 +5,6 @@
  */
 class TaxCollectorFleetAI extends FleetAI {
     calcDestination() {
-        return rndMember([...gs.system.dwarfPlanets].filter(p=>(p !== this.home)))
+        return rndMember([...gs.system.dwarfPlanets, ...gs.system.spaceStations].filter(p=>(p !== this.origin)))
     }
 }
