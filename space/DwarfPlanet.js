@@ -2,7 +2,7 @@
 /**
  * @extends {Planet}
  */
-class Moon extends Planet {
+class DwarfPlanet extends Planet {
     /**
      * @param {string} name - The name of the planet.
      * @param {number[]} color - The color of the planet.
@@ -17,6 +17,6 @@ class Moon extends Planet {
      */
     constructor(name = "Unnamed", color = COLORS.White, radius = 0, orbit = null, planetType = PLANET_TYPES_ALL[0], settlement = null, civilization = null, climate = null, features = [], dayLength = 1.0, magnetosphereRadius = 0) {
         super(name, color, radius, orbit, planetType, settlement, civilization, climate, features, dayLength, magnetosphereRadius);
-        this.objectType = OBJECT_TYPES.MOON;
+        this.objectType = OBJECT_TYPES.DWARF_PLANET;
     }
 }

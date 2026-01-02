@@ -108,6 +108,7 @@ class StarMap extends BaseMap {
         this.handleCanvasOrbits()
         this.handleCanvasStars()
         this.handleCanvasPlanets()
+        this.handleCanvasSpaceStations()
         this.handleCanvasAnomalies()
         this.handleCanvasFleets()
         this.handleCanvasWaypoint()
@@ -219,6 +220,51 @@ class StarMap extends BaseMap {
             
             if (body == this.selectedObject) {
                 planetObj.strokeColor = COLORS.Green
+                labelObj.strokeColor = COLORS.Green
+            }
+        })
+    }
+
+    handleCanvasSpaceStations() {
+        const {starSystem, cvs} = this
+        const {spaceStations} = starSystem
+        
+        if (!spaceStations) return
+
+        spaceStations.forEach((station) => {
+            const stationId = `station${station.uuid}`
+            const labelId = `stationlabel${station.uuid}`
+            
+            let stationObj = cvs.getObject(stationId)
+            let labelObj = cvs.getObject(labelId)
+            
+            // Create objects if they don't exist
+            if (!stationObj) {
+                stationObj = cvs.addFilledRectangle(stationId, station.x, station.y, 10, 10, 6, station.color, () => this.selectObject(station))
+                labelObj = cvs.addText(labelId, station.x, station.y, 0, -24, station.name, station.color, DEFAULT_FONT_SIZE, 2, () => this.selectObject(station))
+                
+                const objs = [stationObj, labelObj]
+                for (const obj of objs) {
+                    obj.onHover = () => {
+                        labelObj.visible = true
+                        for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
+                    }
+                    obj.onHoverEnd = () => {
+                        labelObj.visible = false
+                        for (const obj3 of objs) obj3.strokeColor = (station == this.selectedObject) ? COLORS.Green : COLORS.Black
+                    }
+                    obj.onHoverEnd()
+                }
+            }
+            
+            // Update positions and selection state
+            stationObj.x = station.x
+            stationObj.y = station.y
+            labelObj.x = station.x
+            labelObj.y = station.y
+            
+            if (station == this.selectedObject) {
+                stationObj.strokeColor = COLORS.Green
                 labelObj.strokeColor = COLORS.Green
             }
         })

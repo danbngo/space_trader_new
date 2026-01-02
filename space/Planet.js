@@ -7,8 +7,6 @@ class Planet extends OrbitingObject {
      * @param {string} name - The name of the planet.
      * @param {number[]} color - The color of the planet.
      * @param {number} radius - The radius of the planet.
-     * @param {number} x - The x-coordinate of the planet.
-     * @param {number} y - The y-coordinate of the planet.
      * @param {Orbit} orbit - The orbit of the planet.
      * @param {PlanetType} planetType - The type of the planet.
      * @param {Settlement|null} settlement - The settlement on the planet.
@@ -17,8 +15,8 @@ class Planet extends OrbitingObject {
      * @param {PlanetFeatureType[]} features - Unique features of the planet.
      * @param {number} dayLength - The length of one day in Earth days.
      */
-    constructor(name = "Unnamed", color = COLORS.White, radius = 0, x = 0, y = 0, orbit = null, planetType = PLANET_TYPES_ALL[0], settlement = null, civilization = null, climate = null, features = [], dayLength = 1.0, magnetosphereRadius = 0) {
-        super(name, color, radius, x, y, orbit);
+    constructor(name = "Unnamed", color = COLORS.White, radius = 0, orbit = null, planetType = PLANET_TYPES_ALL[0], settlement = null, civilization = null, climate = null, features = [], dayLength = 1.0, magnetosphereRadius = 0) {
+        super(name, OBJECT_TYPES.PLANET, color, radius, orbit);
         /** @type {PlanetType} */
         this.planetType = planetType
         /** @type {Settlement|null} */

@@ -13,6 +13,10 @@ class Orbit {
         this.progressOffset = progressOffset % 1;
     }
 
+    clone() {
+        return new Orbit(this.radius, this.progressOffset);
+    }
+
     /**
      * Calculate orbital period in Earth years using Kepler's third law (P^2 = a^3).
      * @returns {number} The orbital period in years.

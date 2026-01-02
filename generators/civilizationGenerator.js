@@ -1,9 +1,9 @@
 /**
  * Generates a civilization for a planet with randomized attributes.
- * @param {Planet} planet - The planet to generate civilization for.
+ * @param {Planet|SpaceStation} planet - The planet to generate civilization for.
  * @returns {Civilization} The generated civilization.
  */
-function generateCivilization(planet = new Planet()) {
+function generateCivilization(planet) {
     const governmentType = rndMember(GT_ALL.filter(gt => gt != GT.PUPPET_STATE))
     // Dwarf planets are small outposts with reduced stats (0.25x)
     const dwarfMultiplier = !(gs.system.planets.includes(planet)) ? 1 : 0.25

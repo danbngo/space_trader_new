@@ -14,6 +14,7 @@ class StarSystem extends SpaceObject {
      * @param {Star[]} stars - The stars in the star system.
      * @param {Planet[]} planets - The planets in the star system.
      * @param {Planet[]} dwarfPlanets - The dwarf planets in the star system.
+     * @param {SpaceStation[]} spaceStations - The space stations in the star system.
      * @param {Fleet[]} fleets - The fleets in the star system.
      * @param {AsteroidBelt[]} asteroidBelts - The asteroid belts in the star system.
      * @param {Asteroid[]} asteroids - The asteroids in the star system.
@@ -21,9 +22,9 @@ class StarSystem extends SpaceObject {
      * @param {Religion[]} religions - The religions in the star system.
      * @param {Anomaly[]} anomalies - The anomalies in the star system.
      */
-    constructor(name = "Unnamed", color = COLORS.White, radius = 0, x = 0, y = 0, barycenter = null, stars = [], planets = [], dwarfPlanets = [], fleets = [], asteroidBelts = [], asteroids = [], backgroundStars = [], religions = [], anomalies = []) {
-        console.log('instantiating star system w name:', name, 'stars:', stars, 'planets:', planets, 'dwarf planets:', dwarfPlanets, 'fleets:', fleets);
-        super(name, color, radius, x, y)
+    constructor(name = "Unnamed", color = COLORS.White, radius = 0, x = 0, y = 0, barycenter = null, stars = [], planets = [], dwarfPlanets = [], spaceStations = [], fleets = [], asteroidBelts = [], asteroids = [], backgroundStars = [], religions = [], anomalies = []) {
+        console.log('instantiating star system w name:', name, 'stars:', stars, 'planets:', planets, 'dwarf planets:', dwarfPlanets, 'space stations:', spaceStations, 'fleets:', fleets);
+        super(name, OBJECT_TYPES.ABSTRACT, color, radius, x, y)
         /** @type {SpaceObject} */
         this.barycenter = barycenter
         /** @type {Star[]} */
@@ -32,6 +33,8 @@ class StarSystem extends SpaceObject {
         this.planets = planets
         /** @type {Planet[]} */
         this.dwarfPlanets = dwarfPlanets
+        /** @type {SpaceStation[]} */
+        this.spaceStations = spaceStations
         /** @type {Fleet[]} */
         this.fleets = fleets
         /** @type {AsteroidBelt[]} */
@@ -72,7 +75,7 @@ class StarSystem extends SpaceObject {
     }
 
     refreshPositions(year = gs.year) {
-        const objects = [...this.stars, ...this.planets, ...this.dwarfPlanets, ...this.asteroids]
+        const objects = [...this.stars, ...this.planets, ...this.dwarfPlanets, ...this.spaceStations, ...this.asteroids]
         for (const obj of objects) {
             const [x, y] = obj.calcAbsPositionAtYear(year)
             obj.x = x

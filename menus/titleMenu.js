@@ -153,6 +153,25 @@ async function startNewGame() {
         }
     }
 
+    // Generate civilizations and settlements for space stations
+    //presumed to be neutral, we'll dig into this more later
+    /*if (gs.system.spaceStations) {
+        for (const station of gs.system.spaceStations) {
+            // Civilizations and settlements are already generated in generateSpaceStation
+            // Just need to set up relationships
+            for (const p of allPlanets) {
+                station.c.relationships.set(p, RELATIONSHIP_TYPES.NEUTRAL)
+                p.c.relationships.set(station, RELATIONSHIP_TYPES.NEUTRAL)
+            }
+            // Set relationships between stations
+            for (const otherStation of gs.system.spaceStations) {
+                if (station !== otherStation) {
+                    station.c.relationships.set(otherStation, RELATIONSHIP_TYPES.NEUTRAL)
+                }
+            }
+        }
+    }*/
+
     gs.system.refreshPositions(gs.year)
 
     // Simulate history

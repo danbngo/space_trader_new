@@ -71,6 +71,9 @@ const BACKGROUND_STARS = generateBackgroundStars(SOLAR_SYSTEM_RADIUS_IN_AU, 5000
 // Generate religions for the star system (1-3 religions)
 const RELIGIONS = generateReligions()
 
+// Generate space stations (3-5 stations at Lagrange points)
+const SPACE_STATIONS = generateSpaceStations(rng(5, 3), ALL_LAGRANGE_POINTS, [CORONA, ASTEROID_BELT, TROJANS, GREEKS, KUIPER_BELT])
+
 const SOLAR_SYSTEM = new StarSystem(
     'Sol System',
     hexToRgba('#ffff44'),
@@ -79,6 +82,7 @@ const SOLAR_SYSTEM = new StarSystem(
     SOL, [SOL],
     PLANETS,
     DWARF_PLANETS,
+    SPACE_STATIONS,
     [],
     [CORONA, ASTEROID_BELT, TROJANS, GREEKS, KUIPER_BELT], [...ALL_ASTEROIDS],
     BACKGROUND_STARS,
@@ -87,4 +91,5 @@ const SOLAR_SYSTEM = new StarSystem(
 
 console.log("Generated solar system:", SOLAR_SYSTEM)
 console.log("Generated religions:", RELIGIONS)
+console.log("Generated space stations:", SPACE_STATIONS)
 

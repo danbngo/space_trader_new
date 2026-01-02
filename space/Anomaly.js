@@ -12,7 +12,7 @@ class Anomaly extends SpaceObject {
      * @param {number} radius - The radius of the anomaly in AU.
      */
     constructor(name = "Unknown Anomaly", anomalyType = ANOMALY_TYPES.QUANTUM_FLUCTUATION, x = 0, y = 0, radius = 0.1) {
-        super(name, anomalyType.color, radius, x, y);
+        super(name, OBJECT_TYPES.ANOMALY, anomalyType.color, radius, x, y);
         /** @type {AnomalyType} */
         this.anomalyType = anomalyType;
     }
