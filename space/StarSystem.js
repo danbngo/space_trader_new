@@ -98,9 +98,8 @@ class StarSystem extends SpaceObject {
                     if (currentMap && currentMap.selectObject && fleet == gs.fleet) currentMap.selectObject(fleet)
                 }
                 //only dock if player fleet near the destination, otherwise its handled by ai
-                if (fleet == gs.fleet && fleet.route.destination instanceof Planet) fleet.dock(fleet.route.destination)
+                if (fleet.route.destination instanceof Planet) fleet.dock(fleet.route.destination)
                 fleet.route = undefined
-                fleet.location = undefined
                 continue
             }
             //otherwise, make progress along journey

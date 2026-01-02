@@ -58,14 +58,14 @@ function generateFleet(fleetType = FLEET_TYPES_ALL[0], factionType = null, plane
  * @param {Object} progress - Progress tracking object with completePercentage property.
  */
 async function addFleetActivity(numYears = 2, progress = {completePercentage: 0}) {
-    console.log(`Starting fleet activity simulation: ${numYears} years (${numYears * 52} weeks)`)
-    let weeksSinceYield = 0
-    const YIELD_EVERY_WEEKS = 5 // Yield control every 5 weeks
-    const WEEKS_PER_YEAR = 52
-    const YEARS_PER_WEEK = 1 / WEEKS_PER_YEAR
-    const DAYS_PER_WEEK = 7
-    const totalWeeks = numYears * WEEKS_PER_YEAR
-    let currentWeek = 0
+    const DAYS_PER_YEAR = 365
+    const totalDays = numYears * DAYS_PER_YEAR
+    console.log(`Starting fleet activity simulation: ${numYears} years (${totalDays} days)`)
+    
+    let daysSinceYield = 0
+    const YIELD_EVERY_DAYS = 20 // Yield control every 20 days for smooth UI
+    const YEARS_PER_DAY = 1 / DAYS_PER_YEAR
+    let currentDay = 0
     let fleetsSpawned = 0
     const initialFleetCount = gs.system.fleets.length
     
@@ -79,30 +79,30 @@ async function addFleetActivity(numYears = 2, progress = {completePercentage: 0}
 
     console.log('Pre-calculated max fleets per planet for simulation:', planetMaxFleets)
     
-    for (let w = 0; w < totalWeeks; w++) {
-        currentWeek++
-        weeksSinceYield++
+    for (let d = 0; d < totalDays; d++) {
+        currentDay++
+        daysSinceYield++
         
-        // Increment game year during simulation
-        gs.year += YEARS_PER_WEEK
+        // Increment game year during simulation (small daily increments)
+        gs.year += YEARS_PER_DAY
         
         // Spawn fleets from planets (using pre-calculated max fleets for performance)
         const fleetCountBefore = gs.system.fleets.length
-        checkForFleetSpawning(DAYS_PER_WEEK, planetMaxFleets)
+        checkForFleetSpawning(1, planetMaxFleets) // 1 day at a time
         fleetsSpawned += (gs.system.fleets.length - fleetCountBefore)
         
-        // Tick NPC fleet AI (move fleets around)
-        tickNPCFleets(YEARS_PER_WEEK)
+        // Tick NPC fleet AI (move fleets around with daily time increments)
+        tickNPCFleets(YEARS_PER_DAY)
         
-        // Reposition planets every 4 weeks (once per month)
-        if (w % 4 === 0) {
+        // Reposition planets every 30 days (once per month)
+        if (d % 30 === 0) {
             gs.system.refreshPositions(gs.year)
         }
         
         // Update progress and yield control for smooth UI
-        if (weeksSinceYield >= YIELD_EVERY_WEEKS) {
-            weeksSinceYield = 0
-            progress.completePercentage = (currentWeek / totalWeeks) * 100
+        if (daysSinceYield >= YIELD_EVERY_DAYS) {
+            daysSinceYield = 0
+            progress.completePercentage = (currentDay / totalDays) * 100
             await new Promise(resolve => setTimeout(resolve, 0))
         }
     }
@@ -111,7 +111,7 @@ async function addFleetActivity(numYears = 2, progress = {completePercentage: 0}
     progress.completePercentage = 100
     
     console.log(`Fleet activity simulation complete:`)
-    console.log(`  Duration: ${numYears} years (${totalWeeks} weeks)`)
+    console.log(`  Duration: ${numYears} years (${totalDays} days)`)
     console.log(`  Fleets spawned: ${fleetsSpawned}`)
     console.log(`  Starting fleets: ${initialFleetCount}`)
     console.log(`  Final active fleets: ${gs.system.fleets.length}`)

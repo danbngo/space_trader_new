@@ -5,7 +5,20 @@
  */
 class MissionaryFleetAI extends FleetAI {
     calcValidTargets() {
-        return [];
+        // Target fleets from planets with different state religion
+        if (!this.fleet.planet || !this.fleet.planet.civilization || !this.fleet.planet.civilization.stateReligion) {
+            return [];
+        }
+        
+        const homeReligion = this.fleet.planet.civilization.stateReligion;
+        
+        return gs.system.fleets.filter(f => 
+            f !== this.fleet && 
+            f.planet && 
+            f.planet.civilization && 
+            f.planet.civilization.stateReligion && 
+            f.planet.civilization.stateReligion !== homeReligion
+        );
     }
     
     calcDestination() {

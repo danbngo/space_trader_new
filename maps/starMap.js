@@ -17,7 +17,7 @@ class StarMap extends BaseMap {
 
         this.gameYearsPerMs = STAR_MAP_YEARS_PER_MS
 
-        this.initializeDOM(this.starSystem.radius*4, this.starSystem.radius*0.4, this.starSystem.radius*40, this.starSystem.radius*0.5)
+        this.initializeDOM(this.starSystem.radius*4, this.starSystem.radius*0.4, this.starSystem.radius*40, this.starSystem.radius*1)
 
         for (const bgStar of starSystem.backgroundStars) bgStar.reset()
 
@@ -119,10 +119,11 @@ class StarMap extends BaseMap {
         const {starSystem, cvs} = this
         const {backgroundStars} = starSystem
         
+        const sizeOffset = Math.max(this.cvs.canvas.width, this.cvs.canvas.height)/SOLAR_SYSTEM_RADIUS_IN_AU * 4
         backgroundStars.forEach((bgStar, index) => {
             bgStar.twinkle(gs.year)
             if (!cvs.pixels[index]) {
-                cvs.addPixel(bgStar.x, bgStar.y, bgStar.color, bgStar.radius)
+                cvs.addPixel(0, 0, bgStar.color, bgStar.radius, bgStar.x * sizeOffset, bgStar.y * sizeOffset, true)
             }
             cvs.pixels[index].a = bgStar.color[3]
         })
@@ -349,7 +350,7 @@ class StarMap extends BaseMap {
             let pathObj = cvs.getObject(pathId)
             let thrusterObj = cvs.getObject(thrusterId)
             
-            const fleetAngle = fleet.route ? fleet.route.path.angle : -Math.PI/2
+            const fleetAngle = fleet.route ? fleet.route.path.angle : undefined//-Math.PI/2
             const isPlayerFleet = fleet === gs.fleet
             
             // Create objects if they don't exist
@@ -378,7 +379,7 @@ class StarMap extends BaseMap {
             // Update fleet position and angle
             fleetObj.x = fleet.x
             fleetObj.y = fleet.y
-            fleetObj.angle = fleetAngle
+            if (fleetAngle !== undefined) fleetObj.angle = fleetAngle
             fleetObj.strokeColor = (fleet == this.selectedObject) ? COLORS.Green : COLORS.Black
             
             // Update label
@@ -407,7 +408,7 @@ class StarMap extends BaseMap {
                 thrusterObj.visible = false
             } else {
                 const [screenOffsetX, screenOffsetY] = rotatePoint(10, 0, 0, 0, fleetAngle - Math.PI)
-                thrusterObj.angle = fleetAngle - Math.PI
+                if (fleetAngle !== undefined) thrusterObj.angle = fleetAngle - Math.PI
                 thrusterObj.visible = true
                 thrusterObj.x = fleet.x
                 thrusterObj.y = fleet.y

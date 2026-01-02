@@ -58,7 +58,7 @@ const SHIP_TYPES = {
     FIRE_SHIP: new ShipType('Fire Ship', 'Ship that can detonate itself, causing massive area damage.', SHAPES.FilledTriangle, 0.1, 0.5, 0.5, 1.5, 0.5, 0.5, [SHIP_MODULE_TYPES.DETONATE], 2),
     PASSENGER_SHIP: new ShipType('Passenger Ship', 'Civilian transport designed to carry passengers in comfort with moderate cargo space.', SHAPES.FilledTriangle, 2, 0.5, 0.1, 1, 2, 0.5, [], 1),
     SUPPLY_SHIP: new ShipType('Supply Ship', 'Nimble cargo vessel specializing in quick resupply runs with decent cargo capacity.', SHAPES.FilledTriangle, 0.5, 0.1, 0.1, 2, 3, 0.5, [], 1),
-    TANKER: new ShipType('Tanker', 'Massive bulk hauler with enormous cargo holds designed to transport liquids and gases.', SHAPES.FilledTriangle, 1.5, 0.25, 0.1, 1, 5, 1, [], 2),
+    TANKER: new ShipType('Tanker', 'Massive bulk hauler with enormous cargo holds designed to transport liquids and gases.', SHAPES.FilledTriangle, 1.5, 0.25, 0.1, 1.5, 5, 1, [], 2),
     BLOCKADE_RUNNER: new ShipType('Blockade Runner', 'Sleek smuggler ship equipped with cloaking technology for evading detection and patrols.', SHAPES.FilledTriangle, 1, 1, 0.5, 3, 2, 1, [SHIP_MODULE_TYPES.CLOAK], 1),
     SCOUT: new ShipType('Scout', 'Long-range reconnaissance vessel with powerful sensors and high speed for exploration.', SHAPES.FilledTriangle, 0.5, 0.5, 0.5, 3, 0.5, 3, [SHIP_MODULE_TYPES.BOOSTER], 1),
     FIGHTER: new ShipType('Fighter', 'Agile combat craft with blink drive, designed for hit-and-run attacks and dogfighting.', SHAPES.FilledTriangle, 0.5, 1, 1.5, 2, 0.1, 1, [SHIP_MODULE_TYPES.BLINK], 1),

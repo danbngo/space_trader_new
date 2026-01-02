@@ -4,7 +4,7 @@ class BackgroundMap extends BaseMap {
         this.lastTickMs = Date.now()
         this.gameYearsPerMs = 1/365/24/60 * 2
 
-        this.cvs = new CanvasWrapper(100, 10, 1000, NEPTUNE.orbit.radius*2)
+        this.cvs = new CanvasWrapper(100, 10, 1000, NEPTUNE.orbit.radius)
         this.root = ce({classNames: ['starmap-root'], children: [this.cvs.root]})
         this.outerRadius = 20
         this.innerRadius = 3

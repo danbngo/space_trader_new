@@ -7,7 +7,7 @@ class InquisitorFleetAI extends FleetAI {
     calcValidTargets() {
         return gs.system.fleets.filter(f => {
             if (f === this.fleet) return false;
-            
+            if (f.location) return false;
             // Attack fleets from planets with different state religions
             if (this.fleet.planet && this.fleet.planet.civilization && this.fleet.planet.civilization.stateReligion &&
                 f.planet && f.planet.civilization && f.planet.civilization.stateReligion) {
@@ -21,7 +21,7 @@ class InquisitorFleetAI extends FleetAI {
     }
     
     onNearTarget() {
-        if (this.target instanceof Fleet) {
+        if (this.target instanceof Fleet && !this.target.location) {
             if (Math.random() > 0.5) {
                 this.fightTarget();
             }

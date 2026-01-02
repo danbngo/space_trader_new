@@ -6,7 +6,12 @@
 class MinerFleetAI extends FleetAI {
     calcValidTargets() {
         //introduce some fuzz so ship will move around
-        return gs.system.asteroids.filter(a=>(calcDistance(this.fleet.x, this.fleet.y, a.x, a.y) > 0.1))
+        // Filter out asteroids from Plasma belts (like Corona) - too dangerous to mine
+        return gs.system.asteroids.filter(a => {
+            if (calcDistance(this.fleet.x, this.fleet.y, a.x, a.y) <= 0.3) return false;
+            if (a.belt && a.belt.beltType === ASTEROID_BELT_TYPES.Plasma) return false;
+            return true;
+        })
     }
     calcDestination() {
         return rndMember([...gs.system.planets].filter(p=>(p !== this.home)))

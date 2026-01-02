@@ -5,14 +5,15 @@
  */
 class SlaverFleetAI extends FleetAI {
     calcValidTargets() {
-        return gs.system.fleets.filter(f => (f !== this.fleet && !f.factionType.authority && !f.factionType.criminal));
+        //slavers will attack other criminals!
+        return gs.system.fleets.filter(f => (f !== this.fleet && !f.factionType.authority && !f.location));
     }
     calcDestination() {
         return rndMember([...gs.system.dwarfPlanets].filter(p=>(p !== this.home)))
     }
     onNearTarget() {
         if (this.target instanceof Fleet) {
-            if (Math.random() > 0.5) {
+            if (Math.random() > 0.5 && !this.target.location) {
                 this.fightTarget();
             }
         }

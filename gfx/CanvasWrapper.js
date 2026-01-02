@@ -48,7 +48,7 @@ class CanvasWrapper {
         
         this.pixelRatio = CanvasWrapper.getPixelRatio(this.ctx);
         
-        this.maxFrameRate = 60; //do not refresh more than 30 times per second
+        this.maxFrameRate = MAX_FRAMES_PER_SECOND; //do not refresh more than 30 times per second
         this.lastRedrawAt = 0;
         
         this.autoResize()
@@ -144,8 +144,8 @@ class CanvasWrapper {
         return this.addObject(obj)
     }
     
-    addPixel(x = 0, y = 0, color = COLORS.White, size = 1) {
-        const pixel = new CanvasPixel({x, y, color, size})
+    addPixel(x = 0, y = 0, color = COLORS.White, size = 1, screenOffsetX = 0, screenOffsetY = 0, parallax = false) {
+        const pixel = new CanvasPixel({x, y, color, size, screenOffsetX, screenOffsetY, parallax})
         this.pixels.push(pixel)
         return pixel
     }
@@ -325,6 +325,47 @@ class CanvasWrapper {
         this.drawOrder = sorted
     }
 
+    /**
+     * Check if a line segment intersects or is within a rectangle (viewport)
+     * @param {number} x1 - Line start x
+     * @param {number} y1 - Line start y
+     * @param {number} x2 - Line end x
+     * @param {number} y2 - Line end y
+     * @param {number} rectX - Rectangle left
+     * @param {number} rectY - Rectangle top
+     * @param {number} rectWidth - Rectangle width
+     * @param {number} rectHeight - Rectangle height
+     * @returns {boolean}
+     */
+    isLineIntersectingRect(x1, y1, x2, y2, rectX, rectY, rectWidth, rectHeight) {
+        // Check if either endpoint is inside the rectangle
+        if ((x1 >= rectX && x1 <= rectX + rectWidth && y1 >= rectY && y1 <= rectY + rectHeight) ||
+            (x2 >= rectX && x2 <= rectX + rectWidth && y2 >= rectY && y2 <= rectY + rectHeight)) {
+            return true;
+        }
+        
+        // Check intersection with each edge of the rectangle
+        const rectRight = rectX + rectWidth;
+        const rectBottom = rectY + rectHeight;
+        
+        // Helper to check if line segments intersect
+        const lineSegmentIntersect = (ax1, ay1, ax2, ay2, bx1, by1, bx2, by2) => {
+            const denominator = ((bx2 - bx1) * (ay2 - ay1)) - ((by2 - by1) * (ax2 - ax1));
+            if (denominator === 0) return false; // Parallel lines
+            
+            const ua = (((by2 - by1) * (ax1 - bx1)) - ((bx2 - bx1) * (ay1 - by1))) / denominator;
+            const ub = (((ay2 - ay1) * (ax1 - bx1)) - ((ax2 - ax1) * (ay1 - by1))) / denominator;
+            
+            return ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1;
+        };
+        
+        // Check intersection with all four edges of the rectangle
+        return lineSegmentIntersect(x1, y1, x2, y2, rectX, rectY, rectRight, rectY) ||           // Top edge
+               lineSegmentIntersect(x1, y1, x2, y2, rectRight, rectY, rectRight, rectBottom) ||   // Right edge
+               lineSegmentIntersect(x1, y1, x2, y2, rectX, rectBottom, rectRight, rectBottom) ||  // Bottom edge
+               lineSegmentIntersect(x1, y1, x2, y2, rectX, rectY, rectX, rectBottom);             // Left edge
+    }
+
     removeExpiredObjects() {
         const expiredIds = this.drawOrder.filter(o=>o.expired).map(o=>o.id)
         for (const id of expiredIds) {
@@ -360,9 +401,13 @@ class CanvasWrapper {
         }
         
         for (const pixel of pixels) {
-            let [sx, sy] = this.worldToScreen(pixel.x, pixel.y);
+            let sx = 0//pixel.offsetY;
+            let sy = 0//pixel.offsetY;
+            if (!pixel.parallax) [sx, sy] = this.worldToScreen(pixel.x, pixel.y);
+            sx += pixel.screenOffsetX;
+            sy += pixel.screenOffsetY;
             sx = Math.round(sx*pixelRatio)
-            sy = Math.round(sy*pixelRatio) 
+            sy = Math.round(sy*pixelRatio)
             if (sx < 0 || sx >= width || sy < 0 || sy >= height) continue;
             const size = pixel.size;
             const intSize = Math.ceil(size)
@@ -386,7 +431,16 @@ class CanvasWrapper {
             sy += obj.screenOffsetY;
             const size = Math.max(obj.minScreenSize, obj.size * zoom / pixelRatio)
             
-            if (sx + size < 0 || sx - size >= width || sy + size < 0 || sy - size >= height) continue;
+            // Special visibility check for lines
+            if (obj.shape === SHAPES.Line && obj.x2 !== undefined && obj.y2 !== undefined) {
+                const [sx2, sy2] = this.worldToScreen(obj.x2, obj.y2);
+                // Check if line intersects with or is within the viewport
+                if (!this.isLineIntersectingRect(sx, sy, sx2, sy2, 0, 0, width, height)) continue;
+            } else {
+                // Standard visibility check for other shapes
+                if (sx + size < 0 || sx - size >= width || sy + size < 0 || sy - size >= height) continue;
+            }
+            
             sx = Math.round(sx)
             sy = Math.round(sy)
             

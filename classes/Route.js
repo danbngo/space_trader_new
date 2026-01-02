@@ -8,13 +8,21 @@ class Route {
      */
     constructor(fleet = new Fleet(), destination = new Planet(), startYear = gs.year) {
         //run simu
+        this.fleet = fleet
+        this.destination = destination
+        this.startYear = startYear
+
+        if (fleet.x == destination.x && fleet.y == destination.y) { 
+            this.endYear = startYear
+            this.travelTime = 0
+            this.path = null
+            return
+        }
+
         const naiveDistance = calcDistance(fleet.x, fleet.y, destination.x, destination.y)
         const naiveTravelTime = naiveDistance/fleet.speed
         //add one extra day
         const {toX, toY, endYear} = Route.estimateTravelTimeToOrbitingBody(startYear, fleet, destination, 100, naiveTravelTime*10+1/365)
-        this.fleet = fleet
-        this.destination = destination
-        this.startYear = startYear
         this.endYear = endYear
         this.travelTime = endYear-startYear
         this.path = new Path(fleet.x, fleet.y, toX, toY)

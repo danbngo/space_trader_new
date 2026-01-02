@@ -11,10 +11,9 @@ class FleetType {
      * @param {number} maxShips - The maximum number of ships in this fleet type.
      * @param {number} maxCredits - The maximum credits this fleet can carry.
      * @param {CargoType[]} cargoTypes - The types of cargo this fleet can carry.
-     * @param {number} voyageMinYears - The minimum voyage years for this fleet type.
-     * @param {number} voyageMaxYears - The maximum voyage years for this fleet type.
+     * @param {number} voyageYears - The voyage duration in years for this fleet type.
      */
-    constructor(name = '', shipTypes = [], minShips = 1, maxShips = 1, maxCredits = 1, cargoTypes = [], voyageMinYears = 1, voyageMaxYears = 5, targetMaxDistance = Infinity) {
+    constructor(name = '', shipTypes = [], minShips = 1, maxShips = 1, maxCredits = 1, cargoTypes = [], voyageYears = 0.08, targetMaxDistance = Infinity) {
         /** @type {string} */
         this.name = name
         /** @type {ShipType[]} */
@@ -24,9 +23,7 @@ class FleetType {
         /** @type {number} */
         this.maxShips = maxShips
         /** @type {number} */
-        this.voyageMinYears = voyageMinYears
-        /** @type {number} */
-        this.voyageMaxYears = voyageMaxYears
+        this.voyageYears = voyageYears
         /** @type {number} */
         this.targetMaxDistance = targetMaxDistance
         /** @type {number} */
@@ -38,32 +35,32 @@ class FleetType {
 
 class PseudoFleetType extends FleetType {
     constructor(name = '', shipTypes = [], minShips = 1, maxShips = 1, cargoTypes = []) {
-        super(name, shipTypes, minShips, maxShips, 0, cargoTypes, 0, 0)
+        super(name, shipTypes, minShips, maxShips, 0, cargoTypes, 0)
     }
 }
 
 const FLEET_TYPES = {
-    SOLDIERS: new FleetType('Soldiers', [SHIP_TYPES.BATTLESHIP, SHIP_TYPES.FRIGATE, SHIP_TYPES.DESTROYER], 3, 7, 500, [CARGO_TYPES.FOOD, CARGO_TYPES.WATER, CARGO_TYPES.WEAPONS, CARGO_TYPES.ANTIMATTER], 4, 12, CHASE_DISTANCES.NEAR),
-    POLICE: new FleetType('Police', [SHIP_TYPES.INTERCEPTOR], 1, 5, 500, [], 2, 6, CHASE_DISTANCES.FAR),
-    BOUNTY_HUNTERS: new FleetType('Bounty Hunters', [SHIP_TYPES.DESTROYER, SHIP_TYPES.INTERCEPTOR, SHIP_TYPES.SCOUT, SHIP_TYPES.JAMMER], 1, 3, 2500, [], 3, 10, CHASE_DISTANCES.FAR),
+    SOLDIERS: new FleetType('Soldiers', [SHIP_TYPES.BATTLESHIP, SHIP_TYPES.FRIGATE, SHIP_TYPES.DESTROYER], 3, 7, 500, [CARGO_TYPES.FOOD, CARGO_TYPES.WATER, CARGO_TYPES.WEAPONS, CARGO_TYPES.ANTIMATTER], 0.1, CHASE_DISTANCES.NEAR),
+    POLICE: new FleetType('Police', [SHIP_TYPES.INTERCEPTOR], 1, 5, 500, [], 0.05, CHASE_DISTANCES.FAR),
+    BOUNTY_HUNTERS: new FleetType('Bounty Hunters', [SHIP_TYPES.DESTROYER, SHIP_TYPES.INTERCEPTOR, SHIP_TYPES.SCOUT, SHIP_TYPES.JAMMER], 1, 3, 2500, [], 0.08, CHASE_DISTANCES.FAR),
 
-    INQUISITORS: new FleetType('Inquisitors', [SHIP_TYPES.DESTROYER], 2, 4, 3000, [CARGO_TYPES.WEAPONS, CARGO_TYPES.RELICS], 3, 10, CHASE_DISTANCES.NEAR),
-    PIRATES: new FleetType('Pirates', [SHIP_TYPES.FIGHTER, SHIP_TYPES.FRIGATE, SHIP_TYPES.BATTLESHIP, SHIP_TYPES.JAMMER, SHIP_TYPES.FIRE_SHIP], 1, 5, 10000, CARGO_TYPES_ALL, 3, 8, CHASE_DISTANCES.NEAR),
-    SLAVERS: new FleetType('Slavers', [SHIP_TYPES.FIGHTER, SHIP_TYPES.INTERCEPTOR, SHIP_TYPES.PASSENGER_SHIP, SHIP_TYPES.JAMMER], 2, 4, 7000, [], 3, 7, CHASE_DISTANCES.NEAR),
-    REBELS: new FleetType('Rebels', [SHIP_TYPES.FIGHTER, SHIP_TYPES.BLOCKADE_RUNNER, SHIP_TYPES.FIRE_SHIP], 2, 4, 4000, [CARGO_TYPES.WEAPONS, CARGO_TYPES.WEAPONS, CARGO_TYPES.HOLOCUBES, CARGO_TYPES.WEAPONS], 0, 0),
+    INQUISITORS: new FleetType('Inquisitors', [SHIP_TYPES.DESTROYER], 2, 4, 3000, [CARGO_TYPES.WEAPONS, CARGO_TYPES.RELICS], 0.12, CHASE_DISTANCES.NEAR),
+    PIRATES: new FleetType('Pirates', [SHIP_TYPES.FIGHTER, SHIP_TYPES.FRIGATE, SHIP_TYPES.BATTLESHIP, SHIP_TYPES.JAMMER, SHIP_TYPES.FIRE_SHIP], 1, 5, 10000, CARGO_TYPES_ALL, 0.08, CHASE_DISTANCES.NEAR),
+    SLAVERS: new FleetType('Slavers', [SHIP_TYPES.FIGHTER, SHIP_TYPES.INTERCEPTOR, SHIP_TYPES.PASSENGER_SHIP, SHIP_TYPES.JAMMER], 2, 4, 7000, [], 0.08, CHASE_DISTANCES.NEAR),
+    REBELS: new FleetType('Rebels', [SHIP_TYPES.FIGHTER, SHIP_TYPES.BLOCKADE_RUNNER, SHIP_TYPES.FIRE_SHIP], 2, 4, 4000, [CARGO_TYPES.WEAPONS, CARGO_TYPES.WEAPONS, CARGO_TYPES.HOLOCUBES, CARGO_TYPES.WEAPONS], 0),
 
-    TAX_COLLECTORS: new FleetType('Tax Collectors', [SHIP_TYPES.COURIER_SHIP, SHIP_TYPES.ESCORT_SHIP, SHIP_TYPES.FRIGATE], 1, 2, 2000, [CARGO_TYPES.CREDITS, CARGO_TYPES.CREDITS, CARGO_TYPES.CREDITS, CARGO_TYPES.CREDITS], 0, 0),
-    MERCHANTS: new FleetType('Merchants', [SHIP_TYPES.TANKER, SHIP_TYPES.SUPPLY_SHIP, SHIP_TYPES.ESCORT_SHIP], 1, 5, 10000, CARGO_TYPES_ALL.filter(ct=>(!ct.illegal)), 4, 10),
-    MINERS: new FleetType('Miners', [SHIP_TYPES.DRILLING_RIG, SHIP_TYPES.TANKER], 1, 3, 10000, [CARGO_TYPES.FOOD, CARGO_TYPES.WATER, CARGO_TYPES.METAL, CARGO_TYPES.ISOTOPES], 2, 5, Infinity),
-    SALVAGERS: new FleetType('Salvagers', [SHIP_TYPES.TUG_SHIP, SHIP_TYPES.TANKER], 1, 3, 8000, CARGO_TYPES_ALL, 3, 10, Infinity),
-    TOURISTS: new FleetType('Tourists', [SHIP_TYPES.PASSENGER_SHIP, SHIP_TYPES.ESCORT_SHIP], 1, 3, 10000, [CARGO_TYPES.FOOD, CARGO_TYPES.WATER, CARGO_TYPES.DRUGS, CARGO_TYPES.HOLOCUBES], 5, 15),
-    COLONISTS: new FleetType('Colonists', [SHIP_TYPES.PASSENGER_SHIP, SHIP_TYPES.DRILLING_RIG, SHIP_TYPES.ESCORT_SHIP], 1, 3, 4000, [CARGO_TYPES.FOOD, CARGO_TYPES.WATER], 10, 20),
-    SCIENTISTS: new FleetType('Scientists', [SHIP_TYPES.SCOUT, SHIP_TYPES.TUG_SHIP, SHIP_TYPES.COURIER_SHIP], 1, 3, 3000, [CARGO_TYPES.RELICS, CARGO_TYPES.ISOTOPES, CARGO_TYPES.NANITES, CARGO_TYPES.ANTIMATTER], 3, 8),
-    PILGRIMS: new FleetType('Pilgrims', [SHIP_TYPES.PASSENGER_SHIP], 1, 3, 100, [CARGO_TYPES.FOOD, CARGO_TYPES.WATER, CARGO_TYPES.RELICS], 5, 15),
-    MISSIONARIES: new FleetType('Missionaries', [SHIP_TYPES.COURIER_SHIP], 1, 2, 1500, [CARGO_TYPES.FOOD, CARGO_TYPES.WATER, CARGO_TYPES.RELICS], 4, 12),
-    DIPLOMATS: new FleetType('Diplomats', [SHIP_TYPES.COURIER_SHIP, SHIP_TYPES.FRIGATE], 1, 2, 3000, [CARGO_TYPES.FOOD, CARGO_TYPES.WATER, CARGO_TYPES.HOLOCUBES], 6, 18),
-    REFUGEES: new FleetType('Refugees', [SHIP_TYPES.PASSENGER_SHIP, SHIP_TYPES.SUPPLY_SHIP], 2, 5, 3000, [CARGO_TYPES.FOOD, CARGO_TYPES.WATER, CARGO_TYPES.FOOD, CARGO_TYPES.WATER], 0, 0),
-    SMUGGLERS: new FleetType('Smugglers', [SHIP_TYPES.BLOCKADE_RUNNER, SHIP_TYPES.JAMMER], 1, 3, 5000, [CARGO_TYPES.DRUGS, CARGO_TYPES.ANTIMATTER, CARGO_TYPES.WEAPONS], 3, 8),
+    TAX_COLLECTORS: new FleetType('Tax Collectors', [SHIP_TYPES.COURIER_SHIP, SHIP_TYPES.ESCORT_SHIP, SHIP_TYPES.FRIGATE], 1, 2, 2000, [CARGO_TYPES.CREDITS, CARGO_TYPES.CREDITS, CARGO_TYPES.CREDITS, CARGO_TYPES.CREDITS], 0.04),
+    MERCHANTS: new FleetType('Merchants', [SHIP_TYPES.TANKER, SHIP_TYPES.SUPPLY_SHIP, SHIP_TYPES.ESCORT_SHIP], 1, 5, 10000, CARGO_TYPES_ALL.filter(ct=>(!ct.illegal)), 0.1),
+    MINERS: new FleetType('Miners', [SHIP_TYPES.DRILLING_RIG, SHIP_TYPES.TANKER], 1, 3, 10000, [CARGO_TYPES.FOOD, CARGO_TYPES.WATER, CARGO_TYPES.METAL, CARGO_TYPES.ISOTOPES], 0.25, Infinity),
+    SALVAGERS: new FleetType('Salvagers', [SHIP_TYPES.TUG_SHIP, SHIP_TYPES.TANKER], 1, 3, 8000, CARGO_TYPES_ALL, 0.1, Infinity),
+    TOURISTS: new FleetType('Tourists', [SHIP_TYPES.PASSENGER_SHIP, SHIP_TYPES.ESCORT_SHIP], 1, 3, 10000, [CARGO_TYPES.FOOD, CARGO_TYPES.WATER, CARGO_TYPES.DRUGS, CARGO_TYPES.HOLOCUBES], 0.15),
+    COLONISTS: new FleetType('Colonists', [SHIP_TYPES.PASSENGER_SHIP, SHIP_TYPES.DRILLING_RIG, SHIP_TYPES.ESCORT_SHIP], 1, 3, 4000, [CARGO_TYPES.FOOD, CARGO_TYPES.WATER], 0.2),
+    SCIENTISTS: new FleetType('Scientists', [SHIP_TYPES.SCOUT, SHIP_TYPES.TUG_SHIP, SHIP_TYPES.COURIER_SHIP], 1, 3, 3000, [CARGO_TYPES.RELICS, CARGO_TYPES.ISOTOPES, CARGO_TYPES.NANITES, CARGO_TYPES.ANTIMATTER], 0.25),
+    PILGRIMS: new FleetType('Pilgrims', [SHIP_TYPES.PASSENGER_SHIP], 1, 3, 100, [CARGO_TYPES.FOOD, CARGO_TYPES.WATER, CARGO_TYPES.RELICS], 0.15),
+    MISSIONARIES: new FleetType('Missionaries', [SHIP_TYPES.COURIER_SHIP], 1, 2, 1500, [CARGO_TYPES.FOOD, CARGO_TYPES.WATER, CARGO_TYPES.RELICS], 0.12),
+    DIPLOMATS: new FleetType('Diplomats', [SHIP_TYPES.COURIER_SHIP, SHIP_TYPES.FRIGATE], 1, 2, 3000, [CARGO_TYPES.FOOD, CARGO_TYPES.WATER, CARGO_TYPES.HOLOCUBES], 0.12),
+    REFUGEES: new FleetType('Refugees', [SHIP_TYPES.PASSENGER_SHIP, SHIP_TYPES.SUPPLY_SHIP], 2, 5, 3000, [CARGO_TYPES.FOOD, CARGO_TYPES.WATER, CARGO_TYPES.FOOD, CARGO_TYPES.WATER], 0),
+    SMUGGLERS: new FleetType('Smugglers', [SHIP_TYPES.BLOCKADE_RUNNER, SHIP_TYPES.JAMMER], 1, 3, 5000, [CARGO_TYPES.DRUGS, CARGO_TYPES.ANTIMATTER, CARGO_TYPES.WEAPONS], 0.08),
 }
 
 const PSEUDO_FLEET_TYPES = {
@@ -81,4 +78,4 @@ const PSEUDO_FLEET_TYPES = {
 
 const FLEET_TYPES_ALL = Object.values(FLEET_TYPES)
 
-const PLAYER_FLEET_TYPE = new FleetType('Player Fleet', [], 0, 0, 0, [], 0, 0)
+const PLAYER_FLEET_TYPE = new FleetType('Player Fleet', [], 0, 0, 0, [], 0)

@@ -5,13 +5,13 @@
  */
 class PoliceFleetAI extends FleetAI {
     calcValidTargets() {
-        return gs.system.fleets.filter(f => (f !== this.fleet && f.factionType.criminal));
+        return gs.system.fleets.filter(f => (f !== this.fleet && f.factionType.criminal && !f.location));
     }
     calcDestination() {
         return rndMember([...gs.system.planets].filter(p=>(p !== this.home)))
     }
     onNearTarget() {
-        if (this.target instanceof Fleet) {
+        if (this.target instanceof Fleet && !this.target.location) {
             if (Math.random() > 0.5) {
                 this.fightTarget();
             }

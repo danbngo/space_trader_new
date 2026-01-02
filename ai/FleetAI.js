@@ -27,21 +27,22 @@ class FleetAI {
      */
     tick(elapsedYears = 1) {
         this.voyageYearsRemaining -= elapsedYears;
-        if (this.isNearHome()) {
+        if (this.isNearHome(elapsedYears)) {
             this.onNearHome()
             return
         }
-        else if (this.isNearDestination()) {
+        else if (this.isNearDestination(elapsedYears)) {
             this.onNearDestination();
             return
         }
-        else if (this.isNearTarget()) {
+        else if (this.isNearTarget(elapsedYears)) {
             this.onNearTarget();
             return
         }
         else if (this.voyageYearsRemaining > 0) {
             //ships that pursue other ships will continuously check for closer targets
             if (!this.target || Number.isFinite(this.fleet.fleetType.targetMaxDistance)) { 
+                if (Math.random() < .98) return
                 const validTargets = this.calcValidTargets()
                 const target = this.findNearest(validTargets, this.fleet.fleetType.targetMaxDistance || Infinity);
                 if (target && target !== this.target) {
@@ -65,7 +66,7 @@ class FleetAI {
     }
 
     resetVoyageDuration() {
-        this.voyageYearsRemaining = rng(this.fleet.fleetType.voyageMaxYears, this.fleet.fleetType.voyageMinYears);
+        this.voyageYearsRemaining = this.fleet.fleetType.voyageYears;
     }
 
     setTarget(target) {
@@ -77,27 +78,29 @@ class FleetAI {
      * Checks if fleet has arrived at destination.
      * @returns {boolean}
      */
-    isNearDestination() {
-        return this.destination && this.isNearby(this.destination)
+    isNearDestination(elapsedYears = 1) {
+        return this.destination && this.isNearby(this.destination, elapsedYears)
     }
 
-    isNearHome() {
-        return this.isNearby(this.home) && !this.destination
+    isNearHome(elapsedYears = 1) {
+        return this.isNearby(this.home, elapsedYears) && !this.destination
     }
 
-    isNearTarget() {
-        return this.target && this.isNearby(this.target)
+    isNearTarget(elapsedYears = 1) {
+        return this.target && this.isNearby(this.target, elapsedYears)
     }
 
-    isNearby(object = new SpaceObject()) {
+    isNearby(object = new SpaceObject(), elapsedYears = 1) {
         if (!this.fleet.route || this.fleet.route.destination !== object) return false;
-        return calcDistance(this.fleet.x, this.fleet.y, object.x, object.y) < 0.2 // Within 0.01 AU
+        const distMod = elapsedYears/MAX_FRAMES_PER_SECOND/STAR_MAP_YEARS_PER_MS
+        return calcDistance(this.fleet.x, this.fleet.y, object.x, object.y) < (0.1*distMod) // Within 0.01 AU
     }
 
     resumeVoyage() {
         this.target = null
-        if (this.destination) this.fleet.route = new Route(this.fleet, this.destination)
-        else this.fleet.route = new Route(this.fleet, this.home)
+        if (Math.random() < .98) return; //ships will "hang out" for a while before moving on
+        if (this.destination && this.fleet.location != this.destination) this.fleet.route = new Route(this.fleet, this.destination)
+        else if (this.home && this.fleet.location != this.home) this.fleet.route = new Route(this.fleet, this.home)
     }
 
     /**

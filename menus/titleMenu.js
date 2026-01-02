@@ -87,10 +87,12 @@ async function simulateFleetActivity(numYears) {
     const activeFleetCountElement = ce({tag: 'div', id: 'active_fleet_count', style: 'text-align: center; margin-top: 5px;', children: ['Active Fleets: 0']})
     const activeAnomalyCountElement = ce({tag: 'div', id: 'active_anomaly_count', style: 'text-align: center; margin-top: 5px;', children: ['Active Anomalies: 0']})
     
+    const displayYears = numYears < 1 ? `${Math.round(numYears * 12)} months` : `${numYears} years`
+    
     showModal(
         'Generating Fleet Activity',
         ce({children: [
-            `Simulating ${numYears} years of fleet movement...`,
+            `Simulating ${displayYears} of fleet movement...`,
             ce({tag:'br'}),
             activityProgressBar.container,
             ce({tag:'br'}),
@@ -183,8 +185,8 @@ async function startNewGame() {
     const HISTORY_NUM_YEARS = 10
     await simulateHistory(HISTORY_NUM_YEARS)
     
-    // Simulate fleet activity
-    const FLEET_ACTIVITY_YEARS = 2
+    // Simulate fleet activity (daily ticks for better efficiency)
+    const FLEET_ACTIVITY_YEARS = 5
     await simulateFleetActivity(FLEET_ACTIVITY_YEARS)
 
     // Create captain

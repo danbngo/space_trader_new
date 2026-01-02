@@ -7,6 +7,7 @@ class SoldierFleetAI extends FleetAI {
     calcValidTargets() {
         return gs.system.fleets.filter(f => {
             if (f === this.fleet) return false;
+            if (f.location) return false;
             
             // Attack criminals
             if (f.factionType.criminal) return true;
@@ -23,7 +24,7 @@ class SoldierFleetAI extends FleetAI {
         return rndMember([...gs.system.planets].filter(p=>(p !== this.home)))
     }
     onNearTarget() {
-        if (this.target instanceof Fleet) {
+        if (this.target instanceof Fleet && !this.target.location) {
             if (Math.random() > 0.5) {
                 this.fightTarget();
             }
