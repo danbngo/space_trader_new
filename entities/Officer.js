@@ -91,12 +91,6 @@ class Officer {
         return ''
     }
 
-
-
-
-
-
-
     /**
      * Calculates total reputation for a planet or faction (specific + global average).
      * @param {Planet|FactionType} target - The planet or faction to calculate reputation for.

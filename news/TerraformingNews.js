@@ -45,8 +45,15 @@ class TerraformingNews extends News {
     isValid() {
         const {planet: p} = this
         const ratingsValid = (p.c.education > CL.SLIGHTLY_HIGH || p.c.technology > CL.SLIGHTLY_HIGH) && p.c.taxes > CL.SLIGHTLY_LOW
+        
+        // Terraforming makes sense for worlds with challenging conditions
+        const hasChallengingClimate = 
+            (p.climate.temperature && (p.climate.temperature.value < TEMPERATURES.LOW.value || p.climate.temperature.value > TEMPERATURES.HIGH.value)) ||
+            (p.climate.atmosphericPressure && p.climate.atmosphericPressure.value < ATMOSPHERIC_PRESSURES.LOW.value) ||
+            (p.climate.gravity && (p.climate.gravity.value < GRAVITIES.LOW.value || p.climate.gravity.value > GRAVITIES.HIGH.value))
+        
         // Planet must not already have this event
         const interferingEvent = News.planetHasAnyNews(p, NT_ECONOMY_PREVENTING)
-        return ratingsValid && !interferingEvent
+        return ratingsValid && hasChallengingClimate && !interferingEvent
     }
 }

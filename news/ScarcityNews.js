@@ -26,6 +26,7 @@ class ScarcityNews extends News {
             },
             {
                 population: CL.VERY_LOW,
+                army: CL.SLIGHTLY_LOW,
                 economy: CL.VERY_LOW,
                 industry: CL.LOW,
                 wealth: CL.LOW,
@@ -48,7 +49,12 @@ class ScarcityNews extends News {
         const {planet: p} = this
         //more likely if high pop and high industry
         const ratingsValid = p.c.population > CL.VERY_HIGH || p.c.industry >= CL.VERY_HIGH
+        
+        // More likely on dry worlds with limited agriculture potential
+        const scarcityRisk = !p.climate.oceanCoverage || 
+            p.climate.oceanCoverage.value < OCEAN_COVERAGES.SLIGHTLY_LOW.value
+        
         const interferingEvent = News.planetHasAnyNews(p, NT_ECONOMY_BOOSTING)
-        return ratingsValid && !interferingEvent
+        return ratingsValid && scarcityRisk && !interferingEvent
     }
 }

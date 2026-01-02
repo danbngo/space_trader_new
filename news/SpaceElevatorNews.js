@@ -35,6 +35,7 @@ class SpaceElevatorNews extends News {
             {
                 buildingsDamaged,
                 population: CL.LOW,
+                army: CL.LOW,
                 economy: CL.LOW,
                 industry: CL.LOW,
                 wealth: CL.VERY_LOW,
@@ -57,6 +58,16 @@ class SpaceElevatorNews extends News {
 
     isValid() {
         const {planet: p} = this
+        
+        // Space elevator requires stable climate - no extreme seismic activity or extreme weather
+        const seismicStability = !p.climate.geologicalActivity || 
+            p.climate.geologicalActivity.value < GEOLOGICAL_ACTIVITIES.HIGH.value
+        const weatherStability = !p.climate.temperature || 
+            (p.climate.temperature.value > TEMPERATURES.VERY_LOW.value && p.climate.temperature.value < TEMPERATURES.VERY_HIGH.value)
+        const climateStable = seismicStability && weatherStability
+        
+        if (!climateStable) return false
+        
         // Must have at least one moon
         const hasMoons = p.children && p.children.length > 0
         // Requires high tech and industry

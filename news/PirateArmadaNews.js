@@ -10,12 +10,7 @@ class PirateArmadaNews extends News {
 
         this.addPlanetEffect(
             {
-                navy: CL.VERY_HIGH,
-                taxes: CL.HIGH,
-                wealth: CL.MEDIUM,
-                reserves: CL.MEDIUM,
-                commerce: CL.HIGH,
-                economy: CL.MEDIUM
+                economy: CL.LOW,
             },
             {
                 navy: CL.SLIGHTLY_HIGH,
@@ -24,15 +19,12 @@ class PirateArmadaNews extends News {
                 commerce: CL.SLIGHTLY_HIGH
             },
             {
-                navy: CL.VERY_HIGH,
-                prestige: CL.VERY_HIGH,
-                territory: CL.HIGH,
-                taxes: CL.EXTREMELY_HIGH,
+                navy: CL.VERY_LOW,
+                prestige: CL.LOW,
+                territory: CL.LOW,
                 inflation: CL.SLIGHTLY_HIGH,
-                reserves: CL.VERY_HIGH,
-                economy: CL.HIGH,
-                commerce: CL.VERY_HIGH,
-                population: CL.SLIGHTLY_HIGH
+                reserves: CL.LOW,
+                economy: CL.LOW,
             }
         )
     }

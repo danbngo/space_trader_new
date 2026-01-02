@@ -22,7 +22,7 @@ class CivilStrifeNews extends News {
                 culture: CL.SLIGHTLY_HIGH,
             },
             {
-                army: CL.SLIGHTLY_LOW,
+                army: CL.LOW,
                 security: CL.LOW,
                 crime: CL.SLIGHTLY_HIGH,
                 prestige: CL.LOW,

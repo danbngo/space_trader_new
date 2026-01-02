@@ -31,7 +31,7 @@ class CivilWarNews extends News {
                 governmentType,
                 population: CL.VERY_LOW,
                 territory: CL.SLIGHTLY_LOW,
-                army: CL.LOW,
+                army: CL.VERY_LOW,
                 security: CL.LOW,
                 economy: CL.LOW,
                 industry: CL.LOW,

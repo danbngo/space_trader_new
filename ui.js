@@ -320,7 +320,7 @@ let currentModal = ce()
 function showModal(title = '', text = '', buttons = [['Continue', ()=>{}, false]], id = '', onClosePanel = null) {
     if (currentMap) {
         currentMap.refresh()
-        if (currentMap.togglePause) currentMap.togglePause()
+        if (currentMap.togglePause) currentMap.togglePause(true)
     }
     // Close existing modal if open
     if (currentModal) closeModal();

@@ -18,12 +18,12 @@ class DisasterVolcanoNews extends News {
             },
             {
                 culture: CL.SLIGHTLY_LOW,
-                population: CL.SLIGHTLY_LOW
+                territory: CL.SLIGHTLY_LOW,
             },
             {
                 buildingsDamaged: buildingsToDisable,
-                population: CL.HIGH,
-                industry: CL.SLIGHTLY_HIGH,
+                population: CL.LOW,
+                industry: CL.LOW,
                 culture: CL.SLIGHTLY_LOW,
                 territory: CL.SLIGHTLY_LOW
             }

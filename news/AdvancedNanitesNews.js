@@ -33,6 +33,7 @@ class AdvancedNanitesNews extends News {
             {
                 // Failure: Gray goo disaster
                 population: CL.VERY_LOW,
+                army: CL.VERY_LOW,
                 industry: CL.VERY_LOW,
                 economy: CL.VERY_LOW,
                 territory: CL.LOW,

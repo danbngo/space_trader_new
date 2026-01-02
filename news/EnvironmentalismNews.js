@@ -36,7 +36,15 @@ class EnvironmentalismNews extends News {
         const {planet: p} = this
         //happens when industry is getting out of hand
         const ratingsValid = p.c.industry >= CL.HIGH
+        
+        // More likely on planets with breathable atmospheres and biospheres to protect
+        const hasAtmosphere = p.climate.atmosphericPressure && p.climate.atmosphericPressure.value >= ATMOSPHERIC_PRESSURES.SLIGHTLY_LOW.value
+        
+        // More likely if planet has oceans or other natural features worth preserving
+        const hasOceans = p.climate.oceanCoverage && p.climate.oceanCoverage.value >= OCEAN_COVERAGES.SLIGHTLY_LOW.value
+        const hasNature = hasOceans || (p.features && p.features.length > 0)
+        
         const interferingEvent = News.planetHasAnyNews(p, NT_ECONOMY_PREVENTING)
-        return ratingsValid && !interferingEvent
+        return ratingsValid && hasAtmosphere && !interferingEvent
     }
 }

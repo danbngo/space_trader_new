@@ -12,8 +12,6 @@ class DisasterTsunamiNews extends News {
 
         this.addPlanetEffect(
             {
-                economy: CL.SLIGHTLY_LOW,
-                culture: CL.SLIGHTLY_LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.FOOD, CL.SLIGHTLY_HIGH], [CARGO_TYPES.MEDICINE, CL.SLIGHTLY_HIGH], [CARGO_TYPES.CONSTRUCTION, CL.SLIGHTLY_HIGH]]))
             },
             {
@@ -22,11 +20,11 @@ class DisasterTsunamiNews extends News {
             },
             {
                 buildingsDamaged: buildingsToDisable,
-                population: CL.VERY_HIGH,
-                economy: CL.HIGH,
-                culture: CL.SLIGHTLY_HIGH,
-                reserves: CL.HIGH,
-                wealth: CL.SLIGHTLY_HIGH
+                population: CL.LOW,
+                economy: CL.LOW,
+                culture: CL.SLIGHTLY_LOW,
+                reserves: CL.LOW,
+                wealth: CL.SLIGHTLY_LOW
             }
         )
     }

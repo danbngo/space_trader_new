@@ -38,10 +38,6 @@ class MegacityNews extends News {
                 taxes: CL.VERY_HIGH,
                 inflation: CL.VERY_HIGH,
                 prestige: CL.LOW,
-                cargoPriceMultipliers: new CountsMap(new Map([
-                    [CARGO_TYPES.DRUGS, CL.VERY_HIGH],
-                    [CARGO_TYPES.WEAPONS, CL.HIGH]
-                ]))
             }
         )
     }

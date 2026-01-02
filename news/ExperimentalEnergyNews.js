@@ -16,11 +16,13 @@ class ExperimentalEnergyNews extends News {
             {
                 technology: CL.HIGH,
                 industry: CL.SLIGHTLY_HIGH,
+                education: CL.SLIGHTLY_HIGH,
                 economy: CL.SLIGHTLY_HIGH,
                 prestige: CL.SLIGHTLY_HIGH
             },
             {
                 population: CL.SLIGHTLY_LOW,
+                army: CL.SLIGHTLY_LOW,
                 industry: CL.SLIGHTLY_LOW,
                 economy: CL.SLIGHTLY_LOW,
                 prestige: CL.SLIGHTLY_LOW

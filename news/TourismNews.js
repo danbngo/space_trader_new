@@ -46,9 +46,18 @@ class TourismNews extends News {
         const {planet: p} = this
         //more likely to try this out if we need economy
         const ratingsValid = (p.c.economy < CL.MEDIUM) || (p.c.culture < CL.MEDIUM)
+        
+        // Climate must be pleasant for tourism (moderate temp, breathable atmosphere, low pollution)
+        const temperatureValid = !p.climate.temperature || 
+            (p.climate.temperature.value >= TEMPERATURES.MEDIUM.value && p.climate.temperature.value <= TEMPERATURES.SLIGHTLY_HIGH.value)
+        const atmosphereValid = p.climate.atmosphericPressure && 
+            p.climate.atmosphericPressure.value >= ATMOSPHERIC_PRESSURES.MEDIUM.value
+        const pollutionValid = !p.climate.pollution || p.climate.pollution.value < POLLUTION_LEVELS.HIGH.value
+        const climateValid = temperatureValid && atmosphereValid && pollutionValid
+        
         const interferingEvent = 
             News.planetHasAnyNews(p, [...NT_DANGEROUS, ...NT_ECONOMY_PREVENTING]) ||
             News.planetHasAnyNewsTargeting(p, [...NT_DANGEROUS, ...NT_ECONOMY_PREVENTING])
-        return ratingsValid && !interferingEvent
+        return ratingsValid && climateValid && !interferingEvent
     }
 }

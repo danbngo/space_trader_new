@@ -132,6 +132,9 @@ function generateStationClimate(distanceFromSun = 1.0, asteroidBelts = [], stati
         }
     }
     
+    // Pollution - stations generally have low pollution due to advanced life support
+    const pollution = POLLUTION_LEVELS.VERY_LOW
+    
     // Atmosphere type - stations typically have breathable air
     const atmosphereType = PLANET_ATMOSPHERE_TYPES.OXYGEN_NITROGEN
     
@@ -144,6 +147,7 @@ function generateStationClimate(distanceFromSun = 1.0, asteroidBelts = [], stati
         magnetosphere,
         radiationLevel,
         asteroidImpact,
+        pollution,
         atmosphereType,
         oceanType,
         geologyType

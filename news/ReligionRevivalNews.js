@@ -38,6 +38,7 @@ class ReligionRevivalNews extends News {
                     }
                 },
                 population: CL.HIGH,
+                army: CL.SLIGHTLY_HIGH,
                 education: CL.SLIGHTLY_LOW,
                 culture: CL.VERY_HIGH,
                 corruption: CL.EXTREMELY_LOW,

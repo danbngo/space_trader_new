@@ -17,14 +17,16 @@ class DisasterGreenhouseNews extends News {
             },
             {
                 culture: CL.SLIGHTLY_HIGH,
-                industry: CL.SLIGHTLY_LOW
+                technology: CL.SLIGHTLY_HIGH,
+                education: CL.SLIGHTLY_HIGH
             },
             {
-                territory: CL.HIGH,
-                population: CL.SLIGHTLY_HIGH,
-                economy: CL.SLIGHTLY_HIGH,
-                culture: CL.SLIGHTLY_LOW,
-                reserves: CL.HIGH
+                territory: CL.LOW,
+                army: CL.SLIGHTLY_LOW,
+                population: CL.SLIGHTLY_LOW,
+                economy: CL.VERY_LOW,
+                industry: CL.SLIGHTLY_LOW,
+                reserves: CL.SLIGHTLY_LOW
             }
         )
     }
@@ -44,6 +46,9 @@ class DisasterGreenhouseNews extends News {
         const atmosphereValid = p.climate.atmosphericPressure && p.climate.atmosphericPressure.value > ATMOSPHERIC_PRESSURES.VERY_LOW.value
         const settlementValid = p.settlement && p.settlement.settlementType !== null
         
-        return climateValid && atmosphereValid && settlementValid
+        // Requires high pollution levels (greenhouse effect is caused by pollution)
+        const pollutionValid = p.climate.pollution && p.climate.pollution.value >= POLLUTION_LEVELS.HIGH.value
+        
+        return climateValid && atmosphereValid && settlementValid && pollutionValid
     }
 }

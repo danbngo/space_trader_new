@@ -28,6 +28,7 @@ class IndustrialAccidentNews extends News {
             {
                 buildingsDamaged: buildingsToDisable,
                 population: CL.LOW,
+                army: CL.SLIGHTLY_LOW,
                 economy: CL.LOW,
                 industry: CL.VERY_LOW,
                 reserves: CL.LOW,
@@ -47,6 +48,10 @@ class IndustrialAccidentNews extends News {
         const {planet: p} = this
         // More likely with very high industry and corruption (poor safety controls)
         const ratingsValid = p.c.industry > CL.VERY_HIGH && p.c.corruption > CL.MEDIUM
-        return ratingsValid
+        
+        // More likely on heavily polluted worlds with poor environmental controls
+        const pollutionValid = !p.climate.pollution || p.climate.pollution.value >= POLLUTION_LEVELS.HIGH.value
+        
+        return ratingsValid && pollutionValid
     }
 }

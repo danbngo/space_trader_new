@@ -17,12 +17,14 @@ class CloningNews extends News {
             },
             {
                 population: CL.VERY_HIGH,
+                army: CL.SLIGHTLY_HIGH,
                 technology: CL.SLIGHTLY_HIGH,
                 education: CL.SLIGHTLY_HIGH,
                 prestige: CL.LOW,
             },
             {
                 population: CL.SLIGHTLY_HIGH,
+                army: CL.SLIGHTLY_LOW,
                 prestige: CL.VERY_LOW,
                 education: CL.LOW,
                 wealth: CL.LOW,

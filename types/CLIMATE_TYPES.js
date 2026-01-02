@@ -47,6 +47,7 @@ class GeologicalActivity extends ClimateValue {}
 class Magnetosphere extends ClimateValue {}
 class RadiationLevel extends ClimateValue {}
 class AsteroidImpact extends ClimateValue {}
+class Pollution extends ClimateValue {}
 
 const ATMOSPHERIC_PRESSURES = Object.freeze({
     NONE: new AtmosphericPressure("None", 0, 1),
@@ -175,3 +176,19 @@ const ASTEROID_IMPACTS = Object.freeze({
 })
 
 const ASTEROID_IMPACTS_ALL = Object.values(ASTEROID_IMPACTS)
+
+const POLLUTION_LEVELS = Object.freeze({
+    NONE: new Pollution("Pristine", 0, 8/12),
+    EXTREMELY_LOW: new Pollution("Clean", 8/16, 8/12),
+    VERY_LOW: new Pollution("Trace", 8/12, 8/12),
+    LOW: new Pollution("Minor", 8/10, 8/12),
+    SLIGHTLY_LOW: new Pollution("Average", 8/9, 8/12),
+    MEDIUM: new Pollution("Unclean", 1, 8/12),
+    SLIGHTLY_HIGH: new Pollution("Smoggy", 9/8, 8/12),
+    HIGH: new Pollution("Polluted", 10/8, 8/12),
+    VERY_HIGH: new Pollution("Toxic", 12/8, 8/12),
+    EXTREMELY_HIGH: new Pollution("Hazardous", 16/8, 8/12),
+    CHOKING: new Pollution("Uninhabitable", 32/8, 8/12),
+})
+
+const POLLUTION_LEVELS_ALL = Object.values(POLLUTION_LEVELS)

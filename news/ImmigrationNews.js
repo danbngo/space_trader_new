@@ -22,6 +22,7 @@ class ImmigrationNews extends News {
             },
             {
                 population: CL.HIGH,
+                army: CL.SLIGHTLY_HIGH,
                 security: CL.LOW,
                 culture: CL.SLIGHTLY_LOW,
             }

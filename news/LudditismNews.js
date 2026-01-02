@@ -30,6 +30,7 @@ class LudditismNews extends News {
                 inflation: CL.EXTREMELY_LOW,
                 crime: CL.LOW,
                 corruption: CL.LOW,
+                army: CL.LOW,
                 taxes: CL.LOW,
                 culture: CL.HIGH,
                 population: CL.HIGH

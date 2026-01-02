@@ -74,6 +74,7 @@ const NEWS_TYPE_CLASSES = [
     [NT.ADVANCED_NANITES, AdvancedNanitesNews],
     [NT.SPACE_STATION, SpaceStationNews],
     [NT.STOCK_MARKET_CRASH, StockMarketCrashNews],
+    [NT.SUPER_SOLDIERS, SuperSoldiersNews],
     [NT.SURPLUS, SurplusNews],
     [NT.PLANETARY_DEFENSE, PlanetaryDefenseNews],
     [NT.SPACE_ELEVATOR, SpaceElevatorNews],

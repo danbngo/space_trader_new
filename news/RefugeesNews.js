@@ -14,7 +14,7 @@ class RefugeesNews extends News {
             },
             {
                 population: CL.LOW,
-                prestige: CL.SLIGHTLY_LOW
+                prestige: CL.SLIGHTLY_HIGH
             },
             {
                 population: CL.LOW,
@@ -30,8 +30,10 @@ class RefugeesNews extends News {
             },
             {
                 population: CL.SLIGHTLY_HIGH,
+                economy: CL.SLIGHTLY_HIGH,
                 culture: CL.SLIGHTLY_HIGH,
-                prestige: CL.SLIGHTLY_HIGH
+                prestige: CL.SLIGHTLY_HIGH,
+                taxes: CL.SLIGHTLY_LOW
             },
             {
                 population: CL.SLIGHTLY_LOW,

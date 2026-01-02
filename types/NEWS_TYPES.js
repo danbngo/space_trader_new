@@ -103,6 +103,7 @@ const NT = {
     SANCTIONS: new NewsType('Sanctions', NF.GEOPOLITICS, 3, 15, 1, [GT.ANARCHY, GT.PUPPET_STATE, GT.CORPORATISM], [GT.DEMOCRACY], []),
     SCARCITY: new NewsType('Scarcity', NF.ECONOMY, 3, 8, 1, [], [], []),
     SCIENTIFIC_BREAKTHROUGH: new NewsType('Scientific Breakthrough', NF.SCIENCE, 1, 4, 1, [], [GT.TECHNOCRACY], []),
+    SUPER_SOLDIERS: new NewsType('Super Soldiers', NF.MILITARY, 7, 15, 1, [GT.DEMOCRACY, GT.ANARCHY], [GT.POLICE_STATE, GT.TECHNOCRACY], []),
     COLONY_SHIP: new NewsType('Colony Ship', NF.SCIENCE, 10, 30, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.TECHNOCRACY, GT.CORPORATISM], []),
     MEGA_AI: new NewsType('Mega AI', NF.SCIENCE, 5, 15, 1, [GT.ANARCHY, GT.THEOCRACY], [GT.TECHNOCRACY], []),
     ADVANCED_NANITES: new NewsType('Advanced Nanites', NF.SCIENCE, 5, 12, 1, [], [GT.TECHNOCRACY, GT.CORPORATISM], []),

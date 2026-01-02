@@ -33,6 +33,7 @@ class BioweaponNews extends News {
                     }
                 },
                 population: CL.LOW,
+                army: CL.LOW,
                 culture: CL.LOW,
                 prestige: CL.VERY_LOW,
                 economy: CL.SLIGHTLY_LOW

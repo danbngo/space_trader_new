@@ -37,6 +37,15 @@ class DisasterFlareNews extends News {
         // Only affects planets close to the star (within 10 AU)
         const orbitValid = p.orbit && p.orbit.radius < 10
         
-        return orbitValid
+        // More likely on planets with weaker magnetospheres (less natural protection)
+        const weakMagnetosphere = p.climate.magnetosphere && p.climate.magnetosphere.value < MAGNETOSPHERES.MEDIUM.value
+        
+        // More likely on planets already experiencing high radiation (closer to star, etc.)
+        const highRadiation = p.climate.radiationLevel && p.climate.radiationLevel.value >= RADIATION_LEVELS.SLIGHTLY_HIGH.value
+        
+        // Needs settlement
+        const settlementValid = p.settlement && p.settlement.settlementType !== null
+        
+        return orbitValid && settlementValid
     }
 }

@@ -17,15 +17,15 @@ class DisasterEarthquakesNews extends News {
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.CONSTRUCTION, CL.HIGH], [CARGO_TYPES.MEDICINE, CL.SLIGHTLY_HIGH]]))
             },
             {
-                economy: CL.SLIGHTLY_LOW,
-                security: CL.SLIGHTLY_LOW
+                culture: CL.HIGH,
             },
             {
                 buildingsDamaged: buildingsToDisable,
-                population: CL.SLIGHTLY_HIGH,
-                economy: CL.HIGH,
-                security: CL.SLIGHTLY_LOW,
-                reserves: CL.SLIGHTLY_HIGH
+                population: CL.SLIGHTLY_LOW,
+                army: CL.SLIGHTLY_LOW,
+                economy: CL.LOW,
+                industry: CL.LOW,
+                reserves: CL.SLIGHTLY_LOW
             }
         )
     }

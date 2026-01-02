@@ -12,7 +12,7 @@ class PlagueVaccineNews extends News {
             {
                 taxes: CL.VERY_HIGH,
                 cargoPriceMultipliers: new CountsMap(new Map([
-                    [CARGO_TYPES.MEDICINE, CL.VERY_HIGH]
+                    [CARGO_TYPES.MEDICINE, CL.SLIGHTLY_HIGH]
                 ]))
             },
             {

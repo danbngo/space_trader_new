@@ -13,21 +13,20 @@ class DisasterAsteroidNews extends News {
         this.addPlanetEffect(
             {
                 taxes: CL.VERY_HIGH,
-                wealth: CL.HIGH,
-                culture: CL.SLIGHTLY_LOW
             },
             {
+                technology: CL.HIGH,
+                navy: CL.SLIGHTLY_HIGH,
                 prestige: CL.SLIGHTLY_HIGH,
-                technology: CL.SLIGHTLY_LOW
             },
             {
                 buildingsDamaged: buildingsToDisable,
-                population: CL.VERY_HIGH,
-                territory: CL.HIGH,
-                economy: CL.HIGH,
-                industry: CL.HIGH,
-                reserves: CL.VERY_HIGH,
-                wealth: CL.HIGH
+                population: CL.VERY_LOW,
+                army: CL.SLIGHTLY_LOW,
+                territory: CL.SLIGHTLY_LOW,
+                economy: CL.LOW,
+                industry: CL.VERY_LOW,
+                reserves: CL.VERY_LOW,
             }
         )
     }

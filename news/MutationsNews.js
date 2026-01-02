@@ -47,7 +47,6 @@ class MutationsNews extends News {
         const settlementValid = p.settlement && p.settlement.settlementType !== null
         
         // Can't already have mutation events or certain plague events
-        const interferingEvent = News.planetHasAnyNews(p, [NT.MUTATIONS, NT.PLAGUE, NT.PLAGUE_SPREAD, NT.BIOWEAPON])
-        return climateValid && settlementValid && !interferingEvent
+        return climateValid && settlementValid
     }
 }

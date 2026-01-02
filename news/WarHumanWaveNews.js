@@ -34,7 +34,9 @@ class WarHumanWaveNews extends News {
             {},
             {
                 army: CL.LOW,
-                reserves: CL.LOW
+                industry: CL.LOW,
+                reserves: CL.LOW,
+                inflation: CL.HIGH
             },
             {},
             {}

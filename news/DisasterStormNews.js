@@ -12,19 +12,18 @@ class DisasterStormNews extends News {
 
         this.addPlanetEffect(
             {
-                economy: CL.SLIGHTLY_LOW,
-                industry: CL.SLIGHTLY_LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.CONSTRUCTION, CL.SLIGHTLY_HIGH], [CARGO_TYPES.FOOD, CL.SLIGHTLY_HIGH]]))
             },
             {
-                technology: CL.SLIGHTLY_LOW
+                technology: CL.HIGH
             },
             {
                 buildingsDamaged: buildingsToDisable,
-                population: CL.SLIGHTLY_HIGH,
-                economy: CL.SLIGHTLY_HIGH,
-                industry: CL.HIGH,
-                reserves: CL.SLIGHTLY_HIGH
+                population: CL.LOW,
+                army: CL.LOW,
+                economy: CL.SLIGHTLY_LOW,
+                industry: CL.LOW,
+                reserves: CL.SLIGHTLY_LOW
             }
         )
     }

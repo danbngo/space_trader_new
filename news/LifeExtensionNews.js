@@ -19,6 +19,7 @@ class LifeExtensionNews extends News {
             },
             {
                 population: CL.HIGH,
+                army: CL.SLIGHTLY_HIGH,
                 education: CL.HIGH,
                 culture: CL.HIGH,
                 economy: CL.HIGH,

@@ -17,6 +17,7 @@ class DiasporaReturnsNews extends News {
             },
             {
                 population: CL.HIGH,
+                army: CL.SLIGHTLY_HIGH,
                 culture: CL.HIGH,
                 education: CL.SLIGHTLY_HIGH,
                 wealth: CL.SLIGHTLY_HIGH,
