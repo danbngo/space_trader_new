@@ -8,8 +8,12 @@ class RebelFleetAI extends FleetAI {
         return rndMember([...gs.system.planets].filter(p=>(p !== this.home)))
     }
     calcValidTargets() {
-        // Target any fleet that belongs to the rebel's home planet
-        return gs.system.fleets.filter(f => (f !== this.fleet && f.planet === this.home && !f.location));
+        const ourScore = this.fleet.combatRating
+        return gs.system.fleets.filter(f => {
+            if (f === this.fleet || f.planet !== this.home || f.location) return false
+            // Don't attack targets that are 2x stronger
+            return f.combatRating <= ourScore * 2
+        })
     }
     onNearTarget() {
         if (this.target instanceof Fleet && !this.target.location) {

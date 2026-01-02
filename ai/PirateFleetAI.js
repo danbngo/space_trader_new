@@ -5,7 +5,12 @@
  */
 class PirateFleetAI extends FleetAI {
     calcValidTargets() {
-        return gs.system.fleets.filter(f => (f !== this.fleet && !f.factionType.criminal && !f.factionType.authority && !f));
+        const ourScore = this.fleet.combatRating
+        return gs.system.fleets.filter(f => {
+            if (f === this.fleet || f.factionType.criminal || f.factionType.authority || f.location) return false
+            // Don't attack targets that are 2x stronger
+            return f.combatRating <= ourScore * 2
+        })
     }
     calcDestination() {
         return rndMember([...gs.system.dwarfPlanets].filter(p=>(p !== this.home)))

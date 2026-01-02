@@ -42,7 +42,7 @@ class FleetAI {
         else if (this.voyageYearsRemaining > 0) {
             //ships that pursue other ships will continuously check for closer targets
             if (!this.target || Number.isFinite(this.fleet.fleetType.targetMaxDistance)) { 
-                if (Math.random() < .98) return
+                if (Math.random() < .9) return
                 const validTargets = this.calcValidTargets()
                 const target = this.findNearest(validTargets, this.fleet.fleetType.targetMaxDistance || Infinity);
                 if (target && target !== this.target) {
@@ -91,14 +91,13 @@ class FleetAI {
     }
 
     isNearby(object = new SpaceObject(), elapsedYears = 1) {
-        if (!this.fleet.route || this.fleet.route.destination !== object) return false;
         const distMod = elapsedYears/MAX_FRAMES_PER_SECOND/STAR_MAP_YEARS_PER_MS
-        return calcDistance(this.fleet.x, this.fleet.y, object.x, object.y) < (0.1*distMod) // Within 0.01 AU
+        return calcDistance(this.fleet.x, this.fleet.y, object.x, object.y) < (0.25*distMod) // Within 0.01 AU
     }
 
     resumeVoyage() {
         this.target = null
-        if (Math.random() < .98) return; //ships will "hang out" for a while before moving on
+        if (Math.random() < .9) return; //ships will "hang out" for a while before moving on
         if (this.destination && this.fleet.location != this.destination) this.fleet.route = new Route(this.fleet, this.destination)
         else if (this.home && this.fleet.location != this.home) this.fleet.route = new Route(this.fleet, this.home)
     }
@@ -107,14 +106,14 @@ class FleetAI {
      * Called when fleet arrives at destination.
      */
     onNearHome() {
-        //console.log('🏠', `${this.fleet.name+' '+this.fleet.uuid} has returned home to ${this.home.name+' '+this.home.uuid}.`)
+        console.log('🏠', `${this.fleet.name+' '+this.fleet.uuid} has returned home to ${this.home.name+' '+this.home.uuid}.`)
         this.route = null
         this.destination = null
         gs.system.removeFleet(this.fleet)
     }
 
     onNearDestination() {
-        //console.log('🛬', `${this.fleet.name+' '+this.fleet.uuid} has arrived at destination ${this.destination.name+' '+this.destination.uuid}.`)
+        console.log('🛬', `${this.fleet.name+' '+this.fleet.uuid} has arrived at destination ${this.destination.name+' '+this.destination.uuid}.`)
         this.destination = null
         this.route = null
         this.resetVoyageDuration()
@@ -125,13 +124,25 @@ class FleetAI {
     }
 
     fightTarget() {
-        //console.log('⚔️', `${this.fleet.name+' '+this.fleet.uuid} is engaging ${this.target.name+' '+this.target.uuid}!`)
+        console.log('⚔️', `${this.fleet.name+' '+this.fleet.uuid} is engaging ${this.target.name+' '+this.target.uuid}!`)
         //chance to win is based on our fleet combat scores
         const ourScore = this.fleet.combatRating
         const theirScore = this.target.combatRating
         const totalScore = ourScore + theirScore
         const roll = rng(totalScore, 1)
         if (roll <= ourScore) {
+            // We won - calculate damage to our fleet based on their strength
+            const strengthRatio = theirScore / ourScore // How strong they were relative to us
+            const baseDamage = strengthRatio * 0.3 // Base damage 0-30% based on strength ratio
+            const randomVariance = Math.random() * 0.2 // Add 0-20% random variance
+            const damagePercent = Math.min(0.8, baseDamage + randomVariance) // Cap at 80% damage
+            
+            // Apply damage to our ships
+            for (const ship of this.fleet.ships) {
+                const damage = ship.hull[1] * damagePercent
+                ship.hull[0] = Math.max(0, ship.hull[0] - damage)
+            }
+            
             // Winner takes cargo from loser
             this.transferCargo(this.target, this.fleet)
             gs.system.removeFleet(this.target)
@@ -140,6 +151,18 @@ class FleetAI {
             return true
         }
         else {
+            // They won - calculate damage to their fleet
+            const strengthRatio = ourScore / theirScore
+            const baseDamage = strengthRatio * 0.3
+            const randomVariance = Math.random() * 0.2
+            const damagePercent = Math.min(0.8, baseDamage + randomVariance)
+            
+            // Apply damage to their ships
+            for (const ship of this.target.ships) {
+                const damage = ship.hull[1] * damagePercent
+                ship.hull[0] = Math.max(0, ship.hull[0] - damage)
+            }
+            
             // Loser's cargo is taken by winner
             this.transferCargo(this.fleet, this.target)
             gs.system.removeFleet(this.fleet)

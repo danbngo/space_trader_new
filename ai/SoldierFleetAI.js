@@ -5,9 +5,12 @@
  */
 class SoldierFleetAI extends FleetAI {
     calcValidTargets() {
+        const ourScore = this.fleet.combatRating
         return gs.system.fleets.filter(f => {
             if (f === this.fleet) return false;
             if (f.location) return false;
+            // Don't attack targets that are 2x stronger
+            if (f.combatRating > ourScore * 2) return false;
             
             // Attack criminals
             if (f.factionType.criminal) return true;

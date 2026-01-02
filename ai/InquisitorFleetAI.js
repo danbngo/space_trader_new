@@ -5,9 +5,12 @@
  */
 class InquisitorFleetAI extends FleetAI {
     calcValidTargets() {
+        const ourScore = this.fleet.combatRating
         return gs.system.fleets.filter(f => {
             if (f === this.fleet) return false;
             if (f.location) return false;
+            // Don't attack targets that are 2x stronger
+            if (f.combatRating > ourScore * 2) return false;
             // Attack fleets from planets with different state religions
             if (this.fleet.planet && this.fleet.planet.civilization && this.fleet.planet.civilization.stateReligion &&
                 f.planet && f.planet.civilization && f.planet.civilization.stateReligion) {

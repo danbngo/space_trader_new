@@ -130,6 +130,9 @@ async function simulateFleetActivity(numYears) {
     
     await addFleetActivity(numYears, activityProgress)
     
+    // Refresh positions one final time to ensure all objects are correctly positioned
+    gs.system.refreshPositions(gs.year)
+    
     console.log('Fleet activity simulation finished')
     clearInterval(activityProgressInterval)
     closeModal()

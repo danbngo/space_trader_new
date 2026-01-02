@@ -52,7 +52,7 @@ class StarMap extends BaseMap {
         this.refreshControls();
         this.refreshInfoBar();
         this.refreshObjectPane();
-        this.handleCanvasObjects();
+        this.handleCanvasObjects(); // Update canvas objects even when paused for hover to work
     }
 
     refreshControls() {
@@ -358,21 +358,25 @@ class StarMap extends BaseMap {
                 fleetObj = cvs.addFilledTriangle(fleetId, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU, fleet.radius/EARTH_RADII_PER_AU, 12, fleet.color, fleetAngle, () => this.selectObject(fleet))
                 pathObj = cvs.addLine(pathId, 0, 0, 0, 0, fleet.color, 1)
                 thrusterObj = cvs.addFilledTriangle(thrusterId, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU*0.5, fleet.radius/EARTH_RADII_PER_AU*0.5, 6, COLORS.Orange)
-                labelObj = cvs.addText(labelId, fleet.x, fleet.y, 0, -32, fleet.name, fleet.color, DEFAULT_FONT_SIZE, 2, () => this.selectObject(fleet))
+                // Show faction symbol instead of full name
+                const symbolText = fleet.factionType?.symbol || '?'
+                labelObj = cvs.addText(labelId, fleet.x, fleet.y, 0, -18, symbolText, fleet.color, DEFAULT_FONT_SIZE, 2, () => this.selectObject(fleet))
                 
-                labelObj.visible = isPlayerFleet
+                // Always show faction symbol for all fleets
+                labelObj.visible = true
                 
                 const objs = [fleetObj, labelObj]
                 for (const obj of objs) {
                     obj.onHover = () => {
-                        labelObj.visible = true
+                        // On hover, show full name
+                        labelObj.textContent = fleet.name
                         for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
                     }
                     obj.onHoverEnd = () => {
-                        labelObj.visible = isPlayerFleet
+                        // On hover end, show faction symbol again
+                        labelObj.textContent = symbolText
                         for (const obj3 of objs) obj3.strokeColor = (fleet == this.selectedObject) ? COLORS.Green : COLORS.Black
                     }
-                    if (!isPlayerFleet) obj.onHoverEnd()
                 }
             }
             
@@ -386,13 +390,15 @@ class StarMap extends BaseMap {
             if (fleet.location || !fleet.route) {
                 labelObj.visible = false
             } else {
-                labelObj.visible = isPlayerFleet
+                // Always show faction symbols for fleets in transit
+                labelObj.visible = true
                 labelObj.x = fleet.x
                 labelObj.y = fleet.y
             }
             
-            // Update path
-            if (!fleet.route) {
+            // Update path (only show for player fleet or selected fleet)
+            const shouldShowPath = (fleet === gs.fleet || fleet === this.selectedObject) && fleet.route
+            if (!shouldShowPath) {
                 pathObj.visible = false
             } else {
                 let {startX, startY, toX, toY} = fleet.route.path
