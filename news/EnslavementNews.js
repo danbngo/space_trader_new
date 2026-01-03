@@ -32,7 +32,8 @@ class EnslavementNews extends News {
         this.startEffects[0].onApply = () => {
             if (this.planet instanceof Planet && this.targetPlanet instanceof Planet) {
                 this.planet.addCulture(this.targetPlanet, 0.05);
-            }        )
+            }
+        }
 
         this.addTargetPlanetEffect(
             {

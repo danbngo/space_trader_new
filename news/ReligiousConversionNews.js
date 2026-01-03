@@ -35,6 +35,10 @@ class ReligiousConversionNews extends News {
                         targetPlanet.c.religions.setAmount(planet.c.stateReligion, currentAmount + 0.3)
                         targetPlanet.c.religions.normalize()
                     }
+                    // Religious conversion also spreads culture
+                    if (targetPlanet instanceof Planet) {
+                        targetPlanet.addCulture(planet, 0.02);
+                    }
                 },
                 culture: CL.HIGH,
                 prestige: CL.SLIGHTLY_HIGH,

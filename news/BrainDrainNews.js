@@ -42,6 +42,13 @@ class BrainDrainNews extends News {
                 prestige: CL.SLIGHTLY_LOW
             }
         )
+        
+        // Intellectuals bring their culture with them
+        this.startEffects[0].onApply = () => {
+            if (this.targetPlanet instanceof Planet) {
+                this.targetPlanet.addCulture(this.planet, 0.02);
+            }
+        }
     }
 
     determineOutcome() {

@@ -59,6 +59,13 @@ class RaidingNews extends News {
                 culture: CL.SLIGHTLY_HIGH,
             },
         )
+        
+        // Raiders spread their culture through contact
+        this.startEffects[0].onApply = () => {
+            if (this.targetPlanet instanceof Planet) {
+                this.targetPlanet.addCulture(this.planet, 0.01);
+            }
+        }
     }
 
     shouldCancel() {

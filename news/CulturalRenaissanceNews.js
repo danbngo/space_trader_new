@@ -28,6 +28,18 @@ class CulturalRenaissanceNews extends News {
                 prestige: CL.SLIGHTLY_LOW
             }
         )
+        
+        // Cultural renaissance spreads influence to all other planets
+        this.startEffects[0].onApply = () => {
+            if (this.planet instanceof Planet) {
+                const allPlanets = [...gs.system.planets, ...gs.system.dwarfPlanets, ...gs.system.spaceStations];
+                for (const otherPlanet of allPlanets) {
+                    if (otherPlanet !== this.planet && otherPlanet instanceof Planet) {
+                        otherPlanet.addCulture(this.planet, 0.01);
+                    }
+                }
+            }
+        }
     }
 
     determineOutcome() {

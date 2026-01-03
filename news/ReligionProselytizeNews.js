@@ -33,6 +33,10 @@ class ReligionProselytizeNews extends News {
                         const currentAmount = targetPlanet.c.religions.getAmount(planet.c.stateReligion) || 0
                         targetPlanet.c.religions.setAmount(planet.c.stateReligion, currentAmount + 0.15)
                     }
+                    // Missionaries also spread culture
+                    if (targetPlanet instanceof Planet) {
+                        targetPlanet.addCulture(planet, 0.02);
+                    }
                 },
                 culture: CL.HIGH,
                 prestige: CL.SLIGHTLY_HIGH,

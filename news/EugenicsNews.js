@@ -32,6 +32,13 @@ class EugenicsNews extends News {
                 prestige: CL.VERY_LOW,
             }
         )
+        
+        // Eugenics strengthens native culture (ethnic cleansing aspect)
+        this.startEffects[0].onApply = () => {
+            if (this.planet instanceof Planet && this.planet.c.cultures) {
+                this.planet.addCulture(this.planet, 0.02);
+            }
+        }
     }
 
     determineOutcome() {
