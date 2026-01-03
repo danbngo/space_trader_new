@@ -15,6 +15,8 @@ class Anomaly extends SpaceObject {
         super(name, OBJECT_TYPES.ANOMALY, anomalyType.color, radius, x, y);
         /** @type {AnomalyType} */
         this.anomalyType = anomalyType;
+        /** @type {number|null} Year when this anomaly was discovered, null if undiscovered */
+        this.discoveredYear = null;
     }
 
     /**

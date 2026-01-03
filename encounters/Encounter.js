@@ -317,11 +317,13 @@ class Encounter {
 
     /**
      * Initializes and positions ships for the encounter based on formation type.
+     * @param {FormationType} formationType - The formation type to use.
+     * @param {number} playerAngle - The angle for player ships (optional).
+     * @param {number} enemyAngle - The angle for enemy ships (optional).
      */
-    positionShips() {
+    positionShips(formationType, playerAngle, enemyAngle) {
         console.log('Encounter.positionShips')
         const {playerShips, enemyShips, ships, encounterType} = this
-        const {formationType} = encounterType
         const maxSpawnDistance = this.mapRadius * ENCOUNTER_SHIP_MAX_SPAWN_DISTANCE_RATIO
         const minSpawnDistance = maxSpawnDistance / 5
 
@@ -333,20 +335,20 @@ class Encounter {
         if (formationType == FORMATION_TYPES.PlayerEncircle) {
             const angleStep = (Math.PI * 2) / playerShips.length
             playerShips.forEach((ship, i) => {
-                const angle = angleStep * i
+                const angle = angleStep * i + (playerAngle || 0)
                 const [x, y] = rotatePoint(maxSpawnDistance, 0, 0, 0, angle)
                 Object.assign(ship, {x, y})
             })
         }
         else if (formationType == FORMATION_TYPES.PlayerEncircled) {
             for (const ship of playerShips) {
-                const [x, y] = rotatePoint(rng(minSpawnDistance/2, 0, false), 0, 0, 0, rng(Math.PI * 2, 0, false))
+                const [x, y] = rotatePoint(rng(minSpawnDistance/2, 0, false), 0, 0, 0, rng(Math.PI * 2, 0, false) + (playerAngle || 0))
                 Object.assign(ship, {x, y})
             }
         }
         else {
             for (const ship of playerShips) {
-                const [x,y] = rotatePoint(rng(maxSpawnDistance, minSpawnDistance/2, false), 0, 0, 0, rng(Math.PI + Math.PI/4, Math.PI - Math.PI/4, false))
+                const [x,y] = rotatePoint(rng(maxSpawnDistance, minSpawnDistance/2, false), 0, 0, 0, rng(Math.PI + Math.PI/4, Math.PI - Math.PI/4, false) + (playerAngle || 0))
                 Object.assign(ship, {x, y})
             }
         }
@@ -358,27 +360,27 @@ class Encounter {
 
         if (formationType == FORMATION_TYPES.PlayerEncircle) {
             for (const ship of enemyShips) {
-                const [x, y] = rotatePoint(rng(minSpawnDistance/2, 0, false), 0, 0, 0, rng(Math.PI * 2, 0, false))
+                const [x, y] = rotatePoint(rng(minSpawnDistance/2, 0, false), 0, 0, 0, rng(Math.PI * 2, 0, false) + (enemyAngle || 0))
                 Object.assign(ship, {x, y})
             }
         }
         else if (formationType == FORMATION_TYPES.PlayerEncircled) {
             const angleStep = (Math.PI * 2) / enemyShips.length
             enemyShips.forEach((ship, i) => {
-                const angle = angleStep * i
+                const angle = angleStep * i + (enemyAngle || 0)
                 const [x, y] = rotatePoint(maxSpawnDistance, 0, 0, 0, angle)
                 Object.assign(ship, {x, y})
             })
         }
-        else if (formationType == FORMATION_TYPES.FaceOff) {
+        else if (formationType == FORMATION_TYPES.Default) {
             for (const ship of enemyShips) {
-                const [x,y] = rotatePoint(rng(maxSpawnDistance, minSpawnDistance, false), 0, 0, 0, rng(0 + Math.PI/4, 0 - Math.PI/4, false))
+                const [x,y] = rotatePoint(rng(maxSpawnDistance, minSpawnDistance, false), 0, 0, 0, rng(0 + Math.PI/4, 0 - Math.PI/4, false) + (enemyAngle || 0))
                 Object.assign(ship, {x, y})
             }
         }
         else if (formationType == FORMATION_TYPES.Storm) {
             for (const ship of enemyShips) {
-                let [x,y] = rotatePoint(rng(this.mapRadius*0.9, minSpawnDistance, false), 0, 0, 0, rng(0 + Math.PI*3/4, 0 - Math.PI*3/4, false))
+                let [x,y] = rotatePoint(rng(this.mapRadius*0.9, minSpawnDistance, false), 0, 0, 0, rng(0 + Math.PI*3/4, 0 - Math.PI*3/4, false) + (enemyAngle || 0))
                 x += rng(this.mapRadius*2, 0, false)
                 Object.assign(ship, {x, y})
             }

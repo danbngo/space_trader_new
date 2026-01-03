@@ -2,7 +2,7 @@
 /** @typedef {'Attack'|'Escape'|'Asteroid'} CombatStrategyType */
 /** @typedef {'FilledCircle'|'EmptyCircle'|'FilledTriangle'|'EmptyTriangle'|'Text'|'Line'|'FilledOval'|'EmptyOval'|'FilledRectangle'} ShapeType */
 /** @typedef {'Move'|'Laser'|'Ram'|'Recharge'|'Wait'|'Blink'|'Booster'|'Cloak'|'Warhead'|'EMPPulse'|'Magnetize'|'SmokeBomb'|'Drill'|'Detonate'} MoveType */
-/** @typedef {'FaceOff'|'Storm'} FormationType */
+/** @typedef {'Default'|'Storm'|'PlayerEncircle'|'PlayerEncircled'} FormationType */
 /** @typedef {'Ship'|'Asteroid'} AIType */
 /** @typedef {'Rocky'|'Icy'|'Plasma'} AsteroidBeltType */
 
@@ -91,8 +91,7 @@ const MOVE_TYPES_ALL = Object.values(MOVE_TYPES)
 
 /** @enum {FormationType} */
 const FORMATION_TYPES = Object.freeze({
-    //Ambush: 'Ambush',
-    FaceOff: 'FaceOff', //ships all facing each other initially
+    Default: 'Default', //ships all facing each other initially
     Storm: 'Storm', //ships all moving in an arbitrary direction - could be used for asteroid encounters
     PlayerEncircle: 'PlayerEncircle', //player ships surround enemy ships
     PlayerEncircled: 'PlayerEncircled', //enemy ships surround player ships

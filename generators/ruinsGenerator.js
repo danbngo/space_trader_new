@@ -8,20 +8,18 @@ function generateRuins(starSystem, count = 3) {
     const ruins = [];
     const ruinsTypes = RUINS_TYPES_ALL;
     
-    // Find the most distant body (planet or dwarf planet)
+    // Find the most distant body (planet or dwarf planet) using orbit radius
     let maxOrbitalRadius = 0;
     
     for (const planet of starSystem.planets) {
-        const distance = Math.sqrt(planet.x * planet.x + planet.y * planet.y);
-        if (distance > maxOrbitalRadius) {
-            maxOrbitalRadius = distance;
+        if (planet.orbit && planet.orbit.radius > maxOrbitalRadius) {
+            maxOrbitalRadius = planet.orbit.radius;
         }
     }
     
     for (const dwarf of starSystem.dwarfPlanets) {
-        const distance = Math.sqrt(dwarf.x * dwarf.x + dwarf.y * dwarf.y);
-        if (distance > maxOrbitalRadius) {
-            maxOrbitalRadius = distance;
+        if (dwarf.orbit && dwarf.orbit.radius > maxOrbitalRadius) {
+            maxOrbitalRadius = dwarf.orbit.radius;
         }
     }
     

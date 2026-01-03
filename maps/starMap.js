@@ -87,9 +87,6 @@ class StarMap extends BaseMap {
     refreshControls() {
         this.controls.innerHTML = ""
         
-        // Check if player is near an asteroid for mining
-        const nearbyBelt = checkNearbyAsteroid()
-        
         ce({
             parent:this.controls,
             classNames: ['starmap-buttons'],
@@ -97,7 +94,6 @@ class StarMap extends BaseMap {
                 ce({tag:'button', classNames: [(this.paused && !gs.location) || (!this.paused && gs.location) ? 'highlighted' : null] , innerHTML:this.paused ? '▶' : '⏸', onClick: () => this.togglePause()}),
                 ce({tag:'button', innerHTML:'+', onClick: () => this.adjustZoom(1.33)}),
                 ce({tag:'button', innerHTML:'-', onClick: () => this.adjustZoom(0.66)}),
-                nearbyBelt ? ce({tag:'button', innerHTML:'⛏️ Mine', onClick: () => startMining()}) : null,
                 ce({tag:'button', classNames: [gs.captain.skillPoints > 0 ? 'highlighted' : null], innerHTML:'?', onClick: () => showAssistantMenu()}),
             ]
         })
@@ -634,6 +630,12 @@ class StarMap extends BaseMap {
         }
         if (obj == gs.fleet) {
             if (gs.location) ce({parent:container, tag:'button', innerHTML:`Dock (${coloredName(gs.location)})`, onClick:()=>this.explore(gs.location)})
+            
+            // Check if player is near an asteroid for mining
+            const nearbyBelt = checkNearbyAsteroid()
+            if (nearbyBelt) {
+                ce({parent:container, tag:'button', innerHTML:'⛏️ Mine', onClick: () => startMining()})
+            }
         }
         if (obj instanceof Planet) {
             const distance = roundToPlaces(calcDistance(gs.fleet.x, gs.fleet.y, obj.x, obj.y), 2)

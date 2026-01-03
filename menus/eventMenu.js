@@ -186,8 +186,24 @@ function tickPlanets(elapsedYears = 1) {
         }
         //convert some of our planetary culture to our culture
         for (const [key,value] of planet.c.cultures.counts) {
+            if (value < CIVILIZATION_CULTURE_DISAPPEAR_THRESHOLD) {
+                planet.c.cultures.setAmount(key, 0)
+                continue
+            }
             const convertAmount = value * CIVILIZATION_CONVERT_CULTURE_PER_YEAR * elapsedYears
             planet.c.cultures.increment(key, -convertAmount)
+        }
+        for (const [key,value] of planet.c.religions.counts) {
+            if (value < CIVILIZATION_CULTURE_DISAPPEAR_THRESHOLD) {
+                planet.c.religions.setAmount(key, 0)
+                continue
+            }
+        }
+        for (const [key,value] of planet.c.races.counts) {
+            if (value < CIVILIZATION_CULTURE_DISAPPEAR_THRESHOLD) {
+                planet.c.races.setAmount(key, 0)
+                continue
+            }
         }
         planet.c.cultures.normalize()
     }

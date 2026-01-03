@@ -53,9 +53,10 @@ function checkForFleetCollision(collisionDistance) {
     // Pause the game
     // Create encounter from existing fleet
     const encounter = createEncounterFromFleet(encounterType, targetFleet)
+    encounter.startEncounter()
     
     // Show modal asking player if they want to engage
-    showModal(`Encountered ${coloredName(targetFleet)}`, 
+    /*showModal(`Encountered ${coloredName(targetFleet)}`, 
         `You've crossed paths with a ${targetFleet.fleetType.name} fleet!<br/>What do you want to do?`,
         [
             ['Engage', () => {
@@ -67,7 +68,7 @@ function checkForFleetCollision(collisionDistance) {
                 closeModal()
             }]
         ]
-    )
+    )*/
     
     return true
 }

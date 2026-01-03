@@ -18,7 +18,7 @@ class PiratesEncounter extends FleetEncounter {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} are in awe of your fearsome exploits! They broadcast a merry jig and salute you while you pass.`, [
                 //['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackFleetModal(false)],
+                ['Attack', ()=>this.showPlayerAttackFleetModal()],
             ])
         }
         else if (Math.random() < 0.5) {
@@ -32,7 +32,7 @@ class PiratesEncounter extends FleetEncounter {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} broadcast insults and jeers at your fleet, but let you pass regardless.`, [
                 //['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackFleetModal(false)],
+                ['Attack', ()=>this.showPlayerAttackFleetModal()],
             ])
         }
     }

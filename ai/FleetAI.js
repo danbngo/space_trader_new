@@ -160,6 +160,7 @@ class FleetAI {
 
     fightTarget(andLoot = false) {
         if (!this.target || !(this.target instanceof Fleet) || !this.target.fleetAI) {
+            console.log(this,this.target,this.fleet)
             throw new Error('FleetAI.fightTarget called with invalid target!');
         }
         console.log('⚔️', `${this.fleet.name+' '+this.fleet.uuid} is engaging ${this.target.name+' '+this.target.uuid}!`)
@@ -182,7 +183,7 @@ class FleetAI {
         const loserScore = (roll <= ourScore) ? theirScore : ourScore
 
         const strengthRatio = (loserScore / winnerScore) / (winnerScore+loserScore) // How strong they were relative to us
-        // Apply damage to our ships
+        // Apply damage to both sides
         for (const ship of winner.ships) {
             const damage = rng(ship.hull[1]*strengthRatio)
             ship.takeDamage(damage,true)
@@ -192,7 +193,25 @@ class FleetAI {
             ship.takeDamage(damage,true)
         }
         
-        // Show skull popup at target's death location
+        // Check if loser still has any active ships after damage
+        const loserHasActiveShips = loser.ships.some(ship => ship.hull[0] > 0)
+        
+        // 30% chance for loser to flee if they still have active ships
+        if (loserHasActiveShips && Math.random() < 0.3) {
+            // Loser flees - no loot, both sides took damage
+            console.log('💨', `${loser.name+' '+loser.uuid} has fled from ${winner.name+' '+winner.uuid}!`)
+            this.addPopup('💨', COLORS.Yellow, loser.x, loser.y)
+            
+            // Clear targets and routes for both fleets
+            loser.fleetAI.target = null
+            loser.fleetAI.route = null
+            winner.fleetAI.target = null
+            winner.fleetAI.route = null
+            
+            return winner
+        }
+        
+        // Loser is destroyed
         this.addPopup('💀', COLORS.Red, loser.x, loser.y)
 
         loser.fleetAI.onDestroyed()
@@ -243,9 +262,9 @@ class FleetAI {
         if (transferred > 0) {
             
             // Show theft popup at the location where cargo is being taken
-            this.addPopup('💰', COLORS.LightYellow)
+            this.addPopup('💰', COLORS.LightYellow, toFleet.x, toFleet.y)
             //show another popup to show that target is LOSING money
-            this.addPopup('💸', COLORS.DarkYellow, this.target.x, this.target.y)
+            this.addPopup('💸', COLORS.DarkYellow, fromFleet.x, fromFleet.y)
         }
     }
 
@@ -290,8 +309,8 @@ class FleetAI {
         console.log(`👥 ${toFleet.name+' '+toFleet.uuid} captured ${officersToTake.length} officers from ${fromFleet.name+' '+fromFleet.uuid}`);
         
         // Show crew capture popup
-            this.addPopup('👥', COLORS.Orange)
-            this.addPopup('💔', COLORS.DarkRed, this.target.x, this.target.y)
+            this.addPopup('👥', COLORS.Orange, toFleet.x, toFleet.y)
+            this.addPopup('💔', COLORS.DarkRed, fromFleet.x, fromFleet.y)
     }
     /**
      * Finds nearest object of a given type.

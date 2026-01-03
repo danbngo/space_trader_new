@@ -11,14 +11,14 @@ class SmugglersEncounter extends MercantileEncounter {
                 ['Hail', ()=>{
                     this.onStart()
                 }],
-                ['Sneak Attack', ()=>this.showPlayerAttackFleetModal(1, 0, true)],
+                ['Sneak Attack', ()=>this.showPlayerAttackFleetModal(true)],
             ])
         }
         else if (FameLevel.hasFameLevel(gs.captain, this.planet, FAME_LEVELS.LOVED)) {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} have heard of your hostility towards the criminal community and quickly flee!`, [
                 //['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackFleetModal(1, 0, false)],
+                ['Attack', ()=>this.showPlayerAttackFleetModal()],
             ])
         }
         else if (Math.random() > .5) {
@@ -26,14 +26,14 @@ class SmugglersEncounter extends MercantileEncounter {
                 //['View', ()=>closeModal()],
                 ['Trade', ()=>this.showTradeOfferModal(false)],
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackFleetModal(1, 0, false)],
+                ['Attack', ()=>this.showPlayerAttackFleetModal()],
             ])
         }
         else {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} take no chances and start moving quickly away from you.`, [
                 //['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackFleetModal(1, 0, false)],
+                ['Attack', ()=>this.showPlayerAttackFleetModal()],
             ])
         }
     }

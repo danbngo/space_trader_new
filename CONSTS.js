@@ -14,7 +14,7 @@ const FLEET_RADIUS = 1/1000 * 1/EARTH_RADII_PER_AU
 const RUINS_RADIUS = 1/100 * 1/EARTH_RADII_PER_AU
 const ANOMALY_RADIUS = 1/10 * 1/EARTH_RADII_PER_AU
 
-const FLEET_COLLISION_DISTANCE = FLEET_RADIUS * 100000
+const FLEET_COLLISION_DISTANCE = FLEET_RADIUS * 1000000
 
 const PLANET_ENCOUNTER_CHANCE_PER_DAY = 0//0.01; //chance of random encounter per day when right next to an 'average' planet
 const ASTEROIDS_ENCOUNTER_CHANCE_PER_DAY = 0.01//0.5; //chance of fooroid storms when in the middle of an asteroid belt
@@ -108,3 +108,4 @@ const ENCOUNTER_MAX_EXTORT_RATIO = 0.5 //if syndicates catch you, they'll take u
 
 const CIVILIZATION_BONUS_RATE_PER_YEAR = 0.1 //each year a democracy will MULTIPLY its economy by 1 + this, for instance
 const CIVILIZATION_CONVERT_CULTURE_PER_YEAR = 0.1 //each year a civilization will convert this fraction of its population to its dominant culture
+const CIVILIZATION_CULTURE_DISAPPEAR_THRESHOLD = 0.0001

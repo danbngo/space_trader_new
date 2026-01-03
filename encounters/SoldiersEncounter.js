@@ -18,7 +18,7 @@ class SoldiersEncounter extends AuthoritiesEncounter {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} salute you over comms, having heard of your good deeds.<br/>${FameLevel.hasInfamyLevel(gs.captain, this.planet, INFAMY_LEVELS.DISREPUTABLE) ? `In their view, the good you've done far outweighs the bad.` : ''}`, [
                 //['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackFleetModal(-10, 10, false)],
+                ['Attack', ()=>this.showPlayerAttackFleetModal()],
             ])
         }
         if (Math.random()*gs.captain.calcReputationForTarget(this.planet) < 300 && gs.captain.calcBountyForPlanet(this.planet) > 0) {
@@ -32,7 +32,7 @@ class SoldiersEncounter extends AuthoritiesEncounter {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} ships blares a platriotic jingle extolling the greatness of ${coloredName(this.planet)}.`, [
                 //['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackFleetModal(-10, 10, false)],
+                ['Attack', ()=>this.showPlayerAttackFleetModal()],
             ])
         }
     }

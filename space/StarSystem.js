@@ -76,7 +76,7 @@ class StarSystem extends SpaceObject {
     }
 
     updatePositions(year = gs.year) {
-        const objects = [...this.stars, ...this.planets, ...this.dwarfPlanets, ...this.spaceStations, ...this.asteroids]
+        const objects = [...this.stars, ...this.planets, ...this.dwarfPlanets, ...this.spaceStations, ...this.asteroids, ...(this.ruins || [])]
         for (const obj of objects) {
             const [x, y] = obj.calcAbsPositionAtYear(year)
             obj.x = x
@@ -110,6 +110,16 @@ class StarSystem extends SpaceObject {
             const [fx,fy] = fleet.route.positionAtYear(year)
             fleet.x = fx
             fleet.y = fy
+        }
+        
+        // Check if player fleet has discovered any anomalies
+        if (gs.fleet && this.anomalies) {
+            for (const anomaly of this.anomalies) {
+                if (anomaly.discoveredYear === null && anomaly.detectable(gs.fleet)) {
+                    anomaly.discoveredYear = year
+                    console.log(`🔍 Discovered anomaly: ${anomaly.name} at ${Math.round(year * 10) / 10}`)
+                }
+            }
         }
     }
 
