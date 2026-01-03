@@ -136,7 +136,7 @@ class NewsEffect extends Civilization {
             if (targetPlanet && newRelationship) {
                 civilization.relationships.set(targetPlanet, newRelationship);
                 targetPlanet.civilization.relationships.set(planet, newRelationship);
-                console.log('relationships set:',planet.name,targetPlanet.name,newRelationship)
+                //console.log('relationships set:',planet.name,targetPlanet.name,newRelationship)
             }
             for (const building of buildingsDamaged) {
                 building.level = Math.max(0, building.level-1)

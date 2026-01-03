@@ -17,6 +17,8 @@ class Route {
         this.valid = false
 
         if (fleet.x == destination.x && fleet.y == destination.y) { 
+            /** @ts-ignore */
+            console.log('ERR: Route destination is the same as fleet location:',fleet.name,fleet.uuid,destination.name,destination.uuid)
             return
         }
 
@@ -27,6 +29,7 @@ class Route {
         this.endYear = endYear
         this.travelTime = endYear-startYear
         this.path = new Path(fleet.x, fleet.y, toX, toY)
+        this.valid = true
     }
 
     positionAtYear(year = 0) {
@@ -94,7 +97,9 @@ class Route {
                 bestYearOffset: bestYearOffset,
                 results: results
             })
-            throw new Error('couldnt find a valid route!')
+            /** @ts-ignore */
+            console.log('ERR: Could not find a valid route:',fleet.name,fleet.uuid,planet.name,planet.uuid)
+            return null
         }
 
         return {

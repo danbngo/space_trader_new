@@ -36,6 +36,7 @@ class FleetAI {
     }
 
     addPopup(text = '', color = COLORS.WHITE, overrideX = this.fleet.x, overrideY = this.fleet.y) {
+        if (!this.starMap) return
         this.starMap.addPopup(overrideX, overrideY, text, color)
     }
     /**
@@ -63,8 +64,12 @@ class FleetAI {
                 const target = this.findNearest(validTargets, this.fleet.fleetType.targetMaxDistance || Infinity);
                 if (target && target !== this.target) {
                     // Show interest popup when finding a new target
-                        this.addPopup('!!', COLORS.Yellow)
-                    this.setTarget(target);
+                    const canTarget = this.setTarget(target);
+                    console.log(`🔍 ${this.fleet.name} ${this.fleet.uuid} found new target: ${target.name} ${target.uuid} and could target:`, canTarget)
+                    if (!canTarget) {
+                        this.visited.push(target) //give up if we cant reach the target
+                    }
+                    else this.addPopup('!', COLORS.DarkYellow)
                     return
                 }
             }
@@ -98,7 +103,9 @@ class FleetAI {
         if (route.valid) {
             this.route = route
             this.target = target
+            return true
         }
+        return false
     }
 
     /**
@@ -123,8 +130,9 @@ class FleetAI {
     }
 
     resumeVoyage() {
-        this.target = null
         if (Math.random() < .9) return; //ships will "hang out" for a while before moving on
+        console.log('▶', `${this.fleet.name+' '+this.fleet.uuid} is resuming its voyage.`)
+        this.target = null
         if (this.destination && this.fleet.location != this.destination) this.fleet.route = new Route(this.fleet, this.destination)
         else if (this.origin && this.fleet.location != this.origin) this.fleet.route = new Route(this.fleet, this.origin)
     }
@@ -150,13 +158,15 @@ class FleetAI {
         //override in subclass
     }
 
-    fightTarget() {
+    fightTarget(andLoot = false) {
+        if (!this.target || !(this.target instanceof Fleet) || !this.target.fleetAI) {
+            throw new Error('FleetAI.fightTarget called with invalid target!');
+        }
         console.log('⚔️', `${this.fleet.name+' '+this.fleet.uuid} is engaging ${this.target.name+' '+this.target.uuid}!`)
         
     // Show popup if starMap is available
-        const midX = (this.fleet.x + this.target.x) / 2
-        const midY = (this.fleet.y + this.target.y) / 2
-        this.addPopup('⚔️', COLORS.Red, midX, midY)
+        this.addPopup('⚔️', COLORS.Red)
+        this.addPopup('⚔️', COLORS.Red, this.target.x, this.target.y)
         
         // Reveal both fleets during combat
         this.fleet.cloakLevel = 0
@@ -177,13 +187,25 @@ class FleetAI {
             const damage = rng(ship.hull[1]*strengthRatio)
             ship.takeDamage(damage,true)
         }
+        for (const ship of loser.ships) {
+            const damage = rng(ship.hull[1]*1/strengthRatio)
+            ship.takeDamage(damage,true)
+        }
         
         // Show skull popup at target's death location
         this.addPopup('💀', COLORS.Red, loser.x, loser.y)
 
-        loser.ai.onDestroyed()
-        winner.ai.target = null
-        winner.ai.route = null
+        loser.fleetAI.onDestroyed()
+        winner.fleetAI.target = null
+        winner.fleetAI.route = null
+        console.log('🏆', `${winner.name+' '+winner.uuid} has defeated ${loser.name+' '+loser.uuid} in combat!`)
+
+        if (andLoot) {
+            // Winner takes cargo from loser
+            winner.fleetAI.transferCargo(loser, winner)
+            winner.fleetAI.transferCredits(loser, winner)
+        }
+
         return winner
     }
 
@@ -197,6 +219,7 @@ class FleetAI {
      * @param {Fleet} toFleet - Fleet to transfer cargo to
      */
     transferCargo(fromFleet, toFleet) {
+        console.log(`💰 ${toFleet.name+' '+toFleet.uuid} seizing of cargo from ${fromFleet.name+' '+fromFleet.uuid}`);
         if (!fromFleet.cargo || fromFleet.cargo.total === 0) return;
         
         const availableSpace = toFleet.availableCargoSpace;
@@ -218,7 +241,6 @@ class FleetAI {
         }
         
         if (transferred > 0) {
-            console.log(`💰 ${toFleet.name+' '+toFleet.uuid} seized ${transferred} units of cargo from ${fromFleet.name+' '+fromFleet.uuid}`);
             
             // Show theft popup at the location where cargo is being taken
             this.addPopup('💰', COLORS.LightYellow)
@@ -262,7 +284,7 @@ class FleetAI {
         // Remove all subordinates from source fleet
         for (const officer of officersToTake) {
             fromFleet.removeOfficer(officer);
-            //toFleet.captain.addSubordinate(officer); //no need.
+            toFleet.officers.push(officer); //no need.
         }
         
         console.log(`👥 ${toFleet.name+' '+toFleet.uuid} captured ${officersToTake.length} officers from ${fromFleet.name+' '+fromFleet.uuid}`);

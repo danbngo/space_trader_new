@@ -36,12 +36,19 @@ class TaxCollectorFleetAI extends FleetAI {
             // Mark as visited
             this.visited.push(this.target);
             
-            // 90% chance to collect taxes peacefully, 10% chance to fight
-            if (Math.random() < 0.9) {
+            // 50% chance to collect taxes, 40% chance nothing happens, 10% chance to fight
+            const roll = Math.random();
+            if (roll < 0.5) {
+                // Collect taxes peacefully
                 this.transferCredits(this.target, this.fleet);
                 this.target = null;
                 this.route = null;
+            } else if (roll < 0.9) {
+                // Nothing happens - target evades or refuses
+                this.target = null;
+                this.route = null;
             } else {
+                // Fight
                 this.fightTarget();
             }
         }

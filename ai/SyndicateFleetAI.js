@@ -30,7 +30,7 @@ class SyndicateFleetAI extends FleetAI {
             // Mark as visited
             this.visited.push(this.target);
             
-            // 50% chance to extort credits peacefully, 50% chance to fight
+            // 75% chance to extort credits peacefully, 25% chance to fight
             if (Math.random() < 0.5) {
                 this.transferCredits(this.target, this.fleet);
                 this.target = null;
@@ -39,6 +39,9 @@ class SyndicateFleetAI extends FleetAI {
                 this.fightTarget();
             }
         }
+    }
+    fightTarget() {
+        return super.fightTarget(true)
     }
     onDestroyed() {
         // Destroying syndicates reduces organized crime and corruption

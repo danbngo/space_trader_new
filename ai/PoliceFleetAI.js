@@ -4,10 +4,18 @@
  * @extends FleetAI
  */
 class PoliceFleetAI extends FleetAI {
+    constructor(fleet = null, origin = null, starMap = null) {
+        super(fleet, origin, starMap);
+        /** @type {Fleet[]} */
+        this.visited = [];
+    }
+    
     calcValidTargets() {
         const ourScore = this.fleet.combatRating
         return gs.system.fleets.filter(f => {
             if (f === this.fleet || !f.factionType.criminal || f.location) return false
+            // Skip if already visited
+            if (this.visited.includes(f)) return false
             // Don't attack targets that are 2x stronger
             return f.combatRating <= ourScore * 2
         })
@@ -17,6 +25,9 @@ class PoliceFleetAI extends FleetAI {
     }
     onNearTarget() {
         if (this.target instanceof Fleet && !this.target.location) {
+            // Mark as visited
+            this.visited.push(this.target);
+            
             if (Math.random() > 0.5) {
                 this.fightTarget();
             }

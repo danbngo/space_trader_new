@@ -154,7 +154,7 @@ class Officer {
                 // Check if officer meets level requirement and doesn't already have this perk
                 if (this.level >= perk.minLevel && !this.perks.includes(perk)) {
                     this.perks.push(perk)
-                    console.log(`Auto-granted perk: ${perk.name}`)
+                    //console.log(`Auto-granted perk: ${perk.name}`)
                 }
             }
         }

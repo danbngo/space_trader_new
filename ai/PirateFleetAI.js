@@ -36,12 +36,7 @@ class PirateFleetAI extends FleetAI {
         }
     }
     fightTarget() {
-        const victor = super.fightTarget()
-        if (victor == this.fleet) {
-            // Winner takes cargo from loser
-            this.transferCargo(this.target, this.fleet)
-        }
-        return victor
+        return super.fightTarget(true)
     }
     onDestroyed() {
         // Destroying pirates improves security (reduces crime)

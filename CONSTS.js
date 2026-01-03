@@ -14,7 +14,7 @@ const FLEET_RADIUS = 1/1000 * 1/EARTH_RADII_PER_AU
 const RUINS_RADIUS = 1/100 * 1/EARTH_RADII_PER_AU
 const ANOMALY_RADIUS = 1/10 * 1/EARTH_RADII_PER_AU
 
-const FLEET_COLLISION_DISTANCE = FLEET_RADIUS * 100
+const FLEET_COLLISION_DISTANCE = FLEET_RADIUS * 100000
 
 const PLANET_ENCOUNTER_CHANCE_PER_DAY = 0//0.01; //chance of random encounter per day when right next to an 'average' planet
 const ASTEROIDS_ENCOUNTER_CHANCE_PER_DAY = 0.01//0.5; //chance of fooroid storms when in the middle of an asteroid belt

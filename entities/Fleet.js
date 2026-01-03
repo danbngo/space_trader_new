@@ -52,6 +52,7 @@ class Fleet extends SpaceObject {
      * @param {Planet} planet - The planet to dock at.
      */
     dock(planet) {
+        console.log(`🚢 ${this.name} ${this.uuid} is docking at ${planet.name} ${planet.uuid}`);
         this.location = planet
         this.x = planet.x
         this.y = planet.y

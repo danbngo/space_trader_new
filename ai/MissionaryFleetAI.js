@@ -69,6 +69,7 @@ class MissionaryFleetAI extends FleetAI {
                 console.log(`${this.fleet.name} failed to convert ${this.target.captain.name}`);
             }
             
+            console.log(`🕊️ ${this.fleet.name} ${this.fleet.uuid} has attempted conversion of ${this.target.name} ${this.target.uuid} and is moving on to its next destination.`);
             // Clear target and move on
             this.target = null;
             this.route = null;

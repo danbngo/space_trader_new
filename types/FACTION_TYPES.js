@@ -324,7 +324,7 @@ const FACTION_TYPES = {
         '🎭',
         COLORS.LightRed,
         'Organized crime networks dealing in illegal goods and extorting protection money.',
-        true,  
+        false,  
         false,
         false, 
         true,

@@ -25,7 +25,7 @@ function generateFleetCargo(fleet = new Fleet(), fleetType = FLEET_TYPES_ALL[0])
  * @returns {Fleet} The generated fleet.
  */
 function generateFleet(fleetType = FLEET_TYPES_ALL[0], factionType = null, planet = new Planet(), startAt = planet) {
-    console.log('generating a fleet:',fleetType,factionType,planet,startAt)
+    //console.log('generating a fleet:',fleetType,factionType,planet,startAt)
     const ships = []
     const populationMod = planet ? planet.c.population : 1
     const numShips = Math.ceil(0.1 + rng(fleetType.minShips*populationMod, fleetType.maxShips*populationMod))
@@ -50,10 +50,10 @@ function generateFleet(fleetType = FLEET_TYPES_ALL[0], factionType = null, plane
     fleet.captain.credits = rng(fleetType.maxCredits, 0)
     
     // Assign AI to fleet - need to do this after fleet is added to starmap
-    /*const fleetAIType = getFleetAITypeForFleetType(fleetType)
+    const fleetAIType = getFleetAITypeForFleetType(fleetType)
     if (fleetAIType) {
         fleet.fleetAI = new fleetAIType.aiClass(fleet, startAt)
-    }*/
+    }
 
     // Set cloak level if faction has cloaked flag
     if (factionType && factionType.cloaked) {

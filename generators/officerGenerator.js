@@ -4,7 +4,7 @@
  * @returns {string} The generated officer name.
  */
 function generateOfficerName(planet = new Planet()) {
-    console.log('generating officer name for planet:',planet)
+    //console.log('generating officer name for planet:',planet)
     const syllables = ["ka", "zo", "ri", "tan", "vek", "shi", "lor", "an", "ex", "qu"];
     let name = "";
     const syllableCount = rng(5,2)
@@ -21,18 +21,18 @@ function generateOfficerName(planet = new Planet()) {
  * @returns {Officer} The generated officer.
  */
 function generateOfficer(planet = new Planet(), factionType = FACTION_TYPES_ALL[0]) {
-    console.log('generating officer for planet:',planet)
+    //console.log('generating officer for planet:',planet)
     const {civilization} = planet
     const {education} = civilization
     const level = rng(10*education, 1)
     const credits = 0
     const officer = new Officer(generateOfficerName(planet), planet, factionType, credits)
     
-    console.log('determining race..')
+    //console.log('determining race..')
     // Assign random race
     officer.race = rndMember(RACES_ALL)
     
-    console.log('determining religion..')
+    //console.log('determining religion..')
     // If faction is religious, assign state religion; otherwise use planet distribution
     if (factionType.religious && civilization.stateReligion) {
         officer.religion = civilization.stateReligion
@@ -55,28 +55,28 @@ function generateOfficer(planet = new Planet(), factionType = FACTION_TYPES_ALL[
         officer.religion = RELIGION_AGNOSTICISM
     }
     
-    console.log('applying levelups..')
+    //console.log('applying levelups..')
     // Level up to target level
     for (let i = 0; i < level; i++) {
         officer.levelUp(false) // Don't auto-improve skills during leveling
     }
-    console.log('improving skills..')
+    //console.log('improving skills..')
     officer.skillPoints = Math.max(0, officer.skillPoints*rng(2,0.5,false))
     officer.autoImproveSkills()
     
     // Calculate age based on level (21-55 years old)
     // Lower levels = younger, higher levels = older
-    console.log('rolling for age..')
+    //console.log('rolling for age..')
     const minAge = 21
     const maxAge = 55
     const levelFactor = Math.min(officer.level / 10, 1) // Normalize level to 0-1 range
     officer.age = Math.round(minAge + (maxAge - minAge) * levelFactor)
     
     // Assign CITIZEN rank to planet of origin
-    console.log('assigning citizen rank to planet of origin..')
+    //console.log('assigning citizen rank to planet of origin..')
     officer.ranks.set(planet, RANK_TYPES.CITIZEN)
 
-    console.log('adding implants...')
+    //console.log('adding implants...')
     // Add cyber implants if criminal faction (0-3 random implants)
     if (factionType.criminal && CYBER_IMPLANT_TYPES_ALL) {
         const numImplants = rng(3, 0)
@@ -91,7 +91,7 @@ function generateOfficer(planet = new Planet(), factionType = FACTION_TYPES_ALL[
         }
     }
     
-    console.log('adding reputation for home planet...')
+    //console.log('adding reputation for home planet...')
     // Reputation based on faction type
     const maxReputation = 50 * officer.level
     if (factionType.authority) {

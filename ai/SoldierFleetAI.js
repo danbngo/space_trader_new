@@ -4,16 +4,24 @@
  * @extends FleetAI
  */
 class SoldierFleetAI extends FleetAI {
+    constructor(fleet = null, origin = null, starMap = null) {
+        super(fleet, origin, starMap);
+        /** @type {Fleet[]} */
+        this.visited = [];
+    }
+    
     calcValidTargets() {
         const ourScore = this.fleet.combatRating
         return gs.system.fleets.filter(f => {
             if (f === this.fleet) return false;
             if (f.location) return false;
+            // Skip if already visited
+            if (this.visited.includes(f)) return false;
             // Don't attack targets that are 2x stronger
             if (f.combatRating > ourScore * 2) return false;
             
-            // Attack criminals
-            if (f.factionType.criminal) return true;
+            // Attack criminals who are also militant (pirates, slavers, rebels but not syndies or smugglers)
+            if (f.factionType.criminal && f.factionType.militant) return true;
             
             // Attack fleets from planets we're at war with
             if (this.fleet.planet && this.fleet.planet.civilization && f.planet && f.planet.civilization) {
@@ -28,6 +36,9 @@ class SoldierFleetAI extends FleetAI {
     }
     onNearTarget() {
         if (this.target instanceof Fleet && !this.target.location) {
+            // Mark as visited
+            this.visited.push(this.target);
+            
             if (Math.random() > 0.5) {
                 this.fightTarget();
             }

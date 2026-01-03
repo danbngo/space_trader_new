@@ -43,12 +43,7 @@ class RebelFleetAI extends FleetAI {
         }
     }
     fightTarget() {
-        const victor = super.fightTarget()
-        if (victor == this.fleet) {
-            // Winner takes cargo from loser
-            this.transferCargo(this.target, this.fleet)
-        }
-        return victor
+        return super.fightTarget(true)
     }
     onDestroyed() {
         // Increase prestige and culture when rebels are destroyed (restores order)

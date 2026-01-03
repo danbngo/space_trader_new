@@ -127,7 +127,6 @@ function checkForFleetSpawning(elapsedDays = 1, planetMaxFleets = null) {
                 const fleetType = rndMember(faction.fleetTypes)
                 const spawnAt = calcRandomSpawnPlanet(fleetType, faction, planet)
                 const fleet = generateFleet(fleetType, faction, planet, spawnAt)
-                fleet.fleetAI.starMap = currentMap
                 fleet.color = planet.color
                 fleet.x = planet.x
                 fleet.y = planet.y
@@ -207,6 +206,11 @@ function calculateMaxFleetsForPlanet(planet) {
     const maxNumFleetsPerFaction = new CountsMap()
     
     for (const factionType of FACTION_TYPES_ALL) {
+        // Skip religious factions if planet has no state religion
+        if (factionType.religious && !c.stateReligion) {
+            continue
+        }
+        
         let maxNumFleets = c.population
         //modify based on policies
         for (const p of c.policies.all) {

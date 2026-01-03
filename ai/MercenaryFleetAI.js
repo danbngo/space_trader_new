@@ -46,12 +46,7 @@ class MercenaryFleetAI extends FleetAI {
         }
     }
     fightTarget() {
-        const victor = super.fightTarget()
-        if (victor == this.fleet) {
-            // Winner takes cargo from loser
-            this.transferCargo(this.target, this.fleet)
-        }
-        return victor
+        return super.fightTarget(true)
     }
     onDestroyed() {
         // Losing mercenaries hurts military capacity
