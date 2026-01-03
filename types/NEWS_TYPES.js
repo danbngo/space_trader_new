@@ -139,6 +139,16 @@ const NT = {
     DISASTER_GREENHOUSE: new NewsType('Greenhouse Effect', NF.DISASTER, 5, 15, 1, [], [GT.CORPORATISM], []),
     DISASTER_STORM: new NewsType('Mega-Storm', NF.DISASTER, 2, 6, 1, [], [], []),
     DISASTER_TSUNAMI: new NewsType('Tsunami', NF.DISASTER, 1, 4, 1, [], [], []),
+    ASTEROID_BARRAGE: new NewsType('Asteroid Barrage', NF.DISASTER, 3, 8, 1, [], [], []),
+    ATMOSPHERE_STRIPPED: new NewsType('Atmosphere Stripping', NF.DISASTER, 5, 15, 1, [], [], []),
+    GLOBAL_COOLING: new NewsType('Global Cooling', NF.DISASTER, 3, 10, 1, [], [], []),
+    GRAVITY_COLLAPSE: new NewsType('Gravity Collapse', NF.DISASTER, 3, 8, 1, [], [], []),
+    GRAVITY_HEALTH: new NewsType('Microgravity Health Crisis', NF.DISASTER, 3, 10, 1, [], [], []),
+    ICE_CAPS_MELT: new NewsType('Ice Caps Melting', NF.DISASTER, 5, 15, 1, [], [], []),
+    MAGNETIC_STORMS: new NewsType('Magnetic Storms', NF.DISASTER, 3, 8, 1, [], [], []),
+    OCEAN_EVAPORATION: new NewsType('Ocean Evaporation', NF.DISASTER, 5, 15, 1, [], [], []),
+    POLLUTION_FAMINE: new NewsType('Pollution Famine', NF.DISASTER, 3, 10, 1, [], [], []),
+    RADIATION_SICKNESS: new NewsType('Radiation Sickness', NF.HEALTH_HAZARD, 3, 8, 1, [], [], []),
     PIRATE_HAVEN: new NewsType('Pirate Haven', NF.CRIME, 5, 20, 1, [GT.POLICE_STATE], [GT.ANARCHY, GT.PUPPET_STATE], []),
     PIRATE_ARMADA: new NewsType('Pirate Armada', NF.CRIME, 3, 10, 1, [GT.ANARCHY], [GT.CORPORATISM, GT.ARISTOCRACY], []),
     MUTATIONS: new NewsType('Mutations', NF.HEALTH_HAZARD, 5, 15, 1, [], [], []),
@@ -151,17 +161,27 @@ const NT = {
     TERRAFORMING: new NewsType('Terraforming', NF.SCIENCE, 5, 40, 1, [], [GT.TECHNOCRACY, GT.CORPORATISM], []), //two neutral planets have relations changed to hostile
     TOURISM: new NewsType('Tourism', NF.CULTURE, 3, 8, 1, [], [GT.DEMOCRACY, GT.CORPORATISM], []),
     TRADE_AGREEMENT: new NewsType('Trade Agreement', NF.GEOPOLITICS, 10, 20, 1, [], [GT.CORPORATISM, GT.DEMOCRACY], []), //two neutral or allied planets have improved trade relations
+    ATMOSPHERE_RESTORATION: new NewsType('Atmosphere Restoration', NF.SCIENCE, 8, 20, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.TECHNOCRACY, GT.DEMOCRACY], []),
+    POLLUTION_CLEANUP: new NewsType('Pollution Cleanup', NF.SCIENCE, 5, 15, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.DEMOCRACY, GT.TECHNOCRACY], []),
+    OCEAN_RESTORATION: new NewsType('Ocean Restoration', NF.SCIENCE, 10, 25, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.TECHNOCRACY, GT.CORPORATISM], []),
+    ORBITAL_SHIELDS: new NewsType('Orbital Shields', NF.SCIENCE, 8, 20, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.TECHNOCRACY], []),
+    ASTEROID_STEERING: new NewsType('Asteroid Steering', NF.SCIENCE, 5, 15, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.TECHNOCRACY], []),
+    MANTLE_HEATING: new NewsType('Mantle Heating', NF.SCIENCE, 10, 30, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.TECHNOCRACY], []),
+    HEAT_RADIATOR: new NewsType('Heat Radiator', NF.SCIENCE, 8, 20, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.TECHNOCRACY, GT.CORPORATISM], []),
     WAR: new NewsType('War', NF.WAR, 5, 20, 100, [GT.ANARCHY, GT.PUPPET_STATE], [GT.POLICE_STATE, GT.ARISTOCRACY], []), //two planets where at least one was hostile go to war
     WAR_ALLY: new NewsType('War Ally', NF.WAR, 3, 15, 150, [], [GT.ARISTOCRACY, GT.DEMOCRACY], []),
     WAR_BOMBARDMENT: new NewsType('War: Bombardment', NF.WAR, 0.1, 0.5, 200, [], [GT.TECHNOCRACY], []), //the target planet loses some buildings (temporarily disabled)
     WAR_CONVERT_INDUSTRY: new NewsType('War Industry', NF.WAR, 999, 999, 1, [], [], []),
+    WAR_FALSE_FLAG: new NewsType('War: False Flag', NF.WAR, 5, 20, 100, [GT.ANARCHY, GT.PUPPET_STATE], [GT.POLICE_STATE, GT.ARISTOCRACY], []),
     WAR_HUMAN_WAVE: new NewsType('War: Human Wave', NF.WAR, 0.5, 2, 150, [GT.DEMOCRACY], [GT.POLICE_STATE, GT.COMMUNISM], []),
     WAR_INVASION: new NewsType('War: Invasion', NF.WAR, 1, 5, 150, [], [GT.POLICE_STATE, GT.ARISTOCRACY], []),
     WAR_OFFENSIVE: new NewsType('War: Offensive', NF.WAR, 1, 5, 150, [], [], []),
     WAR_SABOTAGE: new NewsType('War: Sabotage', NF.WAR, 0.5, 2, 150, [], [GT.TECHNOCRACY, GT.ANARCHY], []),
     WAR_SCORCHED_EARTH: new NewsType('War: Scorched Earth', NF.WAR, 0.5, 2, 150, [], [GT.COMMUNISM], []),
+    WAR_SNEAK_ATTACK: new NewsType('War: Sneak Attack', NF.WAR, 5, 20, 100, [GT.ANARCHY, GT.PUPPET_STATE], [GT.POLICE_STATE, GT.TECHNOCRACY], []),
     WAR_SUBJUGATION: new NewsType('War: Subjugation', NF.WAR, 25, 100, 200, [], [GT.POLICE_STATE, GT.ARISTOCRACY, GT.COMMUNISM], []),
     WAR_SURRENDER: new NewsType('War: Surrender', NF.WAR, 0.1, 0.5, 250, [], [], []),
+    PROXY_WAR: new NewsType('Proxy War', NF.GEOPOLITICS, 5, 20, 150, [GT.ANARCHY, GT.PUPPET_STATE], [GT.DEMOCRACY, GT.CORPORATISM], []),
     //more to come later: environmental disasters, terraforming, etc.
 }
 

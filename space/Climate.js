@@ -55,6 +55,94 @@ class Climate {
     }
 
     /**
+     * Gets the property name associated with a climate type array
+     * @param {Object} climateTypeArray - The climate type constants object (e.g., TEMPERATURES, POLLUTION_LEVELS)
+     * @returns {string|null} The property name or null if not found
+     * @private
+     */
+    _getPropertyName(climateTypeArray) {
+        if (climateTypeArray === TEMPERATURES) return 'temperature'
+        if (climateTypeArray === ATMOSPHERIC_PRESSURES) return 'atmosphericPressure'
+        if (climateTypeArray === GRAVITIES) return 'gravity'
+        if (climateTypeArray === OCEAN_COVERAGES) return 'oceanCoverage'
+        if (climateTypeArray === GEOLOGICAL_ACTIVITIES) return 'geologicalActivity'
+        if (climateTypeArray === MAGNETOSPHERES) return 'magnetosphere'
+        if (climateTypeArray === RADIATION_LEVELS) return 'radiationLevel'
+        if (climateTypeArray === ASTEROID_IMPACTS) return 'asteroidImpact'
+        if (climateTypeArray === POLLUTION_LEVELS) return 'pollution'
+        if (climateTypeArray === PLANET_ATMOSPHERE_TYPES) return 'atmosphereType'
+        if (climateTypeArray === PLANET_OCEAN_TYPES) return 'oceanType'
+        if (climateTypeArray === PLANET_GEOLOGY_TYPES) return 'geologyType'
+        return null
+    }
+
+    /**
+     * Gets the current climate value for a given climate type
+     * @param {Object} climateTypeArray - The climate type constants object (e.g., TEMPERATURES, POLLUTION_LEVELS)
+     * @returns {ClimateValue|null} The current climate value or null if not found
+     */
+    getClimateValue(climateTypeArray) {
+        const propertyName = this._getPropertyName(climateTypeArray)
+        return propertyName ? this[propertyName] : null
+    }
+
+    /**
+     * Sets the climate value for a given climate type
+     * @param {Object} climateTypeArray - The climate type constants object (e.g., TEMPERATURES, POLLUTION_LEVELS)
+     * @param {ClimateValue} newValue - The new climate value to set
+     * @returns {boolean} True if successful, false otherwise
+     */
+    setClimateValue(climateTypeArray, newValue) {
+        const propertyName = this._getPropertyName(climateTypeArray)
+        if (propertyName) {
+            this[propertyName] = newValue
+            return true
+        }
+        return false
+    }
+
+    /**
+     * Increments or decrements the climate value by stepping through the array
+     * @param {Object} climateTypeArray - The climate type constants object (e.g., TEMPERATURES, POLLUTION_LEVELS, PLANET_ATMOSPHERE_TYPES)
+     * @param {number} amount - The number of steps to increment (positive) or decrement (negative)
+     * @returns {boolean} True if successful, false otherwise
+     */
+    incrementClimateValue(climateTypeArray, amount) {
+        const propertyName = this._getPropertyName(climateTypeArray)
+        if (!propertyName) return false
+
+        const currentValue = this[propertyName]
+        
+        // Get the full array of values for this climate type
+        const allValues = Object.values(climateTypeArray)
+        
+        // Handle null values (allow incrementing from null for type properties)
+        let currentIndex
+        if (currentValue === null) {
+            currentIndex = amount > 0 ? -1 : allValues.length
+        } else {
+            currentIndex = allValues.findIndex(v => v === currentValue)
+            if (currentIndex === -1) return false
+        }
+
+        // Calculate new index with clamping
+        const newIndex = Math.max(0, Math.min(allValues.length - 1, currentIndex + amount))
+        this[propertyName] = allValues[newIndex]
+        
+        return true
+    }
+
+    /**
+     * Sets a type property (atmosphereType, oceanType, or geologyType) by incrementing through available types
+     * @param {Object} typeArray - The type constants object (PLANET_ATMOSPHERE_TYPES, PLANET_OCEAN_TYPES, or PLANET_GEOLOGY_TYPES)
+     * @param {number} amount - The number of steps to increment (positive) or decrement (negative)
+     * @returns {boolean} True if successful, false otherwise
+     */
+    incrementTypeValue(typeArray, amount) {
+        return this.incrementClimateValue(typeArray, amount)
+    }
+
+    /**
      * Gets a human-readable description of the climate
      * @returns {string}
      */

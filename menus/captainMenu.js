@@ -20,6 +20,8 @@ function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
         const canAfford = skillPoints >= cost
         const buttons = [
             ['Upgrade', () => improveSkill(skill), !canAfford],
+            ['Implants', () => showCaptainImplantsMenu()],
+            ['Genetics', () => showCaptainGeneticsMenu()],
             ['Perks', () => showCaptainPerksMenu(), false, captain.numPerkPoints > 0 ? 'highlighted' : null],
             ['Reputation', () => showCaptainReputationMenu()],
             ['Close', () => closeModal()],
@@ -31,17 +33,13 @@ function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
     const skillTableRows = [
         ['Skill', 'Level', 'Cost to Upgrade'],
         ...SKILLS_ALL.map(sk => [
-            sk,
+            coloredName(sk),
             statColorSpan(skills.getAmount(sk), skills.getAmount(sk)*SKILLS_ALL.length/5/SKILL_POINTS_PER_LEVEL),
             captain.calcSkillPointsToUpgrade(sk)
         ])
     ]
 
     const skillTable = createTable(skillTableRows, (rowIndex) => onSelectSkill(SKILLS_ALL[rowIndex]), selectedSkill ? SKILLS_ALL.indexOf(selectedSkill) + 1 : null)
-
-    const implantsText = captain.implants.length > 0 
-        ? captain.implants.map(i => colorSpan(i.implantType.name, i.implantType.color) + ` (${roundToPlaces(i.quality*100, 1)}%)`).join(', ')
-        : colorSpan('(None)', COLORS.Gray)
 
     const raceText = captain.race ? `${captain.race.symbol} ${colorSpan(captain.race.name, captain.race.color)}` : 'Human'
 
@@ -61,16 +59,15 @@ function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
     showModal(
         `Captain Overview`,
         ce({children:[
-            `Name: ${name} | Race: ${raceText} | Credits ${credits}`,
-            `Level: ${level} | Exp.: ${expPoints} | To Next Lvl: ${expToNextLevel}`,
+            `Name: ${name} | Race: ${raceText} | Credits: ${credits}`,
+            `Level: ${level} | Exp: ${expPoints} | Next Lvl At: ${expToNextLevel}`,
             expProgressBar.container,
             `Skill Points: ${colorSpan(String(skillPoints), skillPoints > 0 ? COLORS.Green : '')}`,
-            skillTable,
-            ce({style: 'margin-top: 20px;', children: [
-                ce({children: [`<b>Cybernetic Implants:</b><br/>`, implantsText]})
-            ]})
+            skillTable
         ]}),
         [
+            ["Implants", () => showCaptainImplantsMenu()],
+            ["Genetics", () => showCaptainGeneticsMenu()],
             ["Perks", () => showCaptainPerksMenu(), false, captain.numPerkPoints > 0 ? 'highlighted' : null],
             ["Reputation", () => showCaptainReputationMenu()],
             ["Close", () => closeModal()],
@@ -78,7 +75,11 @@ function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
         'captain_panel'
     );
 
-    if (selectedSkill) {
+    // Select first skill by default if no skill is selected
+    if (!selectedSkill && SKILLS_ALL.length > 0) {
+        console.log('auto selecting first skill')
+        onSelectSkill(SKILLS_ALL[0]);
+    } else if (selectedSkill) {
         console.log('auto selecting skill:',selectedSkill)
         onSelectSkill(selectedSkill);
     }
@@ -131,6 +132,8 @@ function showCaptainPerksMenu(captain = gs.captain, selectedPerk = null) {
                 )
             }, !canTake],
             ['Skills', () => showCaptainSkillsMenu()],
+            ['Implants', () => showCaptainImplantsMenu()],
+            ['Genetics', () => showCaptainGeneticsMenu()],
             ['Reputation', () => showCaptainReputationMenu()],
             ['Close', () => closeModal()],
         ]
@@ -176,6 +179,8 @@ function showCaptainPerksMenu(captain = gs.captain, selectedPerk = null) {
         ]}),
         [
             ["Skills", () => showCaptainSkillsMenu()],
+            ["Implants", () => showCaptainImplantsMenu()],
+            ["Genetics", () => showCaptainGeneticsMenu()],
             ["Reputation", () => showCaptainReputationMenu()],
             ["Close", () => closeModal()],
         ],
@@ -186,6 +191,88 @@ function showCaptainPerksMenu(captain = gs.captain, selectedPerk = null) {
         console.log('auto selecting perk:', selectedPerk)
         onSelectPerk(selectedPerk);
     }
+}
+
+/**
+ * Displays the captain's cybernetic implants menu.
+ * @param {Officer} captain - The captain whose implants to display.
+ */
+function showCaptainImplantsMenu(captain = gs.captain) {
+    console.log('showCaptainImplantsMenu called with captain:', captain)
+    const {name, level, implants} = captain
+
+    // Build implants table
+    const implantTableRows = [
+        ['Implant', 'Quality'],
+        ...implants.map(implant => [
+            colorSpan(implant.implantType.name, implant.implantType.color),
+            `${roundToPlaces(implant.quality*100, 1)}%`
+        ])
+    ]
+
+    const implantTable = implants.length > 0 
+        ? createTable(implantTableRows)
+        : ce({children: [colorSpan('No cybernetic implants installed.', COLORS.Gray)]})
+
+    showModal(
+        `Captain Implants`,
+        ce({children:[
+            `Name: ${name} | Level: ${level}`,
+            ce({style: 'margin-top: 15px;', children: [
+                ce({children: [`<b>Installed Cybernetic Implants:</b>`]}),
+                implantTable
+            ]})
+        ]}),
+        [
+            ["Skills", () => showCaptainSkillsMenu()],
+            ["Genetics", () => showCaptainGeneticsMenu()],
+            ["Perks", () => showCaptainPerksMenu(), false, captain.numPerkPoints > 0 ? 'highlighted' : null],
+            ["Reputation", () => showCaptainReputationMenu()],
+            ["Close", () => closeModal()],
+        ],
+        'captain_panel'
+    );
+}
+
+/**
+ * Displays the captain's genetic modifications menu.
+ * @param {Officer} captain - The captain whose genetic modifications to display.
+ */
+function showCaptainGeneticsMenu(captain = gs.captain) {
+    console.log('showCaptainGeneticsMenu called with captain:', captain)
+    const {name, level, geneticModifications = []} = captain
+
+    // Build genetic modifications table
+    const geneticsTableRows = [
+        ['Genetic Modification', 'Quality'],
+        ...geneticModifications.map(mod => [
+            colorSpan(mod.modificationType.name, mod.modificationType.color),
+            `${roundToPlaces(mod.quality*100, 1)}%`
+        ])
+    ]
+
+    const geneticsTable = geneticModifications.length > 0 
+        ? createTable(geneticsTableRows)
+        : ce({children: [colorSpan('No genetic modifications applied.', COLORS.Gray)]})
+
+    showModal(
+        `Captain Genetics`,
+        ce({children:[
+            `Name: ${name} | Level: ${level}`,
+            ce({style: 'margin-top: 15px;', children: [
+                ce({children: [`<b>Applied Genetic Modifications:</b>`]}),
+                geneticsTable
+            ]})
+        ]}),
+        [
+            ["Skills", () => showCaptainSkillsMenu()],
+            ["Implants", () => showCaptainImplantsMenu()],
+            ["Perks", () => showCaptainPerksMenu(), false, captain.numPerkPoints > 0 ? 'highlighted' : null],
+            ["Reputation", () => showCaptainReputationMenu()],
+            ["Close", () => closeModal()],
+        ],
+        'captain_panel'
+    );
 }
 
 function showCaptainReputationMenu() {
@@ -259,8 +346,10 @@ function showCaptainReputationMenu() {
             reputationContainer,
         ]}),
         [
-            ["Perks", () => showCaptainPerksMenu(captain), false, captain.numPerkPoints > 0 ? 'highlighted' : null],
             ["Skills", () => showCaptainSkillsMenu(captain)],
+            ["Implants", () => showCaptainImplantsMenu(captain)],
+            ["Genetics", () => showCaptainGeneticsMenu(captain)],
+            ["Perks", () => showCaptainPerksMenu(captain), false, captain.numPerkPoints > 0 ? 'highlighted' : null],
             ["Close", () => closeModal()],
         ],
         'captain_panel'

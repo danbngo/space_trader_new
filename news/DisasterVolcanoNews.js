@@ -25,7 +25,8 @@ class DisasterVolcanoNews extends News {
                 population: CL.LOW,
                 industry: CL.LOW,
                 culture: CL.SLIGHTLY_LOW,
-                territory: CL.SLIGHTLY_LOW
+                territory: CL.SLIGHTLY_LOW,
+                wealth: CL.VERY_LOW,
             }
         )
     }

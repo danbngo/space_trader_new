@@ -21,7 +21,7 @@ class DisasterFlareNews extends News {
                 economy: CL.LOW,
                 industry: CL.LOW,
                 technology: CL.LOW,
-                wealth: CL.SLIGHTLY_LOW
+                wealth: CL.LOW,
             }
         )
     }
@@ -36,6 +36,10 @@ class DisasterFlareNews extends News {
         const {planet: p} = this
         // Only affects planets close to the star (within 10 AU)
         const orbitValid = p.orbit && p.orbit.radius < 10
+        
+        // Protected if planet has high magnetosphere
+        const protectedByMagnetosphere = p.climate.magnetosphere && p.climate.magnetosphere.value >= MAGNETOSPHERES.HIGH.value
+        if (protectedByMagnetosphere) return false
         
         // More likely on planets with weaker magnetospheres (less natural protection)
         const weakMagnetosphere = p.climate.magnetosphere && p.climate.magnetosphere.value < MAGNETOSPHERES.MEDIUM.value

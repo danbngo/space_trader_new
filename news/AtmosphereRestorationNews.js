@@ -1,0 +1,70 @@
+class AtmosphereRestorationNews extends News {
+    constructor(planet = new Planet()) {
+        super(
+            `${coloredName(planet)} launches an ambitious algal terraforming program to rebuild their planetary atmosphere!`,
+            `${coloredName(planet)}'s algal processors succeed, enriching the atmosphere with breathable gases!`,
+            `${coloredName(planet)}'s algal terraforming project spirals out of control, creating toxic blooms!`,
+            ``,
+            NT.ATMOSPHERE_RESTORATION, planet
+        )
+
+        this.addPlanetEffect(
+            {
+                taxes: CL.VERY_HIGH,
+                wealth: CL.SLIGHTLY_LOW,
+                reserves: CL.LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.ISOTOPES, CL.VERY_HIGH],
+                    [CARGO_TYPES.NANITES, CL.HIGH]
+                ]))
+            },
+            {
+                economy: CL.SLIGHTLY_HIGH,
+                industry: CL.SLIGHTLY_HIGH,
+                technology: CL.HIGH,
+                education: CL.SLIGHTLY_HIGH,
+                culture: CL.SLIGHTLY_HIGH,
+                prestige: CL.HIGH,
+                climateAlterations: () => {
+                    // Successfully raise atmospheric pressure
+                    planet.climate.incrementClimateValue(ATMOSPHERIC_PRESSURES, 1)
+                }
+            },
+            {
+                population: CL.SLIGHTLY_LOW,
+                wealth: CL.LOW,
+                reserves: CL.LOW,
+                economy: CL.SLIGHTLY_LOW,
+                prestige: CL.SLIGHTLY_LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.MEDICINE, CL.HIGH],
+                    [CARGO_TYPES.FOOD, CL.SLIGHTLY_HIGH]
+                ]))
+            }
+        )
+    }
+
+    determineOutcome() {
+        const {planet: p} = this
+        // Success depends on education (managing complex biological systems) and technology
+        this.rollOutcome(p.c.education * p.c.technology / p.c.corruption, CL.MEDIUM)
+    }
+
+    isValid() {
+        const {planet: p} = this
+        // Requires high education and low pollution
+        const ratingsValid = p.c.education > CL.HIGH 
+            && p.c.wealth > CL.MEDIUM
+            && p.c.reserves > CL.SLIGHTLY_LOW
+        
+        // Must not already have high atmosphere or unhealthy atmosphere
+        const atmosphereValid = p.climate.atmosphericPressure && 
+            p.climate.atmosphericPressure.value < ATMOSPHERIC_PRESSURES.HIGH.value
+        
+        // Pollution must be low for algae to work effectively
+        const pollutionValid = !p.climate.pollution || 
+            p.climate.pollution.value < POLLUTION_LEVELS.SLIGHTLY_HIGH.value
+        
+        return ratingsValid && atmosphereValid && pollutionValid
+    }
+}

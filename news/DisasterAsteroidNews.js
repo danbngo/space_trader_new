@@ -27,6 +27,7 @@ class DisasterAsteroidNews extends News {
                 economy: CL.LOW,
                 industry: CL.VERY_LOW,
                 reserves: CL.VERY_LOW,
+                wealth: CL.LOW,
             }
         )
     }

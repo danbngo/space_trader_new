@@ -84,6 +84,12 @@ function createGovernmentSection(govType, governmentCounts, totalPlanets) {
     const count = governmentCounts.get(govType) || 0
     const adoptionPercentage = totalPlanets > 0 ? (count / totalPlanets) * 100 : 0
     
+    // Get planet symbols for this government type
+    const planetSymbols = gs.system.planets
+        .filter(p => p.c && p.c.governmentType === govType)
+        .map(p => p.symbol)
+        .join(' ')
+    
     const govSection = ce({
         style: 'border-left: 3px solid ' + rgbArrayToString(govType.color) + '; padding-left: 15px; margin-bottom: 15px;',
         children: [
@@ -110,7 +116,7 @@ function createGovernmentSection(govType, governmentCounts, totalPlanets) {
         children: [
             ce({
                 style: 'margin-bottom: 4px; font-size: 0.9em;',
-                children: [`${count} of ${totalPlanets} planets`]
+                innerHTML: `${count} of ${totalPlanets} planets: ${planetSymbols}`
             }),
             adoptionProgressBar.container
         ]
@@ -172,9 +178,15 @@ function createPolicyAdoptionTable(civilizedPlanets) {
         ]
 
         for (const policy of usedPolicies) {
+            // Get planet symbols for this policy
+            const planetSymbols = civilizedPlanets
+                .filter(p => p.c.policies.all.includes(policy))
+                .map(p => p.symbol)
+                .join(' ')
+            
             tableRows.push([
                 coloredName(policy),
-                policyCounts.get(policy)
+                ce({innerHTML: planetSymbols})
             ])
         }
 

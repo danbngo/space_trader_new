@@ -146,6 +146,20 @@ class Officer {
         if (this.level % 3 === 0) {
             this.numPerkPoints += 1;
         }
+        
+        // Auto-grant race automatic perks if level threshold is met
+        if (this.race && this.race.automaticPerks) {
+            for (const perk of this.race.automaticPerks) {
+                // Check if officer meets level requirement and doesn't already have this perk
+                if (this.level >= perk.minLevel && !this.perks.includes(perk)) {
+                    this.perks.push(perk)
+                    if (this === gs.captain) {
+                        console.log(`Auto-granted perk: ${perk.name}`)
+                    }
+                }
+            }
+        }
+        
         if (autoImproveSkills) {
             this.autoImproveSkills();
         }

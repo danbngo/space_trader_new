@@ -44,6 +44,10 @@ class AntimatterGridNews extends News {
                 technology: CL.LOW,
                 taxes: CL.VERY_HIGH,
                 prestige: CL.LOW,
+                climateAlterations: () => {
+                    // Catastrophic failure releases massive radiation
+                    planet.climate.incrementClimateValue(RADIATION_LEVELS, 2)
+                },
                 cargoPriceMultipliers: new CountsMap(new Map([
                     [CARGO_TYPES.ANTIMATTER, CL.VERY_HIGH],
                     [CARGO_TYPES.MEDICINE, CL.VERY_HIGH],

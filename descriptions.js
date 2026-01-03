@@ -32,7 +32,9 @@ function coloredName(obj = new SpaceObject()) {
     if (obj instanceof Fleet) return obj.planet ? `${coloredIanName(obj.planet)} ${obj.name}` : obj.name
 
     // @ts-ignore
-    return `${obj.symbol ? obj.symbol+' ' : ''}${colorSpan(name, obj.color ? obj.color : '')}`
+    const symbol = obj instanceof Planet ? '' : `${obj.symbol ? obj.symbol+' ' : ''}`
+
+    return `${colorSpan(symbol+name, obj.color ? obj.color : '')}`
 }
 
 function coloredIanName(obj = new Planet()) {

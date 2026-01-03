@@ -24,7 +24,7 @@ class DisasterTsunamiNews extends News {
                 economy: CL.LOW,
                 culture: CL.SLIGHTLY_LOW,
                 reserves: CL.LOW,
-                wealth: CL.SLIGHTLY_LOW
+                wealth: CL.VERY_LOW,
             }
         )
     }

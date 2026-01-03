@@ -444,6 +444,27 @@ class News {
         // Change the government type
         targetPlanet.civilization.governmentType = newGovernmentType
         
+        // Handle religion changes based on new government
+        if (gs && gs.system && gs.system.religions) {
+            const favoredReligions = newGovernmentType.favoredReligions || []
+            const forbiddenReligions = newGovernmentType.forbiddenReligions || []
+            
+            // Filter available religions: remove forbidden ones
+            const allowedReligions = gs.system.religions.filter(r => !forbiddenReligions.includes(r))
+            
+            // 50% chance to adopt a favored religion if available
+            const availableFavoredReligions = favoredReligions.filter(r => allowedReligions.includes(r))
+            if (availableFavoredReligions.length > 0 && Math.random() < 0.5) {
+                targetPlanet.civilization.stateReligion = rndMember(availableFavoredReligions)
+            } else if (allowedReligions.length > 0) {
+                // Otherwise pick a random allowed religion (or possibly null)
+                targetPlanet.civilization.stateReligion = Math.random() < 0.3 ? null : rndMember(allowedReligions)
+            } else {
+                // No allowed religions, set to null
+                targetPlanet.civilization.stateReligion = null
+            }
+        }
+        
         // Filter policies by what's valid for the new government
         const validEconomicPolicies = ECONOMIC_POLICIES.filter(p => !p.forbiddenGovs.includes(newGovernmentType))
         const validLaborPolicies = LABOR_POLICIES.filter(p => !p.forbiddenGovs.includes(newGovernmentType))

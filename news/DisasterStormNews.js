@@ -23,7 +23,8 @@ class DisasterStormNews extends News {
                 army: CL.LOW,
                 economy: CL.SLIGHTLY_LOW,
                 industry: CL.LOW,
-                reserves: CL.SLIGHTLY_LOW
+                reserves: CL.SLIGHTLY_LOW,
+                wealth: CL.VERY_LOW
             }
         )
     }

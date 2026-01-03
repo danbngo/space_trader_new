@@ -102,10 +102,7 @@ function generateCivilization(planet) {
         const numReligions = Math.min(rng(systemReligions.length, 1), systemReligions.length)
         const selectedReligions = rndMembers(systemReligions, numReligions, true)
         
-        // Set state religion first (70% chance if religions exist)
-        if (Math.random() < 0.7 && selectedReligions.length > 0) {
-            stateReligion = rndMember(selectedReligions)
-        }
+        stateReligion = rndMember(selectedReligions)
         
         // Generate random weights for religions
         const religionWeights = []

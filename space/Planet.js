@@ -33,6 +33,8 @@ class Planet extends OrbitingObject {
         this.closed = false
         /** @type {number} - Radius of magnetosphere in AU */
         this.magnetosphereRadius = magnetosphereRadius
+        /** @type {string} - Symbol: first letter of planet name in its color */
+        this.symbol = colorSpan(this.name.charAt(0), this.color)
     }
     get c() {
         return this.civilization

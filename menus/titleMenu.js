@@ -194,6 +194,10 @@ async function startNewGame() {
 
     // Create captain
     const captain = new Officer("Captain", STARTING_CREDITS);
+    
+    // Give captain all cyber implants for testing
+    captain.implants = CYBER_IMPLANT_TYPES_ALL.map(implantType => new CyberImplant(implantType, 1.0))
+    
     const playerShip = new Ship("Starting Ship", STARTING_SHIP_TYPE, COLORS.LightGray, [30,30], [20,20], 100, 10, 10, 10)
     
     // Give player all modules for testing

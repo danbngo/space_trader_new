@@ -24,7 +24,7 @@ function showPoliticsMenu(backFunction = () => closeModal()) {
         const alliances = []
         for (const [otherPlanet, relationship] of c.relationships.entries()) {
             if (relationship === RELATIONSHIP_TYPES.ALLY) {
-                alliances.push(otherPlanet.name)
+                alliances.push(otherPlanet.symbol)
             }
         }
         
@@ -32,7 +32,7 @@ function showPoliticsMenu(backFunction = () => closeModal()) {
         const tense = []
         for (const [otherPlanet, relationship] of c.relationships.entries()) {
             if (relationship === RELATIONSHIP_TYPES.TENSE) {
-                tense.push(otherPlanet.name)
+                tense.push(otherPlanet.symbol)
             }
         }
         
@@ -40,7 +40,7 @@ function showPoliticsMenu(backFunction = () => closeModal()) {
         const atWar = []
         for (const [otherPlanet, relationship] of c.relationships.entries()) {
             if (relationship === RELATIONSHIP_TYPES.WAR) {
-                atWar.push(otherPlanet.name)
+                atWar.push(otherPlanet.symbol)
             }
         }
         
@@ -48,9 +48,9 @@ function showPoliticsMenu(backFunction = () => closeModal()) {
             coloredName(c.governmentType),
             c.stateReligion ? coloredName(c.stateReligion) : 'None',
             c.races?.calcHighestValue() ? coloredName(c.races.calcHighestValue()) : 'Unknown',
-            statColorSpan(alliances.length, 1+alliances.length),
-            statColorSpan(tense.length, 1 / (1+tense.length)),
-            statColorSpan(atWar.length, 1 / (1+(atWar.length*2))),
+            alliances.length > 0 ? alliances.join(' ') : '-',
+            tense.length > 0 ? tense.join(' ') : '-',
+            atWar.length > 0 ? atWar.join(' ') : '-',
         ]
     })
 

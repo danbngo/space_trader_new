@@ -13,12 +13,18 @@ class DisasterGreenhouseNews extends News {
                 culture: CL.SLIGHTLY_LOW,
                 population: CL.SLIGHTLY_LOW,
                 reserves: CL.SLIGHTLY_LOW,
+                climateAlterations: () => {
+                    planet.climate.incrementClimateValue(TEMPERATURES, 1)
+                },
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.FOOD, CL.SLIGHTLY_HIGH], [CARGO_TYPES.WATER, CL.HIGH]]))
             },
             {
                 culture: CL.SLIGHTLY_HIGH,
                 technology: CL.SLIGHTLY_HIGH,
-                education: CL.SLIGHTLY_HIGH
+                education: CL.SLIGHTLY_HIGH,
+                climateAlterations: () => {
+                    planet.climate.incrementClimateValue(TEMPERATURES, 1)
+                }
             },
             {
                 territory: CL.LOW,
@@ -26,7 +32,11 @@ class DisasterGreenhouseNews extends News {
                 population: CL.SLIGHTLY_LOW,
                 economy: CL.VERY_LOW,
                 industry: CL.SLIGHTLY_LOW,
-                reserves: CL.SLIGHTLY_LOW
+                reserves: CL.SLIGHTLY_LOW,
+                wealth: CL.SLIGHTLY_LOW,
+                climateAlterations: () => {
+                    planet.climate.incrementClimateValue(TEMPERATURES, 2)
+                }
             }
         )
     }

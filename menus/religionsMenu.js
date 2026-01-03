@@ -87,22 +87,34 @@ function createReligionSection(religion, religionFollowers, totalSystemPopulatio
         ]
     })
 
+    // Add traits as comma-separated list
     if (religion.traits && religion.traits.length > 0) {
-        for (const trait of religion.traits) {
-            const traitEl = ce({
-                style: 'margin-left: 10px; margin-bottom: 5px;',
-                children: [
-                    `• ${colorSpan(trait.name, trait.color)}`,
-                ]
-            })
-            religionSection.appendChild(traitEl)
-        }
+        const traitsList = religion.traits.map(trait => colorSpan(trait.name, trait.color)).join(', ')
+        const traitsEl = ce({
+            style: 'margin-top: 5px; margin-bottom: 8px;',
+            children: [`Traits: ${traitsList}`]
+        })
+        religionSection.appendChild(traitsEl)
     } else {
         const noTraits = ce({
-            style: 'margin-top: 5px; opacity: 0.6; font-style: italic;',
+            style: 'margin-top: 5px; margin-bottom: 8px; opacity: 0.6; font-style: italic;',
             children: ['This faith has no documented doctrinal traits.']
         })
         religionSection.appendChild(noTraits)
+    }
+
+    // Add state religion adoption info
+    const planetsWithStateReligion = gs.system.planets.filter(p => p.c && p.c.stateReligion === religion)
+    const stateReligionCount = planetsWithStateReligion.length
+    const totalPlanets = gs.system.planets.filter(p => p.c).length
+    
+    if (totalPlanets > 0) {
+        const planetSymbols = planetsWithStateReligion.map(p => p.symbol).join(' ')
+        const stateReligionEl = ce({
+            style: 'margin-bottom: 8px;',
+            children: [`State Religion: ${stateReligionCount} of ${totalPlanets} planets ${planetSymbols ? '— ' + planetSymbols : ''}`]
+        })
+        religionSection.appendChild(stateReligionEl)
     }
 
     // Add faith reach progress bar

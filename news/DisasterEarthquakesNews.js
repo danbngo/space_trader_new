@@ -25,7 +25,8 @@ class DisasterEarthquakesNews extends News {
                 army: CL.SLIGHTLY_LOW,
                 economy: CL.LOW,
                 industry: CL.LOW,
-                reserves: CL.SLIGHTLY_LOW
+                reserves: CL.SLIGHTLY_LOW,
+                wealth: CL.LOW,
             }
         )
     }

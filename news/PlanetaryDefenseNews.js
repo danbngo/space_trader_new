@@ -47,6 +47,11 @@ class PlanetaryDefenseNews extends News {
             && p.c.navy > CL.MEDIUM
             && p.c.wealth > CL.MEDIUM
             && p.c.reserves > CL.SLIGHTLY_LOW
-        return ratingsValid
+        
+        // Orbital platform needs stable space environment (low asteroid impact risk)
+        const orbitalStability = !p.climate.asteroidImpact || 
+            p.climate.asteroidImpact.value < ASTEROID_IMPACTS.HIGH.value
+        
+        return ratingsValid && orbitalStability
     }
 }
