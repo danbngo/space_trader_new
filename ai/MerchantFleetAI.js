@@ -34,7 +34,7 @@ class MerchantFleetAI extends FleetAI {
             console.log(`💰 ${this.fleet.name} traded at ${this.destination.name}: unloaded cargo and loaded ${reservedCargo.total} units`)
             
             // Show trade popup
-                this.starMap.addPopup(this.fleet.x, this.fleet.y, '💲', COLORS.Green)
+                this.addPopup('💲', COLORS.Green)
         }
         
         // Spread minor culture when trading at destinations (0.1% influence)
@@ -59,7 +59,7 @@ class MerchantFleetAI extends FleetAI {
             
             console.log(`💰 ${this.fleet.name} unloaded all cargo at ${this.origin.name}`)
             
-                this.starMap.addPopup(this.fleet.x, this.fleet.y, '💲', COLORS.Green)
+                this.addPopup('💲', COLORS.Green)
         }
         
         super.onNearOrigin()

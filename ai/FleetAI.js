@@ -34,6 +34,10 @@ class FleetAI {
             gs.system.removeFleet(this.fleet)
         }
     }
+
+    addPopup(text = '', color = COLORS.WHITE, overrideX = this.fleet.x, overrideY = this.fleet.y) {
+        this.starMap.addPopup(overrideX, overrideY, text, color)
+    }
     /**
      * Updates AI behavior each game tick.
      */
@@ -59,7 +63,7 @@ class FleetAI {
                 const target = this.findNearest(validTargets, this.fleet.fleetType.targetMaxDistance || Infinity);
                 if (target && target !== this.target) {
                     // Show interest popup when finding a new target
-                        this.starMap.addPopup(this.fleet.x, this.fleet.y, '!!', COLORS.Yellow, 1500)
+                        this.addPopup('!!', COLORS.Yellow)
                     this.setTarget(target);
                     return
                 }
@@ -152,7 +156,7 @@ class FleetAI {
     // Show popup if starMap is available
         const midX = (this.fleet.x + this.target.x) / 2
         const midY = (this.fleet.y + this.target.y) / 2
-        this.starMap.addPopup(midX, midY, '⚔️', COLORS.Red)
+        this.addPopup('⚔️', COLORS.Red, midX, midY)
         
         // Reveal both fleets during combat
         this.fleet.cloakLevel = 0
@@ -175,7 +179,8 @@ class FleetAI {
         }
         
         // Show skull popup at target's death location
-        this.starMap.addPopup(loser.x, loser.y, '💀', COLORS.Red)
+        this.addPopup('💀', COLORS.Red, loser.x, loser.y)
+
         loser.ai.onDestroyed()
         winner.ai.target = null
         winner.ai.route = null
@@ -216,7 +221,9 @@ class FleetAI {
             console.log(`💰 ${toFleet.name+' '+toFleet.uuid} seized ${transferred} units of cargo from ${fromFleet.name+' '+fromFleet.uuid}`);
             
             // Show theft popup at the location where cargo is being taken
-            this.starMap.addPopup(fromFleet.x, fromFleet.y, '💰', COLORS.Yellow)
+            this.addPopup('💰', COLORS.LightYellow)
+            //show another popup to show that target is LOSING money
+            this.addPopup('💸', COLORS.DarkYellow, this.target.x, this.target.y)
         }
     }
 
@@ -237,7 +244,8 @@ class FleetAI {
         console.log(`💵 ${toFleet.name+' '+toFleet.uuid} took ${creditsToTake} credits from ${fromFleet.name+' '+fromFleet.uuid}`);
         
         // Show credits transfer popup
-        this.starMap.addPopup(fromFleet.x, fromFleet.y, '💵', COLORS.Green)
+        this.addPopup('💵', COLORS.Green, toFleet.x, toFleet.y)
+        this.addPopup('💸', COLORS.DarkYellow, fromFleet.x, fromFleet.y)
     }
 
     /**
@@ -260,7 +268,8 @@ class FleetAI {
         console.log(`👥 ${toFleet.name+' '+toFleet.uuid} captured ${officersToTake.length} officers from ${fromFleet.name+' '+fromFleet.uuid}`);
         
         // Show crew capture popup
-            this.starMap.addPopup(fromFleet.x, fromFleet.y, '👥', COLORS.Orange)
+            this.addPopup('👥', COLORS.Orange)
+            this.addPopup('💔', COLORS.DarkRed, this.target.x, this.target.y)
     }
     /**
      * Finds nearest object of a given type.

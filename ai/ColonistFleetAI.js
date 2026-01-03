@@ -34,7 +34,14 @@ class ColonistFleetAI extends FleetAI {
         
         // Transfer cultural values from origin to destination (2% influence)
         if (this.destination instanceof Planet) {
-            this.destination.addCulture(this.fleet.planet, 0.02);
+            this.destination.addCulture(this.fleet.planet, 0.05); //mayflower like effect
+            this.destination.c.population *= 1.01 //stimulate population growth
+            this.destination.c.wealth *= 0.99
+            this.destination.c.prestige *= 0.99 //dude you're being colonized!
+            this.destination.c.culture *= 0.99
+            this.fleet.planet.c.wealth *= 1.01
+            this.fleet.planet.c.culture *= 1.01
+            this.fleet.planet.c.taxes *= 0.99
         }
 
         super.onNearDestination()

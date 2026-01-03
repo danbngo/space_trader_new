@@ -70,7 +70,8 @@ class Planet extends OrbitingObject {
             return;
         }
         
-        this.c.cultures.increment(sourcePlanet, weight);
+        const currentAmt = this.c.cultures.getAmount(sourcePlanet)
+        this.c.cultures.setAmount(sourcePlanet, currentAmt * (1 + weight));
         this.c.cultures.normalize();
     }
     
@@ -84,7 +85,8 @@ class Planet extends OrbitingObject {
             return;
         }
         
-        this.c.races.increment(sourceRace, weight);
+        const currentAmt = this.c.races.getAmount(sourceRace)
+        this.c.races.setAmount(sourceRace, currentAmt * (1 + weight));
         this.c.races.normalize();
     }
 

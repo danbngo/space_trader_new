@@ -34,7 +34,7 @@ class DiplomatFleetAI extends FleetAI {
                 
                 // Show diplomacy popup
                 if (this.starMap) {
-                    this.starMap.addPopup(this.fleet.x, this.fleet.y, '🕊️', COLORS.White)
+                    this.addPopup('🕊️', COLORS.White)
                 }
             }
         }

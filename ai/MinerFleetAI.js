@@ -49,7 +49,7 @@ class MinerFleetAI extends FleetAI {
                 console.log(`⛏️ ${this.fleet.name} mined ${mineAmount} ${cargoType.name}`);
                 
                 // Show mining popup
-                    this.starMap.addPopup(this.fleet.x, this.fleet.y, '⛏️', COLORS.Orange)
+                    this.addPopup('⛏️', COLORS.Orange)
             }
         }
     }
@@ -69,7 +69,7 @@ class MinerFleetAI extends FleetAI {
             console.log(`💰 ${this.fleet.name} unloaded all cargo at ${this.destination.name}`)
             
             // Show trade popup
-            this.starMap.addPopup(this.fleet.x, this.fleet.y, '💲', COLORS.Green)
+            this.addPopup('💲', COLORS.Green)
         }
         
         super.onNearDestination()
@@ -90,7 +90,7 @@ class MinerFleetAI extends FleetAI {
             console.log(`💰 ${this.fleet.name} unloaded all cargo at ${this.origin.name}`)
             
             // Show trade popup
-            this.starMap.addPopup(this.fleet.x, this.fleet.y, '💲', COLORS.Green)
+            this.addPopup('💲', COLORS.Green)
         }
         
         super.onNearOrigin()

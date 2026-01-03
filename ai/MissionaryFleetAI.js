@@ -46,7 +46,7 @@ class MissionaryFleetAI extends FleetAI {
                 console.log(`☠️ ${this.fleet.name} was destroyed by ${this.target.name} while proselytizing!`);
                 
                 // Show skull popup at missionary's death location
-                this.starMap.addPopup(this.fleet.x, this.fleet.y, '💀', COLORS.Red);
+                this.addPopup('💀', COLORS.Red);
                 
                 this.onDestroyed()
                 return;
@@ -59,7 +59,7 @@ class MissionaryFleetAI extends FleetAI {
                 console.log(`✝️ ${this.fleet.name} converted ${this.target.captain.name} to ${ourReligion.name}!`);
                 
                 // Show conversion popup
-                this.starMap.addPopup(this.target.x, this.target.y, '✝️', COLORS.White);
+                this.addPopup('✝️', COLORS.White);
                 
                 // Spread culture to converted fleet's home planet (0.1% influence)
                 if (this.target.planet instanceof Planet) {

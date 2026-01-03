@@ -76,7 +76,7 @@ class InquisitorFleetAI extends FleetAI {
                     
                     // Show purge popup
                     if (this.starMap) {
-                        this.starMap.addPopup(this.target.x, this.target.y, '⚖️', COLORS.DarkRed);
+                        this.addPopup('⚖️', COLORS.DarkRed, this.target.x, this.target.y);
                     }
                 }
                 
@@ -93,7 +93,7 @@ class InquisitorFleetAI extends FleetAI {
                 
                 // Show conversion popup
                 if (this.starMap) {
-                    this.starMap.addPopup(this.target.x, this.target.y, '✝️', COLORS.White);
+                    this.addPopup('✝️', COLORS.White);
                 }
                 
                 this.target = null;

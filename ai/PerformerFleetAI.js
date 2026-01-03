@@ -72,7 +72,7 @@ class PerformerFleetAI extends FleetAI {
                     
                     // Show performance popup
                     if (this.starMap) {
-                        this.starMap.addPopup(this.target.x, this.target.y, '🎭', COLORS.LightYellow);
+                        this.addPopup('🎭', COLORS.LightYellow);
                     }
                 }
             } else {
@@ -80,7 +80,7 @@ class PerformerFleetAI extends FleetAI {
                 
                 // Show performance popup
                 if (this.starMap) {
-                    this.starMap.addPopup(this.target.x, this.target.y, '🎭', COLORS.DarkYellow);
+                    this.addPopup('🎭', COLORS.DarkYellow);
                 }
             }
             

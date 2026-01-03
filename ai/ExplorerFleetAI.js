@@ -72,12 +72,12 @@ class ExplorerFleetAI extends FleetAI {
                     console.log(`🧭 ${this.fleet.name} charted ${this.target.name} and discovered ${relicsFound} relics`);
                     
                     // Show discovery popup
-                    this.starMap.addPopup(this.fleet.x, this.fleet.y, '✨', COLORS.Green)
+                    this.addPopup('✨', COLORS.Green)
                 } else {
                     console.log(`🧭 ${this.fleet.name} charted ${this.target.name}`);
                     
                     // Show discovery popup
-                    this.starMap.addPopup(this.fleet.x, this.fleet.y, '✨', COLORS.Green)
+                    this.addPopup('✨', COLORS.Green)
                 }
             }
         }
@@ -98,14 +98,14 @@ class ExplorerFleetAI extends FleetAI {
                     
                     // Show success popup
                     if (this.starMap) {
-                        this.starMap.addPopup(this.fleet.x, this.fleet.y, '💎', COLORS.Green, 2500);
+                        this.addPopup('💎', COLORS.Green)
                     }
                 } else {
                     console.log(`🧭 ${this.fleet.name} explored ${this.target.name} but found nothing of value`);
                     
                     // Show neutral popup
                     if (this.starMap) {
-                        this.starMap.addPopup(this.fleet.x, this.fleet.y, '🔍', COLORS.White, 2500);
+                        this.addPopup('🔍', COLORS.White)
                     }
                 }
             }
@@ -115,7 +115,7 @@ class ExplorerFleetAI extends FleetAI {
                 
                 // Show destruction popup
                 if (this.starMap) {
-                    this.starMap.addPopup(this.fleet.x, this.fleet.y, '💀', COLORS.Red, 2500);
+                    this.addPopup('💀', COLORS.Red)
                 }
                 
                 this.onDestroyed();
@@ -141,7 +141,7 @@ class ExplorerFleetAI extends FleetAI {
                 
                 // Show danger popup
                 if (this.starMap) {
-                    this.starMap.addPopup(this.fleet.x, this.fleet.y, '⚠️', COLORS.Orange, 2500);
+                    this.addPopup('⚠️', COLORS.Orange)
                 }
             }
             

@@ -29,12 +29,12 @@ class ScientistFleetAI extends FleetAI {
                     console.log(`🔬 ${this.fleet.name} catalogued ${this.target.name} and discovered ${relicsFound} relics`);
                     
                     // Show discovery popup
-                    this.starMap.addPopup(this.fleet.x, this.fleet.y, '✨', COLORS.LightCyan)
+                    this.addPopup('✨', COLORS.LightCyan)
                 } else {
                     console.log(`🔬 ${this.fleet.name} catalogued ${this.target.name}`);
                     
                     // Show discovery popup
-                    this.starMap.addPopup(this.fleet.x, this.fleet.y, '✨', COLORS.LightCyan)
+                    this.addPopup('✨', COLORS.DarkCyan)
                 }
             }
         }

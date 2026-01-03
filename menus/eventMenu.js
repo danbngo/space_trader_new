@@ -127,6 +127,7 @@ function checkForFleetSpawning(elapsedDays = 1, planetMaxFleets = null) {
                 const fleetType = rndMember(faction.fleetTypes)
                 const spawnAt = calcRandomSpawnPlanet(fleetType, faction, planet)
                 const fleet = generateFleet(fleetType, faction, planet, spawnAt)
+                fleet.fleetAI.starMap = currentMap
                 fleet.color = planet.color
                 fleet.x = planet.x
                 fleet.y = planet.y

@@ -20,9 +20,15 @@ class RefugeeFleetAI extends FleetAI {
             }
         }
         
-        // Transfer cultural values from origin to destination (2% influence)
+        // Transfer cultural values from origin to destination (1% influence, way less than colonists)
         if (this.destination instanceof Planet) {
-            this.destination.addCulture(this.fleet.planet, 0.02);
+            this.destination.addCulture(this.fleet.planet, 0.1);
+            this.destination.c.population *= 1.01 //stimulate population growth
+            this.destination.c.wealth *= 0.99 //refugees strain local economy
+            this.destination.c.economy *= 1.01
+            this.destination.c.taxes *= 1.01
+            this.destination.c.security *= 0.99 //refugees can cause unrest
+            this.fleet.planet.c.population *= 0.99
         }
 
         super.onNearDestination()
