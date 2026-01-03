@@ -31,7 +31,7 @@ class MissionaryFleetAI extends FleetAI {
     }
     
     calcDestination() {
-        return rndMember([...gs.system.planets, ...gs.system.dwarfPlanets, ...gs.system.spaceStations].filter(p => p !== this.origin));
+        return rndMember([...gs.system.dwarfPlanets, ...gs.system.spaceStations].filter(p => p !== this.origin));
     }
     
     onNearTarget() {

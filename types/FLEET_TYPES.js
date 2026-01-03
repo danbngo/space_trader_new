@@ -40,7 +40,7 @@ class PseudoFleetType extends FleetType {
 }
 
 const AVG_CR = 5000 //something like a basic unit of credits per fleet
-const AVG_DR = 1/12 //average voyage is max 1 month
+const AVG_DR = 1/4 //average voyage is max 3 months
 
 const FLEET_TYPES = {
     SOLDIERS: new FleetType('Soldiers', [SHIP_TYPES.BATTLESHIP, SHIP_TYPES.FRIGATE, SHIP_TYPES.DESTROYER], 3, 7, AVG_CR*CL.LOW, [CARGO_TYPES.FOOD, CARGO_TYPES.WATER, CARGO_TYPES.WEAPONS, CARGO_TYPES.ANTIMATTER], AVG_DR*CL.SLIGHTLY_HIGH, CHASE_DISTANCES.NEAR),

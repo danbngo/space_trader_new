@@ -8,28 +8,13 @@ function generateRuins(starSystem, count = 3) {
     const ruins = [];
     const ruinsTypes = RUINS_TYPES_ALL;
     
-    // Find the most distant body (planet or dwarf planet) using orbit radius
-    let maxOrbitalRadius = 0;
-    
-    for (const planet of starSystem.planets) {
-        if (planet.orbit && planet.orbit.radius > maxOrbitalRadius) {
-            maxOrbitalRadius = planet.orbit.radius;
-        }
-    }
-    
-    for (const dwarf of starSystem.dwarfPlanets) {
-        if (dwarf.orbit && dwarf.orbit.radius > maxOrbitalRadius) {
-            maxOrbitalRadius = dwarf.orbit.radius;
-        }
-    }
-    
     // Place ruins beyond the most distant body
     // Start at 1.2x the max orbital radius, up to 2x
-    const minDistance = maxOrbitalRadius * 1.2;
-    const maxDistance = maxOrbitalRadius * 2.0;
+    const minDistance = starSystem.radius * .66
+    const maxDistance = starSystem.radius * 0.99
     
     for (let i = 0; i < count; i++) {
-        const orbitalRadius = minDistance + Math.random() * (maxDistance - minDistance);
+        const orbitalRadius = rng(maxDistance, minDistance, false)
         
         // Random ruins type
         const ruinsType = ruinsTypes[Math.floor(Math.random() * ruinsTypes.length)];

@@ -179,8 +179,9 @@ class Fleet extends SpaceObject {
         const weight = this.totalMass + this.cargo.total
         const baseSpeed = AVERAGE_FLEET_SPEED * this.totalEngine/AVERAGE_SHIP_ENGINE / weight
         const totalPilotSkill = this.totalSkills.getAmount(SKILLS.Pilot)
-        const speed = baseSpeed * (1 + totalPilotSkill/50)
-        return speed 
+        const speed = Math.sqrt(baseSpeed) * (1 + totalPilotSkill/50)
+        return speed
+        //fleets are a lil too fast, slow ones are a lil too slow
     }
 
     get totalRadar() {

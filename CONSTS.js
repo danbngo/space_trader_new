@@ -23,7 +23,7 @@ const NEWS_CHANCE_PER_DAY = 1/30;
 const META_NEWS_CHANCE_PER_DAY = 1/365;
 const ANOMALY_CHANCE_PER_DAY = 1/30;
 const MAX_NUM_ANOMALIES = 3;
-const FLEET_SPAWN_CHANCE_PER_DAY = 1/15 / 20 //about 20 fleet types
+const FLEET_SPAWN_CHANCE_PER_DAY = 1/30 / 20 //about 20 fleet types
 const ENCOUNTER_IMMUNITY_DAYS = 1; //days of immunity after an encounter ends
 const ENCOUNTER_DENIED_DAYS = 0.25; //days player can't bump into fleets after denying an encounter (0.25 = 6 hours)
 
@@ -110,3 +110,7 @@ const ENCOUNTER_MAX_EXTORT_RATIO = 0.5 //if syndicates catch you, they'll take u
 const CIVILIZATION_BONUS_RATE_PER_YEAR = 0.1 //each year a democracy will MULTIPLY its economy by 1 + this, for instance
 const CIVILIZATION_CONVERT_CULTURE_PER_YEAR = 0.1 //each year a civilization will convert this fraction of its population to its dominant culture
 const CIVILIZATION_CULTURE_DISAPPEAR_THRESHOLD = 0.0001
+
+
+const SIMULATE_FLEET_ACTIVITY_YEARS = 2
+const SIMULATE_HISTORY_NUM_YEARS = 5

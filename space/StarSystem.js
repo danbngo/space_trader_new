@@ -127,5 +127,15 @@ class StarSystem extends SpaceObject {
     removeFleet(fleet) {
         console.log(`🗑️ Removing fleet ${fleet.name}`)
         this.fleets.splice(gs.system.fleets.indexOf(fleet), 1)
+        
+        // Clear this fleet as a target/route for any other fleets
+        for (const otherFleet of this.fleets) {
+            if (otherFleet.fleetAI?.target === fleet) {
+                otherFleet.fleetAI.target = null
+            }
+            if (otherFleet.route?.destination === fleet) {
+                otherFleet.route = null
+            }
+        }
     }
 }

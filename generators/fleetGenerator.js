@@ -22,6 +22,7 @@ function generateFleetCargo(fleet = new Fleet(), fleetType = FLEET_TYPES_ALL[0])
  * @param {FleetType} fleetType - The type of fleet to generate.
  * @param {FactionType|null} factionType - The faction the fleet belongs to.
  * @param {Planet|null} planet - The planet the fleet is associated with.
+ * @param {SpaceObject|null} startAt - The planet where the fleet starts its journey.
  * @returns {Fleet} The generated fleet.
  */
 function generateFleet(fleetType = FLEET_TYPES_ALL[0], factionType = null, planet = null, startAt = planet) {
@@ -109,7 +110,7 @@ async function addFleetActivity(numYears = 2, progress = {completePercentage: 0}
         
         // Reposition planets every 30 days (once per month)
         //if (d % 30 === 0) {
-            gs.system.updateObjectPositions(gs.year)
+            gs.system.updatePositions(gs.year)
         //}
         
         // Update progress and yield control for smooth UI

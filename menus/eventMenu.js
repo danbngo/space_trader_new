@@ -122,7 +122,7 @@ function checkForFleetSpawning(elapsedDays = 1, planetMaxFleets = null) {
             if ((numExisting >= weight)) {
                 continue
             }
-            if (calcOccurrencesPerTimespan(FLEET_SPAWN_CHANCE_PER_DAY, weight/(1+numExisting)*elapsedDays)) {
+            if (calcOccurrencesPerTimespan(FLEET_SPAWN_CHANCE_PER_DAY, Math.min(weight/(1+numExisting), weight-numExisting)*elapsedDays)) {
                 // Spawn the fleet
                 const fleetType = rndMember(faction.fleetTypes)
                 const spawnAt = calcRandomSpawnPlanet(fleetType, faction, planet)
@@ -137,6 +137,12 @@ function checkForFleetSpawning(elapsedDays = 1, planetMaxFleets = null) {
     }
 }
 
+/**
+ * @param {FleetType} fleetType 
+ * @param {FactionType} faction 
+ * @param {Planet} planet 
+ * @returns 
+ */
 function calcRandomSpawnPlanet(fleetType, faction, planet) {
     // Bounty hunters: spawn at any planet, dwarf planet, or space station
     if (faction.cloaked) {
@@ -144,8 +150,11 @@ function calcRandomSpawnPlanet(fleetType, faction, planet) {
         return rndMember(options)
     }
     
-    // Criminal factions: spawn at dwarf planets, space stations, or home planet
+    // Criminal factions: 75% chance to spawn at asteroids, 25% at dwarf planets/stations/home
     if (faction.criminal) {
+        if (Math.random() < 0.75 && gs.system.asteroids.length > 0) {
+            return rndMember(gs.system.asteroids)
+        }
         const options = [...gs.system.dwarfPlanets, planet, ...gs.system.spaceStations]
         return rndMember(options)
     }
@@ -236,32 +245,41 @@ function calculateMaxFleetsForPlanet(planet) {
         }
         maxNumFleetsPerFaction.setAmount(factionType, maxNumFleets)
     }
-    // Apply civilization-specific multipliers to max fleet counts
-    maxNumFleetsPerFaction.multiply(FACTION_TYPES.MINERS, c.industry/c.reserves)
-    maxNumFleetsPerFaction.multiply(FACTION_TYPES.SCIENTISTS, c.technology*c.education)
-    maxNumFleetsPerFaction.multiply(FACTION_TYPES.PIRATES, c.crime)
-    maxNumFleetsPerFaction.multiply(FACTION_TYPES.MERCHANTS, c.economy)
-    maxNumFleetsPerFaction.multiply(FACTION_TYPES.SOLDIERS, c.navy)
-    maxNumFleetsPerFaction.multiply(FACTION_TYPES.MERCENARIES, c.navy * 0.6) // Mercenaries spawn 60% as often as soldiers
-    maxNumFleetsPerFaction.multiply(FACTION_TYPES.PILGRIMS, c.wealth)
-    maxNumFleetsPerFaction.multiply(FACTION_TYPES.INQUISITORS, 1/c.corruption)
-    maxNumFleetsPerFaction.multiply(FACTION_TYPES.MISSIONARIES, c.prestige*c.education)
-    maxNumFleetsPerFaction.multiply(FACTION_TYPES.TOURISTS, c.wealth)
-    maxNumFleetsPerFaction.multiply(FACTION_TYPES.SMUGGLERS, c.taxes*c.corruption)
+    // Apply civilization-specific multipliers to max fleet counts (alphabetical order)
     maxNumFleetsPerFaction.multiply(FACTION_TYPES.BOUNTY_HUNTERS, c.security*c.crime)
-    maxNumFleetsPerFaction.multiply(FACTION_TYPES.SLAVERS, c.corruption/c.population)
     maxNumFleetsPerFaction.multiply(FACTION_TYPES.COLONISTS, c.population/c.economy)
     maxNumFleetsPerFaction.multiply(FACTION_TYPES.DIPLOMATS, c.prestige)
-    maxNumFleetsPerFaction.multiply(FACTION_TYPES.SALVAGERS, c.inflation/c.reserves)
-    maxNumFleetsPerFaction.multiply(FACTION_TYPES.TAX_COLLECTORS, c.taxes)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.EXPLORERS, c.prestige*c.education)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.INQUISITORS, 1/c.corruption)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.MERCENARIES, c.army*c.wealth) // Mercenaries spawn 60% as often as soldiers
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.MERCHANTS, c.economy)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.MINERS, c.industry/c.reserves)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.MISSIONARIES, c.culture*c.education)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.PERFORMERS, c.culture)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.PILGRIMS, c.culture*c.wealth)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.PIRATES, c.crime)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.POLICE, c.navy*c.security)
     maxNumFleetsPerFaction.multiply(FACTION_TYPES.REBELS, c.army/(c.security*c.culture))
-    maxNumFleetsPerFaction.multiply(FACTION_TYPES.REFUGEES, 1/c.score)
-    
-    // Apply religion-based multipliers
-    for (const ft of [FACTION_TYPES.PILGRIMS, FACTION_TYPES.INQUISITORS, FACTION_TYPES.MISSIONARIES]) {
-        maxNumFleetsPerFaction.multiply(ft, c.stateReligion ? 0.5+c.religions.getAmount(c.stateReligion) : 0)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.REFUGEES, c.population/c.score)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.SALVAGERS, c.inflation/c.reserves)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.SCIENTISTS, c.technology*c.education)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.SLAVERS, c.corruption/c.security)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.SMUGGLERS, c.taxes*c.corruption)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.SOLDIERS, c.navy*c.army)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.SYNDICATES, c.crime*c.corruption)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.TAX_COLLECTORS, c.taxes)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.TOURISTS, c.wealth)
+
+    // a few types are less common, a bit exotic
+    for (const ft of [FACTION_TYPES.INQUISITORS, FACTION_TYPES.PILGRIMS, FACTION_TYPES.MISSIONARIES, FACTION_TYPES.PERFORMERS, FACTION_TYPES.DIPLOMATS]) {
+        maxNumFleetsPerFaction.multiply(ft, 1/3)
     }
 
+    // a few types are more common, throwback to OG space trader
+    for (const ft of [FACTION_TYPES.MERCHANTS, FACTION_TYPES.POLICE, FACTION_TYPES.PIRATES, FACTION_TYPES.MINERS, FACTION_TYPES.SALVAGERS]) {
+        maxNumFleetsPerFaction.multiply(ft, 3)
+    }
+    
     //sqrt the values to make them more reasonable
     for (const [key,value] of maxNumFleetsPerFaction.counts) {
         maxNumFleetsPerFaction.setAmount(key, Math.sqrt(value))

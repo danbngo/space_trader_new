@@ -35,26 +35,19 @@ class ExplorerFleetAI extends FleetAI {
     }
     
     calcDestination() {
-        // Travel to the 50% furthest planets/stations
-        const allDestinations = [...gs.system.planets, ...gs.system.dwarfPlanets, ...gs.system.spaceStations].filter(p => p !== this.origin)
+        // Always travel to a random waypoint in the outer regions (at least 0.75x radius from center)
+        // This ensures explorers travel to distant frontiers like the Kuiper belt
+        const minDistance = gs.system.radius * 0.75;
+        let x, y, distance;
         
-        if (allDestinations.length === 0) {
-            return this.origin
-        }
+        // Keep generating random points until we get one far enough from center
+        do {
+            x = rng(gs.system.radius * 2) - gs.system.radius;
+            y = rng(gs.system.radius * 2) - gs.system.radius;
+            distance = Math.sqrt(x * x + y * y);
+        } while (distance < minDistance);
         
-        // Calculate distances from origin
-        const destinationsWithDistance = allDestinations.map(dest => ({
-            destination: dest,
-            distance: calcDistance(this.origin.x, this.origin.y, dest.x, dest.y)
-        }))
-        
-        // Sort by distance (furthest first)
-        destinationsWithDistance.sort((a, b) => b.distance - a.distance)
-        
-        // Select from the furthest 50%
-        const furthestHalf = destinationsWithDistance.slice(0, Math.max(1, Math.ceil(destinationsWithDistance.length * 0.5)))
-        
-        return rndMember(furthestHalf).destination
+        return new Waypoint(x, y);
     }
     
     onNearTarget() {

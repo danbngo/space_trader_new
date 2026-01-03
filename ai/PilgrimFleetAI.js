@@ -9,6 +9,18 @@ class PilgrimFleetAI extends FleetAI {
     }
     
     calcDestination() {
+        // 25% chance to travel to a random asteroid (meditation site)
+        if (Math.random() < 0.25 && gs.system.asteroids.length > 0) {
+            return rndMember(gs.system.asteroids);
+        }
+        
+        // 10% chance to travel to a random waypoint in space (pilgrimage journey)
+        if (Math.random() < 0.10) {
+            const x = rng(gs.system.radius * 2) - gs.system.radius;
+            const y = rng(gs.system.radius * 2) - gs.system.radius;
+            return new Waypoint(x, y);
+        }
+        
         // Travel to planets with the same state religion as home planet
         if (!this.fleet.planet || !this.fleet.planet.civilization || !this.fleet.planet.civilization.stateReligion) {
             return rndMember([...gs.system.planets, ...gs.system.dwarfPlanets, ...gs.system.spaceStations].filter(p => p !== this.origin));

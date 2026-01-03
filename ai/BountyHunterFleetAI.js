@@ -11,6 +11,12 @@ class BountyHunterFleetAI extends FleetAI {
     }
     
     calcDestination() {
+        // 75% chance to scope out a random asteroid (looking for criminals hiding there)
+        if (Math.random() < 0.75 && gs.system.asteroids.length > 0) {
+            return rndMember(gs.system.asteroids);
+        }
+        
+        // Fallback to planets/stations
         return rndMember([...gs.system.planets, ...gs.system.dwarfPlanets, ...gs.system.spaceStations].filter(p=>(p !== this.origin)))
     }
     calcValidTargets() {

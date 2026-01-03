@@ -191,12 +191,11 @@ async function startNewGame() {
     gs.system.updatePositions(gs.year)
 
     // Simulate history
-    const HISTORY_NUM_YEARS = 10
-    await simulateHistory(HISTORY_NUM_YEARS)
+    await simulateHistory(SIMULATE_HISTORY_NUM_YEARS)
     
     // Simulate fleet activity (daily ticks for better efficiency)
-    const FLEET_ACTIVITY_YEARS = 2
-    await simulateFleetActivity(FLEET_ACTIVITY_YEARS)
+
+    await simulateFleetActivity(SIMULATE_FLEET_ACTIVITY_YEARS)
 
     // Create captain
     const captain = new Officer("Captain", rndMember(gs.system.planets), PLAYER_FACTION_TYPE, STARTING_CREDITS);

@@ -15,7 +15,7 @@ class FleetAI {
         this.origin = origin;
         /** @type {StarMap|null} */
         this.starMap = starMap;
-        /** @type {SpaceObject} */
+        /** @type {SpaceObject|Waypoint} */
         this.destination = this.calcDestination();
         /** @type {any} */
         this.target = null
@@ -70,7 +70,6 @@ class FleetAI {
                         this.visited.push(target) //give up if we cant reach the target
                     }
                     else this.addPopup('!', COLORS.DarkYellow)
-                    return                    return
                 }
             }
         }
@@ -89,7 +88,7 @@ class FleetAI {
         //override in subclasses
         return []
     }
-    /** @returns {SpaceObject|null} */
+    /** @returns {SpaceObject|Waypoint|null} */
     calcDestination() {
         return rndMember(gs.system.planets.filter(p=>(p !== this.origin)))
     }
@@ -124,7 +123,13 @@ class FleetAI {
         return this.target && this.isNearby(this.target, elapsedYears)
     }
 
-    isNearby(object = new SpaceObject(), elapsedYears = 1) {
+    /**
+     * 
+     * @param {SpaceObject|Waypoint} object 
+     * @param {number} elapsedYears 
+     * @returns 
+     */
+    isNearby(object, elapsedYears = 1) {
         const distMod = elapsedYears/MAX_FRAMES_PER_SECOND/STAR_MAP_YEARS_PER_MS //during simus make ships able to collide easier
         return calcDistance(this.fleet.x, this.fleet.y, object.x, object.y) < (FLEET_COLLISION_DISTANCE*distMod) // Within 0.01 AU
     }
@@ -146,7 +151,7 @@ class FleetAI {
     }
 
     onNearDestination() {
-        console.log('🛬', `${this.fleet.name+' '+this.fleet.uuid} has arrived at destination ${this.destination.name+' '+this.destination.uuid}.`)
+        console.log('🛬', `${this.fleet.name+' '+this.fleet.uuid} has arrived at destination ${this.destination.name}.`)
         this.destination = null
         this.resetVoyageDuration()
     }

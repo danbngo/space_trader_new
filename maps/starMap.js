@@ -404,9 +404,8 @@ class StarMap extends BaseMap {
             
             // Create objects if they don't exist (empty square/rectangle)
             if (!ruinsObj) {
-                ruinsObj = cvs.addEmptySquare(ruinsId, ruin.x, ruin.y, ruin.radius * 15, 2, ruin.color, 1, () => this.selectObject(ruin))
+                ruinsObj = cvs.addEmptyRectangle(ruinsId, ruin.x, ruin.y, ruin.radius * 15, ruin.radius * 15, 2, ruin.color, 1, () => this.selectObject(ruin))
                 labelObj = cvs.addText(labelId, ruin.x, ruin.y, 0, -24, ruin.name, ruin.color, DEFAULT_FONT_SIZE, 2, () => this.selectObject(ruin))
-                labelObj.visible = false
                 
                 const objs = [ruinsObj, labelObj]
                 for (const obj of objs) {
@@ -414,15 +413,11 @@ class StarMap extends BaseMap {
                         labelObj.visible = true
                         for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
                     }
-                    obj.onEndHover = () => {
+                    obj.onHoverEnd = () => {
                         labelObj.visible = false
-                        // Reset to selection color if selected, otherwise clear
-                        if (ruin === this.selectedObject) {
-                            for (const obj2 of objs) obj2.strokeColor = COLORS.Green
-                        } else {
-                            for (const obj2 of objs) obj2.strokeColor = undefined
-                        }
+                        for (const obj3 of objs) obj3.strokeColor = (ruin == this.selectedObject) ? COLORS.Green : ruin.color
                     }
+                    obj.onHoverEnd()
                 }
             }
             

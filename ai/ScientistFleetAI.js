@@ -11,7 +11,10 @@ class ScientistFleetAI extends FleetAI {
         return [...detectableAnomalies, ...icyAsteroids]
     }
     calcDestination() {
-        return rndMember([...gs.system.planets].filter(p=>(p !== this.origin)))
+        // Always travel to a random waypoint in space for research expedition
+        const x = rng(gs.system.radius * 2) - gs.system.radius;
+        const y = rng(gs.system.radius * 2) - gs.system.radius;
+        return new Waypoint(x, y);
     }
     
     onNearTarget() {
