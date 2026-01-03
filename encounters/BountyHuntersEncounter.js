@@ -4,7 +4,7 @@
  */
 class BountyHuntersEncounter extends AuthoritiesEncounter {
     onStart() {
-        if (Math.random() * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > this.fleet.totalRadar) {
+        if (this.playerUndetected) {
             showModal(coloredName(this.fleet), 'Your long range sensors detect a bounty hunters fleet before they detect you.<br/>You manage to approach them stealthily.', [
                 //['View', ()=>closeModal()],
                 ['Bypass', ()=>this.endEncounter()],

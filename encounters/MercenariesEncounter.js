@@ -46,7 +46,7 @@ class MercenariesEncounter extends FleetEncounter {
             `A ${coloredName(this.fleet)} fleet hails you over comms.<br/>` +
             `"We're hired guns, not trouble seekers. Keep your distance and we'll keep ours."`, [
             ['Ignore', () => this.endEncounter()],
-            ['Attack', () => this.showPlayerAttackFleetModal(false)],
+            ['Attack', () => this.showPlayerAttackFleetModal()],
             //['Hail', () => this.showTradeMenu()],
         ])
     }

@@ -8,6 +8,14 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
     let selectedFaction = gs.fleet.factionType || FACTION_TYPES.MERCHANTS
     let selectedReligion = captain.religion || null
 
+    // Helper to set fleet location and position
+    function setFleetLocation(planet) {
+        gs.fleet.location = planet
+        gs.fleet.planet = planet
+        gs.fleet.x = planet.x
+        gs.fleet.y = planet.y
+    }
+
     function improveSkill(skill = SKILLS_ALL[0]) {
         const cost = captain.calcSkillPointsToUpgrade(skill)
         captain.skills.increment(skill, 1)
@@ -18,28 +26,20 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
     function resetCaptain() {
         captain.skills = new CountsMap()
         captain.skillPoints = STARTING_SKILL_POINTS;
-        // Reset background to defaults
         captain.race = RACES.HUMAN
-        gs.fleet.location = EARTH
-        gs.fleet.x = EARTH.x
-        gs.fleet.y = EARTH.y
-        gs.fleet.factionType = FACTION_TYPES.MERCHANTS
         captain.religion = null
+        gs.fleet.factionType = FACTION_TYPES.MERCHANTS
+        setFleetLocation(EARTH)
         showCaptainCreationMenu(captain, onClose)
     }
 
     function randomizeCaptain() {
         captain.skills = new CountsMap()
         captain.skillPoints = STARTING_SKILL_POINTS;
-        
-        // Randomize background
         captain.race = rndMember(Object.values(RACES))
-        const randomPlanet = rndMember(gs.system.planets)
-        gs.fleet.location = randomPlanet
-        gs.fleet.x = randomPlanet.x
-        gs.fleet.y = randomPlanet.y
-        gs.fleet.factionType = rndMember(FACTION_TYPES_ALL)
         captain.religion = gs.system.religions.length > 0 ? (Math.random() < 0.3 ? null : rndMember(gs.system.religions)) : null
+        gs.fleet.factionType = rndMember(FACTION_TYPES_ALL)
+        setFleetLocation(rndMember(gs.system.planets))
         
         // Randomly spend all skill points
         while (captain.skillPoints > 0) {
@@ -183,9 +183,7 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
                             coloredName(planet),
                             () => {
                                 selectedPlanet = planet
-                                gs.fleet.location = planet
-                                gs.fleet.x = planet.x
-                                gs.fleet.y = planet.y
+                                setFleetLocation(planet)
                                 showCaptainCreationMenu(captain, onClose, selectedSkill)
                             }
                         ]),

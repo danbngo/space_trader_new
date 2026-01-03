@@ -10,8 +10,9 @@ class Encounter {
      * @param {Planet} planet - The planet where the encounter occurs.
      * @param {Fleet} fleet - The enemy fleet.
      * @param {Effect[]} effects - Environmental effects active in the encounter.
+     * @param {Fleet|null} undetectedFleet
      */
-    constructor(encounterType = ENCOUNTER_TYPES_ALL[0], planet = new Planet(), fleet = new Fleet(), effects = []) {
+    constructor(encounterType = ENCOUNTER_TYPES_ALL[0], planet = new Planet(), fleet = new Fleet(), effects = [], undetectedFleet) {
         console.log('Encounter.constructor', { encounterType, planet, fleet });
         /** @type {EncounterType} */
         this.encounterType = encounterType;
@@ -45,6 +46,15 @@ class Encounter {
         this.activeTurnFleet = this.playerFleet
         /** @type {Effect[]} */
         this.effects = effects
+        /** @type {Fleet|null} */
+        this.undetectedFleet = undetectedFleet
+        this.playerUndetected = undetectedFleet == this.playerFleet
+        this.enemyUndetected = undetectedFleet == this.fleet
+        this.formationType =
+            this.encounterType.aiType == AI_TYPES.Asteroid ? FORMATION_TYPES.Storm
+            : this.playerUndetected ? FORMATION_TYPES.PlayerEncircle
+            : this.enemyUndetected ? FORMATION_TYPES.PlayerEncircled
+            : FORMATION_TYPES.Default
 
         /** @type {Map<Ship, number>} */
         this.playerShipHullsAtStart = new Map()
@@ -317,13 +327,10 @@ class Encounter {
 
     /**
      * Initializes and positions ships for the encounter based on formation type.
-     * @param {FormationType} formationType - The formation type to use.
-     * @param {number} playerAngle - The angle for player ships (optional).
-     * @param {number} enemyAngle - The angle for enemy ships (optional).
      */
-    positionShips(formationType, playerAngle, enemyAngle) {
+    positionShips() {
         console.log('Encounter.positionShips')
-        const {playerShips, enemyShips, ships, encounterType} = this
+        const {playerShips, enemyShips, ships, playerFleet, enemyFleet, formationType} = this
         const maxSpawnDistance = this.mapRadius * ENCOUNTER_SHIP_MAX_SPAWN_DISTANCE_RATIO
         const minSpawnDistance = maxSpawnDistance / 5
 
@@ -331,81 +338,60 @@ class Encounter {
             ship.resetCombatVars()
         }
 
-        // Position player ships based on formation
+        const anglePlayerFleetToEnemy = calcAngleTowardsPoint(playerFleet.x, playerFleet.y, enemyFleet.x, enemyFleet.y)
+        const angleEnemyFleetToPlayer = calcAngleTowardsPoint(enemyFleet.x, enemyFleet.y, playerFleet.x, playerFleet.y)
+        const enemyFacingAngle = enemyFleet.angle
+        const playerFacingAngle = playerFleet.angle
+        const distMargin = ENCOUNTER_SHIP_MAX_SPAWN_DISTANCE_RATIO-ENCOUNTER_SHIP_MIN_SPAWN_DISTANCE_RATIO
+        const avgDist = distMargin/2 + ENCOUNTER_SHIP_MIN_SPAWN_DISTANCE_RATIO
+
+        //players ships should be in a half circle around the enemy
+        if (formationType == FORMATION_TYPES.Storm) {
+            for (const ship of enemyShips) {
+                const dist = rng(this.mapRadius*0.9, this.mapRadius*0.7, false)
+                const angle = rng(0 + Math.PI*3/4, 0 - Math.PI*3/4, false) + ((angleEnemyFleetToPlayer) || 0)
+                let [x,y] = rotatePoint(dist, 0, 0, 0, angle)
+                Object.assign(ship, {x, y, angle: (angle + Math.PI)})
+            }
+        }
+        else if (formationType == FORMATION_TYPES.PlayerEncircled) {
+            //enemy ships should be in a half circle around the players fleet
+            const angleStep = (Math.PI * 2)/enemyShips.length
+            enemyShips.forEach((ship, i) => {
+                const angle = angleStep * i + (enemyFleet.angle || 0)
+                const [x, y] = rotatePoint(maxSpawnDistance, 0, 0, 0, angle)
+                Object.assign(ship, {x, y})
+            })
+        }
+        else {
+            const [cx, cy] = rotatePoint(this.mapRadius * avgDist, 0, 0, 0, angleEnemyFleetToPlayer+Math.PI)
+            enemyFleet.ships.forEach((ship,i)=>{
+                const distFromCenter = rng(avgDist, avgDist/4)
+                const [dx,dy] = rotatePoint(distFromCenter * this.mapRadius, 0, 0, 0, rng(Math.PI*2, 0, false))
+                const angleDiff = rng(Math.PI/8)
+                Object.assign(ship, {x: cx+dx, y: cy+dy, angle: enemyFacingAngle + angleDiff})
+            })
+        }
         if (formationType == FORMATION_TYPES.PlayerEncircle) {
             const angleStep = (Math.PI * 2) / playerShips.length
             playerShips.forEach((ship, i) => {
-                const angle = angleStep * i + (playerAngle || 0)
+                const angle = angleStep * i + (playerFleet.angle || 0)
                 const [x, y] = rotatePoint(maxSpawnDistance, 0, 0, 0, angle)
                 Object.assign(ship, {x, y})
             })
-        }
-        else if (formationType == FORMATION_TYPES.PlayerEncircled) {
-            for (const ship of playerShips) {
-                const [x, y] = rotatePoint(rng(minSpawnDistance/2, 0, false), 0, 0, 0, rng(Math.PI * 2, 0, false) + (playerAngle || 0))
-                Object.assign(ship, {x, y})
-            }
         }
         else {
-            for (const ship of playerShips) {
-                const [x,y] = rotatePoint(rng(maxSpawnDistance, minSpawnDistance/2, false), 0, 0, 0, rng(Math.PI + Math.PI/4, Math.PI - Math.PI/4, false) + (playerAngle || 0))
-                Object.assign(ship, {x, y})
-            }
-        }
-
-        // Position enemy ships
-        for (const ship of enemyShips) {
-            Object.assign(ship, {color: this.encounterType.enemyColor})
-        }
-
-        if (formationType == FORMATION_TYPES.PlayerEncircle) {
-            for (const ship of enemyShips) {
-                const [x, y] = rotatePoint(rng(minSpawnDistance/2, 0, false), 0, 0, 0, rng(Math.PI * 2, 0, false) + (enemyAngle || 0))
-                Object.assign(ship, {x, y})
-            }
-        }
-        else if (formationType == FORMATION_TYPES.PlayerEncircled) {
-            const angleStep = (Math.PI * 2) / enemyShips.length
-            enemyShips.forEach((ship, i) => {
-                const angle = angleStep * i + (enemyAngle || 0)
-                const [x, y] = rotatePoint(maxSpawnDistance, 0, 0, 0, angle)
-                Object.assign(ship, {x, y})
+            const [cx,cy] = rotatePoint(this.mapRadius * avgDist, 0, 0, 0, anglePlayerFleetToEnemy+Math.PI)
+            playerFleet.ships.forEach((ship,i)=>{
+                const distFromCenter = rng(avgDist, avgDist/4)
+                const [dx,dy] = rotatePoint(distFromCenter * this.mapRadius, 0, 0, 0, rng(Math.PI*2, 0, false))
+                const angleDiff = rng(Math.PI/8)
+                Object.assign(ship, {x: cx+dx, y: cy+dy, angle: playerFacingAngle + angleDiff})
             })
         }
-        else if (formationType == FORMATION_TYPES.Default) {
-            for (const ship of enemyShips) {
-                const [x,y] = rotatePoint(rng(maxSpawnDistance, minSpawnDistance, false), 0, 0, 0, rng(0 + Math.PI/4, 0 - Math.PI/4, false) + (enemyAngle || 0))
-                Object.assign(ship, {x, y})
-            }
-        }
-        else if (formationType == FORMATION_TYPES.Storm) {
-            for (const ship of enemyShips) {
-                let [x,y] = rotatePoint(rng(this.mapRadius*0.9, minSpawnDistance, false), 0, 0, 0, rng(0 + Math.PI*3/4, 0 - Math.PI*3/4, false) + (enemyAngle || 0))
-                x += rng(this.mapRadius*2, 0, false)
-                Object.assign(ship, {x, y})
-            }
-        }
 
-        // Set ship angles to face targets
-        for (const ship of playerShips) {
-            const randomTarget = rndMember(enemyShips)
-            if (randomTarget) {
-                const angle = new Path(ship.x, ship.y, randomTarget.x, randomTarget.y).angle
-                Object.assign(ship, {angle})
-            }
-        }
         for (const ship of enemyShips) {
-            if (formationType == FORMATION_TYPES.Storm) {
-                const angle = rng(Math.PI + Math.PI/4, Math.PI - Math.PI/4, false)
-                Object.assign(ship, {angle})
-            }
-            else {
-                const randomTarget = rndMember(playerShips)
-                if (randomTarget) {
-                    const angle = new Path(ship.x, ship.y, randomTarget.x, randomTarget.y).angle
-                    Object.assign(ship, {angle})
-                }
-            }
+            Object.assign(ship, {color: this.encounterType.enemyColor})
         }
     }
 
@@ -603,7 +589,8 @@ class Encounter {
     }
 
 
-    showPlayerAttackFleetModal(sneakAttack = false, onContinue = ()=>this.startCombat(true)) {
+    showPlayerAttackFleetModal(onContinue = ()=>this.startCombat(true)) {
+        const sneakAttack = this.undetectedFleet == gs.fleet
         console.log('showPlayerAttackFleetModal', { sneakAttack });
         const fleetName = coloredName(this.fleet)
         const planet = this.planet
@@ -613,10 +600,6 @@ class Encounter {
         const bounty = reputationMultiplier > 0 ? ENCOUNTER_BASE_FINE_ON_ATTACK * reputationMultiplier : 0
 
         if (sneakAttack) {
-            // Change formation to player encircling enemy
-            this.encounterType.formationType = FORMATION_TYPES.PlayerEncircle
-            // Reposition ships for the new formation
-            this.positionShips()
             // Drop shields after repositioning
             for (const ship of this.ships) ship.shields[0] = 0
         }
@@ -632,9 +615,7 @@ class Encounter {
         }
 
         showModal(fleetName, msg, [['Continue', ()=>{
-            onContinue()
+            this.startCombat()
         }]])
     }
-
-
 }

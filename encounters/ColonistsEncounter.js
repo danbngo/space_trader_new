@@ -12,26 +12,19 @@
  */
 class ColonistsEncounter extends NeutralsEncounter {
     /**
-     * @param {EncounterType} encounterType
-     */
-    constructor(encounterType) {
-        super(encounterType)
-    }
-
-    /**
      * Called when the encounter starts.
      * Colonists will try to avoid the player or flee if the player has high infamy.
      * @override
      */
     onStart() {
-        if (Math.random() * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > this.fleet.totalRadar) {
+        if (this.playerUndetected) {
             showModal(coloredName(this.fleet), 'Your long range sensors detect a colonist fleet before they detect you.<br/>You manage to approach them stealthily.', [
                 //['View', ()=>closeModal()],
                 ['Bypass', ()=>this.endEncounter()],
                 ['Hail', ()=>{
                     this.onStart()
                 }],
-                ['Sneak Attack', ()=>this.showPlayerAttackNeutralsModal(true)],
+                ['Sneak Attack', ()=>this.showPlayerAttackNeutralsModal()],
             ])
         }
         else if (FameLevel.hasInfamyLevel(gs.captain, this.planet, INFAMY_LEVELS.VILIFIED)) {

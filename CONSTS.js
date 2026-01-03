@@ -28,7 +28,8 @@ const ENCOUNTER_IMMUNITY_DAYS = 1; //days of immunity after an encounter ends
 const ENCOUNTER_DENIED_DAYS = 0.25; //days player can't bump into fleets after denying an encounter (0.25 = 6 hours)
 
 //combat distances = miles, time = seconds
-const ENCOUNTER_SHIP_MAX_SPAWN_DISTANCE_RATIO = 0.5
+const ENCOUNTER_SHIP_MIN_SPAWN_DISTANCE_RATIO = 0.5
+const ENCOUNTER_SHIP_MAX_SPAWN_DISTANCE_RATIO = 0.75
 const ENCOUNTER_MAP_RADIUS_MILES = 100
 const BASE_SHIP_RADIUS_IN_MILES = 1/2
 const AVERAGE_SHIP_MASS = 1

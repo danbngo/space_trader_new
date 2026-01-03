@@ -110,6 +110,7 @@ class StarSystem extends SpaceObject {
             const [fx,fy] = fleet.route.positionAtYear(year)
             fleet.x = fx
             fleet.y = fy
+            fleet.angle = fleet.route.path ? fleet.route.path.angle : 0
         }
         
         // Check if player fleet has discovered any anomalies

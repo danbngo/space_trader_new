@@ -1,5 +1,9 @@
 class EncounterMap extends BaseMap {
-    constructor(encounter = new Encounter(), autoSelectObject = encounter.playerShips[0]) {
+    /** 
+     * @param {Encounter} encounter
+     * @param {Ship} autoSelectObject
+     */
+    constructor(encounter, autoSelectObject = encounter.playerShips[0]) {
         super()
         this.starSystem = gs.system
         this.encounter = encounter
@@ -535,6 +539,16 @@ class EncounterMap extends BaseMap {
             showModal(`Surrender?`, `Surrender to the ${coloredName(gs.encounter.fleet)}?`, [
                 ['Surrender', ()=>gs.encounter.onSurrender()],
                 ['Cancel', ()=>closeModal()]
+            ])
+        }
+        else if (gs.encounter.playerUndetected) {
+            showModal(coloredName(gs.encounter.fleet), `Your long range sensors detect a ${coloredName(gs.encounter.fleet)} fleet before they detect you.<br/>`, [
+                //['View', ()=>closeModal()],
+                ['Bypass', ()=>closeModal()],
+                ['Hail', ()=>gs.encounter.onStart()],
+                ['Sneak Attack', ()=>{
+                    gs.encounter.showPlayerAttackFleetModal()
+                }],
             ])
         }
         else gs.encounter.onStart()
