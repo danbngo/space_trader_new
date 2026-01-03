@@ -25,6 +25,7 @@
  * @property {number} [taxes] - Tax rate applied to most transactions (0 to MAX_TAX_RATE).
  * @property {CountsMap} [religions] - Religious representation on this planet (Religion -> adherent population ratio).
  * @property {CountsMap} [races] - Racial demographics of this civilization (Race -> population proportion).
+ * @property {CountsMap} [cultures] - Planetary culture demographics of this civilization (Planet -> population proportion).
  * @property {Religion|null} [stateReligion] - The official state religion of this civilization (if any).
  */
 
@@ -38,7 +39,7 @@ class Civilization {
      */
     constructor({
         planet = null, governmentType = null, cargoPriceMultipliers = new CountsMap(), skillPriceMultipliers = new CountsMap(),
-        technology = 1.0, education = 1.0, territory = 1, population = 1, industry = 1,
+        technology = 1.0, education = 1.0, territory = 1, population = 1, industry = 1, cultures = new CountsMap(),
         economy = 1, security = 1, culture = 1, prestige = 1, policies = new Policies(),
         navy = 1, army = 1, corruption = 1, crime = 1, wealth = 1, reserves = 1, inflation = 1, taxes = 1,
         religions = new CountsMap(), races = new CountsMap(), stateReligion = null
@@ -59,6 +60,8 @@ class Civilization {
         this.religions = religions
         /** @type {CountsMap} */
         this.races = races
+        /** @type {CountsMap} */
+        this.cultures = cultures
         /** @type {Religion|null} */
         this.stateReligion = stateReligion
         /** @type {number} */

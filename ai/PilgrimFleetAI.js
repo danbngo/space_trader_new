@@ -28,4 +28,25 @@ class PilgrimFleetAI extends FleetAI {
         // Fallback to any planet
         return rndMember([...gs.system.planets, ...gs.system.dwarfPlanets, ...gs.system.spaceStations].filter(p => p !== this.origin));
     }
+
+    onNearDestination() {
+        if (!(this.fleet.planet instanceof Planet) || !(this.destination instanceof Planet)) {
+            return super.onNearDestination()
+        }
+        
+        // Calculate population transfer ratio (10% of origin's relative population)
+        const populationRatio = this.fleet.planet.c.population / (this.fleet.planet.c.population + this.destination.c.population) * 0.1
+        
+        // Transfer religious values from origin to destination
+        if (this.fleet.planet.c.religions && this.destination.c.religions) {
+            for (const [religion, amount] of this.fleet.planet.c.religions.counts.entries()) {
+                const transferAmount = amount * populationRatio
+                this.destination.c.religions.increment(religion, transferAmount)
+            }
+            // Normalize to ensure total stays at 1
+            this.destination.c.religions.normalize()
+        }
+
+        super.onNearDestination()
+    }
 }

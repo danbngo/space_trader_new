@@ -10,8 +10,6 @@ class Guild extends Building {
      */
     constructor(planet = new Planet(), moon = null) {
         super(planet, BUILDING_TYPES.GUILD, moon)
-        /** @type {Officer[]} */
-        this.officers = []; // Officer[]
         /** @type {Contract[]} */
         this.contracts = []; // Contract[]
         this.normalize(true)
@@ -32,16 +30,6 @@ class Guild extends Building {
             this.officers = []
             this.contracts = []
         }
-        const officerDiffFromBase = this.officers.length - this.baseNumOfficers
-        if (officerDiffFromBase > 0) {
-            this.officers.splice(0, officerDiffFromBase)
-        } else if (officerDiffFromBase < 0) {
-            for (let i = 0; i < -officerDiffFromBase; i++) {
-                // Guild officers have fame for their home planet
-                this.officers.push(generateOfficer(this.planet, false, 'fame'))
-            }
-        }
-        
         const contractDiffFromBase = this.contracts.length - this.baseNumContracts
         if (contractDiffFromBase > 0) {
             this.contracts.splice(0, contractDiffFromBase)

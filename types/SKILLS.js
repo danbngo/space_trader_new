@@ -28,11 +28,23 @@ const SKILLS = {
         '✈️',
         'Improves fleet maneuverability and travel speed. Higher skill helps avoid hazards and navigate more efficiently.'
     ),
+    Gunner: new SkillType(
+        'Gunner',
+        COLORS.Red,
+        '🔫',
+        'Improves accuracy and damage with ship weapons. Higher skill increases effectiveness in combat.'
+    ),
     Stealth: new SkillType(
         'Stealth',
         COLORS.DarkGray,
         '🥷',
-        'Reduces detection range and enables sneak attacks. Helps avoid unwanted fleet encounters.'
+        'Reduces detection range and enables sneak attacks. Helps avoid unwanted fleet encounters. Makes your ships harder to hit.'
+    ),
+    Negotiation: new SkillType(
+        'Negotiation',
+        COLORS.LightPurple,
+        '🤝',
+        'Improves outcomes in diplomatic interactions. Higher skill can unlock better rewards and alliances.'
     ),
     Barter: new SkillType(
         'Barter',
@@ -50,7 +62,13 @@ const SKILLS = {
         'Salvage',
         COLORS.LightGray,
         '⚙️',
-        'Increases cargo yield from destroyed asteroids and salvaged encounters. More efficient resource gathering.'
+        'Increases cargo yield from destroyed asteroids and abandoned ships and improves chance to find rare items.'
+    ),
+    Science: new SkillType(
+        'Science',
+        COLORS.LightGreen,
+        '🔬',
+        'Detect anomalies from further away, gain more relics when making discoveries, gain more stats when upgrading your ships.'
     ),
 }
 

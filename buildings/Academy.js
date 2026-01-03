@@ -46,10 +46,12 @@ class Academy extends Building {
         if (officerDiffFromBase > 0) {
             this.officers.splice(0, officerDiffFromBase)
         } else if (officerDiffFromBase < 0) {
+            // Get valid faction types (not criminal or religious)
+            const validFactionTypes = FACTION_TYPES_ALL.filter(f => !f.criminal && !f.religious)
+            
             for (let i = 0; i < -officerDiffFromBase; i++) {
-                // Tavern officers: cyber implants (0-3), fame + infamy
-                // Academy officers: no implants, no reputation
-                this.officers.push(generateOfficer(this.planet, this.isTavern, this.isTavern ? 'both' : null))
+                const factionType = rndMember(validFactionTypes)
+                this.officers.push(generateOfficer(this.planet, factionType))
             }
         }
     }

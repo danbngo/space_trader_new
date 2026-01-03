@@ -45,6 +45,10 @@ function generateFleet(fleetType = FLEET_TYPES_ALL[0], factionType = null, plane
     
     fleet.cargo = generateFleetCargo(fleet, fleetType)
     
+    // Generate captain and crew officers
+    fleet.captain = generateOfficer(planet, factionType)
+    fleet.captain.credits = rng(fleetType.maxCredits, 0)
+    
     // Assign AI to fleet
     const fleetAIType = getFleetAITypeForFleetType(fleetType)
     if (fleetAIType) {

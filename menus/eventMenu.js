@@ -148,18 +148,9 @@ function calcRandomSpawnPlanet(fleetType, faction, planet) {
         const options = [...gs.system.dwarfPlanets, planet, ...gs.system.spaceStations]
         return rndMember(options)
     }
-    
-    // Authority factions (or military/police specifically): always spawn at home planet
-    if (faction.authority || faction === FACTION_TYPES.SOLDIERS || faction === FACTION_TYPES.POLICE || faction === FACTION_TYPES.MERCENARIES) {
-        return planet
-    }
-    
-    // Other factions: 50/50 chance to spawn at home or random planet (excluding dwarfs and stations)
-    if (Math.random() < 0.5) {
-        return planet
-    } else {
-        return rndMember(gs.system.planets.filter(p => p !== planet))
-    }
+
+    //otherwise spawn at home    
+    return planet
 }
 
 /**

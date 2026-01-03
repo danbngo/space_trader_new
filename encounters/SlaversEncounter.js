@@ -151,7 +151,7 @@ class SlaversEncounter extends FleetEncounter {
         // Capture officers
         const officerCount = gs.fleet.officers.length
         if (officerCount > 0) {
-            const officersToCaptureCount = Math.max(1, Math.round(officerCount * rng(ENOCUNTER_MAX_LOSE_OFFICERS_RATIO, ENOCUNTER_MAX_LOSE_OFFICERS_RATIO * 0.66)))
+            const officersToCaptureCount = Math.max(1, Math.round(officerCount * rng(ENCOUNTER_MAX_LOSE_OFFICERS_RATIO, ENCOUNTER_MAX_LOSE_OFFICERS_RATIO * 0.66)))
             const capturedOfficers = []
             
             // Remove random officers

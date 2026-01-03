@@ -6,21 +6,33 @@ class FleetAI {
     /**
      * @param {Fleet} fleet - The fleet controlled by this AI.
      * @param {SpaceObject} origin - The planet this fleet originated from.
+     * @param {StarMap} starMap - Optional reference to the StarMap for displaying popups.
      */
-    constructor(fleet = null, origin = null) {
+    constructor(fleet = null, origin = null, starMap = null) {
         /** @type {Fleet} */
         this.fleet = fleet;
         /** @type {SpaceObject} */
         this.origin = origin;
+        /** @type {StarMap|null} */
+        this.starMap = starMap;
         /** @type {SpaceObject} */
         this.destination = this.calcDestination();
-        if (!this.destination) throw new Error('fleetAI must have a destination!!')
         /** @type {any} */
         this.target = null
         this.voyageYearsRemaining = Infinity
+        /** @type {Fleet[]} */
+        this.visitedFleets = []
         this.resetVoyageDuration()
         if (!Number.isFinite(this.voyageYearsRemaining)) throw new Error('fleetAI must have a finite voyage duration!!')
         //console.log('created fleet AI with props:', {fleet: this.fleet, home: this.home, destination: this.destination, voyageYearsRemaining: this.voyageYearsRemaining})
+        if (!this.destination) {
+            console.log('Warning: Could not find a valid destination for fleet type, going to remove it immediately')
+            this.origin = null
+            this.destination = null
+            this.target = null
+            this.voyageYearsRemaining - -Infinity
+            gs.system.removeFleet(this.fleet)
+        }
     }
     /**
      * Updates AI behavior each game tick.
@@ -46,6 +58,8 @@ class FleetAI {
                 const validTargets = this.calcValidTargets()
                 const target = this.findNearest(validTargets, this.fleet.fleetType.targetMaxDistance || Infinity);
                 if (target && target !== this.target) {
+                    // Show interest popup when finding a new target
+                        this.starMap.addPopup(this.fleet.x, this.fleet.y, '!!', COLORS.Yellow, 1500)
                     this.setTarget(target);
                     return
                 }
@@ -55,15 +69,7 @@ class FleetAI {
             this.resumeVoyage()
         }
         else {
-            //occasionally refresh route to ensure still valid and adjust to target's movement
-            if (Math.random() < 0.1) {
-                this.fleet.route.refresh()
-                if (!this.fleet.route.valid) {
-                    this.fleet.route = null
-                    this.target = null
-                    this.resumeVoyage()
-                }
-            }
+           //was some route refresh logic here but it was causing problems
         }
         if (this.fleet.factionType.cloaked) {
             this.fleet.cloakLevel = Math.min(1.0, this.fleet.cloakLevel + (0.01 * elapsedYears));
@@ -142,6 +148,12 @@ class FleetAI {
 
     fightTarget() {
         console.log('⚔️', `${this.fleet.name+' '+this.fleet.uuid} is engaging ${this.target.name+' '+this.target.uuid}!`)
+        
+    // Show popup if starMap is available
+        const midX = (this.fleet.x + this.target.x) / 2
+        const midY = (this.fleet.y + this.target.y) / 2
+        this.starMap.addPopup(midX, midY, '⚔️', COLORS.Red, 2000)
+        
         // Reveal both fleets during combat
         this.fleet.cloakLevel = 0
         this.target.cloakLevel = 0
@@ -150,44 +162,25 @@ class FleetAI {
         const theirScore = this.target.combatRating
         const totalScore = ourScore + theirScore
         const roll = rng(totalScore, 1)
-        if (roll <= ourScore) {
-            // We won - calculate damage to our fleet based on their strength
-            const strengthRatio = theirScore / ourScore // How strong they were relative to us
-            const baseDamage = strengthRatio * 0.3 // Base damage 0-30% based on strength ratio
-            const randomVariance = Math.random() * 0.2 // Add 0-20% random variance
-            const damagePercent = Math.min(0.8, baseDamage + randomVariance) // Cap at 80% damage
-            
-            // Apply damage to our ships
-            for (const ship of this.fleet.ships) {
-                const damage = ship.hull[1] * damagePercent
-                ship.hull[0] = Math.max(0, ship.hull[0] - damage)
-            }
-            
-            // Winner takes cargo from loser
-            this.transferCargo(this.target, this.fleet)
-            gs.system.removeFleet(this.target)
-            this.target = null
-            this.route = null
-            return true
+        const loser = (roll <= ourScore) ? this.target : this.fleet
+        const winner = (roll <= ourScore) ? this.fleet : this.target
+        const winnerScore = (roll <= ourScore) ? ourScore : theirScore
+        const loserScore = (roll <= ourScore) ? theirScore : ourScore
+
+        const strengthRatio = (loserScore / winnerScore) / (winnerScore+loserScore) // How strong they were relative to us
+        // Apply damage to our ships
+        for (const ship of winner.ships) {
+            const damage = rng(ship.hull[1]*strengthRatio)
+            ship.takeDamage(damage,true)
         }
-        else {
-            // They won - calculate damage to their fleet
-            const strengthRatio = ourScore / theirScore
-            const baseDamage = strengthRatio * 0.3
-            const randomVariance = Math.random() * 0.2
-            const damagePercent = Math.min(0.8, baseDamage + randomVariance)
-            
-            // Apply damage to their ships
-            for (const ship of this.target.ships) {
-                const damage = ship.hull[1] * damagePercent
-                ship.hull[0] = Math.max(0, ship.hull[0] - damage)
-            }
-            
-            // Loser's cargo is taken by winner
-            this.transferCargo(this.fleet, this.target)
-            gs.system.removeFleet(this.fleet)
-            return false
-        }
+        
+        // Show skull popup at target's death location
+        this.starMap.addPopup(loser.x, loser.y, '💀', COLORS.Red)
+        
+        gs.system.removeFleet(loser)
+        winner.ai.target = null
+        winner.ai.route = null
+        return winner
     }
 
     /**
@@ -217,8 +210,54 @@ class FleetAI {
         }
         
         if (transferred > 0) {
-            //console.log(`💰 ${toFleet.name+' '+toFleet.uuid} seized ${transferred} units of cargo from ${fromFleet.name+' '+fromFleet.uuid}`);
+            console.log(`💰 ${toFleet.name+' '+toFleet.uuid} seized ${transferred} units of cargo from ${fromFleet.name+' '+fromFleet.uuid}`);
+            
+            // Show theft popup at the location where cargo is being taken
+            this.starMap.addPopup(fromFleet.x, fromFleet.y, '💰', COLORS.Yellow)
         }
+    }
+
+    /**
+     * Transfer credits from one fleet's captain to another
+     * @param {Fleet} fromFleet - Fleet to take credits from
+     * @param {Fleet} toFleet - Fleet to transfer credits to
+     */
+    transferCredits(fromFleet, toFleet) {
+        if (!fromFleet.captain || !toFleet.captain) return;
+        
+        const creditsToTake = fromFleet.captain.credits;
+        if (creditsToTake <= 0) return;
+        
+        fromFleet.captain.credits = 0;
+        toFleet.captain.credits += creditsToTake;
+        
+        console.log(`💵 ${toFleet.name+' '+toFleet.uuid} took ${creditsToTake} credits from ${fromFleet.name+' '+fromFleet.uuid}`);
+        
+        // Show credits transfer popup
+        this.starMap.addPopup(fromFleet.x, fromFleet.y, '💵', COLORS.Green, 2000)
+    }
+
+    /**
+     * Transfer officers (excluding captain) from one fleet to another
+     * @param {Fleet} fromFleet - Fleet to take officers from
+     * @param {Fleet} toFleet - Fleet to transfer officers to
+     */
+    transferOfficers(fromFleet, toFleet) {
+        if (!fromFleet.captain || !toFleet.captain) return;
+        
+        const officersToTake = fromFleet.officers.slice(); // Copy array
+        if (officersToTake.length === 0) return;
+        
+        // Remove all subordinates from source fleet
+        for (const officer of officersToTake) {
+            fromFleet.removeOfficer(officer);
+            //toFleet.captain.addSubordinate(officer); //no need.
+        }
+        
+        console.log(`👥 ${toFleet.name+' '+toFleet.uuid} captured ${officersToTake.length} officers from ${fromFleet.name+' '+fromFleet.uuid}`);
+        
+        // Show crew capture popup
+            this.starMap.addPopup(fromFleet.x, fromFleet.y, '👥', COLORS.Orange, 2000)
     }
     /**
      * Finds nearest object of a given type.

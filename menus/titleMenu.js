@@ -197,7 +197,7 @@ async function startNewGame() {
     await simulateFleetActivity(FLEET_ACTIVITY_YEARS)
 
     // Create captain
-    const captain = new Officer("Captain", STARTING_CREDITS);
+    const captain = new Officer("Captain", rndMember(gs.system.planets), PLAYER_FACTION_TYPE, STARTING_CREDITS);
     
     // Give captain all cyber implants for testing
     captain.implants = CYBER_IMPLANT_TYPES_ALL.map(implantType => new CyberImplant(implantType, 1.0))

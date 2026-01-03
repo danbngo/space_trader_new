@@ -121,11 +121,16 @@ class Ship {
 
     get maxMoveDistance() {
         const baseDistance = (1 + AVERAGE_SHIP_MOVE_DISTANCE * Math.pow( (this.engine/AVERAGE_SHIP_ENGINE) / (this.mass/AVERAGE_SHIP_MASS), 0.5));
+        
+        // Apply Pilot skill (2x movement at 50 skill)
+        const pilotSkill = this.fleet.totalSkills.getAmount(SKILLS.Pilot)
+        const pilotModifier = 1 + (pilotSkill / 50)
+        
         // Apply movement penalty if ship is frozen
         if (this.statusEffects.has(STATUS_EFFECTS.FROZEN)) {
-            return baseDistance * 0.5;
+            return baseDistance * pilotModifier * 0.5;
         }
-        return baseDistance;
+        return baseDistance * pilotModifier;
     }
 
     get maxAttackDistance() {

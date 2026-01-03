@@ -47,6 +47,7 @@ const ENCOUNTER_TYPES = {
     SCIENTISTS: new EncounterType('Scientists', COLORS.LightCyan, 'You encountered: scientists.', FACTION_TYPES.SCIENTISTS, FLEET_TYPES.SCIENTISTS, AI_TYPES.Ship, FORMATION_TYPES.FaceOff, ScientistsEncounter),
     MERCHANTS: new EncounterType('Merchants', COLORS.Yellow, 'You encountered: merchants.', FACTION_TYPES.MERCHANTS, FLEET_TYPES.MERCHANTS, AI_TYPES.Ship, FORMATION_TYPES.FaceOff, MerchantsEncounter),
     SMUGGLERS: new EncounterType('Smugglers', COLORS.Yellow, 'You encountered: smugglers.', FACTION_TYPES.SMUGGLERS, FLEET_TYPES.SMUGGLERS, AI_TYPES.Ship, FORMATION_TYPES.FaceOff, SmugglersEncounter),
+    SYNDICATES: new EncounterType('Syndicates', COLORS.LightRed, 'You encountered: syndicates.', FACTION_TYPES.SYNDICATES, FLEET_TYPES.SYNDICATES, AI_TYPES.Ship, FORMATION_TYPES.FaceOff, SyndicatesEncounter),
     PIRATES: new EncounterType('Pirates', COLORS.LightRed, 'You encountered: pirates.', FACTION_TYPES.PIRATES, FLEET_TYPES.PIRATES, AI_TYPES.Ship, FORMATION_TYPES.FaceOff, PiratesEncounter),
     SLAVERS: new EncounterType('Slavers', COLORS.DarkRed, 'You encountered: slavers.', FACTION_TYPES.SLAVERS, FLEET_TYPES.SLAVERS, AI_TYPES.Ship, FORMATION_TYPES.FaceOff, SlaversEncounter),
     POLICE: new EncounterType('Police', COLORS.LightBlue, 'You encountered: police.', FACTION_TYPES.POLICE, FLEET_TYPES.POLICE, AI_TYPES.Ship, FORMATION_TYPES.FaceOff, PoliceEncounter),

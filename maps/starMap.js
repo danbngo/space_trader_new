@@ -32,6 +32,9 @@ class StarMap extends BaseMap {
         this.refresh()
         this.selectObject(autoSelectObject || gs.fleet)
         if (StarMap.lastZoom) this.adjustZoom(StarMap.lastZoom/this.cvs.zoom)
+        
+        // Set starMap reference for all fleet AIs
+        this.updateFleetAIReferences()
     }
 
     static lastZoom = 1
@@ -39,6 +42,32 @@ class StarMap extends BaseMap {
     adjustZoom(modifier = 1.0) {
         this.cvs.adjustZoom(modifier)
         StarMap.lastZoom = this.cvs.zoom
+    }
+
+    /**
+     * Add a temporary popup text at a location
+     * @param {number} x - World X coordinate
+     * @param {number} y - World Y coordinate  
+     * @param {string} text - Text to display
+     * @param {number[]} color - Color array [r,g,b,a]
+     * @param {number} duration - Duration in milliseconds (default 2000)
+     */
+    addPopup(x, y, text, color = COLORS.White, duration = 2000) {
+        const popupId = `popup_${Date.now()}_${Math.random()}`
+        const textObj = this.cvs.addText(popupId, x, y, 0, -DEFAULT_FONT_SIZE, text, color, DEFAULT_FONT_SIZE, 2)
+        textObj.setDurationMs(duration)
+        return textObj
+    }
+
+    /**
+     * Update all fleet AIs to have a reference to this StarMap
+     */
+    updateFleetAIReferences() {
+        for (const fleet of this.starSystem.fleets) {
+            if (fleet.fleetAI) {
+                fleet.fleetAI.starMap = this
+            }
+        }
     }
     
     onDeferredInit() {
@@ -284,10 +313,18 @@ class StarMap extends BaseMap {
         
         if (!anomalies) return
 
+        // Calculate detection range based on Science skill (base 10 AU, 20 AU at 50 skill)
+        const scienceSkill = gs.fleet.totalSkills.getAmount(SKILLS.Science)
+        const detectionRange = 10 * (1 + scienceSkill / 50)
+        
         // Track existing anomaly UUIDs
         const existingAnomalyIds = new Set()
         
         anomalies.forEach((anomaly) => {
+            // Check if anomaly is within detection range
+            const distanceToFleet = calcDistance(anomaly.x, anomaly.y, gs.fleet.x, gs.fleet.y)
+            const isVisible = distanceToFleet <= detectionRange
+            
             existingAnomalyIds.add(`anomaly${anomaly.uuid}`)
             existingAnomalyIds.add(`anomalylabel${anomaly.uuid}`)
             const anomalyId = `anomaly${anomaly.uuid}`
@@ -320,6 +357,10 @@ class StarMap extends BaseMap {
             anomalyObj.y = anomaly.y
             labelObj.x = anomaly.x
             labelObj.y = anomaly.y
+            
+            // Set visibility based on detection range
+            anomalyObj.visible = isVisible
+            labelObj.visible = isVisible && labelObj.visible // Keep label logic, but hide if out of range
             
             if (anomaly == this.selectedObject) {
                 anomalyObj.strokeColor = COLORS.Green

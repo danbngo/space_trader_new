@@ -8,8 +8,6 @@
 function generateEncounter(encounterType = rndMember(ENCOUNTER_TYPES_ALL), planet = null, effectTypes = []) {
     const {fleetType} = encounterType
     const fleet = generateFleet(fleetType, encounterType.faction, planet)
-    fleet.captain = new Officer(`${encounterType.fleetType.name} Captain`, 0)
-    fleet.captain.credits = rng(fleetType.maxCredits, 0)
     for (const s of fleet.ships) s.aiType = encounterType.aiType
     const effects = effectTypes && effectTypes.length > 0 ? generateEffects(encounterType, effectTypes) : []
     

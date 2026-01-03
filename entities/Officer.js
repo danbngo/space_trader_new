@@ -6,11 +6,17 @@
 class Officer {
     /**
      * @param {string} name - The name of the officer.
+     * @param {Planet|null} planet - The planet the officer is from.
+     * @param {FactionType} factionType - The faction type of the officer.
      * @param {number} credits - The credits owned by the officer.
      */
-    constructor(name = "Unnamed", credits = 0) {
+    constructor(name = "Unnamed", planet = new Planet(), factionType = FACTION_TYPES_ALL[0], credits = 0) {
         /** @type {string} */
         this.name = name;
+        /** @type {Planet} */
+        this.planet = planet;
+        /** @type {FactionType} */
+        this.factionType = factionType;
         /** @type {number} */
         this.credits = credits;
         // Convert old number values to CountsMap if needed (for backwards compatibility)
@@ -160,14 +166,49 @@ class Officer {
 
     /**
      * Automatically spends available skill points on random skills.
+     * Considers home planet skill price modifiers and faction favored skills.
      */
     autoImproveSkills() {
         let attempts = 100
         while (this.skillPoints > 0 && attempts-- > 0) {
-            const skill = rndMember(SKILLS_ALL)
-            const costToUpgrade = this.calcSkillPointsToUpgrade(skill)
+            // Build weighted skill list
+            const skillWeights = []
+            for (const skill of SKILLS_ALL) {
+                let weight = 1.0
+                
+                // Factor in home planet's skill price modifier (lower price = higher weight)
+                if (this.planet && this.planet.c && this.planet.c.skillPriceMultipliers) {
+                    const priceModifier = this.planet.c.skillPriceMultipliers.getAmount(skill)
+                    if (priceModifier > 0) {
+                        // Invert: lower price = higher weight (1/priceModifier)
+                        weight *= (2 / priceModifier) // Scale so 1.0 modifier = 2x weight, lower = more
+                    }
+                }
+                
+                // Factor in faction's favored skills (2x weight)
+                if (this.factionType && this.factionType.favoredSkills && this.factionType.favoredSkills.includes(skill)) {
+                    weight *= 2
+                }
+                
+                skillWeights.push({ skill, weight })
+            }
+            
+            // Select skill using weighted random
+            const totalWeight = skillWeights.reduce((sum, sw) => sum + sw.weight, 0)
+            let roll = Math.random() * totalWeight
+            let selectedSkill = SKILLS_ALL[0]
+            
+            for (const sw of skillWeights) {
+                roll -= sw.weight
+                if (roll <= 0) {
+                    selectedSkill = sw.skill
+                    break
+                }
+            }
+            
+            const costToUpgrade = this.calcSkillPointsToUpgrade(selectedSkill)
             if (this.skillPoints >= costToUpgrade) {
-                this.skills.increment(skill, 1)
+                this.skills.increment(selectedSkill, 1)
                 this.skillPoints -= costToUpgrade
             }
         }

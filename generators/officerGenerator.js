@@ -17,25 +17,26 @@ function generateOfficerName(planet = new Planet()) {
 /**
  * Generates an officer with skills based on planet quality.
  * @param {Planet} planet - The planet the officer is from.
- * @param {boolean} withImplants - Whether to generate cyber implants (for tavern hires).
- * @param {string|null} reputationType - 'fame' for guild officers, 'both' for tavern officers, null for none.
+ * @param {FactionType} factionType - The faction type of the officer.
  * @returns {Officer} The generated officer.
  */
-function generateOfficer(planet = new Planet(), withImplants = false, reputationType = null) {
+function generateOfficer(planet = new Planet(), factionType = FACTION_TYPES_ALL[0]) {
     console.log('generating officer for planet:',planet)
     const {civilization} = planet
     const {education} = civilization
     const level = rng(10*education, 1)
     const credits = 0
-    const officer = new Officer(generateOfficerName(planet), credits)
+    const officer = new Officer(generateOfficerName(planet), planet, factionType, credits)
     
     console.log('determining race..')
     // Assign random race
     officer.race = rndMember(RACES_ALL)
     
     console.log('determining religion..')
-    // Assign religion based on planet's religious distribution
-    if (civilization.religions && civilization.religions.counts.size > 0) {
+    // If faction is religious, assign state religion; otherwise use planet distribution
+    if (factionType.religious && civilization.stateReligion) {
+        officer.religion = civilization.stateReligion
+    } else if (civilization.religions && civilization.religions.counts.size > 0) {
         const religionEntries = Array.from(civilization.religions.counts.entries())
         const totalWeight = religionEntries.reduce((sum, [_, weight]) => sum + weight, 0)
         const roll = Math.random() * totalWeight
@@ -76,8 +77,8 @@ function generateOfficer(planet = new Planet(), withImplants = false, reputation
     officer.ranks.set(planet, RANK_TYPES.CITIZEN)
 
     console.log('adding implants...')
-    // Add cyber implants if from tavern (0-3 random implants)
-    if (withImplants && CYBER_IMPLANT_TYPES_ALL) {
+    // Add cyber implants if criminal faction (0-3 random implants)
+    if (factionType.criminal && CYBER_IMPLANT_TYPES_ALL) {
         const numImplants = rng(3, 0)
         const availableImplants = [...CYBER_IMPLANT_TYPES_ALL]
         for (let i = 0; i < numImplants && availableImplants.length > 0; i++) {
@@ -91,23 +92,26 @@ function generateOfficer(planet = new Planet(), withImplants = false, reputation
     }
     
     console.log('adding reputation for home planet...')
-    if (reputationType) {
-        const maxReputation = 50 * officer.level
-        
-        if (reputationType === 'fame' || reputationType === 'both') {
-            const fame = rng(maxReputation, 0)
-            if (fame > 0) {
-                officer.reputation.increment(planet, fame)
-            }
+    // Reputation based on faction type
+    const maxReputation = 50 * officer.level
+    if (factionType.authority) {
+        // Authority factions get positive reputation
+        const fame = rng(maxReputation, 0)
+        if (fame > 0) {
+            officer.reputation.increment(planet, fame)
+        }
+    } else if (factionType.criminal) {
+        // Criminal factions get negative reputation (infamy)
+        const infamy = rng(maxReputation, 0)
+        if (infamy > 0) {
+            officer.reputation.increment(planet, -infamy)
         }
         
-        if (reputationType === 'both') {
-            const infamy = rng(maxReputation, 0)
-            if (infamy > 0) {
-                officer.reputation.increment(planet, -infamy)
-            }
-        }
+        // Add bounty for criminals
+        const bounty = rng(officer.level * 1000, officer.level * 100)
+        officer.bounty.setAmount(planet, bounty)
     }
+    // Otherwise reputation stays at 0
 
     return officer
 }

@@ -59,6 +59,10 @@ class Fleet extends SpaceObject {
         planet.addChildren([this])
     }
 
+    get subordinates() {
+        return this.officers.filter(officer => officer !== this.captain);
+    }
+
     /**
      * Calculates the total credit share owed to officers.
      * @param {number} ofCR - The amount of credits to calculate share from.
@@ -208,6 +212,19 @@ class Fleet extends SpaceObject {
         if (!this.captain) this.captain = officer
         this.officers.push(officer)
         officer.fleet = this
+    }
+
+    removeOfficer(officer = new Officer()) {
+        //assign a new captain if needed
+        if (officer === this.captain) {
+            const newCaptain = this.officers.find(o => o !== officer);
+            this.captain = newCaptain || null;
+        }
+        const index = this.officers.indexOf(officer);
+        if (index !== -1) {
+            this.officers.splice(index, 1);
+            officer.fleet = null;
+        }
     }
 
     get activeShips() {

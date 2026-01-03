@@ -4,7 +4,7 @@ class AllianceEthnicNews extends News {
             `Ethnic alliance formed between ${coloredName(planet)} and ${coloredName(targetPlanet)}!`,
             `Ethnic alliance dissolved between ${coloredName(planet)} and ${coloredName(targetPlanet)}!`,
             ``,
-            `Tensions between ${coloredName(planet)} and ${coloredName(targetPlanet)} prevent ethnic alliance formation!`,
+            `Tensions between ${coloredName(planet)} and ${coloredName(targetPlanet)} interfere with their ethnic alliance!`,
             NT.ALLIANCE_ETHNIC, planet, targetPlanet
         )
 

@@ -24,8 +24,14 @@ class ScientistFleetAI extends FleetAI {
                     const relicsFound = Math.min(rng(3, 1), this.fleet.availableCargoSpace);
                     this.fleet.cargo.increment(CARGO_TYPES.RELICS, relicsFound);
                     console.log(`🔬 ${this.fleet.name} catalogued ${this.target.name} and discovered ${relicsFound} relics`);
+                    
+                    // Show discovery popup
+                    this.starMap.addPopup(this.fleet.x, this.fleet.y, '✨', COLORS.LightCyan)
                 } else {
                     console.log(`🔬 ${this.fleet.name} catalogued ${this.target.name}`);
+                    
+                    // Show discovery popup
+                    this.starMap.addPopup(this.fleet.x, this.fleet.y, '✨', COLORS.LightCyan)
                 }
             }
         }

@@ -113,9 +113,12 @@ class Encounter {
             // Decrement module cooldowns
             for (const moduleType of Object.values(SHIP_MODULE_TYPES)) {
                 const currentCooldown = ship.moduleCooldowns.getAmount(moduleType)
-                if (currentCooldown > 0) {
-                    ship.moduleCooldowns.setAmount(moduleType, currentCooldown - 1)
+                if (currentCooldown <= 0) continue
+                let cooldownToRecover = 1
+                while (Math.random()*(1+ship.fleet.totalSkills.getAmount(SKILLS.Engineer)/50) > 0.5 && cooldownToRecover < currentCooldown) {
+                    cooldownToRecover += 1
                 }
+                ship.moduleCooldowns.setAmount(moduleType, currentCooldown - cooldownToRecover)
             }
         }
         

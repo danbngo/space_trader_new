@@ -11,11 +11,12 @@ class Route {
         this.fleet = fleet
         this.destination = destination
         this.startYear = startYear
+        this.endYear = startYear
+        this.travelTime = 0
+        this.path = null
+        this.valid = false
 
         if (fleet.x == destination.x && fleet.y == destination.y) { 
-            this.endYear = startYear
-            this.travelTime = 0
-            this.path = null
             return
         }
 
@@ -34,7 +35,6 @@ class Route {
         const progressRatio = elapsedTime/duration
         return this.path.positionAtProgress(progressRatio)
     }
-
 
     /**
      * 
