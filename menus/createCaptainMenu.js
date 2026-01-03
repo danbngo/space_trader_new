@@ -113,21 +113,32 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
             ce({
                 style: {display: 'flex', flexDirection: 'column', gap: '4px'},
                 children: [
-                    new Dropdown(
-                        FACTION_TYPES_ALL.map(faction => [
-                            `${faction.symbol} ${faction.name}`,
-                            () => {
-                                selectedFaction = faction
-                                gs.fleet.factionType = faction
-                                // Apply faction stat modifiers if needed
-                                showCaptainCreationMenu(captain, onClose, selectedSkill)
-                            }
-                        ]),
-                        false,
-                        FACTION_TYPES_ALL.indexOf(selectedFaction),
-                        250,
-                        2
-                    ).container
+                    (() => {
+                        const factionDropdown = new Dropdown(
+                            FACTION_TYPES_ALL.map(faction => [
+                                `${faction.symbol} ${faction.name}`,
+                                () => {
+                                    selectedFaction = faction
+                                    gs.fleet.factionType = faction
+                                    // Apply faction stat modifiers if needed
+                                    showCaptainCreationMenu(captain, onClose, selectedSkill)
+                                }
+                            ]),
+                            false,
+                            FACTION_TYPES_ALL.indexOf(selectedFaction),
+                            250,
+                            2
+                        )
+                        // Add popover to the label showing current selection
+                        setTimeout(() => {
+                            createPopoverElement(factionDropdown.labelElement, selectedFaction.description)
+                            // Add popovers to dropdown items
+                            factionDropdown.dropdownButtons.forEach((btn, index) => {
+                                createPopoverElement(btn, FACTION_TYPES_ALL[index].description)
+                            })
+                        }, 10)
+                        return factionDropdown.container
+                    })()
                 ]
             }),
             
@@ -135,20 +146,31 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
             ce({
                 style: {display: 'flex', flexDirection: 'column', gap: '4px'},
                 children: [
-                    new Dropdown(
-                        Object.values(RACES).map(race => [
-                            `${race.symbol} ${race.name}`,
-                            () => {
-                                selectedRace = race
-                                captain.race = race
-                                // Apply race stat modifiers if they exist
-                                showCaptainCreationMenu(captain, onClose, selectedSkill)
-                            }
-                        ]),
-                        false,
-                        Object.values(RACES).indexOf(selectedRace),
-                        250
-                    ).container
+                    (() => {
+                        const raceDropdown = new Dropdown(
+                            Object.values(RACES).map(race => [
+                                `${race.symbol} ${race.name}`,
+                                () => {
+                                    selectedRace = race
+                                    captain.race = race
+                                    // Apply race stat modifiers if they exist
+                                    showCaptainCreationMenu(captain, onClose, selectedSkill)
+                                }
+                            ]),
+                            false,
+                            Object.values(RACES).indexOf(selectedRace),
+                            250
+                        )
+                        // Add popover to the label showing current selection
+                        setTimeout(() => {
+                            createPopoverElement(raceDropdown.labelElement, selectedRace.description)
+                            // Add popovers to dropdown items
+                            raceDropdown.dropdownButtons.forEach((btn, index) => {
+                                createPopoverElement(btn, Object.values(RACES)[index].description)
+                            })
+                        }, 10)
+                        return raceDropdown.container
+                    })()
                 ]
             }),
             

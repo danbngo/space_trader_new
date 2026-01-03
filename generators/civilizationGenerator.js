@@ -4,6 +4,7 @@
  * @returns {Civilization} The generated civilization.
  */
 function generateCivilization(planet) {
+    console.log('generating civ for planet:',planet)
     const governmentType = rndMember(GT_ALL.filter(gt => gt != GT.PUPPET_STATE))
     // Dwarf planets are small outposts with reduced stats (0.25x)
     const multiplier = planet.objectType == OBJECT_TYPES.DWARF_PLANET ? 0.25 : planet.objectType == OBJECT_TYPES.SPACE_STATION ? 0.5 : 1.0

@@ -38,6 +38,10 @@ function generateAnomalies(count = 1, minDistance = 5, maxDistance = SOLAR_SYSTE
  * @param {number} maxDistance - Maximum distance from system center in AU.
  * @returns {Anomaly} A generated anomaly.
  */
-function generateAnomaly(minDistance = 5, maxDistance = SOLAR_SYSTEM_RADIUS_IN_AU) {
-    return generateAnomalies(1, minDistance, maxDistance)[0];
+function generateAnomaly(minDistance = null, maxDistance = null) {
+    // Default to spawning in outer half of the system (between radius/2 and radius)
+    const systemRadius = gs.system ? gs.system.radius : SOLAR_SYSTEM_RADIUS_IN_AU;
+    const min = minDistance !== null ? minDistance : systemRadius / 2;
+    const max = maxDistance !== null ? maxDistance : systemRadius;
+    return generateAnomalies(1, min, max)[0];
 }

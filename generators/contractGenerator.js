@@ -4,6 +4,7 @@
  * @returns {Contract} The generated contract.
  */
 function generateContract(planet = new Planet()) {
+    console.log('generating contract for planet:',planet)
     const civilization = planet.civilization;
     
     // Weight contract types based on civilization attributes

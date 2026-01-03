@@ -1,3 +1,4 @@
+
 function showPlanetModal(planet = new Planet(), title = '', msg = '', options = [], modalId = '', onNavigate = (nextPlanet)=>{}) {
     // Create title with navigation arrows
     // Navigate within same planet type (dwarf, regular, or moons)
@@ -40,7 +41,7 @@ function showPlanetModal(planet = new Planet(), title = '', msg = '', options = 
             }),
             ce({
                 tag: 'div',
-                style: {minWidth: '300px', textAlign: 'center'},
+                style: {minWidth: '300px', textAlign: 'center', color: 'black important!'},
                 children: [title]
             }),
             ce({

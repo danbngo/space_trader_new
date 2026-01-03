@@ -23,7 +23,7 @@ class Dropdown {
         
         this.buttons = buttons
         this.dropUpwards = dropUpwards
-        this.maxWidth = maxWidth
+        this.maxWidth = maxWidth || 250
         this.numColumns = numColumns
         this.currentSelectedIndex = selectedIndex !== null && !isNaN(selectedIndex) && selectedIndex >= 0 ? selectedIndex : 0
         this.dropdownButtons = []
@@ -55,14 +55,7 @@ class Dropdown {
         
         // Create the items container that will be attached to body
         this.itemsContainer = ce({
-            classNames: ['dropdown-items'],
-            style: {
-                position: 'fixed', // Use fixed positioning relative to viewport
-                display: 'none',
-                zIndex: '10000', // Very high z-index to appear above modals
-                backgroundColor: '#000',
-                border: '1px solid #444'
-            }
+            classNames: ['dropdown-items']
         })
         
         // Create dropdown items
@@ -73,12 +66,7 @@ class Dropdown {
             const btn = ce({
                 tag: 'div',
                 classNames: ['gameButton'],
-                innerHTML: label,
-                style: {
-                    whiteSpace: 'nowrap',
-                    margin: '0',
-                    boxSizing: 'border-box',
-                }
+                innerHTML: label
             })
             
             // Add custom class names if provided
@@ -111,9 +99,7 @@ class Dropdown {
         this.container = ce({
             classNames: ['dropdown-container'],
             style: {
-                width: Math.ceil(this.maxWidth)+'px',
-                position: 'relative',
-                display: 'inline-block'
+                width: Math.ceil(this.maxWidth)+'px'
             },
             children: [this.labelElement]
         })

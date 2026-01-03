@@ -221,6 +221,7 @@ function showPlanetClimateMenu(planet = new Planet()) {
     
     // Build left column: Physical Properties and Composition
     let leftContent = `<u>Physical Properties</u><br/>`
+    leftContent += `Class: ${coloredName(planet.objectType)}<br/>`
     leftContent += `Type: ${coloredName(planet.planetType)}<br/>`
     leftContent += `Radius: ${statColorSpan(roundToPlaces(planet.radius, 2) + ' Earth radii', scoreEarthlikeValue(planet.radius, EARTH.radius))}<br/>`
     leftContent += `Day Length: ${statColorSpan(roundToPlaces(planet.dayLength, 2) + ' Earth days', scoreEarthlikeValue(planet.dayLength, EARTH.dayLength))}<br/>`

@@ -1,0 +1,24 @@
+/* Dropdown Component Styles */
+
+.dropdown-container {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-label {
+    box-sizing: border-box;
+}
+
+.dropdown-items {
+    position: fixed;
+    display: none;
+    z-index: 10000;
+    background-color: #000;
+    border: 1px solid #444;
+}
+
+.dropdown-items .gameButton {
+    white-space: nowrap;
+    margin: 0;
+    box-sizing: border-box;
+}

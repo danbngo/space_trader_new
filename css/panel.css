@@ -39,18 +39,24 @@
 }
 
 .panel-close-button:hover {
+    text-transform: uppercase;
     background: #00ffff22;
     border: 1px solid #0ff;
     box-shadow: 0 0 6px #0ff;
 }
 
 
-.panel-title {
+.panel-header {
+    text-transform: uppercase;
+    color: black !important;
     font-size: 1em;
     font-weight: bold;
-    background-color: #0ff;
-    color: black;
+    background-color: #088;
     margin-bottom: 10px;
+}
+.panel-header div, .panel-header span {
+    text-transform: uppercase;
+    color: black !important;
 }
 
 .panel-content {

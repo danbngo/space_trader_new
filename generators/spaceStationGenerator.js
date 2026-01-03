@@ -6,15 +6,17 @@
  * @returns {SpaceStation}
  */
 function generateSpaceStation(name = "Station", lagrangePoint, asteroidBelts = []) {
+    console.log('generating space station:',name,lagrangePoint,asteroidBelts)
     const stationType = determineSpaceStationSettlementType(null) // Station not created yet, function doesn't use parameter
     const color = stationType.color
     const radius = 0.001 // Small radius for stations
     
+    console.log('generating station orbit')
     // Copy orbit from lagrange point
     const orbit = lagrangePoint.orbit.clone()
-    
     // Generate climate based on distance and type
     const distanceFromSun = orbit.radius
+    console.log('generating station climate')
     const climate = generateStationClimate(distanceFromSun, asteroidBelts, stationType)
     
     // Day length (stations can rotate independently)
@@ -26,6 +28,7 @@ function generateSpaceStation(name = "Station", lagrangePoint, asteroidBelts = [
         ? 0.001 
         : 0
     
+    console.log('instantiating space station')
     const station = new SpaceStation(
         name,
         color,
@@ -179,10 +182,14 @@ function generateSpaceStations(count = rng(5, 3), lagrangePoints = [], asteroidB
     
     // Limit count to available lagrange points
     const actualCount = Math.min(count, shuffledLagrangePoints.length)
+
+    console.log('adding # space stations:',actualCount)
     
     for (let i = 0; i < actualCount; i++) {
         const name = shuffledNames[i] || `Station ${i + 1}`
         const lagrangePoint = shuffledLagrangePoints[i] // Use unique lagrange point for each station
+
+        console.log(name,lagrangePoint)
         
         const station = generateSpaceStation(name, lagrangePoint, asteroidBelts)
         stations.push(station)

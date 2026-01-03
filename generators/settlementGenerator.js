@@ -122,6 +122,7 @@ function determinePlanetSettlementType(planet) {
  * @returns {Settlement} The generated settlement.
  */
 function generateSettlement(planet) {
+    console.log('generating settlement for planet:',planet)
     // Determine settlement type based on planet characteristics
     const settlementType = 
         planet.objectType == OBJECT_TYPES.PLANET || planet.objectType == OBJECT_TYPES.DWARF_PLANET ? determinePlanetSettlementType(planet) :
@@ -129,6 +130,7 @@ function generateSettlement(planet) {
     
     // Get moons for this planet (children that are Moon instances)
     const planetMoons = planet.children ? planet.children.filter(child => child instanceof Moon) : []
+    console.log('found moons:',planetMoons)
     
     // Helper function to randomly assign a moon or null
     const getRandomMoon = () => {
@@ -136,21 +138,39 @@ function generateSettlement(planet) {
         // 50% chance to be on a moon if moons exist
         return Math.random() < 0.5 ? rndMember(planetMoons) : null
     }
+
+    console.log('generating buildings...')
     
     const shipyard = new Shipyard(planet, getRandomMoon())
+    console.log('1')
     const market =  new Market(planet, false, getRandomMoon())
+    console.log('1')
     const blackMarket =  new Market(planet, true, getRandomMoon()) 
+    console.log('1')
     const guild =  new Guild(planet, getRandomMoon()) 
+    console.log('1')
     const bank =  new Bank(planet, getRandomMoon()) 
+    console.log('1')
     const courthouse = new Courthouse(planet, getRandomMoon())
+    console.log('1')
     const academy = new Academy(planet, false, getRandomMoon())
+    console.log('1')
     const tavern = new Academy(planet, true, getRandomMoon())
+    console.log('1')
     const cyberSurgeon = new CyberSurgeon(planet, getRandomMoon())
+    console.log('1')
     const palace = new Palace(planet, getRandomMoon())
+    console.log('1')
     const temple = new Temple(planet, getRandomMoon())
+    console.log('1')
     const casino = new Casino(planet, getRandomMoon())
+    console.log('1')
     const armory = new Armory(planet, getRandomMoon())
+    console.log('1')
     const outfitter = new Outfitter(planet, getRandomMoon())
+    console.log('1')
+
+    console.log('disabling some buildings...')
 
     // Dwarf planets have much lower chance of having buildings (95% disabled vs 80% for others)
     const disableChance = planet.objectType == OBJECT_TYPES.PLANET ? 0.8 : planet.objectType == OBJECT_TYPES.DWARF_PLANET ? 0.4 : 0.2

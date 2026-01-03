@@ -35,6 +35,8 @@ class Officer {
         this.fleet = null;
         /** @type {CyberImplant[]} */
         this.implants = [];
+        /** @type {GeneticModification[]} */
+        this.geneticModifications = [];
         /** @type {Map<Planet, RankType>} */
         this.ranks = new Map();
         /** @type {PerkType[]} */
@@ -59,17 +61,15 @@ class Officer {
     grantExperience(amount = 0, autoLevelUp = (this !== gs.captain), autoImproveSkills = (this !== gs.captain)) {
         let msg = ''
         this.expPoints += amount;
-        if (this == gs.captain) {
-            msg += `You gained ${amount} experience points.<br/>`;
-        }
+        msg += `You gained ${amount} experience points.<br/>`;
         if (this.canLevelUp) {
             const oldLevel = this.level
-            if (this == gs.captain) msg += colorSpan(`You leveled up to level ${this.level + 1}!<br/>`, COLORS.LightGreen);
+            msg += colorSpan(`You leveled up to level ${this.level + 1}!<br/>`, COLORS.LightGreen);
             while (autoLevelUp && this.canLevelUp) {
                 this.levelUp(autoImproveSkills);
             }
             // Check if perk point was earned
-            if (this == gs.captain && Math.floor(this.level / 3) > Math.floor(oldLevel / 3)) {
+            if (Math.floor(this.level / 3) > Math.floor(oldLevel / 3)) {
                 msg += colorSpan(`You earned a perk point!<br/>`, COLORS.Gold);
             }
         }
@@ -84,11 +84,8 @@ class Officer {
      */
     grantReputation(target, amount = 1) {
         this.reputation.increment(target, amount);
-        if (this == gs.captain) {
-            const targetName = target.name ? coloredName(target) : (target instanceof FactionType ? `${target.symbol} ${colorSpan(target.name, target.color)}` : target);
-            return colorSpan(`You ${amount >= 0 ? 'gained' : 'lost'} ${Math.abs(amount)} reputation with ${targetName}.<br/>`, amount >= 0 ? COLORS.LightGreen : COLORS.LightRed);
-        }
-        return ''
+        const targetName = target.name ? coloredName(target) : (target instanceof FactionType ? `${target.symbol} ${colorSpan(target.name, target.color)}` : target);
+        return colorSpan(`You ${amount >= 0 ? 'gained' : 'lost'} ${Math.abs(amount)} reputation with ${targetName}.<br/>`, amount >= 0 ? COLORS.LightGreen : COLORS.LightRed);
     }
 
     /**
@@ -117,10 +114,8 @@ class Officer {
      */
     grantBounty(planet = new Planet(), amount = 1) {
         this.bounty.increment(planet, amount);
-        if (this == gs.captain) {
-            return colorSpan(`You ${amount >= 0 ? 'gained' : 'lost'} ${Math.abs(amount)} bounty on ${coloredName(planet)}.<br/>`, amount >= 0 ? COLORS.LightRed : COLORS.LightGreen);
-        }
-        return ''
+        const planetName = coloredName(planet);
+        return colorSpan(`You ${amount >= 0 ? 'gained' : 'lost'} ${Math.abs(amount)} bounty on ${planetName}.<br/>`, amount >= 0 ? COLORS.LightRed : COLORS.LightGreen);
     }
 
     /**
@@ -153,9 +148,7 @@ class Officer {
                 // Check if officer meets level requirement and doesn't already have this perk
                 if (this.level >= perk.minLevel && !this.perks.includes(perk)) {
                     this.perks.push(perk)
-                    if (this === gs.captain) {
-                        console.log(`Auto-granted perk: ${perk.name}`)
-                    }
+                    console.log(`Auto-granted perk: ${perk.name}`)
                 }
             }
         }
@@ -194,7 +187,6 @@ class Officer {
     }
 
     get crShare() {
-        if (this == gs.captain) return 0
         return Math.min(100, Math.round( Math.pow(1 + this.level, 1.5) )) / 100
     }
 

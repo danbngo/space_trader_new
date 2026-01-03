@@ -66,7 +66,7 @@ function refreshPanelButtons (panelId = '', buttons) {
  */
 function createPanel(title = '', text = '', buttons = [], id = '', onClosePanel = null) {
     const panelChildren = [
-        ce({classNames:['panel-title'], children: [title]}),
+        ce({classNames:['panel-header'], children: [title]}),
         ce({classNames:['panel-content'], children: [text]}),
         ce({classNames:['panel-buttons']})
     ];
@@ -230,7 +230,7 @@ function ce({tag = 'div', id = '', innerHTML = '', children = [], parent = undef
 
     /** @type {any} */
     const effectiveStyle = style || {}
-    if (onClick) effectiveStyle.cursor = 'pointer'
+    //if (onClick) effectiveStyle.cursor = 'pointer'
     if (disabled) effectiveStyle.cursor = ''
 
     /** @type {any} */

@@ -34,27 +34,38 @@ function getUnusedReligionSymbol() {
  */
 function generateReligionName() {
     const prefixes = [
-        'Church of', 'Order of', 'Temple of', 'Followers of', 'Brotherhood of',
-        'Sisterhood of', 'Covenant of', 'Path of', 'Way of', 'Cult of',
-        'Faith of', 'Disciples of', 'Children of', 'Seekers of', 'Keepers of'
+        'Order of', 'Path of', 'Way of', 'Cult of', 'Seekers of'
     ];
     
-    const concepts = [
-        'the Eternal Light', 'the Void', 'the Cosmos', 'the Stars', 'Divine Unity',
-        'the Sacred Flame', 'Universal Truth', 'the Infinite', 'Celestial Harmony',
-        'the Ancient Ones', 'the Singularity', 'Transcendence', 'the Nexus',
-        'the Great Cycle', 'Divine Reason', 'the Cosmic Dance', 'the Solar Winds',
-        'the Quantum Mind', 'Stellar Ascension', 'the Void Between', 'Perfect Balance',
-        'the Crystal Spheres', 'Universal Consciousness', 'the Deep Time', 'Eternal Return',
-        'the Architects', 'the First Cause', 'the Prime Mover', 'Sacred Geometry',
-        'the Luminous Path', 'the Dark Mother', 'the Stellar Forge', 'Pure Mathematics'
+    const shortConcepts = [
+        'the Void', 'the Nexus', 'Light', 'Unity', 'the Flame', 
+        'the Stars', 'Balance', 'the Cycle', 'Reason', 'Truth',
+        'the Singularity', 'the Architects', 'Harmony', 'Ascension'
     ];
     
-    // 30% chance to use prefix + concept, otherwise just concept
-    if (Math.random() < 0.3) {
-        return `${rndMember(prefixes)} ${rndMember(concepts)}`;
+    const oneWordNames = [
+        'Voidism', 'Cosmism', 'Nexism', 'Lumism', 'Stellarism',
+        'Unitarians', 'Singularians', 'Cyclists', 'Harmonics', 'Transcendents',
+        'Eternalists', 'Geometrists', 'Quantumists', 'Architects', 'Reasonists'
+    ];
+    
+    const mashupPrefixes = ['Cos', 'Void', 'Star', 'Lum', 'Nex', 'Uni', 'Quan', 'Eter', 'Cel', 'Arch'];
+    const mashupSuffixes = ['ism', 'ites', 'ians', 'ists', 'os', 'ix', 'ar', 'on'];
+    
+    const roll = Math.random();
+    
+    if (roll < 0.4) {
+        // 40% single word
+        return rndMember(oneWordNames);
+    } else if (roll < 0.7) {
+        // 30% mashup word
+        return rndMember(mashupPrefixes) + rndMember(mashupSuffixes);
+    } else if (roll < 0.9) {
+        // 20% prefix + short concept
+        return `${rndMember(prefixes)} ${rndMember(shortConcepts)}`;
     } else {
-        return rndMember(concepts);
+        // 10% just short concept
+        return rndMember(shortConcepts);
     }
 }
 

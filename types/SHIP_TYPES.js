@@ -67,7 +67,7 @@ const SHIP_TYPES = {
     JAMMER: new ShipType('Jammer', 'Electronic warfare vessel designed to disrupt enemy sensors and communications.', SHAPES.FilledTriangle, 2, 2, 1, 1, 0.1, 2, [SHIP_MODULE_TYPES.EMP_PULSE], 2),
     BATTLESHIP: new ShipType('Battleship', 'Massive capital ship with warhead launchers, heavy armor, and shields for fleet engagements.', SHAPES.FilledTriangle, 4, 4, 3, 1, 2, 1.5, [SHIP_MODULE_TYPES.WARHEAD], 3),
     TUG_SHIP: new ShipType('Tug Ship', 'Heavy-duty vessel designed for towing and maneuvering larger ships or objects in space.', SHAPES.FilledTriangle, 2, 0.5, 0.5, 2, 1, 1, [SHIP_MODULE_TYPES.MAGNETIZE], 1),
-    DRILLING_RIG: new ShipType('Drilling Rig', 'Industrial vessel with a heavy drill for asteroid mining and resource extraction.', SHAPES.FilledTriangle, 3, 0.1, 1, 0.5, 3, 0.5, [SHIP_MODULE_TYPES.DRILL], 2),
+    DRILLING_RIG: new ShipType('Drilling Rig', 'Industrial vessel with a heavy drill for asteroid mining and resource extraction.', SHAPES.FilledTriangle, 3, 0.1, 2, 1, 3, 0.5, [SHIP_MODULE_TYPES.DRILL], 2),
     ESCORT_SHIP: new ShipType('Escort Ship', 'Defensive support vessel with smoke bombs and strong shields to protect allied ships.', SHAPES.FilledTriangle, 1, 1.5, 1.5, 0.5, 0.25, 1.5, [SHIP_MODULE_TYPES.SMOKE_BOMB], 2),
     INTERCEPTOR: new ShipType('Interceptor', 'Fast pursuit craft with magnetic grapples for capturing or disabling enemy vessels.', SHAPES.FilledTriangle, 1.5, 1.5, 1.5, 2, 0.25, 2, [SHIP_MODULE_TYPES.MAGNETIZE], 2),
 }

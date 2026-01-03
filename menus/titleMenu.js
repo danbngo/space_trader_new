@@ -145,8 +145,12 @@ async function startNewGame() {
     gs = new GameState()
     gs.year = GAME_START_YEAR
     gs.system = SOLAR_SYSTEM
+
+    console.log('Adding religions...')
     gs.system.religions = generateReligions()
-    gs.system.spaceStations = generateSpaceStations(rng(5, 3), ALL_LAGRANGE_POINTS, ASTEROID_BELTS_ALL)
+    console.log('Adding space stations...')
+    const numToGenerate = Math.min(rng(12, 6), ALL_LAGRANGE_POINTS.length)
+    gs.system.spaceStations = generateSpaceStations(numToGenerate, ALL_LAGRANGE_POINTS, ASTEROID_BELTS_ALL)
     
     console.log("Generated religions:", RELIGIONS)
     console.log("Generated space stations:", SPACE_STATIONS)
