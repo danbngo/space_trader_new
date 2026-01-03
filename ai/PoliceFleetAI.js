@@ -22,4 +22,12 @@ class PoliceFleetAI extends FleetAI {
             }
         }
     }
+    onDestroyed() {
+        // Losing police increases crime and reduces security
+        if (this.fleet.planet && this.fleet.planet.civilization) {
+            this.fleet.planet.c.crime *= 1.01;
+            this.fleet.planet.c.security *= 0.99;
+        }
+        super.onDestroyed()
+    }
 }

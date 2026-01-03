@@ -7,7 +7,7 @@ class MercenaryFleetAI extends FleetAI {
     constructor(fleet = null, origin = null, starMap = null) {
         super(fleet, origin, starMap);
         /** @type {Fleet[]} */
-        this.visitedFleets = [];
+        this.visited = [];
     }
     
     calcValidTargets() {
@@ -16,7 +16,7 @@ class MercenaryFleetAI extends FleetAI {
             if (f === this.fleet) return false;
             if (f.location) return false;
             // Skip if already visited
-            if (this.visitedFleets.includes(f)) return false;
+            if (this.visited.includes(f)) return false;
             // Only target fleets with cargo
             if (!f.cargo || f.cargo.total === 0) return false;
             // Don't attack targets that are 2x stronger
@@ -38,7 +38,7 @@ class MercenaryFleetAI extends FleetAI {
     onNearTarget() {
         if (this.target instanceof Fleet && !this.target.location) {
             // Mark as visited
-            this.visitedFleets.push(this.target);
+            this.visited.push(this.target);
             
             if (Math.random() > 0.5) {
                 this.fightTarget();
@@ -52,5 +52,13 @@ class MercenaryFleetAI extends FleetAI {
             this.transferCargo(this.target, this.fleet)
         }
         return victor
+    }
+    onDestroyed() {
+        // Losing mercenaries hurts military capacity
+        if (this.fleet.planet && this.fleet.planet.civilization) {
+            this.fleet.planet.c.army *= 0.99;
+            this.fleet.planet.c.taxes *= 0.99;
+        }
+        super.onDestroyed()
     }
 }

@@ -7,7 +7,7 @@ class SlaverFleetAI extends FleetAI {
     constructor(fleet = null, origin = null, starMap = null) {
         super(fleet, origin, starMap);
         /** @type {Fleet[]} */
-        this.visitedFleets = [];
+        this.visited = [];
     }
     
     calcValidTargets() {
@@ -15,7 +15,7 @@ class SlaverFleetAI extends FleetAI {
         return gs.system.fleets.filter(f => {
             if (f === this.fleet || f.factionType.authority || f.location) return false
             // Skip if already visited
-            if (this.visitedFleets.includes(f)) return false
+            if (this.visited.includes(f)) return false
             // Only target fleets with officers (captain + at least 1 subordinate)
             if (!f.captain || f.subordinates.length === 0) return false
             // Don't attack targets that are 2x stronger
@@ -28,7 +28,7 @@ class SlaverFleetAI extends FleetAI {
     onNearTarget() {
         if (this.target instanceof Fleet && !this.target.location) {
             // Mark as visited
-            this.visitedFleets.push(this.target);
+            this.visited.push(this.target);
             
             // 50% chance to capture officers peacefully, 50% chance to fight
             if (Math.random() < 0.5) {
@@ -39,5 +39,14 @@ class SlaverFleetAI extends FleetAI {
                 this.fightTarget();
             }
         }
+    }
+    onDestroyed() {
+        // Destroying slavers improves freedom and reduces crime
+        if (this.fleet.planet && this.fleet.planet.civilization) {
+            this.fleet.planet.c.population *= 0.99;
+            this.fleet.planet.c.industry *= 0.99;
+            this.fleet.planet.c.corruption *= 0.98;
+        }
+        super.onDestroyed()
     }
 }

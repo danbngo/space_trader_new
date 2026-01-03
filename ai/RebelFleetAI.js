@@ -7,7 +7,7 @@ class RebelFleetAI extends FleetAI {
     constructor(fleet = null, origin = null, starMap = null) {
         super(fleet, origin, starMap);
         /** @type {Fleet[]} */
-        this.visitedFleets = [];
+        this.visited = [];
     }
     
     calcDestination() {
@@ -18,7 +18,7 @@ class RebelFleetAI extends FleetAI {
         return gs.system.fleets.filter(f => {
             if (f === this.fleet || f.planet !== this.fleet.planet || f.location) return false
             // Skip if already visited
-            if (this.visitedFleets.includes(f)) return false
+            if (this.visited.includes(f)) return false
             // Only target fleets with cargo
             if (!f.cargo || f.cargo.total === 0) return false
             // Don't attack targets that are 2x stronger
@@ -28,7 +28,13 @@ class RebelFleetAI extends FleetAI {
     onNearTarget() {
         if (this.target instanceof Fleet && !this.target.location) {
             // Mark as visited
-            this.visitedFleets.push(this.target);
+            this.visited.push(this.target);
+            
+            // Reduce prestige and culture when rebels fight
+            if (this.fleet.planet && this.fleet.planet.civilization) {
+                this.fleet.planet.c.prestige *= 0.99;
+                this.fleet.planet.c.culture *= 0.99;
+            }
             
             // Always fight fleets from their home planet
             this.fightTarget();
@@ -42,5 +48,12 @@ class RebelFleetAI extends FleetAI {
         }
         return victor
     }
-
+    onDestroyed() {
+        // Increase prestige and culture when rebels are destroyed (restores order)
+        if (this.fleet.planet && this.fleet.planet.civilization) {
+            this.fleet.planet.c.prestige *= 1.01;
+            this.fleet.planet.c.culture *= 1.01;
+        }
+        super.onDestroyed()
+    }
 }

@@ -11,6 +11,7 @@ class MerchantFleetAI extends FleetAI {
     onNearDestination() {
         // Trade at destination: reserve cargo from market, unload our cargo, load reserved cargo
         if (this.destination && this.destination instanceof Planet && this.destination.s && this.destination.s.market) {
+            this.destination.c.economy *= 1.01; // Boost economy slightly when merchants arrive
             const market = this.destination.s.market
             const availableSpace = this.fleet.availableCargoSpace
             
@@ -33,7 +34,7 @@ class MerchantFleetAI extends FleetAI {
             console.log(`💰 ${this.fleet.name} traded at ${this.destination.name}: unloaded cargo and loaded ${reservedCargo.total} units`)
             
             // Show trade popup
-                this.starMap.addPopup(this.fleet.x, this.fleet.y, '💲', COLORS.Green, 2000)
+                this.starMap.addPopup(this.fleet.x, this.fleet.y, '💲', COLORS.Green)
         }
         
         super.onNearDestination()
@@ -42,6 +43,7 @@ class MerchantFleetAI extends FleetAI {
     onNearOrigin() {
         // Unload all cargo at origin market
         if (this.origin && this.origin instanceof Planet &&this.origin.s && this.origin.s.market) {
+            this.origin.c.economy *= 1.01; // Boost economy slightly when merchants arrive
             const market = this.origin.s.market
             
             // Add all our cargo to the market
@@ -52,9 +54,17 @@ class MerchantFleetAI extends FleetAI {
             
             console.log(`💰 ${this.fleet.name} unloaded all cargo at ${this.origin.name}`)
             
-                this.starMap.addPopup(this.fleet.x, this.fleet.y, '💲', COLORS.Green, 2000)
+                this.starMap.addPopup(this.fleet.x, this.fleet.y, '💲', COLORS.Green)
         }
         
         super.onNearOrigin()
+    }
+    onDestroyed() {
+        // Losing merchants hurts trade and economy
+        if (this.fleet.planet && this.fleet.planet.civilization) {
+            this.fleet.planet.c.economy *= 0.98;
+            this.fleet.planet.c.wealth *= 0.99;
+        }
+        super.onDestroyed()
     }
 }

@@ -23,7 +23,7 @@ function generateAnomalies(count = 1, minDistance = 5, maxDistance = SOLAR_SYSTE
         const name = `${anomalyType.name} ${String.fromCharCode(65 + i)}`;
         
         // Small radius (visual size)
-        const radius = 0.05 + Math.random() * 0.1;
+        const radius = ANOMALY_RADIUS
         
         const anomaly = new Anomaly(name, anomalyType, x, y, radius);
         anomalies.push(anomaly);

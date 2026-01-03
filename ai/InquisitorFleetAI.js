@@ -7,7 +7,7 @@ class InquisitorFleetAI extends FleetAI {
     constructor(fleet = null, origin = null, starMap = null) {
         super(fleet, origin, starMap);
         /** @type {Fleet[]} */
-        this.visitedFleets = [];
+        this.visited = [];
     }
     
     calcValidTargets() {
@@ -23,7 +23,7 @@ class InquisitorFleetAI extends FleetAI {
         return gs.system.fleets.filter(f => {
             if (f === this.fleet || f.location) return false;
             // Skip if already visited
-            if (this.visitedFleets.includes(f)) return false;
+            if (this.visited.includes(f)) return false;
             // Don't attack targets that are 2x stronger
             if (f.combatRating > ourScore * 2) return false;
             // Target fleets whose captain has a different religion
@@ -35,7 +35,7 @@ class InquisitorFleetAI extends FleetAI {
     onNearTarget() {
         if (this.target instanceof Fleet && !this.target.location) {
             // Mark as visited
-            this.visitedFleets.push(this.target);
+            this.visited.push(this.target);
             
             const ourReligion = this.fleet.planet.civilization.stateReligion;
             
@@ -123,5 +123,14 @@ class InquisitorFleetAI extends FleetAI {
         
         // Fallback to any planet
         return rndMember([...gs.system.planets].filter(p => p !== this.origin));
+    }
+    onDestroyed() {
+        // Losing inquisitors weakens religious authority and control
+        if (this.fleet.planet && this.fleet.planet.civilization) {
+            this.fleet.planet.c.culture *= 1.01;
+            this.fleet.planet.c.education *= 1.01;
+            this.fleet.planet.c.security *= 0.98;
+        }
+        super.onDestroyed()
     }
 }

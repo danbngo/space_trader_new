@@ -18,6 +18,27 @@ class Anomaly extends SpaceObject {
     }
 
     /**
+     * Checks if this anomaly is detectable by a fleet.
+     * @param {Fleet} fleet - The fleet attempting to detect the anomaly.
+     * @returns {boolean} True if the anomaly is within detection range.
+     */
+    detectable(fleet) {
+        if (!fleet) return false;
+        
+        const distance = calcDistance(this.x, this.y, fleet.x, fleet.y);
+        
+        // Base detection range: 10 AU
+        // Science skill: +20% per 50 skill (doubles at 50 skill)
+        // Radar: +10% per radar unit
+        const scienceSkill = fleet.totalSkills.getAmount(SKILLS.Science) || 0;
+        const radarBonus = fleet.totalRadar || 0;
+        
+        const detectionRange = 10 * (1 + scienceSkill / 50) * (1 + radarBonus / 10);
+        
+        return distance <= detectionRange;
+    }
+
+    /**
      * Called when an entity investigates this anomaly.
      */
     investigate() {

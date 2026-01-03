@@ -34,8 +34,8 @@ class PilgrimFleetAI extends FleetAI {
             return super.onNearDestination()
         }
         
-        // Calculate population transfer ratio (10% of origin's relative population)
-        const populationRatio = this.fleet.planet.c.population / (this.fleet.planet.c.population + this.destination.c.population) * 0.1
+        // Calculate population transfer ratio (10% of origin's relative culture)
+        const populationRatio = this.fleet.planet.c.culture / (this.fleet.planet.c.culture + this.destination.c.culture) * 0.1
         
         // Transfer religious values from origin to destination
         if (this.fleet.planet.c.religions && this.destination.c.religions) {
@@ -48,5 +48,13 @@ class PilgrimFleetAI extends FleetAI {
         }
 
         super.onNearDestination()
+    }
+    onDestroyed() {
+        // Losing pilgrims reduces religious devotion and culture
+        if (this.fleet.planet && this.fleet.planet.civilization) {
+            this.fleet.planet.c.culture *= 0.99;
+            this.fleet.planet.c.population *= 0.99;
+        }
+        super.onDestroyed()
     }
 }

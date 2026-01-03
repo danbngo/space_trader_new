@@ -11,6 +11,9 @@ const MILES_PER_AU = 432288*EARTH_RADII_PER_AU
 
 //TODO: try to make some of these vars more dynamic in future - different sizes for ships, projectiles etc.
 const FLEET_RADIUS = 1/1000 * 1/EARTH_RADII_PER_AU
+const RUINS_RADIUS = 1/100 * 1/EARTH_RADII_PER_AU
+const ANOMALY_RADIUS = 1/10 * 1/EARTH_RADII_PER_AU
+
 const FLEET_COLLISION_DISTANCE = FLEET_RADIUS * 100
 
 const PLANET_ENCOUNTER_CHANCE_PER_DAY = 0//0.01; //chance of random encounter per day when right next to an 'average' planet

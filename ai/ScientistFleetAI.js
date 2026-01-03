@@ -5,7 +5,10 @@
  */
 class ScientistFleetAI extends FleetAI {
     calcValidTargets() {
-        return [...(gs.system.anomalies || []), ...gs.system.asteroids.filter(a=>a.belt.beltType == ASTEROID_BELT_TYPES.Icy && Math.random() < .2)]
+        // Target detectable anomalies and icy asteroids
+        const detectableAnomalies = (gs.system.anomalies || []).filter(anomaly => anomaly.detectable(this.fleet))
+        const icyAsteroids = gs.system.asteroids.filter(a => a.belt.beltType == ASTEROID_BELT_TYPES.Icy && Math.random() < .2)
+        return [...detectableAnomalies, ...icyAsteroids]
     }
     calcDestination() {
         return rndMember([...gs.system.planets].filter(p=>(p !== this.origin)))
@@ -35,6 +38,14 @@ class ScientistFleetAI extends FleetAI {
                 }
             }
         }
+    }
+    onDestroyed() {
+        // Losing scientists hurts research and education
+        if (this.fleet.planet && this.fleet.planet.civilization) {
+            this.fleet.planet.c.education *= 0.99;
+            this.fleet.planet.c.technology *= 0.99;
+        }
+        super.onDestroyed()
     }
 }
 

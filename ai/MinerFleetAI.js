@@ -49,7 +49,7 @@ class MinerFleetAI extends FleetAI {
                 console.log(`⛏️ ${this.fleet.name} mined ${mineAmount} ${cargoType.name}`);
                 
                 // Show mining popup
-                    this.starMap.addPopup(this.fleet.x, this.fleet.y, '⛏️', COLORS.Orange, 2000)
+                    this.starMap.addPopup(this.fleet.x, this.fleet.y, '⛏️', COLORS.Orange)
             }
         }
     }
@@ -57,6 +57,7 @@ class MinerFleetAI extends FleetAI {
     onNearDestination() {
         // Unload all cargo at destination market
         if (this.destination && this.destination instanceof Planet && this.destination.s && this.destination.s.market && this.fleet.cargo.total > 0) {
+            this.destination.c.industry *= 1.01; // Boost economy slightly when merchants arrive
             const market = this.destination.s.market
             
             // Add all our cargo to the market
@@ -68,7 +69,7 @@ class MinerFleetAI extends FleetAI {
             console.log(`💰 ${this.fleet.name} unloaded all cargo at ${this.destination.name}`)
             
             // Show trade popup
-            this.starMap.addPopup(this.fleet.x, this.fleet.y, '💲', COLORS.Green, 2000)
+            this.starMap.addPopup(this.fleet.x, this.fleet.y, '💲', COLORS.Green)
         }
         
         super.onNearDestination()
@@ -77,6 +78,7 @@ class MinerFleetAI extends FleetAI {
     onNearOrigin() {
         // Unload all cargo at origin market
         if (this.origin && this.origin instanceof Planet && this.origin.s && this.origin.s.market && this.fleet.cargo.total > 0) {
+            this.origin.c.industry *= 1.01; // Boost economy slightly when merchants arrive
             const market = this.origin.s.market
             
             // Add all our cargo to the market
@@ -88,9 +90,16 @@ class MinerFleetAI extends FleetAI {
             console.log(`💰 ${this.fleet.name} unloaded all cargo at ${this.origin.name}`)
             
             // Show trade popup
-            this.starMap.addPopup(this.fleet.x, this.fleet.y, '💲', COLORS.Green, 2000)
+            this.starMap.addPopup(this.fleet.x, this.fleet.y, '💲', COLORS.Green)
         }
         
         super.onNearOrigin()
+    }
+    onDestroyed() {
+        // Losing miners hurts industrial production
+        if (this.fleet.planet && this.fleet.planet.civilization) {
+            this.fleet.planet.c.industry *= 0.98;
+        }
+        super.onDestroyed()
     }
 }

@@ -124,6 +124,15 @@ class CanvasWrapper {
         return this.addObject(obj)
     }
     
+    addEmptyRectangle(id = "", x = 0, y = 0, width = 0, height = 0, minScreenSize = 0, strokeColor = COLORS.LightGray, lineWidth = 1, onClick = null) {
+        const obj = new CanvasObject({ id, shape: SHAPES.EmptyRectangle, x, y, size: width, minorSize: height, minScreenSize, strokeColor, onClick, lineWidth });
+        return this.addObject(obj)
+    }
+    
+    addEmptySquare(id = "", x = 0, y = 0, size = 0, minScreenSize = 0, strokeColor = COLORS.LightGray, lineWidth = 1, onClick = null) {
+        return this.addEmptyRectangle(id, x, y, size, size, minScreenSize, strokeColor, lineWidth, onClick);
+    }
+    
     addEmptyCircle(id = "", x = 0, y = 0, size = 0, minScreenSize = 0, strokeColor = COLORS.LightGray, lineWidth = 1, onClick = null) {
         const obj = new CanvasObject({ id, shape: SHAPES.EmptyCircle, x, y, size, minScreenSize, strokeColor, onClick, lineWidth });
         return this.addObject(obj)
@@ -319,7 +328,7 @@ class CanvasWrapper {
     recalculateDrawOrder() {
         // Sort so dots at bottom, text at top
         const sorted = [...this.drawOrder].sort((a, b) => {
-            const order = { Line: 0, EmptyCircle: 1, EmptyOval: 2, EmptyTriangle: 3, FilledRectangle: 4, FilledCircle: 5, FilledOval: 6, Triangle: 7, Text: 8 };
+            const order = { Line: 0, EmptyCircle: 1, EmptyOval: 2, EmptyRectangle: 3, EmptyTriangle: 4, FilledRectangle: 5, FilledCircle: 6, FilledOval: 7, Triangle: 8, Text: 9 };
             return order[a.shape] - order[b.shape];
         });
         this.drawOrder = sorted

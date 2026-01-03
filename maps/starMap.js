@@ -146,6 +146,7 @@ class StarMap extends BaseMap {
         this.handleCanvasPlanets()
         this.handleCanvasSpaceStations()
         this.handleCanvasAnomalies()
+        this.handleCanvasRuins()
         this.handleCanvasFleets()
         this.handleCanvasWaypoint()
         this.cvs.redraw(true)
@@ -312,18 +313,13 @@ class StarMap extends BaseMap {
         const {anomalies} = starSystem
         
         if (!anomalies) return
-
-        // Calculate detection range based on Science skill (base 10 AU, 20 AU at 50 skill)
-        const scienceSkill = gs.fleet.totalSkills.getAmount(SKILLS.Science)
-        const detectionRange = 10 * (1 + scienceSkill / 50)
         
         // Track existing anomaly UUIDs
         const existingAnomalyIds = new Set()
         
         anomalies.forEach((anomaly) => {
-            // Check if anomaly is within detection range
-            const distanceToFleet = calcDistance(anomaly.x, anomaly.y, gs.fleet.x, gs.fleet.y)
-            const isVisible = distanceToFleet <= detectionRange
+            // Check if anomaly is detectable by player fleet
+            const isVisible = anomaly.detectable(gs.fleet)
             
             existingAnomalyIds.add(`anomaly${anomaly.uuid}`)
             existingAnomalyIds.add(`anomalylabel${anomaly.uuid}`)
@@ -342,12 +338,19 @@ class StarMap extends BaseMap {
                 const objs = [anomalyObj, labelObj]
                 for (const obj of objs) {
                     obj.onHover = () => {
+                        // Only allow hover if detectable
+                        if (!anomaly.detectable(gs.fleet)) return
                         labelObj.visible = true
                         for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
                     }
                     obj.onEndHover = () => {
                         labelObj.visible = false
-                        for (const obj2 of objs) obj2.strokeColor = undefined
+                        // Reset to selection color if selected, otherwise clear
+                        if (anomaly === this.selectedObject) {
+                            for (const obj2 of objs) obj2.strokeColor = COLORS.Green
+                        } else {
+                            for (const obj2 of objs) obj2.strokeColor = undefined
+                        }
                     }
                 }
             }
@@ -360,17 +363,97 @@ class StarMap extends BaseMap {
             
             // Set visibility based on detection range
             anomalyObj.visible = isVisible
-            labelObj.visible = isVisible && labelObj.visible // Keep label logic, but hide if out of range
+            // Only show label if visible and either hovered or selected
+            if (!isVisible) {
+                labelObj.visible = false
+            }
             
+            // Update selection colors
             if (anomaly == this.selectedObject) {
                 anomalyObj.strokeColor = COLORS.Green
                 labelObj.strokeColor = COLORS.Green
+                labelObj.visible = isVisible
+            } else if (!labelObj.visible) {
+                // Clear stroke color if not selected and not hovered
+                anomalyObj.strokeColor = undefined
+                labelObj.strokeColor = undefined
             }
         })
         
         // Remove canvas objects for anomalies that no longer exist
         for (const [id, obj] of cvs.objectMap.entries()) {
             if (id.startsWith('anomaly') && !existingAnomalyIds.has(id)) {
+                cvs.deleteObject(id)
+            }
+        }
+    }
+
+    handleCanvasRuins() {
+        const {starSystem, cvs} = this
+        const {ruins} = starSystem
+        
+        if (!ruins) return
+        
+        // Track existing ruins UUIDs
+        const existingRuinsIds = new Set()
+        
+        ruins.forEach((ruin) => {
+            existingRuinsIds.add(`ruins${ruin.uuid}`)
+            existingRuinsIds.add(`ruinslabel${ruin.uuid}`)
+            const ruinsId = `ruins${ruin.uuid}`
+            const labelId = `ruinslabel${ruin.uuid}`
+            
+            let ruinsObj = cvs.getObject(ruinsId)
+            let labelObj = cvs.getObject(labelId)
+            
+            // Create objects if they don't exist (empty square/rectangle)
+            if (!ruinsObj) {
+                ruinsObj = cvs.addEmptySquare(ruinsId, ruin.x, ruin.y, ruin.radius * 15, 2, ruin.color, 1, () => this.selectObject(ruin))
+                labelObj = cvs.addText(labelId, ruin.x, ruin.y, 0, -24, ruin.name, ruin.color, DEFAULT_FONT_SIZE, 2, () => this.selectObject(ruin))
+                labelObj.visible = false
+                
+                const objs = [ruinsObj, labelObj]
+                for (const obj of objs) {
+                    obj.onHover = () => {
+                        labelObj.visible = true
+                        for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
+                    }
+                    obj.onEndHover = () => {
+                        labelObj.visible = false
+                        // Reset to selection color if selected, otherwise clear
+                        if (ruin === this.selectedObject) {
+                            for (const obj2 of objs) obj2.strokeColor = COLORS.Green
+                        } else {
+                            for (const obj2 of objs) obj2.strokeColor = undefined
+                        }
+                    }
+                }
+            }
+            
+            // Update positions
+            ruinsObj.x = ruin.x
+            ruinsObj.y = ruin.y
+            labelObj.x = ruin.x
+            labelObj.y = ruin.y
+            
+            // Ruins are always visible
+            ruinsObj.visible = true
+            
+            // Update selection colors
+            if (ruin == this.selectedObject) {
+                ruinsObj.strokeColor = COLORS.Green
+                labelObj.strokeColor = COLORS.Green
+                labelObj.visible = true
+            } else if (!labelObj.visible) {
+                // Clear stroke color if not selected and not hovered
+                ruinsObj.strokeColor = undefined
+                labelObj.strokeColor = undefined
+            }
+        })
+        
+        // Remove canvas objects for ruins that no longer exist
+        for (const [id, obj] of cvs.objectMap.entries()) {
+            if (id.startsWith('ruins') && !existingRuinsIds.has(id)) {
                 cvs.deleteObject(id)
             }
         }

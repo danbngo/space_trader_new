@@ -188,6 +188,11 @@ class CanvasObject {
             if (this.strokeColor) ctx.strokeRect(-size / 2, -minorSize / 2, size, minorSize);
             break;
             
+            case SHAPES.EmptyRectangle:
+            // size is the width, minorSize is the height
+            ctx.strokeRect(-size / 2, -minorSize / 2, size, minorSize);
+            break;
+            
             case SHAPES.EmptyCircle:
             ctx.beginPath();
             ctx.arc(0, 0, size, 0, Math.PI * 2);

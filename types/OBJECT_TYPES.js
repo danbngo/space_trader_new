@@ -15,6 +15,7 @@ const OBJECT_TYPES = Object.freeze({
     ASTEROID: new ObjectType('Asteroid', '#6b5b4a', '◆'),
     STAR: new ObjectType('Star', '#ffff00', '★'),
     ANOMALY: new ObjectType('Anomaly', '#ff00ff', '?'),
+    RUINS: new ObjectType('Ruins', '#8b8533', '□'),
     FLEET: new ObjectType('Fleet', '#ff4500', '▸'),
     ABSTRACT: new ObjectType('Abstract', '#ffffff', '·'),
 })

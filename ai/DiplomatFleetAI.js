@@ -11,7 +11,7 @@ class DiplomatFleetAI extends FleetAI {
     onNearDestination() {
         if (this.fleet.planet && this.fleet.planet.civilization && this.destination instanceof Planet && this.destination.civilization) {
             // Grant small prestige boost to home planet
-            this.fleet.planet.c.prestige += 0.01
+            this.fleet.planet.c.prestige *= 1.01
             
             // 10% chance to improve relationship
             if (Math.random() < 0.1) {
@@ -34,11 +34,18 @@ class DiplomatFleetAI extends FleetAI {
                 
                 // Show diplomacy popup
                 if (this.starMap) {
-                    this.starMap.addPopup(this.fleet.x, this.fleet.y, '🕊️', COLORS.White, 2000)
+                    this.starMap.addPopup(this.fleet.x, this.fleet.y, '🕊️', COLORS.White)
                 }
             }
         }
         
         super.onNearDestination()
+    }
+    onDestroyed() {
+        // Losing diplomats hurts prestige and diplomatic standing
+        if (this.fleet.planet && this.fleet.planet.civilization) {
+            this.fleet.planet.c.prestige *= 0.98;
+        }
+        super.onDestroyed()
     }
 }

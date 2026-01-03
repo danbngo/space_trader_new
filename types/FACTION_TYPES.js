@@ -47,7 +47,7 @@ const FACTION_TYPES = {
         false,
         false,
         [FLEET_TYPES.MINERS],
-        -1,  // reputationMultiplier (lose rep for attacking civilians)
+        1,  // reputationMultiplier (lose rep for attacking civilians)
         [SKILLS.Engineer]
     ),
     MERCHANTS: new FactionType(
@@ -60,7 +60,7 @@ const FACTION_TYPES = {
         false,
         false,
         [FLEET_TYPES.MERCHANTS],
-        -1,  // reputationMultiplier (lose more rep for attacking merchants)
+        1,  // reputationMultiplier (lose more rep for attacking merchants)
         [SKILLS.Barter]
     ),
     SMUGGLERS: new FactionType(
@@ -73,7 +73,7 @@ const FACTION_TYPES = {
         false,
         true,
         [FLEET_TYPES.SMUGGLERS],
-        1,  // reputationMultiplier (small gain for defeating criminals)
+        -1,  // reputationMultiplier (small gain for defeating criminals)
         [SKILLS.Stealth]
     ),
     PIRATES: new FactionType(
@@ -86,7 +86,7 @@ const FACTION_TYPES = {
         false,
         false,
         [FLEET_TYPES.PIRATES],
-        3,  // reputationMultiplier (good gain for defeating pirates)
+        -3,  // reputationMultiplier (good gain for defeating pirates)
         [SKILLS.Gunner, SKILLS.Stealth]
     ),
     POLICE: new FactionType(
@@ -99,7 +99,7 @@ const FACTION_TYPES = {
         false,
         false,
         [FLEET_TYPES.POLICE],
-        -3,  // reputationMultiplier (lose rep for attacking law enforcement)
+        3,  // reputationMultiplier (lose rep for attacking law enforcement)
         [SKILLS.Pilot, SKILLS.Gunner, SKILLS.Negotiation]
     ),
     SOLDIERS: new FactionType(
@@ -112,7 +112,7 @@ const FACTION_TYPES = {
         false,
         false,
         [FLEET_TYPES.SOLDIERS],
-        -5,  // reputationMultiplier (highest loss for attacking military)
+        5,  // reputationMultiplier (highest loss for attacking military)
         [SKILLS.Gunner]
     ),
     MERCENARIES: new FactionType(
@@ -151,7 +151,7 @@ const FACTION_TYPES = {
         false,
         false,
         [FLEET_TYPES.TOURISTS],
-        -1,  // reputationMultiplier (lose rep for attacking tourists)
+        1,  // reputationMultiplier (lose rep for attacking tourists)
         []
     ),
     SLAVERS: new FactionType(
@@ -164,7 +164,7 @@ const FACTION_TYPES = {
         false,
         true,
         [FLEET_TYPES.SLAVERS],
-        5,  // reputationMultiplier (highest gain for defeating slavers - heroes)
+        -5,  // reputationMultiplier (highest gain for defeating slavers - heroes)
         [SKILLS.Stealth, SKILLS.Barter]
     ),
     COLONISTS: new FactionType(
@@ -177,7 +177,7 @@ const FACTION_TYPES = {
         false,
         false,
         [FLEET_TYPES.COLONISTS],
-        -2,  // reputationMultiplier (lose rep for attacking settlers)
+        2,  // reputationMultiplier (lose rep for attacking settlers)
         []
     ),
     SCIENTISTS: new FactionType(
@@ -190,7 +190,7 @@ const FACTION_TYPES = {
         false,
         false,
         [FLEET_TYPES.SCIENTISTS],
-        -1,  // reputationMultiplier (lose rep for attacking scientists)
+        1,  // reputationMultiplier (lose rep for attacking scientists)
         [SKILLS.Science]
     ),
     PILGRIMS: new FactionType(
@@ -203,7 +203,7 @@ const FACTION_TYPES = {
         true,
         false,
         [FLEET_TYPES.PILGRIMS],
-        -2,  // reputationMultiplier (lose rep for attacking pilgrims)
+        2,  // reputationMultiplier (lose rep for attacking pilgrims)
         []
     ),
     INQUISITORS: new FactionType(
@@ -229,7 +229,7 @@ const FACTION_TYPES = {
         true,
         false,
         [FLEET_TYPES.MISSIONARIES],
-        -2,  // reputationMultiplier (lose rep for attacking missionaries)
+        2,  // reputationMultiplier (lose rep for attacking missionaries)
         [SKILLS.Negotiation]
     ),
     DIPLOMATS: new FactionType(
@@ -242,7 +242,7 @@ const FACTION_TYPES = {
         false,
         false,
         [FLEET_TYPES.DIPLOMATS],
-        -5, // reputationMultiplier (lose significant rep for attacking diplomats)
+        5, // reputationMultiplier (lose significant rep for attacking diplomats)
         [SKILLS.Negotiation]
     ),
     SALVAGERS: new FactionType(
@@ -255,7 +255,7 @@ const FACTION_TYPES = {
         false,
         false,
         [FLEET_TYPES.SALVAGERS],
-        -1,  // reputationMultiplier (small loss for attacking salvagers)
+        1,  // reputationMultiplier (small loss for attacking salvagers)
         [SKILLS.Salvage]
     ),
     TAX_COLLECTORS: new FactionType(
@@ -268,7 +268,7 @@ const FACTION_TYPES = {
         false,
         false,
         [FLEET_TYPES.TAX_COLLECTORS],
-        -3,  // reputationMultiplier (lose rep for attacking government agents)
+        3,  // reputationMultiplier (lose rep for attacking government agents)
         [SKILLS.Barter, SKILLS.Negotiation]
     ),
     REBELS: new FactionType(
@@ -294,7 +294,7 @@ const FACTION_TYPES = {
         false,
         false,
         [FLEET_TYPES.REFUGEES],
-        -5,  // reputationMultiplier (lose significant rep for attacking refugees)
+        5,  // reputationMultiplier (lose significant rep for attacking refugees)
         []
     ),
     SYNDICATES: new FactionType(
@@ -307,8 +307,34 @@ const FACTION_TYPES = {
         false, 
         true,
         [FLEET_TYPES.SYNDICATES],
-        3,  // reputationMultiplier (good gain for defeating criminals)
+        -3,  // reputationMultiplier (good gain for defeating criminals)
         [SKILLS.Negotiation, SKILLS.Stealth]
+    ),
+    EXPLORERS: new FactionType(
+        'Explorers',
+        '🧭',
+        COLORS.Green,
+        'Adventurers and pioneers charting unknown regions of space and seeking new discoveries.',
+        false,
+        false,
+        false,
+        false,
+        [FLEET_TYPES.EXPLORERS],
+        1,  // reputationMultiplier
+        [SKILLS.Navigation, SKILLS.Science]
+    ),
+    PERFORMERS: new FactionType(
+        'Performers',
+        '🎤',
+        COLORS.Magenta,
+        'Entertainers traveling the galaxy to perform for audiences on various worlds.',
+        false,
+        false,
+        false,
+        false,
+        [], 
+        1,  // reputationMultiplier
+        [SKILLS.Stealth, SKILLS.Barter, SKILLS.Negotiation]
     ),
 }
 

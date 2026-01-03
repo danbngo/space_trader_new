@@ -33,4 +33,13 @@ class SoldierFleetAI extends FleetAI {
             }
         }
     }
+    onDestroyed() {
+        // Losing soldiers weakens military strength and defense
+        if (this.fleet.planet && this.fleet.planet.civilization) {
+            this.fleet.planet.c.army *= 0.99;
+            this.fleet.planet.c.navy *= 0.98;
+            this.fleet.planet.c.prestige *= 0.99;
+        }
+        super.onDestroyed()
+    }
 }

@@ -32,6 +32,7 @@ const SHAPES = Object.freeze({
     FilledOval: 'FilledOval',
     EmptyOval: 'EmptyOval',
     FilledRectangle: 'FilledRectangle',
+    EmptyRectangle: 'EmptyRectangle',
 })
 
 /**

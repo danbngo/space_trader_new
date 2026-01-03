@@ -20,8 +20,8 @@ class FleetAI {
         /** @type {any} */
         this.target = null
         this.voyageYearsRemaining = Infinity
-        /** @type {Fleet[]} */
-        this.visitedFleets = []
+        /** @type {SpaceObject[]} */
+        this.visited = []
         this.resetVoyageDuration()
         if (!Number.isFinite(this.voyageYearsRemaining)) throw new Error('fleetAI must have a finite voyage duration!!')
         //console.log('created fleet AI with props:', {fleet: this.fleet, home: this.home, destination: this.destination, voyageYearsRemaining: this.voyageYearsRemaining})
@@ -152,7 +152,7 @@ class FleetAI {
     // Show popup if starMap is available
         const midX = (this.fleet.x + this.target.x) / 2
         const midY = (this.fleet.y + this.target.y) / 2
-        this.starMap.addPopup(midX, midY, '⚔️', COLORS.Red, 2000)
+        this.starMap.addPopup(midX, midY, '⚔️', COLORS.Red)
         
         // Reveal both fleets during combat
         this.fleet.cloakLevel = 0
@@ -176,11 +176,14 @@ class FleetAI {
         
         // Show skull popup at target's death location
         this.starMap.addPopup(loser.x, loser.y, '💀', COLORS.Red)
-        
-        gs.system.removeFleet(loser)
+        loser.ai.onDestroyed()
         winner.ai.target = null
         winner.ai.route = null
         return winner
+    }
+
+    onDestroyed() {
+        gs.system.removeFleet(this.fleet)
     }
 
     /**
@@ -234,7 +237,7 @@ class FleetAI {
         console.log(`💵 ${toFleet.name+' '+toFleet.uuid} took ${creditsToTake} credits from ${fromFleet.name+' '+fromFleet.uuid}`);
         
         // Show credits transfer popup
-        this.starMap.addPopup(fromFleet.x, fromFleet.y, '💵', COLORS.Green, 2000)
+        this.starMap.addPopup(fromFleet.x, fromFleet.y, '💵', COLORS.Green)
     }
 
     /**
@@ -257,7 +260,7 @@ class FleetAI {
         console.log(`👥 ${toFleet.name+' '+toFleet.uuid} captured ${officersToTake.length} officers from ${fromFleet.name+' '+fromFleet.uuid}`);
         
         // Show crew capture popup
-            this.starMap.addPopup(fromFleet.x, fromFleet.y, '👥', COLORS.Orange, 2000)
+            this.starMap.addPopup(fromFleet.x, fromFleet.y, '👥', COLORS.Orange)
     }
     /**
      * Finds nearest object of a given type.

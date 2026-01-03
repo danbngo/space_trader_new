@@ -7,7 +7,7 @@ class SyndicateFleetAI extends FleetAI {
     constructor(fleet = null, origin = null, starMap = null) {
         super(fleet, origin, starMap);
         /** @type {Fleet[]} */
-        this.visitedFleets = [];
+        this.visited = [];
     }
     
     calcValidTargets() {
@@ -15,7 +15,7 @@ class SyndicateFleetAI extends FleetAI {
         return gs.system.fleets.filter(f => {
             if (f === this.fleet || f.factionType.criminal || f.factionType.authority || f.location) return false
             // Skip if already visited
-            if (this.visitedFleets.includes(f)) return false
+            if (this.visited.includes(f)) return false
             // Only target fleets with credits
             if (!f.captain || f.captain.credits <= 0) return false
             // Target civilian ships that aren't too strong
@@ -28,7 +28,7 @@ class SyndicateFleetAI extends FleetAI {
     onNearTarget() {
         if (this.target instanceof Fleet && !this.target.location) {
             // Mark as visited
-            this.visitedFleets.push(this.target);
+            this.visited.push(this.target);
             
             // 50% chance to extort credits peacefully, 50% chance to fight
             if (Math.random() < 0.5) {
@@ -39,5 +39,14 @@ class SyndicateFleetAI extends FleetAI {
                 this.fightTarget();
             }
         }
+    }
+    onDestroyed() {
+        // Destroying syndicates reduces organized crime and corruption
+        if (this.fleet.planet && this.fleet.planet.civilization) {
+            this.fleet.planet.c.crime *= 0.99;
+            this.fleet.planet.c.corruption *= 0.99;
+            this.fleet.planet.c.wealth *= 0.99;
+        }
+        super.onDestroyed()
     }
 }

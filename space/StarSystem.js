@@ -19,8 +19,9 @@ class StarSystem extends SpaceObject {
      * @param {BackgroundStar[]} backgroundStars - The background stars for visual effect.
      * @param {Religion[]} religions - The religions in the star system.
      * @param {Anomaly[]} anomalies - The anomalies in the star system.
+     * @param {Ruins[]} ruins - The ruins in the star system.
      */
-    constructor(name = "Unnamed", color = COLORS.White, radius = 0, barycenter = null, stars = [], planets = [], dwarfPlanets = [], spaceStations = [], fleets = [], asteroidBelts = [], asteroids = [], backgroundStars = [], religions = [], anomalies = []) {
+    constructor(name = "Unnamed", color = COLORS.White, radius = 0, barycenter = null, stars = [], planets = [], dwarfPlanets = [], spaceStations = [], fleets = [], asteroidBelts = [], asteroids = [], backgroundStars = [], religions = [], anomalies = [], ruins = []) {
         console.log('instantiating star system w name:', name, 'stars:', stars, 'planets:', planets, 'dwarf planets:', dwarfPlanets, 'space stations:', spaceStations, 'fleets:', fleets);
         super(name, OBJECT_TYPES.ABSTRACT, color, radius, 0, 0);
         /** @type {SpaceObject} */
@@ -53,6 +54,8 @@ class StarSystem extends SpaceObject {
         this.religions = religions
         /** @type {Anomaly[]} */
         this.anomalies = anomalies
+        /** @type {Ruins[]} */
+        this.ruins = ruins
     }
 
     /**

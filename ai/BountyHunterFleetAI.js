@@ -7,7 +7,7 @@ class BountyHunterFleetAI extends FleetAI {
     constructor(fleet = null, origin = null, starMap = null) {
         super(fleet, origin, starMap);
         /** @type {Fleet[]} */
-        this.visitedFleets = [];
+        this.visited = [];
     }
     
     calcDestination() {
@@ -18,7 +18,7 @@ class BountyHunterFleetAI extends FleetAI {
         return gs.system.fleets.filter(f => {
             if (f === this.fleet || !f.factionType.criminal || f.location) return false
             // Skip if already visited
-            if (this.visitedFleets.includes(f)) return false
+            if (this.visited.includes(f)) return false
             // Only target fleets with credits
             if (!f.captain || f.captain.credits <= 0) return false
             // Don't attack targets that are 2x stronger
@@ -28,7 +28,7 @@ class BountyHunterFleetAI extends FleetAI {
     onNearTarget() {
         if (this.target instanceof Fleet && !this.target.location) {
             // Mark as visited
-            this.visitedFleets.push(this.target);
+            this.visited.push(this.target);
             
             // 50% chance to take credits peacefully if they have any, otherwise fight
             if (this.target.captain && this.target.captain.credits > 0 && Math.random() < 0.5) {
@@ -39,5 +39,12 @@ class BountyHunterFleetAI extends FleetAI {
                 this.fightTarget();
             }
         }
+    }
+    onDestroyed() {
+        // Losing bounty hunters increases crime (less law enforcement)
+        if (this.fleet.planet && this.fleet.planet.civilization) {
+            this.fleet.planet.c.crime *= 1.01;
+        }
+        super.onDestroyed()
     }
 }
