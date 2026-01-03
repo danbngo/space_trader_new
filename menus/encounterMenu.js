@@ -10,7 +10,8 @@ function checkForEncounter(elapsedDays = 1) {
     if (gs.location || gs.encounter) return
     // Check encounter immunity
     if (gs.year < gs.encounterImmunityUntilYear) return
-    return checkForPlanetEncounters(elapsedDays) || checkForAsteroidBeltEncounters(elapsedDays)
+    //return checkForPlanetEncounters(elapsedDays) || 
+    checkForAsteroidBeltEncounters(elapsedDays)
 }
 
 function checkForAsteroidBeltEncounters(elapsedDays = 1) {
@@ -43,11 +44,12 @@ function checkForAsteroidBeltEncounters(elapsedDays = 1) {
     console.log(`🚨 ASTEROID ENCOUNTER TRIGGERED`, {selectedAsteroidIndex, selectedAsteroid, selectedBelt, encounterType, proximityFactors, totalProximityFactor});
     
     // Start the encounter
-    const encounter = generateEncounter(encounterType, null, selectedBelt.effectTypes)
+    const encounter = generateRandomEncounter(encounterType, null, selectedBelt.effectTypes)
     encounter.startEncounter()
     return true
 }
 
+/*
 function checkForPlanetEncounters(elapsedDays = 1) {
     //console.log('checkForPlanetEncounters', { elapsedDays });
     //dont have encounters while docked or already in an encounter
@@ -193,6 +195,7 @@ function checkForPlanetEncounters(elapsedDays = 1) {
     
     return false
 }
+*/
 
 function rollEncounterEffectTypes() {
     //check for proximity to individual asteroids and give the player different effects based on their belts

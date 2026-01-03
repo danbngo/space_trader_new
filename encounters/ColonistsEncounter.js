@@ -17,17 +17,7 @@ class ColonistsEncounter extends NeutralsEncounter {
      * @override
      */
     onStart() {
-        if (this.playerUndetected) {
-            showModal(coloredName(this.fleet), 'Your long range sensors detect a colonist fleet before they detect you.<br/>You manage to approach them stealthily.', [
-                //['View', ()=>closeModal()],
-                ['Bypass', ()=>this.endEncounter()],
-                ['Hail', ()=>{
-                    this.onStart()
-                }],
-                ['Sneak Attack', ()=>this.showPlayerAttackNeutralsModal()],
-            ])
-        }
-        else if (FameLevel.hasInfamyLevel(gs.captain, this.planet, INFAMY_LEVELS.VILIFIED)) {
+        if (FameLevel.hasInfamyLevel(gs.captain, this.planet, INFAMY_LEVELS.VILIFIED)) {
             showModal(coloredName(this.fleet), 'The colonists have heard of your fearsome deeds and start fleeing immediately!', [
                 //['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],

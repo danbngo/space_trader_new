@@ -45,9 +45,6 @@ class MissionaryFleetAI extends FleetAI {
             if (roll < 0.1) {
                 console.log(`☠️ ${this.fleet.name} was destroyed by ${this.target.name} while proselytizing!`);
                 
-                // Show skull popup at missionary's death location
-                this.addPopup('💀', COLORS.Red);
-                
                 this.onDestroyed()
                 return;
             }

@@ -4,22 +4,7 @@
  */
 class ScientistsEncounter extends NeutralsEncounter {
     onStart() {
-        const fleetName = coloredName(this.fleet)
-        
-        // Scientists are generally friendly and curious
-        if (Math.random() * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > this.fleet.totalRadar) {
-            showModal(fleetName, 'Your sensors detect a scientific expedition before they detect you.<br/>You approach cautiously.', [
-                //['View', ()=>closeModal()],
-                ['Bypass', ()=>this.endEncounter()],
-                ['Hail', ()=>{
-                    this.showGreeting()
-                }],
-                ['Sneak Attack', ()=>this.showPlayerAttackNeutralsModal(true)],
-            ])
-        }
-        else {
-            this.showGreeting()
-        }
+        this.showGreeting()
     }
 
     showGreeting() {

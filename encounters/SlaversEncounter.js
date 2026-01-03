@@ -13,13 +13,6 @@
  */
 class SlaversEncounter extends FleetEncounter {
     /**
-     * @param {EncounterType} encounterType
-     */
-    constructor(encounterType) {
-        super(encounterType)
-    }
-
-    /**
      * Called when the encounter starts.
      * Slavers check for stealth, then react based on reputation.
      * @override
@@ -28,17 +21,7 @@ class SlaversEncounter extends FleetEncounter {
         console.log('SlaversEncounter.onStart')
         const {enemyFleet} = this
 
-        if (Math.random() * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > this.fleet.totalRadar) {
-            showModal(coloredName(this.fleet), `Your long range sensors detect a ${coloredName(this.fleet)} fleet before they detect you.<br/>You manage to approach the ${coloredName(this.fleet)} stealthily.`, [
-                ['Bypass', ()=>this.endEncounter()],
-                ['Hail', ()=>{
-                    this.onStart()
-                }],
-                ['Sneak Attack', ()=>this.showPlayerAttackFleetModal(true)],
-            ])
-        }
-        
-        else if (Math.random()*gs.captain.reputation.getAmount(FACTION_TYPES.SLAVERS) > 250) {
+        if (Math.random()*gs.captain.reputation.getAmount(FACTION_TYPES.SLAVERS) > 250) {
             // Friendly - they let you pass
             showModal('Recognized', `The ${coloredName(enemyFleet)} recognize you as an ally.<br/>They signal that you may pass freely.`,
             [

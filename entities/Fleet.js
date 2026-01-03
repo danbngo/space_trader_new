@@ -35,14 +35,12 @@ class Fleet extends SpaceObject {
         this.officers = []
         /** @type {Planet} */
         this.location = null;
-        /** @type {Route} */
-        this.route = null //could be Route class
         /** @type {FactionType|null} */
         this.factionType = factionType;
         /** @type {FleetAI} */
         this.fleetAI = null;
         /** @type {number} */
-        this.angle = 0 //danmod this is temporary should get rid of it later
+        this.angle = 0
         /** @type {number} */
         this.cloakLevel = 0; // 0 = visible, 1.0 = fully cloaked
     }
@@ -58,6 +56,11 @@ class Fleet extends SpaceObject {
         this.y = planet.y
         this.route = null
         planet.addChildren([this])
+        
+        // Grant encounter immunity when player docks
+        if (this === gs.fleet) {
+            gs.encounterImmunityUntilYear = gs.year + (ENCOUNTER_IMMUNITY_DAYS / 365)
+        }
     }
 
     get subordinates() {
@@ -177,7 +180,7 @@ class Fleet extends SpaceObject {
         const baseSpeed = AVERAGE_FLEET_SPEED * this.totalEngine/AVERAGE_SHIP_ENGINE / weight
         const totalPilotSkill = this.totalSkills.getAmount(SKILLS.Pilot)
         const speed = baseSpeed * (1 + totalPilotSkill/50)
-        return speed
+        return speed 
     }
 
     get totalRadar() {
@@ -186,6 +189,31 @@ class Fleet extends SpaceObject {
 
     get combatRating() {
         return this.ships.reduce((total, ship) => total + ship.combatRating, 0);
+    }
+    
+    /**
+     * Checks if this fleet is in position to backstab/sneak attack an enemy fleet.
+     * @param {Fleet} enemyFleet - The enemy fleet to check against.
+     * @returns {boolean} True if this fleet can backstab the enemy.
+     */
+    isBackstabbing(enemyFleet) {
+        // Calculate angle from this fleet to enemy fleet
+        const angleToEnemy = calcAngleTowardsPoint(this.x, this.y, enemyFleet.x, enemyFleet.y)
+        
+        // Check if this fleet is facing toward enemy (within ~90 degrees)
+        const angleDiff = Math.abs(normalizeAngle(this.angle - angleToEnemy))
+        const facingEnemy = angleDiff < Math.PI / 2
+        
+        // Check if this fleet is behind enemy (within ~90 degrees of enemy's back)
+        const angleEnemyToThis = calcAngleTowardsPoint(enemyFleet.x, enemyFleet.y, this.x, this.y)
+        const enemyBackAngle = normalizeAngle(enemyFleet.angle + Math.PI) // Enemy's back is 180 degrees from facing
+        const relativeToEnemyBack = Math.abs(normalizeAngle(angleEnemyToThis - enemyBackAngle))
+        const behindEnemy = relativeToEnemyBack < Math.PI / 2
+        
+        // Check stealth/radar advantage
+        const stealthAdvantage = this.totalRadar * (1 + this.totalSkills.getAmount(SKILLS.Stealth) / 50) > enemyFleet.totalRadar
+        
+        return facingEnemy && behindEnemy && stealthAdvantage
     }
     
     get stranded() {

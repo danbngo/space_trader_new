@@ -332,7 +332,7 @@ class Encounter {
         console.log('Encounter.positionShips')
         const {playerShips, enemyShips, ships, playerFleet, enemyFleet, formationType} = this
         const maxSpawnDistance = this.mapRadius * ENCOUNTER_SHIP_MAX_SPAWN_DISTANCE_RATIO
-        const minSpawnDistance = maxSpawnDistance / 5
+        const minSpawnDistance = this.mapRadius * ENCOUNTER_SHIP_MIN_SPAWN_DISTANCE_RATIO
 
         for (const ship of ships) {
             ship.resetCombatVars()
@@ -342,13 +342,13 @@ class Encounter {
         const angleEnemyFleetToPlayer = calcAngleTowardsPoint(enemyFleet.x, enemyFleet.y, playerFleet.x, playerFleet.y)
         const enemyFacingAngle = enemyFleet.angle
         const playerFacingAngle = playerFleet.angle
-        const distMargin = ENCOUNTER_SHIP_MAX_SPAWN_DISTANCE_RATIO-ENCOUNTER_SHIP_MIN_SPAWN_DISTANCE_RATIO
-        const avgDist = distMargin/2 + ENCOUNTER_SHIP_MIN_SPAWN_DISTANCE_RATIO
+        const distMargin = maxSpawnDistance-minSpawnDistance
+        const avgDist = distMargin/2 + minSpawnDistance
 
         //players ships should be in a half circle around the enemy
         if (formationType == FORMATION_TYPES.Storm) {
             for (const ship of enemyShips) {
-                const dist = rng(this.mapRadius*0.9, this.mapRadius*0.7, false)
+                const dist = rng(maxSpawnDistance,minSpawnDistance)
                 const angle = rng(0 + Math.PI*3/4, 0 - Math.PI*3/4, false) + ((angleEnemyFleetToPlayer) || 0)
                 let [x,y] = rotatePoint(dist, 0, 0, 0, angle)
                 Object.assign(ship, {x, y, angle: (angle + Math.PI)})
@@ -359,7 +359,8 @@ class Encounter {
             const angleStep = (Math.PI * 2)/enemyShips.length
             enemyShips.forEach((ship, i) => {
                 const angle = angleStep * i + (enemyFleet.angle || 0)
-                const [x, y] = rotatePoint(maxSpawnDistance, 0, 0, 0, angle)
+                const dist = rng(maxSpawnDistance,minSpawnDistance)
+                const [x, y] = rotatePoint(dist, 0, 0, 0, angle)
                 Object.assign(ship, {x, y})
             })
         }
@@ -376,14 +377,15 @@ class Encounter {
             const angleStep = (Math.PI * 2) / playerShips.length
             playerShips.forEach((ship, i) => {
                 const angle = angleStep * i + (playerFleet.angle || 0)
-                const [x, y] = rotatePoint(maxSpawnDistance, 0, 0, 0, angle)
+                const dist = rng(maxSpawnDistance,minSpawnDistance)
+                const [x, y] = rotatePoint(dist, 0, 0, 0, angle)
                 Object.assign(ship, {x, y})
             })
         }
         else {
             const [cx,cy] = rotatePoint(this.mapRadius * avgDist, 0, 0, 0, anglePlayerFleetToEnemy+Math.PI)
             playerFleet.ships.forEach((ship,i)=>{
-                const distFromCenter = rng(avgDist, avgDist/4)
+                const distFromCenter = rng(avgDist, avgDist/8)
                 const [dx,dy] = rotatePoint(distFromCenter * this.mapRadius, 0, 0, 0, rng(Math.PI*2, 0, false))
                 const angleDiff = rng(Math.PI/8)
                 Object.assign(ship, {x: cx+dx, y: cy+dy, angle: playerFacingAngle + angleDiff})
@@ -505,6 +507,12 @@ class Encounter {
         gs.encounter = this
         // Set encounter immunity for after this encounter ends
         gs.encounterImmunityUntilYear = gs.year + (ENCOUNTER_IMMUNITY_DAYS / 365)
+        
+        // Add player fleet to enemy AI's visited list so they don't actively target player again
+        if (this.fleet.fleetAI && this.fleet.fleetAI.visited && !this.fleet.fleetAI.visited.includes(gs.fleet)) {
+            this.fleet.fleetAI.visited.push(gs.fleet)
+        }
+        
         this.positionShips()
 
         showModal(coloredName(this.fleet), this.encounterType.description, [['Ok', ()=>{
@@ -590,8 +598,8 @@ class Encounter {
 
 
     showPlayerAttackFleetModal(onContinue = ()=>this.startCombat(true)) {
-        const sneakAttack = this.undetectedFleet == gs.fleet
-        console.log('showPlayerAttackFleetModal', { sneakAttack });
+        const {playerUndetected} = this
+        console.log('showPlayerAttackFleetModal', { playerUndetected });
         const fleetName = coloredName(this.fleet)
         const planet = this.planet
         const faction = this.fleet.factionType
@@ -599,13 +607,13 @@ class Encounter {
         const reputation = ENCOUNTER_BASE_REPUTATION_EFFECT_ON_ATTACK * reputationMultiplier
         const bounty = reputationMultiplier > 0 ? ENCOUNTER_BASE_FINE_ON_ATTACK * reputationMultiplier : 0
 
-        if (sneakAttack) {
+        if (playerUndetected) {
             // Drop shields after repositioning
             for (const ship of this.ships) ship.shields[0] = 0
         }
 
-        let msg = `You ${sneakAttack ? 'sneakily ' : ''}attack the ${fleetName}!<br/>`
-        if (sneakAttack) msg += `The ${fleetName} are caught with their shields down!<br/>`
+        let msg = `You ${playerUndetected ? 'sneakily ' : ''}attack the ${fleetName}!<br/>`
+        if (playerUndetected) msg += `The ${fleetName} are caught with their shields down!<br/>`
         if (reputation) {
             if (planet) msg += gs.captain.grantReputation(planet, reputation)
             if (faction) msg += gs.captain.grantReputation(faction, reputation)

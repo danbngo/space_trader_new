@@ -4,17 +4,7 @@
  */
 class PiratesEncounter extends FleetEncounter {
     onStart() {
-        if (Math.random() * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > this.fleet.totalRadar) {
-            showModal(coloredName(this.fleet), `Your long range sensors detect a ${coloredName(this.fleet)} fleet before they detect you.<br/>You manage to approach the ${coloredName(this.fleet)} stealthily.`, [
-                //['View', ()=>closeModal()],
-                ['Bypass', ()=>this.endEncounter()],
-                ['Hail', ()=>{
-                    this.onStart()
-                }],
-                ['Sneak Attack', ()=>this.showPlayerAttackFleetModal(true)],
-            ])
-        }
-        else if (Math.random() * gs.captain.calcReputationForTarget(this.planet) > 200) {
+        if (Math.random() * gs.captain.calcReputationForTarget(this.planet) > 200) {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} are in awe of your fearsome exploits! They broadcast a merry jig and salute you while you pass.`, [
                 //['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],

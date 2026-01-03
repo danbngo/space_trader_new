@@ -64,13 +64,13 @@ class FleetAI {
                 const target = this.findNearest(validTargets, this.fleet.fleetType.targetMaxDistance || Infinity);
                 if (target && target !== this.target) {
                     // Show interest popup when finding a new target
+                    console.log(`🔍 ${this.fleet.name} ${this.fleet.uuid} found new target: ${target.name} ${target.uuid} and could target:`)
                     const canTarget = this.setTarget(target);
-                    console.log(`🔍 ${this.fleet.name} ${this.fleet.uuid} found new target: ${target.name} ${target.uuid} and could target:`, canTarget)
                     if (!canTarget) {
                         this.visited.push(target) //give up if we cant reach the target
                     }
                     else this.addPopup('!', COLORS.DarkYellow)
-                    return
+                    return                    return
                 }
             }
         }
@@ -142,15 +142,12 @@ class FleetAI {
      */
     onNearOrigin() {
         console.log('🏠', `${this.fleet.name+' '+this.fleet.uuid} has returned home to ${this.origin.name+' '+this.origin.uuid}.`)
-        this.route = null
-        this.destination = null
         gs.system.removeFleet(this.fleet)
     }
 
     onNearDestination() {
         console.log('🛬', `${this.fleet.name+' '+this.fleet.uuid} has arrived at destination ${this.destination.name+' '+this.destination.uuid}.`)
         this.destination = null
-        this.route = null
         this.resetVoyageDuration()
     }
 
@@ -159,10 +156,19 @@ class FleetAI {
     }
 
     fightTarget(andLoot = false) {
-        if (!this.target || !(this.target instanceof Fleet) || !this.target.fleetAI) {
+        if (!this.target || !(this.target instanceof Fleet) || (!this.target.fleetAI && this.target !== gs.fleet)) {
             console.log(this,this.target,this.fleet)
             throw new Error('FleetAI.fightTarget called with invalid target!');
         }
+        
+        // If target is the player fleet, trigger an encounter instead
+        if (this.target === gs.fleet) {
+            console.log('⚔️', `${this.fleet.name+' '+this.fleet.uuid} is engaging player fleet - starting encounter!`)
+            const encounter = generateEncounterForFleet(this.fleet)
+            encounter.startEncounter()
+            return
+        }
+        
         console.log('⚔️', `${this.fleet.name+' '+this.fleet.uuid} is engaging ${this.target.name+' '+this.target.uuid}!`)
         
     // Show popup if starMap is available
@@ -202,21 +208,20 @@ class FleetAI {
             console.log('💨', `${loser.name+' '+loser.uuid} has fled from ${winner.name+' '+winner.uuid}!`)
             this.addPopup('💨', COLORS.Yellow, loser.x, loser.y)
             
-            // Clear targets and routes for both fleets
+            // Clear targets for both fleets
             loser.fleetAI.target = null
             loser.fleetAI.route = null
             winner.fleetAI.target = null
             winner.fleetAI.route = null
             
+            
             return winner
         }
         
         // Loser is destroyed
-        this.addPopup('💀', COLORS.Red, loser.x, loser.y)
 
         loser.fleetAI.onDestroyed()
         winner.fleetAI.target = null
-        winner.fleetAI.route = null
         console.log('🏆', `${winner.name+' '+winner.uuid} has defeated ${loser.name+' '+loser.uuid} in combat!`)
 
         if (andLoot) {
@@ -229,6 +234,7 @@ class FleetAI {
     }
 
     onDestroyed() {
+        this.addPopup('💀', COLORS.Red, this.fleet.x, this.fleet.y)
         gs.system.removeFleet(this.fleet)
     }
 

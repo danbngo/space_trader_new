@@ -85,8 +85,8 @@ class NeutralsEncounter extends FleetEncounter {
         ])
     }
 
-    showPlayerAttackNeutralsModal(sneakAttack = false) {
-        this.showPlayerAttackFleetModal(sneakAttack, ()=>{
+    showPlayerAttackNeutralsModal() {
+        this.showPlayerAttackFleetModal(()=>{
                 let combatAdvantage = gs.fleet.combatRating / gs.encounter.fleet.combatRating
                 //combat advantage should vary from 0.5 its original amount to 2x based on the player's infamy
                 combatAdvantage *= 2 - (75/(50 + Math.abs(Math.min(0, gs.captain.calcReputationForTarget(gs.encounter.fleet.planet))))) //approaches 2x as reputation becomes more negative

@@ -112,12 +112,6 @@ class ExplorerFleetAI extends FleetAI {
             // 33% chance to be destroyed
             else if (roll < 0.66) {
                 console.log(`☠️ ${this.fleet.name} was destroyed exploring ${this.target.name}!`);
-                
-                // Show destruction popup
-                if (this.starMap) {
-                    this.addPopup('💀', COLORS.Red)
-                }
-                
                 this.onDestroyed();
                 return;
             }
@@ -147,7 +141,7 @@ class ExplorerFleetAI extends FleetAI {
             
             // Clear target and move on
             this.target = null;
-            this.route = null;
+            this.route = null
         }
     }
     

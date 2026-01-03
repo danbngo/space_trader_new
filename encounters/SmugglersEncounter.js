@@ -4,17 +4,7 @@
  */
 class SmugglersEncounter extends MercantileEncounter {
     onStart() {
-        if (Math.random() * gs.fleet.totalRadar * (1+gs.fleet.totalSkills.getAmount(SKILLS.Stealth)/50) > this.fleet.totalRadar) {
-            showModal(coloredName(this.fleet), 'Your long range sensors detect a smuggler fleet before they detect you.<br/>You manage to approach them stealthily.', [
-                //['View', ()=>closeModal()],
-                ['Bypass', ()=>this.endEncounter()],
-                ['Hail', ()=>{
-                    this.onStart()
-                }],
-                ['Sneak Attack', ()=>this.showPlayerAttackFleetModal(true)],
-            ])
-        }
-        else if (FameLevel.hasFameLevel(gs.captain, this.planet, FAME_LEVELS.LOVED)) {
+        if (FameLevel.hasFameLevel(gs.captain, this.planet, FAME_LEVELS.LOVED)) {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} have heard of your hostility towards the criminal community and quickly flee!`, [
                 //['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],

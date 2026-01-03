@@ -21,10 +21,10 @@ function generateFleetCargo(fleet = new Fleet(), fleetType = FLEET_TYPES_ALL[0])
  * Generates a complete fleet with ships and cargo.
  * @param {FleetType} fleetType - The type of fleet to generate.
  * @param {FactionType|null} factionType - The faction the fleet belongs to.
- * @param {Planet} planet - The planet the fleet is associated with.
+ * @param {Planet|null} planet - The planet the fleet is associated with.
  * @returns {Fleet} The generated fleet.
  */
-function generateFleet(fleetType = FLEET_TYPES_ALL[0], factionType = null, planet = new Planet(), startAt = planet) {
+function generateFleet(fleetType = FLEET_TYPES_ALL[0], factionType = null, planet = null, startAt = planet) {
     //console.log('generating a fleet:',fleetType,factionType,planet,startAt)
     const ships = []
     const populationMod = planet ? planet.c.population : 1
@@ -45,9 +45,11 @@ function generateFleet(fleetType = FLEET_TYPES_ALL[0], factionType = null, plane
     
     fleet.cargo = generateFleetCargo(fleet, fleetType)
     
-    // Generate captain and crew officers
-    fleet.captain = generateOfficer(planet, factionType)
-    fleet.captain.credits = rng(fleetType.maxCredits, 0)
+    if (planet) {
+        // Generate captain and crew officers
+        fleet.captain = generateOfficer(planet, factionType)
+        fleet.captain.credits = rng(fleetType.maxCredits, 0)
+    }
     
     // Assign AI to fleet - need to do this after fleet is added to starmap
     const fleetAIType = getFleetAITypeForFleetType(fleetType)
@@ -107,7 +109,7 @@ async function addFleetActivity(numYears = 2, progress = {completePercentage: 0}
         
         // Reposition planets every 30 days (once per month)
         //if (d % 30 === 0) {
-            gs.system.updatePositions(gs.year)
+            gs.system.updateObjectPositions(gs.year)
         //}
         
         // Update progress and yield control for smooth UI

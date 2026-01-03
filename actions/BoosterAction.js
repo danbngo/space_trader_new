@@ -1,5 +1,5 @@
 class BoosterAction extends ShipAction {
-    constructor(encounter = new Encounter(), actor = new Ship()) {
+    constructor(encounter, actor = new Ship()) {
         super(encounter, actor, MOVE_TYPES.Booster)
         const boostDistance = actor.maxMoveDistance * 4
         const [dx, dy] = rotatePoint(boostDistance, 0, 0, 0, actor.angle)

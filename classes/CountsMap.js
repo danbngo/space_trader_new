@@ -13,6 +13,10 @@ class CountsMap {
         this.counts = counts
     }
 
+    /**
+     * Creates a deep copy of this CountsMap.
+     * @returns {CountsMap} A new CountsMap with the same entries.
+     */
     clone() {
         const newCounts = new Map()
         for (const [key, amt] of this.counts) {
@@ -21,14 +25,28 @@ class CountsMap {
         return new CountsMap(newCounts)
     }
 
+    /**
+     * Gets the count for a specific key.
+     * @param {any} key - The key to look up.
+     * @returns {number} The count for the key, or 0 if not found.
+     */
     getAmount(key = {}) {
         return this.counts.get(key) || 0
     }
 
+    /**
+     * Gets the number of unique keys in the map.
+     * @returns {number} The number of entries.
+     */
     get size() {
         return this.counts.size
     }
 
+    /**
+     * Increments the count for a key by a specific amount. Removes the key if count drops to or below 0.
+     * @param {any} key - The key to increment.
+     * @param {number} amt - Amount to add (default 1, can be negative).
+     */
     increment(key = {}, amt = 1) {
         const newAmt = this.getAmount(key) + amt
         if (newAmt <= 0) {
@@ -38,6 +56,11 @@ class CountsMap {
         this.counts.set(key, newAmt)
     }
 
+    /**
+     * Multiplies the count for a key by a specific factor. Removes the key if result is 0 or negative.
+     * @param {any} key - The key to multiply.
+     * @param {number} amt - Factor to multiply by (default 1).
+     */
     multiply(key = {}, amt = 1) {
         const newAmt = this.getAmount(key) * amt
         if (newAmt <= 0) {
@@ -47,6 +70,11 @@ class CountsMap {
         this.counts.set(key, newAmt)
     }
 
+    /**
+     * Sets the count for a key to the specified amount, but only if greater than current.
+     * @param {any} key - The key to update.
+     * @param {number} amt - The minimum amount to ensure.
+     */
     raiseTo(key = {}, amt = 1) {
         const currentAmt = this.getAmount(key)
         if (amt > currentAmt) {
@@ -54,18 +82,36 @@ class CountsMap {
         }
     }
 
+    /**
+     * Sets the count for a key to an exact amount.
+     * @param {any} key - The key to set.
+     * @param {number} amt - The amount to set.
+     */
     setAmount(key = {}, amt = 0) {
         this.counts.set(key, amt)
     }
 
+    /**
+     * Calculates the average value across all entries.
+     * @returns {number} The average value (total / size).
+     */
     get average() {
         return this.total/this.size
     }
 
+    /**
+     * Calculates the sum of all values in the map.
+     * @returns {number} The total of all counts.
+     */
     get total() {
         return calcMapValuesTotal(this.counts)
     }
     
+    /**
+     * Selects a random key from the map, optionally weighted by their counts.
+     * @param {boolean} weighted - If true, keys with higher counts are more likely (default true).
+     * @returns {any} A randomly selected key.
+     */
     randomItem(weighted = true) {
         const ctWeights = []
         const keys = Array.from(this.keys)
@@ -78,10 +124,17 @@ class CountsMap {
         return ct
     }
 
+    /**
+     * Removes all entries from the map.
+     */
     clear() {
         this.counts.clear()
     }
 
+    /**
+     * Gets all keys in the map as an array.
+     * @returns {any[]} Array of all keys.
+     */
     get keys() {
         return Array.from(this.counts.keys())
     }
@@ -100,7 +153,12 @@ class CountsMap {
         }
     }
 
-    //probably not mathematically correct but oh well
+    /**
+     * Creates a random subset of entries with a specific total count.
+     * Note: This may not be statistically rigorous for all use cases.
+     * @param {number} amt - The total count desired in the subset.
+     * @returns {CountsMap} A new CountsMap containing the random subset.
+     */
     randomSubset(amt = 0) {
         const subset = new CountsMap()
         amt = Math.min(this.total, amt)
@@ -116,22 +174,39 @@ class CountsMap {
         return subset
     }
 
+    /**
+     * Adds all counts from another CountsMap to this one.
+     * @param {CountsMap} added - The CountsMap to add.
+     */
     addAmounts(added = new CountsMap()) {
         for (const [key, amt] of added.counts) {
             this.increment(key, amt)
         }
     }
 
+    /**
+     * Subtracts all counts from another CountsMap from this one.
+     * @param {CountsMap} subtracted - The CountsMap to subtract.
+     */
     subtractAmounts(subtracted = new CountsMap()) {
         for (const [key, amt] of subtracted.counts) {
             this.increment(key, -amt)
         }
     }
 
+    /**
+     * Checks if a key exists with a count greater than 0.
+     * @param {any} key - The key to check.
+     * @returns {boolean} True if the key has a positive count.
+     */
     has(key = {}) {
         return this.getAmount(key) > 0
     }
 
+    /**
+     * Custom serialization for JSON.stringify. Converts Map to object with string keys.
+     * @returns {Object} An object representation with counts property.
+     */
     toJSON() {
         // Custom serialization for JSON.stringify
         // Convert Map to object, handling Planet keys specially
@@ -144,6 +219,10 @@ class CountsMap {
         return { counts: obj }
     }
 
+    /**
+     * Creates a new CountsMap with inverted values (1/value for each entry).
+     * @returns {CountsMap} A new CountsMap with reciprocal values.
+     */
     calcInvertedMultipliers() {
         const inverted = new CountsMap()
         for (const [key, value] of this.counts) {
@@ -174,7 +253,10 @@ class CountsMap {
         return maxKey
     }
 
-    //returns keys as an array, sorted highest value to lowest
+    /**
+     * Returns all keys sorted by their values from highest to lowest.
+     * @returns {any[]} Array of keys sorted in descending order by value.
+     */
     calcHighestKeys() {
         const entriesArray = Array.from(this.counts.entries())
         entriesArray.sort((a, b) => b[1] - a[1]) // Sort descending by value

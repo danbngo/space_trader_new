@@ -1,5 +1,5 @@
 class ShipAction {
-    constructor(encounter = new Encounter(), actor = new Ship(), actionType = MOVE_TYPES_ALL[0], target = null, toX = undefined, toY = undefined, targetToX = undefined, targetToY = undefined) {
+    constructor(encounter, actor, actionType = MOVE_TYPES_ALL[0], target = null, toX = undefined, toY = undefined, targetToX = undefined, targetToY = undefined) {
         console.log('ShipAction.constructor', { encounter, actor, actionType, target, toX, toY });
         this.encounter = encounter
         this.actionType = actionType
@@ -112,7 +112,7 @@ class ShipAction {
         return result
     }
 
-    static getDamageAction(encounter = new Encounter(), target = new Ship(), hullDamage = 0, shieldDamage = 0, disabled = false, escaped = false) {
+    static getDamageAction(encounter, target = new Ship(), hullDamage = 0, shieldDamage = 0, disabled = false, escaped = false) {
         const pseudoShipAction = new ShipAction(encounter, null, null, target)
         pseudoShipAction.targetShieldDamage = shieldDamage
         pseudoShipAction.targetHullDamage = hullDamage

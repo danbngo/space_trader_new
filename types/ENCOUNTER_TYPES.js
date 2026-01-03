@@ -35,6 +35,17 @@ class EncounterType {
         this.encounterClass = encounterClass;
         this.mapRadius = mapRadius;
     }
+    /**
+     * @param {FactionType} factionType
+     */
+    static getEncounterTypeForFaction(factionType) {
+        for (const encounterType of ENCOUNTER_TYPES_ALL) {
+            if (encounterType.faction === factionType) {
+                return encounterType;
+            }
+        }
+        return null
+    }
 }
 
 const ENCOUNTER_TYPES = {
@@ -56,6 +67,8 @@ const ENCOUNTER_TYPES = {
     TAX_COLLECTORS: new EncounterType('Tax Collectors', COLORS.Gold, 'You encountered: tax collectors.', FACTION_TYPES.TAX_COLLECTORS, FLEET_TYPES.TAX_COLLECTORS, AI_TYPES.Ship, TaxCollectorsEncounter),
     REBELS: new EncounterType('Rebels', COLORS.Red, 'You encountered: rebels.', FACTION_TYPES.REBELS, FLEET_TYPES.REBELS, AI_TYPES.Ship, RebelsEncounter),
     REFUGEES: new EncounterType('Refugees', COLORS.Brown, 'You encountered: refugees.', FACTION_TYPES.REFUGEES, FLEET_TYPES.REFUGEES, AI_TYPES.Ship, RefugeesEncounter),
+    PERFORMERS: new EncounterType('Performers', COLORS.LightOrange, 'You encountered: performers.', FACTION_TYPES.PERFORMERS, FLEET_TYPES.PERFORMERS, AI_TYPES.Ship, PerformersEncounter),
+    PILGRIMS: new EncounterType('Pilgrims', COLORS.LightCyan, 'You encountered: pilgrims.', FACTION_TYPES.PILGRIMS, FLEET_TYPES.PILGRIMS, AI_TYPES.Ship, PilgrimsEncounter),
     ABANDONED_SHIP: new EncounterType('Abandoned Ship', COLORS.Gray, 'You encountered: an abandoned ship.', FACTION_TYPES.PIRATES, PSEUDO_FLEET_TYPES.ABANDONED_SHIP, AI_TYPES.Ship, AbandonedShipEncounter),
     ASTEROIDS_STORM: new EncounterType('Asteroid Storm', COLORS.LightGray, 'You encountered: an asteroid storm.', null, PSEUDO_FLEET_TYPES.ASTEROIDS_STORM, AI_TYPES.Asteroid, AsteroidsStormEncounter),
     ASTEROIDS_CALM: new EncounterType('Asteroid Field', COLORS.LightGray, 'You encountered: an asteroid field.', null, PSEUDO_FLEET_TYPES.ASTEROIDS_CALM, AI_TYPES.Asteroid, AsteroidsCalmEncounter),

@@ -544,7 +544,7 @@ class EncounterMap extends BaseMap {
         else if (gs.encounter.playerUndetected) {
             showModal(coloredName(gs.encounter.fleet), `Your long range sensors detect a ${coloredName(gs.encounter.fleet)} fleet before they detect you.<br/>`, [
                 //['View', ()=>closeModal()],
-                ['Bypass', ()=>closeModal()],
+                ['Bypass', ()=>gs.encounter.endEncounter()],
                 ['Hail', ()=>gs.encounter.onStart()],
                 ['Sneak Attack', ()=>{
                     gs.encounter.showPlayerAttackFleetModal()
