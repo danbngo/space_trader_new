@@ -10,6 +10,7 @@ function checkForEvents(elapsedYears = 1) {
     checkForAnomalies(elapsedDays)
     checkForFleetSpawning(elapsedDays)
     tickNPCFleets(elapsedYears)
+    tickPlanets(elapsedYears)
     if (checkForEncounter(elapsedDays)) return
     if (checkDebtCollections(elapsedDays)) return
     if (isNaN(gs.credits)) {
@@ -166,6 +167,29 @@ function tickNPCFleets(elapsedYears = 1) {
         if (!fleet.fleetAI) continue
         
         fleet.fleetAI.tick(elapsedYears)
+    }
+}
+
+
+function tickPlanets(elapsedYears = 1) {
+    //for planets and dwarf planets, apply some gradual bonuses over time based on GovernmentType civBonuses
+    //dont apply to dwarf planets yet - we dont have a disasters, etc mechanism to balance their growth
+    const allPlanets = [...gs.system.planets]
+    for (const planet of allPlanets) {
+        if (!planet.civilization || !planet.civilization.governmentType) continue
+        const govBonuses = planet.civilization.governmentType.civBonuses
+        for (const [key, value] of Object.entries(govBonuses)) {
+            if (planet.c[key] !== undefined) {
+                // @ts-ignore
+                planet.c[key] *= (1 + value * CIVILIZATION_BONUS_RATE_PER_YEAR * elapsedYears) // very small gradual bonus
+            }
+        }
+        //convert some of our planetary culture to our culture
+        for (const [key,value] of planet.c.cultures.counts) {
+            const convertAmount = value * CIVILIZATION_CONVERT_CULTURE_PER_YEAR * elapsedYears
+            planet.c.cultures.increment(key, -convertAmount)
+        }
+        planet.c.cultures.normalize()
     }
 }
 

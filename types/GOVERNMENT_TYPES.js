@@ -11,6 +11,7 @@ class GovernmentType {
      * @param {Religion[]} favoredReligions - Array of religions favored by this government.
      * @param {Religion[]} forbiddenReligions - Array of religions forbidden by this government.
      * @property {GovernmentType|null} opposingType - The opposing government type (if any).
+     * @property {CivilizationParams} civBonuses - Bonuses applied over time
      */
     constructor(
         name = '',
@@ -18,7 +19,8 @@ class GovernmentType {
         blockedBuildings = [],
         description = '',
         favoredReligions = [],
-        forbiddenReligions = []
+        forbiddenReligions = [],
+        civBonuses = {}
     ) {
         /** @type {string} */
         this.name = name
@@ -34,6 +36,8 @@ class GovernmentType {
         this.forbiddenReligions = forbiddenReligions
         /** @type {GovernmentType|null} */
         this.opposingType = null
+        /** @type {CivilizationParams} */
+        this.civBonuses = civBonuses
     }
 }
 
@@ -44,7 +48,8 @@ const GT = {
         [],
         'Rule by elected representatives. A stable, balanced government with minimal restrictions.',
         [],
-        []
+        [],
+        {culture: 1, economy: 1}
     ),
     ARISTOCRACY: new GovernmentType(
         'Aristocracy',
@@ -52,7 +57,8 @@ const GT = {
         [BUILDING_TYPES.GUILD],
         'Rule by hereditary nobility. Elite classes control wealth and power.',
         [],
-        []
+        [],
+        {prestige: 1, wealth: 1}
     ),
     COMMUNISM: new GovernmentType(
         'Communism',
@@ -60,7 +66,8 @@ const GT = {
         [BUILDING_TYPES.BANK, BUILDING_TYPES.BLACK_MARKET, BUILDING_TYPES.CASINO],
         'Collective ownership of resources. No private banking or gambling, minimal merchant activity.',
         [],
-        []
+        [],
+        {industry: 1, security: 1},
     ),
     CORPORATISM: new GovernmentType(
         'Corporatism',
@@ -68,7 +75,8 @@ const GT = {
         [],
         'Rule by corporate entities. All store fees doubled, profit-driven policies.',
         [],
-        []
+        [],
+        {wealth: 1, economy: 1}
     ),
     THEOCRACY: new GovernmentType(
         'Theocracy',
@@ -76,7 +84,8 @@ const GT = {
         [BUILDING_TYPES.CYBER_SURGEON, BUILDING_TYPES.CASINO],
         'Rule by religious authority. Cybernetic enhancement and gambling forbidden.',
         [],
-        [RELIGION_ATHEISM, RELIGION_AGNOSTICISM]
+        [RELIGION_ATHEISM, RELIGION_AGNOSTICISM],
+        {population: 1, culture: 1}
     ),
     TECHNOCRACY: new GovernmentType(
         'Technocracy',
@@ -84,7 +93,8 @@ const GT = {
         [BUILDING_TYPES.TEMPLE],
         'Rule by technical experts. Science and efficiency prioritized over faith.',
         [RELIGION_ATHEISM, RELIGION_AGNOSTICISM],
-        []
+        [],
+        {technology: 1, education: 1}
     ),
     POLICE_STATE: new GovernmentType(
         'Police State',
@@ -92,7 +102,8 @@ const GT = {
         [BUILDING_TYPES.BLACK_MARKET, BUILDING_TYPES.CASINO],
         'Authoritarian surveillance state. Heavy security presence, limited criminal activity.',
         [],
-        []
+        [],
+        {security: 1, army: 1}
     ),
     ANARCHY: new GovernmentType(
         'Anarchy',
@@ -100,7 +111,8 @@ const GT = {
         [BUILDING_TYPES.COURTHOUSE, BUILDING_TYPES.PALACE, BUILDING_TYPES.ACADEMY],
         'Absence of formal government. No police or military, maximum individual freedom.',
         [],
-        []
+        [],
+        {culture: 1, crime: 1}
     ),
     PUPPET_STATE: new GovernmentType(
         'Puppet State',
@@ -108,7 +120,8 @@ const GT = {
         [BUILDING_TYPES.PALACE],
         'Nominally independent but controlled by external power.',
         [],
-        []
+        [],
+        {corruption: 1, taxes: 1}
     ),
 }
 const GT_ALL = Object.values(GT)

@@ -10,6 +10,7 @@ const NEWS_TYPE_CLASSES = [
     [NT.ALLIANCE_RELIGIOUS, AllianceReligiousNews],
     [NT.ALLIANCE_GOVERNMENT, AllianceGovernmentNews],
     [NT.ALLIANCE_ETHNIC, AllianceEthnicNews],
+    [NT.ALLIANCE_CULTURAL, AllianceCulturalNews],
     [NT.ARMS_DEAL, ArmsDealNews],
     [NT.BLOCKADE, BlockadeNews],
     [NT.CIVIL_STRIFE, CivilStrifeNews],

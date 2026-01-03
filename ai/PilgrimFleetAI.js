@@ -46,6 +46,12 @@ class PilgrimFleetAI extends FleetAI {
             // Normalize to ensure total stays at 1
             this.destination.c.religions.normalize()
         }
+        
+        // Spread minor culture when passing through destinations (0.1% influence)
+        if (this.destination instanceof Planet) {
+            this.destination.addCulture(this.fleet.planet, 0.001);
+            this.destination.c.wealth *= 1.01 //stimulate the local economy
+        }
 
         super.onNearDestination()
     }

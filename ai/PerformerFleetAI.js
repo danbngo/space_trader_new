@@ -15,7 +15,7 @@ class PerformerFleetAI extends FleetAI {
         return gs.system.fleets.filter(f => {
             if (f === this.fleet || f.location) return false;
             // Skip authority, criminal, and religious fleets
-            if (f.factionType.authority || f.factionType.criminal || f.factionType.religious) return false;
+            if (f.factionType.authority || f.factionType.criminal) return false;
             // Skip if already visited
             if (this.visited.includes(f)) return false;
             // Only target fleets with captains who have credits
@@ -48,12 +48,17 @@ class PerformerFleetAI extends FleetAI {
             
             // Increase home planet's culture every performance
             if (this.fleet.planet && this.fleet.planet.civilization) {
-                this.fleet.planet.c.culture *= 1.005; // 0.5% increase
+                this.fleet.planet.c.culture *= 1.0001; // .01% increase
                 
                 // 10% chance for prestige increase
                 if (Math.random() < 0.1) {
                     this.fleet.planet.c.prestige *= 1.01;
                 }
+            }
+            
+            // Spread culture to the target fleet's home planet (0.1% influence)
+            if (this.target.planet instanceof Planet) {
+                this.target.planet.addCulture(this.fleet.planet, 0.001);
             }
             
             // 50% chance of performing well and taking 20% of their credits
@@ -85,6 +90,15 @@ class PerformerFleetAI extends FleetAI {
         }
     }
 
+    onNearDestination() {
+        // Spread minor culture when passing through destinations (0.1% influence)
+        if (this.destination instanceof Planet) {
+            this.destination.addCulture(this.fleet.planet, 0.001);
+        }
+        
+        super.onNearDestination()
+    }
+    
     onDestroyed() {
         // Losing performers slightly reduces culture and morale
         if (this.fleet.planet && this.fleet.planet.civilization) {

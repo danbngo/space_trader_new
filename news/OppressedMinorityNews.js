@@ -46,10 +46,13 @@ class OppressedMinorityNews extends News {
         // Target must be oppressive, planet must have influence
         const ratingsValid = tp.c.security > CL.SLIGHTLY_HIGH && tp.c.culture < CL.MEDIUM && p.c.prestige > CL.SLIGHTLY_LOW
         
+        // Target planet's 2nd highest culture must be this planet (significant minority from this planet)
+        const cultureValid = tp.c.cultures && tp.c.cultures.calcHighestKeys()[1] === p
+        
         // Must not be allies (wouldn't oppress ally's citizens)
         const relationshipsValid = !Civilization.areAllies(p, tp)
         
         const interferingEvent = News.hasAnyNewsBidirectional(p, tp, [NT.OPPRESSED_MINORITY, NT.DEPORTATION, NT.DIASPORA_RETURNS])
-        return ratingsValid && relationshipsValid && !interferingEvent
+        return ratingsValid && cultureValid && relationshipsValid && !interferingEvent
     }
 }

@@ -47,7 +47,7 @@ function showPoliticsMenu(backFunction = () => closeModal()) {
         return [coloredName(planet),
             coloredName(c.governmentType),
             c.stateReligion ? coloredName(c.stateReligion) : 'None',
-            c.races?.calcHighestValue() ? coloredName(c.races.calcHighestValue()) : 'Unknown',
+            c.races?.calcHighestKey() ? coloredName(c.races.calcHighestKey()) : 'Unknown',
             alliances.length > 0 ? alliances.join(' ') : '-',
             tense.length > 0 ? tense.join(' ') : '-',
             atWar.length > 0 ? atWar.join(' ') : '-',

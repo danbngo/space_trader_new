@@ -158,7 +158,7 @@ class CountsMap {
      * Returns the key with the highest value in the map.
      * @returns {any|null} The key with the highest value, or null if empty.
      */
-    calcHighestValue() {
+    calcHighestKey() {
         if (this.counts.size === 0) return null
         
         let maxKey = null
@@ -172,5 +172,12 @@ class CountsMap {
         }
         
         return maxKey
+    }
+
+    //returns keys as an array, sorted highest value to lowest
+    calcHighestKeys() {
+        const entriesArray = Array.from(this.counts.entries())
+        entriesArray.sort((a, b) => b[1] - a[1]) // Sort descending by value
+        return entriesArray.map(entry => entry[0]) // Return sorted keys
     }
 }

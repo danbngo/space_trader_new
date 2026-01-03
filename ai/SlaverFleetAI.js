@@ -13,7 +13,7 @@ class SlaverFleetAI extends FleetAI {
     calcValidTargets() {
         const ourScore = this.fleet.combatRating
         return gs.system.fleets.filter(f => {
-            if (f === this.fleet || f.factionType.authority || f.location) return false
+            if (f === this.fleet || f.factionType.militant || f.factionType.criminal || f.location) return false
             // Skip if already visited
             if (this.visited.includes(f)) return false
             // Only target fleets with officers (captain + at least 1 subordinate)

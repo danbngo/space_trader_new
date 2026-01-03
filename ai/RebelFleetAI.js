@@ -19,6 +19,8 @@ class RebelFleetAI extends FleetAI {
             if (f === this.fleet || f.planet !== this.fleet.planet || f.location) return false
             // Skip if already visited
             if (this.visited.includes(f)) return false
+            // Only target authority fleets (government, police, military)
+            if (!f.factionType.authority) return false
             // Only target fleets with cargo
             if (!f.cargo || f.cargo.total === 0) return false
             // Don't attack targets that are 2x stronger
@@ -32,8 +34,8 @@ class RebelFleetAI extends FleetAI {
             
             // Reduce prestige and culture when rebels fight
             if (this.fleet.planet && this.fleet.planet.civilization) {
-                this.fleet.planet.c.prestige *= 0.99;
-                this.fleet.planet.c.culture *= 0.99;
+                this.fleet.planet.c.prestige *= 0.999;
+                this.fleet.planet.c.culture *= 0.999;
             }
             
             // Always fight fleets from their home planet

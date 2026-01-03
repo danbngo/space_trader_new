@@ -60,6 +60,11 @@ class MissionaryFleetAI extends FleetAI {
                 
                 // Show conversion popup
                 this.starMap.addPopup(this.target.x, this.target.y, '✝️', COLORS.White);
+                
+                // Spread culture to converted fleet's home planet (0.1% influence)
+                if (this.target.planet instanceof Planet) {
+                    this.target.planet.addCulture(this.fleet.planet, 0.001);
+                }
             } else {
                 console.log(`${this.fleet.name} failed to convert ${this.target.captain.name}`);
             }
@@ -69,6 +74,15 @@ class MissionaryFleetAI extends FleetAI {
             this.route = null;
         }
     }
+    onNearDestination() {
+        // Spread minor culture when passing through destinations (0.1% influence)
+        if (this.destination instanceof Planet) {
+            this.destination.addCulture(this.fleet.planet, 0.001);
+        }
+        
+        super.onNearDestination()
+    }
+    
     onDestroyed() {
         // Losing missionaries reduces religious cultural influence
         if (this.fleet.planet && this.fleet.planet.civilization) {

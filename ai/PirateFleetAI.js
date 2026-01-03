@@ -13,7 +13,7 @@ class PirateFleetAI extends FleetAI {
     calcValidTargets() {
         const ourScore = this.fleet.combatRating
         return gs.system.fleets.filter(f => {
-            if (f === this.fleet || f.factionType.criminal || f.factionType.authority || f.location) return false
+            if (f === this.fleet || f.factionType.militant || f.location) return false
             // Skip if already visited
             if (this.visited.includes(f)) return false
             // Only target fleets with cargo

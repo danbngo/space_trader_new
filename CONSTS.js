@@ -105,3 +105,6 @@ const ENCOUNTER_BASE_REPUTATION_EFFECT_ON_NO_SURRENDER = 5 //this is applied as 
 const ENCOUNTER_BASE_REPUTATION_EFFECT_ON_ATTACK = -5 //attacking a fleet gains you notoriety if they're good and fame if they're bad
 const ENCOUNTER_MAX_TAX_RATIO = 0.2 //if tax collectors catch you, they'll take up to this much of your credits (min 100)
 const ENCOUNTER_MAX_EXTORT_RATIO = 0.5 //if syndicates catch you, they'll take up to this much of your credits (min 100)
+
+const CIVILIZATION_BONUS_RATE_PER_YEAR = 0.1 //each year a democracy will MULTIPLY its economy by 1 + this, for instance
+const CIVILIZATION_CONVERT_CULTURE_PER_YEAR = 0.1 //each year a civilization will convert this fraction of its population to its dominant culture

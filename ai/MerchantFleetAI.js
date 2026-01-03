@@ -37,6 +37,11 @@ class MerchantFleetAI extends FleetAI {
                 this.starMap.addPopup(this.fleet.x, this.fleet.y, '💲', COLORS.Green)
         }
         
+        // Spread minor culture when trading at destinations (0.1% influence)
+        if (this.destination instanceof Planet) {
+            this.destination.addCulture(this.fleet.planet, 0.001);
+        }
+        
         super.onNearDestination()
     }
 

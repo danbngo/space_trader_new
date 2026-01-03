@@ -51,8 +51,8 @@ class TensionsEthnicNews extends News {
         const {planet: p, targetPlanet: tp} = this
         
         // Must have different majority ethnicity/race
-        const pMajorityRace = p.c.races?.calcHighestValue()
-        const tpMajorityRace = tp.c.races?.calcHighestValue()
+        const pMajorityRace = p.c.races?.calcHighestKey()
+        const tpMajorityRace = tp.c.races?.calcHighestKey()
         const differentMajorityRaces = pMajorityRace && tpMajorityRace && pMajorityRace !== tpMajorityRace
 
         // Power balance check

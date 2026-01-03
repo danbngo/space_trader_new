@@ -5,7 +5,7 @@
  */
 class ColonistFleetAI extends FleetAI {
     calcDestination() {
-        return rndMember([...gs.system.planets, ...gs.system.dwarfPlanets, ...gs.system.spaceStations].filter(p => {
+        return rndMember([...gs.system.dwarfPlanets, ...gs.system.spaceStations].filter(p => {
             if (p === this.origin || p === this.fleet.planet) return false
             
             // Don't travel to planets we're at war or tense with
@@ -25,17 +25,16 @@ class ColonistFleetAI extends FleetAI {
             return super.onNearDestination()
         }
         
-        // Calculate population transfer ratio (10% of origin's relative population)
-        const populationRatio = this.fleet.planet.c.population / (this.fleet.planet.c.population + this.destination.c.population) * 0.1
-        
-        // Transfer racial/ethnic values from origin to destination
-        if (this.fleet.planet.c.races && this.destination.c.races) {
-            for (const [race, amount] of this.fleet.planet.c.races.counts.entries()) {
-                const transferAmount = amount * populationRatio
-                this.destination.c.races.increment(race, transferAmount)
+        // Transfer racial/ethnic values from origin to destination (2% influence)
+        if (this.fleet.planet.c.races) {
+            for (const [race] of this.fleet.planet.c.races.counts.entries()) {
+                this.destination.addRace(race, 0.02);
             }
-            // Normalize to ensure total stays at 1
-            this.destination.c.races.normalize()
+        }
+        
+        // Transfer cultural values from origin to destination (2% influence)
+        if (this.destination instanceof Planet) {
+            this.destination.addCulture(this.fleet.planet, 0.02);
         }
 
         super.onNearDestination()

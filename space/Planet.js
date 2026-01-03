@@ -59,5 +59,33 @@ class Planet extends OrbitingObject {
         if (baseName.endsWith('sian')) baseName = baseName.replace('sian', 'tian') //mars
         return baseName
     }
+    
+    /**
+     * Add cultural influence from another planet to this planet's civilization.
+     * @param {Planet} sourcePlanet - The planet whose culture is being spread
+     * @param {number} weight - The influence weight (1.0 = 100% population addition)
+     */
+    addCulture(sourcePlanet, weight) {
+        if (!this.civilization || !this.civilization.cultures || !sourcePlanet) {
+            return;
+        }
+        
+        this.c.cultures.increment(sourcePlanet, weight);
+        this.c.cultures.normalize();
+    }
+    
+    /**
+     * Add racial influence from another planet to this planet's civilization.
+     * @param {Race} sourceRace - The race being spread
+     * @param {number} weight - The influence weight (1.0 = 100% population addition)
+     */
+    addRace(sourceRace, weight) {
+        if (!this.civilization || !this.civilization.races || !sourceRace) {
+            return;
+        }
+        
+        this.c.races.increment(sourceRace, weight);
+        this.c.races.normalize();
+    }
 
 }

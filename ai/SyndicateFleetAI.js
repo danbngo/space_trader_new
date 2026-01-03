@@ -1,5 +1,5 @@
 /**
- * AI for syndicate fleets - extorts and hunts civilian ships.
+ * AI for syndicate fleets - extorts and hunts civilian AND criminal ships.
  * @class SyndicateFleetAI
  * @extends FleetAI
  */
@@ -13,7 +13,7 @@ class SyndicateFleetAI extends FleetAI {
     calcValidTargets() {
         const ourScore = this.fleet.combatRating
         return gs.system.fleets.filter(f => {
-            if (f === this.fleet || f.factionType.criminal || f.factionType.authority || f.location) return false
+            if (f === this.fleet || f.factionType.militant || f.factionType.authority || f.location) return false
             // Skip if already visited
             if (this.visited.includes(f)) return false
             // Only target fleets with credits

@@ -46,8 +46,8 @@ class AllianceEthnicNews extends News {
         const {planet: p, targetPlanet: tp} = this
         
         // Must have same majority ethnicity/race
-        const pMajorityRace = p.c.races?.calcHighestValue()
-        const tpMajorityRace = tp.c.races?.calcHighestValue()
+        const pMajorityRace = p.c.races?.calcHighestKey()
+        const tpMajorityRace = tp.c.races?.calcHighestKey()
         const sameMajorityRace = pMajorityRace && tpMajorityRace && pMajorityRace === tpMajorityRace
         
         // Both planets must be currently neutral towards each other

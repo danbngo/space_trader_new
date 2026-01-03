@@ -1,11 +1,11 @@
-class AllianceReligiousNews extends News {
+class AllianceCulturalNews extends News {
     constructor(planet = new Planet(), targetPlanet = new Planet()) {
         super(
-            `Religious alliance formed between ${coloredName(planet)} and ${coloredName(targetPlanet)}!`,
-            `Religious alliance dissolved between ${coloredName(planet)} and ${coloredName(targetPlanet)}!`,
+            `Cultural alliance formed between ${coloredName(planet)} and ${coloredName(targetPlanet)}!`,
+            `Cultural alliance dissolved between ${coloredName(planet)} and ${coloredName(targetPlanet)}!`,
             ``,
-            `Tensions between ${coloredName(planet)} and ${coloredName(targetPlanet)} prevent religious alliance formation!`,
-            NT.ALLIANCE_RELIGIOUS, planet, targetPlanet
+            `Tensions between ${coloredName(planet)} and ${coloredName(targetPlanet)} interfere with their cultural alliance!`,
+            NT.ALLIANCE_CULTURAL, planet, targetPlanet
         )
 
         this.addPlanetEffect({
@@ -45,16 +45,10 @@ class AllianceReligiousNews extends News {
     isValid() {
         const {planet: p, targetPlanet: tp} = this
         
-        // Must have same state religion policy
-        const hasStateReligionPolicy = (planet) => {
-            return planet.c.policies.all.some(policy => policy === PT.STATE_RELIGION)
-        }
-        const bothHaveStateReligion = hasStateReligionPolicy(p) && hasStateReligionPolicy(tp)
-        
-        // Must have same majority religion
-        const pMajorityReligion = p.c.religions?.calcHighestKey()
-        const tpMajorityReligion = tp.c.religions?.calcHighestKey()
-        const sameMajorityReligion = pMajorityReligion && tpMajorityReligion && pMajorityReligion === tpMajorityReligion
+        // Must have same majority culture
+        const pMajorityCulture = p.c.cultures?.calcHighestKey()
+        const tpMajorityCulture = tp.c.cultures?.calcHighestKey()
+        const sameMajorityCulture = pMajorityCulture && tpMajorityCulture && pMajorityCulture === tpMajorityCulture
         
         // Both planets must be currently neutral towards each other
         const relationships = [p.c.relationships.get(tp), tp.c.relationships.get(p)]
@@ -63,6 +57,6 @@ class AllianceReligiousNews extends News {
         const opposingGovernmentsValid = !Civilization.areOpposingGovernments(p, tp)
         const interferingEvent = News.hasAnyNewsBidirectional(p, tp, NT_COOPERATION_PREVENTING)
         
-        return bothHaveStateReligion && sameMajorityReligion && opposingGovernmentsValid && relationshipsValid && !interferingEvent
+        return sameMajorityCulture && opposingGovernmentsValid && relationshipsValid && !interferingEvent
     }
 }

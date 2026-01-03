@@ -24,6 +24,13 @@ class TaxCollectorFleetAI extends FleetAI {
     calcDestination() {
         return rndMember([...gs.system.dwarfPlanets, ...gs.system.spaceStations].filter(p=>(p !== this.origin)))
     }
+    onNearOrigin() {
+        if (this.origin instanceof Planet) {
+            this.origin.c.wealth *= 1.01 //stimulate the local economy
+            this.origin.c.taxes *= 0.98;
+        }
+        super.onNearOrigin()
+    }
     onNearTarget() {
         if (this.target instanceof Fleet && !this.target.location) {
             // Mark as visited

@@ -11,9 +11,10 @@
  * @property {string} symbol - The symbol representing the faction.
  * @property {number[]} color - The color associated with the faction.
  * @property {string} description - A brief description of the faction.
- * @property {boolean} criminal - Whether this faction is considered criminal.
+ * @property {boolean} militant - Whether this faction is considered militant.
  * @property {boolean} authority - Whether this faction is considered an authority.
  * @property {boolean} religious - Whether this faction is religiously affiliated.
+ * @property {boolean} criminal - Whether this faction is considered criminal.
  * @property {boolean} cloaked - Whether this faction is able to be cloaked.
  * @property {FleetType[]} fleetTypes - The types of fleets associated with this faction.
  * @property {number} reputationMultiplier - Reputation change multiplier (positive = good faction, negative = bad faction, affects both victory and attack).
@@ -21,12 +22,13 @@
  * @constructor
  */
 class FactionType {
-    constructor(name = '', symbol = '', color = COLORS.White, description = '', criminal = false, authority = false, religious = false, cloaked = false, fleetTypes = [], reputationMultiplier = 0, favoredSkills = []) {
+    constructor(name = '', symbol = '', color = COLORS.White, description = '', militant = false, authority = false, religious = false, criminal = false, cloaked = false, fleetTypes = [], reputationMultiplier = 0, favoredSkills = []) {
         this.name = name;
         this.symbol = symbol;
         this.color = color;
         this.description = description;
         this.criminal = criminal;
+        this.militant = militant;
         this.authority = authority;
         this.religious = religious;
         this.cloaked = cloaked;
@@ -46,6 +48,7 @@ const FACTION_TYPES = {
         false,
         false,
         false,
+        false,
         [FLEET_TYPES.MINERS],
         1,  // reputationMultiplier (lose rep for attacking civilians)
         [SKILLS.Engineer]
@@ -59,6 +62,7 @@ const FACTION_TYPES = {
         false,
         false,
         false,
+        false,
         [FLEET_TYPES.MERCHANTS],
         1,  // reputationMultiplier (lose more rep for attacking merchants)
         [SKILLS.Barter]
@@ -68,9 +72,10 @@ const FACTION_TYPES = {
         '📦',
         COLORS.DarkGray,
         'Black market traders dealing in illicit and restricted cargo.',
-        true,  
+        false,
         false, 
         false,
+        true,  
         true,
         [FLEET_TYPES.SMUGGLERS],
         -1,  // reputationMultiplier (small gain for defeating criminals)
@@ -81,10 +86,11 @@ const FACTION_TYPES = {
         '☠️',
         COLORS.Red,
         'Ruthless outlaws who prey on merchant vessels and settlements.',
-        true,  
+        true,
         false, 
         false,
-        false,
+        true,  
+        true,
         [FLEET_TYPES.PIRATES],
         -3,  // reputationMultiplier (good gain for defeating pirates)
         [SKILLS.Gunner, SKILLS.Stealth]
@@ -94,8 +100,9 @@ const FACTION_TYPES = {
         '👮',
         COLORS.LightBlue,
         'Law enforcement maintaining order and security in civilized space.',
-        false, 
+        true,
         true,  
+        false, 
         false,
         false,
         [FLEET_TYPES.POLICE],
@@ -107,8 +114,9 @@ const FACTION_TYPES = {
         '⚔️',
         COLORS.Green,
         'Military forces protecting planets and enforcing government authority.',
-        false, 
+        true, 
         true,  
+        false,
         false,
         false,
         [FLEET_TYPES.SOLDIERS],
@@ -120,6 +128,7 @@ const FACTION_TYPES = {
         '🗡️',
         COLORS.DarkGreen,
         'Professional soldiers-for-hire who fight for the highest bidder.',
+        true,
         false,
         false,
         false,
@@ -133,6 +142,7 @@ const FACTION_TYPES = {
         '🎯',
         COLORS.DarkBlue,
         'Professional trackers and hunters who capture criminals for profit.',
+        true,
         false,
         false,
         false,
@@ -150,6 +160,7 @@ const FACTION_TYPES = {
         false,
         false,
         false,
+        false,
         [FLEET_TYPES.TOURISTS],
         1,  // reputationMultiplier (lose rep for attacking tourists)
         []
@@ -163,6 +174,7 @@ const FACTION_TYPES = {
         false, 
         false,
         true,
+        true,
         [FLEET_TYPES.SLAVERS],
         -5,  // reputationMultiplier (highest gain for defeating slavers - heroes)
         [SKILLS.Stealth, SKILLS.Barter]
@@ -172,6 +184,7 @@ const FACTION_TYPES = {
         '🏘️',
         COLORS.Magenta,
         'Settlers traveling to establish new colonies. They prefer to avoid trouble and focus on their mission.',
+        false,
         false,
         false,
         false,
@@ -189,6 +202,7 @@ const FACTION_TYPES = {
         false,
         false,
         false,
+        false,
         [FLEET_TYPES.SCIENTISTS],
         1,  // reputationMultiplier (lose rep for attacking scientists)
         [SKILLS.Science]
@@ -202,6 +216,7 @@ const FACTION_TYPES = {
         false,
         true,
         false,
+        false,
         [FLEET_TYPES.PILGRIMS],
         2,  // reputationMultiplier (lose rep for attacking pilgrims)
         []
@@ -211,9 +226,10 @@ const FACTION_TYPES = {
         '⚖️',
         COLORS.DarkPurple,
         'Religious enforcers tasked with rooting out heresy and maintaining doctrinal purity.',
+        true,
         false,
         true,
-        true,
+        false,
         false,
         [FLEET_TYPES.INQUISITORS],
         0,  // reputationMultiplier (lose rep for attacking religious authority)
@@ -228,6 +244,7 @@ const FACTION_TYPES = {
         false,
         true,
         false,
+        false,
         [FLEET_TYPES.MISSIONARIES],
         2,  // reputationMultiplier (lose rep for attacking missionaries)
         [SKILLS.Negotiation]
@@ -237,6 +254,7 @@ const FACTION_TYPES = {
         '🤝',
         COLORS.White,
         'Official envoys and ambassadors negotiating treaties and maintaining diplomatic relations.',
+        false,
         false,
         false,
         false,
@@ -254,6 +272,7 @@ const FACTION_TYPES = {
         false,
         false,
         false,
+        false,
         [FLEET_TYPES.SALVAGERS],
         1,  // reputationMultiplier (small loss for attacking salvagers)
         [SKILLS.Salvage]
@@ -264,6 +283,7 @@ const FACTION_TYPES = {
         COLORS.DarkYellow,
         'Government agents collecting taxes and enforcing financial regulations.',
         false,
+        true,
         false,
         false,
         false,
@@ -277,8 +297,9 @@ const FACTION_TYPES = {
         COLORS.DarkMagenta,
         'Revolutionary forces fighting against established authority and seeking to overthrow the current regime.',
         false,
-        true,
         false,
+        false,
+        true,
         false,
         [FLEET_TYPES.REBELS],
         -1,  // reputationMultiplier (slight gain - depends on perspective)
@@ -289,6 +310,7 @@ const FACTION_TYPES = {
         '🏃',
         COLORS.LightMagenta,
         'Displaced populations fleeing war, persecution, or catastrophe, seeking sanctuary.',
+        false,
         false,
         false,
         false,
@@ -306,6 +328,7 @@ const FACTION_TYPES = {
         false,
         false, 
         true,
+        false,
         [FLEET_TYPES.SYNDICATES],
         -3,  // reputationMultiplier (good gain for defeating criminals)
         [SKILLS.Negotiation, SKILLS.Stealth]
@@ -319,6 +342,7 @@ const FACTION_TYPES = {
         false,
         false,
         false,
+        false,
         [FLEET_TYPES.EXPLORERS],
         1,  // reputationMultiplier
         [SKILLS.Navigation, SKILLS.Science]
@@ -328,6 +352,7 @@ const FACTION_TYPES = {
         '🎤',
         COLORS.Magenta,
         'Entertainers traveling the galaxy to perform for audiences on various worlds.',
+        false,
         false,
         false,
         false,

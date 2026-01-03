@@ -57,8 +57,8 @@ class TensionsReligiousNews extends News {
         const differentStateReligions = hasStateReligionPolicy(p) && hasStateReligionPolicy(tp)
         
         // Must have different majority religions
-        const pMajorityReligion = p.c.religions?.calcHighestValue()
-        const tpMajorityReligion = tp.c.religions?.calcHighestValue()
+        const pMajorityReligion = p.c.religions?.calcHighestKey()
+        const tpMajorityReligion = tp.c.religions?.calcHighestKey()
         const differentMajorityReligions = pMajorityReligion && tpMajorityReligion && pMajorityReligion !== tpMajorityReligion
 
         // Power balance check
