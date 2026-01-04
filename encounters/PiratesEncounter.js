@@ -46,7 +46,13 @@ class PiratesEncounter extends FleetEncounter {
     showPlayerDefeatedByPiratesModal() {
         console.log('showPlayerDefeatedByPiratesModal');
         const {enemyFleet, fleet, disabledPlayerShips} = this
+        
+        const victoriousDialogue = this.getVictoriousDialogue()
+        
         let msg = `Unfortunately, you were no match for the ${coloredName(enemyFleet)}.<br/>`
+        if (victoriousDialogue) {
+            msg += `"${victoriousDialogue}"<br/>`
+        }
 
         if (disabledPlayerShips.length > 0) {
             msg += `${disabledPlayerShips.length} of your ships were disabled in the fighting.<br/>`
@@ -74,6 +80,10 @@ class PiratesEncounter extends FleetEncounter {
             }
         }
         if (gs.credits <= 10) {
+            const brokeDialogue = this.getPlayerBrokeDialogue()
+            if (brokeDialogue) {
+                msg += `"${brokeDialogue}"<br/>`
+            }
             msg += `They note with contempt that you have ${gs.credits == 0 ? 'no' : 'barely any'} credits to steal!<br/>`
         }
         else {

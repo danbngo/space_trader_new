@@ -27,9 +27,11 @@ class TaxCollectorsEncounter extends NeutralsEncounter {
         
         if (playerCredits === 0) {
             // No credits at all - send away with scorn
+            const brokeDialogue = this.getPlayerBrokeDialogue()
+            const dialogueMsg = brokeDialogue ? `"${brokeDialogue}"<br/><br/>` : ''
             showModal(
                 coloredName(this.fleet),
-                msg + '<br/><br/>You inform them you have no credits.<br/><br/>"Pathetic. You\'re not even worth the paperwork. Move along, pauper."',
+                msg + '<br/><br/>You inform them you have no credits.<br/><br/>' + dialogueMsg + '"Pathetic. You\'re not even worth the paperwork. Move along, pauper."',
                 [['Continue', ()=>this.endEncounter()]]
             )
         } else if (playerCredits < 100) {
@@ -86,7 +88,7 @@ class TaxCollectorsEncounter extends NeutralsEncounter {
         showModal(
             'Tax Evasion',
             msg,
-            [['Fight', ()=>this.enableCombat()]]
+            [['Fight', ()=>this.startCombat()]]
         )
     }
 }

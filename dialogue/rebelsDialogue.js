@@ -8,6 +8,9 @@ const DIALOGUE_REBELS_GREETING = [
     `We TRIED non-violence once. Didn't work out so well.`,
     `The revolution is coming!`,
     `And they call US criminals.`,
+    `Remember, remember! The cause of our endeavor!`,
+    `The more they tighten their grip, the more systems will slip through their fingers.`,
+    `I am a leaf on the wind. Watch how I soar.`,
 ]
 
 const DIALOGUE_REBELS_DEMAND_SURRENDER = [
@@ -23,5 +26,20 @@ const DIALOGUE_REBELS_FAMOUS = [
 
 const DIALOGUE_REBELS_INFAMOUS = [
     `I understand you. There are no wrong methods. Only wrong targets.`,
-    ``
+    `All the things you've done, the way you've built your fortune, it might make you a criminal. It don't make you an outlaw. I am the outlaw.`,
 ]
+
+const DIALOGUE_REBELS_SURRENDERING = [
+    `We'll never truly surrender! The cause lives on!`,
+]
+
+const DIALOGUE_REBELS_VICTORIOUS = [
+    `Freedom prevails!`,
+    `That's what happens when you side with tyrants!`,
+]
+
+const DIALOGUE_REBELS_PLAYER_DID_SURRENDER = [
+    `You made the right choice. The revolution is inevitable.`,
+]
+
+const DIALOGUE_REBELS_PLAYER_BROKE = []

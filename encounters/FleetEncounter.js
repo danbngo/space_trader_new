@@ -25,7 +25,7 @@ class FleetEncounter extends Encounter {
         const planet = this.planet
         const faction = this.fleet.factionType
         const reputationMultiplier = faction.reputationMultiplier
-        const reputation = ENCOUNTER_BASE_REPUTATION_EFFECT_ON_VICTORY * reputationMultiplier
+        const reputation = Math.ceil(ENCOUNTER_BASE_REPUTATION_EFFECT_ON_VICTORY * reputationMultiplier)
         const abandonedCargoCapacity = disabledEnemyShips.reduce( (total, ship) => {
             return total + ship.cargoSpace
         }, 0)
@@ -45,7 +45,12 @@ class FleetEncounter extends Encounter {
         // Award experience points based on enemy fleet strength
         const expGained = Math.round(AVERAGE_EXP_FROM_COMBAT * (enemyFleet.combatRating / this.playerFleet.combatRating))
 
+        const surrenderDialogue = this.getSurrenderingDialogue()
+        
         let msg = `You defeated the ${coloredName(enemyFleet)}!<br/>`
+        if (surrenderDialogue) {
+            msg += `"${surrenderDialogue}"<br/>`
+        }
         msg += gs.captain.grantExperience(expGained)
         if (reputation) {
             if (planet) msg += gs.captain.grantReputation(planet, reputation)

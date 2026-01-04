@@ -276,7 +276,7 @@ function calculateMaxFleetsForPlanet(planet) {
     }
 
     // a few types are more common, throwback to OG space trader
-    for (const ft of [FACTION_TYPES.MERCHANTS, FACTION_TYPES.POLICE, FACTION_TYPES.PIRATES, FACTION_TYPES.MINERS, FACTION_TYPES.SALVAGERS]) {
+    for (const ft of [FACTION_TYPES.MERCHANTS, FACTION_TYPES.POLICE, FACTION_TYPES.PIRATES, FACTION_TYPES.MINERS]) {
         maxNumFleetsPerFaction.multiply(ft, 3)
     }
     

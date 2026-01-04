@@ -7,8 +7,9 @@
  * Show the ad-hoc market menu for trading with a merchant fleet
  * @param {Fleet} merchantFleet - The merchant fleet to trade with
  * @param {Function} onClose - Callback when the market closes
+ * @param {Encounter} [encounter] - The encounter instance (optional, for dialogue)
  */
-function showAdHocMarketMenu(merchantFleet, onClose) {
+function showAdHocMarketMenu(merchantFleet, onClose, encounter = null) {
     const fleetName = coloredName(merchantFleet);
     const playerCaptain = gs.fleet.captain;
     const merchantCaptain = merchantFleet.captain;
@@ -54,7 +55,7 @@ function showAdHocMarketMenu(merchantFleet, onClose) {
         gs.credits -= totalCost;
         merchantCaptain.credits += totalCost;
         
-        showAdHocMarketMenu(merchantFleet, onClose);
+        showAdHocMarketMenu(merchantFleet, onClose, encounter);
     }
     
     // Sell cargo to merchant
@@ -67,7 +68,7 @@ function showAdHocMarketMenu(merchantFleet, onClose) {
         gs.credits += totalEarnings;
         merchantCaptain.credits -= totalEarnings;
         
-        showAdHocMarketMenu(merchantFleet, onClose);
+        showAdHocMarketMenu(merchantFleet, onClose, encounter);
     }
     
     // Show buy slider for selected cargo
@@ -85,7 +86,7 @@ function showAdHocMarketMenu(merchantFleet, onClose) {
                 ${playerCargoSpace <= 0 ? 'Your cargo hold is full.<br/>' : ''}
                 ${maxAffordable <= 0 ? 'You cannot afford any.<br/>' : ''}
                 ${merchantStock <= 0 ? 'Merchant has none in stock.<br/>' : ''}`,
-                [['OK', () => showAdHocMarketMenu(merchantFleet, onClose)]]);
+                [['OK', () => showAdHocMarketMenu(merchantFleet, onClose, encounter)]]);
             return;
         }
         
@@ -95,7 +96,7 @@ function showAdHocMarketMenu(merchantFleet, onClose) {
             (amt) => `Price: ${amt * buyPrice}CR<br/>Credits After: ${playerCredits - (amt * buyPrice)}CR`,
             'Buy', 'Cancel',
             (amt) => buyCargo(ct, amt),
-            () => showAdHocMarketMenu(merchantFleet, onClose)
+            () => showAdHocMarketMenu(merchantFleet, onClose, encounter)
         );
     }
     
@@ -114,7 +115,7 @@ function showAdHocMarketMenu(merchantFleet, onClose) {
                 ${playerStock <= 0 ? 'You have none.<br/>' : ''}
                 ${merchantCargoSpace <= 0 ? 'Merchant cargo hold is full.<br/>' : ''}
                 ${maxMerchantCanAfford <= 0 ? 'Merchant cannot afford any.<br/>' : ''}`,
-                [['OK', () => showAdHocMarketMenu(merchantFleet, onClose)]]);
+                [['OK', () => showAdHocMarketMenu(merchantFleet, onClose, encounter)]]);
             return;
         }
         
@@ -128,7 +129,7 @@ function showAdHocMarketMenu(merchantFleet, onClose) {
             },
             'Sell', 'Cancel',
             (amt) => sellCargo(ct, amt),
-            () => showAdHocMarketMenu(merchantFleet, onClose)
+            () => showAdHocMarketMenu(merchantFleet, onClose, encounter)
         );
     }
     

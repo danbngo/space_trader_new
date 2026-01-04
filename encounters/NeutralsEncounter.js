@@ -36,9 +36,14 @@ class NeutralsEncounter extends FleetEncounter {
         const {enemyFleet, disabledPlayerShips} = this
         const planet = this.planet
         const faction = this.fleet.factionType
-        const reputationShrink = ENCOUNTER_BASE_REPUTATION_SHRINK_ON_DEFEAT
+        const reputationShrink = Math.ceil(ENCOUNTER_BASE_REPUTATION_SHRINK_ON_DEFEAT)
+
+        const victoriousDialogue = this.getVictoriousDialogue()
 
         let msg = ''
+        if (victoriousDialogue) {
+            msg += `"${victoriousDialogue}"<br/>`
+        }
         msg += `The ${coloredName(enemyFleet)} seem shocked to have defeated you.<br/>`
         msg += `They quickly depart the scene in case there are other attackers nearby.<br/>`
 

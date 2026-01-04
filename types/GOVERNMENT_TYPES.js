@@ -81,8 +81,8 @@ const GT = {
     THEOCRACY: new GovernmentType(
         'Theocracy',
         COLORS.White,
-        [BUILDING_TYPES.CYBER_SURGEON, BUILDING_TYPES.CASINO],
-        'Rule by religious authority. Cybernetic enhancement and gambling forbidden.',
+        [BUILDING_TYPES.CYBER_SURGEON, BUILDING_TYPES.GENETICIST, BUILDING_TYPES.CASINO],
+        'Rule by religious authority. Cybernetic enhancement, genetic modification, and gambling forbidden.',
         [],
         [RELIGION_ATHEISM, RELIGION_AGNOSTICISM],
         {population: 1, culture: 1}

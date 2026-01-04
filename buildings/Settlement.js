@@ -16,13 +16,14 @@ class Settlement {
      * @param {Academy} params.academy - The academy building.
      * @param {Academy} params.tavern - The tavern building.
      * @param {CyberSurgeon} params.cyberSurgeon - The cyber surgeon building.
+     * @param {Geneticist} params.geneticist - The geneticist building.
      * @param {Palace} params.palace - The palace building.
      * @param {Temple} params.temple - The temple building.
      * @param {Armory} params.armory - The armory building.
      * @param {Outfitter} params.outfitter - The outfitter building.
      * @param {Casino} params.casino - The casino building.
      */
-    constructor({planet = new Planet(), settlementType = null, shipyard = null, market = null, blackMarket = null, guild = null, bank = null, courthouse = null, academy = null, tavern = null, cyberSurgeon = null, palace = null, temple = null, armory = null, outfitter = null, casino = null}) {
+    constructor({planet = new Planet(), settlementType = null, shipyard = null, market = null, blackMarket = null, guild = null, bank = null, courthouse = null, academy = null, tavern = null, cyberSurgeon = null, geneticist = null, palace = null, temple = null, armory = null, outfitter = null, casino = null}) {
         /** @type {Planet} */
         this.planet = planet;
         /** @type {SettlementType} */
@@ -45,6 +46,8 @@ class Settlement {
         this.tavern = tavern;
         /** @type {CyberSurgeon} */
         this.cyberSurgeon = cyberSurgeon;
+        /** @type {Geneticist} */
+        this.geneticist = geneticist;
         /** @type {Palace} */
         this.palace = palace;
         /** @type {Temple} */
@@ -57,7 +60,7 @@ class Settlement {
         this.casino = casino;
     }
     get buildings() {
-        return [this.academy, this.armory, this.bank, this.blackMarket, this.casino, this.courthouse, this.cyberSurgeon, this.guild, this.market, this.outfitter, this.palace, this.shipyard, this.tavern, this.temple]
+        return [this.academy, this.armory, this.bank, this.blackMarket, this.casino, this.courthouse, this.cyberSurgeon, this.geneticist, this.guild, this.market, this.outfitter, this.palace, this.shipyard, this.tavern, this.temple]
     }
     get damagableBuildings() {
         return this.buildings.filter(b=>(b.permitted && b.level > 0))

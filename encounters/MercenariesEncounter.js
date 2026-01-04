@@ -54,11 +54,11 @@ class MercenariesEncounter extends FleetEncounter {
     onVictory() {
         super.onVictory()
         // Defeating mercenaries improves your reputation with them (they respect strength)
-        const reputationChange = ENCOUNTER_BASE_REPUTATION_EFFECT_ON_VICTORY * FACTION_TYPES.MERCENARIES.reputationMultiplier
+        const reputationChange = Math.ceil(ENCOUNTER_BASE_REPUTATION_EFFECT_ON_VICTORY * FACTION_TYPES.MERCENARIES.reputationMultiplier)
         if (reputationChange) {
             gs.captain.grantReputation(FACTION_TYPES.MERCENARIES, reputationChange)
             if (this.planet) {
-                gs.captain.grantReputation(this.planet, reputationChange / 5)
+                gs.captain.grantReputation(this.planet, Math.ceil(reputationChange / 5))
             }
         }
     }
@@ -86,7 +86,7 @@ class MercenariesEncounter extends FleetEncounter {
         ])
         
         // Surrendering shrinks reputation toward 0
-        const reputationShrink = ENCOUNTER_BASE_REPUTATION_SHRINK_ON_SURRENDER / Math.abs(FACTION_TYPES.MERCENARIES.reputationMultiplier || 1)
+        const reputationShrink = Math.ceil(ENCOUNTER_BASE_REPUTATION_SHRINK_ON_SURRENDER / Math.abs(FACTION_TYPES.MERCENARIES.reputationMultiplier || 1))
         if (reputationShrink) {
             const currentRep = gs.captain.reputation.getAmount(FACTION_TYPES.MERCENARIES)
             gs.captain.grantReputation(FACTION_TYPES.MERCENARIES, currentRep > 0 ? -reputationShrink : reputationShrink)

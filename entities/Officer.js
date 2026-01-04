@@ -89,9 +89,11 @@ class Officer {
      * @returns {string} Message describing the reputation change.
      */
     grantReputation(target, amount = 1) {
-        this.reputation.increment(target, amount);
+        // Round amount to ensure no fractional reputation values
+        const roundedAmount = Math.round(amount);
+        this.reputation.increment(target, roundedAmount);
         const targetName = target.name ? coloredName(target) : (target instanceof FactionType ? `${target.symbol} ${colorSpan(target.name, target.color)}` : target);
-        return colorSpan(`You ${amount >= 0 ? 'gained' : 'lost'} ${Math.abs(amount)} reputation with ${targetName}.<br/>`, amount >= 0 ? COLORS.LightGreen : COLORS.LightRed);
+        return colorSpan(`You ${roundedAmount >= 0 ? 'gained' : 'lost'} ${Math.abs(roundedAmount)} reputation with ${targetName}.<br/>`, roundedAmount >= 0 ? COLORS.LightGreen : COLORS.LightRed);
     }
 
     /**

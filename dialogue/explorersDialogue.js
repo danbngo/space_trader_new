@@ -5,9 +5,12 @@ const DIALOGUE_EXPLORERS_GREETING = [
     `Who's your favorite explorer, and why is it me?`,
     `I'm kind of a big deal in exploration circles.`,
     `No time for autographs, I'm afraid. I'm off to chart the unchartable.`,
-    `It belongs in a museum! Just kidding, I'm taking it with me!`,
-    `I don't know. I'm making it up as I go.`,
+    `It belongs in a museum!`,
     `My god, it's full of stars!`,
+    `Space: the final frontier.`,
+    `To boldly go where no one has gone before!`,
+    `Fortune and glory, kid. Fortune and glory.`,
+    `I've seen things you people wouldn't believe.`,
 ]
 
 const DIALOGUE_EXPLORERS_FAMOUS = [
@@ -24,3 +27,15 @@ const DIALOGUE_EXPLORERS_INFAMOUS = [
     `We do what it takes in our line of work, eh?`,
     `Rules are made to be broken, eh?`,
 ]
+
+const DIALOGUE_EXPLORERS_SURRENDERING = [
+    `Okay, okay! I surrender! I've got research data to protect!`,
+]
+
+const DIALOGUE_EXPLORERS_VICTORIOUS = []
+
+const DIALOGUE_EXPLORERS_PLAYER_DID_SURRENDER = [
+    `Fascinating combat technique you employed there. Or lack thereof.`,
+]
+
+const DIALOGUE_EXPLORERS_PLAYER_BROKE = []

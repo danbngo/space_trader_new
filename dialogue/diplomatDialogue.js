@@ -17,3 +17,16 @@ const DIALOGUE_DIPLOMAT_FAMOUS = [
 
 const DIALOGUE_DIPLOMAT_INFAMOUS = [
 ]
+
+const DIALOGUE_DIPLOMAT_SURRENDERING = [
+    `This is outrageous! My government will hear about this!`,
+    `Do you have ANY idea who I am?!`,
+]
+
+const DIALOGUE_DIPLOMAT_VICTORIOUS = []
+
+const DIALOGUE_DIPLOMAT_PLAYER_DID_SURRENDER = [
+    `As it should be. We'll discuss reparations.`,
+]
+
+const DIALOGUE_DIPLOMAT_PLAYER_BROKE = []

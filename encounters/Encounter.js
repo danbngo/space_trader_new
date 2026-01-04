@@ -570,7 +570,7 @@ class Encounter {
         const planet = this.planet
         const faction = this.fleet.factionType
         const reputationMultiplier = faction.reputationMultiplier
-        const reputation = ENCOUNTER_BASE_REPUTATION_EFFECT_ON_NO_SURRENDER * reputationMultiplier
+        const reputation = Math.ceil(ENCOUNTER_BASE_REPUTATION_EFFECT_ON_NO_SURRENDER * reputationMultiplier)
         const bounty = reputationMultiplier > 0 ? ENCOUNTER_BASE_FINE_ON_ATTACK * reputationMultiplier : 0
         
         let msg = `You refuse to submit to the ${fleetName} demands, and the battle is joined!<br/>`
@@ -590,9 +590,14 @@ class Encounter {
         const planet = this.planet
         const faction = this.fleet.factionType
         const reputationMultiplier = faction.reputationMultiplier
-        const reputationShrink = ENCOUNTER_BASE_REPUTATION_SHRINK_ON_SURRENDER / Math.abs(reputationMultiplier || 1)
+        const reputationShrink = Math.ceil(ENCOUNTER_BASE_REPUTATION_SHRINK_ON_SURRENDER / Math.abs(reputationMultiplier || 1))
+
+        const surrenderDialogue = this.getPlayerDidSurrenderDialogue()
 
         let msg = `There's no other choice. You power your ships down and broadcast the universal signal for surrender.<br/>`
+        if (surrenderDialogue) {
+            msg += `"${surrenderDialogue}"<br/>`
+        }
         if (reputationShrink) {
             if (planet) msg += gs.captain.grantReputation(planet, gs.captain.reputation.getAmount(planet) > 0 ? -reputationShrink : reputationShrink)
             if (faction) msg += gs.captain.grantReputation(faction, gs.captain.reputation.getAmount(faction) > 0 ? -reputationShrink : reputationShrink)
@@ -609,7 +614,7 @@ class Encounter {
         const planet = this.planet
         const faction = this.fleet.factionType
         const reputationMultiplier = faction.reputationMultiplier
-        const reputation = ENCOUNTER_BASE_REPUTATION_EFFECT_ON_ATTACK * reputationMultiplier
+        const reputation = Math.ceil(ENCOUNTER_BASE_REPUTATION_EFFECT_ON_ATTACK * reputationMultiplier)
         const bounty = reputationMultiplier > 0 ? ENCOUNTER_BASE_FINE_ON_ATTACK * reputationMultiplier : 0
 
         if (playerUndetected) {
@@ -630,5 +635,124 @@ class Encounter {
         showModal(fleetName, msg, [['Continue', ()=>{
             this.startCombat()
         }]])
+    }
+
+    /**
+     * Get a random dialogue string from an array, evaluating functions if needed
+     * @param {(string|Function)[]} dialogueArray - Array of dialogue strings or functions
+     * @returns {string} A random dialogue string
+     */
+    getRandomDialogue(dialogueArray) {
+        if (!dialogueArray || dialogueArray.length === 0) return ''
+        const dialogue = rndMember(dialogueArray)
+        return typeof dialogue === 'function' ? dialogue() : dialogue
+    }
+
+    /**
+     * Get greeting dialogue based on player's fame/infamy
+     * @returns {string} Greeting dialogue
+     */
+    getGreetingDialogue() {
+        const factionName = this.fleet.factionType?.name?.toUpperCase().replace(/\s+/g, '_') || ''
+        
+        // Check for famous/infamous specific dialogue first
+        if (this.planet) {
+            if (FameLevel.hasFameLevel(gs.captain, this.planet, FAME_LEVELS.FAMOUS)) {
+                const famousArray = window[`DIALOGUE_${factionName}_FAMOUS`]
+                if (famousArray && famousArray.length > 0) {
+                    return this.getRandomDialogue(famousArray)
+                }
+            }
+            if (FameLevel.hasInfamyLevel(gs.captain, this.planet, INFAMY_LEVELS.INFAMOUS)) {
+                const infamousArray = window[`DIALOGUE_${factionName}_INFAMOUS`]
+                if (infamousArray && infamousArray.length > 0) {
+                    return this.getRandomDialogue(infamousArray)
+                }
+            }
+        }
+        
+        // Fall back to regular greeting
+        const greetingArray = window[`DIALOGUE_${factionName}_GREETING`]
+        return this.getRandomDialogue(greetingArray)
+    }
+
+    /**
+     * Get demand surrender dialogue
+     * @returns {string} Surrender demand dialogue
+     */
+    getDemandSurrenderDialogue() {
+        const factionName = this.fleet.factionType?.name?.toUpperCase().replace(/\s+/g, '_') || ''
+        const demandArray = window[`DIALOGUE_${factionName}_DEMAND_SURRENDER`]
+        return this.getRandomDialogue(demandArray)
+    }
+
+    /**
+     * Get offer trade dialogue
+     * @returns {string} Trade offer dialogue
+     */
+    getOfferTradeDialogue() {
+        const factionName = this.fleet.factionType?.name?.toUpperCase().replace(/\s+/g, '_') || ''
+        const offerArray = window[`DIALOGUE_${factionName}_OFFER_TRADE`]
+        return this.getRandomDialogue(offerArray)
+    }
+
+    /**
+     * Get buy transaction dialogue (player selling to NPC)
+     * @returns {string} Buy dialogue
+     */
+    getBuyDialogue() {
+        const factionName = this.fleet.factionType?.name?.toUpperCase().replace(/\s+/g, '_') || ''
+        const buyArray = window[`DIALOGUE_${factionName}_BUY`]
+        return this.getRandomDialogue(buyArray)
+    }
+
+    /**
+     * Get sell transaction dialogue (NPC selling to player)
+     * @returns {string} Sell dialogue
+     */
+    getSellDialogue() {
+        const factionName = this.fleet.factionType?.name?.toUpperCase().replace(/\s+/g, '_') || ''
+        const sellArray = window[`DIALOGUE_${factionName}_SELL`]
+        return this.getRandomDialogue(sellArray)
+    }
+
+    /**
+     * Get surrendering dialogue (when enemy surrenders)
+     * @returns {string} Surrendering dialogue
+     */
+    getSurrenderingDialogue() {
+        const factionName = this.fleet.factionType?.name?.toUpperCase().replace(/\s+/g, '_') || ''
+        const surrenderArray = window[`DIALOGUE_${factionName}_SURRENDERING`]
+        return this.getRandomDialogue(surrenderArray)
+    }
+
+    /**
+     * Get victorious dialogue (when enemy wins)
+     * @returns {string} Victorious dialogue
+     */
+    getVictoriousDialogue() {
+        const factionName = this.fleet.factionType?.name?.toUpperCase().replace(/\s+/g, '_') || ''
+        const victoriousArray = window[`DIALOGUE_${factionName}_VICTORIOUS`]
+        return this.getRandomDialogue(victoriousArray)
+    }
+
+    /**
+     * Get dialogue when player surrenders
+     * @returns {string} Player surrendered dialogue
+     */
+    getPlayerDidSurrenderDialogue() {
+        const factionName = this.fleet.factionType?.name?.toUpperCase().replace(/\s+/g, '_') || ''
+        const surrenderedArray = window[`DIALOGUE_${factionName}_PLAYER_DID_SURRENDER`]
+        return this.getRandomDialogue(surrenderedArray)
+    }
+
+    /**
+     * Get dialogue when player can't pay/is broke
+     * @returns {string} Player broke dialogue
+     */
+    getPlayerBrokeDialogue() {
+        const factionName = this.fleet.factionType?.name?.toUpperCase().replace(/\s+/g, '_') || ''
+        const brokeArray = window[`DIALOGUE_${factionName}_PLAYER_BROKE`]
+        return this.getRandomDialogue(brokeArray)
     }
 }
