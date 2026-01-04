@@ -272,6 +272,30 @@ class Fleet extends SpaceObject {
         return this.officers.filter(callback);
     }
 
+    /**
+     * Calculate price multiplier when trading with another fleet based on barter skill comparison.
+     * Uses 50-point intervals: if their barter is 50 and ours is 1, they get 2x advantage.
+     * @param {Fleet} otherFleet - The other fleet to compare barter skills with.
+     * @param {boolean} isBuying - True if this fleet is buying, false if selling.
+     * @returns {number} Price multiplier (1.0 = base price, >1.0 = worse deal, <1.0 = better deal).
+     */
+    calcBarterPriceMultiplier(otherFleet, isBuying) {
+        const myBarter = this.totalSkills.getAmount(SKILLS.Barter) || 0;
+        const theirBarter = otherFleet.totalSkills.getAmount(SKILLS.Barter) || 0;
+        
+        // Calculate ratio based on 50-point intervals
+        // (1 + theirBarter/50) / (1 + myBarter/50)
+        const skillRatio = (1 + theirBarter / 50) / (1 + myBarter / 50);
+        
+        if (isBuying) {
+            // When buying: higher ratio = higher price (worse for us)
+            return skillRatio;
+        } else {
+            // When selling: higher ratio = lower price (worse for us)
+            return 1.0 / skillRatio;
+        }
+    }
+
     get activeShips() {
         return this.ships.filter(s=>!s.disabled && !s.escaped)
     }

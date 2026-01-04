@@ -14,7 +14,7 @@ class MerchantsEncounter extends MercantileEncounter {
         else if (Math.random() > .5) {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} eagerly invite you to trade. They claim to have the best prices in the sector!`, [
                 //['View', ()=>closeModal()],
-                ['Trade', ()=>this.showTradeOfferModal()],
+                ['Trade', ()=>showAdHocMarketMenu(this.fleet, ()=>this.endEncounter())],
                 ['Ignore', ()=>this.endEncounter()],
                 ['Attack', ()=>this.showPlayerAttackNeutralsModal()],
             ])

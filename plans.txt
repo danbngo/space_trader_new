@@ -1,13 +1,13 @@
 DONE:
 -cant shoot under debris, little too punishing for asteroids. instead make it higher miss chance
-
+-when ships fight each other there should be an 'abandoned ship' after which salvagers wanna move to
 
 
 TODO:
-
+-we need to tweak and test the hell out of encounters, they've been largely just 'assumed to work' so far and most need 
+better/more interesting content
 -asteroids change shape when i miss them!!??
 
--when ships fight each other there should be an 'abandoned ship' after which salvagers wanna move to
  -these can trigger the abandoned ship encounter
 -make ruins and anomalies interactive
 -make the encounters more fleshed out especially for the newer ones
@@ -36,6 +36,7 @@ give officers and ships perks - not just boring levelups
 
 
 PROBABLY NOT ANY TIME SOON
+more interesting dialogue during encounters
 unique ships
 -what happens if player reaches the end of the map? we dont really need to do anything but might be cool.
 - tutorial?

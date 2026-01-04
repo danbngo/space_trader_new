@@ -8,9 +8,9 @@
  * Colonists are peaceful settlers traveling to establish new colonies.
  * They prefer to avoid conflict and will flee if threatened.
  * @class ColonistsEncounter
- * @extends NeutralsEncounter
+ * @extends MercantileEncounter
  */
-class ColonistsEncounter extends NeutralsEncounter {
+class ColonistsEncounter extends MercantileEncounter {
     /**
      * Called when the encounter starts.
      * Colonists will try to avoid the player or flee if the player has high infamy.
@@ -23,6 +23,12 @@ class ColonistsEncounter extends NeutralsEncounter {
                 ['Ignore', ()=>this.endEncounter()],
                 ['Attack', ()=>this.showPlayerAttackNeutralsModal()],
             ])
+        }
+        else if (Math.random() > .5) {
+            // Colonists want to buy supplies (food, water, medicine, weapons)
+            const supplyTypes = [CARGO_TYPES.FOOD, CARGO_TYPES.WATER, CARGO_TYPES.MEDICINE, CARGO_TYPES.WEAPONS];
+            this.showTradeOfferModal(true, null, supplyTypes);
+            return;
         }
         else {
             showModal(coloredName(this.fleet), 'The colonists send a friendly greeting and wave as they continue on their journey.', [

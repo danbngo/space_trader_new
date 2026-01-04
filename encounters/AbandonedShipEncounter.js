@@ -12,65 +12,12 @@ class AbandonedShipEncounter extends PiratesEncounter {
         msg += `Your scanners detect cargo aboard. Do you want to investigate?<br/>`
         
         showModal('Abandoned Ship', msg, [
-            ['Loot', ()=>this.attemptLoot()],
+            ['Loot', ()=>this.successfulLoot()],
             ['Leave', ()=>this.endEncounter()]
         ])
     }
 
-    attemptLoot() {
-        // 50% chance of ambush (pirates or slavers)
-        if (Math.random() < 0.5) {
-            this.ambush()
-        } else {
-            this.successfulLoot()
-        }
-    }
-
-    ambush() {
-        // 50/50 chance of pirates or slavers
-        const isPirates = Math.random() < 0.5
-        const fleetType = isPirates ? FLEET_TYPES.PIRATES : FLEET_TYPES.SLAVERS
-        const factionType = isPirates ? FACTION_TYPES.PIRATES : FACTION_TYPES.SLAVERS
-        const ambushFleet = generateFleet(fleetType, factionType, this.planet)
-        
-        // Position enemy ships using PlayerEncircled formation (they surround the player)
-        const maxSpawnDistance = this.mapRadius * ENCOUNTER_SHIP_MAX_SPAWN_DISTANCE_RATIO
-        const angleStep = (Math.PI * 2) / ambushFleet.ships.length
-        
-        ambushFleet.ships.forEach((ship, i) => {
-            ship.aiType = AI_TYPES.Ship
-            
-            // Position in circle around center (encircling player)
-            const angle = angleStep * i
-            const [x, y] = rotatePoint(maxSpawnDistance, 0, 0, 0, angle)
-            Object.assign(ship, {x, y, color: this.encounterType.enemyColor})
-            
-            // Face towards center
-            const targetAngle = new Path(ship.x, ship.y, 0, 0).angle
-            ship.angle = targetAngle
-            
-            // Give every ship a cloak module and start cloaked
-            ship.modules.push(new ShipModule(SHIP_MODULE_TYPES.CLOAK, 1))
-            ship.statusEffects.setAmount(STATUS_EFFECTS.CLOAKED, 5)
-            
-            this.fleet.addShip(ship)
-        })
-        
-        // Update encounter fleet captain to ambusher captain
-        this.fleet.captain = ambushFleet.captain
-        
-        const ambusherName = isPirates ? 'Pirates' : 'Slavers'
-        let msg = `It's a trap! ${ambusherName} decloak from all around you!<br/>`
-        msg += `${ambushFleet.ships.length} ${ambusherName.toLowerCase()} ships appear and move to attack!<br/>`
-        
-        showModal(`${ambusherName} Ambush!`, msg, [
-            ['Fight', ()=>this.startCombat(false)]
-        ])
-    }
-
     successfulLoot() {
-        const abandonedShip = this.fleet.ships[0]
-        
         // Calculate loot from the abandoned ship
         const cargoRatio = 1 // All cargo is available
         const maxLootAmt = Math.ceil(this.fleet.cargo.total * cargoRatio)
@@ -103,8 +50,7 @@ class AbandonedShipEncounter extends PiratesEncounter {
     }
 
     onVictory() {
-        // After defeating pirates, allow looting both pirate ships and abandoned ship
-        this.showPlayerDefeatedEnemyModal()
+        this.successfulLoot()
     }
 
     onDefeat() {
