@@ -1,4 +1,12 @@
 
+/**
+ * @param {Planet} planet 
+ * @param {string} title 
+ * @param {string|HTMLElement} msg 
+ * @param {ButtonData[]} options 
+ * @param {string} modalId 
+ * @param {(nextPlanet: Planet) => void} onNavigate 
+ */
 function showPlanetModal(planet = new Planet(), title = '', msg = '', options = [], modalId = '', onNavigate = (nextPlanet)=>{}) {
     // Create title with navigation arrows
     // Navigate within same planet type (dwarf, regular, or moons)
@@ -56,5 +64,5 @@ function showPlanetModal(planet = new Planet(), title = '', msg = '', options = 
     });
 
     const modal = showModal(titleEl, msg, options, modalId, ()=>closeModal());
-    modal.firstChild.style.minWidth = '90vw'
+    //modal.firstChildE.style.minWidth = '90vw'
 }

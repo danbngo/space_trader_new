@@ -29,6 +29,7 @@ function removeChildren(parent = ce()) {
 function refreshPanelButtons (panelId = '', buttons) {
     const panel = (panelId instanceof HTMLElement) ? panelId : document.body.querySelector(`#${panelId}`)
     if (!panel) throw new Error(`Panel with id '${panelId}' not found for refreshPanelButtons`);
+    /** @type {HTMLElement} */
     const buttonsEl = panel.querySelector(".panel-buttons")
     removeChildren(buttonsEl)
     if (buttons) buttons.forEach((btnData, index) => {
@@ -156,6 +157,7 @@ function showSliderModal(min = 0, max = 10, title = '', description = '', footer
     };
     slider.disabled = (min >= max)
 
+    /** @type {ButtonData[]} */
     const buttons = [
         [acceptLabel, () => {
             closeModal()
@@ -262,7 +264,7 @@ function rgbArrayToString(color = [255, 255, 255, 1.0]) {
 /** 
  * Creates a colored span HTML string.
  * @function colorSpan
- * @param {string} text - The text to display
+ * @param {string|number} text - The text to display
  * @param {string | Array<number>} color - CSS color string or RGB(A) array
  * @returns {string} HTML string with colored span
  */
@@ -333,12 +335,12 @@ function applyStyle(element, style = {}) {
 /**
  * Creates a table element from a 2D array of data.
  * @function createTable
- * @param {any[][]} rows - 2D array representing table rows and cells
+ * @param {(HTMLElement|string|number|any)[][]} rows - 2D array representing table rows and cells
  * @param {((rowIndex: number) => void)|null} onSelectRow - Callback when a row is selected (pass null for no selection)
  * @param {number|null} firstSelectedIndex - Index of the row to be initially selected
  * @returns {HTMLTableElement} - The created table element
  */
-function createTable(rows = [ce()], onSelectRow = null, firstSelectedIndex = onSelectRow ? 0 : null) {
+function createTable(rows = [[ce()]], onSelectRow = null, firstSelectedIndex = onSelectRow ? 0 : null) {
     const table = document.createElement("table");
     table.className = "ui-table";
 
@@ -388,7 +390,7 @@ let currentModal = ce()
 /**
  * Shows a modal dialog with title, content, and buttons.
  * @param {string | HTMLElement} title - The modal title
- * @param {string | HTMLElement | Element} text - The modal content
+ * @param {string | HTMLElement} text - The modal content
  * @param {(ButtonData|HTMLElement)[]} buttons - Array of button data or HTML elements
  * @param {string} id - The ID to assign to the modal
  * @param {Function|null} onClosePanel - Optional callback when close button is clicked
@@ -429,7 +431,7 @@ function attachDragHandler(element = ce(), callback = (dx=0,dy=0)=>{}) {
     let lastX = 0;
     let lastY = 0;
 
-    element.addEventListener("mousedown", (ev) => {
+    if (element instanceof HTMLElement) element.addEventListener("mousedown", (ev) => {
         if (ev.button !== 0) return; // left mouse only
 
         isDown = true;

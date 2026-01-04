@@ -25,6 +25,7 @@ function showPlanetDemographicsMenu(planet = new Planet()) {
         const sortedRaces = Array.from(civilization.races.counts.entries())
             .sort((a, b) => b[1] - a[1])
         
+        /** @type {Array<[string, string|HTMLElement]>} */
         const raceRows = [['Race', '% of Population']]
         for (const [race, proportion] of sortedRaces) {
             const percentage = (proportion * 100).toFixed(1)
@@ -36,7 +37,7 @@ function showPlanetDemographicsMenu(planet = new Planet()) {
         }
         racialDemographicsSection.appendChild(createTable(raceRows))
     } else {
-        racialDemographicsSection.appendChild('(No demographic data available)')
+        racialDemographicsSection.appendChild(ce({innerHTML:'(No demographic data available)'}))
     }
     
     // Religious Demographics
@@ -52,6 +53,8 @@ function showPlanetDemographicsMenu(planet = new Planet()) {
             .sort((a, b) => b[1] - a[1])
         
             console.log('sortedReligions:',sortedReligions)
+
+        /** @type {Array<[string, string|HTMLElement]>} */
         const religionRows = [['Religion', '% of Population']]
         for (const [religion, proportion] of sortedReligions) {
             const percentage = (proportion * 100).toFixed(1)

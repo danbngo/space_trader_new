@@ -43,6 +43,7 @@ function showGeneticistBuyMenu(geneticist = new Geneticist()) {
         const hasOfficer = fleet.officers.length > 0 || gs.captain
         
         const canBuy = canAfford && hasOfficer && isDocked
+        /** @type {ButtonData[]} */
         const buttons = [
             [`Buy & Apply`, ()=>showGeneticistApplyModificationMenu(geneticist, modification), !canBuy],
             ["Back", () => leave()],
@@ -112,6 +113,7 @@ function showGeneticistApplyModificationMenu(geneticist = new Geneticist(), modi
         const alreadyHasModification = officer.geneticModifications.some(m => m.modificationType === modification.modificationType)
         const canApply = !alreadyHasModification && gs.credits >= buyPrice
         
+        /** @type {ButtonData[]} */
         const buttons = [
             ['Buy & Apply', () => buyModification(modification, officer), !canApply],
             ['Cancel', () => showGeneticistBuyMenu(geneticist)],

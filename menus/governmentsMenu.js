@@ -170,6 +170,7 @@ function createPolicyAdoptionTable(civilizedPlanets) {
         // Sort by count descending
         usedPolicies.sort((a, b) => policyCounts.get(b) - policyCounts.get(a))
 
+        /** @type {Array<[string, string|HTMLElement]>} */
         const tableRows = [
             ['Policy', 'Governments']
         ]

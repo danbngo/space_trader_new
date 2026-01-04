@@ -3,10 +3,11 @@
  * @param {Ship[]} ships - Array of ships to display.
  * @param {(ship: Ship) => void} onSelectShip - Callback when a ship is selected.
  * @param {Ship|null} selectedShip - Currently selected ship to highlight.
- * @returns {HTMLTableElement|string} The ships table or "(None)" if no ships.
+ * @returns {HTMLElement} The ships table or "(None)" if no ships.
  */
 function createShipsListMenu(ships = [new Ship()], onSelectShip = (s = new Ship())=>{}, selectedShip = null) {
-    if (ships.length == 0) return `(None)`
+    if (ships.length == 0) return ce({innerHTML: `(None)`})
+    /** @type {Array<(string|HTMLElement)[]>} */
     const rows = [
         ['Name', 'Pilot', 'Lasers', 'Engine', 'Cargo', 'Shields', 'Hull']
     ]
@@ -132,6 +133,7 @@ function showShipsMenu(ships = [...gs.fleet.ships], selectedShip = null) {
 
     const columnLayout = createColumnLayout([leftColumn, rightColumn])
 
+    /** @type {ButtonData[]} */
     const buttons = selectedShip ? [
         ['Dump', ()=>showDumpShipModal(selectedShip), gs.fleet.ships.length < 2],
         ["Close", () => closeModal()],

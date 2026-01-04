@@ -6,6 +6,7 @@
  */
 function createOfficersTable(officers = [new Officer()], onSelectOfficer = (officer = new Officer())=>{}) {
     if (officers.length == 0) return colorSpan('(No officers hired yet)', COLORS.Gray)
+    /** @type {(HTMLElement|string|number|SkillType)[][]} */
     const rows = [
         ['Name', 'Age', 'Race', 'Religion', 'Piloting', 'Level', 'CR Share', ...SKILLS_ALL]
     ]
@@ -177,6 +178,7 @@ function showOfficersMenu(officers = gs.fleet.officers.filter(o => o !== gs.capt
         selectedOfficer = officer
         const isCaptain = officer === gs.captain
         const notEnoughPilots = gs.fleet.numPilots <= gs.fleet.ships.length
+        /** @type {ButtonData[]} */
         const buttons = [
             ['Equipment', () => showEquipmentMenu(officer)],
             ['Fire', ()=>showFireOfficerModal(officer), isCaptain || notEnoughPilots],
