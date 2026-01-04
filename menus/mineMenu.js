@@ -16,7 +16,7 @@ function checkNearbyAsteroid() {
     const nearbyAsteroids = []
     for (const asteroid of asteroids) {
         const distance = calcDistance(playerFleet.x, playerFleet.y, asteroid.x, asteroid.y)
-        if (distance < FLEET_COLLISION_DISTANCE) {
+        if (distance < ASTEROID_MINING_DISTANCE) {
             nearbyAsteroids.push({asteroid, distance})
         }
     }

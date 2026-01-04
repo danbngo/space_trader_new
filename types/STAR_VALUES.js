@@ -42,7 +42,12 @@ class StarValue {
  * @extends StarValue
  * @classdesc Represents the metallicity (heavy element content) of a star.
  */
-class StarMetallicity extends StarValue {}
+class StarMetallicity extends StarValue {
+    constructor(name, value, solValue, weight = 1.0) {
+        super(name, value, solValue)
+        this.weight = weight
+    }
+}
 
 /**
  * @class StarAge
@@ -60,16 +65,16 @@ class StarLuminosity extends StarValue {}
 
 // Metallicity Levels (Z/Z_sol where Z_sol = 0.0134 mass fraction)
 const STAR_METALLICITY_LEVELS = Object.freeze({
-    ULTRA_POOR: new StarMetallicity("Ultra Metal-Poor", 0.001, 1),      // 0.001x solar
-    EXTREMELY_POOR: new StarMetallicity("Extremely Metal-Poor", 0.01, 1), // 0.01x solar
-    VERY_POOR: new StarMetallicity("Very Metal-Poor", 0.1, 1),          // 0.1x solar
-    POOR: new StarMetallicity("Metal-Poor", 0.5, 1),                    // 0.5x solar
-    SLIGHTLY_POOR: new StarMetallicity("Slightly Metal-Poor", 0.75, 1), // 0.75x solar
-    SOLAR: new StarMetallicity("Solar Metallicity", 1.0, 1),            // 1.0x solar (Sol)
-    SLIGHTLY_RICH: new StarMetallicity("Slightly Metal-Rich", 1.33, 1), // 1.33x solar
-    RICH: new StarMetallicity("Metal-Rich", 2.0, 1),                    // 2x solar
-    VERY_RICH: new StarMetallicity("Very Metal-Rich", 3.0, 1),          // 3x solar
-    EXTREMELY_RICH: new StarMetallicity("Extremely Metal-Rich", 5.0, 1), // 5x solar
+    ULTRA_POOR: new StarMetallicity("Ultra Metal-Poor", 0.001, 1, 0.05),      // 0.001x solar
+    EXTREMELY_POOR: new StarMetallicity("Extremely Metal-Poor", 0.01, 1, 0.10), // 0.01x solar
+    VERY_POOR: new StarMetallicity("Very Metal-Poor", 0.1, 1, 0.10),          // 0.1x solar
+    POOR: new StarMetallicity("Metal-Poor", 0.5, 1, 0.10),                    // 0.5x solar
+    SLIGHTLY_POOR: new StarMetallicity("Slightly Metal-Poor", 0.75, 1, 0.15), // 0.75x solar
+    SOLAR: new StarMetallicity("Solar Metallicity", 1.0, 1, 0.20),            // 1.0x solar (Sol)
+    SLIGHTLY_RICH: new StarMetallicity("Slightly Metal-Rich", 1.33, 1, 0.15), // 1.33x solar
+    RICH: new StarMetallicity("Metal-Rich", 2.0, 1, 0.10),                    // 2x solar
+    VERY_RICH: new StarMetallicity("Very Metal-Rich", 3.0, 1, 0.10),          // 3x solar
+    EXTREMELY_RICH: new StarMetallicity("Extremely Metal-Rich", 5.0, 1, 0.05), // 5x solar
 })
 
 const STAR_METALLICITY_LEVELS_ALL = Object.values(STAR_METALLICITY_LEVELS)

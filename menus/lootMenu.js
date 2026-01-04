@@ -48,6 +48,7 @@ function showLootMenu(loot = new CountsMap()) {
                 `
             },
             'Take', 'Cancel', (amt = 0)=>takeCargo(ct, amt), ()=>reloadMenu(),
+            [['Take All', ()=>takeCargo(ct, takeableAmount)]]
         )
     }
 
@@ -77,6 +78,20 @@ function showLootMenu(loot = new CountsMap()) {
         refreshPanelButtons('loot_panel', buttons)
     }
 
+    function takeAllLoot() {
+        let availableSpace = fleet.availableCargoSpace
+        for (const ct of CARGO_TYPES_ALL) {
+            const lootAmount = loot.getAmount(ct)
+            if (lootAmount > 0 && availableSpace > 0) {
+                const amountToTake = Math.min(lootAmount, availableSpace)
+                fleet.cargo.increment(ct, amountToTake)
+                loot.increment(ct, -amountToTake)
+                availableSpace -= amountToTake
+            }
+        }
+        reloadMenu()
+    }
+
     let infoContainer = ce({
         children: [
             createLootCargoTable(fleet.cargo, loot, onSelectCargoType),
@@ -87,7 +102,10 @@ function showLootMenu(loot = new CountsMap()) {
     showModal(
         `Loot Cargo`,
         infoContainer,
-        [['Continue', ()=>gs.encounter.endEncounter()]],
+        [
+            ['Take All', ()=>takeAllLoot(), fleet.availableCargoSpace == 0 || loot.total == 0],
+            ['Continue', ()=>gs.encounter.endEncounter()]
+        ],
         'loot_panel'
     );
 }

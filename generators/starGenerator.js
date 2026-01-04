@@ -15,17 +15,9 @@
 function generateStar(name = "Unnamed", starType = null, x = 0, y = 0, orbit = null) {
     // If no star type provided, select from main sequence (weighted toward common types)
     if (!starType) {
-        const weights = [
-            0.00003, // O-type (very rare)
-            0.13,    // B-type (rare)
-            0.6,     // A-type (uncommon)
-            3,       // F-type (common)
-            7.6,     // G-type (common, like Sol)
-            12.1,    // K-type (very common)
-            76.45,   // M-type (most common)
-            0.15,    // Red dwarf (subset of M, very common)
-        ]
-        starType = weightedRandomMember(MAIN_SEQUENCE_STAR_TYPES, weights)
+        const weights = MAIN_SEQUENCE_STAR_TYPES.map(st => st.weight)
+        const index = rndIndexWeighted(weights)
+        starType = MAIN_SEQUENCE_STAR_TYPES[index]
     }
     
     // Generate radius within type's range (in solar radii, then convert to AU)
@@ -39,40 +31,23 @@ function generateStar(name = "Unnamed", starType = null, x = 0, y = 0, orbit = n
     const temperatureKelvin = starType.minTemp + Math.random() * (starType.maxTemp - starType.minTemp)
     
     // Generate metallicity
-    let metallicity = null
-    const metallicityRoll = Math.random()
-    if (metallicityRoll < 0.05) {
-        metallicity = rndMember([STAR_METALLICITY_LEVELS.ULTRA_POOR, STAR_METALLICITY_LEVELS.EXTREMELY_POOR])
-    } else if (metallicityRoll < 0.15) {
-        metallicity = STAR_METALLICITY_LEVELS.VERY_POOR
-    } else if (metallicityRoll < 0.25) {
-        metallicity = STAR_METALLICITY_LEVELS.POOR
-    } else if (metallicityRoll < 0.40) {
-        metallicity = STAR_METALLICITY_LEVELS.SLIGHTLY_POOR
-    } else if (metallicityRoll < 0.60) {
-        metallicity = STAR_METALLICITY_LEVELS.SOLAR
-    } else if (metallicityRoll < 0.75) {
-        metallicity = STAR_METALLICITY_LEVELS.SLIGHTLY_RICH
-    } else if (metallicityRoll < 0.85) {
-        metallicity = STAR_METALLICITY_LEVELS.RICH
-    } else if (metallicityRoll < 0.95) {
-        metallicity = STAR_METALLICITY_LEVELS.VERY_RICH
-    } else {
-        metallicity = STAR_METALLICITY_LEVELS.EXTREMELY_RICH
-    }
+    const metallicityWeights = STAR_METALLICITY_LEVELS_ALL.map(m => m.weight)
+    const metallicityIndex = rndIndexWeighted(metallicityWeights)
+    const metallicity = STAR_METALLICITY_LEVELS_ALL[metallicityIndex]
     
     // Generate age based on star type
     let age = null
-    const ageRoll = Math.random()
     if (starType === STAR_TYPES.O_TYPE || starType === STAR_TYPES.B_TYPE) {
         // Massive stars are always young (burn out quickly)
-        age = ageRoll < 0.5 ? STAR_AGE_LEVELS.INFANT : STAR_AGE_LEVELS.YOUNG
+        age = Math.random() < 0.5 ? STAR_AGE_LEVELS.INFANT : STAR_AGE_LEVELS.YOUNG
     } else if (starType === STAR_TYPES.M_TYPE || starType === STAR_TYPES.RED_DWARF) {
         // Red dwarfs can be very old
-        age = weightedRandomMember(STAR_AGE_LEVELS_ALL, [0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+        const ageIndex = rndIndexWeighted([0.5, 1, 2, 3, 4, 5, 6, 7, 8, 9])
+        age = STAR_AGE_LEVELS_ALL[ageIndex]
     } else {
         // Other stars have more typical age distribution
-        age = weightedRandomMember(STAR_AGE_LEVELS_ALL, [0.5, 1, 2, 3, 5, 7, 6, 4, 2, 1])
+        const ageIndex = rndIndexWeighted([0.5, 1, 2, 3, 5, 7, 6, 4, 2, 1])
+        age = STAR_AGE_LEVELS_ALL[ageIndex]
     }
     
     // Generate luminosity based on star type

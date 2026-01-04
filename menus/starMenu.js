@@ -10,7 +10,8 @@ function showStarMenu(star = new Star()) {
         leftContent += `Type: ${colorSpan(star.starType.name, star.starType.color)}<br/>`
         leftContent += `Spectral Class: ${colorSpan(star.starType.spectralClass, star.starType.color)}<br/>`
     }
-    leftContent += `Radius: ${roundToPlaces(star.radius * SOLAR_RADII_PER_AU, 2)} solar radii<br/>`
+    // Convert radius from Earth radii to solar radii (1 solar radius = ~109 Earth radii)
+    leftContent += `Radius: ${roundToPlaces(star.radius * SOLAR_RADII_PER_AU / EARTH_RADII_PER_AU, 2)} solar radii<br/>`
     if (star.mass) {
         leftContent += `Mass: ${roundToPlaces(star.mass, 2)} solar masses<br/>`
     }
@@ -40,7 +41,7 @@ function showStarMenu(star = new Star()) {
     rightContent += `<br/>`
     
     // Create column layout
-    const columnLayout = createColumnLayout([leftContent, rightContent])
+    const columnLayout = createColumnLayout([ce({innerHTML:leftContent}), ce({innerHTML: rightContent})])
     
     // Star features (outside the columns)
     const features = ce({children: []})

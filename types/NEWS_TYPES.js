@@ -12,10 +12,12 @@ class NewsType {
      * @param {GovernmentType[]} forbiddenGovs - Government types that cannot have this news event.
      * @param {GovernmentType[]} favoriteGovs - Government types that are more likely to have this news event.
      * @param {GovernmentType[]} immuneGovs - Government types that are immune to this news event.
+     * @param {GovernmentType|undefined} planetObjectType - If specified the planet must be of this type
+     * @param {GovernmentType|undefined} targetPlanetObjectType - If specified the target must be of this type
      */
     constructor(
         name = '', newsFlavor = NF_ALL[0], minYears = null, maxYears = null, displayPriority = 0, 
-        forbiddenGovs = [], favoriteGovs = [], immuneGovs = []
+        forbiddenGovs = [], favoriteGovs = [], immuneGovs = [], planetObjectType = undefined, targetPlanetObjectType = undefined
     ) {
         /** @type {string} */
         this.name = name
@@ -34,6 +36,8 @@ class NewsType {
         /** @type {GovernmentType[]} */
         this.immuneGovs = immuneGovs //cannot be the target/victim/planet who fares less well of the event
         this.weight = this.newsFlavor.weight
+        this.planetObjectType = planetObjectType
+        this.targetPlanetObjectType = targetPlanetObjectType
     }
 }
 

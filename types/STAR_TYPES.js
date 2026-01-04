@@ -15,6 +15,7 @@
  * @property {number} maxRadius - Maximum radius in solar radii.
  * @property {number} minTemp - Minimum surface temperature in Kelvin.
  * @property {number} maxTemp - Maximum surface temperature in Kelvin.
+ * @property {number} weight - Relative frequency weight for generation.
  */
 class StarType {
     /**
@@ -27,8 +28,9 @@ class StarType {
      * @param {number} maxRadius - Maximum radius in solar radii.
      * @param {number} minTemp - Minimum temperature in Kelvin.
      * @param {number} maxTemp - Maximum temperature in Kelvin.
+     * @param {number} weight - Relative frequency weight for generation.
      */
-    constructor(name, spectralClass, color, minMass, maxMass, minRadius, maxRadius, minTemp, maxTemp) {
+    constructor(name, spectralClass, color, minMass, maxMass, minRadius, maxRadius, minTemp, maxTemp, weight = 1.0) {
         /** @type {string} */
         this.name = name
         /** @type {string} */
@@ -47,22 +49,24 @@ class StarType {
         this.minTemp = minTemp
         /** @type {number} */
         this.maxTemp = maxTemp
+        /** @type {number} */
+        this.weight = weight
     }
 }
 
 // Main Sequence Stars (by spectral class)
 const STAR_TYPES = Object.freeze({
     // Main Sequence Stars
-    O_TYPE: new StarType("O-Type Star", "O", COLORS.LightBlue, 16, 90, 6.6, 15, 30000, 50000),
-    B_TYPE: new StarType("B-Type Star", "B", COLORS.Blue, 2.1, 16, 1.8, 6.6, 10000, 30000),
-    A_TYPE: new StarType("A-Type Star", "A", COLORS.White, 1.4, 2.1, 1.4, 1.8, 7500, 10000),
-    F_TYPE: new StarType("F-Type Star", "F", COLORS.LightYellow, 1.04, 1.4, 1.15, 1.4, 6000, 7500),
-    G_TYPE: new StarType("G-Type Star", "G", COLORS.Yellow, 0.8, 1.04, 0.96, 1.15, 5200, 6000),
-    K_TYPE: new StarType("K-Type Star", "K", COLORS.Orange, 0.45, 0.8, 0.7, 0.96, 3700, 5200),
-    M_TYPE: new StarType("M-Type Star", "M", COLORS.Red, 0.08, 0.45, 0.4, 0.7, 2400, 3700),
+    O_TYPE: new StarType("O-Type Star", "O", COLORS.LightBlue, 16, 90, 6.6, 15, 30000, 50000, 0.00003),
+    B_TYPE: new StarType("B-Type Star", "B", COLORS.Blue, 2.1, 16, 1.8, 6.6, 10000, 30000, 0.13),
+    A_TYPE: new StarType("A-Type Star", "A", COLORS.White, 1.4, 2.1, 1.4, 1.8, 7500, 10000, 0.6),
+    F_TYPE: new StarType("F-Type Star", "F", COLORS.LightYellow, 1.04, 1.4, 1.15, 1.4, 6000, 7500, 3),
+    G_TYPE: new StarType("G-Type Star", "G", COLORS.Yellow, 0.8, 1.04, 0.96, 1.15, 5200, 6000, 7.6),
+    K_TYPE: new StarType("K-Type Star", "K", COLORS.Orange, 0.45, 0.8, 0.7, 0.96, 3700, 5200, 12.1),
+    M_TYPE: new StarType("M-Type Star", "M", COLORS.Red, 0.08, 0.45, 0.4, 0.7, 2400, 3700, 76.45),
     
     // Red Dwarfs (smallest M-types)
-    RED_DWARF: new StarType("Red Dwarf", "M", COLORS.DarkRed, 0.08, 0.3, 0.1, 0.4, 2300, 3500),
+    RED_DWARF: new StarType("Red Dwarf", "M", COLORS.DarkRed, 0.08, 0.3, 0.1, 0.4, 2300, 3500, 0.15),
     
     // Brown Dwarfs (sub-stellar)
     BROWN_DWARF: new StarType("Brown Dwarf", "L/T", COLORS.Brown, 0.01, 0.08, 0.08, 0.15, 500, 2300),
