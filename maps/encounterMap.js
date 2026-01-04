@@ -546,7 +546,10 @@ class EncounterMap extends BaseMap {
         this.refreshBackground(currentTime/200000) //hack to make stars twinkle at a reasonable speed
         this.refreshCanvas()
 
-        requestAnimationFrame(()=>this.tick())
+        // Only continue animation loop if not paused
+        if (!this.paused) {
+            requestAnimationFrame(()=>this.tick())
+        }
     }
 
     handleEnemyActions() {

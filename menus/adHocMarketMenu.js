@@ -12,12 +12,11 @@
  */
 function showAdHocMarketMenu(merchantFleet, onClose, encounter = null, sellOnly = false) {
     const fleetName = coloredName(merchantFleet);
-    const playerCaptain = gs.fleet.captain;
     const merchantCaptain = merchantFleet.captain;
     
     // Calculate barter skill difference for pricing
-    const playerBarter = playerCaptain.skills.getAmount(SKILLS.Barter) || 0;
-    const merchantBarter = merchantCaptain.skills.getAmount(SKILLS.Barter) || 0;
+    const playerBarter = gs.fleet.totalSkills.getAmount(SKILLS.Barter) || 0;
+    const merchantBarter = merchantFleet.totalSkills.getAmount(SKILLS.Barter) || 0;
     const barterDiff = playerBarter - merchantBarter;
     
     // Base price multipliers: better barter = better prices

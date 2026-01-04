@@ -250,6 +250,7 @@ function calculateMaxFleetsForPlanet(planet) {
     maxNumFleetsPerFaction.multiply(FACTION_TYPES.COLONISTS, c.population/c.economy)
     maxNumFleetsPerFaction.multiply(FACTION_TYPES.DIPLOMATS, c.prestige)
     maxNumFleetsPerFaction.multiply(FACTION_TYPES.EXPLORERS, c.prestige*c.education)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.HACKERS, c.technology*c.corruption)
     maxNumFleetsPerFaction.multiply(FACTION_TYPES.INQUISITORS, 1/c.corruption)
     maxNumFleetsPerFaction.multiply(FACTION_TYPES.MERCENARIES, c.army*c.wealth) // Mercenaries spawn 60% as often as soldiers
     maxNumFleetsPerFaction.multiply(FACTION_TYPES.MERCHANTS, c.economy)

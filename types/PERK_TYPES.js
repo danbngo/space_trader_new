@@ -46,6 +46,12 @@ const PERK_TYPES = {
     CYBER_CAPACITY_4: new PerkType('Cyber Capacity IV', COLORS.LightCyan, 'Increase number of cybernetic implant slots by 4.', 15),
     CYBER_CAPACITY_5: new PerkType('Cyber Capacity V', COLORS.LightCyan, 'Increase number of cybernetic implant slots by 5.', 20),
 
+    GENE_CAPACITY_1: new PerkType('Gene Capacity I', COLORS.LightGreen, 'Increase number of genetic modification slots by 1.', 1),
+    GENE_CAPACITY_2: new PerkType('Gene Capacity II', COLORS.LightGreen, 'Increase number of genetic modification slots by 2.', 5),
+    GENE_CAPACITY_3: new PerkType('Gene Capacity III', COLORS.LightGreen, 'Increase number of genetic modification slots by 3.', 10),
+    GENE_CAPACITY_4: new PerkType('Gene Capacity IV', COLORS.LightGreen, 'Increase number of genetic modification slots by 4.', 15),
+    GENE_CAPACITY_5: new PerkType('Gene Capacity V', COLORS.LightGreen, 'Increase number of genetic modification slots by 5.', 20),
+
     MUTATION_1: new PerkType('Mutation I', COLORS.Green, 'Gain a random genetic modification. This does not count against the genetic modification limit.', 1),
     MUTATION_2: new PerkType('Mutation II', COLORS.Green, 'Gain a random genetic modification. This does not count against the genetic modification limit.', 5),
     MUTATION_3: new PerkType('Mutation III', COLORS.Green, 'Gain a random genetic modification. This does not count against the genetic modification limit.', 10),

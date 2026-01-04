@@ -33,7 +33,7 @@ class MissionaryFleetAI extends FleetAI {
     }
     
     onNearTarget() {
-        if (this.target instanceof Fleet && !this.target.location) {
+        if (this.target instanceof Fleet && !this.target.location && this.target.captain) {
             // Mark fleet as visited
             this.visited.push(this.target);
             
@@ -56,7 +56,7 @@ class MissionaryFleetAI extends FleetAI {
                     this.target.planet.addCulture(this.fleet.planet, 0.001);
                 }
             } else {
-                console.log(`${this.fleet.name} failed to convert ${this.target.captain.name}`);
+                console.log(`${this.fleet.name} failed to convert ${this.target.captain ? this.target.captain.name : 'unknown captain'}`);
             }
             
             console.log(`🕊️ ${this.fleet.name} ${this.fleet.uuid} has attempted conversion of ${this.target.name} ${this.target.uuid} and is moving on to its next destination.`);

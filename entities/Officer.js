@@ -57,6 +57,15 @@ class Officer {
         this.equipment = new Map();
     }
 
+    get bonusSkills() {
+        const skillBonuses = new CountsMap()
+        const amt = this.factionType.favoredSkills.length > 0 ? Math.floor(this.level * 6 / this.factionType.favoredSkills.length) : 0
+        for (const skill of this.factionType.favoredSkills) {
+            skillBonuses.setAmount(skill, amt)
+        }
+        return skillBonuses
+    }
+
     /**
      * Grants experience points to the officer and handles level ups.
      * @param {number} amount - The amount of experience to grant.
@@ -103,6 +112,43 @@ class Officer {
      */
     calcReputationForTarget(target) {
         return Math.max(this.reputation.getAmount(target), this.reputation.total / (gs.system?.planets?.length || 20))
+    }
+
+    /**
+     * Gets the maximum number of cybernetic implants this officer can have.
+     * Base: 1, increased by CYBER_CAPACITY perks.
+     * @returns {number}
+     */
+    get maxImplants() {
+        let max = 1; // Base capacity
+        
+        // Add capacity from perks
+        if (this.perks.includes(PERK_TYPES.CYBER_CAPACITY_1)) max += 1;
+        if (this.perks.includes(PERK_TYPES.CYBER_CAPACITY_2)) max += 1;
+        if (this.perks.includes(PERK_TYPES.CYBER_CAPACITY_3)) max += 1;
+        if (this.perks.includes(PERK_TYPES.CYBER_CAPACITY_4)) max += 1;
+        if (this.perks.includes(PERK_TYPES.CYBER_CAPACITY_5)) max += 1;
+        
+        return max;
+    }
+
+    /**
+     * Gets the maximum number of genetic modifications this officer can have.
+     * Base: 1, increased by GENE_CAPACITY perks.
+     * Note: MUTATION perks grant modifications that don't count against this limit.
+     * @returns {number}
+     */
+    get maxGeneticModifications() {
+        let max = 1; // Base capacity
+        
+        // Add capacity from perks
+        if (this.perks.includes(PERK_TYPES.GENE_CAPACITY_1)) max += 1;
+        if (this.perks.includes(PERK_TYPES.GENE_CAPACITY_2)) max += 1;
+        if (this.perks.includes(PERK_TYPES.GENE_CAPACITY_3)) max += 1;
+        if (this.perks.includes(PERK_TYPES.GENE_CAPACITY_4)) max += 1;
+        if (this.perks.includes(PERK_TYPES.GENE_CAPACITY_5)) max += 1;
+        
+        return max;
     }
 
     /**

@@ -11,7 +11,6 @@ class DiplomatFleetAI extends FleetAI {
     calcDestination() {
         return rndMember([...gs.system.planets, ...gs.system.dwarfPlanets, ...gs.system.spaceStations].filter(p => {
             // Don't visit origin or same location twice
-            console.log(this,this.visited,'diplo thing')
             if (p === this.origin || this.visited.includes(p)) return false
             return true
         }))

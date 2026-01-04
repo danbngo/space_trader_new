@@ -23,14 +23,9 @@ class ScientistFleetAI extends FleetAI {
     }
     
     onNearTarget() {
-        // If target is an anomaly, investigate and remove it
+        // If target is an anomaly, investigate it
         if (this.target && this.target instanceof Anomaly) {
-            this.target.investigate();
-            const index = gs.system.anomalies.indexOf(this.target);
-            if (index !== -1) {
-                gs.system.anomalies.splice(index, 1);
-                this.makeDiscoveries(this.target.name, 1, 3, '🔬', COLORS.LightCyan);
-            }
+            this.investigateAnomaly(this.target, '🔬', COLORS.LightCyan)
         }
     }
     

@@ -5,7 +5,7 @@
  * @returns {HTMLTableElement|string} The officers table or "(None)" if no officers.
  */
 function createOfficersTable(officers = [new Officer()], onSelectOfficer = (officer = new Officer())=>{}) {
-    if (officers.length == 0) return colorSpan('(No officers available)', COLORS.Gray)
+    if (officers.length == 0) return colorSpan('(No officers hired yet)', COLORS.Gray)
     const rows = [
         ['Name', 'Age', 'Race', 'Religion', 'Piloting', 'Level', 'CR Share', ...SKILLS_ALL]
     ]
@@ -23,7 +23,14 @@ function createOfficersTable(officers = [new Officer()], onSelectOfficer = (offi
             shipName,
             ''+statColorSpan(officer.level, officer.level/5),
             ''+statColorSpan(officer.crShare*100+'%', 5/officer.level),
-            ...SKILLS_ALL.map(sk=>''+statColorSpan(officer.skills.getAmount(sk), officer.skills.getAmount(sk)*SKILLS_ALL.length/5/SKILL_POINTS_PER_LEVEL)),
+            ...SKILLS_ALL.map(sk => {
+                const baseSkill = officer.skills.getAmount(sk);
+                const bonusSkill = officer.bonusSkills.getAmount(sk);
+                const displayLevel = bonusSkill > 0 
+                    ? `${baseSkill} ${colorSpan('(+' + bonusSkill + ')', COLORS.White)}`
+                    : baseSkill;
+                return ''+statColorSpan(displayLevel, baseSkill*SKILLS_ALL.length/5/SKILL_POINTS_PER_LEVEL);
+            }),
         ])
     }
     return createTable(rows, (rowIndex = 0)=>onSelectOfficer(officers[rowIndex]))

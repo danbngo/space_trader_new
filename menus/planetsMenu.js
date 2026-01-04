@@ -47,6 +47,9 @@ function showPlanetsMenu(backFunction = () => closeModal(), dwarfOnly = false, s
         let bestRatio = Infinity
         
         for (const [cargoType, buyPrice] of planet.s.market.calcCargoBuyPrices().counts) {
+            // Skip relics - they can't be produced by planets
+            if (cargoType === CARGO_TYPES.RELICS) continue
+            
             if (cargoType.value > 0) {
                 const ratio = buyPrice / cargoType.value
                 if (ratio < bestRatio) {

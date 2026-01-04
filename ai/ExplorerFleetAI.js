@@ -56,14 +56,9 @@ class ExplorerFleetAI extends FleetAI {
     }
     
     onNearTarget() {
-        // If target is an anomaly, investigate and catalog it
+        // If target is an anomaly, investigate it
         if (this.target && this.target instanceof Anomaly) {
-            this.target.investigate();
-            const index = gs.system.anomalies.indexOf(this.target);
-            if (index !== -1) {
-                gs.system.anomalies.splice(index, 1);
-                this.makeDiscoveries(this.target.name, 1, 2, '🧭', COLORS.Green);
-            }
+            this.investigateAnomaly(this.target, '🧭', COLORS.Green)
         }
         
         // If target is ruins, explore with risks

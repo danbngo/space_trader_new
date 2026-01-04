@@ -195,6 +195,11 @@ class StarSystem extends SpaceObject {
         resurrectedFleet.flagship = abandonedFleet.flagship;
         resurrectedFleet.angle = abandonedFleet.angle;
         
+        // Resurrected ships come back with half hull
+        for (const ship of resurrectedFleet.ships) {
+            ship.hull[0] = Math.ceil(ship.hull[1] / 2);
+        }
+        
         // Assign captain if none exists (pick first living officer)
         if (!resurrectedFleet.captain || !resurrectedFleet.officers.includes(resurrectedFleet.captain)) {
             resurrectedFleet.captain = resurrectedFleet.officers[0];

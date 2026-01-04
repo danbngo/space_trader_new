@@ -116,11 +116,8 @@ class CountsMap {
         const ctWeights = []
         const keys = Array.from(this.keys)
         for (const ct of keys) ctWeights.push(weighted ? this.getAmount(ct) : (this.getAmount(ct) > 0 ? 1 : 0))
-        console.log('ct weights:',ctWeights)
-        console.log('keys:',keys)
         const ctIndex = rndIndexWeighted(ctWeights)
         const ct = keys[ctIndex]
-        console.log('random ct index:',ctIndex,'ct selected:',ct,'from keys:',keys)
         return ct
     }
 

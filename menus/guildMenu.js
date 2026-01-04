@@ -19,7 +19,14 @@ function createHireOfficerMenu(officers = [new Officer()], guild = new Guild(), 
             officer.age,
             statColorSpan(officer.level, officer.level/5),
             statColorSpan(officer.crShare*100+'%', 5/officer.level),
-            ...SKILLS_ALL.map(sk=>statColorSpan(officer.skills.getAmount(sk), officer.skills.getAmount(sk)*SKILLS_ALL.length/5/SKILL_POINTS_PER_LEVEL)),
+            ...SKILLS_ALL.map(sk => {
+                const baseSkill = officer.skills.getAmount(sk);
+                const bonusSkill = officer.bonusSkills.getAmount(sk);
+                const displayLevel = bonusSkill > 0 
+                    ? `${baseSkill} ${colorSpan('(+' + bonusSkill + ')', COLORS.White)}`
+                    : baseSkill;
+                return statColorSpan(displayLevel, baseSkill*SKILLS_ALL.length/5/SKILL_POINTS_PER_LEVEL);
+            }),
             statColorSpan(hirePrice, officer.value/hirePrice)
         ])
     }

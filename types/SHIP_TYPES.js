@@ -70,17 +70,17 @@ const SHIP_TYPES = {
     DRILLING_RIG: new ShipType('Drilling Rig', 'Industrial vessel with a heavy drill for asteroid mining and resource extraction.', SHAPES.FilledTriangle, 3, 0.1, 2, 1, 3, 0.5, [SHIP_MODULE_TYPES.DRILL], 2),
     ESCORT_SHIP: new ShipType('Escort Ship', 'Defensive support vessel with smoke bombs and strong shields to protect allied ships.', SHAPES.FilledTriangle, 1, 1.5, 1.5, 0.5, 0.25, 1.5, [SHIP_MODULE_TYPES.SMOKE_BOMB], 2),
     INTERCEPTOR: new ShipType('Interceptor', 'Fast pursuit craft with magnetic grapples for capturing or disabling enemy vessels.', SHAPES.FilledTriangle, 1.5, 1.5, 1.5, 2, 0.25, 2, [SHIP_MODULE_TYPES.MAGNETIZE], 2),
-    MEDICAL_SHIP: new ShipType('Medical Ship', 'Hospital vessel equipped with advanced medical facilities for treating injuries and illnesses.', SHAPES.FilledTriangle, 1.5, 1, 0.5, 1.5, 2, 1, [], 2),    REPAIR_SHIP: new ShipType('Repair Ship', 'Engineering vessels equipped with nanite beams for repairing damaged allied ships in combat.', SHAPES.FilledSquare, 1.5, 1.5, 0.5, 1, 1.5, 1, [SHIP_MODULE_TYPES.NANITE_BEAM], 2),}
+}
 
 const SHIP_TYPES_ALL = Object.values(SHIP_TYPES)
 
 const STARTING_SHIP_TYPE = new ShipType('Starting Ship', 'A basic ship with balanced capabilities suitable for beginning your journey.', SHAPES.FilledTriangle, 1, 1, 1, 1, 1, 1, [], 1, 1)
 
 const ASTEROID_SHIP_TYPES = {
-    ASTEROID: new ShipType('Asteroid', 'Rocky space debris drifting through the void, can be mined for valuable minerals.', SHAPES.FilledOval, 0.4, 0, 0, 0.25, 0.5, 1, [], 0, 1),
-    CRYOID: new ShipType('Cryoid', 'Frozen comet fragment containing water ice, leaves a freezing vapor trail when destroyed.', SHAPES.FilledOval, 0.6, 0, 0, 0.25, 0.5, 1, [SHIP_MODULE_TYPES.SMOKE_BOMB], 0, 1),
-    PLASMOID: new ShipType('Plasmoid', 'Energetic plasma sphere moving at high velocity, highly volatile and dangerous.', SHAPES.FilledCircle, 0.5, 0.5, 0, 0.5, 0.5, 1, [SHIP_MODULE_TYPES.BOOSTER], 0, 1),
-    MAGNETOID: new ShipType('Magnetoid', 'Magnetically-charged metallic fragment that can disrupt ship systems and pull objects.', SHAPES.FilledCircle, 0.4, 0.3, 0, 0.5, 0.5, 1, [SHIP_MODULE_TYPES.MAGNETIZE], 0, 1),
+    ASTEROID: new ShipType('Asteroid', 'Rocky space debris drifting through the void, can be mined for valuable minerals.', SHAPES.FilledOval, 0.3, 0, 0, 0.25, 0.5, 1, [], 0, 1),
+    CRYOID: new ShipType('Cryoid', 'Frozen comet fragment containing water ice, leaves a freezing vapor trail when destroyed.', SHAPES.FilledOval, 0.3, 0, 0, 0.25, 0.5, 1, [SHIP_MODULE_TYPES.SMOKE_BOMB], 0, 1),
+    PLASMOID: new ShipType('Plasmoid', 'Energetic plasma sphere moving at high velocity, highly volatile and dangerous.', SHAPES.FilledCircle, 0.2, 0.5, 0, 0.5, 0.5, 1, [SHIP_MODULE_TYPES.BOOSTER], 0, 1),
+    MAGNETOID: new ShipType('Magnetoid', 'Magnetically-charged metallic fragment that can disrupt ship systems and pull objects.', SHAPES.FilledCircle, 0.2, 0.3, 0, 0.5, 0.5, 1, [SHIP_MODULE_TYPES.MAGNETIZE], 0, 1),
 }
 
 const ASTEROID_SHIP_TYPES_ALL = Object.values(ASTEROID_SHIP_TYPES)
@@ -95,7 +95,7 @@ ASTEROID_SHIP_TYPES.ASTEROID.onDisabled = (died = new Ship(), encounter) => {
     console.log('Asteroid.onDisabled', { died, encounter });
     if (Math.random()*died.radiusModifier < 0.5) {
         const effect = new DebrisCloudEffect(died.x, died.y, Math.random() * Math.PI * 4)
-        effect.radius *= Math.sqrt(died.radiusModifier)/2
+        effect.radius *= Math.sqrt(died.radiusModifier)
         encounter.addEffect(effect)
     } else {
         spawnSmallerAsteroids(died, encounter)
@@ -104,7 +104,7 @@ ASTEROID_SHIP_TYPES.ASTEROID.onDisabled = (died = new Ship(), encounter) => {
 
 ASTEROID_SHIP_TYPES.CRYOID.onDisabled = (died = new Ship(), encounter) => {
     console.log('Cryoid.onDisabled', { died, encounter });
-    if (Math.random()*died.radiusModifier > 0.5) {
+    if (Math.random()*died.radiusModifier < 0.5) {
         const effect = new IceCloudEffect(died.x, died.y, Math.random() * Math.PI * 4)
         effect.radius *= died.radiusModifier
         encounter.addEffect(effect)
@@ -115,7 +115,7 @@ ASTEROID_SHIP_TYPES.CRYOID.onDisabled = (died = new Ship(), encounter) => {
 
 ASTEROID_SHIP_TYPES.PLASMOID.onDisabled = (died = new Ship(), encounter) => {
     console.log('Plasmoid.onDisabled', { died, encounter });
-    if (Math.random()*died.radiusModifier > 0.5) {
+    if (Math.random()*died.radiusModifier < 0.5) {
         const effect = new IonCloudEffect(died.x, died.y, Math.random() * Math.PI * 4)
         effect.radius *= died.radiusModifier
         encounter.addEffect(effect)
@@ -126,7 +126,7 @@ ASTEROID_SHIP_TYPES.PLASMOID.onDisabled = (died = new Ship(), encounter) => {
 
 ASTEROID_SHIP_TYPES.MAGNETOID.onDisabled = (died = new Ship(), encounter) => {
     console.log('Magnetoid.onDisabled', { died, encounter });
-    if (Math.random()*died.radiusModifier > 0.5) {
+    if (Math.random()*died.radiusModifier < 0.5) {
         const effect = new IonCloudEffect(died.x, died.y, Math.random() * Math.PI * 4)
         effect.radius *= died.radiusModifier
         encounter.addEffect(effect)

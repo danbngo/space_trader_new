@@ -5,7 +5,7 @@
 function showCyberwareMenu(selectedOfficer = null) {
     const {fleet} = gs
     const officer = selectedOfficer || gs.captain
-    const allCrew = [gs.captain, ...fleet.officers]
+    const allCrew = fleet.officers // officers already includes captain
     
     // Create officer selection dropdown
     const officerOptions = allCrew.map(o => [
@@ -45,19 +45,9 @@ function showCyberwareMenu(selectedOfficer = null) {
     function onSelectInstalledImplant(implant = new CyberImplant()) {
         const buttons = [
             ['Remove', () => {
-                showModal(
-                    'Remove Implant',
-                    `Remove ${colorSpan(implant.implantType.name, implant.implantType.color)} from ${officer.name}?<br/><br/>` +
-                    `The implant will be added to your fleet's inventory.`,
-                    [
-                        ['Confirm', () => {
-                            safeRemove(officer.implants, implant)
-                            fleet.cyberModules.push(implant)
-                            showCyberwareMenu(officer)
-                        }],
-                        ['Cancel', () => showCyberwareMenu(officer)]
-                    ]
-                )
+                safeRemove(officer.implants, implant)
+                fleet.cyberModules.push(implant)
+                showCyberwareMenu(officer)
             }],
             ['Back', () => showCyberwareMenu(officer)],
         ]
@@ -88,9 +78,15 @@ function showCyberwareMenu(selectedOfficer = null) {
     
     function onSelectFleetImplant(implant = new CyberImplant()) {
         const alreadyHasImplant = officer.implants.some(i => i.implantType === implant.implantType)
-        const canInstall = !alreadyHasImplant
+        const atCapacity = officer.implants.length >= officer.maxImplants
+        const canInstall = !alreadyHasImplant && !atCapacity
         
-        let reasonText = alreadyHasImplant ? `${officer.name} already has a ${implant.implantType.name} installed.` : ''
+        let reasonText = ''
+        if (alreadyHasImplant) {
+            reasonText = `${officer.name} already has a ${implant.implantType.name} installed.`
+        } else if (atCapacity) {
+            reasonText = `${officer.name} is at maximum implant capacity (${officer.maxImplants}). Invest in Cyber Capacity perks to increase.`
+        }
         
         const buttons = [
             ['Install on ' + officer.name, () => {
@@ -101,12 +97,7 @@ function showCyberwareMenu(selectedOfficer = null) {
             ['Back', () => showCyberwareMenu(officer)],
         ]
         
-        if (reasonText) {
-            refreshPanelButtons('cyberware_panel', buttons)
-            // Show reason text somewhere - could add a message area
-        } else {
-            refreshPanelButtons('cyberware_panel', buttons)
-        }
+        refreshPanelButtons('cyberware_panel', buttons)
     }
     
     // Left column - Installed implants
@@ -115,7 +106,7 @@ function showCyberwareMenu(selectedOfficer = null) {
         children: [
             ce({children: ['<b><u>Crew Member</u></b>']}),
             officerDropdown.container,
-            ce({children: ['<br/><b>Installed Implants</b>']}),
+            ce({children: [`<br/><b>Installed Implants (${officer.implants.length}/${officer.maxImplants})</b>`]}),
             createInstalledImplantsTable(),
         ]
     })

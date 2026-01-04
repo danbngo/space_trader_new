@@ -116,6 +116,7 @@ class Fleet extends SpaceObject {
         for (const skill of SKILLS_ALL) {
             for (const officer of this.officers) {
                 totalSkills.increment(skill, officer.skills.getAmount(skill))
+                totalSkills.increment(skill, officer.bonusSkills.getAmount(skill))
             }
         }
         return totalSkills

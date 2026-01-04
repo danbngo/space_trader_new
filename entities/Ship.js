@@ -261,7 +261,6 @@ class Ship {
      * @returns {[number, number, boolean]} [hullDamage, shieldDamage, disabled]
      */
     takeDamage(dmg = 0, bypassShields = false, dontHurtHull = false, sourceShip = null) {
-        console.log('applying dmg to ship:',this,dmg,bypassShields)
         if (this.disabled) return [0, 0, false]
         
         // Clear cloak status when taking damage

@@ -5,13 +5,13 @@
 class RankType {
     /**
      * @param {string} name - The name of the rank.
-     * @param {string} color - The color associated with this rank.
+     * @param {number[]} color - The color associated with this rank.
      * @param {string} description - A description of the rank's benefits or status.
      */
     constructor(name = '', color = COLORS.White, description = '') {
         /** @type {string} */
         this.name = name
-        /** @type {string} */
+        /** @type {number[]} */
         this.color = color;
         /** @type {string} */
         this.description = description

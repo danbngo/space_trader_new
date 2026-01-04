@@ -36,6 +36,7 @@ class FactionType {
         this.reputationMultiplier = reputationMultiplier;
         this.favoredSkills = favoredSkills;
     }
+    //returns 6 divided by num favored skills distributed across those skills
 }
 
 const FACTION_TYPES = {
@@ -372,7 +373,7 @@ const FACTION_TYPES = {
         true,  // criminal
         true,  // cloaked
         [FLEET_TYPES.HACKERS],
-        -2,  // reputationMultiplier
+        0,  // reputationMultiplier
         [SKILLS.Engineer, SKILLS.Science]
     ),
 }

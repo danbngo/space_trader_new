@@ -106,12 +106,17 @@ class BackgroundMap extends BaseMap {
     }
 
     tick() {
+        if (this.paused) return
+        
         const currentTime = Date.now()
         this.refreshBackground(currentTime/200000) //hack to make stars twinkle at a reasonable speed
         this.rebuildCanvas() // Rebuild to update trails
         this.refreshCanvas()
 
-        requestAnimationFrame(()=>this.tick())
+        // Only continue animation loop if not paused
+        if (!this.paused) {
+            requestAnimationFrame(()=>this.tick())
+        }
     }
 }
 

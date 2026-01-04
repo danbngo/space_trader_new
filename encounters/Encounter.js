@@ -353,7 +353,7 @@ class Encounter {
         //players ships should be in a half circle around the enemy
         if (formationType == FORMATION_TYPES.Storm) {
             for (const ship of enemyShips) {
-                const dist = rng(maxSpawnDistance, minSpawnDistance)
+                const dist = rng(0, this.mapRadius)
                 const angle = rng(Math.PI * 2, 0, false)
                 let [x, y] = rotatePoint(dist, 0, 0, 0, angle)
                 Object.assign(ship, {x, y, angle: rng(Math.PI * 2, 0, false)})

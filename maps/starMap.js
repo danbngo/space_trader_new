@@ -826,7 +826,10 @@ class StarMap extends BaseMap {
 
         checkForEvents(elapsedYears)
 
-        requestAnimationFrame(()=>this.tick())
+        // Only continue animation loop if not paused
+        if (!this.paused) {
+            requestAnimationFrame(()=>this.tick())
+        }
     }
 }
 

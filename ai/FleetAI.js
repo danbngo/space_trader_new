@@ -138,6 +138,61 @@ class FleetAI {
         }
     }
 
+    /**
+     * Investigates an anomaly with random outcomes.
+     * @param {Anomaly} anomaly - The anomaly to investigate
+     * @param {string} icon - The icon to show in popups
+     * @param {number[]} iconColor - The color for success popups
+     * @returns {boolean} True if fleet survived, false if destroyed
+     */
+    investigateAnomaly(anomaly, icon = '🔬', iconColor = COLORS.LightCyan) {
+        if (!anomaly || !(anomaly instanceof Anomaly)) return false
+        
+        anomaly.investigate()
+        
+        // Always gain antimatter (1-5 units)
+        const antimatterGain = Math.floor(rng(5, 1))
+        this.fleet.cargo.increment(CARGO_TYPES.ANTIMATTER, antimatterGain)
+        console.log(`⚛️ ${this.fleet.name} collected ${antimatterGain} antimatter from ${anomaly.name}`)
+        
+        const roll = Math.random()
+        
+        // 33% chance: Anomaly disappears (safest outcome)
+        if (roll < 0.33) {
+            const index = gs.system.anomalies.indexOf(anomaly)
+            if (index !== -1) {
+                gs.system.anomalies.splice(index, 1)
+                console.log(`${icon} ${this.fleet.name} successfully investigated ${anomaly.name} - anomaly dissipated`)
+            }
+            this.addPopup(icon, iconColor)
+            return true
+        }
+        // 33% chance: Fleet is destroyed
+        else if (roll < 0.66) {
+            console.log(`💥 ${this.fleet.name} was destroyed investigating ${anomaly.name}!`)
+            this.addPopup('💥', COLORS.Red)
+            this.onDestroyed()
+            return false
+        }
+        // 33% chance: Fleet is teleported away
+        else {
+            // Teleport to a random location within the system (not outside map radius)
+            const maxRadius = gs.system.radius * 0.9 // Stay within 90% of system radius
+            const angle = Math.random() * Math.PI * 2
+            const distance = rng(maxRadius, maxRadius * 0.3) // Random distance between 30-90% of max
+            
+            this.fleet.x = Math.cos(angle) * distance
+            this.fleet.y = Math.sin(angle) * distance
+            
+            // Clear route since we've been teleported
+            this.fleet.route = null
+            
+            console.log(`🌀 ${this.fleet.name} was teleported by ${anomaly.name} to (${this.fleet.x.toFixed(1)}, ${this.fleet.y.toFixed(1)})`)
+            this.addPopup('🌀', COLORS.Purple)
+            return true
+        }
+    }
+
     /** @returns {Fleet[]|SpaceObject[]} */
     calcValidTargets() {        
         //override in subclasses

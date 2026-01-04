@@ -108,11 +108,18 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
     // Build skills table
     const skillTableRows = [
         ['Skill', 'Level', 'Cost to Upgrade'],
-        ...SKILLS_ALL.map(sk => [
-            `${coloredName(sk)}`,
-            statColorSpan(skills.getAmount(sk), skills.getAmount(sk)*SKILLS_ALL.length/5/SKILL_POINTS_PER_LEVEL),
-            captain.calcSkillPointsToUpgrade(sk)
-        ])
+        ...SKILLS_ALL.map(sk => {
+            const baseSkill = skills.getAmount(sk);
+            const bonusSkill = captain.bonusSkills.getAmount(sk);
+            const displayLevel = bonusSkill > 0 
+                ? `${baseSkill} ${colorSpan('(+' + bonusSkill + ')', COLORS.White)}`
+                : baseSkill;
+            return [
+                `${coloredName(sk)}`,
+                statColorSpan(displayLevel, baseSkill*SKILLS_ALL.length/5/SKILL_POINTS_PER_LEVEL),
+                captain.calcSkillPointsToUpgrade(sk)
+            ];
+        })
     ]
 
     const skillTable = createTable(skillTableRows, (rowIndex) => onSelectSkill(SKILLS_ALL[rowIndex]), selectedSkill ? SKILLS_ALL.indexOf(selectedSkill) + 1 : null)
@@ -249,9 +256,8 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
     const rightColumn = ce({
         style: {display: 'flex', flexDirection: 'column', gap: '12px'},
         children: [
-            ce({children: ['<u>Skills</u>']}),
-            `Skill Points: ${statColorSpan(skillPoints, skillPoints > 0 ? 4 : 1)}`,
             skillTable,
+            `Skill Points: ${statColorSpan(skillPoints, skillPoints > 0 ? 4 : 1)}`,
         ]
     })
 

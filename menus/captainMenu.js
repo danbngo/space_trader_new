@@ -32,11 +32,18 @@ function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
     // Build skills table
     const skillTableRows = [
         ['Skill', 'Level', 'Cost to Upgrade'],
-        ...SKILLS_ALL.map(sk => [
-            coloredName(sk),
-            statColorSpan(skills.getAmount(sk), skills.getAmount(sk)*SKILLS_ALL.length/5/SKILL_POINTS_PER_LEVEL),
-            captain.calcSkillPointsToUpgrade(sk)
-        ])
+        ...SKILLS_ALL.map(sk => {
+            const baseSkill = skills.getAmount(sk);
+            const bonusSkill = captain.bonusSkills.getAmount(sk);
+            const displayLevel = bonusSkill > 0 
+                ? `${baseSkill} ${colorSpan('(+' + bonusSkill + ')', COLORS.White)}`
+                : baseSkill;
+            return [
+                coloredName(sk),
+                statColorSpan(displayLevel, baseSkill*SKILLS_ALL.length/5/SKILL_POINTS_PER_LEVEL),
+                captain.calcSkillPointsToUpgrade(sk)
+            ];
+        })
     ]
 
     const skillTable = createTable(skillTableRows, (rowIndex) => onSelectSkill(SKILLS_ALL[rowIndex]), selectedSkill ? SKILLS_ALL.indexOf(selectedSkill) + 1 : null)
@@ -60,10 +67,12 @@ function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
         `Captain Overview`,
         ce({children:[
             `Name: ${name} | Race: ${raceText} | Credits: ${credits}`,
+            ce({tag:'br'}),
             `Level: ${level} | Exp: ${expPoints} | Next Lvl At: ${expToNextLevel}`,
             expProgressBar.container,
+            ce({tag:'br'}),
+            skillTable,
             `Skill Points: ${colorSpan(String(skillPoints), skillPoints > 0 ? COLORS.Green : '')}`,
-            skillTable
         ]}),
         [
             ["Implants", () => showCaptainImplantsMenu()],
