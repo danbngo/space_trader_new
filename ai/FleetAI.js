@@ -35,7 +35,7 @@ class FleetAI {
     }
 
     addPopup(text = '', color = COLORS.WHITE, overrideX = this.fleet.x, overrideY = this.fleet.y) {
-        if (!this.starMap) return
+        if (!this.starMap || !this.starMap.addPopup) return
         this.starMap.addPopup(overrideX, overrideY, text, color)
     }
     

@@ -7,13 +7,19 @@ class HackersEncounter extends FleetEncounter {
         const greeting = this.getGreetingDialogue()
         const rand = Math.random()
         
-        // 50% chance to siphon credits (hostile action)
-        if (rand < 0.5) {
+        // 33% chance to siphon credits (hostile action)
+        if (rand < 0.33) {
             this.siphonCredits(greeting)
             return
         }
         
-        // 50% chance to offer cyber implant
+        // 33% chance to offer ship upgrade
+        if (rand < 0.66) {
+            this.offerShipUpgrade(greeting)
+            return
+        }
+        
+        // 33% chance to offer cyber implant
         this.offerCyberImplant(greeting)
     }
     
@@ -49,7 +55,7 @@ class HackersEncounter extends FleetEncounter {
         ])
     }
     
-    offerShipImprovement(greeting) {
+    offerShipUpgrade(greeting) {
         // Select a random ship from player's fleet
         if (gs.fleet.ships.length === 0) {
             this.showStandardHackerGreeting(greeting)
@@ -58,34 +64,34 @@ class HackersEncounter extends FleetEncounter {
         
         const ship = rndMember(gs.fleet.ships)
         
-        // Calculate fee: 10% of ship value
+        // Calculate fee: 10% of ship value (cheaper than scientists)
         const fee = Math.ceil(ship.value * 0.1)
         const canAfford = gs.credits >= fee
         
         let message = greeting ? `"${greeting}"<br/><br/>` : ''
         message += `A hacker from the ${coloredName(this.fleet)} opens a secure channel:<br/><br/>`
-        message += `"We can... 'improve' your ${ship.name}. Hardware mods, firmware tweaks, the works. `
-        message += `Can't guarantee exactly what you'll get - our methods are experimental. But it'll be different. ${fee} CR."<br/><br/>`
+        message += `"We can upgrade your ${ship.name}. Hardware mods, firmware exploits, system overclocking - the works. `
+        message += `Can't guarantee exactly what you'll get - our methods are... creative. But it'll be different. ${fee} CR."<br/><br/>`
         message += `<b>${ship.name}</b> (${ship.shipType.name})<br/>`
         message += `<span style="color: #999999">Value: ${Math.round(ship.value)} CR</span>`
         
         showModal(coloredName(this.fleet), message, [
             ['Accept', () => {
                 gs.credits -= fee
-                const results = this.improveShip(ship)
+                const results = this.upgradeShip(ship)
                 
                 let resultMessage = `The hackers board your ${ship.name} and get to work. Sparks fly, systems flicker...<br/><br/>`
-                resultMessage += `<b>Modifications Complete:</b><br/>`
+                resultMessage += `<b>Upgrades Applied:</b><br/>`
                 resultMessage += results.join('<br/>')
                 
-                showModal('Ship Improved', resultMessage, [['Continue', () => this.endEncounter()]])
+                showModal('Ship Upgraded', resultMessage, [['Continue', () => this.endEncounter()]])
             }, !canAfford],
             ['Decline', () => this.showStandardHackerGreeting(greeting)],
             ['Attack', () => this.showPlayerAttackFleetModal()],
         ])
     }
     
-    improveShip(ship) {
+    upgradeShip(ship) {
         const results = []
         
         // Modify lasers

@@ -6,19 +6,19 @@ class ScientistsEncounter extends NeutralsEncounter {
     onStart() {
         const rand = Math.random()
         
-        // 25% chance to share anomaly knowledge
-        if (rand < 0.25) {
+        // 33% chance to share anomaly knowledge
+        if (rand < 0.33) {
             this.shareAnomalyKnowledge()
             return
         }
         
-        // 25% chance to offer ship upgrade
-        if (rand < 0.5) {
-            this.offerShipUpgrade()
+        // 33% chance to offer genetic modification
+        if (rand < 0.66) {
+            this.offerGeneticModification()
             return
         }
         
-        // 50% chance for standard greeting
+        // 33% chance for standard greeting
         this.showGreeting()
     }
     
@@ -63,6 +63,66 @@ class ScientistsEncounter extends NeutralsEncounter {
                 ])
             }],
             ['Continue', () => this.endEncounter()],
+        ])
+    }
+    
+    offerGeneticModification() {
+        // Check if player has any officers
+        if (gs.fleet.officers.length === 0) {
+            this.showGreeting()
+            return
+        }
+        
+        // Don't preview the modification or recipient - player must accept blindly
+        const price = rng(3000, 1500) // Random price 1500-3000 CR
+        const canAfford = gs.credits >= price
+        
+        const fleetName = coloredName(this.fleet)
+        let message = `Scientists from the ${fleetName} contact you with an unusual proposal:<br/><br/>`
+        message += `"We're conducting genetic research and need test subjects. One of your crew will receive an experimental gene therapy - ${price} CR to participate. `
+        message += `The modification is untested but theoretically beneficial. Interested?"<br/><br/>`
+        message += `<span style="color: #ff9999">⚠️ A random crew member will receive a random genetic modification!</span>`
+        
+        showModal(fleetName, message, [
+            ['Accept', () => {
+                gs.credits -= price
+                
+                // Select random officer
+                const recipient = rndMember(gs.fleet.officers)
+                
+                // Generate random modification
+                const modification = generateGeneticModification(this.planet)
+                
+                // Check if officer already has this modification
+                const alreadyHas = recipient.geneticModifications.some(m => m.modificationType === modification.modificationType)
+                
+                if (alreadyHas) {
+                    showModal('Procedure Cancelled',
+                        `The scientists begin scanning ${recipient.name}...<br/><br/>` +
+                        `"Interesting - they already have these genetic markers. The procedure would be redundant. Here's your refund."<br/><br/>` +
+                        `<span style="color: #ffff66">Refund: ${price} CR</span>`,
+                        [['Continue', () => {
+                            gs.credits += price // Refund
+                            this.endEncounter()
+                        }]]
+                    )
+                } else {
+                    // Apply modification to officer
+                    recipient.geneticModifications.push(modification)
+                    
+                    showModal('Modification Complete',
+                        `The scientists carefully apply the gene therapy to ${recipient.name}...<br/><br/>` +
+                        `After several hours of precise work, the procedure is complete.<br/><br/>` +
+                        `<b>Recipient:</b> ${recipient.name}<br/>` +
+                        `<b>Modification:</b> ${modification.modificationType.name} (Quality: ${modification.quality.toFixed(2)})<br/>` +
+                        `${modification.modificationType.description}<br/><br/>` +
+                        `"Fascinating results! The modifications are stable and active."`,
+                        [['Continue', () => this.endEncounter()]]
+                    )
+                }
+            }, !canAfford],
+            ['Decline', () => this.showGreeting()],
+            ['Ignore', () => this.endEncounter()],
         ])
     }
     
