@@ -157,4 +157,62 @@ class StarSystem extends SpaceObject {
             }
         }
     }
+
+    /**
+     * Resurrects an abandoned fleet back into a normal active fleet.
+     * @param {AbandonedFleet} abandonedFleet - The abandoned fleet to resurrect.
+     * @returns {Fleet|null} The resurrected fleet, or null if resurrection failed.
+     */
+    resurrectFleet(abandonedFleet) {
+        if (!(abandonedFleet instanceof AbandonedFleet)) {
+            console.error('resurrectFleet: Not an AbandonedFleet');
+            return null;
+        }
+        
+        if (!abandonedFleet.officers || abandonedFleet.officers.length === 0) {
+            console.error('resurrectFleet: No officers to resurrect fleet');
+            return null;
+        }
+        
+        console.log(`✨ Resurrecting abandoned fleet ${abandonedFleet.name}`);
+        
+        // Create new Fleet from the abandoned one
+        const resurrectedFleet = new Fleet(
+            abandonedFleet.name,
+            abandonedFleet.planet,
+            abandonedFleet.fleetType,
+            abandonedFleet.factionType,
+            abandonedFleet.color.map(c => c * 2), // Restore original brightness
+            abandonedFleet.x,
+            abandonedFleet.y
+        );
+        
+        // Transfer properties from abandoned fleet
+        resurrectedFleet.ships = abandonedFleet.ships;
+        resurrectedFleet.cargo = abandonedFleet.cargo;
+        resurrectedFleet.equipment = abandonedFleet.equipment;
+        resurrectedFleet.officers = abandonedFleet.officers;
+        resurrectedFleet.flagship = abandonedFleet.flagship;
+        resurrectedFleet.angle = abandonedFleet.angle;
+        
+        // Assign captain if none exists (pick first living officer)
+        if (!resurrectedFleet.captain || !resurrectedFleet.officers.includes(resurrectedFleet.captain)) {
+            resurrectedFleet.captain = resurrectedFleet.officers[0];
+            console.log(`👤 Assigned ${resurrectedFleet.captain.name} as new captain`);
+        }
+        
+        // Assign appropriate AI based on fleet type
+        const aiType = getFleetAITypeForFleetType(resurrectedFleet.fleetType);
+        if (aiType) {
+            resurrectedFleet.fleetAI = new aiType.aiClass(resurrectedFleet, resurrectedFleet.planet, this);
+            console.log(`🤖 Assigned ${aiType.name} to resurrected fleet`);
+        }
+        
+        // Remove from abandonedFleets and add to active fleets
+        this.removeAbandonedFleet(abandonedFleet);
+        this.fleets.push(resurrectedFleet);
+        
+        console.log(`✅ Successfully resurrected ${resurrectedFleet.name} with ${resurrectedFleet.officers.length} officers`);
+        return resurrectedFleet;
+    }
 }

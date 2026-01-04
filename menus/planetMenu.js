@@ -60,7 +60,8 @@ function showPlanetMenu(planet = new Planet()) {
                 type.canAccess(planet, isDocked)
             if (building.damaged) access.canAccess = false
             if (access.canShow) {
-                options.push([type.name, () => menu(building), access.isDisabled])
+                const levelDisplay = building.level ? ` ${toRomanNumeral(building.level)}` : ''
+                options.push([type.name + levelDisplay, () => menu(building), access.isDisabled])
             }
         }
     }

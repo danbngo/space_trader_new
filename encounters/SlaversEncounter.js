@@ -30,18 +30,106 @@ class SlaversEncounter extends FleetEncounter {
             ])
         }
         else if (gs.captain.reputation.getAmount(FACTION_TYPES.SLAVERS) > 0) {
-            // Neutral - they ignore you
-            showModal('Ignored', `The ${coloredName(enemyFleet)} note your presence but choose to ignore you.`,
-                ['Continue', ()=>this.endEncounter()]
-            )
+            // Neutral - offer trade opportunities
+            this.showNeutralSlavers()
         }
+        else {
+            // Hostile - demand surrender
+            showModal('Demand Surrender', `The ${coloredName(enemyFleet)} hail you.<br/>Your ships and crew belong to us now. Surrender immediately or be destroyed!`,
+                [
+                    ['Surrender', ()=>this.showPlayerDidSurrenderModal()],
+                    ['Refuse', ()=>closeModal()],
+                ])
+        }
+    }
 
-        // Hostile - demand surrender
-        showModal('Demand Surrender', `The ${coloredName(enemyFleet)} hail you.<br/>Your ships and crew belong to us now. Surrender immediately or be destroyed!`,
-            [
-                ['Surrender', ()=>this.showPlayerDidSurrenderModal()],
-                ['Refuse', ()=>closeModal()],
-            ])
+    showNeutralSlavers() {
+        const rand = Math.random()
+        
+        // 25% chance to offer to buy a subordinate
+        if (rand < 0.25 && gs.fleet.subordinates.length > 0) {
+            this.offerToBuySubordinate()
+            return
+        }
+        
+        // 25% chance to offer to sell an officer (25-50% range)
+        if (rand < 0.5) {
+            this.offerToSellOfficer()
+            return
+        }
+        
+        // Otherwise just ignore
+        showModal('Ignored', `The ${coloredName(this.fleet)} note your presence but choose to ignore you.`,
+            ['Continue', ()=>this.endEncounter()]
+        )
+    }
+
+    offerToBuySubordinate() {
+        // Pick random subordinate
+        const subordinate = rndMember(gs.fleet.subordinates)
+        const price = Math.round(subordinate.value * 0.5) // Half the officer's value
+        
+        let message = `The ${coloredName(this.fleet)} hail you with an offer:<br/><br/>`
+        message += `"We're always looking for new... recruits. We'll take that ${subordinate.name} off your hands for ${price} CR. No questions asked."<br/><br/>`
+        message += `<b>${subordinate.name}</b> - Level ${subordinate.level}<br/>`
+        message += `<b>Value:</b> ${subordinate.value} CR<br/>`
+        message += `<b>Offer:</b> ${price} CR (${Math.round(price / subordinate.value * 100)}% of value)`
+        
+        showModal(coloredName(this.fleet), message, [
+            ['Sell', () => {
+                gs.credits += price
+                gs.fleet.officers = gs.fleet.officers.filter(o => o !== subordinate)
+                showModal('Officer Sold',
+                    `You receive ${price} CR as the ${coloredName(this.fleet)} take ${subordinate.name}.<br/><br/>` +
+                    `"Pleasure doing business with you. We'll put them to good use."<br/><br/>` +
+                    colorSpan(`${subordinate.name} has been sold to the slavers.`, COLORS.Red),
+                    [['Continue', () => this.endEncounter()]]
+                )
+            }],
+            ['Refuse', () => {
+                showModal('Offer Declined',
+                    `"Suit yourself. But the offer stands if you change your mind."`,
+                    [['Continue', () => this.endEncounter()]]
+                )
+            }],
+        ])
+    }
+
+    offerToSellOfficer() {
+        // Generate officer from random faction
+        const randomFaction = rndMember(FACTION_TYPES_ALL)
+        const officer = generateOfficer(this.planet, randomFaction)
+        
+        // Price is officer value (slavers don't discount much)
+        const price = officer.value
+        const canAfford = gs.credits >= price
+        const canHire = gs.fleet.officers.length < gs.captain.maxSubordinates
+        
+        let message = `The ${coloredName(this.fleet)} hail you with an offer:<br/><br/>`
+        message += `"We have some... merchandise that might interest you. Fresh acquisition, willing to work. ${price} CR and they're yours."<br/><br/>`
+        message += `<b>${officer.name}</b> - Level ${officer.level}<br/>`
+        message += `<b>Faction:</b> ${colorSpan(officer.factionType.name, officer.factionType.color)}<br/>`
+        message += `<b>Skills:</b> ${SKILLS_ALL.map(sk => `${sk.symbol}${officer.skills.getAmount(sk)}`).join(' ')}<br/>`
+        message += `<b>CR Share:</b> ${Math.round(officer.crShare * 100)}%`
+        
+        showModal(coloredName(this.fleet), message, [
+            ['Buy', () => {
+                gs.credits -= price
+                gs.fleet.addOfficer(officer)
+                showModal('Officer Acquired',
+                    `You transfer ${price} CR.<br/><br/>` +
+                    `"Good. They're all yours now. Try not to lose them too quickly."<br/><br/>` +
+                    `${officer.name} has joined your crew!`,
+                    [['Continue', () => this.endEncounter()]]
+                )
+            }, !canAfford || !canHire],
+            ['Decline', () => {
+                showModal('Offer Declined',
+                    `"Your loss. We'll find another buyer."`,
+                    [['Continue', () => this.endEncounter()]]
+                )
+            }],
+        ])
     }
 
     /**

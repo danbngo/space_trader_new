@@ -59,7 +59,7 @@ class MinerFleetAI extends FleetAI {
             // Mark asteroid as visited
             this.visitedAsteroids.push(this.target);
             
-            const asteroidBeltType = this.target.parent.asteroidBeltType;
+            const asteroidBeltType = this.target.belt.asteroidBeltType;
             const mineAmount = Math.min(rng(5, 2), this.fleet.availableCargoSpace);
             
             // Determine cargo type based on belt

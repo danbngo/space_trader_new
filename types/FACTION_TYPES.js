@@ -361,6 +361,34 @@ const FACTION_TYPES = {
         1,  // reputationMultiplier
         [SKILLS.Stealth, SKILLS.Barter, SKILLS.Negotiation]
     ),
+    HACKERS: new FactionType(
+        'Hackers',
+        '💻',
+        COLORS.LightCyan,
+        'Rogue technologists offering illegal cybernetic modifications and electronic services.',
+        false,
+        false,
+        false,
+        true,  // criminal
+        true,  // cloaked
+        [FLEET_TYPES.HACKERS],
+        -2,  // reputationMultiplier
+        [SKILLS.Engineer, SKILLS.Science]
+    ),
+    GENETICISTS: new FactionType(
+        'Geneticists',
+        '🧬',
+        COLORS.Green,
+        'Traveling genetic engineers offering advanced biological modifications and medical services.',
+        false,
+        false,
+        false,
+        false,
+        false,
+        [FLEET_TYPES.GENETICISTS],
+        1,  // reputationMultiplier
+        [SKILLS.Science, SKILLS.Medicine]
+    ),
 }
 
 const FACTION_TYPES_ALL = Object.values(FACTION_TYPES)

@@ -1,16 +1,18 @@
 DONE:
 -cant shoot under debris, little too punishing for asteroids. instead make it higher miss chance
 -when ships fight each other there should be an 'abandoned ship' after which salvagers wanna move to
+ -these can trigger the abandoned ship encounter
 
 
 TODO:
--we need to tweak and test the hell out of encounters, they've been largely just 'assumed to work' so far and most need 
-better/more interesting content
+-add an escort fleet system to the game - will be very useful later for quests
+-make the encounters more fleshed out especially for the newer ones
+-cyber modules, geneticist and perks all need to be tested
+-should officers + captain be able to do stuff other than just fly around? ie actually get out of their ship and use their skills
+and equipment?
 -asteroids change shape when i miss them!!??
 
- -these can trigger the abandoned ship encounter
 -make ruins and anomalies interactive
--make the encounters more fleshed out especially for the newer ones
 -dwarf planets, space stations should be under the influence of different major planets
  -incorporate them into the existing news system but tweak their interactions to represent being "jr partners"
  -downshift their numbers on the planet stats tab

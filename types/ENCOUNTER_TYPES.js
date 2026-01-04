@@ -69,6 +69,8 @@ const ENCOUNTER_TYPES = {
     REFUGEES: new EncounterType('Refugees', COLORS.Brown, 'You encountered: refugees.', FACTION_TYPES.REFUGEES, FLEET_TYPES.REFUGEES, AI_TYPES.Ship, RefugeesEncounter),
     PERFORMERS: new EncounterType('Performers', COLORS.LightOrange, 'You encountered: performers.', FACTION_TYPES.PERFORMERS, FLEET_TYPES.PERFORMERS, AI_TYPES.Ship, PerformersEncounter),
     PILGRIMS: new EncounterType('Pilgrims', COLORS.LightCyan, 'You encountered: pilgrims.', FACTION_TYPES.PILGRIMS, FLEET_TYPES.PILGRIMS, AI_TYPES.Ship, PilgrimsEncounter),
+    HACKERS: new EncounterType('Hackers', COLORS.Cyan, 'You encountered: hackers.', FACTION_TYPES.HACKERS, FLEET_TYPES.HACKERS, AI_TYPES.Ship, HackersEncounter),
+    GENETICISTS: new EncounterType('Geneticists', COLORS.Green, 'You encountered: geneticists.', FACTION_TYPES.GENETICISTS, FLEET_TYPES.GENETICISTS, AI_TYPES.Ship, GeneticistsEncounter),
     ABANDONED_SHIP: new EncounterType('Abandoned Ship', COLORS.Gray, 'You encountered: an abandoned ship.', FACTION_TYPES.PIRATES, PSEUDO_FLEET_TYPES.ABANDONED_SHIP, AI_TYPES.Ship, AbandonedShipEncounter),
     ASTEROIDS_STORM: new EncounterType('Asteroid Storm', COLORS.LightGray, 'You encountered: an asteroid storm.', null, PSEUDO_FLEET_TYPES.ASTEROIDS_STORM, AI_TYPES.Asteroid, AsteroidsStormEncounter),
     ASTEROIDS_CALM: new EncounterType('Asteroid Field', COLORS.LightGray, 'You encountered: an asteroid field.', null, PSEUDO_FLEET_TYPES.ASTEROIDS_CALM, AI_TYPES.Asteroid, AsteroidsCalmEncounter),

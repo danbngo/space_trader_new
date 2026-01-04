@@ -42,12 +42,95 @@ class MercenariesEncounter extends FleetEncounter {
     }
     
     showNeutralMercenaries() {
-        showModal(coloredName(this.fleet), 
-            `A ${coloredName(this.fleet)} fleet hails you over comms.<br/>` +
-            `"We're hired guns, not trouble seekers. Keep your distance and we'll keep ours."`, [
+        const greeting = this.getGreetingDialogue()
+        const rand = Math.random()
+        
+        // 25% chance to offer hiring an officer
+        if (rand < 0.25) {
+            this.offerOfficerForHire(greeting)
+            return
+        }
+        
+        // 25% chance to offer selling a ship
+        if (rand < 0.5) {
+            this.offerShipForSale(greeting)
+            return
+        }
+        
+        // Otherwise standard neutral behavior
+        const message = greeting 
+            ? `A ${coloredName(this.fleet)} fleet hails you.<br/>"${greeting}"`
+            : `A ${coloredName(this.fleet)} fleet hails you over comms.<br/>"We're hired guns, not trouble seekers. Keep your distance and we'll keep ours."`
+        
+        showModal(coloredName(this.fleet), message, [
             ['Ignore', () => this.endEncounter()],
             ['Attack', () => this.showPlayerAttackFleetModal()],
-            //['Hail', () => this.showTradeMenu()],
+        ])
+    }
+    
+    offerOfficerForHire(greeting) {
+        // Generate a mercenary officer
+        const officer = generateOfficer(this.planet, FACTION_TYPES.MERCENARIES)
+        
+        // Price is 70% of guild price (better deal)
+        const basePrice = Math.round(officer.value * (1 + this.planet.c.corruption) * this.planet.c.inflation / this.planet.c.army)
+        const price = Math.round(basePrice * 0.7)
+        const canAfford = gs.credits >= price
+        const canHire = gs.fleet.officers.length < gs.captain.maxSubordinates
+        
+        let message = greeting ? `"${greeting}"<br/><br/>` : ''
+        message += `A mercenary from the ${coloredName(this.fleet)} steps forward:<br/><br/>`
+        message += `"Looking for experienced muscle? I'm available for hire. ${price} CR and I'm yours."<br/><br/>`
+        message += `<b>${officer.name}</b> - Level ${officer.level}<br/>`
+        message += `<b>Skills:</b> ${SKILLS_ALL.map(sk => `${sk.symbol}${officer.skills.getAmount(sk)}`).join(' ')}<br/>`
+        message += `<b>CR Share:</b> ${Math.round(officer.crShare * 100)}%`
+        
+        showModal(coloredName(this.fleet), message, [
+            ['Hire', () => {
+                gs.credits -= price
+                gs.fleet.addOfficer(officer)
+                showModal('Officer Hired',
+                    `You transfer ${price} CR.<br/><br/>` +
+                    `"Good. I'll follow your orders... as long as the credits keep flowing."<br/><br/>` +
+                    `${officer.name} has joined your crew!`,
+                    [['Continue', () => this.endEncounter()]]
+                )
+            }, !canAfford || !canHire],
+            ['Decline', () => this.endEncounter()],
+        ])
+    }
+    
+    offerShipForSale(greeting) {
+        // Generate a mercenary ship (weighted toward combat ships)
+        const shipType = Math.random() < 0.7 
+            ? rndMember([SHIP_TYPES.FIGHTER, SHIP_TYPES.CORVETTE, SHIP_TYPES.FRIGATE, SHIP_TYPES.DESTROYER])
+            : rndMember(SHIP_TYPES_ALL)
+        const ship = generateShip(this.planet, shipType)
+        
+        // Price is 75% of shipyard price (better deal)
+        const basePrice = Math.round(ship.value * (1 + this.planet.c.corruption/4) * (1 + this.planet.c.inflation/4) * (1 + this.planet.c.taxes/4) / this.planet.c.navy)
+        const price = Math.round(basePrice * 0.75)
+        const canAfford = gs.credits >= price
+        
+        let message = greeting ? `"${greeting}"<br/><br/>` : ''
+        message += `The mercenary captain gestures to one of their ships:<br/><br/>`
+        message += `"Got a surplus ship here. Battle-tested but still solid. ${price} CR and it's yours - no questions asked."<br/><br/>`
+        message += `<b>${ship.shipType.name}</b><br/>`
+        message += `<b>Hull:</b> ${ship.hull[1]} | <b>Shields:</b> ${ship.shields[1]} | <b>Lasers:</b> ${ship.lasers}<br/>`
+        message += `<b>Engine:</b> ${ship.engine} | <b>Cargo:</b> ${ship.cargoSpace}`
+        
+        showModal(coloredName(this.fleet), message, [
+            ['Buy', () => {
+                gs.credits -= price
+                gs.fleet.addShip(ship)
+                showModal('Ship Purchased',
+                    `You transfer ${price} CR.<br/><br/>` +
+                    `"Pleasure doing business. She'll serve you well in a fight."<br/><br/>` +
+                    `${ship.shipType.name} added to your fleet!`,
+                    [['Continue', () => this.endEncounter()]]
+                )
+            }, !canAfford],
+            ['Decline', () => this.endEncounter()],
         ])
     }
 

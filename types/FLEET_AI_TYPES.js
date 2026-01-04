@@ -41,6 +41,8 @@ const FLEET_AI_TYPES = {
     REFUGEE: new FleetAIType('Refugee AI', RefugeeFleetAI, FLEET_TYPES.REFUGEES),
     SYNDICATE: new FleetAIType('Syndicate AI', SyndicateFleetAI, FLEET_TYPES.SYNDICATES),
     EXPLORER: new FleetAIType('Explorer AI', ExplorerFleetAI, FLEET_TYPES.EXPLORERS),
+    HACKER: new FleetAIType('Hacker AI', HackerFleetAI, FLEET_TYPES.HACKERS),
+    GENETICIST: new FleetAIType('Geneticist AI', GeneticistFleetAI, FLEET_TYPES.GENETICISTS),
 }
 
 const FLEET_AI_TYPES_ALL = Object.values(FLEET_AI_TYPES)

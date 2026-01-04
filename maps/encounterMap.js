@@ -38,6 +38,7 @@ class EncounterMap extends BaseMap {
             [MOVE_TYPES.SmokeBomb, new SmokeBombActionHandler(this)],
             [MOVE_TYPES.Drill, new DrillActionHandler(this)],
             [MOVE_TYPES.Detonate, new DetonateActionHandler(this)],
+            [MOVE_TYPES.NaniteBeam, new NaniteBeamActionHandler(this)],
         ])
         
         this.animatingAction = null

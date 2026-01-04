@@ -228,6 +228,16 @@ function safeRemove(arr = [], item) {
 }
 
 /**
+ * Converts a number to Roman numeral.
+ * @param {number} num - The number to convert (1-10).
+ * @returns {string} The Roman numeral representation.
+ */
+function toRomanNumeral(num) {
+    const romanNumerals = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X']
+    return romanNumerals[Math.min(Math.max(Math.floor(num), 0), 10)] || num.toString()
+}
+
+/**
  * Safely adds an item to an array if it doesn't already exist.
  * @template T
  * @param {T[]} arr - The array to add to.

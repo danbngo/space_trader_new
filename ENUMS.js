@@ -86,7 +86,8 @@ const MOVE_TYPES = Object.freeze({
     Magnetize: 'Magnetize',
     SmokeBomb: 'SmokeBomb',
     Drill: 'Drill',
-    Detonate: 'Detonate'
+    Detonate: 'Detonate',
+    NaniteBeam: 'NaniteBeam'
 })
 const MOVE_TYPES_ALL = Object.values(MOVE_TYPES)
 
