@@ -4,62 +4,50 @@
  */
 class MercenariesEncounter extends FleetEncounter {
     onStart() {
-        // Check player's origin planet
+        // Check if player is from enemy planet or has infamy
         const originPlanet = gs.fleet.planet
-        if (!originPlanet) {
-            // No origin planet, treat as neutral
-            this.showNeutralMercenaries()
-            return
-        }
+        const isAtWar = originPlanet && this.planet.c?.relationships?.get(originPlanet) === RELATIONSHIP_TYPES.WAR
+        const hasInfamy = this.planet && FameLevel.hasInfamyLevel(gs.captain, this.planet, INFAMY_LEVELS.DISREPUTABLE)
         
-        // Check relationship between player's origin and mercenary's planet
-        const relationship = this.planet.c?.relationships?.get(originPlanet)
-        
-        // 75% chance to attack if at war
-        if (relationship === RELATIONSHIP_TYPES.WAR && Math.random() < 0.75) {
+        // Mercenaries demand surrender if at war or infamous (50% chance for infamy)
+        if (isAtWar || (hasInfamy && Math.random() < 0.5)) {
+            const reason = isAtWar 
+                ? `"${coloredName(originPlanet)} vessel detected! Our contract with ${coloredName(this.planet)} is clear - surrender or die!"` 
+                : `"We've been hired to deal with you. You've made too many enemies. Surrender your ships or we open fire!"`;
+            
             showModal(coloredName(this.fleet), 
-                `A ${coloredName(this.fleet)} fleet hired by ${coloredName(this.planet)} spots you!<br/>` +
-                `"${coloredName(originPlanet)} scum! Our contract is clear - your head has a price on it!"`, [
-                ['Fight', () => this.startCombat(true)],
-                ['Surrender', () => this.onSurrender()],
+                `The ${coloredName(this.fleet)} intercept you immediately!<br/>` + reason, [
+                ['Resist', () => this.startCombat(true)],
+                ['Surrender', () => this.impoundPlayerFleet()],
             ])
             return
         }
         
-        // 50% chance to attack if tense
-        if (relationship === RELATIONSHIP_TYPES.TENSE && Math.random() < 0.5) {
-            showModal(coloredName(this.fleet), 
-                `A ${coloredName(this.fleet)} fleet contracted by ${coloredName(this.planet)} intercepts you!<br/>` +
-                `"We've been authorized to deal with ${coloredName(originPlanet)} ships in this sector. Stand down!"`, [
-                ['Fight', () => this.startCombat(true)],
-                ['Try to Talk', () => this.showNeutralMercenaries()],
-            ])
-            return
+        // Check for tense relationships
+        if (originPlanet) {
+            const relationship = this.planet.c?.relationships?.get(originPlanet)
+            
+            // 50% chance to attack if tense
+            if (relationship === RELATIONSHIP_TYPES.TENSE && Math.random() < 0.5) {
+                showModal(coloredName(this.fleet), 
+                    `A ${coloredName(this.fleet)} fleet contracted by ${coloredName(this.planet)} intercepts you!<br/>` +
+                    `"We've been authorized to deal with ${coloredName(originPlanet)} ships in this sector. Stand down!"`, [
+                    ['Fight', () => this.startCombat(true)],
+                    ['Try to Talk', () => this.showNeutralMercenaries()],
+                ])
+                return
+            }
         }
         
-        // Otherwise neutral
+        // Otherwise neutral - only offer officer hiring
         this.showNeutralMercenaries()
     }
     
     showNeutralMercenaries() {
         const greeting = this.getGreetingDialogue()
-        const rand = Math.random()
         
-        // 50% chance to offer hiring an officer
-        if (rand < 0.5) {
-            this.offerOfficerForHire(greeting)
-            return
-        }
-        
-        // Otherwise standard neutral behavior
-        const message = greeting 
-            ? `A ${coloredName(this.fleet)} fleet hails you.<br/>"${greeting}"`
-            : `A ${coloredName(this.fleet)} fleet hails you over comms.<br/>"We're hired guns, not trouble seekers. Keep your distance and we'll keep ours."`
-        
-        showModal(coloredName(this.fleet), message, [
-            ['Ignore', () => this.endEncounter()],
-            ['Attack', () => this.showPlayerAttackFleetModal()],
-        ])
+        // Always try to offer an officer for hire
+        this.offerOfficerForHire(greeting)
     }
     
     offerOfficerForHire(greeting) {
@@ -91,40 +79,7 @@ class MercenariesEncounter extends FleetEncounter {
                 )
             }, !canAfford || !canHire],
             ['Decline', () => this.endEncounter()],
-        ])
-    }
-    
-    offerShipForSale(greeting) {
-        // Generate a mercenary ship (weighted toward combat ships)
-        const shipType = Math.random() < 0.7 
-            ? rndMember([SHIP_TYPES.FIGHTER, SHIP_TYPES.CORVETTE, SHIP_TYPES.FRIGATE, SHIP_TYPES.DESTROYER])
-            : rndMember(SHIP_TYPES_ALL)
-        const ship = generateShip(this.planet, shipType)
-        
-        // Price is 75% of shipyard price (better deal)
-        const basePrice = Math.round(ship.value * (1 + this.planet.c.corruption/4) * (1 + this.planet.c.inflation/4) * (1 + this.planet.c.taxes/4) / this.planet.c.navy)
-        const price = Math.round(basePrice * 0.75)
-        const canAfford = gs.credits >= price
-        
-        let message = greeting ? `"${greeting}"<br/><br/>` : ''
-        message += `The mercenary captain gestures to one of their ships:<br/><br/>`
-        message += `"Got a surplus ship here. Battle-tested but still solid. ${price} CR and it's yours - no questions asked."<br/><br/>`
-        message += `<b>${ship.shipType.name}</b><br/>`
-        message += `<b>Hull:</b> ${ship.hull[1]} | <b>Shields:</b> ${ship.shields[1]} | <b>Lasers:</b> ${ship.lasers}<br/>`
-        message += `<b>Engine:</b> ${ship.engine} | <b>Cargo:</b> ${ship.cargoSpace}`
-        
-        showModal(coloredName(this.fleet), message, [
-            ['Buy', () => {
-                gs.credits -= price
-                gs.fleet.addShip(ship)
-                showModal('Ship Purchased',
-                    `You transfer ${price} CR.<br/><br/>` +
-                    `"Pleasure doing business. She'll serve you well in a fight."<br/><br/>` +
-                    `${ship.shipType.name} added to your fleet!`,
-                    [['Continue', () => this.endEncounter()]]
-                )
-            }, !canAfford],
-            ['Decline', () => this.endEncounter()],
+            ['Attack', () => this.showPlayerAttackFleetModal()],
         ])
     }
 
@@ -140,33 +95,72 @@ class MercenariesEncounter extends FleetEncounter {
         }
     }
 
+    onDefeat() {
+        this.showPlayerDestroyedByMercenariesModal()
+    }
+
     onSurrender() {
-        // Mercenaries take cargo and some credits
-        const creditsTaken = Math.min(gs.credits, rng(gs.credits * ENCOUNTER_MAX_LOSE_CREDITS_RATIO, gs.credits * ENCOUNTER_MAX_LOSE_CREDITS_RATIO / 2, true))
-        gs.credits -= creditsTaken
+        this.showPlayerDestroyedByMercenariesModal()
+    }
+
+    impoundPlayerFleet() {
+        const planetName = coloredName(this.planet);
+        const fleetName = coloredName(this.fleet);
         
-        // Take random cargo
-        const cargoTaken = []
-        const cargoTypes = gs.fleet.cargo.keys
-        for (let i = 0; i < Math.min(3, cargoTypes.length); i++) {
-            const ct = rndMember(cargoTypes)
-            const amount = Math.min(gs.fleet.cargo.getAmount(ct), rng(gs.fleet.cargo.getAmount(ct) * ENCOUNTER_MAX_LOSE_CARGO_RATIO, gs.fleet.cargo.getAmount(ct) * ENCOUNTER_MAX_LOSE_CARGO_RATIO / 2, true))
-            gs.fleet.cargo.increment(ct, -amount)
-            cargoTaken.push(`${amount} ${ct.name}`)
+        // Destroy all ships except flagship
+        for (let i = 1; i < gs.fleet.ships.length; i++) {
+            gs.fleet.ships[i].hull[0] = 0;
         }
         
-        showModal('Surrender', 
-            `You surrender to the ${coloredName(this.fleet)}.<br/>` +
-            `They take ${creditsTaken} CR` + (cargoTaken.length > 0 ? ` and ${cargoTaken.join(', ')}` : '') + `.<br/>` +
-            `"Professional courtesy - we're letting you live. Next time, stay out of our way."`, [
-            ['Continue', () => this.endEncounter()]
+        // Clear all cargo
+        gs.fleet.cargo.clear();
+        
+        // Teleport player to this planet
+        gs.fleet.dock(this.planet);
+        
+        showModal('Impounded', `You surrender to the ${fleetName}. They escort you to ${planetName} where your escort ships and cargo are turned over to their employer.<br/><br/>"Smart choice. Our contract didn't require killing you - just taking your assets. You're free to go... for now."<br/><br/>Your crew is intact, but you've lost everything except your flagship.`, [
+            ['Continue', ()=>this.endEncounter()],
         ])
+    }
+
+    showPlayerDestroyedByMercenariesModal() {
+        const planetName = coloredName(this.planet);
+        const fleetName = coloredName(this.fleet);
         
-        // Surrendering shrinks reputation toward 0
-        const reputationShrink = Math.ceil(ENCOUNTER_BASE_REPUTATION_SHRINK_ON_SURRENDER / Math.abs(FACTION_TYPES.MERCENARIES.reputationMultiplier || 1))
-        if (reputationShrink) {
-            const currentRep = gs.captain.reputation.getAmount(FACTION_TYPES.MERCENARIES)
-            gs.captain.grantReputation(FACTION_TYPES.MERCENARIES, currentRep > 0 ? -reputationShrink : reputationShrink)
+        // 50% chance each crew member dies
+        const casualties = [];
+        for (let i = gs.fleet.officers.length - 1; i >= 0; i--) {
+            if (Math.random() < 0.5) {
+                casualties.push(gs.fleet.officers[i].name);
+                gs.fleet.officers.splice(i, 1);
+            }
         }
+        
+        // Destroy all ships except flagship
+        for (let i = 1; i < gs.fleet.ships.length; i++) {
+            gs.fleet.ships[i].hull[0] = 0;
+        }
+        
+        // Clear all cargo
+        gs.fleet.cargo.clear();
+        
+        // Halve infamy with this planet
+        const currentRep = gs.captain.reputation.getAmount(this.planet);
+        if (currentRep < 0) {
+            const halvedInfamy = currentRep * 0.5;
+            gs.captain.reputation.setAmount(this.planet, halvedInfamy);
+        }
+        
+        let message = `The ${fleetName} execute their contract with ruthless efficiency, reducing your fleet to scrap metal and debris. Your flagship barely survives, drifting through the wreckage.<br/><br/>`;
+        
+        if (casualties.length > 0) {
+            message += `<b>Casualties:</b> ${casualties.join(', ')} perished in the battle.<br/><br/>`;
+        }
+        
+        message += `They've seized all your cargo and destroyed your escort ships. "Contract fulfilled. Nothing personal."<br/><br/>Your infamy with ${planetName} has been somewhat reduced by this defeat.`;
+        
+        showModal('Destroyed', message, [
+            ['Continue', ()=>this.endEncounter()],
+        ])
     }
 }

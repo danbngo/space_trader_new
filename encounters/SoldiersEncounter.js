@@ -11,10 +11,13 @@ class SoldiersEncounter extends AuthoritiesEncounter {
                 ['Attack', ()=>this.showPlayerAttackFleetModal()],
             ])
         }
-        // Soldiers attack enemies of the state (50% chance if sufficiently infamous)
-        else if (FameLevel.hasInfamyLevel(gs.captain, this.planet, INFAMY_LEVELS.DISREPUTABLE) && Math.random() < 0.5) {
-            showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} ships power up their weapons the instant you pass by!<br/>You have grown so notorious that even the government considers you a threat!`, [
-                ['Resist', ()=>this.showPlayerRefuseSurrenderModal()],
+        // Soldiers demand surrender if player is from enemy planet
+        else if (gs.fleet.planet && this.planet.c?.relationships?.get(gs.fleet.planet) === RELATIONSHIP_TYPES.WAR) {
+            showModal(coloredName(this.fleet), 
+                `The ${coloredName(this.fleet)} intercept you immediately!<br/>` +
+                `"${coloredName(gs.fleet.planet)} vessel detected! You're in restricted space during wartime. Surrender your ships immediately or be destroyed!"`, [
+                ['Resist', ()=>this.startCombat(true)],
+                ['Surrender', ()=>this.impoundPlayerFleet()],
             ])
         }
         // Otherwise, ignore you
@@ -42,9 +45,38 @@ class SoldiersEncounter extends AuthoritiesEncounter {
         this.showPlayerDestroyedBySoldiersModal()
     }
 
+    impoundPlayerFleet() {
+        const planetName = coloredName(this.planet);
+        const fleetName = coloredName(this.fleet);
+        
+        // Destroy all ships except flagship
+        for (let i = 1; i < gs.fleet.ships.length; i++) {
+            gs.fleet.ships[i].hull[0] = 0;
+        }
+        
+        // Clear all cargo
+        gs.fleet.cargo.clear();
+        
+        // Teleport player to this planet
+        gs.fleet.dock(this.planet);
+        
+        showModal('Impounded', `You surrender to the ${fleetName}. They escort you to ${planetName} where your escort ships and cargo are immediately impounded.<br/><br/>"You're lucky we're following protocol. Your ships will be held until this war ends... if it ever does."<br/><br/>Your crew is intact, but you've lost everything except your flagship.`, [
+            ['Continue', ()=>this.endEncounter()],
+        ])
+    }
+
     showPlayerDestroyedBySoldiersModal() {
         const planetName = coloredName(this.planet);
         const fleetName = coloredName(this.fleet);
+        
+        // 50% chance each crew member dies
+        const casualties = [];
+        for (let i = gs.fleet.officers.length - 1; i >= 0; i--) {
+            if (Math.random() < 0.5) {
+                casualties.push(gs.fleet.officers[i].name);
+                gs.fleet.officers.splice(i, 1);
+            }
+        }
         
         // Destroy all ships except flagship
         for (let i = 1; i < gs.fleet.ships.length; i++) {
@@ -61,7 +93,15 @@ class SoldiersEncounter extends AuthoritiesEncounter {
             gs.captain.reputation.setAmount(this.planet, halvedInfamy);
         }
         
-        showModal('Destroyed', `The ${fleetName} open fire without mercy, reducing your fleet to scrap metal and debris. Your flagship barely survives, limping through space as wreckage drifts around you.<br/><br/>They've seized all your cargo and destroyed your escort ships. You're left for dead, adrift in the void.<br/><br/>Your infamy with ${planetName} has been somewhat reduced by this crushing defeat.`, [
+        let message = `The ${fleetName} open fire without mercy, reducing your fleet to scrap metal and debris. Your flagship barely survives, limping through space as wreckage drifts around you.<br/><br/>`;
+        
+        if (casualties.length > 0) {
+            message += `<b>Casualties:</b> ${casualties.join(', ')} perished in the battle.<br/><br/>`;
+        }
+        
+        message += `They've seized all your cargo and destroyed your escort ships. You're left for dead, adrift in the void.<br/><br/>Your infamy with ${planetName} has been somewhat reduced by this crushing defeat.`;
+        
+        showModal('Destroyed', message, [
             ['Continue', ()=>this.endEncounter()],
         ])
     }
