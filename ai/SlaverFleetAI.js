@@ -6,13 +6,11 @@
 class SlaverFleetAI extends FleetAI {
     constructor(fleet = null, origin = null, starMap = null) {
         super(fleet, origin, starMap);
-        /** @type {Fleet[]} */
-        this.visited = [];
     }
     
     calcValidTargets() {
         const ourScore = this.fleet.combatRating
-        return gs.system.fleets.filter(f => {
+        const liveFleets = gs.system.fleets.filter(f => {
             if (f === this.fleet || f.factionType.militant || f.factionType.criminal || f.location) return false
             // Skip if already visited
             if (this.visited.includes(f)) return false
@@ -21,6 +19,16 @@ class SlaverFleetAI extends FleetAI {
             // Don't attack targets that are 2x stronger
             return f.combatRating <= ourScore * 2
         })
+        
+        // Also target abandoned fleets with crew
+        const abandonedFleets = gs.system.abandonedFleets.filter(f => {
+            // Skip if already visited
+            if (this.visited.includes(f)) return false
+            // Only target abandoned fleets that still have crew
+            return f.officers.length > 0
+        })
+        
+        return [...liveFleets, ...abandonedFleets]
     }
     calcDestination() {
         return rndMember([...gs.system.dwarfPlanets, ...gs.system.spaceStations].filter(p=>(p !== this.origin)))
@@ -30,13 +38,21 @@ class SlaverFleetAI extends FleetAI {
             // Mark as visited
             this.visited.push(this.target);
             
-            // 50% chance to capture officers peacefully, 50% chance to fight
-            if (Math.random() < 0.5) {
-                this.transferOfficers(this.target, this.fleet);
-                this.target = null;
-                this.route = null;
+            // Check if target is abandoned
+            if (this.target instanceof AbandonedFleet) {
+                // Take all crew from abandoned fleet using utility function
+                this.transferOfficers(this.target, this.fleet, '⛓️', COLORS.Orange, '🆘', COLORS.Gray);
+                this.target = null
+                this.fleet.route = null
             } else {
-                this.fightTarget();
+                // 50% chance to capture officers peacefully, 50% chance to fight
+                if (Math.random() < 0.5) {
+                    this.transferOfficers(this.target, this.fleet);
+                    this.target = null;
+                    this.fleet.route = null;
+                } else {
+                    this.fightTarget(true);
+                }
             }
         }
     }

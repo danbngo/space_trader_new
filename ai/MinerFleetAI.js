@@ -10,20 +10,30 @@ class MinerFleetAI extends FleetAI {
         this.visitedAsteroids = [];
     }
     calcValidTargets() {
+        // Only target asteroids if we have cargo space
+        if (this.fleet.availableCargoSpace <= 0) {
+            return []
+        }
+        
         //introduce some fuzz so ship will move around
         // Filter out asteroids from Plasma belts (like Corona) - too dangerous to mine
         return gs.system.asteroids.filter(a => {
             if (calcDistance(this.fleet.x, this.fleet.y, a.x, a.y) <= 0.3) return false;
-            if (a.belt && a.belt.beltType === ASTEROID_BELT_TYPES.Plasma) return false;
+            if (a.belt && a.belt.asteroidBeltType === ASTEROID_BELT_TYPES.Plasma) return false;
             // Skip if already visited
             if (this.visitedAsteroids.includes(a)) return false;
             return true;
         })
     }
     calcDestination() {
+        // If cargo is full, go to a planet to unload
+        if (this.fleet.availableCargoSpace <= 0) {
+            return rndMember([...gs.system.planets].filter(p => p !== this.origin));
+        }
+        
         // Filter out Plasma belt asteroids (too dangerous)
         const validAsteroids = gs.system.asteroids.filter(a => {
-            if (a.belt && a.belt.beltType === ASTEROID_BELT_TYPES.Plasma) return false;
+            if (a.belt && a.belt.asteroidBeltType === ASTEROID_BELT_TYPES.Plasma) return false;
             return true;
         });
         
@@ -49,22 +59,27 @@ class MinerFleetAI extends FleetAI {
             // Mark asteroid as visited
             this.visitedAsteroids.push(this.target);
             
-            const beltType = this.target.parent.beltType;
+            const asteroidBeltType = this.target.parent.asteroidBeltType;
             const mineAmount = Math.min(rng(5, 2), this.fleet.availableCargoSpace);
             
             // Determine cargo type based on belt
             let cargoType;
-            if (beltType === ASTEROID_BELT_TYPES.Rocky) {
+            if (asteroidBeltType === ASTEROID_BELT_TYPES.Rocky) {
                 cargoType = rndMember([CARGO_TYPES.METAL, CARGO_TYPES.ISOTOPES]);
-            } else if (beltType === ASTEROID_BELT_TYPES.Icy) {
+            } else if (asteroidBeltType === ASTEROID_BELT_TYPES.Icy) {
                 cargoType = rndMember([CARGO_TYPES.WATER, CARGO_TYPES.ISOTOPES]);
-            } else if (beltType === ASTEROID_BELT_TYPES.Plasma) {
+            } else if (asteroidBeltType === ASTEROID_BELT_TYPES.Plasma) {
                 cargoType = CARGO_TYPES.ANTIMATTER;
             }
             
             if (cargoType) {
                 this.fleet.cargo.increment(cargoType, mineAmount);
                 console.log(`⛏️ ${this.fleet.name} mined ${mineAmount} ${cargoType.name}`);
+                
+                // Randomize asteroid orbit after mining
+                if (this.target.orbit) {
+                    this.target.orbit.progressOffset = Math.random();
+                }
                 
                 // Show mining popup
                     this.addPopup('⛏️', COLORS.Orange)
@@ -73,42 +88,26 @@ class MinerFleetAI extends FleetAI {
     }
     
     onNearDestination() {
-        // Unload all cargo at destination market
-        if (this.destination && this.destination instanceof Planet && this.destination.s && this.destination.s.market && this.fleet.cargo.total > 0) {
-            this.destination.c.industry *= 1.01; // Boost economy slightly when merchants arrive
-            const market = this.destination.s.market
-            
-            // Add all our cargo to the market
-            for (const [cargoType, amount] of this.fleet.cargo.counts.entries()) {
-                market.cargo.increment(cargoType, amount)
+        // Sell all cargo at destination market for credits
+        if (this.destination && this.destination instanceof Planet && this.fleet.cargo.total > 0) {
+            // Boost industry specifically for miners
+            if (this.destination.civilization) {
+                this.destination.c.industry *= 1.01;
             }
-            this.fleet.cargo.clear()
-            
-            console.log(`💰 ${this.fleet.name} unloaded all cargo at ${this.destination.name}`)
-            
-            // Show trade popup
-            this.addPopup('💲', COLORS.Green)
+            this.sellCargoAtMarket(this.destination);
         }
         
         super.onNearDestination()
     }
     
     onNearOrigin() {
-        // Unload all cargo at origin market
-        if (this.origin && this.origin instanceof Planet && this.origin.s && this.origin.s.market && this.fleet.cargo.total > 0) {
-            this.origin.c.industry *= 1.01; // Boost economy slightly when merchants arrive
-            const market = this.origin.s.market
-            
-            // Add all our cargo to the market
-            for (const [cargoType, amount] of this.fleet.cargo.counts.entries()) {
-                market.cargo.increment(cargoType, amount)
+        // Sell all cargo at origin market for credits
+        if (this.origin && this.origin instanceof Planet && this.fleet.cargo.total > 0) {
+            // Boost industry specifically for miners
+            if (this.origin.civilization) {
+                this.origin.c.industry *= 1.01;
             }
-            this.fleet.cargo.clear()
-            
-            console.log(`💰 ${this.fleet.name} unloaded all cargo at ${this.origin.name}`)
-            
-            // Show trade popup
-            this.addPopup('💲', COLORS.Green)
+            this.sellCargoAtMarket(this.origin);
         }
         
         super.onNearOrigin()

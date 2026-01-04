@@ -6,13 +6,11 @@
 class SoldierFleetAI extends FleetAI {
     constructor(fleet = null, origin = null, starMap = null) {
         super(fleet, origin, starMap);
-        /** @type {Fleet[]} */
-        this.visited = [];
     }
     
     calcValidTargets() {
         const ourScore = this.fleet.combatRating
-        return gs.system.fleets.filter(f => {
+        const hostileFleets = gs.system.fleets.filter(f => {
             if (f === this.fleet) return false;
             if (f.location) return false;
             // Skip if already visited
@@ -30,13 +28,28 @@ class SoldierFleetAI extends FleetAI {
             
             return false;
         });
+        
+        // Also rescue crew from abandoned fleets from own planet or allied planets
+        const abandonedRescues = gs.system.abandonedFleets.filter(f => {
+            // Skip if already visited
+            if (this.visited.includes(f)) return false;
+            // Only target abandoned fleets that still have crew
+            if (f.officers.length === 0) return false;
+            // Only rescue from own planet or allied planets
+            if (this.fleet.planet && this.fleet.planet.civilization && f.planet && f.planet.civilization) {
+                return (f.planet === this.fleet.planet) || Civilization.areAllies(this.fleet.planet, f.planet);
+            }
+            return false;
+        });
+        
+        return [...hostileFleets, ...abandonedRescues];
     }
     calcDestination() {
         // 75% chance to patrol a random asteroid (weighted toward closer ones)
         if (Math.random() < 0.75 && gs.system.asteroids.length > 0) {
             // Filter out Plasma belt asteroids (too dangerous)
             const validAsteroids = gs.system.asteroids.filter(a => {
-                if (a.belt && a.belt.beltType === ASTEROID_BELT_TYPES.Plasma) return false;
+                if (a.belt && a.belt.asteroidBeltType === ASTEROID_BELT_TYPES.Plasma) return false;
                 return true;
             });
             
@@ -63,8 +76,16 @@ class SoldierFleetAI extends FleetAI {
             // Mark as visited
             this.visited.push(this.target);
             
-            if (Math.random() > 0.5) {
-                this.fightTarget();
+            // Check if target is abandoned
+            if (this.target instanceof AbandonedFleet) {
+                // Rescue crew from abandoned fleet
+                this.rescueCrew(this.target);
+                this.target = null
+                this.fleet.route = null
+            } else {
+                if (Math.random() > 0.5) {
+                    this.fightTarget(true);
+                }
             }
         }
     }

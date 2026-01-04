@@ -1,5 +1,5 @@
 class RamAction extends ShipAction {
-    constructor(encounter = new Encounter(), actor = new Ship(), target = new Ship()) {
+    constructor(encounter, actor = new Ship(), target = new Ship()) {
         super(encounter, actor, MOVE_TYPES.Ram, target)
         //this.actorInfoMessage = 'Ramming Speed!' //clutter-y
     }

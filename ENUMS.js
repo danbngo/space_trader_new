@@ -68,6 +68,7 @@ const COLORS = Object.freeze({
     DarkMagenta: [180,0,180,1], // rgba(180,0,180,1)
     Targeting: [0,255,0,0.5], // rgba(0,255,0,0.1)
     TargetingConfirm: [0,255,0,1], // rgba(0,255,0,0.7)
+    Transparent: [0,0,0,0], // rgba(0,0,0,0)
 })
 
 /** @enum {MoveType} */
@@ -128,8 +129,8 @@ const CL = Object.freeze({
 
 
 const CHASE_DISTANCES = Object.freeze({
-    NEAR: 2,
-    MEDIUM: 4,
-    FAR: 8,
-    EXTREME: 16
+    NEAR: 8,
+    MEDIUM: 16,
+    FAR: 32,
+    EXTREME: 64
 })

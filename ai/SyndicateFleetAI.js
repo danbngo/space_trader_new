@@ -6,8 +6,6 @@
 class SyndicateFleetAI extends FleetAI {
     constructor(fleet = null, origin = null, starMap = null) {
         super(fleet, origin, starMap);
-        /** @type {Fleet[]} */
-        this.visited = [];
     }
     
     calcValidTargets() {
@@ -34,7 +32,7 @@ class SyndicateFleetAI extends FleetAI {
             if (Math.random() < 0.5) {
                 this.transferCredits(this.target, this.fleet);
                 this.target = null;
-                this.route = null;
+                this.fleet.route = null;
             } else {
                 this.fightTarget();
             }

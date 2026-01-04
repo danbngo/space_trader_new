@@ -1,5 +1,11 @@
+DONE:
+-cant shoot under debris, little too punishing for asteroids. instead make it higher miss chance
+
+
 
 TODO:
+
+-asteroids change shape when i miss them!!??
 
 -when ships fight each other there should be an 'abandoned ship' after which salvagers wanna move to
  -these can trigger the abandoned ship encounter

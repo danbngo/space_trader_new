@@ -68,6 +68,11 @@ class Ship {
         this.uuid = generateUUID('ship_');
         /** @type {number} */
         this.radiusModifier = this.shipType ? rng(this.shipType.maxRadiusModifier, this.shipType.minRadiusModifier, false) : 1;
+
+        const statModifier = Math.sqrt(this.radiusModifier)
+        this.engine = Math.ceil(this.engine/statModifier)
+        this.hull[0] = Math.ceil(statModifier*this.hull[0])
+        this.hull[1] = Math.ceil(statModifier*this.hull[1])
     }
 
     get modules() {
@@ -368,7 +373,7 @@ class Ship {
     }
 
     get canShoot() {
-        return this.lasers > 0 && !this.disabled && !this.escaped && !this.statusEffects.has(STATUS_EFFECTS.DUSTY)
+        return this.lasers > 0 && !this.disabled && !this.escaped
     }
 
     get canUseModules() {

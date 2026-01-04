@@ -5,6 +5,11 @@
  */
 class ColonistFleetAI extends FleetAI {
     calcDestination() {
+        // If no officers left (except captain), return to origin to restock
+        if (this.fleet.subordinates.length === 0) {
+            return this.origin
+        }
+        
         return rndMember([...gs.system.dwarfPlanets, ...gs.system.spaceStations].filter(p => {
             if (p === this.origin || p === this.fleet.planet) return false
             
@@ -23,6 +28,30 @@ class ColonistFleetAI extends FleetAI {
     onNearDestination() {
         if (!(this.fleet.planet instanceof Planet) || !(this.destination instanceof Planet)) {
             return super.onNearDestination()
+        }
+        
+        // If at origin, restock officers
+        if (this.destination === this.origin) {
+            const crew = generateCrew(this.fleet.planet, this.fleet.factionType)
+            this.fleet.officers.push(...crew)
+            console.log(`👥 ${this.fleet.name} restocked ${crew.length} officers at ${this.origin.name}`)
+            return super.onNearDestination()
+        }
+        
+        // Lose some officers (0-100%, except captain)
+        if (this.fleet.subordinates.length > 0) {
+            const lossRate = Math.random()
+            const subordinates = [...this.fleet.subordinates]
+            const officersToLose = Math.floor(subordinates.length * lossRate)
+            
+            for (let i = 0; i < officersToLose; i++) {
+                const officer = subordinates[i]
+                this.fleet.removeOfficer(officer)
+            }
+            
+            if (officersToLose > 0) {
+                console.log(`👤 ${this.fleet.name} lost ${officersToLose} colonists (${Math.round(lossRate * 100)}%) at ${this.destination.name}`)
+            }
         }
         
         // Transfer racial/ethnic values from origin to destination (2% influence)

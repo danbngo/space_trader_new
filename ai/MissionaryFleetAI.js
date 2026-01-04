@@ -6,8 +6,6 @@
 class MissionaryFleetAI extends FleetAI {
     constructor(fleet = null, origin = null, starMap = null) {
         super(fleet, origin, starMap);
-        /** @type {Fleet[]} - Fleets already visited to avoid repeat conversions */
-        this.visited = [];
     }
     
     calcValidTargets() {
@@ -51,12 +49,7 @@ class MissionaryFleetAI extends FleetAI {
             // 20% chance to convert
             else if (roll < 0.3) {
                 const ourReligion = this.fleet.captain.religion;
-                this.target.captain.religion = ourReligion;
-                
-                console.log(`✝️ ${this.fleet.name} converted ${this.target.captain.name} to ${ourReligion.name}!`);
-                
-                // Show conversion popup
-                this.addPopup('✝️', COLORS.White);
+                this.convertToReligion(this.target, ourReligion);
                 
                 // Spread culture to converted fleet's home planet (0.1% influence)
                 if (this.target.planet instanceof Planet) {
@@ -69,7 +62,7 @@ class MissionaryFleetAI extends FleetAI {
             console.log(`🕊️ ${this.fleet.name} ${this.fleet.uuid} has attempted conversion of ${this.target.name} ${this.target.uuid} and is moving on to its next destination.`);
             // Clear target and move on
             this.target = null;
-            this.route = null;
+            this.fleet.route = null;
         }
     }
     onNearDestination() {

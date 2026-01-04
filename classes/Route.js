@@ -25,10 +25,11 @@ class Route {
         const naiveDistance = calcDistance(fleet.x, fleet.y, destination.x, destination.y)
         const naiveTravelTime = naiveDistance/fleet.speed
         //add one extra day
-        const {toX, toY, endYear} = Route.estimateTravelTimeToOrbitingBody(startYear, fleet, destination, 100, naiveTravelTime*10+1/365)
-        this.endYear = endYear
-        this.travelTime = endYear-startYear
-        this.path = new Path(fleet.x, fleet.y, toX, toY)
+        const travelMargin = 1/365 //small buffer to routes, dont want fleets zipping around too jerkily
+        const {toX, toY, endYear} = Route.estimateTravelTimeToOrbitingBody(startYear, fleet, destination, 100, naiveTravelTime*10+travelMargin)
+        this.endYear = endYear + travelMargin//add a small buffer to arrival time
+        this.travelTime = this.endYear-this.startYear
+        this.path = new Path(this.fleet.x, this.fleet.y, toX, toY)
         this.valid = true
     }
 

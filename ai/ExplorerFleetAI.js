@@ -35,6 +35,11 @@ class ExplorerFleetAI extends FleetAI {
     }
     
     calcDestination() {
+        // If cargo is full, return to a major planet to unload
+        if (this.fleet.availableCargoSpace <= 0) {
+            return rndMember([...gs.system.planets].filter(p => p !== this.origin));
+        }
+        
         // Always travel to a random waypoint in the outer regions (at least 0.75x radius from center)
         // This ensures explorers travel to distant frontiers like the Kuiper belt
         const minDistance = gs.system.radius * 0.75;
@@ -57,21 +62,7 @@ class ExplorerFleetAI extends FleetAI {
             const index = gs.system.anomalies.indexOf(this.target);
             if (index !== -1) {
                 gs.system.anomalies.splice(index, 1);
-                
-                // Award relics for charting the anomaly
-                if (this.fleet.availableCargoSpace > 0) {
-                    const relicsFound = Math.min(rng(2, 1), this.fleet.availableCargoSpace);
-                    this.fleet.cargo.increment(CARGO_TYPES.RELICS, relicsFound);
-                    console.log(`🧭 ${this.fleet.name} charted ${this.target.name} and discovered ${relicsFound} relics`);
-                    
-                    // Show discovery popup
-                    this.addPopup('✨', COLORS.Green)
-                } else {
-                    console.log(`🧭 ${this.fleet.name} charted ${this.target.name}`);
-                    
-                    // Show discovery popup
-                    this.addPopup('✨', COLORS.Green)
-                }
+                this.makeDiscoveries(this.target.name, 1, 2, '🧭', COLORS.Green);
             }
         }
         
@@ -134,8 +125,21 @@ class ExplorerFleetAI extends FleetAI {
             
             // Clear target and move on
             this.target = null;
-            this.route = null
+            this.fleet.route = null
         }
+    }
+    
+    onNearDestination() {
+        // Unload relics at destination if it's a major planet
+        if (this.destination instanceof Planet && this.fleet.cargo.total > 0) {
+            // Boost technology for exploration discoveries
+            if (this.destination.civilization) {
+                this.destination.c.technology *= 1.01;
+            }
+            this.sellCargoAtMarket(this.destination);
+        }
+        
+        super.onNearDestination();
     }
     
     onDestroyed() {

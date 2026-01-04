@@ -56,12 +56,18 @@ class Fleet extends SpaceObject {
         this.y = planet.y
         this.route = null
         planet.addChildren([this])
-        
-        // Grant encounter immunity when player docks
+    }
+
+    /** @param {Route} route */
+    startRoute(route) {
+        console.log(`🚢 ${this.name} ${this.uuid} is starting route to ${route.destination.name}`)
+        this.location = null
+        this.route = route
+        // Grant encounter immunity when player LEAVES the dock
         if (this === gs.fleet) {
             gs.encounterImmunityUntilYear = gs.year + (ENCOUNTER_IMMUNITY_DAYS / 365)
         }
-    }
+    };
 
     get subordinates() {
         return this.officers.filter(officer => officer !== this.captain);
@@ -177,9 +183,9 @@ class Fleet extends SpaceObject {
     get speed() {
         //each engine makes your fleet go 1 AU per MINUTE if there was no weight
         const weight = this.totalMass + this.cargo.total
-        const baseSpeed = AVERAGE_FLEET_SPEED * this.totalEngine/AVERAGE_SHIP_ENGINE / weight
+        const baseSpeed = this.totalEngine/AVERAGE_SHIP_ENGINE / weight
         const totalPilotSkill = this.totalSkills.getAmount(SKILLS.Pilot)
-        const speed = Math.sqrt(baseSpeed) * (1 + totalPilotSkill/50)
+        const speed = Math.sqrt(baseSpeed) * (1 + totalPilotSkill/50) * AVERAGE_FLEET_SPEED
         return speed
         //fleets are a lil too fast, slow ones are a lil too slow
     }
@@ -255,6 +261,15 @@ class Fleet extends SpaceObject {
             this.officers.splice(index, 1);
             officer.fleet = null;
         }
+    }
+
+    /**
+     * Find all officers matching a given condition
+     * @param {(officer: Officer) => boolean} callback - Function that returns true for matching officers
+     * @returns {Officer[]} Array of officers matching the condition
+     */
+    findOfficersMatching(callback) {
+        return this.officers.filter(callback);
     }
 
     get activeShips() {

@@ -89,7 +89,7 @@ const FACTION_TYPES = {
         true,
         false, 
         false,
-        true,  
+        true,
         true,
         [FLEET_TYPES.PIRATES],
         -3,  // reputationMultiplier (good gain for defeating pirates)
@@ -327,7 +327,7 @@ const FACTION_TYPES = {
         false,  
         false,
         false, 
-        true,
+        false, //you have NO PROOF, they're professionals.
         false,
         [FLEET_TYPES.SYNDICATES],
         -3,  // reputationMultiplier (good gain for defeating criminals)

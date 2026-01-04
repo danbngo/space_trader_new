@@ -96,6 +96,7 @@ class HazardEncounter extends Encounter {
 
     //simulates the player doing his best to escape the hazard, creates a random combat result basically
     autoNavigateHazard() {
+        this.combatEnabled = false //very important!
         const {playerShips, enemyShips} = this
         const maxDamage = enemyShips.reduce((sum, ship)=>sum + ship.hull[1]*ship.engine*0.005, 0);
         const damage = rng(maxDamage, 0, true)

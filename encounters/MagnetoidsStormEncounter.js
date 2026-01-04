@@ -5,6 +5,9 @@
  */
 class MagnetoidsStormEncounter extends HazardEncounter {
     onStart() {
+        for (const ship of this.fleet.ships) {
+            ship.engine *= rng(ASTEROID_STORM_SPEED_MULTIPLIER)
+        }
         showModal(coloredName(this.fleet), `You encounter a brutal ${coloredName(this.fleet)}! The magnetic interference is wreaking havoc on your systems.`, [
             //['View', ()=>closeModal()],
             ['Auto-Navigate', ()=>this.autoNavigateHazard()],

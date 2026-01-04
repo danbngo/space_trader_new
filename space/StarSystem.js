@@ -36,6 +36,8 @@ class StarSystem extends SpaceObject {
         this.spaceStations = spaceStations
         /** @type {Fleet[]} */
         this.fleets = fleets
+        /** @type {AbandonedFleet[]} */
+        this.abandonedFleets = []
         /** @type {AsteroidBelt[]} */
         this.asteroidBelts = asteroidBelts
         /** @type {Asteroid[]} */
@@ -124,16 +126,33 @@ class StarSystem extends SpaceObject {
         }
     }
 
-    removeFleet(fleet) {
+    destroyFleet(fleet) {
         console.log(`🗑️ Removing fleet ${fleet.name}`)
         this.fleets.splice(gs.system.fleets.indexOf(fleet), 1)
-        
+        fleet.x = Infinity
+        fleet.y = Infinity
+        fleet.location = null
+        fleet.route = null
         // Clear this fleet as a target/route for any other fleets
         for (const otherFleet of this.fleets) {
             if (otherFleet.fleetAI?.target === fleet) {
                 otherFleet.fleetAI.target = null
             }
-            if (otherFleet.route?.destination === fleet) {
+        }
+    }
+
+    removeAbandonedFleet(abandonedFleet) {
+        console.log(`🗑️ Removing abandoned fleet ${abandonedFleet.name}`)
+        const index = this.abandonedFleets.indexOf(abandonedFleet)
+        if (index >= 0) {
+            this.abandonedFleets.splice(index, 1)
+        }
+        abandonedFleet.x = Infinity
+        abandonedFleet.y = Infinity
+        // Clear this abandoned fleet as a target for any fleets
+        for (const otherFleet of this.fleets) {
+            if (otherFleet.fleetAI?.target === abandonedFleet) {
+                otherFleet.fleetAI.target = null
                 otherFleet.route = null
             }
         }

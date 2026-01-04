@@ -6,8 +6,6 @@
 class TaxCollectorFleetAI extends FleetAI {
     constructor(fleet = null, origin = null, starMap = null) {
         super(fleet, origin, starMap);
-        /** @type {Fleet[]} */
-        this.visited = [];
     }
     
     calcValidTargets() {
@@ -42,14 +40,14 @@ class TaxCollectorFleetAI extends FleetAI {
                 // Collect taxes peacefully
                 this.transferCredits(this.target, this.fleet);
                 this.target = null;
-                this.route = null;
+                this.fleet.route = null;
             } else if (roll < 0.9) {
                 // Nothing happens - target evades or refuses
                 this.target = null;
-                this.route = null;
+                this.fleet.route = null;
             } else {
                 // Fight
-                this.fightTarget();
+                this.fightTarget(true);
             }
         }
     }

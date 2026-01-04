@@ -77,32 +77,95 @@ const SHIP_TYPES_ALL = Object.values(SHIP_TYPES)
 const STARTING_SHIP_TYPE = new ShipType('Starting Ship', 'A basic ship with balanced capabilities suitable for beginning your journey.', SHAPES.FilledTriangle, 1, 1, 1, 1, 1, 1, [], 1, 1)
 
 const ASTEROID_SHIP_TYPES = {
-    ASTEROID: new ShipType('Asteroid', 'Rocky space debris drifting through the void, can be mined for valuable minerals.', SHAPES.FilledOval, 0.4, 0, 0, 8, 0.5, 1, [], 0, 1),
-    CRYOID: new ShipType('Cryoid', 'Frozen comet fragment containing water ice, leaves a freezing vapor trail when destroyed.', SHAPES.FilledOval, 0.6, 0, 0, 8, 0.5, 1, [SHIP_MODULE_TYPES.SMOKE_BOMB], 0, 1),
-    PLASMOID: new ShipType('Plasmoid', 'Energetic plasma sphere moving at high velocity, highly volatile and dangerous.', SHAPES.FilledCircle, 0.5, 0.5, 0, 8, 0.5, 1, [SHIP_MODULE_TYPES.BOOSTER], 0, 1),
-    MAGNETOID: new ShipType('Magnetoid', 'Magnetically-charged metallic fragment that can disrupt ship systems and pull objects.', SHAPES.FilledCircle, 0.4, 0.3, 0, 8, 0.5, 1, [SHIP_MODULE_TYPES.MAGNETIZE], 0, 1),
+    ASTEROID: new ShipType('Asteroid', 'Rocky space debris drifting through the void, can be mined for valuable minerals.', SHAPES.FilledOval, 0.4, 0, 0, 0.25, 0.5, 1, [], 0, 1),
+    CRYOID: new ShipType('Cryoid', 'Frozen comet fragment containing water ice, leaves a freezing vapor trail when destroyed.', SHAPES.FilledOval, 0.6, 0, 0, 0.25, 0.5, 1, [SHIP_MODULE_TYPES.SMOKE_BOMB], 0, 1),
+    PLASMOID: new ShipType('Plasmoid', 'Energetic plasma sphere moving at high velocity, highly volatile and dangerous.', SHAPES.FilledCircle, 0.5, 0.5, 0, 0.5, 0.5, 1, [SHIP_MODULE_TYPES.BOOSTER], 0, 1),
+    MAGNETOID: new ShipType('Magnetoid', 'Magnetically-charged metallic fragment that can disrupt ship systems and pull objects.', SHAPES.FilledCircle, 0.4, 0.3, 0, 0.5, 0.5, 1, [SHIP_MODULE_TYPES.MAGNETIZE], 0, 1),
 }
 
 const ASTEROID_SHIP_TYPES_ALL = Object.values(ASTEROID_SHIP_TYPES)
 
 for (const st of ASTEROID_SHIP_TYPES_ALL) {
-    st.minRadiusModifier = 1
-    st.maxRadiusModifier = 4
+    st.minRadiusModifier = 4
+    st.maxRadiusModifier = 16
 }
 
-ASTEROID_SHIP_TYPES.ASTEROID.onDisabled = (died = new Ship(), encounter = new Encounter())=>{
+
+ASTEROID_SHIP_TYPES.ASTEROID.onDisabled = (died = new Ship(), encounter) => {
     console.log('Asteroid.onDisabled', { died, encounter });
-    if (Math.random() > .5) encounter.addEffect(new DebrisCloudEffect(died.x, died.y, Math.random()*Math.PI*4))
+    if (Math.random()*died.radiusModifier < 0.5) {
+        const effect = new DebrisCloudEffect(died.x, died.y, Math.random() * Math.PI * 4)
+        effect.radius *= Math.sqrt(died.radiusModifier)/2
+        encounter.addEffect(effect)
+    } else {
+        spawnSmallerAsteroids(died, encounter)
+    }
 }
-ASTEROID_SHIP_TYPES.CRYOID.onDisabled = (died = new Ship(), encounter = new Encounter())=>{
+
+ASTEROID_SHIP_TYPES.CRYOID.onDisabled = (died = new Ship(), encounter) => {
     console.log('Cryoid.onDisabled', { died, encounter });
-    if (Math.random() > .5) encounter.addEffect(new IceCloudEffect(died.x, died.y, Math.random()*Math.PI*4))
+    if (Math.random()*died.radiusModifier > 0.5) {
+        const effect = new IceCloudEffect(died.x, died.y, Math.random() * Math.PI * 4)
+        effect.radius *= died.radiusModifier
+        encounter.addEffect(effect)
+    } else {
+        spawnSmallerAsteroids(died, encounter)
+    }
 }
-ASTEROID_SHIP_TYPES.PLASMOID.onDisabled = (died = new Ship(), encounter = new Encounter())=>{
+
+ASTEROID_SHIP_TYPES.PLASMOID.onDisabled = (died = new Ship(), encounter) => {
     console.log('Plasmoid.onDisabled', { died, encounter });
-    if (Math.random() > .5) encounter.addEffect(new IonCloudEffect(died.x, died.y, Math.random()*Math.PI*4))
+    if (Math.random()*died.radiusModifier > 0.5) {
+        const effect = new IonCloudEffect(died.x, died.y, Math.random() * Math.PI * 4)
+        effect.radius *= died.radiusModifier
+        encounter.addEffect(effect)
+    } else {
+        spawnSmallerAsteroids(died, encounter)
+    }
 }
-ASTEROID_SHIP_TYPES.MAGNETOID.onDisabled = (died = new Ship(), encounter = new Encounter())=>{
+
+ASTEROID_SHIP_TYPES.MAGNETOID.onDisabled = (died = new Ship(), encounter) => {
     console.log('Magnetoid.onDisabled', { died, encounter });
-    if (Math.random() > .5) encounter.addEffect(new IonCloudEffect(died.x, died.y, Math.random()*Math.PI*4))
+    if (Math.random()*died.radiusModifier > 0.5) {
+        const effect = new IonCloudEffect(died.x, died.y, Math.random() * Math.PI * 4)
+        effect.radius *= died.radiusModifier
+        encounter.addEffect(effect)
+    } else {
+        spawnSmallerAsteroids(died, encounter)
+    }
+}
+
+
+/**
+ * Utility function to spawn smaller asteroids when a large asteroid is destroyed
+ * @param {Ship} died - The destroyed asteroid
+ * @param {Encounter} encounter - The current encounter
+ */
+function spawnSmallerAsteroids(died, encounter) {
+    if (died.hull[1] < 4) return; // Too small to split
+    
+    // Spawn 2 smaller asteroids
+    for (let i = 0; i < 2; i++) {
+        const angle = Math.random() * Math.PI * 2
+        const newHull = Math.floor(died.hull[1] * 0.5)
+        const offsetDist = rng(died.radius, died.radius/4, false)
+        const newX = died.x + Math.cos(angle) * offsetDist
+        const newY = died.y + Math.sin(angle) * offsetDist
+        const newEngine = died.engine * 2
+        
+        const smallAsteroid = new Ship(died.name, died.shipType, died.color, [newHull,newHull], [0,0], died.lasers, newEngine, 0, died.radars, died.maxActionsPerTurn)
+        smallAsteroid.hull = [newHull, newHull]
+        smallAsteroid.x = newX
+        smallAsteroid.y = newY
+        smallAsteroid.angle = angle
+        smallAsteroid.radiusModifier = died.radiusModifier / 2
+        smallAsteroid.fleet = died.fleet
+        smallAsteroid.aiType = died.aiType
+        died.fleet.ships.push(smallAsteroid)
+        died.fleet.addShip(smallAsteroid)
+        console.log('spawned small asteroid:',smallAsteroid,smallAsteroid.radius)
+    }
+    if (currentMap && currentMap.refreshCanvas) {
+        currentMap.refreshCanvas()
+    }
 }

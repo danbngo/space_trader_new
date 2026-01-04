@@ -18,6 +18,21 @@ function generateFleetCargo(fleet = new Fleet(), fleetType = FLEET_TYPES_ALL[0])
 }
 
 /**
+ * Generates 1-5 crew members (officers) for a fleet.
+ * @param {Planet} planet - The planet the crew is from.
+ * @param {FactionType} factionType - The faction type of the crew.
+ * @returns {Officer[]} Array of generated officers.
+ */
+function generateCrew(planet, factionType) {
+    const crew = []
+    const numCrew = rng(5, 1) // 1-5 crew members
+    for (let i = 0; i < numCrew; i++) {
+        crew.push(generateOfficer(planet, factionType))
+    }
+    return crew
+}
+
+/**
  * Generates a complete fleet with ships and cargo.
  * @param {FleetType} fleetType - The type of fleet to generate.
  * @param {FactionType|null} factionType - The faction the fleet belongs to.
@@ -47,9 +62,13 @@ function generateFleet(fleetType = FLEET_TYPES_ALL[0], factionType = null, plane
     fleet.cargo = generateFleetCargo(fleet, fleetType)
     
     if (planet) {
-        // Generate captain and crew officers
+        // Generate captain
         fleet.captain = generateOfficer(planet, factionType)
         fleet.captain.credits = rng(fleetType.maxCredits, 0)
+        
+        // Generate crew members (non-captain officers)
+        const crew = generateCrew(planet, factionType)
+        fleet.officers = [fleet.captain, ...crew]
     }
     
     // Assign AI to fleet - need to do this after fleet is added to starmap

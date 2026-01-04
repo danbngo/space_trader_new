@@ -7,10 +7,15 @@ class ScientistFleetAI extends FleetAI {
     calcValidTargets() {
         // Target detectable anomalies and icy asteroids
         const detectableAnomalies = (gs.system.anomalies || []).filter(anomaly => anomaly.detectable(this.fleet))
-        const icyAsteroids = gs.system.asteroids.filter(a => a.belt.beltType == ASTEROID_BELT_TYPES.Icy && Math.random() < .2)
+        const icyAsteroids = gs.system.asteroids.filter(a => a.belt.asteroidBeltType == ASTEROID_BELT_TYPES.Icy && Math.random() < .2)
         return [...detectableAnomalies, ...icyAsteroids]
     }
     calcDestination() {
+        // If cargo is full, return to a major planet to unload
+        if (this.fleet.availableCargoSpace <= 0) {
+            return rndMember([...gs.system.planets].filter(p => p !== this.origin));
+        }
+        
         // Always travel to a random waypoint in space for research expedition
         const x = rng(gs.system.radius * 2) - gs.system.radius;
         const y = rng(gs.system.radius * 2) - gs.system.radius;
@@ -24,23 +29,23 @@ class ScientistFleetAI extends FleetAI {
             const index = gs.system.anomalies.indexOf(this.target);
             if (index !== -1) {
                 gs.system.anomalies.splice(index, 1);
-                
-                // Award relics for studying the anomaly
-                if (this.fleet.availableCargoSpace > 0) {
-                    const relicsFound = Math.min(rng(3, 1), this.fleet.availableCargoSpace);
-                    this.fleet.cargo.increment(CARGO_TYPES.RELICS, relicsFound);
-                    console.log(`🔬 ${this.fleet.name} catalogued ${this.target.name} and discovered ${relicsFound} relics`);
-                    
-                    // Show discovery popup
-                    this.addPopup('✨', COLORS.LightCyan)
-                } else {
-                    console.log(`🔬 ${this.fleet.name} catalogued ${this.target.name}`);
-                    
-                    // Show discovery popup
-                    this.addPopup('✨', COLORS.DarkCyan)
-                }
+                this.makeDiscoveries(this.target.name, 1, 3, '🔬', COLORS.LightCyan);
             }
         }
+    }
+    
+    onNearDestination() {
+        // Unload relics at destination if it's a major planet
+        if (this.destination instanceof Planet && this.fleet.cargo.total > 0) {
+            // Boost education and technology for scientific discoveries
+            if (this.destination.civilization) {
+                this.destination.c.education *= 1.01;
+                this.destination.c.technology *= 1.01;
+            }
+            this.sellCargoAtMarket(this.destination);
+        }
+        
+        super.onNearDestination();
     }
     onDestroyed() {
         // Losing scientists hurts research and education

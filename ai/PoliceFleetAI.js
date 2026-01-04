@@ -6,19 +6,28 @@
 class PoliceFleetAI extends FleetAI {
     constructor(fleet = null, origin = null, starMap = null) {
         super(fleet, origin, starMap);
-        /** @type {Fleet[]} */
-        this.visited = [];
     }
     
     calcValidTargets() {
         const ourScore = this.fleet.combatRating
-        return gs.system.fleets.filter(f => {
+        const criminals = gs.system.fleets.filter(f => {
             if (f === this.fleet || !f.factionType.criminal || f.location) return false
             // Skip if already visited
             if (this.visited.includes(f)) return false
             // Don't attack targets that are 2x stronger
             return f.combatRating <= ourScore * 2
         })
+        
+        // Also rescue crew from any abandoned fleets
+        const abandonedRescues = gs.system.abandonedFleets.filter(f => {
+            // Skip if already visited
+            if (this.visited.includes(f)) return false
+            // Only target abandoned fleets that still have crew
+            if (f.officers.length === 0) return false
+            return true
+        })
+        
+        return [...criminals, ...abandonedRescues]
     }
     calcDestination() {
         return rndMember([...gs.system.planets].filter(p=>(p !== this.origin)))
@@ -28,8 +37,16 @@ class PoliceFleetAI extends FleetAI {
             // Mark as visited
             this.visited.push(this.target);
             
-            if (Math.random() > 0.5) {
-                this.fightTarget();
+            // Check if target is abandoned
+            if (this.target instanceof AbandonedFleet) {
+                // Rescue crew from abandoned fleet
+                this.rescueCrew(this.target, '🚓', COLORS.Blue)
+                this.target = null
+                this.fleet.route = null
+            } else {
+                if (Math.random() > 0.5) {
+                    this.fightTarget(true);
+                }
             }
         }
     }

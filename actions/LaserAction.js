@@ -1,5 +1,5 @@
 class LaserAction extends ShipAction {
-    constructor(encounter = new Encounter(), actor = new Ship(), target = new Ship()) {
+    constructor(encounter, actor = new Ship(), target = new Ship()) {
         super(encounter, actor, MOVE_TYPES.Laser, target)
     }
 
@@ -18,7 +18,10 @@ class LaserAction extends ShipAction {
         const stealthSkill = this.target.fleet.totalSkills.getAmount(SKILLS.Stealth)
         const stealthModifier = 1 + (stealthSkill / 100)
         
-        const adjustedMissChance = baseMissChance * gunnerModifier * stealthModifier
+        // Apply DUSTY status effect (halves hit chance by doubling miss chance)
+        const dustyModifier = this.actor.statusEffects.has(STATUS_EFFECTS.DUSTY) ? 2 : 1
+        
+        const adjustedMissChance = baseMissChance * gunnerModifier * stealthModifier * dustyModifier
         const didMiss = Math.random() < adjustedMissChance
         if (didMiss) {
             Object.assign(this, {targetBadMessage: 'Missed!'})

@@ -2,13 +2,13 @@
  * Generates a space encounter with enemy fleet and effects.
  * @param {EncounterType} encounterType - The type of encounter to generate.
  * @param {Planet} planet - The planet associated with the encounter.
- * @param {EffectType[]} effectTypes - Array of effect types for environmental hazards.
  * @returns {Encounter} The generated encounter.
  */
-function generateRandomEncounter(encounterType = rndMember(ENCOUNTER_TYPES_ALL), planet = null, effectTypes = []) {
+function generateRandomEncounter(encounterType = rndMember(ENCOUNTER_TYPES_ALL), planet = null) {
     const {fleetType} = encounterType
     const fleet = generateFleet(fleetType, encounterType.faction, planet)
     for (const s of fleet.ships) s.aiType = encounterType.aiType
+    const effectTypes = rollEncounterEffectTypes()
     const effects = effectTypes && effectTypes.length > 0 ? generateEffects(encounterType, effectTypes) : []
     
     // Get the encounter class from the encounterType

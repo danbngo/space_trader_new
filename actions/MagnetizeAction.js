@@ -1,5 +1,5 @@
 class MagnetizeAction extends ShipAction {
-    constructor(encounter = new Encounter(), actor = new Ship(), target = new Ship()) {
+    constructor(encounter, actor = new Ship(), target = new Ship()) {
         super(encounter, actor, MOVE_TYPES.Magnetize, target)
         const [attackerToX, attackerToY] = [actor.x*0.75+target.x*0.25, actor.y*0.75+target.y*0.25]
         const [targetToX, targetToY] = [actor.x*0.5+target.x*0.5, actor.y*0.5+target.y*0.5]

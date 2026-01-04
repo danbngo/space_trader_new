@@ -6,8 +6,6 @@
 class InquisitorFleetAI extends FleetAI {
     constructor(fleet = null, origin = null, starMap = null) {
         super(fleet, origin, starMap);
-        /** @type {Fleet[]} */
-        this.visited = [];
     }
     
     calcValidTargets() {
@@ -39,65 +37,37 @@ class InquisitorFleetAI extends FleetAI {
             
             const ourReligion = this.fleet.planet.civilization.stateReligion;
             
-            // Check if there's at least one person of our religion aboard target ship
-            let hasOurReligion = false;
-            if (this.target.captain && this.target.captain.religion === ourReligion) {
-                hasOurReligion = true;
-            }
-            if (this.target.captain && this.target.subordinates) {
-                for (const officer of this.target.subordinates) {
-                    if (officer.religion === ourReligion) {
-                        hasOurReligion = true;
-                        break;
-                    }
-                }
-            }
+            // Find co-religionists using utility
+            const coReligionists = this.target.findOfficersMatching(o => o.religion === ourReligion);
             
-            // If we have co-religionists aboard, 50% chance to purge heretics
-            if (hasOurReligion && Math.random() < 0.5) {
-                // Take all officers who don't share our religion
-                const hereticOfficers = [];
-                if (this.target.captain && this.target.subordinates) {
-                    for (const officer of this.target.subordinates) {
-                        if (officer.religion !== ourReligion) {
-                            hereticOfficers.push(officer);
-                        }
+            // If we have co-religionists aboard, 50% chance to abduct heretics
+            if (coReligionists.length > 0 && Math.random() < 0.5) {
+                // Find heretics (exclude captain, they get converted instead)
+                const heretics = this.target.findOfficersMatching(o => o !== this.target.captain && o.religion !== ourReligion);
+                
+                if (heretics.length > 0) {
+                    // Abduct heretics for trial
+                    for (const heretic of heretics) {
+                        this.target.removeOfficer(heretic);
+                        this.fleet.officers.push(heretic);
                     }
-                }
-                
-                // Transfer heretic officers
-                for (const officer of hereticOfficers) {
-                    this.target.removeOfficer(officer);
-                    //this.fleet.captain.addSubordinate(officer); //no need
-                }
-                
-                if (hereticOfficers.length > 0) {
-                    console.log(`⚖️ ${this.fleet.name} purged ${hereticOfficers.length} heretics from ${this.target.name}`);
                     
-                    // Show purge popup
-                    if (this.starMap) {
-                        this.addPopup('⚖️', COLORS.DarkRed, this.target.x, this.target.y);
-                    }
+                    console.log(`⚖️ ${this.fleet.name} abducted ${heretics.length} heretics from ${this.target.name}`);
+                    this.addPopup('⚖️', COLORS.DarkRed, this.target.x, this.target.y);
                 }
                 
                 this.target = null;
-                this.route = null;
+                this.fleet.route = null;
                 return;
             }
             
             // 50% chance to convert captain, 50% chance to fight
             if (Math.random() < 0.5) {
-                // Convert captain to our religion
-                this.target.captain.religion = ourReligion;
-                console.log(`✝️ ${this.fleet.name} converted ${this.target.captain.name} to ${ourReligion.name}`);
-                
-                // Show conversion popup
-                if (this.starMap) {
-                    this.addPopup('✝️', COLORS.White);
-                }
+                // Convert captain using utility
+                this.convertToReligion(this.target, ourReligion);
                 
                 this.target = null;
-                this.route = null;
+                this.fleet.route = null;
             } else {
                 this.fightTarget();
             }

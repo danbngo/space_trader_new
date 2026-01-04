@@ -44,7 +44,7 @@ function checkForAsteroidBeltEncounters(elapsedDays = 1) {
     console.log(`🚨 ASTEROID ENCOUNTER TRIGGERED`, {selectedAsteroidIndex, selectedAsteroid, selectedBelt, encounterType, proximityFactors, totalProximityFactor});
     
     // Start the encounter
-    const encounter = generateRandomEncounter(encounterType, null, selectedBelt.effectTypes)
+    const encounter = generateRandomEncounter(encounterType, null)
     encounter.startEncounter()
     return true
 }

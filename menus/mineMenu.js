@@ -42,16 +42,15 @@ function startMining() {
         return
     }
     
-    console.log('🪨 STARTING MINING OPERATION', {belt, beltType: belt.beltType})
+    console.log('🪨 STARTING MINING OPERATION', {belt, asteroidBeltType: belt.asteroidBeltType})
     
-    // Determine encounter type: 80% calm, 20% storm
-    const isStorm = Math.random() < 0.2
-    const encounterType = isStorm ? ENCOUNTER_TYPES.ASTEROIDS_STORM : ENCOUNTER_TYPES.ASTEROIDS_CALM
+    const encounterType = rndMember(belt.encounterTypes)
     
-    console.log('Mining encounter type:', encounterType.name, {isStorm})
+    console.log('Mining encounter type:', encounterType.name)
     
     // Generate the mining encounter
-    const encounter = generateEncounter(encounterType, null, belt.effectTypes)
+    //const encounter = generateEncounterForFleet(encounterType, null, belt.effectTypes)
+    const encounter = generateRandomEncounter(encounterType, null)
     
     // Start the encounter
     encounter.startEncounter()

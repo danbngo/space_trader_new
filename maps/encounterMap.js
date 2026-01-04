@@ -81,7 +81,7 @@ class EncounterMap extends BaseMap {
             this.tick()
         }
         this.refresh() //always do first refresh, as fleets launch during pause/unpause
-        this.refreshLogic()
+        //this.refreshLogic() - deadly, DO NOT ENABLE as it may lead to infinite loops
     }
 
     refreshControls() {
@@ -162,7 +162,7 @@ class EncounterMap extends BaseMap {
                 }
                 obj.onHoverEnd()
             }
-            const thrusterColor = ship.aiType == AI_TYPES.Asteroid ? COLORS.Green : COLORS.Orange
+            const thrusterColor = ship.aiType == AI_TYPES.Asteroid ? COLORS.Transparent : COLORS.Orange
             const animThruster = this.cvs.addFilledTriangle(shipId+'thruster', ship.x, ship.y, ship.radius*0.5, ship.radius*0.5, 6, thrusterColor, ship.angle - Math.PI)
         })
 
@@ -189,6 +189,9 @@ class EncounterMap extends BaseMap {
         const {ships, activeTurnFleet, effects} = encounter
 
         const now = Date.now()
+        
+        // Track existing ship UUIDs
+        const existingShipIds = new Set()
 
         //draw objects
         ships.forEach( (ship, index) => {
@@ -197,7 +200,52 @@ class EncounterMap extends BaseMap {
 
             //if (obj.location) return //dont display docked fleets
             const shipId = `ship${ship.uuid}`
-            const cvsShipObject = cvs.getObject(shipId)
+            existingShipIds.add(shipId)
+            existingShipIds.add(shipId+'shield')
+            existingShipIds.add(shipId+'label')
+            existingShipIds.add(shipId+'thruster')
+            
+            let cvsShipObject = cvs.getObject(shipId)
+            
+            // Create ship canvas objects if they don't exist (for dynamically added ships)
+            if (!cvsShipObject) {
+                console.log('dynamically adding new ship to canvas:', shipId, ship)
+                if (ship.shipType.shape == SHAPES.FilledTriangle) {
+                    cvsShipObject = cvs.addFilledTriangle(shipId, ship.x, ship.y, ship.radius, ship.radius, 12, ship.color, ship.angle, ()=>this.selectObject(ship))
+                }
+                else if (ship.shipType.shape == SHAPES.FilledOval) {
+                    cvsShipObject = cvs.addFilledOval(shipId, ship.x, ship.y, ship.radius, (ship.radius*(Math.random()+0.5)), 0.5, ship.color, ship.angle, ()=>this.selectObject(ship))
+                }
+                else if (ship.shipType.shape == SHAPES.FilledCircle) {
+                    cvsShipObject = cvs.addFilledCircle(shipId, ship.x, ship.y, ship.radius, 12, ship.color, ()=>this.selectObject(ship))
+                }
+                else {
+                    console.error('Cannot create ship canvas object - invalid shape:', ship.shipType.shape)
+                    return
+                }
+                
+                cvsShipObject.onHover = ()=>this.hoverObject(ship)
+                cvs.addEmptyCircle(shipId+'shield', ship.x, ship.y, ship.radius*1.1, 10, COLORS.Blue, 1)
+                const labelObj = cvs.addText(shipId+'label', ship.x, ship.y, 0, -32, ship.shipType.name, ship.color, DEFAULT_FONT_SIZE, 2, ()=>this.selectObject(ship))
+                labelObj.onHover = ()=>this.hoverObject(ship)
+                const objs = [cvsShipObject, labelObj]
+                for (const obj of objs) {
+                    obj.onHover = ()=>{
+                        labelObj.visible = true
+                        for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
+                    }
+                    obj.onHoverEnd = ()=>{
+                        labelObj.visible = false
+                        for (const obj3 of objs) obj3.strokeColor = this.calcStrokeColorForObj(ship)
+                    }
+                    obj.onHoverEnd()
+                }
+                const thrusterColor = ship.aiType == AI_TYPES.Asteroid ? COLORS.Green : COLORS.Orange
+                cvs.addFilledTriangle(shipId+'thruster', ship.x, ship.y, ship.radius*0.5, ship.radius*0.5, 6, thrusterColor, ship.angle - Math.PI)
+                
+                cvs.recalculateDrawOrder()
+            }
+            
             if (!cvsShipObject) {
                 //console.log('WARNING: No ship object found!',index,ship)
                 return
@@ -246,13 +294,16 @@ class EncounterMap extends BaseMap {
             cvsLabelObject.x = ship.x
             cvsLabelObject.y = ship.y
 
-            const [xo, yo] = rotatePoint(ship.radius, 0, 0, 0, ship.angle-Math.PI)
-            cvsThrusterObject.x = ship.x+xo
-            cvsThrusterObject.y = ship.y+yo
-            const [sxo, syo] = rotatePoint(4, 0, 0, 0, ship.angle-Math.PI)
-            cvsThrusterObject.screenOffsetX = sxo
-            cvsThrusterObject.screenOffsetY = syo
-            cvsThrusterObject.angle = ship.angle - Math.PI
+            if (ship.aiType !== AI_TYPES.Asteroid) {
+                const [xo, yo] = rotatePoint(ship.radius, 0, 0, 0, ship.angle-Math.PI)
+                cvsThrusterObject.x = ship.x+xo
+                cvsThrusterObject.y = ship.y+yo
+                const [sxo, syo] = rotatePoint(4, 0, 0, 0, ship.angle-Math.PI)
+                cvsThrusterObject.screenOffsetX = sxo
+                cvsThrusterObject.screenOffsetY = syo
+                cvsThrusterObject.angle = ship.angle - Math.PI
+            }
+            else cvsThrusterObject.visible = false
             
             // Oscillate thruster alpha based on engine speed
             const currentMs = Date.now()
@@ -307,6 +358,13 @@ class EncounterMap extends BaseMap {
         const allCanvasObjects = Array.from(cvs.objectMap.keys())
         for (const objId of allCanvasObjects) {
             if (objId.startsWith('effect') && !activeEffectIds.has(objId)) {
+                cvs.deleteObject(objId)
+            }
+        }
+        
+        // Remove canvas objects for ships that no longer exist
+        for (const objId of allCanvasObjects) {
+            if (objId.startsWith('ship') && !existingShipIds.has(objId)) {
                 cvs.deleteObject(objId)
             }
         }
@@ -529,9 +587,12 @@ class EncounterMap extends BaseMap {
         console.log('checking encounter over')
         if (this.encounter.result) {
             this.encounter.endCombat()
+            console.log('encounter was over')
             return true
             //this.refresh()
         }
+        console.log('encounter was not over')
+        return false
     }
 
     onHail() {

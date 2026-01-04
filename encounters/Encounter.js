@@ -37,7 +37,7 @@ class Encounter {
         /** @type {Ship} */
         this.enemyFlagship = this.enemyFleet.flagship
         /** @type {Ship[]} */
-        this.ships = [...this.playerShips, ...this.enemyShips]
+        //this.ships = [...this.playerShips, ...this.enemyShips]
         /** @type {EncounterAI} */
         this.ai = new EncounterAI(this)
         /** @type {ENCOUNTER_RESULTS|null} */
@@ -61,6 +61,10 @@ class Encounter {
         for (const ship of this.playerShips) {
             this.playerShipHullsAtStart.set(ship, ship.hull[0])
         }
+    }
+
+    get ships() {
+        return [...this.playerShips, ...this.enemyShips]
     }
 
     calcPlayerHullDamages() {
@@ -186,14 +190,17 @@ class Encounter {
         const {activeEnemyShips, playerFlagship} = this
         if (activeEnemyShips.length == 0) {
             this.result = ENCOUNTER_RESULTS.Victory
+            this.combatEnabled = false
             return
         }
         else if (playerFlagship.escaped) {
             this.result = ENCOUNTER_RESULTS.Escaped
+            this.combatEnabled = false
             return
         }
         else if (playerFlagship.disabled) {
             this.result = ENCOUNTER_RESULTS.Defeat
+            this.combatEnabled = false
         }
         console.log('Encounter result:',this.result);
     }
@@ -275,10 +282,8 @@ class Encounter {
 
         //fooroids only escape if they reached the left side of the screen
         if (distanceFromCenter > this.mapRadius) {
-            if (ship.aiType != AI_TYPES.Asteroid || ship.x < 0) {
-                pseudoActions.push(ShipAction.getDamageAction(this, ship, 0, 0, false, true))
-                ship.escaped = true
-            }
+            pseudoActions.push(ShipAction.getDamageAction(this, ship, 0, 0, false, true))
+            ship.escaped = true
         }
         return pseudoActions
     }
@@ -348,10 +353,10 @@ class Encounter {
         //players ships should be in a half circle around the enemy
         if (formationType == FORMATION_TYPES.Storm) {
             for (const ship of enemyShips) {
-                const dist = rng(maxSpawnDistance,minSpawnDistance)
-                const angle = rng(0 + Math.PI*3/4, 0 - Math.PI*3/4, false) + ((angleEnemyFleetToPlayer) || 0)
-                let [x,y] = rotatePoint(dist, 0, 0, 0, angle)
-                Object.assign(ship, {x, y, angle: (angle + Math.PI)})
+                const dist = rng(maxSpawnDistance, minSpawnDistance)
+                const angle = rng(Math.PI * 2, 0, false)
+                let [x, y] = rotatePoint(dist, 0, 0, 0, angle)
+                Object.assign(ship, {x, y, angle: rng(Math.PI * 2, 0, false)})
             }
         }
         else if (formationType == FORMATION_TYPES.PlayerEncircled) {
@@ -365,10 +370,10 @@ class Encounter {
             })
         }
         else {
-            const [cx, cy] = rotatePoint(this.mapRadius * avgDist, 0, 0, 0, angleEnemyFleetToPlayer+Math.PI)
+            const [cx, cy] = rotatePoint(avgDist, 0, 0, 0, angleEnemyFleetToPlayer+Math.PI)
             enemyFleet.ships.forEach((ship,i)=>{
-                const distFromCenter = rng(avgDist, avgDist/4)
-                const [dx,dy] = rotatePoint(distFromCenter * this.mapRadius, 0, 0, 0, rng(Math.PI*2, 0, false))
+                const distFromCenter = rng(distMargin, distMargin/8)
+                const [dx,dy] = rotatePoint(distFromCenter, 0, 0, 0, rng(Math.PI*2, 0, false))
                 const angleDiff = rng(Math.PI/8)
                 Object.assign(ship, {x: cx+dx, y: cy+dy, angle: enemyFacingAngle + angleDiff})
             })
@@ -383,10 +388,10 @@ class Encounter {
             })
         }
         else {
-            const [cx,cy] = rotatePoint(this.mapRadius * avgDist, 0, 0, 0, anglePlayerFleetToEnemy+Math.PI)
+            const [cx,cy] = rotatePoint(avgDist, 0, 0, 0, anglePlayerFleetToEnemy+Math.PI)
             playerFleet.ships.forEach((ship,i)=>{
-                const distFromCenter = rng(avgDist, avgDist/8)
-                const [dx,dy] = rotatePoint(distFromCenter * this.mapRadius, 0, 0, 0, rng(Math.PI*2, 0, false))
+                const distFromCenter = rng(distMargin, distMargin/8)
+                const [dx,dy] = rotatePoint(distFromCenter, 0, 0, 0, rng(Math.PI*2, 0, false))
                 const angleDiff = rng(Math.PI/8)
                 Object.assign(ship, {x: cx+dx, y: cy+dy, angle: playerFacingAngle + angleDiff})
             })

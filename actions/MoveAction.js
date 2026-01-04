@@ -1,5 +1,5 @@
 class MoveAction extends ShipAction {
-    constructor(encounter = new Encounter(), actor = new Ship(), toX = undefined, toY = undefined) {
+    constructor(encounter, actor = new Ship(), toX = undefined, toY = undefined) {
         super(encounter, actor, MOVE_TYPES.Move, null, toX, toY)
     }
 

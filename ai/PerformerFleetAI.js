@@ -6,8 +6,6 @@
 class PerformerFleetAI extends FleetAI {
     constructor(fleet = null, origin = null, starMap = null) {
         super(fleet, origin, starMap);
-        /** @type {Fleet[]} - Fleets already visited to avoid repeat performances */
-        this.visited = [];
     }
     
     calcValidTargets() {
@@ -65,28 +63,26 @@ class PerformerFleetAI extends FleetAI {
             if (Math.random() < 0.5) {
                 const creditsToTake = Math.floor(this.target.captain.credits * 0.2);
                 if (creditsToTake > 0) {
-                    this.target.captain.credits -= creditsToTake;
-                    this.fleet.captain.credits += creditsToTake;
+                    // Temporarily store 80% of target's credits, transfer all, then restore the 80%
+                    const remainingCredits = this.target.captain.credits - creditsToTake;
+                    this.transferCredits(this.target, this.fleet);
+                    this.target.captain.credits = remainingCredits;
                     
                     console.log(`🎭 ${this.fleet.name} performed brilliantly for ${this.target.name} and earned ${creditsToTake} credits!`);
                     
                     // Show performance popup
-                    if (this.starMap) {
-                        this.addPopup('🎭', COLORS.LightYellow);
-                    }
+                    this.addPopup('🎭', COLORS.LightYellow);
                 }
             } else {
                 console.log(`🎭 ${this.fleet.name} performed for ${this.target.name} but received no payment`);
                 
                 // Show performance popup
-                if (this.starMap) {
-                    this.addPopup('🎭', COLORS.DarkYellow);
-                }
+                this.addPopup('🎭', COLORS.DarkYellow);
             }
             
             // Clear target and move on
             this.target = null;
-            this.route = null;
+            this.fleet.route = null;
         }
     }
 

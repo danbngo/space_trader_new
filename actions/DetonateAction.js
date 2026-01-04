@@ -1,5 +1,5 @@
 class DetonateAction extends ShipAction {
-    constructor(encounter = new Encounter(), actor = new Ship()) {
+    constructor(encounter, actor = new Ship()) {
         super(encounter, actor, MOVE_TYPES.Detonate, null)
         this.actorInfoMessage = 'Self-Destruct!'
     }

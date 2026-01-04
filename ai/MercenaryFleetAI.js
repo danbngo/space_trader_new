@@ -6,8 +6,6 @@
 class MercenaryFleetAI extends FleetAI {
     constructor(fleet = null, origin = null, starMap = null) {
         super(fleet, origin, starMap);
-        /** @type {Fleet[]} */
-        this.visited = [];
     }
     
     calcValidTargets() {
@@ -33,8 +31,19 @@ class MercenaryFleetAI extends FleetAI {
         });
     }
     calcDestination() {
-        return rndMember([...gs.system.planets].filter(p=>(p !== this.origin)))
+        return rndMember([...gs.system.planets, ...gs.system.dwarfPlanets, ...gs.system.spaceStations].filter(p=>(p !== this.origin)))
     }
+    
+    onNearDestination() {
+        // Sell stolen cargo at destination and restock (like merchants)
+        if (this.destination && this.destination instanceof Planet) {
+            this.sellCargoAtMarket(this.destination);
+            this.buyCargoFromMarket(this.destination);
+        }
+        
+        super.onNearDestination()
+    }
+    
     onNearTarget() {
         if (this.target instanceof Fleet && !this.target.location) {
             // Mark as visited

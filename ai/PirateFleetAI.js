@@ -6,8 +6,6 @@
 class PirateFleetAI extends FleetAI {
     constructor(fleet = null, origin = null, starMap = null) {
         super(fleet, origin, starMap);
-        /** @type {Fleet[]} */
-        this.visited = [];
     }
     
     calcValidTargets() {
@@ -25,6 +23,16 @@ class PirateFleetAI extends FleetAI {
     calcDestination() {
         return rndMember([...gs.system.dwarfPlanets, ...gs.system.spaceStations].filter(p=>(p !== this.origin)))
     }
+    
+    onNearDestination() {
+        // Sell stolen cargo at destination for credits
+        if (this.destination && this.destination instanceof Planet && this.fleet.cargo.total > 0) {
+            this.sellCargoAtMarket(this.destination);
+        }
+        
+        super.onNearDestination()
+    }
+    
     onNearTarget() {
         if (this.target instanceof Fleet && !this.target.location) {
             // Mark as visited

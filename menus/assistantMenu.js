@@ -15,6 +15,7 @@ function showAssistantMenu() {
         ['Dwarf Planets', ()=>showDwarfPlanetsMenu(()=>showAssistantMenu())],
         ['Space Stations', ()=>showSpaceStationsMenu(()=>showAssistantMenu())],
         ['Fleets', ()=>showFleetsMenu(()=>showAssistantMenu())],
+        ['Abandoned Fleets', ()=>showAbandonedFleetsMenu(()=>showAssistantMenu())],
         ['Anomalies', ()=>showAnomaliesMenu(()=>showAssistantMenu())],
         ['Ruins', ()=>showRuinsDatabaseMenu(()=>showAssistantMenu())],
         ce({tag:'br'}),

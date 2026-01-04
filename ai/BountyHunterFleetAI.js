@@ -6,8 +6,6 @@
 class BountyHunterFleetAI extends FleetAI {
     constructor(fleet = null, origin = null, starMap = null) {
         super(fleet, origin, starMap);
-        /** @type {Fleet[]} */
-        this.visited = [];
     }
     
     calcDestination() {
@@ -21,7 +19,7 @@ class BountyHunterFleetAI extends FleetAI {
     }
     calcValidTargets() {
         const ourScore = this.fleet.combatRating
-        return gs.system.fleets.filter(f => {
+        const liveFleets = gs.system.fleets.filter(f => {
             if (f === this.fleet || !f.factionType.criminal || f.location) return false
             // Skip if already visited
             if (this.visited.includes(f)) return false
@@ -30,21 +28,49 @@ class BountyHunterFleetAI extends FleetAI {
             // Don't attack targets that are 2x stronger
             return f.combatRating <= ourScore * 2
         })
+        
+        // Also abduct criminals from abandoned criminal fleets
+        const abandonedCriminals = gs.system.abandonedFleets.filter(f => {
+            // Skip if already visited
+            if (this.visited.includes(f)) return false
+            // Only target abandoned fleets that still have crew
+            if (f.officers.length === 0) return false
+            // Only target criminal factions
+            return f.factionType && f.factionType.criminal
+        })
+        
+        return [...liveFleets, ...abandonedCriminals]
     }
     onNearTarget() {
         if (this.target instanceof Fleet && !this.target.location) {
             // Mark as visited
             this.visited.push(this.target);
             
-            // 50% chance to take credits peacefully if they have any, otherwise fight
-            if (this.target.captain && this.target.captain.credits > 0 && Math.random() < 0.5) {
-                this.transferCredits(this.target, this.fleet);
-                this.target = null;
-                this.route = null;
+            // Check if target is abandoned
+            if (this.target instanceof AbandonedFleet) {
+                // Abduct criminals from abandoned fleet
+                this.transferOfficers(this.target, this.fleet, '🎯', COLORS.Yellow, '⚖️', COLORS.Gray);
+                this.target = null
+                this.fleet.route = null
             } else {
-                this.fightTarget();
+                // 50% chance to take credits peacefully if they have any, otherwise fight
+                if (this.target.captain && this.target.captain.credits > 0 && Math.random() < 0.5) {
+                    this.transferCredits(this.target, this.fleet);
+                    this.target = null;
+                    this.fleet.route = null;
+                } else {
+                    this.fightTarget();
+                }
             }
         }
+    }
+    fightTarget() {
+        const result = super.fightTarget(false)
+        // After combat, if we won, transfer officers from the defeated criminal
+        if (result === this.fleet && this.target && this.target.officers && this.target.officers.length > 0) {
+            this.transferOfficers(this.target, this.fleet)
+        }
+        return result
     }
     onDestroyed() {
         // Losing bounty hunters increases crime (less law enforcement)

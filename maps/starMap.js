@@ -144,6 +144,7 @@ class StarMap extends BaseMap {
         this.handleCanvasAnomalies()
         this.handleCanvasRuins()
         this.handleCanvasFleets()
+        this.handleCanvasAbandonedFleets()
         this.handleCanvasWaypoint()
         this.cvs.redraw(true)
     }
@@ -206,7 +207,8 @@ class StarMap extends BaseMap {
             let cvsObject = cvs.getObject(id)
             
             if (!cvsObject) {
-                cvsObject = cvs.addFilledCircle(id, body.x, body.y, body.radius/EARTH_RADII_PER_AU * 25, 12, body.color, () => this.selectObject(body))
+                const displaySize = Math.sqrt(body.radius/EARTH_RADII_PER_AU) * 3
+                cvsObject = cvs.addFilledCircle(id, body.x, body.y, displaySize, 12, body.color, () => this.selectObject(body))
             }
             
             cvsObject.x = body.x
@@ -229,7 +231,9 @@ class StarMap extends BaseMap {
             
             // Create objects if they don't exist
             if (!planetObj) {
-                planetObj = cvs.addFilledCircle(planetId, body.x, body.y, body.radius/EARTH_RADII_PER_AU * 150, 8, body.color, () => this.selectObject(body))
+                // Use exponent 0.4 instead of 0.5 (sqrt) to compress larger planets more
+                const displaySize = Math.pow(body.radius/EARTH_RADII_PER_AU, 0.4) * 3.5
+                planetObj = cvs.addFilledCircle(planetId, body.x, body.y, displaySize, 8, body.color, () => this.selectObject(body))
                 labelObj = cvs.addText(labelId, body.x, body.y, 0, -32, body.name, body.color, DEFAULT_FONT_SIZE, 2, () => this.selectObject(body))
                 
                 const objs = [planetObj, labelObj]
@@ -477,9 +481,10 @@ class StarMap extends BaseMap {
             
             // Create objects if they don't exist
             if (!fleetObj) {
-                fleetObj = cvs.addFilledTriangle(fleetId, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU, fleet.radius/EARTH_RADII_PER_AU, 12, fleet.color, fleetAngle, () => this.selectObject(fleet))
+                const fleetSize = Math.sqrt(fleet.radius/EARTH_RADII_PER_AU) * 2.5
+                fleetObj = cvs.addFilledTriangle(fleetId, fleet.x, fleet.y, fleetSize, fleetSize, 12, fleet.color, fleetAngle, () => this.selectObject(fleet))
                 pathObj = cvs.addLine(pathId, 0, 0, 0, 0, fleet.color, 1)
-                thrusterObj = cvs.addFilledTriangle(thrusterId, fleet.x, fleet.y, fleet.radius/EARTH_RADII_PER_AU*0.5, fleet.radius/EARTH_RADII_PER_AU*0.5, 6, COLORS.Orange)
+                thrusterObj = cvs.addFilledTriangle(thrusterId, fleet.x, fleet.y, fleetSize*0.5, fleetSize*0.5, 6, COLORS.Orange)
                 labelObj = cvs.addText(labelId, fleet.x, fleet.y, 0, -32, fleet.name, fleet.color, DEFAULT_FONT_SIZE, 2, () => this.selectObject(fleet))
                 
                 labelObj.visible = isPlayerFleet
@@ -545,6 +550,72 @@ class StarMap extends BaseMap {
         // Remove canvas objects for fleets that no longer exist
         for (const [id, obj] of cvs.objectMap.entries()) {
             if ((id.startsWith('fleet') || id.startsWith('fleetthruster') || id.startsWith('fleetpath') || id.startsWith('fleetlabel')) && !existingFleetIds.has(id)) {
+                cvs.deleteObject(id)
+            }
+        }
+    }
+
+    handleCanvasAbandonedFleets() {
+        const {starSystem, cvs} = this
+        const {abandonedFleets} = starSystem
+
+        // Track existing abandoned fleet UUIDs
+        const existingAbandonedFleetIds = new Set()
+        
+        abandonedFleets.forEach((fleet) => {
+            existingAbandonedFleetIds.add(`abandonedfleet${fleet.uuid}`)
+            existingAbandonedFleetIds.add(`abandonedfleetlabel${fleet.uuid}`)
+            existingAbandonedFleetIds.add(`abandonedfleetpath${fleet.uuid}`)
+            const fleetId = `abandonedfleet${fleet.uuid}`
+            const labelId = `abandonedfleetlabel${fleet.uuid}`
+            const pathId = `abandonedfleetpath${fleet.uuid}`
+            
+            let fleetObj = cvs.getObject(fleetId)
+            let labelObj = cvs.getObject(labelId)
+            let pathObj = cvs.getObject(pathId)
+            
+            const fleetAngle = fleet.angle
+            
+            // Create objects if they don't exist
+            if (!fleetObj) {
+                const fleetSize = Math.sqrt(fleet.radius/EARTH_RADII_PER_AU) * 2.5
+                fleetObj = cvs.addFilledTriangle(fleetId, fleet.x, fleet.y, fleetSize, fleetSize, 12, fleet.color, fleetAngle, () => this.selectObject(fleet))
+                pathObj = cvs.addLine(pathId, 0, 0, 0, 0, fleet.color, 1)
+                labelObj = cvs.addText(labelId, fleet.x, fleet.y, 0, -32, fleet.name + ' (Abandoned)', fleet.color, DEFAULT_FONT_SIZE, 2, () => this.selectObject(fleet))
+                
+                const objs = [fleetObj, labelObj]
+                for (const obj of objs) {
+                    obj.onHover = () => {
+                        labelObj.visible = true
+                        for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
+                    }
+                    obj.onHoverEnd = () => {
+                        labelObj.visible = false
+                        for (const obj3 of objs) obj3.strokeColor = (fleet == this.selectedObject) ? COLORS.Green : COLORS.Black
+                    }
+                    obj.onHoverEnd()
+                }
+            }
+            
+            // Update fleet position and angle
+            fleetObj.x = fleet.x
+            fleetObj.y = fleet.y
+            if (fleetAngle !== undefined) fleetObj.angle = fleetAngle
+            fleetObj.strokeColor = (fleet == this.selectedObject) ? COLORS.Green : COLORS.Black
+            fleetObj.fillColor[3] = 0.5 // Dimmed appearance
+            
+            // Update label
+            labelObj.x = fleet.x
+            labelObj.y = fleet.y
+            labelObj.fillColor[3] = 0.7
+            
+            // No path for abandoned fleets
+            pathObj.visible = false
+        })
+        
+        // Remove canvas objects for abandoned fleets that no longer exist
+        for (const [id, obj] of cvs.objectMap.entries()) {
+            if ((id.startsWith('abandonedfleet') || id.startsWith('abandonedfleetpath') || id.startsWith('abandonedfleetlabel')) && !existingAbandonedFleetIds.has(id)) {
                 cvs.deleteObject(id)
             }
         }
@@ -667,26 +738,53 @@ class StarMap extends BaseMap {
     }
 
     /** @param {Planet | Waypoint | Fleet} obj */
-    setDestination(obj, unpause = false) {
+    setDestination(obj, unpause = false, bypassSunWarning = false) {
+        let route = null
+        
         if (obj instanceof Planet) {
-            gs.fleet.route = new Route(gs.fleet, obj)
-            gs.fleet.location = undefined
+            route = new Route(gs.fleet, obj)
         } else if (obj instanceof Fleet) {
             // Attempt to intercept another fleet
-            const interceptRoute = new Route(gs.fleet, obj)
-            if (interceptRoute.valid) {
-                gs.fleet.route = interceptRoute
-                gs.fleet.location = undefined
-            } else {
+            route = new Route(gs.fleet, obj)
+            if (!route.valid) {
                 console.log('Cannot intercept fleet - target is too fast or too far')
-                // Don't assign route or move the player
                 return
             }
         } else if (obj.isWaypoint) {
             // Create a route to arbitrary coordinates
-            gs.fleet.route = new Route(gs.fleet, obj)
-            gs.fleet.location = undefined
+            route = new Route(gs.fleet, obj)
         }
+        
+        // Check if route intersects the sun
+        if (route && FleetAI.checkRouteIntersectsSun(route)) {
+            if (!bypassSunWarning) {
+                // Warn player and require confirmation
+                const targetName = obj.name || 'waypoint'
+                showModal(
+                    '⚠️ Dangerous Route',
+                    ce({
+                        children: [
+                            ce({ innerHTML: `Your route to ${targetName} passes dangerously close to the sun's core.` }),
+                            ce({ innerHTML: 'This path is extremely hazardous. Do you want to proceed anyway?' })
+                        ]
+                    }),
+                    [
+                        ['Cancel', () => closeModal()],
+                        ['Proceed', () => {
+                            closeModal()
+                            this.setDestination(obj, unpause, true)
+                        }]
+                    ]
+                )
+                return
+            }
+        }
+        
+        // Set the route
+        if (route) {
+            gs.fleet.startRoute(route)
+        }
+        
         if (unpause) this.togglePause(false)
         this.refresh()
     }

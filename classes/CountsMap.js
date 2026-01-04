@@ -164,12 +164,12 @@ class CountsMap {
         amt = Math.min(this.total, amt)
         while (amt > 0) {
             const ct = this.randomItem()
-            console.log('amt left to pick:',amt,'ct selected:',ct,'source amt:',this.getAmount(ct),'subset amt:',subset.getAmount(ct))
+            //console.log('amt left to pick:',amt,'ct selected:',ct,'source amt:',this.getAmount(ct),'subset amt:',subset.getAmount(ct))
             if (!ct) break
             if (subset.getAmount(ct) > this.getAmount(ct)) continue
             subset.increment(ct, 1)
             amt--
-            console.log('added:',ct,'amt remaining:',amt)
+            //console.log('added:',ct,'amt remaining:',amt)
         }
         return subset
     }
