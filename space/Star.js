@@ -15,5 +15,19 @@ class Star extends OrbitingObject {
         super(name, OBJECT_TYPES.STAR, color, radius, orbit);
         /** @type {number} - Radius of magnetosphere/heliosphere in AU */
         this.magnetosphereRadius = magnetosphereRadius
+        /** @type {StarType} - The type/classification of the star */
+        this.starType = null
+        /** @type {StarFeatureType[]} - Unique features of the star */
+        this.features = []
+        /** @type {StarMetallicity} - Metallicity level of the star */
+        this.metallicity = null
+        /** @type {StarAge} - Age of the star */
+        this.age = null
+        /** @type {StarLuminosity} - Luminosity of the star */
+        this.luminosity = null
+        /** @type {number} - Mass in solar masses */
+        this.mass = 1.0
+        /** @type {number} - Surface temperature in Kelvin */
+        this.temperature = 5778
     }
 }

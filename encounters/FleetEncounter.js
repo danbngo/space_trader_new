@@ -33,7 +33,7 @@ class FleetEncounter extends Encounter {
         const officersShare = gs.fleet.calcTotalCRShare(creditsAmt, true)
         const finalCredits = creditsAmt - officersShare
         gs.credits += finalCredits
-        if (!isNaN(gs.credits)) throw new Error('creditsAmt was NaN!')
+        if (isNaN(gs.credits)) throw new Error('creditsAmt was NaN!')
         creditsAmt = finalCredits
         const cargoRatio = abandonedCargoCapacity / enemyFleet.totalCargoSpace
         const maxLootAmt = Math.ceil(enemyFleet.cargo.total * cargoRatio)

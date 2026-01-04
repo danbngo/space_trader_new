@@ -43,15 +43,14 @@ function generateCrew(planet, factionType) {
 function generateFleet(fleetType = FLEET_TYPES_ALL[0], factionType = null, planet = null, startAt = planet) {
     //console.log('generating a fleet:',fleetType,factionType,planet,startAt)
     const ships = []
-    const populationMod = planet ? planet.c.population : 1
-    const numShips = Math.ceil(0.1 + rng(fleetType.minShips*populationMod, fleetType.maxShips*populationMod))
+    const numShips = Math.ceil(0.1 + rng(fleetType.minShips, fleetType.maxShips))
     for (let i = 0; i < numShips; i++) {
         const shipType = i == 0 ? fleetType.shipTypes[0] : rndMember(fleetType.shipTypes)
         ships.push(generateShip(planet, shipType))
         //console.log('generated ship:',ships[ships.length-1])
     }
     if (ships.length == 0) {
-        console.log({ fleetType, planet, numShips, populationMod})
+        console.log({ fleetType, planet, numShips})
         throw new Error('generateFleet: No ships generated for fleetType '+fleetType.name)
     }
     const fleet = new Fleet(`${fleetType ? fleetType.name : ''}`, planet,

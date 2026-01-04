@@ -102,12 +102,17 @@ class HackerFleetAI extends FleetAI {
     offerRepairService(targetFleet) {
         if (!(targetFleet instanceof Fleet)) return;
         
+        // Don't automatically interact with player fleet - they get an encounter instead
+        if (targetFleet === gs.fleet) return;
+        
         // 50% chance to help, 50% chance nothing happens
         if (Math.random() < 0.5) {
             // Nothing happens
             console.log(`💻 ${this.fleet.name} observed ${targetFleet.name} but took no action`);
             return;
         }
+
+        console.log(`🔧 ${this.fleet.name} is repairing fleet ${targetFleet.name}`);
         
         // Calculate repair and payment
         const totalMaxHull = targetFleet.ships.reduce((sum, ship) => sum + ship.hull[1], 0);
@@ -132,6 +137,9 @@ class HackerFleetAI extends FleetAI {
     attemptCreditSiphon(targetFleet) {
         if (!(targetFleet instanceof Fleet)) return;
         if (!targetFleet.captain || targetFleet.captain.credits <= 100) return;
+        
+        // Don't automatically interact with player fleet - they get an encounter instead
+        if (targetFleet === gs.fleet) return;
         
         const roll = Math.random();
         

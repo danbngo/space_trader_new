@@ -65,6 +65,13 @@ class RebelFleetAI extends FleetAI {
                 this.target = null
                 this.fleet.route = null
             } else {
+                // Don't automatically interact with player fleet - they get an encounter instead
+                if (this.target === gs.fleet) {
+                    this.target = null;
+                    this.fleet.route = null;
+                    return;
+                }
+                
                 // Reduce prestige and culture when rebels fight
                 if (this.fleet.planet && this.fleet.planet.civilization) {
                     this.fleet.planet.c.prestige *= 0.999;

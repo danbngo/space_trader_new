@@ -96,12 +96,10 @@ class FleetAI {
         if (!this.fleet.route) {
             this.resumeVoyage()
         }
-        else {
-           //was some route refresh logic here but it was causing problems
-        }
         if (this.fleet.factionType.cloaked) {
             this.fleet.cloakLevel = Math.min(1.0, this.fleet.cloakLevel + (CLOAK_REGEN_RATE * elapsedYears));
         }
+        this.checkAsteroidHits()
     }
 
     checkAsteroidHits() {

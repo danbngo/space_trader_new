@@ -34,6 +34,13 @@ class MissionaryFleetAI extends FleetAI {
     
     onNearTarget() {
         if (this.target instanceof Fleet && !this.target.location && this.target.captain) {
+            // Don't automatically interact with player fleet - they get an encounter instead
+            if (this.target === gs.fleet) {
+                this.target = null;
+                this.fleet.route = null;
+                return;
+            }
+            
             // Mark fleet as visited
             this.visited.push(this.target);
             

@@ -53,6 +53,13 @@ class BountyHunterFleetAI extends FleetAI {
                 this.target = null
                 this.fleet.route = null
             } else {
+                // Don't automatically interact with player fleet - they get an encounter instead
+                if (this.target === gs.fleet) {
+                    this.target = null;
+                    this.fleet.route = null;
+                    return;
+                }
+                
                 // 50% chance to take credits peacefully if they have any, otherwise fight
                 if (this.target.captain && this.target.captain.credits > 0 && Math.random() < 0.5) {
                     this.transferCredits(this.target, this.fleet);

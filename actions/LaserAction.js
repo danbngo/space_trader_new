@@ -7,8 +7,8 @@ class LaserAction extends ShipAction {
         console.log('LaserAction.execute', { attacker: this.actor, target: this.target });
         // Clear cloak status when attacking
         this.actor.statusEffects.setAmount(STATUS_EFFECTS.CLOAKED, 0)
-        //player has a 0% chance to miss at min range and 50% at max range
-        const baseMissChance = this.path.distance > 0 ? (0.5 * (this.path.distance / this.actor.maxAttackDistance)) : 0
+        //flat 25% miss chance (75% hit chance) regardless of distance
+        const baseMissChance = 0.25
         
         // Apply Gunner skill (reduces miss chance, 0.5x at 50 skill)
         const gunnerSkill = this.actor.fleet.totalSkills.getAmount(SKILLS.Gunner)

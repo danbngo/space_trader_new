@@ -712,6 +712,9 @@ class StarMap extends BaseMap {
             ce({parent:container, tag:'button', innerHTML:'Travel', onClick:()=>this.setDestination(obj, true), disabled: cantTravelHere})
             if (gs.fleet.route) ce({parent:container, tag:'button', innerHTML:'Stop', onClick:()=>this.stopPlayerFleet()})
         }
+        if (obj instanceof Star) {
+            ce({parent:container, tag:'button', innerHTML:'View Star', onClick:()=>this.explore(obj)})
+        }
         // Handle waypoint (arbitrary coordinates)
         if (obj.isWaypoint) {
             const distance = roundToPlaces(calcDistance(gs.fleet.x, gs.fleet.y, obj.x, obj.y), 2)
@@ -740,8 +743,9 @@ class StarMap extends BaseMap {
         this.refresh();
     }
 
-    explore(planet = gs.location) {
-        if (planet instanceof Planet) showPlanetMenu(planet)
+    explore(obj) {
+        if (obj instanceof Planet) showPlanetMenu(obj)
+        if (obj instanceof Star) showStarMenu(obj)
     }
 
     /** @param {Planet | Waypoint | Fleet} obj */

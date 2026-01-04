@@ -1,6 +1,14 @@
 console.log("Generating solar system...");
 
 const SOL = new Star("Sol", hexToRgba('#ffff44'), 109, null, 122); // Heliosphere extends to ~122 AU
+// Add Sol's stellar properties
+SOL.starType = STAR_TYPES.G_TYPE
+SOL.metallicity = STAR_METALLICITY_LEVELS.SOLAR
+SOL.age = STAR_AGE_LEVELS.SOLAR_AGE
+SOL.luminosity = STAR_LUMINOSITY_LEVELS.SOLAR
+SOL.mass = 1.0
+SOL.temperature = 5778
+SOL.features = []
 
 const MERCURY = new Planet("Mercury", hexToRgba('#aaaaaa'), 0.383, new Orbit(0.39), PLANET_TYPES.TERRESTRIAL, null, null, 
     new Climate(TEMPERATURES.EXTREMELY_HIGH, ATMOSPHERIC_PRESSURES.NONE, GRAVITIES.LOW, OCEAN_COVERAGES.NONE, GEOLOGICAL_ACTIVITIES.EXTREMELY_LOW, MAGNETOSPHERES.VERY_LOW, RADIATION_LEVELS.VERY_HIGH, ASTEROID_IMPACTS.HIGH, POLLUTION_LEVELS.NONE, PLANET_ATMOSPHERE_TYPES.NONE, null, PLANET_GEOLOGY_TYPES.SILICATE_IRON),
