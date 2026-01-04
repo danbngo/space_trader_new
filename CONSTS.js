@@ -23,7 +23,7 @@ const BANK_BOUNTY_CHANCE_PER_DAY = 0.01;
 const NEWS_CHANCE_PER_DAY = 1/30;
 const META_NEWS_CHANCE_PER_DAY = 1/365;
 const ANOMALY_CHANCE_PER_DAY = 1/30;
-const MAX_NUM_ANOMALIES = 3;
+const MAX_NUM_ANOMALIES = 5;
 const FLEET_SPAWN_CHANCE_PER_DAY = 1/30 / 20 //about 20 fleet types
 const ENCOUNTER_IMMUNITY_DAYS = 1; //days of immunity after an encounter ends
 const ENCOUNTER_DENIED_DAYS = 0.25; //days player can't bump into fleets after denying an encounter (0.25 = 6 hours)
@@ -64,7 +64,7 @@ const GUILD_AVERAGE_NUM_OFFICERS = 3
 const GUILD_AVERAGE_NUM_CONTRACTS = 5
 const PALACE_AVERAGE_NUM_CONTRACTS = 3
 
-const MAX_TAX_RATE = 0.75
+const AVERAGE_TAX_RATE = 0.05
 
 const STARTING_CREDITS = 5*1000
 

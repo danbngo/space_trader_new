@@ -208,7 +208,7 @@ class FleetAI {
     }*/
 
     setTarget(target) {
-        const route = new Route(this.fleet, target)
+        const route = target instanceof Fleet ? new InterceptionRoute(this.fleet, target) : new Route(this.fleet, target)
         if (route.valid) {
             // Check if route path intersects with the sun
             if (FleetAI.checkRouteIntersectsSun(route)) {

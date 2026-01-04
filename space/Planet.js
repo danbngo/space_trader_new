@@ -74,7 +74,7 @@ class Planet extends OrbitingObject {
         this.c.cultures.setAmount(sourcePlanet, currentAmt * (1 + weight));
         this.c.cultures.normalize();
     }
-    
+
     /**
      * Add racial influence from another planet to this planet's civilization.
      * @param {Race} sourceRace - The race being spread

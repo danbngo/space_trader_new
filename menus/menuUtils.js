@@ -49,7 +49,7 @@ function showPlanetModal(planet = new Planet(), title = '', msg = '', options = 
             }),
             ce({
                 tag: 'div',
-                style: {minWidth: '300px', textAlign: 'center', color: 'black important!'},
+                style: {minWidth: '300px', textAlign: 'center', color: 'black important!', marginTop: '8px'},
                 children: [title]
             }),
             ce({

@@ -61,7 +61,7 @@ class SoldiersEncounter extends AuthoritiesEncounter {
         gs.fleet.dock(this.planet);
         
         showModal('Impounded', `You surrender to the ${fleetName}. They escort you to ${planetName} where your escort ships and cargo are immediately impounded.<br/><br/>"You're lucky we're following protocol. Your ships will be held until this war ends... if it ever does."<br/><br/>Your crew is intact, but you've lost everything except your flagship.`, [
-            ['Continue', ()=>this.endEncounter()],
+            ['Continue', ()=>showPlanetMenu(this.planet)],
         ])
     }
 

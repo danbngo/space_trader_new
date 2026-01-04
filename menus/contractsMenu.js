@@ -5,7 +5,7 @@ function showContractsMenu() {
     const contracts = gs.contracts || []
     
     if (contracts.length === 0) {
-        showModal('Contracts', 'You have no active contracts.', [
+        showModal('Contracts', colorSpan('You have no active contracts.', COLORS.Gray), [
             ['Close', () => closeModal()]
         ])
         return

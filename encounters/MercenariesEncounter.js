@@ -119,7 +119,7 @@ class MercenariesEncounter extends FleetEncounter {
         gs.fleet.dock(this.planet);
         
         showModal('Impounded', `You surrender to the ${fleetName}. They escort you to ${planetName} where your escort ships and cargo are turned over to their employer.<br/><br/>"Smart choice. Our contract didn't require killing you - just taking your assets. You're free to go... for now."<br/><br/>Your crew is intact, but you've lost everything except your flagship.`, [
-            ['Continue', ()=>this.endEncounter()],
+            ['Continue', ()=>showPlanetMenu(this.planet)],
         ])
     }
 

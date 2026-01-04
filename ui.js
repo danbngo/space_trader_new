@@ -397,6 +397,7 @@ let currentModal = ce()
  * @returns {HTMLElement} The created modal element
  */
 function showModal(title = '', text = '', buttons = [['Continue', ()=>{}, false]], id = '', onClosePanel = null) {
+    onClosePanel = null //danmod - this was ugly
     if (currentMap) {
         currentMap.refresh()
         if (currentMap.togglePause) currentMap.togglePause(true)

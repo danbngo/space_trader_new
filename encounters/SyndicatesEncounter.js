@@ -53,15 +53,6 @@ class SyndicatesEncounter extends FleetEncounter {
             )
         }
     }
-    
-    startCombat() {
-        const msg = 'The syndicate ships open fire without warning!<br/><br/>"You made the wrong choice!"'
-        showModal(
-            'Syndicate Attack',
-            msg,
-            [['Fight', ()=>this.startCombat()]]
-        )
-    }
 
     onVictory() {
         this.showPlayerDefeatedEnemyModal()

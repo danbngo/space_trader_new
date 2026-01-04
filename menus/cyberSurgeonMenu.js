@@ -44,6 +44,7 @@ function showCyberSurgeonBuyMenu(cyberSurgeon = new CyberSurgeon()) {
         
         const canBuyAndInstall = canAfford && hasOfficer && isDocked
         const canTake = canAfford && isDocked
+        /** @type {ButtonData[]} */
         const buttons = [
             [`Buy & Install`, ()=>showCyberSurgeonInstallImplantMenu(cyberSurgeon, implant), !canBuyAndInstall],
             [`Take With Me`, ()=>{
@@ -91,6 +92,7 @@ function showFleetImplantsMenu(cyberSurgeon = new CyberSurgeon()) {
     const {planet} = cyberSurgeon
     
     function onSelectFleetImplant(implant = new CyberImplant()) {
+        /** @type {ButtonData[]} */
         const buttons = [
             ['Install', () => showCyberSurgeonInstallImplantMenu(cyberSurgeon, implant, null, true)],
             ['Back', () => showCyberSurgeonBuyMenu(cyberSurgeon)],
@@ -106,7 +108,7 @@ function showFleetImplantsMenu(cyberSurgeon = new CyberSurgeon()) {
         implantRows.push([
             implant.implantType.name,
             statColorSpan(roundToPlaces(implant.quality*100, 1)+'%', implant.quality),
-            implant.value,
+            ''+implant.value,
             implant.implantType.description
         ])
     }
@@ -169,7 +171,7 @@ function showCyberSurgeonInstallImplantMenu(cyberSurgeon = new CyberSurgeon(), i
     function onSelectOfficer(officer = new Officer()) {
         const alreadyHasImplant = officer.implants.some(i => i.implantType === implant.implantType)
         const canInstall = !alreadyHasImplant && (isFromFleet || gs.credits >= buyPrice)
-        
+        /** @type {ButtonData[]} */
         const buttons = [
             [isFromFleet ? 'Install' : 'Buy & Install', () => buyImplant(implant, officer), !canInstall],
             ['Cancel', () => showCyberSurgeonBuyMenu(cyberSurgeon)],

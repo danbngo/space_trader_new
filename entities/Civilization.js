@@ -108,7 +108,7 @@ class Civilization {
     }
 
     get taxRate() {
-        return this.taxes * MAX_TAX_RATE / 2 //this.taxes ranges from 0-2
+        return this.taxes * AVERAGE_TAX_RATE //this.taxes ranges from 0-2
     }
 
     get military() {

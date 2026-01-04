@@ -130,7 +130,6 @@ function showCyberwareMenu(selectedOfficer = null) {
         children: [
             ce({children: ['<b><u>Crew Member</u></b>']}),
             officerDropdown.container,
-            ce({children: [`<br/><b>Installed Implants (${officer.implants.length}/${officer.maxImplants})</b>`]}),
             createInstalledImplantsTable(),
         ]
     })
@@ -140,7 +139,6 @@ function showCyberwareMenu(selectedOfficer = null) {
         style: {display: 'flex', flexDirection: 'column', gap: '12px'},
         children: [
             ce({children: ['<b><u>Fleet Inventory</u></b>']}),
-            ce({children: [`${fleet.cyberModules.length} implant${fleet.cyberModules.length !== 1 ? 's' : ''} available`]}),
             createFleetImplantsTable(),
         ]
     })

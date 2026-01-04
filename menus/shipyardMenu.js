@@ -132,12 +132,14 @@ function showShipyardBuyMenu(shipyard = new Shipyard()) {
     function onSelectShipyardShip(ship = new Ship()) {
         const buyPrice = shipyard.calcBuyPrice(ship)
         const canBuy = gs.credits >= buyPrice && fleet.ships.length < fleet.numPilots
-        const buttons = [
-            ...(canBuy ? [[`Buy`, ()=>showBuyShipModal(ship)]] : []),
+        /** @type {ButtonData[]} */
+        const buttons = []
+        if (canBuy) buttons.push([`Buy`, ()=>showBuyShipModal(ship)])
+        buttons.push(
             ["Buy Modules", ()=>showShipyardBuyModulesMenu(shipyard)],
             ["Sell Ships", ()=>showShipyardSellMenu(shipyard)],
             ["Back", () => leave()],
-        ]
+        )
         refreshPanelButtons('shipyard_buy_panel', buttons)
     }
 
@@ -149,11 +151,10 @@ function showShipyardBuyMenu(shipyard = new Shipyard()) {
             createBuyShipMenu(shipyard.ships, shipyard, (ship)=>onSelectShipyardShip(ship)),
             `Your # ships: ${fleet.ships.length}/${fleet.numPilots} | Your credits: ${gs.credits}`,
             //`Shipyard credits: ${shipyard.credits}`,
-            `Local Ship Quality: ${roundToPlaces(100*shipyard.planet.c.technology, 2)}%`,
-            `Buy Fee: ${statColorSpan(roundToPlaces(100*planet.c.corruption, 2), 2/(1+planet.c.corruption))}%`,
-            (gs.fleet.totalSkills.getAmount(SKILLS.Barter) > 0) ? `Fee After Barter | ${statColorSpan(roundToPlaces(100*(1+shipyard.rake) - 100, 2), 2/(1+shipyard.rake))}% Buy` : '',
-            planet.civilization ? `Inflation: ${statColorSpan(roundToPlaces(100*planet.c.inflation, 2), 2/(1+planet.c.inflation))}%`
-            +` | Tax Rate: ${statColorSpan(roundToPlaces(100*planet.c.taxes, 2), 2/(1+planet.c.taxes))}%` : '',
+            `Local Ship Quality: ${roundToPlaces(100*shipyard.planet.c.technology, 2)}%
+            ${describeFees(planet.c.corruption)} |
+            ${describeInflation(planet.c.inflation)} | 
+            ${describeTaxes(planet.c.taxes)}`
         ]}),
         [
             ["Buy Modules", ()=>showShipyardBuyModulesMenu(shipyard)],
@@ -189,12 +190,15 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
 
     function onSelectPlayerShip(ship = new Ship()) {
         const canSell = isDocked && shipyard.credits > 0
-        refreshPanelButtons('shipyard_sell_panel', [
-            ...(canSell ? [[`Sell`, ()=>showSellShipModal(ship)]] : []),
+        /** @type {ButtonData[]} */
+        const buttons = []
+        if (canSell) buttons.push([`Sell`, ()=>showSellShipModal(ship)])
+        buttons.push(
             ["Buy Modules", ()=>showShipyardBuyModulesMenu(shipyard)],
             ["Buy Ships", ()=>showShipyardBuyMenu(shipyard)],
             ["Back", () => leave()],
-        ])
+        )
+        refreshPanelButtons('shipyard_buy_panel', buttons)
     }
 
     function showSellShipModal(ship = new Ship()) {
@@ -257,6 +261,7 @@ function showShipyardBuyModulesMenu(shipyard = new Shipyard()) {
         const hasEligibleShip = fleet.ships.filter(s=>s.unusedModuleSlots > 0).length > 0
         
         const canBuy = canAfford && hasEligibleShip && isDocked
+        /** @type {ButtonData[]} */
         const buttons = [
             [`Buy & Install`, ()=>showShipyardInstallModuleMenu(shipyard, module), !canBuy],
             ["Buy Ships", ()=>showShipyardBuyMenu(shipyard)],
@@ -326,7 +331,8 @@ function showShipyardInstallModuleMenu(shipyard = new Shipyard(), module = new S
         const hasOpenSlot = ship.unusedModuleSlots > 0
         const alreadyHasModule = ship.modules.some(m => m.moduleType === module.moduleType)
         const canInstall = hasOpenSlot && !alreadyHasModule && gs.credits >= buyPrice
-        
+
+        /** @type {ButtonData[]} */
         const buttons = [
             ['Buy & Install', () => buyModule(module, ship), !canInstall],
             ['Cancel', () => showShipyardBuyModulesMenu(shipyard)],

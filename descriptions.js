@@ -182,9 +182,18 @@ function describeInflation(inflationRating = 0) {
 }
 
 function describeTaxes(taxesRating = 0) {
-    const taxRate = roundToPlaces(taxesRating * MAX_TAX_RATE / 2 * 100, 1)
+    const taxRate = roundToPlaces(taxesRating * AVERAGE_TAX_RATE / 2 * 100, 1)
     return `${statColorSpan(`${taxRate}% tax rate`, taxesRating)}`
 }
+
+function describeFees(corruptionRating = 0) {
+    const baseFee = roundToPlaces(100*corruptionRating, 2)
+    const barterSkill = gs.fleet.totalSkills.getAmount(SKILLS.Barter)
+    const rake = corruptionRating / (1 + barterSkill / 50)
+    const postBarterFee = roundToPlaces(100*rake, 2)
+    return  `Fee: ${statColorSpan(baseFee, corruptionRating)} | After Barter: ${statColorSpan(postBarterFee, rake)}`
+}
+
 
 function describePrestige(prestigeRating = 0) {
     const prestigeLevel = prestigeRating < 0.5 ? 'Pariah' : prestigeRating < 0.8 ? 'Ignored' : prestigeRating < 1.2 ? 'Recognized' : prestigeRating < 1.5 ? 'Respected' : prestigeRating < 2 ? 'Influential' : 'Dominant'

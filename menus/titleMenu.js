@@ -197,12 +197,20 @@ async function startNewGame() {
 
     await simulateFleetActivity(SIMULATE_FLEET_ACTIVITY_YEARS)
 
+    // Ensure maximum anomalies exist at game start
+    if (!gs.system.anomalies) gs.system.anomalies = [];
+    while (gs.system.anomalies.length < MAX_NUM_ANOMALIES) {
+        const anomaly = generateAnomaly();
+        gs.system.anomalies.push(anomaly);
+    }
+
     // Create captain
     const captain = new Officer("Captain", rndMember(gs.system.planets), FACTION_TYPES_ALL[0], STARTING_CREDITS);
     
-    // Give captain all cyber implants for testing (only in debug mode)
+    // Give captain all cyber implants and genetic modifications for testing (only in debug mode)
     if (DEBUG_MODE) {
         captain.implants = CYBER_IMPLANT_TYPES_ALL.map(implantType => new CyberImplant(implantType, 1.0))
+        captain.geneticModifications = GENETIC_MODIFICATION_TYPES_ALL.map(modificationType => new GeneticModification(modificationType, 1.0))
     }
     
     const playerShip = new Ship("Starting Ship", STARTING_SHIP_TYPE, COLORS.LightGray, [30,30], [20,20], 100, 10, 10, 10)
@@ -239,8 +247,6 @@ async function startNewGame() {
 
     // Add player's fleet to system
     gs.system.fleets.push(gs.fleet);
-    // Initial planet setup
-    gs.fleet.dock(rndMember(gs.system.planets));
 
     console.log("New game started.");
     createCharacter()

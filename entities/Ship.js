@@ -172,6 +172,7 @@ class Ship {
      * @returns {number} The actual amount of shields restored.
      */
     restoreShields(amt = this.shields[1]) {
+        if (this.shields[0] >= this.shields[1]) return 0
         const beforeShields = this.shields[0]
         this.shields[0] = Math.min(this.shields[0]+amt, this.shields[1])
         const actualRecharge = this.shields[0] - beforeShields

@@ -82,13 +82,4 @@ class TaxCollectorsEncounter extends NeutralsEncounter {
             )
         }
     }
-    
-    startCombat() {
-        const msg = 'The tax collectors activate their weapon systems.<br/><br/>"Refusal to pay is a criminal offense. You are under arrest!"'
-        showModal(
-            'Tax Evasion',
-            msg,
-            [['Fight', ()=>this.startCombat()]]
-        )
-    }
 }

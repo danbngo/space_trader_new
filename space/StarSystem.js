@@ -178,7 +178,7 @@ class StarSystem extends SpaceObject {
         
         // Create new Fleet from the abandoned one
         const resurrectedFleet = new Fleet(
-            abandonedFleet.name,
+            abandonedFleet.fleetType.name, // Restore original name from fleet type
             abandonedFleet.planet,
             abandonedFleet.fleetType,
             abandonedFleet.factionType,

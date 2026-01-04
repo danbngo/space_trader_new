@@ -5,7 +5,7 @@
  */
 function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
     console.log('showCaptainSkillsMenu called with captain:',captain,'selectedSkill:',selectedSkill)
-    const {name, level, expPoints, expToNextLevel, skills, skillPoints, credits, geneticModifications = []} = captain
+    const {name, level, expPoints, expToNextLevel, skills, skillPoints, credits, race, planet, factionType, geneticModifications = []} = captain
 
     function improveSkill(skill = SKILLS_ALL[0]) {
         const cost = captain.calcSkillPointsToUpgrade(skill)
@@ -114,7 +114,8 @@ function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
     showModal(
         `Captain Overview`,
         ce({children:[
-            `Name: ${name} | Race: ${raceText} | Credits: ${credits}`,
+            `Name: ${name} | Race: ${coloredName(race)} | Faction: ${coloredName(factionType)} | Planet ${coloredName(planet)}`, 
+            `Credits: ${credits}`,
             ce({tag:'br'}),
             `Level: ${level} | Exp: ${expPoints} | Next Lvl At: ${expToNextLevel}`,
             expProgressBar.container,
@@ -222,15 +223,13 @@ function showCaptainPerksMenu(captain = gs.captain, selectedPerk = null) {
     showModal(
         `Captain Perks`,
         ce({children:[
-            `Name: ${name} | Level: ${level}`,
-            `Perk Points: ${colorSpan(String(numPerkPoints), numPerkPoints > 0 ? COLORS.Green : '')}`,
             ce({style: 'margin-top: 15px;', children: [
                 ce({children: [`<b>Current Perks:</b><br/>`, currentPerksText]})
             ]}),
             ce({style: 'margin-top: 20px;', children: [
-                ce({children: [`<b>Available Perks:</b>`]}),
                 availablePerksTable
-            ]})
+            ]}),
+            `Perk Points: ${colorSpan(String(numPerkPoints), numPerkPoints > 0 ? COLORS.Green : '')}`,
         ]}),
         [
             ["Skills", () => showCaptainSkillsMenu()],

@@ -408,7 +408,7 @@ class StarMap extends BaseMap {
             
             // Create objects if they don't exist (empty square/rectangle)
             if (!ruinsObj) {
-                ruinsObj = cvs.addEmptyRectangle(ruinsId, ruin.x, ruin.y, ruin.radius * 15, ruin.radius * 15, 2, ruin.color, 1, () => this.selectObject(ruin))
+                ruinsObj = cvs.addEmptyRectangle(ruinsId, ruin.x, ruin.y, ruin.radius * 30, ruin.radius * 30, 8, ruin.color, 1, () => this.selectObject(ruin))
                 labelObj = cvs.addText(labelId, ruin.x, ruin.y, 0, -24, ruin.name, ruin.color, DEFAULT_FONT_SIZE, 2, () => this.selectObject(ruin))
                 
                 const objs = [ruinsObj, labelObj]
@@ -710,6 +710,7 @@ class StarMap extends BaseMap {
             ce({parent:container, innerHTML:`ETA: ${describeTimespan(travelTime)}`})
             ce({parent:container, tag:'button', innerHTML:isDockedHere ? 'Dock' : 'Scan', onClick:()=>this.explore(obj)})
             ce({parent:container, tag:'button', innerHTML:'Travel', onClick:()=>this.setDestination(obj, true), disabled: cantTravelHere})
+            if (gs.fleet.route) ce({parent:container, tag:'button', innerHTML:'Stop', onClick:()=>this.stopPlayerFleet()})
         }
         // Handle waypoint (arbitrary coordinates)
         if (obj.isWaypoint) {
@@ -718,7 +719,13 @@ class StarMap extends BaseMap {
             ce({parent:container, innerHTML:`Distance: ${distance} AU`})
             ce({parent:container, innerHTML:`ETA: ${describeTimespan(travelTime)}`})
             ce({parent:container, tag:'button', innerHTML:'Travel', onClick:()=>this.setDestination(obj, true), disabled: gs.fleet.stranded})
+            if (gs.fleet.route) ce({parent:container, tag:'button', innerHTML:'Stop', onClick:()=>this.stopPlayerFleet()})
         }
+    }
+
+    stopPlayerFleet() {
+        gs.fleet.route = null
+        this.refresh()
     }
 
     selectObject(obj) {
@@ -745,11 +752,13 @@ class StarMap extends BaseMap {
             route = new Route(gs.fleet, obj)
         } else if (obj instanceof Fleet) {
             // Attempt to intercept another fleet
-            route = new Route(gs.fleet, obj)
+            route = obj instanceof Fleet ? new InterceptionRoute(gs.fleet, obj) : new Route(gs.fleet, obj)
+            //route = new Route(gs.fleet, obj)
             if (!route.valid) {
-                console.log('Cannot intercept fleet - target is too fast or too far')
+                console.log('!!!! Cannot intercept fleet - target is too fast or too far')
                 return
             }
+            unpause = false //these routes can be wonky, so player needs to confirm
         } else if (obj.isWaypoint) {
             // Create a route to arbitrary coordinates
             route = new Route(gs.fleet, obj)

@@ -10,10 +10,8 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
 
     // Helper to set fleet location and position
     function setFleetLocation(planet) {
-        gs.fleet.location = planet
         gs.fleet.planet = planet
-        gs.fleet.x = planet.x
-        gs.fleet.y = planet.y
+        gs.fleet.dock(planet)
     }
 
     function improveSkill(skill = SKILLS_ALL[0]) {
@@ -39,6 +37,7 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
         captain.race = rndMember(Object.values(RACES))
         captain.religion = gs.system.religions.length > 0 ? (Math.random() < 0.3 ? null : rndMember(gs.system.religions)) : null
         gs.fleet.captain.factionType = rndMember(PLAYER_FACTIONS)
+        gs.fleet.factionType = gs.fleet.captain.factionType
         setFleetLocation(rndMember(gs.system.planets))
         
         // Randomly spend all skill points

@@ -126,7 +126,7 @@ class ScientistsEncounter extends NeutralsEncounter {
         ])
     }
     
-    offerShipUpgrade() {
+    /*offerShipUpgrade() {
         // Select a random ship from player's fleet
         if (gs.fleet.ships.length === 0) {
             this.showGreeting()
@@ -246,7 +246,7 @@ class ScientistsEncounter extends NeutralsEncounter {
         }
         
         return results
-    }
+    }*/
 
     showGreeting() {
         const fleetName = coloredName(this.fleet)

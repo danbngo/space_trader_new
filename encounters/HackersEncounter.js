@@ -176,7 +176,7 @@ class HackersEncounter extends FleetEncounter {
         return results
     }
     
-    offerFleetRepair(greeting) {
+    /*offerFleetRepair(greeting) {
         // Calculate total damage across fleet
         const totalMaxHull = gs.fleet.ships.reduce((sum, ship) => sum + ship.hull[1], 0)
         const totalCurrentHull = gs.fleet.ships.reduce((sum, ship) => sum + ship.hull[0], 0)
@@ -219,7 +219,7 @@ class HackersEncounter extends FleetEncounter {
             ['Decline', () => this.showStandardHackerGreeting(greeting)],
             ['Attack', () => this.showPlayerAttackFleetModal()],
         ])
-    }
+    }*/
     
     offerCyberImplant(greeting) {
         // Don't preview the implant - player must accept blindly
