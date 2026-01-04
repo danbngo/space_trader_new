@@ -87,6 +87,14 @@ class PilgrimsEncounter extends NeutralsEncounter {
                 resultMessage += `"These relics will be treasured and protected. You have blessed our journey beyond measure!"<br/><br/>`
                 resultMessage += `<span style="color: #ffff66">Received ${totalPrice} CR!</span>`
                 
+                // Grant reputation with pilgrim's religion based on relic value
+                if (this.fleet.planet && this.fleet.planet.civilization && this.fleet.planet.civilization.stateReligion) {
+                    const religion = this.fleet.planet.civilization.stateReligion
+                    const reputationGain = Math.ceil(totalPrice / 100) // 1 rep per 100 CR value
+                    gs.captain.reputation.increment(religion, reputationGain)
+                    resultMessage += `<br/><br/><span style="color: #66ff66">+${reputationGain} reputation with ${colorSpan(religion.name, religion.color)}</span>`
+                }
+                
                 showModal('Relics Sold', resultMessage, [
                     ['Continue', () => this.endEncounter()]
                 ])

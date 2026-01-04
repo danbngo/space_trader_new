@@ -10,6 +10,7 @@ function showAssistantMenu() {
         ['Officers', ()=>showOfficersMenu()],
         ['Contracts', ()=>showContractsMenu(), false],
         ['Captain', ()=>showCaptainSkillsMenu(), false, hasSkillPoints || hasPerkPoints ? 'highlighted' : null],
+        ['Cyberware', ()=>showCyberwareMenu()],
         ce({tag:'br'}),
         ['Planets', ()=>showPlanetsMenu(()=>showAssistantMenu())],
         ['Dwarf Planets', ()=>showDwarfPlanetsMenu(()=>showAssistantMenu())],

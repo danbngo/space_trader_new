@@ -42,9 +42,17 @@ function showCyberSurgeonBuyMenu(cyberSurgeon = new CyberSurgeon()) {
         // Check if player has officers/captain to install on
         const hasOfficer = fleet.officers.length > 0 || gs.captain
         
-        const canBuy = canAfford && hasOfficer && isDocked
+        const canBuyAndInstall = canAfford && hasOfficer && isDocked
+        const canTake = canAfford && isDocked
         const buttons = [
-            [`Buy & Install`, ()=>showCyberSurgeonInstallImplantMenu(cyberSurgeon, implant), !canBuy],
+            [`Buy & Install`, ()=>showCyberSurgeonInstallImplantMenu(cyberSurgeon, implant), !canBuyAndInstall],
+            [`Take With Me`, ()=>{
+                gs.credits -= buyPrice
+                cyberSurgeon.credits += buyPrice
+                fleet.cyberModules.push(implant)
+                safeRemove(cyberSurgeon.implants, implant)
+                showCyberSurgeonBuyMenu(cyberSurgeon)
+            }, !canTake],
             ["Back", () => leave()],
         ]
         refreshPanelButtons('cyber_surgeon_panel', buttons)
@@ -57,6 +65,7 @@ function showCyberSurgeonBuyMenu(cyberSurgeon = new CyberSurgeon()) {
             isDocked ? 'Welcome to the cyber surgeon clinic.<br/>' : colorSpan('You must dock to use the cyber surgeon.', COLORS.Yellow) + '<br/>',
             `<b>Available Implants</b>`,
             createBuyImplantMenu(cyberSurgeon.implants, cyberSurgeon, (implant)=>onSelectImplant(implant)),
+            `<br/><b>Your Fleet's Implants:</b> ${fleet.cyberModules.length > 0 ? fleet.cyberModules.map(i => i.implantType.name).join(', ') : '(None)'}<br/>`,
             `Your credits: ${gs.credits} | Your Crew: Captain + ${fleet.officers.length} Officers`,
             `Buy Fee: ${statColorSpan(roundToPlaces(100*planet.c.corruption, 2), 2/(1+planet.c.corruption))}%`,
             (gs.fleet.totalSkills.getAmount(SKILLS.Barter) > 0) ? `Fee After Barter | ${statColorSpan(roundToPlaces(100*(1+cyberSurgeon.rake) - 100, 2), 2/(1+cyberSurgeon.rake))}% Buy` : '',
@@ -64,6 +73,7 @@ function showCyberSurgeonBuyMenu(cyberSurgeon = new CyberSurgeon()) {
             +` | Tax Rate: ${statColorSpan(roundToPlaces(100*planet.c.taxes, 2), 2/(1+planet.c.taxes))}%` : '',
         ]}),
         [
+            ["Install Fleet Implant", () => showFleetImplantsMenu(cyberSurgeon), fleet.cyberModules.length === 0],
             ["Back", () => leave()],
         ],
         `cyber_surgeon_panel`,
@@ -76,16 +86,64 @@ function showCyberSurgeonBuyMenu(cyberSurgeon = new CyberSurgeon()) {
     }
 }
 
-function showCyberSurgeonInstallImplantMenu(cyberSurgeon = new CyberSurgeon(), implant = new CyberImplant(), selectedOfficer = null) {
+function showFleetImplantsMenu(cyberSurgeon = new CyberSurgeon()) {
     const {fleet} = gs
-    const buyPrice = cyberSurgeon.calcBuyImplantPrice(implant)
+    const {planet} = cyberSurgeon
+    
+    function onSelectFleetImplant(implant = new CyberImplant()) {
+        const buttons = [
+            ['Install', () => showCyberSurgeonInstallImplantMenu(cyberSurgeon, implant, null, true)],
+            ['Back', () => showCyberSurgeonBuyMenu(cyberSurgeon)],
+        ]
+        refreshPanelButtons('fleet_implants_panel', buttons)
+    }
+    
+    // Create table of fleet implants
+    const implantRows = [
+        ['Implant Name', 'Quality', 'Value', 'Description']
+    ]
+    for (const implant of fleet.cyberModules) {
+        implantRows.push([
+            implant.implantType.name,
+            statColorSpan(roundToPlaces(implant.quality*100, 1)+'%', implant.quality),
+            implant.value,
+            implant.implantType.description
+        ])
+    }
+    
+    const implantTable = createTable(implantRows, (rowIndex) => onSelectFleetImplant(fleet.cyberModules[rowIndex]))
+    
+    showModal(
+        'Fleet Implants',
+        ce({children:[
+            `Select an implant from your fleet's inventory to install:<br/>`,
+            implantTable,
+        ]}),
+        [
+            ['Back', () => showCyberSurgeonBuyMenu(cyberSurgeon)],
+        ],
+        'fleet_implants_panel'
+    )
+    
+    if (fleet.cyberModules.length > 0) {
+        onSelectFleetImplant(fleet.cyberModules[0])
+    }
+}
+
+function showCyberSurgeonInstallImplantMenu(cyberSurgeon = new CyberSurgeon(), implant = new CyberImplant(), selectedOfficer = null, isFromFleet = false) {
+    const {fleet} = gs
+    const buyPrice = isFromFleet ? 0 : cyberSurgeon.calcBuyImplantPrice(implant)
 
     function buyImplant(implant = new CyberImplant(), officer = new Officer()) {
-        const buyPrice = cyberSurgeon.calcBuyImplantPrice(implant)
+        const buyPrice = isFromFleet ? 0 : cyberSurgeon.calcBuyImplantPrice(implant)
         gs.credits -= buyPrice;
-        cyberSurgeon.credits += buyPrice;
+        if (!isFromFleet) {
+            cyberSurgeon.credits += buyPrice;
+            safeRemove(cyberSurgeon.implants, implant)
+        } else {
+            safeRemove(fleet.cyberModules, implant)
+        }
         officer.implants.push(implant)
-        safeRemove(cyberSurgeon.implants, implant)
         showCyberSurgeonBuyMenu(cyberSurgeon)
     }
 
@@ -110,10 +168,10 @@ function showCyberSurgeonInstallImplantMenu(cyberSurgeon = new CyberSurgeon(), i
 
     function onSelectOfficer(officer = new Officer()) {
         const alreadyHasImplant = officer.implants.some(i => i.implantType === implant.implantType)
-        const canInstall = !alreadyHasImplant && gs.credits >= buyPrice
+        const canInstall = !alreadyHasImplant && (isFromFleet || gs.credits >= buyPrice)
         
         const buttons = [
-            ['Buy & Install', () => buyImplant(implant, officer), !canInstall],
+            [isFromFleet ? 'Install' : 'Buy & Install', () => buyImplant(implant, officer), !canInstall],
             ['Cancel', () => showCyberSurgeonBuyMenu(cyberSurgeon)],
         ]
         refreshPanelButtons('cyber_surgeon_install_panel', buttons)
@@ -124,8 +182,8 @@ function showCyberSurgeonInstallImplantMenu(cyberSurgeon = new CyberSurgeon(), i
         ce({children:[
             `Select a crew member to install this implant:`,
             createOfficerSelectionTable(),
-            `Implant: ${coloredName(implant.implantType)} | Quality: ${roundToPlaces(implant.quality*100, 1)}% | Price: ${buyPrice} credits`,
-            `Your Credits: ${gs.credits} | CR After Purchase: ${gs.credits - buyPrice}`,
+            `Implant: ${coloredName(implant.implantType)} | Quality: ${roundToPlaces(implant.quality*100, 1)}%${isFromFleet ? ' (From Fleet)' : ' | Price: ' + buyPrice + ' credits'}`,
+            isFromFleet ? '' : `Your Credits: ${gs.credits} | CR After Purchase: ${gs.credits - buyPrice}`,
         ]}),
         [
             ['Cancel', () => showCyberSurgeonBuyMenu(cyberSurgeon)],

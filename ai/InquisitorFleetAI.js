@@ -61,6 +61,14 @@ class InquisitorFleetAI extends FleetAI {
                 return;
             }
             
+            // 60% chance to let target go (up from 50%), 40% chance to convert or fight
+            if (Math.random() < 0.6) {
+                // Let them go - "Their sins are minor, not worth our attention"
+                this.target = null;
+                this.fleet.route = null;
+                return;
+            }
+            
             // 50% chance to convert captain, 50% chance to fight
             if (Math.random() < 0.5) {
                 // Convert captain using utility

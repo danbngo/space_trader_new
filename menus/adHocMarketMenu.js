@@ -8,8 +8,9 @@
  * @param {Fleet} merchantFleet - The merchant fleet to trade with
  * @param {Function} onClose - Callback when the market closes
  * @param {Encounter} [encounter] - The encounter instance (optional, for dialogue)
+ * @param {boolean} [sellOnly] - If true, only allow selling to merchant (no buying)
  */
-function showAdHocMarketMenu(merchantFleet, onClose, encounter = null) {
+function showAdHocMarketMenu(merchantFleet, onClose, encounter = null, sellOnly = false) {
     const fleetName = coloredName(merchantFleet);
     const playerCaptain = gs.fleet.captain;
     const merchantCaptain = merchantFleet.captain;
@@ -55,7 +56,7 @@ function showAdHocMarketMenu(merchantFleet, onClose, encounter = null) {
         gs.credits -= totalCost;
         merchantCaptain.credits += totalCost;
         
-        showAdHocMarketMenu(merchantFleet, onClose, encounter);
+        showAdHocMarketMenu(merchantFleet, onClose, encounter, sellOnly);
     }
     
     // Sell cargo to merchant
@@ -68,7 +69,7 @@ function showAdHocMarketMenu(merchantFleet, onClose, encounter = null) {
         gs.credits += totalEarnings;
         merchantCaptain.credits -= totalEarnings;
         
-        showAdHocMarketMenu(merchantFleet, onClose, encounter);
+        showAdHocMarketMenu(merchantFleet, onClose, encounter, sellOnly);
     }
     
     // Show buy slider for selected cargo
@@ -86,7 +87,7 @@ function showAdHocMarketMenu(merchantFleet, onClose, encounter = null) {
                 ${playerCargoSpace <= 0 ? 'Your cargo hold is full.<br/>' : ''}
                 ${maxAffordable <= 0 ? 'You cannot afford any.<br/>' : ''}
                 ${merchantStock <= 0 ? 'Merchant has none in stock.<br/>' : ''}`,
-                [['OK', () => showAdHocMarketMenu(merchantFleet, onClose, encounter)]]);
+                [['OK', () => showAdHocMarketMenu(merchantFleet, onClose, encounter, sellOnly)]]);
             return;
         }
         
@@ -96,7 +97,7 @@ function showAdHocMarketMenu(merchantFleet, onClose, encounter = null) {
             (amt) => `Price: ${amt * buyPrice}CR<br/>Credits After: ${playerCredits - (amt * buyPrice)}CR`,
             'Buy', 'Cancel',
             (amt) => buyCargo(ct, amt),
-            () => showAdHocMarketMenu(merchantFleet, onClose, encounter)
+            () => showAdHocMarketMenu(merchantFleet, onClose, encounter, sellOnly)
         );
     }
     
@@ -115,7 +116,7 @@ function showAdHocMarketMenu(merchantFleet, onClose, encounter = null) {
                 ${playerStock <= 0 ? 'You have none.<br/>' : ''}
                 ${merchantCargoSpace <= 0 ? 'Merchant cargo hold is full.<br/>' : ''}
                 ${maxMerchantCanAfford <= 0 ? 'Merchant cannot afford any.<br/>' : ''}`,
-                [['OK', () => showAdHocMarketMenu(merchantFleet, onClose, encounter)]]);
+                [['OK', () => showAdHocMarketMenu(merchantFleet, onClose, encounter, sellOnly)]]);
             return;
         }
         
@@ -129,7 +130,7 @@ function showAdHocMarketMenu(merchantFleet, onClose, encounter = null) {
             },
             'Sell', 'Cancel',
             (amt) => sellCargo(ct, amt),
-            () => showAdHocMarketMenu(merchantFleet, onClose, encounter)
+            () => showAdHocMarketMenu(merchantFleet, onClose, encounter, sellOnly)
         );
     }
     
@@ -152,11 +153,15 @@ function showAdHocMarketMenu(merchantFleet, onClose, encounter = null) {
         const canBuy = maxBuyable > 0;
         const canSell = maxSellable > 0;
         
-        const buttons = [
-            ['Buy', () => showBuySlider(ct), !canBuy],
-            ['Sell', () => showSellSlider(ct), !canSell],
-            ['Close', () => { if (onClose) onClose(); }]
-        ];
+        const buttons = [];
+        
+        // Only show Buy button if not in sell-only mode
+        if (!sellOnly) {
+            buttons.push(['Buy', () => showBuySlider(ct), !canBuy]);
+        }
+        
+        buttons.push(['Sell', () => showSellSlider(ct), !canSell]);
+        buttons.push(['Close', () => { if (onClose) onClose(); }]);
         
         refreshPanelButtons('adhoc_market_panel', buttons);
     }

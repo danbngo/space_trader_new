@@ -7,19 +7,13 @@ class HackersEncounter extends FleetEncounter {
         const greeting = this.getGreetingDialogue()
         const rand = Math.random()
         
-        // 33% chance to siphon credits (hostile action)
-        if (rand < 0.33) {
+        // 50% chance to siphon credits (hostile action)
+        if (rand < 0.5) {
             this.siphonCredits(greeting)
             return
         }
         
-        // 33% chance to offer ship improvement
-        if (rand < 0.66) {
-            this.offerShipImprovement(greeting)
-            return
-        }
-        
-        // 33% chance to offer cyber implant
+        // 50% chance to offer cyber implant
         this.offerCyberImplant(greeting)
     }
     
@@ -239,29 +233,17 @@ class HackersEncounter extends FleetEncounter {
                 // Generate random implant now
                 const implant = generateCyberImplant(this.planet)
                 
-                // Store in cyber surgeon if docked
-                if (gs.fleet.location && gs.fleet.location.settlement && gs.fleet.location.settlement.cyberSurgeon) {
-                    gs.fleet.location.settlement.cyberSurgeon.implants.push(implant)
-                    
-                    showModal('Implant Acquired',
-                        `You transfer ${price} CR through untraceable channels.<br/><br/>` +
-                        `The hacker tosses you the unmarked container. Inside you find:<br/><br/>` +
-                        `<b>${implant.implantType.name}</b> (Quality: ${implant.quality.toFixed(2)})<br/>` +
-                        `${implant.implantType.description}<br/><br/>` +
-                        `"Good luck. Serial numbers are already scrubbed. Install it at the cyber surgeon."`,
-                        [['Continue', () => this.endEncounter()]]
-                    )
-                } else {
-                    showModal('Not Docked',
-                        `The hacker shakes their head:<br/><br/>` +
-                        `"Can't store cyberware without docking at a station. Come back when you're docked."<br/><br/>` +
-                        `<span style="color: #ffff66">Refund: ${price} CR</span>`,
-                        [['Continue', () => {
-                            gs.credits += price // Refund
-                            this.endEncounter()
-                        }]]
-                    )
-                }
+                // Add to fleet cyberModules
+                gs.fleet.cyberModules.push(implant)
+                
+                showModal('Implant Acquired',
+                    `You transfer ${price} CR through untraceable channels.<br/><br/>` +
+                    `The hacker tosses you the unmarked container. Inside you find:<br/><br/>` +
+                    `<b>${implant.implantType.name}</b> (Quality: ${implant.quality.toFixed(2)})<br/>` +
+                    `${implant.implantType.description}<br/><br/>` +
+                    `"Good luck. Serial numbers are already scrubbed. It's in your fleet's inventory now."`,
+                    [['Continue', () => this.endEncounter()]]
+                )
             }, !canAfford],
             ['Decline', () => this.showStandardHackerGreeting(greeting)],
             ['Attack', () => this.showPlayerAttackFleetModal()],

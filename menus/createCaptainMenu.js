@@ -73,6 +73,30 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
             ['Reset', () => resetCaptain()],
             ['Finish', () => {
                 console.log('finishing captain creation',captain)
+                
+                // Grant starting reputation with player's chosen attributes
+                const startingReputation = 10;
+                
+                // Reputation with starting planet
+                if (gs.fleet.location) {
+                    captain.reputation.increment(gs.fleet.location, startingReputation);
+                }
+                
+                // Reputation with race
+                if (captain.race) {
+                    captain.reputation.increment(captain.race, startingReputation);
+                }
+                
+                // Reputation with religion
+                if (captain.religion) {
+                    captain.reputation.increment(captain.religion, startingReputation);
+                }
+                
+                // Reputation with faction
+                if (gs.fleet.factionType) {
+                    captain.reputation.increment(gs.fleet.factionType, startingReputation);
+                }
+                
                 closeModal()
                 console.log('going to run:',onClose)
                 onClose()
@@ -247,6 +271,30 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
             ["Reset", ()=>resetCaptain()],
             ["Finish", () => {
                 console.log('finishing captain creation',captain)
+                
+                // Grant starting reputation with player's chosen attributes
+                const startingReputation = 10;
+                
+                // Reputation with starting planet
+                if (gs.fleet.location) {
+                    captain.reputation.increment(gs.fleet.location, startingReputation);
+                }
+                
+                // Reputation with race
+                if (captain.race) {
+                    captain.reputation.increment(captain.race, startingReputation);
+                }
+                
+                // Reputation with religion
+                if (captain.religion) {
+                    captain.reputation.increment(captain.religion, startingReputation);
+                }
+                
+                // Reputation with faction
+                if (gs.fleet.factionType) {
+                    captain.reputation.increment(gs.fleet.factionType, startingReputation);
+                }
+                
                 closeModal()
                 console.log('going to run:',onClose)
                 onClose()

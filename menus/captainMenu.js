@@ -198,40 +198,8 @@ function showCaptainPerksMenu(captain = gs.captain, selectedPerk = null) {
  * @param {Officer} captain - The captain whose implants to display.
  */
 function showCaptainImplantsMenu(captain = gs.captain) {
-    console.log('showCaptainImplantsMenu called with captain:', captain)
-    const {name, level, implants} = captain
-
-    // Build implants table
-    const implantTableRows = [
-        ['Implant', 'Quality'],
-        ...implants.map(implant => [
-            colorSpan(implant.implantType.name, implant.implantType.color),
-            `${roundToPlaces(implant.quality*100, 1)}%`
-        ])
-    ]
-
-    const implantTable = implants.length > 0 
-        ? createTable(implantTableRows)
-        : ce({children: [colorSpan('No cybernetic implants installed.', COLORS.Gray)]})
-
-    showModal(
-        `Captain Implants`,
-        ce({children:[
-            `Name: ${name} | Level: ${level}`,
-            ce({style: 'margin-top: 15px;', children: [
-                ce({children: [`<b>Installed Cybernetic Implants:</b>`]}),
-                implantTable
-            ]})
-        ]}),
-        [
-            ["Skills", () => showCaptainSkillsMenu()],
-            ["Genetics", () => showCaptainGeneticsMenu()],
-            ["Perks", () => showCaptainPerksMenu(), false, captain.numPerkPoints > 0 ? 'highlighted' : null],
-            ["Reputation", () => showCaptainReputationMenu()],
-            ["Close", () => closeModal()],
-        ],
-        'captain_panel'
-    );
+    // Redirect to the new comprehensive cyberware menu
+    showCyberwareMenu(captain)
 }
 
 /**
