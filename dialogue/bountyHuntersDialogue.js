@@ -3,7 +3,7 @@
 const DIALOGUE_BOUNTY_HUNTERS_DIALOGUE_GREETING = [
     `Seen any criminals types around? You know the sort.`,
     `Commit all the crimes you like. That's more business for us.`,
-    `Done anything illegal lately?`,
+    `Done anything illegal lately? Or know anyone who has?`,
     `There are three things I hate: Kids, pets, and spacers with attitude.`,
     `Once I bite, I never let go.`,
 ]

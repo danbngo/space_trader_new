@@ -3,18 +3,22 @@
 const DIALOGUE_INQUISITORS_GREETING = [
     `The Inquisitors are always watching.`,
     `Your soul is at stake.`,
+    `I am the eye in the sky.`,
+    `Belief is not optional!`,
+    `Faith is mandatory!`,
 ]
 
 const DIALOGUE_INQUISITORS_DEMAND_SURRENDER = [
     `Repent now or face the consequences!`,
-    `Faith is not optional!`,
     `Repent your sins or face divine judgment!`,
 ]
 
 const DIALOGUE_INQUISITORS_FAMOUS = [
-    `It's you! I've heard of you!`,
+    `Your wordly fame is nothing compared to eternal salvation.`,
+    `You are but an insignificant speck in the eyes of the Almighty.`,
 ]
 
 const DIALOGUE_INQUISITORS_INFAMOUS = [
     `God hates sinners like you.`,
+    `Degenerates like you belong on a cross!`,
 ]
