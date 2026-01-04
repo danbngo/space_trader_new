@@ -44,17 +44,9 @@ class SlaversEncounter extends FleetEncounter {
     }
 
     showNeutralSlavers() {
-        const rand = Math.random()
-        
-        // 25% chance to offer to buy a subordinate
-        if (rand < 0.25 && gs.fleet.subordinates.length > 0) {
+        // 50% chance to offer to buy a subordinate if player has any
+        if (Math.random() < 0.5 && gs.fleet.subordinates.length > 0) {
             this.offerToBuySubordinate()
-            return
-        }
-        
-        // 25% chance to offer to sell an officer (25-50% range)
-        if (rand < 0.5) {
-            this.offerToSellOfficer()
             return
         }
         
@@ -79,12 +71,19 @@ class SlaversEncounter extends FleetEncounter {
             ['Sell', () => {
                 gs.credits += price
                 gs.fleet.officers = gs.fleet.officers.filter(o => o !== subordinate)
-                showModal('Officer Sold',
-                    `You receive ${price} CR as the ${coloredName(this.fleet)} take ${subordinate.name}.<br/><br/>` +
+                
+                // Add bounty with crew member's planet (selling crew = crime)
+                const bountyAmount = Math.ceil(subordinate.value * 0.5)
+                let resultMsg = `You receive ${price} CR as the ${coloredName(this.fleet)} take ${subordinate.name}.<br/><br/>` +
                     `"Pleasure doing business with you. We'll put them to good use."<br/><br/>` +
-                    colorSpan(`${subordinate.name} has been sold to the slavers.`, COLORS.Red),
-                    [['Continue', () => this.endEncounter()]]
-                )
+                    colorSpan(`${subordinate.name} has been sold to the slavers.`, COLORS.Red)
+                
+                if (subordinate.planet) {
+                    gs.captain.grantBounty(subordinate.planet, bountyAmount)
+                    resultMsg += `<br/><br/>` + colorSpan(`Bounty on ${subordinate.planet.name}: +${bountyAmount} CR`, COLORS.Red)
+                }
+                
+                showModal('Officer Sold', resultMsg, [['Continue', () => this.endEncounter()]])
             }],
             ['Refuse', () => {
                 showModal('Offer Declined',

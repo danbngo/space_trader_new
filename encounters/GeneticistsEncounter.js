@@ -7,19 +7,13 @@ class GeneticistsEncounter extends FleetEncounter {
         const greeting = this.getGreetingDialogue()
         const rand = Math.random()
         
-        // 33% chance to offer genetic modification
-        if (rand < 0.33) {
+        // 50% chance to offer genetic modification
+        if (rand < 0.5) {
             this.offerGeneticModification(greeting)
             return
         }
         
-        // 33% chance to offer crew healing
-        if (rand < 0.66) {
-            this.offerCrewHealing(greeting)
-            return
-        }
-        
-        // 33% chance to offer medical supplies (drugs)
+        // 50% chance to offer medical supplies (medicine)
         this.offerMedicalSupplies(greeting)
     }
     

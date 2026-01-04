@@ -7,25 +7,19 @@ class HackersEncounter extends FleetEncounter {
         const greeting = this.getGreetingDialogue()
         const rand = Math.random()
         
-        // 25% chance to siphon credits (hostile action)
-        if (rand < 0.25) {
+        // 33% chance to siphon credits (hostile action)
+        if (rand < 0.33) {
             this.siphonCredits(greeting)
             return
         }
         
-        // 25% chance to offer ship improvement
-        if (rand < 0.5) {
+        // 33% chance to offer ship improvement
+        if (rand < 0.66) {
             this.offerShipImprovement(greeting)
             return
         }
         
-        // 25% chance to offer fleet repair
-        if (rand < 0.75) {
-            this.offerFleetRepair(greeting)
-            return
-        }
-        
-        // 25% chance to offer cyber implant
+        // 33% chance to offer cyber implant
         this.offerCyberImplant(greeting)
     }
     

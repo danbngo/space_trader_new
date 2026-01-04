@@ -14,25 +14,19 @@ class PilgrimsEncounter extends NeutralsEncounter {
         else {
             const rand = Math.random()
             
-            // 25% chance to buy relics (if player has any)
-            if (rand < 0.25) {
+            // 33% chance to buy relics (if player has any)
+            if (rand < 0.33) {
                 this.offerToBuyRelics()
                 return
             }
             
-            // 25% chance to offer food and water
-            if (rand < 0.5) {
+            // 33% chance to offer food and water
+            if (rand < 0.66) {
                 this.offerProvisions()
                 return
             }
             
-            // 25% chance to ask for alms
-            if (rand < 0.75) {
-                this.askForAlms()
-                return
-            }
-            
-            // 25% chance for standard greetings
+            // 33% chance for standard greetings
             this.showStandardGreeting()
         }
     }
@@ -45,7 +39,7 @@ class PilgrimsEncounter extends NeutralsEncounter {
             if (Math.random() < 0.5) {
                 this.offerProvisions()
             } else {
-                this.askForAlms()
+                this.showStandardGreeting()
             }
             return
         }
@@ -65,7 +59,7 @@ class PilgrimsEncounter extends NeutralsEncounter {
             if (Math.random() < 0.5) {
                 this.offerProvisions()
             } else {
-                this.askForAlms()
+                this.showStandardGreeting()
             }
             return
         }

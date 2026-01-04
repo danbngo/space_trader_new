@@ -48,58 +48,13 @@ class RebelsEncounter extends NeutralsEncounter {
     }
     
     supportFellowRebel() {
-        const rebelCredits = this.fleet.captain ? this.fleet.captain.credits : 0
-        const rebelWeapons = this.fleet.cargo.getAmount(CARGO_TYPES.WEAPONS)
-        
-        // Calculate what they can give (up to 10% of their totals)
-        const creditsToGive = Math.floor(rebelCredits * 0.1)
-        const weaponsToGive = Math.min(
-            Math.floor(rebelWeapons * 0.1),
-            gs.fleet.availableCargoSpace
-        )
-        
-        const canGiveSupport = creditsToGive > 0 || weaponsToGive > 0
-        
         let message = `The ${coloredName(this.fleet)} recognize you as a fellow enemy of the regime!<br/><br/>`
-        message += `"Comrade! It's good to see another who opposes the corrupt establishment. The enemy of our enemy is our friend!"`
+        message += `"Comrade! It's good to see another who opposes the corrupt establishment. The enemy of our enemy is our friend!"<br/><br/>`
+        message += `"Stay strong in the fight. Together we'll bring down the tyrants!"`
         
-        if (canGiveSupport && Math.random() < 0.5) {
-            message += `<br/><br/>"We can spare some resources to support the cause."`
-            
-            showModal(coloredName(this.fleet), message, [
-                ['Accept Support', () => {
-                    let resultMessage = `The rebels transfer resources to your fleet:<br/><br/>`
-                    
-                    if (creditsToGive > 0) {
-                        gs.credits += creditsToGive
-                        this.fleet.captain.credits -= creditsToGive
-                        resultMessage += `<span style="color: #ffff66">+${creditsToGive} CR</span><br/>`
-                    }
-                    
-                    if (weaponsToGive > 0) {
-                        gs.fleet.cargo.increment(CARGO_TYPES.WEAPONS, weaponsToGive)
-                        this.fleet.cargo.increment(CARGO_TYPES.WEAPONS, -weaponsToGive)
-                        resultMessage += `<span style="color: #66ff66">+${weaponsToGive} Weapons</span><br/>`
-                    }
-                    
-                    resultMessage += `<br/>"Fight well, comrade. Together we'll bring down the tyrants!"`
-                    
-                    showModal('Support Received', resultMessage, [
-                        ['Continue', () => this.endEncounter()]
-                    ])
-                }],
-                ['Decline', () => {
-                    showModal('Support Declined',
-                        `"Understood. Save your strength for the real fight. Good luck, comrade!"`,
-                        [['Continue', () => this.endEncounter()]]
-                    )
-                }],
-            ])
-        } else {
-            showModal(coloredName(this.fleet), message, [
-                ['Solidarity', () => this.endEncounter()],
-            ])
-        }
+        showModal(coloredName(this.fleet), message, [
+            ['Solidarity', () => this.endEncounter()],
+        ])
     }
     
     demandSupplies() {

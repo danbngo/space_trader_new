@@ -45,15 +45,9 @@ class MercenariesEncounter extends FleetEncounter {
         const greeting = this.getGreetingDialogue()
         const rand = Math.random()
         
-        // 25% chance to offer hiring an officer
-        if (rand < 0.25) {
-            this.offerOfficerForHire(greeting)
-            return
-        }
-        
-        // 25% chance to offer selling a ship
+        // 50% chance to offer hiring an officer
         if (rand < 0.5) {
-            this.offerShipForSale(greeting)
+            this.offerOfficerForHire(greeting)
             return
         }
         

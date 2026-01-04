@@ -8,15 +8,9 @@ class DiplomatsEncounter extends NeutralsEncounter {
         const greeting = this.getGreetingDialogue()
         const rand = Math.random()
         
-        // 25% chance to offer reputation increase
-        if (rand < 0.25 && homePlanet) {
-            this.offerReputationIncrease(greeting)
-            return
-        }
-        
-        // 25% chance to offer bounty clearance
+        // 50% chance to offer reputation increase
         if (rand < 0.5 && homePlanet) {
-            this.offerBountyClearance(greeting)
+            this.offerReputationIncrease(greeting)
             return
         }
         

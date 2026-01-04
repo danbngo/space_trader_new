@@ -19,15 +19,9 @@ class MinersEncounter extends NeutralsEncounter {
     showNeutralMiners() {
         const rand = Math.random()
         
-        // 25% chance to offer to sell their cargo
-        if (rand < 0.25) {
-            this.offerToSellCargo()
-            return
-        }
-        
-        // 25% chance to offer to buy nanites and medicine (25-50% range)
+        // 50% chance to offer to sell their cargo
         if (rand < 0.5) {
-            this.offerToBuySupplies()
+            this.offerToSellCargo()
             return
         }
         

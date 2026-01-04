@@ -42,15 +42,8 @@ class PerformersEncounter extends NeutralsEncounter {
     }
 
     showEntertainmentOptions() {
-        let message = `You pay the entrance fee and board their vessel. The interior is lavishly decorated with lights and exotic fabrics.<br/><br/>`
-        message += `"Welcome! What would you like to experience?"<br/><br/>`
-        message += `<b>Performance:</b> Watch their acclaimed show<br/>`
-        message += `<b>Circus Games:</b> Try your luck at their games of skill and chance`
-        
-        showModal('Entertainment Awaits', message, [
-            ['Performance', () => this.watchPerformance()],
-            ['Circus Games', () => this.playCircusGames()],
-        ])
+        // Go straight to performance
+        this.watchPerformance()
     }
 
     watchPerformance() {
