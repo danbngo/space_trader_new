@@ -77,6 +77,30 @@ class StarSystem extends SpaceObject {
         return [nearestPlanet, nearestDistance]
     }
 
+    updateRoutes(year = gs.year) {
+        // Check all fleets with InterceptionRoute to see if target route has changed
+        for (const fleet of this.fleets) {
+            if (!fleet.route || !(fleet.route instanceof InterceptionRoute)) continue
+            
+            const interceptionRoute = fleet.route
+            const targetFleet = interceptionRoute.targetFleet
+            
+            // Skip if target fleet no longer exists
+            if (!targetFleet || !this.fleets.includes(targetFleet)) {
+                fleet.route = null
+                continue
+            }
+            
+            // Check if target's route has changed (including both becoming null or non-null)
+            if (targetFleet.route !== interceptionRoute.targetRouteAtCreation) {
+                console.log(`🎯 ${fleet.name}'s target ${targetFleet.name} changed route - recalculating interception`)
+                
+                // Create new InterceptionRoute to continue the chase
+                fleet.route = new InterceptionRoute(fleet, targetFleet, year)
+            }
+        }
+    }
+
     updatePositions(year = gs.year) {
         const objects = [...this.stars, ...this.planets, ...this.dwarfPlanets, ...this.spaceStations, ...this.asteroids, ...(this.ruins || [])]
         for (const obj of objects) {
@@ -209,7 +233,7 @@ class StarSystem extends SpaceObject {
         // Assign appropriate AI based on fleet type
         const aiType = getFleetAITypeForFleetType(resurrectedFleet.fleetType);
         if (aiType) {
-            resurrectedFleet.fleetAI = new aiType.aiClass(resurrectedFleet, resurrectedFleet.planet, this);
+            resurrectedFleet.fleetAI = new aiType.aiClass(resurrectedFleet, resurrectedFleet.planet, currentMap);
             console.log(`🤖 Assigned ${aiType.name} to resurrected fleet`);
         }
         

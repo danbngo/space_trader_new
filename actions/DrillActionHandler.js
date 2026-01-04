@@ -1,5 +1,5 @@
 class DrillActionHandler extends ActionHandler {
-    constructor(encounterMap = new EncounterMap()) {
+    constructor(encounterMap ) {
         super(encounterMap)
     }
 

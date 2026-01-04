@@ -1,5 +1,5 @@
 class ActionHandler {
-    constructor(encounterMap = new EncounterMap()) {
+    constructor(encounterMap ) {
         this.encounterMap = encounterMap
         this.encounter = encounterMap.encounter
         this.cvs = encounterMap.cvs

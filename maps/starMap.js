@@ -818,6 +818,7 @@ class StarMap extends BaseMap {
         const elapsedYears = elapsedMs * this.gameYearsPerMs;
 
         gs.year += elapsedYears
+        gs.system.updateRoutes(gs.year)
         gs.system.updatePositions()
 
         this.refreshInfoBar()

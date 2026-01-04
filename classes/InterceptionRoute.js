@@ -49,6 +49,7 @@ class InterceptionRoute extends Route {
         // Store additional information about the interception
         this.isInterception = true
         this.targetFleet = target
+        this.targetRouteAtCreation = target.route // Store target's route at time of creation
         this.interceptionPoint = interceptionResult
         this.iterations = interceptionResult.iterations
     }

@@ -411,7 +411,10 @@ class Encounter {
         this.combatEnabled = true
         this.activeTurnFleet = playerHasInitiative ? gs.fleet : this.enemyFleet
         closeModal()
-        if (currentMap && currentMap.togglePause) currentMap.togglePause(false)
+        if (currentMap && currentMap.togglePause && currentMap.refreshLogic) {
+            currentMap.togglePause(false)
+            currentMap.refreshLogic()
+        } else throw new Error('unexpected map while starting combat!')
     }
 
     /**

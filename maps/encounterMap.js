@@ -60,6 +60,8 @@ class EncounterMap extends BaseMap {
         this.refreshInfoBar();
         this.refreshObjectPane();
         this.refreshCanvas(true);
+        //dangerous!! danmod
+        //this.refreshLogic()
     }
 
     refreshLogic() {
