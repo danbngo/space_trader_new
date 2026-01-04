@@ -119,11 +119,8 @@ function createReligionSection(religion, religionFollowers, totalSystemPopulatio
 
     // Add faith reach progress bar
     const faithProgressBar = new ProgressBar({
-        id: `religion_faith_${religion.name.replace(/\s+/g, '_')}`,
-        label: '',
         value: faithPercentage,
         fillColor: rgbArrayToString(religion.color),
-        showPercentage: true,
         width: 40
     })
     

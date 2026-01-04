@@ -9,37 +9,29 @@ class ProgressBar {
     /**
      * Creates a new progress bar
      * @param {Object} options - Configuration options
-     * @param {string} options.id - Unique identifier for the progress bar
-     * @param {string} [options.label] - Text label to show (e.g., "Generating history" or "Humans")
+     * @param {string} [options.overrideLabel] - Text label to show (e.g., "Generating history" or "Humans")
      * @param {number} [options.value=0] - Initial value (0-100)
      * @param {string} [options.fillColor] - Color for the fill (defaults to COLORS.Green)
      * @param {string} [options.bgColor] - Color for the background (defaults to COLORS.DarkGray)
      * @param {string} [options.borderColor] - Color for the border (defaults to COLORS.White)
-     * @param {boolean} [options.showPercentage=true] - Whether to show percentage value
-     * @param {string} [options.suffix='%'] - The suffix to display after the value (e.g., '%', 'kg', or '')
      * @param {string} [options.minLabelWidth] - Minimum width for the label (e.g., '12em') for alignment
      * @param {number} [options.width=20] - Number of characters in the ASCII bar visualization
      */
     constructor(options) {
         const {
-            id,
-            label = '',
+            overrideLabel = '',
             value = 0,
             fillColor = rgbArrayToString(COLORS.Green),
             bgColor = rgbArrayToString(COLORS.DarkGray),
             borderColor = rgbArrayToString(COLORS.White),
-            showPercentage = true,
-            suffix = '%',
             minLabelWidth = null,
             width = 20
         } = options
 
-        this.label = label
+        this.overrideLabel = overrideLabel
         this.fillColor = fillColor
         this.bgColor = bgColor
         this.borderColor = borderColor
-        this.showPercentage = showPercentage
-        this.suffix = suffix
         this.minLabelWidth = minLabelWidth
         this.width = width
 
@@ -64,7 +56,7 @@ class ProgressBar {
 
         this.percentageElement = ce({
             classNames: ['progressBar-percentage'],
-            children: this.showPercentage ? [`${Math.round(0)}${this.suffix}`] : ['']
+            children: this.overrideLabel ? [this.overrideLabel] : [`${Math.round(0)}$%`]
         })
 
         this.container = ce({
@@ -80,17 +72,12 @@ class ProgressBar {
      * @returns {string} Formatted text
      */
     _formatText(percentage) {
-        let text = this.label
-        
         // Add ASCII progress bar visualization
         const barLength = this.width
         const filledLength = Math.round((percentage / 100) * barLength)
         const emptyLength = barLength - filledLength
         const asciiBar = '[' + '█'.repeat(filledLength) + '░'.repeat(emptyLength) + ']'
-        
-        text += ' ' + asciiBar
-        
-        return text
+        return asciiBar
     }
 
     /**
@@ -102,8 +89,8 @@ class ProgressBar {
             this.textElement.textContent = this._formatText(percentage)
         }
         
-        if (this.percentageElement && this.showPercentage) {
-            this.percentageElement.textContent = `${Math.round(percentage)}${this.suffix}`
+        if (this.percentageElement) {
+            this.percentageElement.textContent = this.overrideLabel ? this.overrideLabel : `${Math.round(percentage)}%`
         }
     }
 

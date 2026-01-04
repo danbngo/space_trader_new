@@ -2,17 +2,29 @@
 
 // Creates a UI panel with title, text, and buttons
 
+/**
+ * @typedef {[string, Function]|[string, Function, boolean]|[string, Function, boolean, (string|string[])]|[string, Function, boolean, (string|string[]), string]} ButtonData
+ * @property {string} 0 - Label text for the button
+ * @property {Function} 1 - Handler function to call when button is clicked
+ * @property {boolean} [2] - Whether the button is disabled
+ * @property {string|string[]} [3] - CSS class name(s) to apply to the button
+ * @property {string} [4] - Disabled reason to show in popover when hovering over disabled button
+ */
+
 const UI_CONTAINER = document.getElementById("game-container");
 
-
+/**
+ * Removes all child elements from a parent element.
+ * @param {HTMLElement} parent - The parent element to clear
+ */
 function removeChildren(parent = ce()) {
     while (parent.firstChild) parent.removeChild(parent.firstChild)
 }
 
 /**
- * 
- * @param {any} panelId 
- * @param {any[]} buttons 
+ * Refreshes the buttons in a panel with new button data.
+ * @param {string|HTMLElement} panelId - The panel ID or element to refresh buttons for
+ * @param {(ButtonData|HTMLElement)[]} buttons - Array of button data or HTML elements
  */
 function refreshPanelButtons (panelId = '', buttons) {
     const panel = (panelId instanceof HTMLElement) ? panelId : document.body.querySelector(`#${panelId}`)
@@ -30,7 +42,7 @@ function refreshPanelButtons (panelId = '', buttons) {
             }
             return
         }
-        const [label, handler, disabled, classNames] = btnData
+        const [label, handler, disabled, classNames, disabledReason] = btnData
         const btn = document.createElement('div');
         btn.classList.add('gameButton');
         btn.innerHTML = label;
@@ -51,18 +63,25 @@ function refreshPanelButtons (panelId = '', buttons) {
             btn.style.float = 'right'
         }
         buttonsEl.appendChild(btn);
-        if (disabled) {console.log('gonna disable a btn:',btn); btn.classList.add('disabled')}
+        if (disabled) {
+            console.log('gonna disable a btn:',btn); 
+            btn.classList.add('disabled')
+            // Add popover if disabledReason is provided
+            if (disabledReason) {
+                createPopoverElement(btn, disabledReason)
+            }
+        }
     });
 }
 
 /**
- * 
- * @param {string|HTMLElement} title 
- * @param {any} text 
- * @param {any[]} buttons 
- * @param {string} id 
- * @param {Function} onClosePanel - Optional callback when close button is clicked
- * @returns 
+ * Creates a panel with title, content, buttons, and optional close button.
+ * @param {string|HTMLElement} title - The panel title
+ * @param {string|HTMLElement} text - The panel content
+ * @param {(ButtonData|HTMLElement)[]} buttons - Array of button data or HTML elements
+ * @param {string} id - The ID to assign to the panel
+ * @param {Function|null} onClosePanel - Optional callback when close button is clicked
+ * @returns {HTMLElement} The created panel element
  */
 function createPanel(title = '', text = '', buttons = [], id = '', onClosePanel = null) {
     const panelChildren = [
@@ -92,12 +111,33 @@ function createPanel(title = '', text = '', buttons = [], id = '', onClosePanel 
     return panel;
 }
 
+/**
+ * Shows a panel in the UI container.
+ * @param {string|HTMLElement} title - The panel title
+ * @param {string|HTMLElement} text - The panel content
+ * @param {(ButtonData|HTMLElement)[]} buttons - Array of button data or HTML elements
+ * @param {string} id - The ID to assign to the panel
+ * @returns {HTMLElement} The created panel element
+ */
 function showPanel(title = '', text = '', buttons = [], id = '') {
     const panel = createPanel(title, text, buttons, id);
     showElement(panel)
     return panel
 }
 
+/**
+ * Shows a slider modal for selecting a numeric value within a range.
+ * @param {number} min - Minimum value for the slider
+ * @param {number} max - Maximum value for the slider
+ * @param {string} title - Modal title
+ * @param {string} description - Description text
+ * @param {(value: number) => string} footerGenerator - Function to generate footer text based on current value
+ * @param {string} acceptLabel - Label for accept button
+ * @param {string} cancelLabel - Label for cancel button
+ * @param {(value: number) => void} onAccept - Callback when accept button is clicked
+ * @param {() => void} onCancel - Callback when cancel button is clicked
+ * @returns {HTMLElement} The created modal panel
+ */
 function showSliderModal(min = 0, max = 10, title = '', description = '', footerGenerator = (value = 0)=>'', acceptLabel = 'Accept', cancelLabel = 'Cancel', onAccept = (value = 0) => {}, onCancel = () =>closeModal()) {
     let currentValue = min;
     
@@ -145,6 +185,10 @@ function showSliderModal(min = 0, max = 10, title = '', description = '', footer
     return panel;
 }
 
+/**
+ * Shows an element in the main UI container, replacing current content.
+ * @param {HTMLElement} element - The element to display
+ */
 function showElement(element = ce()) {
     UI_CONTAINER.innerHTML = "";
     UI_CONTAINER.appendChild(element);
@@ -152,15 +196,20 @@ function showElement(element = ce()) {
 
 let currentMap;
 
-/** @param {BaseMap} map */
+/**
+ * Shows a map in the main UI container.
+ * @param {BaseMap} map - The map to display
+ */
 function showMap(map) {
     currentMap = map
     showElement(map.root)
 }
 
 /**
- * @param {any} text
- * @param {number} ratio
+ * Creates a colored span with text based on a ratio (stat coloring).
+ * @param {string|number} text - The text to display
+ * @param {number} ratio - The ratio used for color interpolation (0-4+)
+ * @returns {string} HTML string with colored span
  */
 function statColorSpan(text = '', ratio = 1.0) {
     // clamp ratio so interpolation works cleanly
@@ -197,6 +246,11 @@ function statColorSpan(text = '', ratio = 1.0) {
     return colorSpan(text, color)
 }
 
+/**
+ * Converts an RGB(A) array to a CSS color string.
+ * @param {number[]} color - Array of [r, g, b] or [r, g, b, a] values
+ * @returns {string} CSS color string (rgb or rgba)
+ */
 function rgbArrayToString(color = [255, 255, 255, 1.0]) {
     if (color.length >= 4) {
         return `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${color[3]})`;
@@ -206,10 +260,11 @@ function rgbArrayToString(color = [255, 255, 255, 1.0]) {
 }
 
 /** 
+ * Creates a colored span HTML string.
  * @function colorSpan
- * @param {string} text
- * @param {string | Array<number>} color
- * @returns {string}
+ * @param {string} text - The text to display
+ * @param {string | Array<number>} color - CSS color string or RGB(A) array
+ * @returns {string} HTML string with colored span
  */
 function colorSpan(text = '', color = '') {
     if (Array.isArray(color)) {
@@ -221,7 +276,20 @@ function colorSpan(text = '', color = '') {
     return `<span style="color: ${color}">${text}</span>`;
 }
 
-
+/**
+ * Creates a DOM element with specified properties.
+ * @param {Object} options - Element configuration options
+ * @param {string} [options.tag='div'] - HTML tag name
+ * @param {string} [options.id=''] - Element ID
+ * @param {string} [options.innerHTML=''] - Inner HTML content
+ * @param {(string|HTMLElement)[]} [options.children=[]] - Child elements or HTML strings
+ * @param {HTMLElement} [options.parent] - Parent element to append to
+ * @param {string[]} [options.classNames=[]] - CSS class names to apply
+ * @param {Function} [options.onClick] - Click event handler
+ * @param {Object} [options.style={}] - CSS styles to apply
+ * @param {boolean} [options.disabled=false] - Whether element is disabled
+ * @returns {HTMLElement} The created element
+ */
 function ce({tag = 'div', id = '', innerHTML = '', children = [], parent = undefined, classNames = [], onClick = undefined, style = {}, disabled = false} = {}) {
     id = id || ''
     tag = tag || 'div'
@@ -250,6 +318,11 @@ function ce({tag = 'div', id = '', innerHTML = '', children = [], parent = undef
     return el
 }
 
+/**
+ * Applies CSS styles to an element.
+ * @param {HTMLElement} element - The element to style
+ * @param {Object} style - Object containing CSS property-value pairs
+ */
 function applyStyle(element, style = {}) {
     for (const key in style) {
         element.style[key] = style[key]
@@ -258,11 +331,12 @@ function applyStyle(element, style = {}) {
 
 // utils.js or tableUtil.js
 /**
+ * Creates a table element from a 2D array of data.
  * @function createTable
- * @param {any[][]} rows - 2D array representing table rows and cells.
- * @param {(rowIndex: number) => void} onSelectRow - Callback when a row is selected.
- * @param {number|null} firstSelectedIndex - Index of the row to be initially selected.
- * @returns {HTMLTableElement} - The created table element.
+ * @param {any[][]} rows - 2D array representing table rows and cells
+ * @param {((rowIndex: number) => void)|null} onSelectRow - Callback when a row is selected (pass null for no selection)
+ * @param {number|null} firstSelectedIndex - Index of the row to be initially selected
+ * @returns {HTMLTableElement} - The created table element
  */
 function createTable(rows = [ce()], onSelectRow = null, firstSelectedIndex = onSelectRow ? 0 : null) {
     const table = document.createElement("table");
@@ -312,11 +386,14 @@ function createTable(rows = [ce()], onSelectRow = null, firstSelectedIndex = onS
 let currentModal = ce()
 
 /**
- * @param {string | HTMLElement} title
- * @param {string | HTMLElement | Element} text
- * @param {any[]} buttons
- * @param {string} id
-*/
+ * Shows a modal dialog with title, content, and buttons.
+ * @param {string | HTMLElement} title - The modal title
+ * @param {string | HTMLElement | Element} text - The modal content
+ * @param {(ButtonData|HTMLElement)[]} buttons - Array of button data or HTML elements
+ * @param {string} id - The ID to assign to the modal
+ * @param {Function|null} onClosePanel - Optional callback when close button is clicked
+ * @returns {HTMLElement} The created modal element
+ */
 function showModal(title = '', text = '', buttons = [['Continue', ()=>{}, false]], id = '', onClosePanel = null) {
     if (currentMap) {
         currentMap.refresh()
@@ -331,6 +408,9 @@ function showModal(title = '', text = '', buttons = [['Continue', ()=>{}, false]
     return currentModal
 }
 
+/**
+ * Closes the currently open modal.
+ */
 function closeModal() {
     if (currentModal) {
         currentModal.remove();
@@ -339,6 +419,11 @@ function closeModal() {
     if (currentMap) currentMap.refresh()
 }
 
+/**
+ * Attaches a drag handler to an element.
+ * @param {HTMLElement} element - The element to make draggable
+ * @param {(dx: number, dy: number) => void} callback - Callback with delta x and y on drag
+ */
 function attachDragHandler(element = ce(), callback = (dx=0,dy=0)=>{}) {
     let isDown = false;
     let lastX = 0;
@@ -376,6 +461,11 @@ function attachDragHandler(element = ce(), callback = (dx=0,dy=0)=>{}) {
 }
 
 
+/**
+ * Attaches a mouse wheel handler to an element.
+ * @param {HTMLElement} element - The element to attach the handler to
+ * @param {(direction: number) => void} callback - Callback with direction (+1 for up, -1 for down)
+ */
 function attachMouseWheelHandler(element = ce(), callback = (direction = 1)=>{}) {
     if (!element || typeof callback !== "function") return;
 
@@ -403,6 +493,11 @@ function attachMouseWheelHandler(element = ce(), callback = (direction = 1)=>{})
 
 
 
+/**
+ * Creates a column layout from an array of elements.
+ * @param {HTMLElement[]} columnItems - Array of elements to display as columns
+ * @returns {HTMLElement} The column layout container
+ */
 function createColumnLayout(columnItems = []) {
     const children = columnItems.map(item => ce({
         classNames: ['gameColumn'],

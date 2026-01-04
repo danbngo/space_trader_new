@@ -103,11 +103,8 @@ function createGovernmentSection(govType, governmentCounts, totalPlanets) {
 
     // Add adoption rate progress bar
     const adoptionProgressBar = new ProgressBar({
-        id: `government_adoption_${govType.name.replace(/\s+/g, '_')}`,
-        label: '',
         value: adoptionPercentage,
         fillColor: rgbArrayToString(govType.color),
-        showPercentage: true,
         width: 40
     })
     

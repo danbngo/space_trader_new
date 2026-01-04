@@ -3,7 +3,10 @@
  * @param {Function} backFunction - Function to call when back button is pressed.
  */
 function showAnomaliesMenu(backFunction = () => closeModal()) {
-    const anomalies = (gs.system.anomalies || []).filter(a => a.discoveredYear !== null)
+    // In debug mode, show all anomalies. Otherwise, only show discovered ones.
+    const anomalies = DEBUG_MODE 
+        ? (gs.system.anomalies || []) 
+        : (gs.system.anomalies || []).filter(a => a.discoveredYear !== null)
     
     if (anomalies.length === 0) {
         showModal(

@@ -103,11 +103,8 @@ function createCultureSection(culturePlanet, culturePopulation, totalSystemPopul
 
     // Add culture reach progress bar
     const cultureProgressBar = new ProgressBar({
-        id: `culture_reach_${culturePlanet.name.replace(/\s+/g, '_')}`,
-        label: '',
         value: culturePercentage,
         fillColor: rgbArrayToString(culturePlanet.color),
-        showPercentage: true,
         width: 40
     })
     

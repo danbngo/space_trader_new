@@ -5,7 +5,7 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
     // State tracking for dropdowns - read from current captain/fleet state
     let selectedRace = captain.race || RACES.HUMAN
     let selectedPlanet = gs.fleet.location || EARTH
-    let selectedFaction = gs.fleet.factionType || FACTION_TYPES.MERCHANTS
+    let selectedFaction = gs.fleet.captain.factionType || PLAYER_FACTIONS[0]
     let selectedReligion = captain.religion || null
 
     // Helper to set fleet location and position
@@ -28,7 +28,7 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
         captain.skillPoints = STARTING_SKILL_POINTS;
         captain.race = RACES.HUMAN
         captain.religion = null
-        gs.fleet.factionType = FACTION_TYPES.MERCHANTS
+        gs.fleet.captain.factionType = PLAYER_FACTIONS[0]
         setFleetLocation(EARTH)
         showCaptainCreationMenu(captain, onClose)
     }
@@ -38,7 +38,7 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
         captain.skillPoints = STARTING_SKILL_POINTS;
         captain.race = rndMember(Object.values(RACES))
         captain.religion = gs.system.religions.length > 0 ? (Math.random() < 0.3 ? null : rndMember(gs.system.religions)) : null
-        gs.fleet.factionType = rndMember(FACTION_TYPES_ALL)
+        gs.fleet.captain.factionType = rndMember(PLAYER_FACTIONS)
         setFleetLocation(rndMember(gs.system.planets))
         
         // Randomly spend all skill points
@@ -64,46 +64,11 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
     }
 
     function onSelectSkill(skill = SKILLS_ALL[0]) {
-        const cost = captain.calcSkillPointsToUpgrade(skill)
-        const canAfford = skillPoints >= cost
-        const hasUnspentPoints = skillPoints > 0
-        const buttons = [
-            ['Upgrade', () => improveSkill(skill), !canAfford],
-            ['Randomize', () => randomizeCaptain()],
-            ['Reset', () => resetCaptain()],
-            ['Finish', () => {
-                console.log('finishing captain creation',captain)
-                
-                // Grant starting reputation with player's chosen attributes
-                const startingReputation = 10;
-                
-                // Reputation with starting planet
-                if (gs.fleet.location) {
-                    captain.reputation.increment(gs.fleet.location, startingReputation);
-                }
-                
-                // Reputation with race
-                if (captain.race) {
-                    captain.reputation.increment(captain.race, startingReputation);
-                }
-                
-                // Reputation with religion
-                if (captain.religion) {
-                    captain.reputation.increment(captain.religion, startingReputation);
-                }
-                
-                // Reputation with faction
-                if (gs.fleet.factionType) {
-                    captain.reputation.increment(gs.fleet.factionType, startingReputation);
-                }
-                
-                closeModal()
-                console.log('going to run:',onClose)
-                onClose()
-            }, hasUnspentPoints],
-        ]
-        refreshPanelButtons('captain_panel', buttons)
+        // Re-render the entire menu to show updated skill bonuses
+        showCaptainCreationMenu(captain, onClose, skill)
     }
+
+    console.log('CAPTAIN:',captain)
 
     // Build skills table
     const skillTableRows = [
@@ -112,7 +77,7 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
             const baseSkill = skills.getAmount(sk);
             const bonusSkill = captain.bonusSkills.getAmount(sk);
             const displayLevel = bonusSkill > 0 
-                ? `${baseSkill} ${colorSpan('(+' + bonusSkill + ')', COLORS.White)}`
+                ? `${baseSkill}\u00A0${colorSpan('(+' + bonusSkill + ')', COLORS.White)}`
                 : baseSkill;
             return [
                 `${coloredName(sk)}`,
@@ -146,17 +111,18 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
                 children: [
                     (() => {
                         const factionDropdown = new Dropdown(
-                            FACTION_TYPES_ALL.map(faction => [
+                            PLAYER_FACTIONS.map(faction => [
                                 `${faction.symbol} ${faction.name}`,
                                 () => {
                                     selectedFaction = faction
+                                    gs.fleet.captain.factionType = faction
                                     gs.fleet.factionType = faction
                                     // Apply faction stat modifiers if needed
                                     showCaptainCreationMenu(captain, onClose, selectedSkill)
                                 }
                             ]),
                             false,
-                            FACTION_TYPES_ALL.indexOf(selectedFaction),
+                            PLAYER_FACTIONS.indexOf(selectedFaction),
                             250,
                             2
                         )
@@ -165,7 +131,7 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
                             createPopoverElement(factionDropdown.labelElement, selectedFaction.description)
                             // Add popovers to dropdown items
                             factionDropdown.dropdownButtons.forEach((btn, index) => {
-                                createPopoverElement(btn, FACTION_TYPES_ALL[index].description)
+                                createPopoverElement(btn, PLAYER_FACTIONS[index].description)
                             })
                         }, 10)
                         return factionDropdown.container
@@ -249,6 +215,33 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
                     ).container
                 ]
             }),
+
+            // Perks section
+            ce({
+                style: {display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '12px'},
+                children: [
+                    ce({tag:'br'}),
+                    ce({children: ['<u>Perks</u>']}),
+                    (() => {
+                        const level1Perks = selectedRace.automaticPerks.filter(perk => perk.minLevel === 1);
+                        if (level1Perks.length === 0) {
+                            return ce({children: [colorSpan('(None)', COLORS.Gray)]});
+                        }
+                        return ce({
+                            tag: 'ul',
+                            style: {marginTop: '4px', marginBottom: '0', paddingLeft: '20px'},
+                            children: level1Perks.map(perk => {
+                                const li = ce({
+                                    tag: 'li',
+                                    children: [colorSpan(perk.name, perk.color)]
+                                });
+                                createPopoverElement(li, perk.description);
+                                return li;
+                            })
+                        });
+                    })()
+                ]
+            }),
         ]
     })
 
@@ -263,6 +256,11 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
 
     const columnLayout = createColumnLayout([leftColumn, rightColumn])
 
+    // Calculate upgrade button state
+    const cost = selectedSkill ? captain.calcSkillPointsToUpgrade(selectedSkill) : 0
+    const canAfford = skillPoints >= cost
+    const hasUnspentPoints = skillPoints > 0
+
     showModal(
         `Create Captain`,
         ce({children:[
@@ -273,6 +271,7 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
             }
         }),
         [
+            ["Upgrade", () => improveSkill(selectedSkill), !canAfford || !selectedSkill],
             ["Randomize", ()=>randomizeCaptain()],
             ["Reset", ()=>resetCaptain()],
             ["Finish", () => {
@@ -304,12 +303,8 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
                 closeModal()
                 console.log('going to run:',onClose)
                 onClose()
-            }, skillPoints > 0],
+            }, hasUnspentPoints],
         ],
         'captain_panel'
     );
-
-    if (selectedSkill) {
-        onSelectSkill(selectedSkill);
-    }
 }

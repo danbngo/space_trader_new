@@ -5,6 +5,7 @@
  * @returns {HTMLTableElement} The cargo table element.
  */
 function createCargoTable(cargo = new CountsMap(), onSelectCargoType = (ct = CARGO_TYPES_ALL[0])=>{}) {
+    /** @type {Array<[string, string, string|HTMLElement]>} */
     const rows = [
         ['Cargo Type', 'Amount', 'Cargo Space %']
     ]
@@ -13,11 +14,8 @@ function createCargoTable(cargo = new CountsMap(), onSelectCargoType = (ct = CAR
         const percentage = (amount / gs.fleet.totalCargoSpace) * 100
         
         const progressBar = new ProgressBar({
-            id: `cargo_${ct.name.replace(/\s+/g, '_')}`,
-            label: '',
             value: percentage,
             fillColor: rgbArrayToString(ct.color),
-            showPercentage: true,
             width: 20
         })
         
@@ -25,19 +23,17 @@ function createCargoTable(cargo = new CountsMap(), onSelectCargoType = (ct = CAR
         
         rows.push([
             coloredName(ct),
-            cargo.getAmount(ct),
+            ''+cargo.getAmount(ct),
             bar,
         ])
     }
     const totalBar = new ProgressBar({
-            id: 'cargo_all',
-            label: '',
             value: (cargo.total / gs.fleet.totalCargoSpace) * 100,
             fillColor: rgbArrayToString(COLORS.LightGray),
     })
     rows.push([
         'All',
-        cargo.total,
+        ''+cargo.total,
         totalBar.container
     ])
     return createTable(rows, (rowIndex = 0)=>onSelectCargoType(CARGO_TYPES_ALL[rowIndex]))
@@ -67,6 +63,7 @@ function showCargoMenu(cargo = gs.fleet.cargo) {
     function onSelectCargoType(ct = CARGO_TYPES_ALL[0]) {
         console.log(`Selected ct: ${ct}`)
         const dumpableAmount = cargo.getAmount(ct)
+        /** @type {ButtonData[]} */
         const buttons = [
             ['Dump', ()=>showDumpCargoSlider(ct, dumpableAmount), dumpableAmount == 0],
             ["Close", () => closeModal()],

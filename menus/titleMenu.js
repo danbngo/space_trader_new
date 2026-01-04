@@ -9,6 +9,10 @@ function showTitleScreen() {
         [
             ["New Game", () => startNewGame()],
             ["Continue", () => continueGame()],
+            ["Debug Mode", () => {
+                DEBUG_MODE = true
+                startNewGame()
+            }],
             ["About", () => showAbout()]
         ]
     );
@@ -19,11 +23,7 @@ function showTitleScreen() {
  * @param {number} numYears - Number of years of history to generate.
  */
 async function simulateHistory(numYears) {
-    const progressBar = new ProgressBar({
-        id: 'history_progress',
-        label: '',
-        width: 50,
-    })
+    const progressBar = new ProgressBar({width: 50,})
 
     const elapsedTimeElement = ce({
         id: 'elapsed_time',
@@ -82,7 +82,7 @@ async function simulateHistory(numYears) {
  * @param {number} numYears - Number of years of fleet activity to simulate.
  */
 async function simulateFleetActivity(numYears) {
-    const activityProgressBar = new ProgressBar({id: 'fleet_activity_progress', value: 0, width: 50})
+    const activityProgressBar = new ProgressBar({value: 0, width: 50})
     const activityElapsedTimeElement = ce({tag: 'div', id: 'fleet_elapsed_time', children: ['Elapsed time: 0.0s']})
     const activeFleetCountElement = ce({tag: 'div', id: 'active_fleet_count', style: 'text-align: center; margin-top: 5px;', children: ['Active Fleets: 0']})
     const activeAnomalyCountElement = ce({tag: 'div', id: 'active_anomaly_count', style: 'text-align: center; margin-top: 5px;', children: ['Active Anomalies: 0']})
@@ -198,31 +198,35 @@ async function startNewGame() {
     await simulateFleetActivity(SIMULATE_FLEET_ACTIVITY_YEARS)
 
     // Create captain
-    const captain = new Officer("Captain", rndMember(gs.system.planets), PLAYER_FACTION_TYPE, STARTING_CREDITS);
+    const captain = new Officer("Captain", rndMember(gs.system.planets), FACTION_TYPES_ALL[0], STARTING_CREDITS);
     
-    // Give captain all cyber implants for testing
-    captain.implants = CYBER_IMPLANT_TYPES_ALL.map(implantType => new CyberImplant(implantType, 1.0))
+    // Give captain all cyber implants for testing (only in debug mode)
+    if (DEBUG_MODE) {
+        captain.implants = CYBER_IMPLANT_TYPES_ALL.map(implantType => new CyberImplant(implantType, 1.0))
+    }
     
     const playerShip = new Ship("Starting Ship", STARTING_SHIP_TYPE, COLORS.LightGray, [30,30], [20,20], 100, 10, 10, 10)
     
-    // Give player all modules for testing
-    playerShip.localModules = [
-        new ShipModule(SHIP_MODULE_TYPES.CLOAK, 1),
-        new ShipModule(SHIP_MODULE_TYPES.MAGNETIZE, 1),
-        new ShipModule(SHIP_MODULE_TYPES.WARHEAD, 1),
-        new ShipModule(SHIP_MODULE_TYPES.EMP_PULSE, 1),
-        new ShipModule(SHIP_MODULE_TYPES.BLINK, 1),
-        new ShipModule(SHIP_MODULE_TYPES.BOOSTER, 1),
-        new ShipModule(SHIP_MODULE_TYPES.SMOKE_BOMB, 1),
-        new ShipModule(SHIP_MODULE_TYPES.SPEED_MODULE, 1)
-    ]
+    // Give player all modules for testing (only in debug mode)
+    if (DEBUG_MODE) {
+        playerShip.localModules = [
+            new ShipModule(SHIP_MODULE_TYPES.CLOAK, 1),
+            new ShipModule(SHIP_MODULE_TYPES.MAGNETIZE, 1),
+            new ShipModule(SHIP_MODULE_TYPES.WARHEAD, 1),
+            new ShipModule(SHIP_MODULE_TYPES.EMP_PULSE, 1),
+            new ShipModule(SHIP_MODULE_TYPES.BLINK, 1),
+            new ShipModule(SHIP_MODULE_TYPES.BOOSTER, 1),
+            new ShipModule(SHIP_MODULE_TYPES.SMOKE_BOMB, 1),
+            new ShipModule(SHIP_MODULE_TYPES.SPEED_MODULE, 1)
+        ]
+    }
 
     // Create fleet
     gs.fleet = new Fleet(
         "Player Fleet",
         null,
         PLAYER_FLEET_TYPE,
-        PLAYER_FACTION_TYPE,
+        null,
         COLORS.LightGray,
         0, 0,
     )

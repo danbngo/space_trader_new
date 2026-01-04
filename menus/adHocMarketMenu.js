@@ -152,6 +152,7 @@ function showAdHocMarketMenu(merchantFleet, onClose, encounter = null, sellOnly 
         const canBuy = maxBuyable > 0;
         const canSell = maxSellable > 0;
         
+        /** @type {ButtonData[]} */
         const buttons = [];
         
         // Only show Buy button if not in sell-only mode

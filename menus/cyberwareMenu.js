@@ -27,22 +27,34 @@ function showCyberwareMenu(selectedOfficer = null) {
         }
         
         const rows = [
-            ['Implant', 'Quality', 'Value', 'Actions']
+            ['Implant', 'Quality', 'Value']
         ]
         
         for (const implant of officer.implants) {
             rows.push([
                 colorSpan(implant.implantType.name, implant.implantType.color),
                 statColorSpan(roundToPlaces(implant.quality*100, 1)+'%', implant.quality),
-                implant.value + ' CR',
-                '→'
+                implant.value + ' CR'
             ])
         }
         
-        return createTable(rows, (rowIndex) => onSelectInstalledImplant(officer.implants[rowIndex]))
+        const table = createTable(rows, (rowIndex) => onSelectInstalledImplant(officer.implants[rowIndex]))
+        
+        // Add popovers to each implant row
+        const tableRows = table.querySelectorAll('tr')
+        tableRows.forEach((row, index) => {
+            if (index === 0) return // Skip header row
+            const implant = officer.implants[index - 1]
+            if (implant && implant.implantType.description) {
+                createPopoverElement(row, implant.implantType.description)
+            }
+        })
+        
+        return table
     }
     
     function onSelectInstalledImplant(implant = new CyberImplant()) {
+        /** @type {ButtonData[]} */
         const buttons = [
             ['Remove', () => {
                 safeRemove(officer.implants, implant)
@@ -61,19 +73,30 @@ function showCyberwareMenu(selectedOfficer = null) {
         }
         
         const rows = [
-            ['Implant', 'Quality', 'Value', 'Actions']
+            ['Implant', 'Quality', 'Value']
         ]
         
         for (const implant of fleet.cyberModules) {
             rows.push([
                 colorSpan(implant.implantType.name, implant.implantType.color),
                 statColorSpan(roundToPlaces(implant.quality*100, 1)+'%', implant.quality),
-                implant.value + ' CR',
-                '→'
+                implant.value + ' CR'
             ])
         }
         
-        return createTable(rows, (rowIndex) => onSelectFleetImplant(fleet.cyberModules[rowIndex]))
+        const table = createTable(rows, (rowIndex) => onSelectFleetImplant(fleet.cyberModules[rowIndex]))
+        
+        // Add popovers to each implant row
+        const tableRows = table.querySelectorAll('tr')
+        tableRows.forEach((row, index) => {
+            if (index === 0) return // Skip header row
+            const implant = fleet.cyberModules[index - 1]
+            if (implant && implant.implantType.description) {
+                createPopoverElement(row, implant.implantType.description)
+            }
+        })
+        
+        return table
     }
     
     function onSelectFleetImplant(implant = new CyberImplant()) {
@@ -88,6 +111,7 @@ function showCyberwareMenu(selectedOfficer = null) {
             reasonText = `${officer.name} is at maximum implant capacity (${officer.maxImplants}). Invest in Cyber Capacity perks to increase.`
         }
         
+        /** @type {ButtonData[]} */
         const buttons = [
             ['Install on ' + officer.name, () => {
                 safeRemove(fleet.cyberModules, implant)

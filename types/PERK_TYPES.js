@@ -64,6 +64,12 @@ const PERK_TYPES = {
     GENE_SOLDIER_4: new PerkType('Gene Soldier IV', COLORS.Cyan, 'Increases effectiveness of mutations by 80%.', 15),
     GENE_SOLDIER_5: new PerkType('Gene Soldier V', COLORS.Cyan, 'Increases effectiveness of mutations by 100%.', 20),
 
+    TECH_SAVVY_1: new PerkType('Tech Savvy I', COLORS.LightGray, 'Increases effectiveness of equipment by 20%', 1),
+    TECH_SAVVY_2: new PerkType('Tech Savvy II', COLORS.LightGray, 'Increases effectiveness of equipment by 40%', 5),
+    TECH_SAVVY_3: new PerkType('Tech Savvy III', COLORS.LightGray, 'Increases effectiveness of equipment by 60%', 10),
+    TECH_SAVVY_4: new PerkType('Tech Savvy IV', COLORS.LightGray, 'Increases effectiveness of equipment by 80%', 15),
+    TECH_SAVVY_5: new PerkType('Tech Savvy V', COLORS.LightGray, 'Increases effectiveness of equipment by 100%', 20),
+
     HARDENED: new PerkType('Hardened', COLORS.Gray, 'Reduces damage taken from all sources by 10%.', 3),
     SHARPSHOOTER: new PerkType('Sharpshooter', COLORS.Red, 'Increases laser accuracy and damage by 15%.', 4),
     ACE_PILOT: new PerkType('Ace Pilot', COLORS.Blue, 'Increases ship maneuverability and evasion.', 5),

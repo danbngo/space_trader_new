@@ -54,7 +54,7 @@ function showPoliticsMenu(backFunction = () => closeModal()) {
         ]
     })
 
-    tableData.unshift(['Planet Name', 'Government Type', 'State Religion', 'Majority Ethnicity', 'Alliances', 'Tense', 'At War'])
+    tableData.unshift(['Planet Name', 'Government Type', 'State Religion', 'Ethnicity', 'Alliances', 'Tense', 'At War'])
     
     // Create table
     const table = createTable(

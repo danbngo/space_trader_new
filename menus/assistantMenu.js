@@ -4,7 +4,8 @@
 function showAssistantMenu() {
     const hasSkillPoints = gs.captain.skillPoints > 0
     const hasPerkPoints = gs.captain.numPerkPoints > 0
-    showModal(`Assistant`, 'How can I help you captain?', [
+    
+    const menuItems = [
         ['Ships', ()=>showShipsMenu()],
         ['Cargo', ()=>showCargoMenu()],
         ['Officers', ()=>showOfficersMenu()],
@@ -15,8 +16,17 @@ function showAssistantMenu() {
         ['Planets', ()=>showPlanetsMenu(()=>showAssistantMenu())],
         ['Dwarf Planets', ()=>showDwarfPlanetsMenu(()=>showAssistantMenu())],
         ['Space Stations', ()=>showSpaceStationsMenu(()=>showAssistantMenu())],
-        ['Fleets', ()=>showFleetsMenu(()=>showAssistantMenu())],
-        ['Abandoned Fleets', ()=>showAbandonedFleetsMenu(()=>showAssistantMenu())],
+    ]
+    
+    // Only show Fleets and Abandoned Fleets in debug mode
+    if (DEBUG_MODE) {
+        menuItems.push(
+            ['Fleets', ()=>showFleetsMenu(()=>showAssistantMenu())],
+            ['Abandoned Fleets', ()=>showAbandonedFleetsMenu(()=>showAssistantMenu())]
+        )
+    }
+    
+    menuItems.push(
         ['Anomalies', ()=>showAnomaliesMenu(()=>showAssistantMenu())],
         ['Ruins', ()=>showRuinsDatabaseMenu(()=>showAssistantMenu())],
         ce({tag:'br'}),
@@ -30,5 +40,7 @@ function showAssistantMenu() {
         ['Cancel', ()=>{
             closeModal()
         }],
-    ])
+    )
+    
+    showModal(`Assistant`, 'How can I help you captain?', menuItems)
 }

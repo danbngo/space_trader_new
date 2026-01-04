@@ -1,3 +1,4 @@
+let DEBUG_MODE = false
 const DEFAULT_FONT_SIZE = 16
 
 // Modeling the Solar System using Star and Planet classes

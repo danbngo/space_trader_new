@@ -29,11 +29,8 @@ function showPlanetDemographicsMenu(planet = new Planet()) {
         for (const [race, proportion] of sortedRaces) {
             const percentage = (proportion * 100).toFixed(1)
             const progressBar = new ProgressBar({
-                id: `race_${race.name.replace(/\s+/g, '_')}`,
-                label: '',
                 value: parseFloat(percentage),
                 fillColor: rgbArrayToString(race.color),
-                showPercentage: true
             })
             raceRows.push([coloredName(race), progressBar.container])
         }
@@ -60,11 +57,8 @@ function showPlanetDemographicsMenu(planet = new Planet()) {
             const percentage = (proportion * 100).toFixed(1)
             console.log('r,p',religion,proportion,percentage)
             const progressBar = new ProgressBar({
-                id: `religion_${(religion.name || '').replace(/\s+/g, '_')}`,
-                label: '',
                 value: parseFloat(percentage),
                 fillColor: rgbArrayToString(religion.color),
-                showPercentage: true
             })
             religionRows.push([coloredName(religion), progressBar.container])
         }

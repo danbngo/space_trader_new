@@ -52,7 +52,7 @@ class SlaversEncounter extends FleetEncounter {
         
         // Otherwise just ignore
         showModal('Ignored', `The ${coloredName(this.fleet)} note your presence but choose to ignore you.`,
-            ['Continue', ()=>this.endEncounter()]
+            [['Continue', ()=>this.endEncounter()]]
         )
     }
 

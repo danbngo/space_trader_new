@@ -2,50 +2,56 @@
  * Creates an HTML table displaying the player's ships.
  * @param {Ship[]} ships - Array of ships to display.
  * @param {(ship: Ship) => void} onSelectShip - Callback when a ship is selected.
+ * @param {Ship|null} selectedShip - Currently selected ship to highlight.
  * @returns {HTMLTableElement|string} The ships table or "(None)" if no ships.
  */
-function createShipsListMenu(ships = [new Ship()], onSelectShip = (s = new Ship())=>{}) {
+function createShipsListMenu(ships = [new Ship()], onSelectShip = (s = new Ship())=>{}, selectedShip = null) {
     if (ships.length == 0) return `(None)`
     const rows = [
-        ['Ship Name', 'Pilot', 'Hull', 'Shields', 'Lasers', 'Engine', 'Cargo', 'Hull%']
+        ['Name', 'Pilot', 'Lasers', 'Engine', 'Cargo', 'Shields', 'Hull']
     ]
     for (const ship of ships) {
         const pilotName = ship.pilot ? ship.pilot.name : colorSpan('(Unassigned)', COLORS.Gray)
         const hullPercentage = (ship.hull[0] / ship.hull[1]) * 100
         
         const hullProgressBar = new ProgressBar({
-            id: `ship_hull_${ship.name.replace(/\s+/g, '_')}`,
-            label: '',
             value: hullPercentage,
             fillColor: rgbArrayToString(COLORS.Green),
-            showPercentage: true,
-            width: 20
+            overrideLabel: `${ship.hull[0]}/${ship.hull[1]}`,
+            width: 10
         })
         
         rows.push([
             ship.name,
             pilotName,
-            ''+statColorSpan(`${ship.hull[0]}/${ship.hull[1]}`, ship.hull[0]/ship.hull[1]),
-            ''+statColorSpan(`${ship.shields[0]}/${ship.shields[1]}`, ship.shields[0]/ship.shields[1]),
             ''+ship.lasers,
             ''+ship.engine,
             ''+ship.cargoSpace,
+            ''+ship.shields[1],
             hullProgressBar.container,
         ])
     }
-    return createTable(rows, (rowIndex = 0)=>onSelectShip(ships[rowIndex]))
+    const selectedIndex = selectedShip ? ships.indexOf(selectedShip) + 1 : null
+    return createTable(rows, (rowIndex = 0)=>onSelectShip(ships[rowIndex]), selectedIndex)
 }
 
 /**
  * Displays the ships manifest menu for managing the player's fleet.
  * @param {Ship[]} ships - Array of ships to display and manage.
+ * @param {Ship|null} selectedShip - Currently selected ship.
  */
-function showShipsMenu(ships = [...gs.fleet.ships]) {
-    const reloadMenu = ()=>showShipsMenu(ships)
+function showShipsMenu(ships = [...gs.fleet.ships], selectedShip = null) {
+    // Default to first ship if none selected
+    if (!selectedShip && ships.length > 0) {
+        selectedShip = ships[0]
+    }
+
+    const reloadMenu = ()=>showShipsMenu(ships, selectedShip)
 
     function dumpShip(ship = new Ship()) {
         safeRemove(ships, ship)
-        showShipsMenu(ships) //DONT use reloadMenu here, wont reflect changes to ship list
+        const newSelected = ships.length > 0 ? ships[0] : null
+        showShipsMenu(ships, newSelected)
     }
 
     function showDumpShipModal(ship = new Ship()) {
@@ -58,79 +64,85 @@ function showShipsMenu(ships = [...gs.fleet.ships]) {
         )
     }
 
-    function showAssignPilotModal(ship = new Ship()) {
-        const allOfficers = [gs.captain, ...gs.fleet.officers]
-        const rows = [['Officer', 'Level', 'Current Assignment']]
+    function swapPilots(ship = new Ship(), newPilot = new Officer()) {
+        // Get current pilot of selected ship
+        const currentPilot = ship.pilot
         
-        for (const officer of allOfficers) {
-            const assignedShip = gs.fleet.getAssignedShip(officer)
-            const assignment = assignedShip ? assignedShip.name : colorSpan('(Unassigned)', COLORS.Gray)
-            rows.push([officer.name, ''+officer.level, assignment])
+        // Get ship piloted by the new pilot (if any)
+        const newPilotCurrentShip = gs.fleet.getAssignedShip(newPilot)
+        
+        // Swap them
+        gs.fleet.assignPilot(ship, newPilot)
+        if (newPilotCurrentShip && currentPilot) {
+            gs.fleet.assignPilot(newPilotCurrentShip, currentPilot)
         }
         
-        const table = createTable(rows, (rowIndex) => {
-            const selectedOfficer = allOfficers[rowIndex]
-            gs.fleet.assignPilot(ship, selectedOfficer)
-            reloadMenu()
-        })
-        
-        showModal(
-            `Assign Pilot to ${ship.name}`,
-            ce({children: [
-                'Select an officer to pilot this ship:',
-                table
-            ]}),
-            [
-                ['Unassign', () => {
-                    gs.fleet.assignPilot(ship, null)
-                    reloadMenu()
-                }],
-                ['Cancel', () => reloadMenu()]
-            ]
-        )
+        showShipsMenu(ships, ship)
     }
 
     function onSelectShip(ship = new Ship()) {
-        const modulesText = ship.modules.length > 0 
-            ? ship.modules.map(m => colorSpan(m.moduleType.name, m.moduleType.color) + ` (${roundToPlaces(m.quality*100, 1)}%)`).join(', ')
-            : colorSpan('(None)', COLORS.Gray)
-        
-        const pilotText = ship.pilot ? ship.pilot.name : colorSpan('(Unassigned)', COLORS.Gray)
-        
-        const buttons = [
-            ['Assign Pilot', ()=>showAssignPilotModal(ship)],
-            ['Dump', ()=>showDumpShipModal(ship), gs.fleet.ships.length < 2],
-            ["Close", () => closeModal()],
-        ]
-        
-        const infoPanel = ce({children: [
-            `<b>${ship.name}</b><br/>`,
-            `Pilot: ${pilotText}<br/>`,
-            `Hull: ${statColorSpan(`${ship.hull[0]}/${ship.hull[1]}`, ship.hull[0]/ship.hull[1])} | `,
-            `Shields: ${statColorSpan(`${ship.shields[0]}/${ship.shields[1]}`, ship.shields[0]/ship.shields[1])}<br/>`,
-            `Lasers: ${ship.lasers} | Engine: ${ship.engine} | Cargo: ${ship.cargoSpace}<br/>`,
-            `<br/><b>Installed Modules:</b><br/>`,
-            modulesText,
-        ]})
-        
-        const modalContent = document.getElementById('ships_panel_content')
-        if (modalContent) {
-            modalContent.innerHTML = ''
-            modalContent.appendChild(infoPanel)
-        }
-        
-        refreshPanelButtons('ships_panel', buttons)
+        showShipsMenu(ships, ship)
     }
+
+    // Left column: Ships table
+    const leftColumn = createShipsListMenu(ships, onSelectShip, selectedShip)
+
+    // Right column: Selected ship details
+    const rightColumn = selectedShip ? (() => {
+        // gs.fleet.officers already includes captain, no need to add separately
+        const allOfficers = gs.fleet.officers
+        const currentPilotIndex = selectedShip.pilot ? allOfficers.indexOf(selectedShip.pilot) : -1
+        
+        const pilotDropdown = new Dropdown(
+            allOfficers.map(officer => [
+                officer.name,
+                () => swapPilots(selectedShip, officer)
+            ]),
+            false,
+            currentPilotIndex >= 0 ? currentPilotIndex : 0,
+            250
+        )
+
+        const modulesSection = selectedShip.modules.length > 0 
+            ? ce({
+                tag: 'ul',
+                style: {marginTop: '4px', marginBottom: '8px', paddingLeft: '20px'},
+                children: selectedShip.modules.map(m => 
+                    ce({
+                        tag: 'li',
+                        style: {whiteSpace: 'nowrap'},
+                        children: [
+                            colorSpan(m.moduleType.name, m.moduleType.color) + `\u00A0(${roundToPlaces(m.quality*100, 1)}%)`
+                        ]
+                    })
+                )
+            })
+            : ce({children: [colorSpan('(None)', COLORS.Gray)]})
+
+        return ce({
+            style: {display: 'flex', flexDirection: 'column', gap: '12px'},
+            children: [
+                `<u>Pilot:</b>`,
+                pilotDropdown.container,
+                `<u>Installed Modules:</u>`,
+                modulesSection
+            ]
+        })
+    })() : ce({children: [colorSpan('(No ship selected)', COLORS.Gray)]})
+
+    const columnLayout = createColumnLayout([leftColumn, rightColumn])
+
+    const buttons = selectedShip ? [
+        ['Dump', ()=>showDumpShipModal(selectedShip), gs.fleet.ships.length < 2],
+        ["Close", () => closeModal()],
+    ] : [
+        ["Close", () => closeModal()],
+    ]
 
     showModal(
         `Ships Manifest`,
-        ce({children:[
-            createShipsListMenu(ships, onSelectShip),
-            ce({id: 'ships_panel_content'}),
-        ]}),
-        [
-            ["Close", () => closeModal()],
-        ],
+        columnLayout,
+        buttons,
         'ships_panel'
     );
 }

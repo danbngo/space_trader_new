@@ -5,7 +5,7 @@
  */
 function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
     console.log('showCaptainSkillsMenu called with captain:',captain,'selectedSkill:',selectedSkill)
-    const {name, level, expPoints, expToNextLevel, skills, skillPoints, credits} = captain
+    const {name, level, expPoints, expToNextLevel, skills, skillPoints, credits, geneticModifications = []} = captain
 
     function improveSkill(skill = SKILLS_ALL[0]) {
         const cost = captain.calcSkillPointsToUpgrade(skill)
@@ -18,10 +18,10 @@ function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
         console.log('on select skill:',skill)
         const cost = captain.calcSkillPointsToUpgrade(skill)
         const canAfford = skillPoints >= cost
+        /** @type {ButtonData[]} */
         const buttons = [
             ['Upgrade', () => improveSkill(skill), !canAfford],
             ['Implants', () => showCaptainImplantsMenu()],
-            ['Genetics', () => showCaptainGeneticsMenu()],
             ['Perks', () => showCaptainPerksMenu(), false, captain.numPerkPoints > 0 ? 'highlighted' : null],
             ['Reputation', () => showCaptainReputationMenu()],
             ['Close', () => closeModal()],
@@ -36,7 +36,7 @@ function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
             const baseSkill = skills.getAmount(sk);
             const bonusSkill = captain.bonusSkills.getAmount(sk);
             const displayLevel = bonusSkill > 0 
-                ? `${baseSkill} ${colorSpan('(+' + bonusSkill + ')', COLORS.White)}`
+                ? `${baseSkill}\u00A0${colorSpan('(+' + bonusSkill + ')', COLORS.White)}`
                 : baseSkill;
             return [
                 coloredName(sk),
@@ -48,6 +48,57 @@ function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
 
     const skillTable = createTable(skillTableRows, (rowIndex) => onSelectSkill(SKILLS_ALL[rowIndex]), selectedSkill ? SKILLS_ALL.indexOf(selectedSkill) + 1 : null)
 
+    // Add popovers to skill rows
+    const skillRows = skillTable.querySelectorAll('tr')
+    skillRows.forEach((row, index) => {
+        if (index === 0) return // Skip header row
+        const skill = SKILLS_ALL[index - 1]
+        if (skill && skill.description) {
+            createPopoverElement(row, skill.description)
+        }
+    })
+
+    // Left column: Skills
+    const leftColumn = ce({
+        style: {display: 'flex', flexDirection: 'column', gap: '12px'},
+        children: [
+            ce({children: ['<b><u>Skills</u></b>']}),
+            skillTable,
+            `Skill Points: ${colorSpan(String(skillPoints), skillPoints > 0 ? COLORS.Green : '')}`,
+        ]
+    })
+
+    // Right column: Genetics
+    const geneticsSection = geneticModifications.length > 0 
+        ? ce({
+            tag: 'ul',
+            style: {marginTop: '4px', marginBottom: '0', paddingLeft: '20px'},
+            children: geneticModifications.map(mod => {
+                const li = ce({
+                    tag: 'li',
+                    children: [
+                        colorSpan(mod.modificationType.name, mod.modificationType.color),
+                        ` (${roundToPlaces(mod.quality*100, 1)}%)`
+                    ]
+                })
+                if (mod.modificationType.description) {
+                    createPopoverElement(li, mod.modificationType.description)
+                }
+                return li
+            })
+        })
+        : ce({children: [colorSpan('(None)', COLORS.Gray)]})
+
+    const rightColumn = ce({
+        style: {display: 'flex', flexDirection: 'column', gap: '12px'},
+        children: [
+            ce({children: [`<b><u>Genetic Modifications (${geneticModifications.length}/${captain.maxGeneticModifications})</u></b>`]}),
+            geneticsSection
+        ]
+    })
+
+    const columnLayout = createColumnLayout([leftColumn, rightColumn])
+
     const raceText = captain.race ? `${captain.race.symbol} ${colorSpan(captain.race.name, captain.race.color)}` : 'Human'
 
     // Calculate experience progress percentage
@@ -55,11 +106,8 @@ function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
     const expProgress = (expPoints / totalExpForLevel) * 100
     
     const expProgressBar = new ProgressBar({
-        id: 'captain_exp_progress',
-        label: '',
         value: expProgress,
         fillColor: rgbArrayToString(COLORS.Blue),
-        showPercentage: false,
         width: 50
     })
 
@@ -71,12 +119,10 @@ function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
             `Level: ${level} | Exp: ${expPoints} | Next Lvl At: ${expToNextLevel}`,
             expProgressBar.container,
             ce({tag:'br'}),
-            skillTable,
-            `Skill Points: ${colorSpan(String(skillPoints), skillPoints > 0 ? COLORS.Green : '')}`,
+            columnLayout,
         ]}),
         [
             ["Implants", () => showCaptainImplantsMenu()],
-            ["Genetics", () => showCaptainGeneticsMenu()],
             ["Perks", () => showCaptainPerksMenu(), false, captain.numPerkPoints > 0 ? 'highlighted' : null],
             ["Reputation", () => showCaptainReputationMenu()],
             ["Close", () => closeModal()],
@@ -129,6 +175,7 @@ function showCaptainPerksMenu(captain = gs.captain, selectedPerk = null) {
         else if (!meetsLevel) reasonText = `Requires level ${perk.minLevel}.`
         else if (!canAfford) reasonText = `You need ${perkCost} perk point${perkCost > 1 ? 's' : ''}.`
 
+        /** @type {ButtonData[]} */
         const buttons = [
             ['Take', () => {
                 showModal(
@@ -142,7 +189,6 @@ function showCaptainPerksMenu(captain = gs.captain, selectedPerk = null) {
             }, !canTake],
             ['Skills', () => showCaptainSkillsMenu()],
             ['Implants', () => showCaptainImplantsMenu()],
-            ['Genetics', () => showCaptainGeneticsMenu()],
             ['Reputation', () => showCaptainReputationMenu()],
             ['Close', () => closeModal()],
         ]
@@ -189,7 +235,6 @@ function showCaptainPerksMenu(captain = gs.captain, selectedPerk = null) {
         [
             ["Skills", () => showCaptainSkillsMenu()],
             ["Implants", () => showCaptainImplantsMenu()],
-            ["Genetics", () => showCaptainGeneticsMenu()],
             ["Reputation", () => showCaptainReputationMenu()],
             ["Close", () => closeModal()],
         ],
@@ -274,13 +319,18 @@ function showCaptainReputationMenu() {
 
     const reputationTable = createTable(tableRows)
     
-    // Build ranks table
+    // Build ranks table - only include planets where player has a rank (not NO_RANK)
+    const rankedPlanets = gs.system.planets.filter(planet => {
+        const rank = captain.ranks.get(planet) || RANK_TYPES.NO_RANK
+        return rank !== RANK_TYPES.NO_RANK
+    })
+    
     const ranksTableRows = [
         // Header row
         ['Planet', 'Rank'],
-        // Data rows for each planet
-        ...gs.system.planets.map(planet => {
-            const rank = captain.ranks.get(planet) || RANK_TYPES.NO_RANK
+        // Data rows for planets with ranks
+        ...rankedPlanets.map(planet => {
+            const rank = captain.ranks.get(planet)
             return [
                 coloredName(planet),
                 colorSpan(rank.name, rank.color)
@@ -288,44 +338,64 @@ function showCaptainReputationMenu() {
         })
     ]
     
-    const ranksTable = createTable(ranksTableRows)
+    const ranksTable = rankedPlanets.length > 0 
+        ? createTable(ranksTableRows)
+        : ce({children: [colorSpan('No planetary ranks yet.', COLORS.Gray)]})
 
-    // Build faction reputation table
-    const factionTableRows = [
-        // Header row
+    // Build faction reputation tables - split into two columns
+    const midpoint = Math.ceil(FACTION_TYPES_ALL.length / 2)
+    const leftFactions = FACTION_TYPES_ALL.slice(0, midpoint)
+    const rightFactions = FACTION_TYPES_ALL.slice(midpoint)
+    
+    const leftFactionTableRows = [
         ['Faction', 'Reputation'],
-        // Data rows for each faction
-        ...FACTION_TYPES_ALL.map(faction => [
+        ...leftFactions.map(faction => [
             `${faction.symbol} ${colorSpan(faction.name, faction.color)}`,
             statColorSpan(captain.reputation.getAmount(faction), 1 / (1 + Math.abs(captain.reputation.getAmount(faction))/50)),
         ])
     ]
     
-    const factionTable = createTable(factionTableRows)
+    const rightFactionTableRows = [
+        ['Faction', 'Reputation'],
+        ...rightFactions.map(faction => [
+            `${faction.symbol} ${colorSpan(faction.name, faction.color)}`,
+            statColorSpan(captain.reputation.getAmount(faction), 1 / (1 + Math.abs(captain.reputation.getAmount(faction))/50)),
+        ])
+    ]
+    
+    const leftFactionTable = createTable(leftFactionTableRows)
+    const rightFactionTable = createTable(rightFactionTableRows)
 
-    // Create side-by-side layout for planetary and factional reputation
-    const reputationContainer = createColumnLayout([
+    // Top section: Planetary ranks and reputation side-by-side
+    const topSection = createColumnLayout([
+        ce({children: [
+            ce({children: ['<b>Planetary Ranks</b>']}),
+            ranksTable
+        ]}),
         ce({children: [
             ce({children: ['<b>Planetary Reputation</b>']}),
             reputationTable
-        ]}),
-        ce({children: [
-            ce({children: ['<b>Factional Reputation</b>']}),
-            factionTable
         ]})
+    ])
+
+    // Bottom section: Factional reputation in two columns
+    const factionSection = createColumnLayout([
+        leftFactionTable,
+        rightFactionTable
     ])
 
     showModal(
         `Captain Reputation`,
         ce({children: [
-            ce({children: ['<b>Planetary Ranks</b>']}),
-            ranksTable,
-            reputationContainer,
+            topSection,
+            ce({style: {marginTop: '20px'}, children: [
+                ce({children: ['<b>Factional Reputation</b>']}),
+                factionSection
+            ]})
         ]}),
         [
             ["Skills", () => showCaptainSkillsMenu(captain)],
             ["Implants", () => showCaptainImplantsMenu(captain)],
-            ["Genetics", () => showCaptainGeneticsMenu(captain)],
             ["Perks", () => showCaptainPerksMenu(captain), false, captain.numPerkPoints > 0 ? 'highlighted' : null],
             ["Close", () => closeModal()],
         ],
