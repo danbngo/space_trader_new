@@ -6,10 +6,9 @@
 class Academy extends Building {
     /**
      * @param {Planet} planet - The planet this academy is on.
-     * @param {Moon} moon - The moon this building is on (null if on planet surface).
      */
-    constructor(planet = new Planet(), moon = null) {
-        super(planet, BUILDING_TYPES.ACADEMY, moon)
+    constructor(planet = new Planet()) {
+        super(planet, BUILDING_TYPES.ACADEMY)
     }
     calcSkillUpgradeCost(officer, skill = SKILLS_ALL[0]) {
         // Base cost scales exponentially with current skill level

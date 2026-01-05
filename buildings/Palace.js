@@ -6,10 +6,9 @@
 class Palace extends Building {
     /**
      * @param {Planet} planet - The planet this palace is on.
-     * @param {Moon} moon - The moon this building is on (null if on planet surface).
      */
-    constructor(planet = new Planet(), moon = null) {
-        super(planet, BUILDING_TYPES.PALACE, moon)
+    constructor(planet = new Planet()) {
+        super(planet, BUILDING_TYPES.PALACE)
         /** @type {Contract[]} */
         this.contracts = []; // Contract[]
         this.normalize(true)

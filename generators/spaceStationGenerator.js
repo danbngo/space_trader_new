@@ -34,7 +34,7 @@ function generateSpaceStation(name = "Station", lagrangePoint, asteroidBelts = [
         color,
         radius,
         orbit,
-        stationType,
+        null,
         null, // settlement - will be generated after station is created
         null, // civilization - will be generated after station is created
         climate,

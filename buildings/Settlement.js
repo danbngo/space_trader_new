@@ -14,7 +14,7 @@ class Settlement {
      * @param {Bank} params.bank - The bank building.
      * @param {Courthouse} params.courthouse - The courthouse building.
      * @param {Academy} params.academy - The academy building.
-     * @param {Academy} params.tavern - The tavern building.
+     * @param {Tavern} params.tavern - The tavern building.
      * @param {CyberSurgeon} params.cyberSurgeon - The cyber surgeon building.
      * @param {Geneticist} params.geneticist - The geneticist building.
      * @param {Palace} params.palace - The palace building.
@@ -40,7 +40,7 @@ class Settlement {
         this.courthouse = courthouse;
         /** @type {Academy} */
         this.academy = academy;
-        /** @type {Academy} */
+        /** @type {Tavern} */
         this.tavern = tavern;
         /** @type {CyberSurgeon} */
         this.cyberSurgeon = cyberSurgeon;

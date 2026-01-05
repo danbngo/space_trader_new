@@ -399,7 +399,7 @@ const FACTION_TYPES = {
         true,   // cloaked
         true,   // detector (can see through cloaking)
         [FLEET_TYPES.AGENTS],
-        2,  // reputationMultiplier (government agents)
+        0,  // reputationMultiplier (government agents)
         [SKILLS.Stealth, SKILLS.Gunner, SKILLS.Engineer]
     ),
     HACKERS: new FactionType(
@@ -431,6 +431,21 @@ const FACTION_TYPES = {
         [FLEET_TYPES.MEDIA],
         5,  // harming the media is considered very bad
         [SKILLS.Negotiation, SKILLS.Stealth]
+    ),
+    COMMISSARS: new FactionType(
+        'Commissars',
+        '📡',
+        COLORS.DarkMagenta,
+        'Political officers ensuring loyalty and ideological purity within military ranks.',
+        true,
+        true,
+        false,
+        false,
+        false, 
+        true,  
+        [FLEET_TYPES.COMMISSARS],
+        5,
+        [SKILLS.Negotiation, SKILLS.Gunner]
     ),
 }
 

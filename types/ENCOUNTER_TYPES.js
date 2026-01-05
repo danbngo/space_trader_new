@@ -58,6 +58,7 @@ const ENCOUNTER_TYPES = {
     SYNDICATES: new EncounterType('Syndicates', COLORS.LightRed, 'You encountered: syndicates.', FACTION_TYPES.SYNDICATES, FLEET_TYPES.SYNDICATES, AI_TYPES.Ship, SyndicatesEncounter),
     PIRATES: new EncounterType('Pirates', COLORS.LightRed, 'You encountered: pirates.', FACTION_TYPES.PIRATES, FLEET_TYPES.PIRATES, AI_TYPES.Ship, PiratesEncounter),
     INQUISITORS: new EncounterType('Inquisitors', COLORS.DarkRed, 'You encountered: inquisitors.', FACTION_TYPES.INQUISITORS, FLEET_TYPES.INQUISITORS, AI_TYPES.Ship, InquisitorsEncounter),
+    COMMISSARS: new EncounterType('Commissars', COLORS.DarkMagenta, 'You encountered: commissars.', FACTION_TYPES.COMMISSARS, FLEET_TYPES.COMMISSARS, AI_TYPES.Ship, CommissarsEncounter),
     SLAVERS: new EncounterType('Slavers', COLORS.DarkRed, 'You encountered: slavers.', FACTION_TYPES.SLAVERS, FLEET_TYPES.SLAVERS, AI_TYPES.Ship, SlaversEncounter),
     POLICE: new EncounterType('Police', COLORS.LightBlue, 'You encountered: police.', FACTION_TYPES.POLICE, FLEET_TYPES.POLICE, AI_TYPES.Ship, PoliceEncounter),
     SOLDIERS: new EncounterType('Soldiers', COLORS.LightGreen, 'You encountered: soldiers.', FACTION_TYPES.SOLDIERS, FLEET_TYPES.SOLDIERS, AI_TYPES.Ship, SoldiersEncounter),

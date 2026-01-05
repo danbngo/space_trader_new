@@ -6,10 +6,9 @@
 class Geneticist extends Building {
     /**
      * @param {Planet} planet - The planet this geneticist is on.
-     * @param {Moon} moon - The moon this building is on (null if on planet surface).
      */
-    constructor(planet = new Planet(), moon = null) {
-        super(planet, BUILDING_TYPES.GENETICIST, moon)
+    constructor(planet = new Planet()) {
+        super(planet, BUILDING_TYPES.GENETICIST)
         /** @type {GeneticModification[]} */
         this.modifications = []; // GeneticModification[]
         this.normalize(true)

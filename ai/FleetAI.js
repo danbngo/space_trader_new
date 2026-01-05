@@ -396,17 +396,20 @@ class FleetAI {
         
         this.addPopup('💀', COLORS.Red, this.fleet.x, this.fleet.y)
         
-        // Random crew survival (0-100%, average 50%)
-        const crewSurvivalRate = Math.random()
-        if (crewSurvivalRate < 0.5) {
-            // Remove all subordinate officers (never remove captain)
-            const subordinates = [...this.fleet.subordinates]
-            for (const officer of subordinates) {
-                this.fleet.removeOfficer(officer)
+        // Random officer deaths (0-100% of subordinates can die)
+        const deathRate = Math.random();
+        const subordinates = [...this.fleet.subordinates];
+        let deaths = 0;
+        for (const officer of subordinates) {
+            if (Math.random() < deathRate) {
+                this.fleet.removeOfficer(officer);
+                deaths++;
             }
-            console.log(`☠️ ${this.fleet.name} crew (except captain) did not survive the destruction`)
+        }
+        if (deaths > 0) {
+            console.log(`☠️ ${this.fleet.name} lost ${deaths}/${subordinates.length} subordinate officers (${Math.round(deathRate * 100)}% casualty rate)`);
         } else {
-            console.log(`🆘 ${this.fleet.name} crew survived in escape pods`)
+            console.log(`🆘 ${this.fleet.name} crew survived in escape pods`);
         }
         
         // Random cargo destruction (0-100%, average 50%)

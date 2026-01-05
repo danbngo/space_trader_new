@@ -57,6 +57,7 @@ const SHIP_MODULE_TYPES = {
     DRILL: new ShipModuleType('Drill', COLORS.Brown, MOVE_TYPES.Drill, 'Drill into a target ship, dealing heavy hull damage and spinning them around.', 2500, 3),
     DETONATE: new ShipModuleType('Detonate', COLORS.Yellow, MOVE_TYPES.Detonate, 'Self-destruct your ship in a massive explosion, dealing devastating damage to all nearby vessels.', 5000, 0),
     NANITE_BEAM: new ShipModuleType('Nanite Beam', COLORS.Green, MOVE_TYPES.NaniteBeam, 'Heal allied ships using a targeted nanite beam. Repairs hull damage based on your engineering skill.', 2500, 3),
+    PLASMA_SPRAY: new ShipModuleType('Plasma Spray', COLORS.Orange, MOVE_TYPES.PlasmaSpray, 'Shoots plasma in a triangular area in front of the ship, overheating all targets hit.', 3000, 3),
     SPEED_MODULE: new ShipModuleType('Speed Module', COLORS.LightGray, null, 'Chance to grant +1 action per turn.', 3000, 0),
     //NANITE_SWARM: new ShipModuleType('Nanite Swarm', 'Repairs hull damage for your ship and nearby allies', 0),
     //DEFLECTOR: new ShipModuleType('Deflector', 'Reflects incoming enemy projectiles/ships', 0),

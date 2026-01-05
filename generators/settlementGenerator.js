@@ -127,45 +127,33 @@ function generateSettlement(planet) {
     const settlementType = 
         planet.objectType == OBJECT_TYPES.PLANET || planet.objectType == OBJECT_TYPES.DWARF_PLANET ? determinePlanetSettlementType(planet) :
         determineSpaceStationSettlementType(planet)
-    
-    // Get moons for this planet (children that are Moon instances)
-    const planetMoons = planet.children ? planet.children.filter(child => child instanceof Moon) : []
-    console.log('found moons:',planetMoons)
-    
-    // Helper function to randomly assign a moon or null
-    const getRandomMoon = () => {
-        if (planetMoons.length === 0) return null
-        // 50% chance to be on a moon if moons exist
-        return Math.random() < 0.5 ? rndMember(planetMoons) : null
-    }
 
     console.log('generating buildings...')
     
-    const shipyard = new Shipyard(planet, getRandomMoon())
+    const shipyard = new Shipyard(planet)
     
-    const market =  new Market(planet, false, getRandomMoon())
+    const market =  new Market(planet, false)
     
-    const blackMarket =  new Market(planet, true, getRandomMoon()) 
+    const blackMarket =  new Market(planet, true) 
     
-    const guild =  new Guild(planet, getRandomMoon()) 
+    const guild =  new Guild(planet)    
+    const bank =  new Bank(planet) 
     
-    const bank =  new Bank(planet, getRandomMoon()) 
+    const courthouse = new Courthouse(planet)
     
-    const courthouse = new Courthouse(planet, getRandomMoon())
+    const academy = new Academy(planet)
     
-    const academy = new Academy(planet, false, getRandomMoon())
+    const tavern = new Tavern(planet, true)
     
-    const tavern = new Academy(planet, true, getRandomMoon())
+    const cyberSurgeon = new CyberSurgeon(planet)
     
-    const cyberSurgeon = new CyberSurgeon(planet, getRandomMoon())
+    const geneticist = new Geneticist(planet)
     
-    const geneticist = new Geneticist(planet, getRandomMoon())
+    const palace = new Palace(planet)
     
-    const palace = new Palace(planet, getRandomMoon())
+    const temple = new Temple(planet)
     
-    const temple = new Temple(planet, getRandomMoon())
-    
-    const casino = new Casino(planet, getRandomMoon())
+    const casino = new Casino(planet)
     
 
     console.log('disabling some buildings...')

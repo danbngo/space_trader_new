@@ -237,6 +237,17 @@ class Encounter {
         return validTargets
     }
 
+    calcPlasmaSprayTargets(attacker = new Ship()) {
+        console.log('Encounter.calcPlasmaSprayTargets', { attacker });
+        const validTargets = []
+        const [t1, t2] = attacker.calcLaserAreas()
+        for (const target of this.calcHarmableTargets(attacker)) {
+            if (!t1.containsPoint(target.x, target.y) && !t2.containsPoint(target.x, target.y)) continue
+            validTargets.push(target)
+        }
+        return validTargets
+    }
+
     calcRamTargets(attacker = new Ship()) {
         console.log('Encounter.calcRamTargets', { attacker });
         const validTargets = []

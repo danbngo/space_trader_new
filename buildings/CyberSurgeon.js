@@ -6,10 +6,9 @@
 class CyberSurgeon extends Building {
     /**
      * @param {Planet} planet - The planet this cyber surgeon is on.
-     * @param {Moon} moon - The moon this building is on (null if on planet surface).
      */
-    constructor(planet = new Planet(), moon = null) {
-        super(planet, BUILDING_TYPES.CYBER_SURGEON, moon)
+    constructor(planet = new Planet()) {
+        super(planet, BUILDING_TYPES.CYBER_SURGEON)
         /** @type {CyberImplant[]} */
         this.implants = []; // CyberImplant[]
         this.normalize(true)

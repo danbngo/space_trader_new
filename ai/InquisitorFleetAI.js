@@ -57,6 +57,15 @@ class InquisitorFleetAI extends FleetAI {
                 const hereticFilter = (o) => o.religion !== ourReligion;
                 this.transferOfficers(this.target, this.fleet, hereticFilter, '⚖️', COLORS.DarkRed, '💔', COLORS.Gray);
                 
+                // 50% chance to execute the transferred heretics
+                const transferredHeretics = this.fleet.officers.filter(o => o.religion !== ourReligion);
+                for (const heretic of transferredHeretics) {
+                    if (Math.random() < 0.5) {
+                        this.fleet.removeOfficer(heretic);
+                        console.log(`☠️ ${this.fleet.name} executed heretic ${heretic.name}`);
+                    }
+                }
+                
                 this.target = null;
                 this.fleet.route = null;
                 return;
@@ -79,6 +88,16 @@ class InquisitorFleetAI extends FleetAI {
                 if (this.fleet.planet && this.fleet.planet.civilization) {
                     this.fleet.planet.c.culture *= 1.01
                     this.fleet.planet.c.prestige *= 1.01
+                }
+                
+                // 33% chance to flip converted fleet's home planet to our planet
+                if (Math.random() < 0.33 && this.target.planet !== this.fleet.planet) {
+                    console.log(`🏴 ${this.target.name} allegiance changed from ${this.target.planet.name} to ${this.fleet.planet.name}`);
+                    this.target.planet = this.fleet.planet;
+                    if (this.target.fleetAI) {
+                        this.target.fleetAI.origin = this.origin;
+                    }
+                    this.addPopup('🏴', COLORS.Purple, this.target.x, this.target.y);
                 }
                 
                 this.target = null;

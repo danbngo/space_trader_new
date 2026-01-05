@@ -295,8 +295,10 @@ function calculateMaxFleetsForPlanet(planet) {
         maxNumFleetsPerFaction.setAmount(factionType, maxNumFleets)
     }
     // Apply civilization-specific multipliers to max fleet counts (alphabetical order)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.AGENTS, c.corruption)
     maxNumFleetsPerFaction.multiply(FACTION_TYPES.BOUNTY_HUNTERS, c.security*c.crime)
     maxNumFleetsPerFaction.multiply(FACTION_TYPES.COLONISTS, c.population/c.economy)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.COMMISSARS, c.security)
     maxNumFleetsPerFaction.multiply(FACTION_TYPES.DIPLOMATS, c.prestige)
     maxNumFleetsPerFaction.multiply(FACTION_TYPES.EXPLORERS, c.prestige*c.education)
     maxNumFleetsPerFaction.multiply(FACTION_TYPES.HACKERS, c.technology*c.corruption)

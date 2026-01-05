@@ -104,8 +104,24 @@ function generateOfficer(planet = new Planet(), factionType = FACTION_TYPES_ALL[
     const levelFromAge = 1 + Math.round((actualYearsOfExperience / baseYearsToRetirement) * (2 * AVERAGE_OFFICER_LEVEL - 1) * education)
     const level = Math.max(1, levelFromAge)
     
-    // Create officer with determined race, religion, and age
-    const officer = new Officer(generateOfficerName(planet), planet, factionType, race, religion, clampedAge, credits)
+    // Determine officer's cultural planet of origin based on planet's cultures distribution
+    let culturalPlanet = planet // Default to current planet
+    if (civilization.cultures && civilization.cultures.counts.size > 0) {
+        const cultureEntries = Array.from(civilization.cultures.counts.entries())
+        const totalWeight = cultureEntries.reduce((sum, [_, weight]) => sum + weight, 0)
+        const roll = Math.random() * totalWeight
+        let cumulative = 0
+        for (const [culturePlanetCandidate, weight] of cultureEntries) {
+            cumulative += weight
+            if (roll <= cumulative) {
+                culturalPlanet = culturePlanetCandidate
+                break
+            }
+        }
+    }
+    
+    // Create officer with determined race, religion, age, and cultural planet of origin
+    const officer = new Officer(generateOfficerName(culturalPlanet), culturalPlanet, factionType, race, religion, clampedAge, credits)
     
     //console.log('applying levelups..')
     // Level up to target level

@@ -68,6 +68,16 @@ class MissionaryFleetAI extends FleetAI {
                 if (this.target.planet instanceof Planet) {
                     this.target.planet.addCulture(this.fleet.planet, 0.001);
                 }
+                
+                // 20% chance to flip converted fleet's home planet to our planet
+                if (Math.random() < 0.2 && this.target.planet !== this.fleet.planet) {
+                    console.log(`🏴 ${this.target.name} allegiance changed from ${this.target.planet.name} to ${this.fleet.planet.name}`);
+                    this.target.planet = this.fleet.planet;
+                    if (this.target.fleetAI) {
+                        this.target.fleetAI.origin = this.origin;
+                    }
+                    this.addPopup('🏴', COLORS.Gold, this.target.x, this.target.y);
+                }
             } else {
                 console.log(`${this.fleet.name} failed to convert ${this.target.captain ? this.target.captain.name : 'unknown captain'}`);
             }

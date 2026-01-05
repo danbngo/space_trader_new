@@ -7,10 +7,9 @@ class Market extends Building {
     /**
      * @param {Planet} planet - The planet this market is on.
      * @param {boolean} blackMarket - Whether this is a black market (illegal goods).
-     * @param {Moon} moon - The moon this building is on (null if on planet surface).
      */
-    constructor(planet = new Planet(), blackMarket = false, moon = null) {
-        super(planet, BUILDING_TYPES.MARKET, moon)
+    constructor(planet = new Planet(), blackMarket = false) {
+        super(planet, BUILDING_TYPES.MARKET)
         /** @type {boolean} */
         this.blackMarket = blackMarket;
         /** @type {CountsMap} */
@@ -190,72 +189,27 @@ class Market extends Building {
         // Invert availability: low availability (0.5x) = high price (2x)
         calc.addFactor('availability', 1.0 / Math.max(0.1, availabilityMultiplier));
         
-        // Climate-based price adjustments
+        // Apply planet type modifiers from cargoModifiers map
         const planetType = this.planet.planetType;
+        if (planetType && planetType.cargoModifiers.has(ct)) {
+            calc.addFactor(planetType.name.toLowerCase(), planetType.cargoModifiers.get(ct));
+        }
         
+        // Cargo-specific demand factors
         if (ct === CARGO_TYPES.FOOD) {
-            // Food demand based on population
             calc.addFactor('population demand', 0.8 + civ.population * 1.2);
-            
-            // Climate effects on food prices
-            if (planetType === PLANET_TYPES.GAS_GIANT || planetType === PLANET_TYPES.GAS_DWARF) {
-                calc.addFactor('gas giant premium', 3.0);
-            } else if (planetType === PLANET_TYPES.ICE_GIANT || planetType === PLANET_TYPES.ICE_DWARF) {
-                calc.addFactor('ice giant premium', 2.5);
-            } else if (climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.OXYGEN_NITROGEN) {
-                calc.addFactor('breathable air discount', 0.7);
-            } else if (climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.SULFURIC_ACID ||
-                       climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.SULFUR_DIOXIDE) {
-                calc.addFactor('toxic atmosphere premium', 2.0);
-            }
-            
-            if (climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.NONE ||
-                climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.SULFURIC_ACID ||
-                climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.SULFUR_DIOXIDE) {
-                calc.addFactor('import dependency', 1.8);
-            }
-            
-            if (climate.geologyType === PLANET_GEOLOGY_TYPES.METALLIC ||
-                climate.geologyType === PLANET_GEOLOGY_TYPES.WATER_ICE ||
-                climate.geologyType === PLANET_GEOLOGY_TYPES.NITROGEN_ICE) {
-                calc.addFactor('poor soil', 1.5);
-            }
-            
-            // Low reserves means scarcity
             calc.addFactor('low reserves', 1.0 + (1.0 / Math.max(0.5, civ.reserves)) * 0.5);
         }
         else if (ct === CARGO_TYPES.METAL) {
             calc.addFactor('industrial demand', 0.5 + civ.industry * 1.5);
-            
-            if (planetType === PLANET_TYPES.GAS_GIANT || planetType === PLANET_TYPES.GAS_DWARF) {
-                calc.addFactor('gas giant scarcity', 1.5);
-            } else if (planetType === PLANET_TYPES.ICE_GIANT || planetType === PLANET_TYPES.ICE_DWARF) {
-                calc.addFactor('ice giant scarcity', 1.4);
-            } else if (planetType === PLANET_TYPES.TERRESTRIAL || planetType === PLANET_TYPES.EARTHLIKE) {
-                calc.addFactor('terrestrial abundance', 0.6);
-            }
         }
         else if (ct === CARGO_TYPES.WATER) {
             calc.addFactor('population demand', 0.5 + civ.population * 1.0);
             calc.addFactor('low reserves', 1.0 / Math.max(0.5, civ.reserves));
-            
-            if (planetType === PLANET_TYPES.ICE_GIANT || planetType === PLANET_TYPES.ICE_DWARF) {
-                calc.addFactor('ice abundance', 0.5);
-            } else if (planetType === PLANET_TYPES.GAS_GIANT || planetType === PLANET_TYPES.GAS_DWARF) {
-                calc.addFactor('gas giant scarcity', 1.3);
-            }
         }
         else if (ct === CARGO_TYPES.ISOTOPES) {
             calc.addFactor('tech demand', 0.5 + civ.technology * 1.5);
             calc.addFactor('education demand', 0.5 + civ.education * 0.5);
-            
-            if (planetType === PLANET_TYPES.GAS_GIANT || planetType === PLANET_TYPES.GAS_DWARF) {
-                calc.addFactor('gas giant abundance', 0.5);
-            } else if (planetType === PLANET_TYPES.ICE_GIANT || planetType === PLANET_TYPES.ICE_DWARF) {
-                calc.addFactor('ice giant premium', 1.2);
-            } else if (planetType === PLANET_TYPES.TERRESTRIAL || planetType === PLANET_TYPES.EARTHLIKE) {
-                calc.addFactor('terrestrial scarcity', 1.3);
-            }
         }
         else if (ct === CARGO_TYPES.NANITES) {
             calc.addFactor('economic demand', 0.5 + civ.economy * 1.0);

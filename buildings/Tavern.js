@@ -5,11 +5,11 @@
  */
 class Tavern extends Building {
     /**
-     * @param {Planet} planet - The planet this academy is on.
-     * @param {Moon} moon - The moon this building is on (null if on planet surface).
+     * @param {Planet} planet - The planet this tavern is on.
+     * @param {boolean} isTavern - Whether this is a tavern (true) or academy (false).
      */
-    constructor(planet = new Planet(), isTavern = false, moon = null) {
-        super(planet, BUILDING_TYPES.ACADEMY, moon)
+    constructor(planet = new Planet(), isTavern = false) {
+        super(planet, BUILDING_TYPES.TAVERN)
         /** @type {boolean} */
         this.isTavern = isTavern;
         /** @type {Officer[]} */

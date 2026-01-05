@@ -6,10 +6,9 @@
 class Bank extends Building {
     /**
      * @param {Planet} planet - The planet this bank is on.
-     * @param {Moon} moon - The moon this building is on (null if on planet surface).
      */
-    constructor(planet = new Planet(), moon = null) {
-        super(planet, BUILDING_TYPES.BANK, moon)
+    constructor(planet = new Planet()) {
+        super(planet, BUILDING_TYPES.BANK)
         /** @type {number} */
         this.playerBalance = 0
     }
@@ -25,7 +24,7 @@ class Bank extends Building {
     }
     calcLoanMaxAmount(officer) {
         let maxLoanAmount = Math.pow(officer.level, 1.5) * 5000 * this.level
-        maxLoanAmount += officer.fame.total*10 - officer.infamy.total*10
+        maxLoanAmount += officer.reputation.total*10
         maxLoanAmount += this.playerBalance
         maxLoanAmount -= officer.bounty.total
         maxLoanAmount -= officer.calcTotalDebts()

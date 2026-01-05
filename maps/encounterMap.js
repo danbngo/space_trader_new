@@ -39,6 +39,7 @@ class EncounterMap extends BaseMap {
             [MOVE_TYPES.Drill, new DrillActionHandler(this)],
             [MOVE_TYPES.Detonate, new DetonateActionHandler(this)],
             [MOVE_TYPES.NaniteBeam, new NaniteBeamActionHandler(this)],
+            [MOVE_TYPES.PlasmaSpray, new PlasmaSprayActionHandler(this)],
         ])
         
         this.animatingAction = null
