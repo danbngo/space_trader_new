@@ -680,7 +680,14 @@ class Encounter {
                 combatAdvantage *= 2 - (75/(50 + Math.abs(Math.min(0, gs.captain.calcReputationForTarget(this.fleet.planet)))))
                 
                 if (combatAdvantage * Math.random() > 1.5) {
-                    this.showNeutralsBribePlayerModal?.(this.fleet.captain.credits)
+                    // Try to show bribe modal if this encounter type supports it
+                    // @ts-ignore - showNeutralsBribePlayerModal exists on NeutralsEncounter subclasses
+                    if (typeof this.showNeutralsBribePlayerModal === 'function') {
+                        this.showNeutralsBribePlayerModal(this.fleet.captain.credits)
+                    } else {
+                        // No bribe modal available, just start combat
+                        this.startCombat(true)
+                    }
                 } else {
                     this.startCombat(true)
                 }
