@@ -3,7 +3,7 @@
 // Creates a UI panel with title, text, and buttons
 
 /**
- * @typedef {[string, Function]|[string, Function, boolean]|[string, Function, boolean, (string|string[])]|[string, Function, boolean, (string|string[]), string]} ButtonData
+ * @typedef {[string, Function]|[string, Function, boolean]|[string, Function, boolean, string]} ButtonData
  * @property {string} 0 - Label text for the button
  * @property {Function} 1 - Handler function to call when button is clicked
  * @property {boolean} [2] - Whether the button is disabled
@@ -43,7 +43,7 @@ function refreshPanelButtons (panelId = '', buttons) {
             }
             return
         }
-        const [label, handler, disabled, classNames, disabledReason] = btnData
+        const [label, handler, disabled, disabledReason] = btnData
         const btn = document.createElement('div');
         btn.classList.add('gameButton');
         btn.innerHTML = label;
@@ -51,13 +51,6 @@ function refreshPanelButtons (panelId = '', buttons) {
         btn.onclick = ()=>{
             if (btn.classList.contains('disabled')) return
             handler()
-        }
-        if (classNames) {
-            if (Array.isArray(classNames)) {
-                classNames.forEach(cn => cn && btn.classList.add(cn))
-            } else {
-                btn.classList.add(classNames)
-            }
         }
         // Apply float:right to last button
         if (index === buttons.length - 1) {

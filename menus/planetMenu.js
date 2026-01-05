@@ -10,7 +10,7 @@ const buildingHandlerMapping = [
     {type: BUILDING_TYPES.CYBER_SURGEON, prop: 'cyberSurgeon', menu: (b) => showCyberSurgeonBuyMenu(b)},
     {type: BUILDING_TYPES.GENETICIST, prop: 'geneticist', menu: (b) => showGeneticistBuyMenu(b)},
     {type: BUILDING_TYPES.PALACE, prop: 'palace', menu: (b) => showPalaceMenu(b)},
-    {type: BUILDING_TYPES.TEMPLE, prop: 'temple', menu: (b) => showModal("Temple", "The temple is quiet and serene.", [["Close", () => showPlanetMenu(b)]])},
+    {type: BUILDING_TYPES.TEMPLE, prop: 'temple', menu: (b) => showModal("Temple", "The temple is quiet and serene.", [["Close", () => showPlanetMenu(b.planet)]])},
     {type: BUILDING_TYPES.CASINO, prop: 'casino', menu: (b) => showCasinoMenu(b)},
     {type: BUILDING_TYPES.ARMORY, prop: 'armory', menu: (b) => showArmoryMenu(b)},
     {type: BUILDING_TYPES.OUTFITTER, prop: 'outfitter', menu: (b) => showOutfitterMenu(b)},
@@ -71,6 +71,7 @@ function showPlanetMenu(planet = new Planet()) {
     if (settlement) for (const {type, prop, menu} of buildingHandlerMapping) {
         const building = settlement[prop]
         if (building && building.exists !== false) {
+            console.log('building, type:',building, type)
             const accessDeniedReason = BuildingType.getAccessDeniedReason(planet, building)
             const isDisabled = accessDeniedReason !== null
             const levelDisplay = building.level ? ` ${toRomanNumeral(building.level)}` : ''

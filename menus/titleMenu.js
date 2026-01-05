@@ -174,8 +174,6 @@ async function startNewGame() {
     console.log('Adding religions...')
     gs.system.religions = generateReligions()
     console.log('Adding space stations...')
-    const numToGenerate = Math.min(rng(12, 6), ALL_LAGRANGE_POINTS.length)
-    gs.system.spaceStations = generateSpaceStations(numToGenerate, ALL_LAGRANGE_POINTS, ASTEROID_BELTS_ALL)
     console.log('Adding ruins...')
     gs.system.ruins = generateRuins(gs.system, rng(8, 4))
     
@@ -193,6 +191,8 @@ async function startNewGame() {
             planet.c.relationships.set(p, RELATIONSHIP_TYPES.NEUTRAL)
         }
     }
+    const numToGenerate = Math.min(rng(12, 6), ALL_LAGRANGE_POINTS.length)
+    gs.system.spaceStations = generateSpaceStations(numToGenerate, ALL_LAGRANGE_POINTS, ASTEROID_BELTS_ALL)
 
     // Generate civilizations and settlements for space stations
     //presumed to be neutral, we'll dig into this more later

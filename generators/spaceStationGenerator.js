@@ -202,11 +202,12 @@ function generateSpaceStations(count = rng(5, 3), lagrangePoints = [], asteroidB
     
     // Set up relationships for all stations after they're created
     // Each station becomes a subject of a random major planet
-    const allBodies = [...SOLAR_SYSTEM.planets, ...SOLAR_SYSTEM.dwarfPlanets, ...SOLAR_SYSTEM.moons]
+    const allBodies = [...gs.system.planets, ...gs.system.dwarfPlanets, ...gs.system.moons]
     
     for (const station of stations) {
         // Pick a random planet to be this station's sovereign
-        const sovereign = SOLAR_SYSTEM.planets[Math.floor(Math.random() * SOLAR_SYSTEM.planets.length)]
+        const sovereign = rndMember(gs.system.planets)
+        console.log('sovereign picked for station:',sovereign)
         
         // Set up subject-sovereign relationship
         station.c.relationships.set(sovereign, RELATIONSHIP_TYPES.SUBJECT)

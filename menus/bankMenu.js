@@ -150,17 +150,19 @@ function showBankMenu(bank = new Bank()) {
     const accessDeniedReason = BuildingType.getAccessDeniedReason(planet, bank)
     const canAccess = accessDeniedReason === null
 
+    /** @type {ButtonData[]} */
     const baseButtons = [
-        ...(canAccess && isDocked && canWithdraw ? [['Withdraw', ()=>showWithdrawSlider()]] : []),
-        ...(canAccess && isDocked && canDeposit ? [['Deposit', ()=>showDepositSlider()]] : []),
-        ...(canAccess && isDocked && canBorrow ? [['Borrow', ()=>showBorrowSlider()]] : []),
+        ['Withdraw', ()=>showWithdrawSlider(), !canAccess || !isDocked || !canWithdraw],
+        ['Deposit', ()=>showDepositSlider(), !canAccess || !isDocked || !canDeposit],
+        ['Borrow', ()=>showBorrowSlider(), !canAccess || !isDocked || !canBorrow],
     ]
 
     function onSelectLoan(loan = new BankLoan()) {
         const canRepay = gs.credits > 0
+        /** @type {ButtonData[]} */
         const buttons = [
             ...baseButtons,
-            ...(canRepay ? [['Repay', ()=>showRepaySlider(loan)]] : []),
+            ['Repay', ()=>showRepaySlider(loan), !canRepay],
             ['Back', ()=>showPlanetMenu(planet)],
         ]
         refreshPanelButtons('bank_panel', buttons)

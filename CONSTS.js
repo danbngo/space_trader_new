@@ -120,7 +120,7 @@ const CIVILIZATION_CONVERT_CULTURE_PER_YEAR = 0.1 //each year a civilization wil
 const CIVILIZATION_CULTURE_DISAPPEAR_THRESHOLD = 0.0001
 
 
-const SIMULATE_FLEET_ACTIVITY_YEARS = 2
+const SIMULATE_FLEET_ACTIVITY_YEARS = 0.1
 const SIMULATE_HISTORY_NUM_YEARS = 1
 const CLOAK_REGEN_RATE = 30*4 //takes 1 week to fully cloak
 const NPC_FLEET_MAX_PURCHASE_CARGO_RATIO = 0.5 //max fraction of market cargo NPC fleets will buy when trading
