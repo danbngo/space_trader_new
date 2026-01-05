@@ -58,7 +58,6 @@ class WarCodeBreakNews extends News {
         // Both need high technology
         const ratingsValid = p.c.technology > CL.SLIGHTLY_HIGH && tp.c.technology > CL.SLIGHTLY_HIGH
         
-        const interferingEvent = News.hasAnyNewsBidirectional(p, tp, [NT.WAR_CODE_BREAK, NT.CYBER_WARFARE, NT.SPY_NETWORK])
-        return relationshipsValid && ratingsValid && !interferingEvent
+        return relationshipsValid && ratingsValid
     }
 }

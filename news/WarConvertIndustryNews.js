@@ -33,8 +33,6 @@ class WarConvertIndustryNews extends News {
         // Must be at war
         const atWar = Civilization.getPlanetsAtWarWith(p).length > 0
         
-        // Can't already be doing this
-        const interferingEvent = News.planetHasAnyNews(p, [NT.WAR_CONVERT_INDUSTRY])
-        return ratingsValid && atWar && !interferingEvent
+        return ratingsValid && atWar
     }
 }

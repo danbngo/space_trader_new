@@ -55,7 +55,7 @@ class TensionsNews extends News {
         const powerValid = powerRatio < CL.VERY_HIGH && powerRatio > CL.VERY_LOW
 
         const relationshipValid = Civilization.areNeutral(p, tp)
-        const interferingEvent = News.hasAnyNewsBidirectional(p, tp, [NT.TENSIONS, ...NT_COOPERATIVE])
+        const interferingEvent = News.hasAnyNewsBidirectional(p, tp, NT_COOPERATIVE)
         return (powerValid) && (governmentsValid) && relationshipValid && !interferingEvent
     }
 

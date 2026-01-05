@@ -10,18 +10,17 @@ class DepressionNews extends News {
 
         this.addPlanetEffect(
             {
-                inflation: CL.EXTREMELY_LOW,
                 reserves: CL.EXTREMELY_LOW,
                 economy: CL.EXTREMELY_LOW,
                 wealth: CL.EXTREMELY_LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.FOOD, CL.HIGH], [CARGO_TYPES.WATER, CL.HIGH], [CARGO_TYPES.MEDICINE, CL.HIGH]])),
             },
             {
-                inflation: CL.EXTREMELY_LOW,
+                reserves: CL.SLIGHTLY_LOW,
                 wealth: CL.LOW,
+                culture: CL.SLIGHTLY_HIGH
             },
             {
-                inflation: CL.EXTREMELY_LOW,
                 reserves: CL.LOW,
                 economy: CL.LOW,
                 wealth: CL.EXTREMELY_LOW,

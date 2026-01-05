@@ -27,7 +27,7 @@ class LudditismNews extends News {
                 technology: CL.VERY_LOW,
                 industry: CL.EXTREMELY_LOW,
                 commerce: CL.LOW,
-                inflation: CL.EXTREMELY_LOW,
+                reserves: CL.SLIGHTLY_LOW,
                 crime: CL.LOW,
                 corruption: CL.LOW,
                 army: CL.LOW,

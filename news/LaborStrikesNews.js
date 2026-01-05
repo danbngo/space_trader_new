@@ -39,10 +39,6 @@ class LaborStrikesNews extends News {
         const {planet: p} = this
         // Requires industry
         if (p.c.industry < CL.SLIGHTLY_LOW) return false;
-        
-        // Can't have multiple labor crises
-        if (News.planetHasAnyNews(p, [NT.LABOR_STRIKES, NT.AUTOMATION_CRISIS, NT.FORCED_LABOR])) return false;
-        
         return true;
     }
 }

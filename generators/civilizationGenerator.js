@@ -7,24 +7,22 @@ function generateCivilization(planet) {
     console.log('generating civ for planet:',planet)
     const governmentType = rndMember(GT_ALL.filter(gt => gt != GT.PUPPET_STATE))
     // Dwarf planets are small outposts with reduced stats (0.25x)
-    const multiplier = planet.objectType == OBJECT_TYPES.DWARF_PLANET ? 0.25 : planet.objectType == OBJECT_TYPES.SPACE_STATION ? 0.5 : 1.0
-    const technology = rng(4,1,false)/2 * 1
-    const education = rng(4,1,false)/2 * 1
-    const population = rng(8,1,false)/4 * multiplier
-    const territory = rng(8,1,false)/4 * multiplier
-    const army = rng(8,1,false)/4 * multiplier
-    const navy = rng(8,1,false)/4 * multiplier
-    const security = rng(8,1,false)/4 * multiplier
-    const economy = rng(8,1,false)/4 * multiplier
-    const industry = rng(8,1,false)/4 * multiplier
-    const culture = rng(8,1,false)/4 * 1
-    const prestige = rng(8,1,false)/4 * multiplier
-    const crime = rng(8,1,false)/4 * 1
-    const corruption = rng(8,1,false)/4 * 1
-    const wealth = rng(8,1,false)/4 * multiplier
-    const reserves = rng(8,1,false)/4 * multiplier
-    const inflation = rng(8,1,false)/4 * 1
-    const taxes = rng(8,1,false)/4 * 1
+    const technology = rng(4,1,false)/2
+    const education = rng(4,1,false)/2
+    const population = rng(8,1,false)/4
+    const territory = rng(8,1,false)/4
+    const army = rng(8,1,false)/4
+    const navy = rng(8,1,false)/4
+    const security = rng(8,1,false)/4
+    const economy = rng(8,1,false)/4
+    const industry = rng(8,1,false)/4
+    const culture = rng(8,1,false)/4
+    const prestige = rng(8,1,false)/4
+    const crime = rng(8,1,false)/4
+    const corruption = rng(8,1,false)/4
+    const wealth = rng(8,1,false)/4
+    const reserves = rng(8,1,false)/4
+    const taxes = rng(8,1,false)/4
 
     const cargoPriceMultipliers = new CountsMap()
     for (const ct of CARGO_TYPES_ALL) {
@@ -159,6 +157,6 @@ function generateCivilization(planet) {
     return new Civilization({
         planet, governmentType, cargoPriceMultipliers, skillPriceMultipliers, technology, education, territory, population,
          army, navy, industry, economy, security, culture, prestige, corruption, crime, policies,
-         wealth, reserves, inflation, taxes, races, religions, stateReligion, cultures
+         wealth, reserves, taxes, races, religions, stateReligion, cultures
     })
 }
