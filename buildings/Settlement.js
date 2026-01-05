@@ -54,7 +54,7 @@ class Settlement {
         this.casino = casino;
     }
     get buildings() {
-        return [this.academy, this.armory, this.bank, this.blackMarket, this.casino, this.courthouse, this.cyberSurgeon, this.geneticist, this.guild, this.market, this.outfitter, this.palace, this.shipyard, this.tavern, this.temple]
+        return [this.academy, this.bank, this.blackMarket, this.casino, this.courthouse, this.cyberSurgeon, this.geneticist, this.guild, this.market, this.palace, this.shipyard, this.tavern, this.temple]
     }
     get damagableBuildings() {
         return this.buildings.filter(b=>(b.exists && b.level > 0))

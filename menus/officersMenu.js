@@ -36,119 +36,6 @@ function createOfficersTable(officers = [], onSelectOfficer = (officer)=>{}) {
     }
     return createTable(rows, (rowIndex = 0)=>onSelectOfficer(officers[rowIndex]))
 }
-/**
- * Shows equipment management menu for a specific officer.
- * @param {Officer} officer - The officer to manage equipment for.
- */
-function showEquipmentMenu(officer) {
-    const reloadMenu = () => showEquipmentMenu(officer)
-
-    function equipItem(equipment) {
-        const slot = equipment.equipmentType.slot
-        // Unequip existing item in that slot
-        if (officer.equipment.has(slot)) {
-            const oldEquipment = officer.equipment.get(slot)
-            gs.fleet.equipment.push(oldEquipment)
-        }
-        // Equip new item
-        officer.equipment.set(slot, equipment)
-        safeRemove(gs.fleet.equipment, equipment)
-        reloadMenu()
-    }
-
-    function unequipItem(slot = EQUIPMENT_SLOTS.HEAD) {
-        if (officer.equipment.has(slot)) {
-            const equipment = officer.equipment.get(slot)
-            gs.fleet.equipment.push(equipment)
-            officer.equipment.delete(slot)
-        }
-        reloadMenu()
-    }
-
-    function showEquipModal(slot = EQUIPMENT_SLOTS.HEAD) {
-        const availableEquipment = gs.fleet.equipment.filter(e => e.equipmentType.slot === slot)
-        
-        if (availableEquipment.length === 0) {
-            showModal(`Equip ${slot.name}`, 
-                `No ${slot.name.toLowerCase()} equipment available.`,
-                [["Close", () => reloadMenu()]]
-            )
-            return
-        }
-
-        const rows = [['Name', 'Quality', 'Value']]
-        for (const equipment of availableEquipment) {
-            rows.push([
-                equipment.name,
-                statColorSpan(roundToPlaces(equipment.quality * 100, 1) + '%', equipment.quality),
-                equipment.value + 'CR',
-            ])
-        }
-
-        showModal(
-            `Equip ${slot.name} for ${officer.name}`,
-            createTable(rows, (rowIndex) => equipItem(availableEquipment[rowIndex])),
-            [["Cancel", () => reloadMenu()]]
-        )
-    }
-
-    const equipmentRows = []
-    
-    for (const slot of EQUIPMENT_SLOTS_ALL) {
-        const equipped = officer.equipment.get(slot)
-        const equippedText = equipped 
-            ? `${equipped.name} (${statColorSpan(roundToPlaces(equipped.quality * 100, 1) + '%', equipped.quality)})`
-            : colorSpan('(Empty)', COLORS.Gray)
-        
-        equipmentRows.push(ce({children: [
-            `<b>${slot.name}:</b> ${equippedText} `,
-            ce({
-                tag: 'button',
-                innerHTML: equipped ? 'Unequip' : 'Equip',
-                onClick: equipped ? () => unequipItem(slot) : () => showEquipModal(slot)
-            }),
-            '<br/>'
-        ]}))
-    }
-
-    // Create cyber implants section
-    const implantsRows = []
-    if (officer.implants && officer.implants.length > 0) {
-        for (const implant of officer.implants) {
-            implantsRows.push(ce({children: [
-                `${colorSpan(implant.implantType.name, implant.implantType.color)} (${roundToPlaces(implant.quality*100, 1)}%)`,
-                '<br/>'
-            ]}))
-        }
-    } else {
-        implantsRows.push(colorSpan('(None)', COLORS.Gray))
-    }
-
-    const equipmentColumn = ce({children: [
-        `<b>Equipment</b><br/>`,
-        `Available: ${gs.fleet.equipment.length} items<br/><br/>`,
-        ...equipmentRows,
-    ]})
-
-    const implantsColumn = ce({children: [
-        `<b>Cyber Implants</b><br/><br/>`,
-        ...implantsRows,
-    ]})
-
-    const content = ce({children: [
-        `<b>${officer.name}</b> (Level ${officer.level})<br/><br/>`,
-        createColumnLayout([equipmentColumn, implantsColumn]),
-    ]})
-
-    showModal(
-        `Equipment - ${officer.name}`,
-        content,
-        [
-            ["Back", () => showOfficersMenu()],
-            ["Close", () => closeModal()],
-        ]
-    );
-}
 
 /**
  * Displays the officers roster menu for managing hired officers.
@@ -180,7 +67,6 @@ function showOfficersMenu(officers = gs.fleet.officers.filter(o => o !== gs.capt
         const notEnoughPilots = gs.fleet.numPilots <= gs.fleet.ships.length
         /** @type {ButtonData[]} */
         const buttons = [
-            ['Equipment', () => showEquipmentMenu(officer)],
             ['Fire', ()=>showFireOfficerModal(officer), isCaptain || notEnoughPilots],
             ["Close", () => closeModal()],
         ]

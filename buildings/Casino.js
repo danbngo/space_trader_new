@@ -10,7 +10,7 @@ class Casino extends Building {
      */
     constructor(planet = new Planet(), moon = null) {
         super(planet, BUILDING_TYPES.CASINO, moon)
-        /** @type {Array<Ship|Equipment|CyberImplant>} */
+        /** @type {Array<Ship|CyberImplant>} */
         this.prizes = []
         /** @type {number} */
         this.currentPrizeIndex = 0
@@ -50,8 +50,6 @@ class Casino extends Building {
         
         let prizeValue = 0
         if (prize instanceof Ship) {
-            prizeValue = prize.value
-        } else if (prize instanceof Equipment) {
             prizeValue = prize.value
         } else if (prize instanceof CyberImplant) {
             prizeValue = prize.value

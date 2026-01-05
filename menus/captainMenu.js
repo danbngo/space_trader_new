@@ -58,6 +58,13 @@ function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
         }
     })
 
+    // Calculate retirement age and years remaining
+    const lifeExtensionPerks = captain.perks.filter(p => p.name.includes('Long Lived'))
+    const retirementAge = MAXIMUM_RETIREMENT_AGE * (1 + lifeExtensionPerks.length * 0.20)
+    const yearsToRetirement = retirementAge - captain.age
+    const retirementRatio = captain.age / retirementAge
+    const retirementColor = statColorSpan(yearsToRetirement, 1 - retirementRatio)
+    
     // Left column: Skills
     const leftColumn = ce({
         style: {display: 'flex', flexDirection: 'column', gap: '12px'},
@@ -65,6 +72,7 @@ function showCaptainSkillsMenu(captain = gs.captain, selectedSkill = null) {
             ce({children: ['<b><u>Skills</u></b>']}),
             skillTable,
             `Skill Points: ${colorSpan(String(skillPoints), skillPoints > 0 ? COLORS.Green : '')}`,
+            `Age: ${captain.age} | Retirement: ${retirementColor}`,
         ]
     })
 

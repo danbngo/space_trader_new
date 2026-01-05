@@ -70,6 +70,12 @@ const PERK_TYPES = {
     TECH_SAVVY_4: new PerkType('Tech Savvy IV', COLORS.LightGray, 'Increases effectiveness of equipment by 80%', 15),
     TECH_SAVVY_5: new PerkType('Tech Savvy V', COLORS.LightGray, 'Increases effectiveness of equipment by 100%', 20),
 
+    LIFE_EXTENSION_1: new PerkType('Long Lived I', COLORS.LightGray, 'Increases maximum age of retirement by 20%', 1),
+    LIFE_EXTENSION_2: new PerkType('Long Lived II', COLORS.LightGray, 'Increases maximum age of retirement by 40%', 5),
+    LIFE_EXTENSION_3: new PerkType('Long Lived III', COLORS.LightGray, 'Increases maximum age of retirement by 60%', 10),
+    LIFE_EXTENSION_4: new PerkType('Long Lived IV', COLORS.LightGray, 'Increases maximum age of retirement by 80%', 15),
+    LIFE_EXTENSION_5: new PerkType('Long Lived V', COLORS.LightGray, 'Increases maximum age of retirement by 100%', 20),
+
     HARDENED: new PerkType('Hardened', COLORS.Gray, 'Reduces damage taken from all sources by 10%.', 3),
     SHARPSHOOTER: new PerkType('Sharpshooter', COLORS.Red, 'Increases laser accuracy and damage by 15%.', 4),
     ACE_PILOT: new PerkType('Ace Pilot', COLORS.Blue, 'Increases ship maneuverability and evasion.', 5),

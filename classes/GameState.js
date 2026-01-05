@@ -45,15 +45,23 @@ class GameState {
     }
 
     /**
-     * Checks if the game has reached the end year and displays game over screen.
+     * Checks if the game has reached retirement age and displays game over screen.
      * @returns {boolean} True if game is over, false otherwise
      */
     checkGameOver() {
-        if (this.year < GAME_END_YEAR) return false
-        //game over - reached end of time period
+        // Calculate retirement age based on life extension perks
+        let retirementAge = MAXIMUM_RETIREMENT_AGE
+        if (this.captain && this.captain.perks) {
+            const lifeExtensionPerks = this.captain.perks.filter(p => p.name.includes('Long Lived'))
+            // Each life extension tier adds 20% to max retirement age
+            retirementAge = MAXIMUM_RETIREMENT_AGE * (1 + lifeExtensionPerks.length * 0.20)
+        }
+        
+        if (this.captain.age < retirementAge) return false
+        //game over - reached retirement age
         if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
         let msg = ''
-        msg += `Congratulations, you have reached the end of the year ${GAME_END_YEAR}!<br/>Thank you for playing!<br/>`
+        msg += `Your captain has reached retirement age (${Math.round(retirementAge)})!<br/>Thank you for playing!<br/>`
         const scoreDetails = this.calcPlayerScore()
         msg += `Your final score is ${scoreDetails.total} points.<br/>`
         msg += `Score breakdown:<br/>`

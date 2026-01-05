@@ -257,7 +257,7 @@ async function startNewGame() {
     }
 
     // Create captain
-    const captain = new Officer("Captain", rndMember(gs.system.planets), FACTION_TYPES_ALL[0], RACES_ALL[0], STARTING_CREDITS);
+    const captain = new Officer("Captain", rndMember(gs.system.planets), FACTION_TYPES_ALL[0], RACES_ALL[0], RELIGION_AGNOSTICISM, MINIMUM_OFFICER_AGE, STARTING_CREDITS);
     
     // Give captain all cyber implants and genetic modifications for testing (only in debug mode)
     if (DEBUG_MODE) {

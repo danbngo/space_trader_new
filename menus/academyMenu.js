@@ -43,6 +43,9 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0],
     const trainVerb = academy.isTavern ? 'Practice' : 'Train'
     const welcomeMsg = academy.isTavern ? 'Welcome to the tavern. Select a skill to practice:' : 'Welcome to the academy. Select a skill to train:'
     const hireMsg = academy.isTavern ? 'Available mercenaries for hire:' : 'Available officers for hire:'
+    
+    // Get sellable discoveries (discovered but not sold anomalies)
+    const sellableAnomalies = (gs.system.anomalies || []).filter(a => a.discoveredYear !== null && !a.sold)
 
     function upgradeSkill(skill = SKILLS_ALL[0]) {
         const cost = academy.calcSkillUpgradeCost(gs.captain, skill)
@@ -51,6 +54,50 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0],
             gs.credits -= cost
             gs.captain.skills.increment(skill, 1)
             reloadMenu(skill)
+        }
+    }
+    
+    function showSellDiscoveriesMenu() {
+        if (!academy.isTavern && sellableAnomalies.length > 0) {
+            const anomalyList = sellableAnomalies.map(a => {
+                const baseValue = 5000 + rng(10000, 2000)
+                const value = Math.round(baseValue * planet.c.education * planet.c.economy * (1 + planet.c.prestige))
+                return {anomaly: a, value}
+            })
+            
+            let message = `The academy is interested in purchasing your anomaly discoveries for research purposes:<br/><br/>`
+            message += `<b>Discoveries You Can Sell:</b><br/>`
+            for (const {anomaly, value} of anomalyList) {
+                message += `• ${anomaly.name} (${anomaly.anomalyType.name}): ${value} CR<br/>`
+            }
+            message += `<br/>Select which discoveries to sell:`
+            
+            const buttons = [
+                ...anomalyList.map(({anomaly, value}) => [
+                    `Sell ${anomaly.name} (${value} CR)`,
+                    () => {
+                        anomaly.sold = true
+                        gs.credits += value
+                        showModal(
+                            'Discovery Sold!',
+                            `You sold your discovery of ${anomaly.name} for ${value} CR!<br/><br/>` +
+                            `The academy thanks you for advancing scientific knowledge.`,
+                            [['Continue', () => reloadMenu(selectedSkill)]]
+                        )
+                    }
+                ]),
+                ['Back', () => reloadMenu(selectedSkill)]
+            ]
+            
+            showModal('Sell Discoveries', message, buttons)
+        } else if (academy.isTavern) {
+            showModal('Not Available', 'Taverns are not interested in purchasing scientific discoveries. Try an academy.', [
+                ['Continue', () => reloadMenu(selectedSkill)]
+            ])
+        } else {
+            showModal('No Discoveries', 'You have no unsold anomaly discoveries to sell.', [
+                ['Continue', () => reloadMenu(selectedSkill)]
+            ])
         }
     }
 
@@ -79,6 +126,7 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0],
         const buttons = [
             ...(isDocked ? [['Upgrade', () => showUpgradeConfirmation(skill), !canTrain]] : []),
             ['Hire Officers', () => reloadMenu(skill, true)],
+            ...(!academy.isTavern && sellableAnomalies.length > 0 ? [['Sell Discoveries', () => showSellDiscoveriesMenu()]] : []),
             ['Back', () => showPlanetMenu(planet)]
         ]
         refreshPanelButtons('academy_panel', buttons)
@@ -177,6 +225,7 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0],
         }),
         [
             [showHiring ? 'Train Skills' : 'Hire Officers', ()=>reloadMenu(selectedSkill, !showHiring)],
+            ...(!academy.isTavern && !showHiring && sellableAnomalies.length > 0 ? [['Sell Discoveries', () => showSellDiscoveriesMenu()]] : []),
             ['Back', ()=>showPlanetMenu(planet)]
         ],
         'academy_panel',

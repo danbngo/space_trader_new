@@ -22,17 +22,6 @@ class MinersEncounter extends NeutralsEncounter {
         }
     }
 
-    onVictory() {
-        // Randomize the mined asteroid's position after successful mining encounter
-        if (this.minedAsteroid && this.minedAsteroid.belt) {
-            this.minedAsteroid.belt.randomizeAsteroid(this.minedAsteroid)
-            console.log('⛏️ Randomized asteroid after mining')
-        }
-        
-        // Call parent implementation
-        super.onVictory()
-    }
-
     showNeutralMiners() {
         const rand = Math.random()
         

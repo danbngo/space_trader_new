@@ -2,13 +2,13 @@
  * Generates casino prizes with high quality.
  * @param {Planet} planet - The planet the casino is on.
  * @param {number} numPrizes - Number of prizes to generate.
- * @returns {Array<Ship|Equipment|CyberImplant>} Array of prizes.
+ * @returns {Array<Ship|CyberImplant>} Array of prizes.
  */
 function generateCasinoPrizes(planet = new Planet(), numPrizes = 5) {
     const prizes = []
     
     for (let i = 0; i < numPrizes; i++) {
-        const prizeType = rng(0, 2, true) // 0 = ship, 1 = equipment, 2 = cyber implant
+        const prizeType = rng(0, 1, true) // 0 = ship, 1 = cyber implant
         
         if (prizeType === 0) {
             // Generate a high-quality ship
@@ -21,12 +21,6 @@ function generateCasinoPrizes(planet = new Planet(), numPrizes = 5) {
             ship.engine = Math.round(ship.engine * qualityBoost)
             ship.cargoSpace = Math.round(ship.cargoSpace * qualityBoost)
             prizes.push(ship)
-        } else if (prizeType === 1) {
-            // Generate high-quality equipment
-            const equipment = equipmentGenerator(planet)
-            // Set quality very high (1.5 to 2.5)
-            equipment.quality = rng(1.5, 2.5, false)
-            prizes.push(equipment)
         } else {
             // Generate high-quality cyber implant
             const implantType = rndMember(CYBER_IMPLANT_TYPES_ALL)

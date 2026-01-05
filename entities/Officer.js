@@ -9,9 +9,11 @@ class Officer {
      * @param {Planet|null} planet - The planet the officer is from.
      * @param {FactionType} factionType - The faction type of the officer.
      * @param {Race} race - The race of the officer
+     * @param {Religion} religion - The religion of the officer
+     * @param {number} age - The age of the officer
      * @param {number} credits - The credits owned by the officer.
      */
-    constructor(name = "Unnamed", planet = new Planet(), factionType = FACTION_TYPES_ALL[0], race = RACES_ALL[0], credits = 0) {
+    constructor(name = "Unnamed", planet = new Planet(), factionType = FACTION_TYPES_ALL[0], race = RACES_ALL[0], religion = RELIGION_AGNOSTICISM, age = 25, credits = 0) {
         /** @type {string} */
         this.name = name;
         /** @type {Planet} */
@@ -20,6 +22,10 @@ class Officer {
         this.factionType = factionType;
         /** @type {Race} */
         this.race = race
+        /** @type {Religion} */
+        this.religion = religion
+        /** @type {number} */
+        this.age = age
         /** @type {number} */
         this.credits = credits;
         // Convert old number values to CountsMap if needed (for backwards compatibility)

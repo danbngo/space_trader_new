@@ -17,6 +17,8 @@ class Anomaly extends SpaceObject {
         this.anomalyType = anomalyType;
         /** @type {number|null} Year when this anomaly was discovered, null if undiscovered */
         this.discoveredYear = null;
+        /** @type {boolean} Whether this discovery has been sold to an academy */
+        this.sold = false;
     }
 
     /**

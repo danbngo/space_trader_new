@@ -24,36 +24,88 @@ function generateOfficer(planet = new Planet(), factionType = FACTION_TYPES_ALL[
     //console.log('generating officer for planet:',planet)
     const {civilization} = planet
     const {education} = civilization
-    const level = rng(10*education, 1)
     const credits = 0
-    const officer = new Officer(generateOfficerName(planet), planet, factionType, credits)
     
     //console.log('determining race..')
-    // Assign random race
-    officer.race = rndMember(RACES_ALL)
+    // Assign race based on planet's racial distribution
+    let race = null
+    if (civilization.races && civilization.races.counts.size > 0) {
+        const raceEntries = Array.from(civilization.races.counts.entries())
+        const totalWeight = raceEntries.reduce((sum, [_, weight]) => sum + weight, 0)
+        const roll = Math.random() * totalWeight
+        let cumulative = 0
+        for (const [raceCandidate, weight] of raceEntries) {
+            cumulative += weight
+            if (roll <= cumulative) {
+                race = raceCandidate
+                break
+            }
+        }
+    }
+    
+    // Default to random race if no race distribution exists
+    if (!race) {
+        race = rndMember(RACES_ALL)
+    }
+    
+    // Calculate level based on education and race life extension
+    // Races with life extension perks can reach higher levels (androids live longer)
+    let lifeExtensionMultiplier = 1.0
+    if (race && race.automaticPerks) {
+        // Count how many LIFE_EXTENSION perks this race has
+        const lifeExtensionPerks = race.automaticPerks.filter(p => p.name.includes('Long Lived'))
+        if (lifeExtensionPerks.length > 0) {
+            // Each life extension tier adds 20% to max age, which means 20% more potential levels
+            // 5 tiers = 100% increase = 2x the levels
+            lifeExtensionMultiplier = 1.0 + (lifeExtensionPerks.length * 0.20)
+        }
+    }
+    const baseLevel = Math.round(rng(10*education*lifeExtensionMultiplier, 1))
     
     //console.log('determining religion..')
     // If faction is religious, assign state religion; otherwise use planet distribution
+    let religion = null
     if (factionType.religious && civilization.stateReligion) {
-        officer.religion = civilization.stateReligion
+        religion = civilization.stateReligion
     } else if (civilization.religions && civilization.religions.counts.size > 0) {
         const religionEntries = Array.from(civilization.religions.counts.entries())
         const totalWeight = religionEntries.reduce((sum, [_, weight]) => sum + weight, 0)
         const roll = Math.random() * totalWeight
         let cumulative = 0
-        for (const [religion, weight] of religionEntries) {
+        for (const [religionCandidate, weight] of religionEntries) {
             cumulative += weight
             if (roll <= cumulative) {
-                officer.religion = religion
+                religion = religionCandidate
                 break
             }
         }
     }
     
     // Default to AGNOSTICISM if no religion was assigned
-    if (!officer.religion) {
-        officer.religion = RELIGION_AGNOSTICISM
+    if (!religion) {
+        religion = RELIGION_AGNOSTICISM
     }
+    
+    // Calculate age based on level with proper scaling
+    // At age 20: level ~1, at age 100 (base retirement): level ~2*AVERAGE_OFFICER_LEVEL (20)
+    // At age 200 (with max life extension): level ~4*AVERAGE_OFFICER_LEVEL (40)
+    //console.log('rolling for age..')
+    const baseMaxAge = MAXIMUM_RETIREMENT_AGE * lifeExtensionMultiplier
+    const yearsOfExperience = (baseLevel / (2 * AVERAGE_OFFICER_LEVEL)) * (MAXIMUM_RETIREMENT_AGE - MINIMUM_OFFICER_AGE)
+    const age = Math.round(MINIMUM_OFFICER_AGE + yearsOfExperience)
+    
+    // Clamp age to reasonable bounds (minimum age to max retirement age with life extension)
+    const clampedAge = Math.max(MINIMUM_OFFICER_AGE, Math.min(age, baseMaxAge))
+    
+    // Recalculate level based on clamped age to ensure consistency
+    // Level scaling: at base retirement (80 years exp) = 2x AVERAGE, at 180 years exp = 4x AVERAGE
+    const actualYearsOfExperience = clampedAge - MINIMUM_OFFICER_AGE
+    const baseYearsToRetirement = MAXIMUM_RETIREMENT_AGE - MINIMUM_OFFICER_AGE // 80 years
+    const levelFromAge = 1 + Math.round((actualYearsOfExperience / baseYearsToRetirement) * (2 * AVERAGE_OFFICER_LEVEL - 1) * education)
+    const level = Math.max(1, levelFromAge)
+    
+    // Create officer with determined race, religion, and age
+    const officer = new Officer(generateOfficerName(planet), planet, factionType, race, religion, clampedAge, credits)
     
     //console.log('applying levelups..')
     // Level up to target level
@@ -63,14 +115,6 @@ function generateOfficer(planet = new Planet(), factionType = FACTION_TYPES_ALL[
     //console.log('improving skills..')
     officer.skillPoints = Math.max(0, officer.skillPoints*rng(2,0.5,false))
     officer.autoImproveSkills()
-    
-    // Calculate age based on level (21-55 years old)
-    // Lower levels = younger, higher levels = older
-    //console.log('rolling for age..')
-    const minAge = 21
-    const maxAge = 55
-    const levelFactor = Math.min(officer.level / 10, 1) // Normalize level to 0-1 range
-    officer.age = Math.round(minAge + (maxAge - minAge) * levelFactor)
     
     // Assign CITIZEN rank to planet of origin
     //console.log('assigning citizen rank to planet of origin..')

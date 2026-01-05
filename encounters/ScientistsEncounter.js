@@ -46,6 +46,7 @@ class ScientistsEncounter extends NeutralsEncounter {
             const anomaly = rndMember(undiscoveredAnomalies.filter(a => !sharedAnomalies.includes(a)))
             if (anomaly) {
                 anomaly.discoveredYear = gs.year
+                anomaly.sold = true // Mark as sold so player can't sell scientist-given data
                 sharedAnomalies.push(anomaly)
             }
         }

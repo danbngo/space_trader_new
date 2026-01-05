@@ -51,9 +51,7 @@ function startMining() {
     
     // Generate the mining encounter
     const encounter = generateRandomEncounter(encounterType, null)
-    
-    // Store reference to the asteroid being mined so we can randomize it after the encounter
-    encounter.minedAsteroid = asteroid
+    belt.randomizeAsteroid(asteroid)
     
     // Start the encounter
     encounter.startEncounter()
