@@ -681,9 +681,9 @@ class Encounter {
                 
                 if (combatAdvantage * Math.random() > 1.5) {
                     // Try to show bribe modal if this encounter type supports it
-                    // @ts-ignore - showNeutralsBribePlayerModal exists on NeutralsEncounter subclasses
-                    if (typeof this.showNeutralsBribePlayerModal === 'function') {
-                        this.showNeutralsBribePlayerModal(this.fleet.captain.credits)
+                    // Note: showNeutralsBribePlayerModal exists on NeutralsEncounter subclasses
+                    if (typeof this['showNeutralsBribePlayerModal'] === 'function') {
+                        this['showNeutralsBribePlayerModal'](this.fleet.captain.credits)
                     } else {
                         // No bribe modal available, just start combat
                         this.startCombat(true)
