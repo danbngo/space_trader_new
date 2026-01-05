@@ -13,7 +13,6 @@ class ProxyWarNews extends News {
                 taxes: CL.HIGH,
                 reserves: CL.SLIGHTLY_LOW,
                 wealth: CL.SLIGHTLY_LOW,
-                inflation: CL.SLIGHTLY_LOW,
                 prestige: CL.SLIGHTLY_HIGH,
                 cargoPriceMultipliers: new CountsMap(new Map([
                     [CARGO_TYPES.WEAPONS, CL.VERY_HIGH],
@@ -32,7 +31,6 @@ class ProxyWarNews extends News {
                 reserves: CL.SLIGHTLY_HIGH,
                 wealth: CL.SLIGHTLY_HIGH,
                 taxes: CL.LOW,
-                inflation: CL.LOW,
                 prestige: CL.SLIGHTLY_HIGH
             },
             {

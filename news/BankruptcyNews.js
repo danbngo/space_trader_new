@@ -12,20 +12,20 @@ class BankruptcyNews extends News {
             {
                 wealth: CL.SLIGHTLY_LOW,
                 economy: CL.SLIGHTLY_LOW,
-                inflation: CL.SLIGHTLY_HIGH,
+                reserves: CL.SLIGHTLY_LOW,
                 taxes: CL.SLIGHTLY_HIGH,
             },
             {
                 wealth: CL.HIGH,
                 economy: CL.HIGH,
-                inflation: CL.LOW,
+                reserves: CL.HIGH,
                 taxes: CL.LOW,
                 prestige: CL.LOW,
             },
             {
                 wealth: CL.HIGH,
                 economy: CL.HIGH,
-                inflation: CL.LOW,
+                reserves: CL.HIGH,
                 taxes: CL.LOW,
                 prestige: CL.EXTREMELY_LOW,
             }
@@ -49,8 +49,8 @@ class BankruptcyNews extends News {
 
     isValid() {
         const {planet: p, targetPlanet: tp} = this
-        // More likely with very low wealth or very high inflation
-        const ratingsValid = p.c.wealth < CL.VERY_LOW || p.c.inflation > CL.VERY_HIGH
+        // More likely with very low wealth or economy
+        const ratingsValid = p.c.wealth < CL.VERY_LOW || p.c.economy > CL.VERY_HIGH
         const relationshipsValid = Civilization.areAlliesOrNeutral(tp, p)
         const interferingEvent = News.planetHasAnyNews(p, NT_GOVERNANCE_PREVENTING) || News.planetHasAnyNewsTargeting(p, NT_GOVERNANCE_PREVENTING)
         || News.hasAnyNewsBidirectional(p, tp, NT_COOPERATION_PREVENTING) 

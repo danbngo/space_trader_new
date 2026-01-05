@@ -14,14 +14,14 @@ class MinorJointStockCompanyNews extends News {
                 prestige: CL.SLIGHTLY_HIGH,
                 territory: CL.SLIGHTLY_HIGH,
                 taxes: CL.LOW,
-                inflation: CL.LOW,
+                reserves: CL.HIGH,
             },
             {
                 economy: CL.HIGH, // Reduced from VERY_HIGH
                 prestige: CL.SLIGHTLY_HIGH, // Reduced from HIGH
                 territory: CL.SLIGHTLY_HIGH, // Reduced from HIGH
                 taxes: CL.LOW,
-                inflation: CL.LOW,
+                reserves: CL.HIGH,
             },
         )
 
@@ -31,7 +31,7 @@ class MinorJointStockCompanyNews extends News {
                 prestige: CL.SLIGHTLY_LOW,
                 territory: CL.SLIGHTLY_LOW,
                 taxes: CL.LOW,
-                inflation: CL.LOW,
+                reserves: CL.HIGH,
                 newGovernmentType: GT.CORPORATISM,
             },
             {
@@ -39,7 +39,7 @@ class MinorJointStockCompanyNews extends News {
                 prestige: CL.LOW,
                 territory: CL.LOW,
                 taxes: CL.LOW,
-                inflation: CL.LOW,
+                reserves: CL.HIGH,
             },
         )
 

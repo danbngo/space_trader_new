@@ -72,8 +72,8 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0],
             }
             message += `<br/>Select which discoveries to sell:`
             
-            const buttons = [
-                ...anomalyList.map(({anomaly, value}) => [
+            /** @type {ButtonData[]} */
+            const buttons = anomalyList.map(({anomaly, value}) => [
                     `Sell ${anomaly.name} (${value} CR)`,
                     () => {
                         anomaly.sold = true
@@ -85,9 +85,8 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0],
                             [['Continue', () => reloadMenu(selectedSkill)]]
                         )
                     }
-                ]),
-                ['Back', () => reloadMenu(selectedSkill)]
-            ]
+            ])
+            buttons.push(['Back', () => reloadMenu(selectedSkill)])
             
             showModal('Sell Discoveries', message, buttons)
         } else if (academy.isTavern) {
@@ -123,12 +122,12 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0],
         const canAfford = gs.credits >= cost && isDocked
         const canTrain = canUpgrade && canAfford
         
+        /** @type {ButtonData[]} */
         const buttons = [
-            ...(isDocked ? [['Upgrade', () => showUpgradeConfirmation(skill), !canTrain]] : []),
-            ['Hire Officers', () => reloadMenu(skill, true)],
-            ...(!academy.isTavern && sellableAnomalies.length > 0 ? [['Sell Discoveries', () => showSellDiscoveriesMenu()]] : []),
-            ['Back', () => showPlanetMenu(planet)]
+            ['Upgrade', () => showUpgradeConfirmation(skill), !canTrain || !isDocked]
         ]
+        if (!academy.isTavern) buttons.push(['Sell Discoveries', () => showSellDiscoveriesMenu(), sellableAnomalies.length > 0])
+        buttons.push(['Back', () => showPlanetMenu(planet)])
         refreshPanelButtons('academy_panel', buttons)
     }
 
@@ -163,8 +162,9 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0],
     function onSelectOfficer(officer) {
         const hirePrice = academy.calcHirePrice(officer)
         const canHire = isDocked && gs.credits >= hirePrice && gs.fleet.officers.length < gs.captain.maxSubordinates
+        /** @type {ButtonData[]} */
         const buttons = [
-            ...(canHire ? [['Hire', ()=>showHireOfficerModal(officer)]] : []),
+            ['Hire', ()=>showHireOfficerModal(officer), canHire],
             ['Train Skills', () => reloadMenu(selectedSkill, false)],
             ['Back', () => showPlanetMenu(planet)],
         ]
@@ -186,7 +186,7 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0],
             const statRatio = 1 / totalMultiplier
             
             return [
-                skill,
+                skill.name,
                 currentLevel,
                 colorSpan(canUpgrade ? 'Yes' : 'No', canUpgrade ? COLORS.Green : COLORS.Red),
                 ''+statColorSpan(cost, statRatio) + ' CR'
@@ -212,6 +212,15 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0],
         ]
     })
 
+    /** @type {ButtonData[]} */
+    const buttons = [
+            [showHiring ? 'Train Skills' : 'Hire Officers', ()=>reloadMenu(selectedSkill, !showHiring)],
+    ]
+    if (!academy.isTavern) buttons.push(['Sell Discoveries', () => showSellDiscoveriesMenu(), (!showHiring && sellableAnomalies.length > 0)])
+    buttons.push(
+            ['Back', ()=>showPlanetMenu(planet)]
+    )
+
     showPlanetModal(
         planet,
         `${coloredName(planet)} - ${buildingName}`,
@@ -221,9 +230,7 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0],
             ]
         }),
         [
-            [showHiring ? 'Train Skills' : 'Hire Officers', ()=>reloadMenu(selectedSkill, !showHiring)],
-            ...(!academy.isTavern && !showHiring && sellableAnomalies.length > 0 ? [['Sell Discoveries', () => showSellDiscoveriesMenu()]] : []),
-            ['Back', ()=>showPlanetMenu(planet)]
+
         ],
         'academy_panel',
         (nextPlanet) => {

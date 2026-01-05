@@ -105,6 +105,14 @@ function showMarketMenu(market = new Market()) {
         const canBuy = canAccess && isDocked && buyableAmount > 0
         const canSell = canAccess && isDocked && sellableAmount > 0
         
+        // Update the price info for the selected cargo type
+        const priceInfoElement = document.querySelector('#market-price-info');
+        if (priceInfoElement) {
+            const newPriceInfo = createMarketCargoPriceInfo(market, blackMarket ? 'Black Market' : 'Market', ct);
+            priceInfoElement.replaceWith(newPriceInfo);
+            newPriceInfo.id = 'market-price-info';
+        }
+        
         /** @type {ButtonData[]} */
         const buttons = [
             ['Buy', ()=>showBuyCargoSlider(ct, buyableAmount, buyPrice), !canBuy],
@@ -114,12 +122,19 @@ function showMarketMenu(market = new Market()) {
         refreshPanelButtons('market_panel', buttons)
     }
 
+    const initialCargoType = (blackMarket ? CARGO_TYPES_ALL.filter(ct=>ct.illegal) : CARGO_TYPES_ALL.filter(ct=>(!ct.illegal)))[0];
+    const marketPriceInfo = createMarketCargoPriceInfo(market, blackMarket ? 'Black Market' : 'Market', initialCargoType);
+    marketPriceInfo.id = 'market-price-info';
+
     let infoContainer = ce({
         children: [
             accessDeniedReason ? colorSpan(accessDeniedReason, COLORS.Orange) + '<br/>' : '',
+            isDocked 
+                ? (blackMarket ? 'You slip into the shadows of the black market.<br/>' : 'Welcome to the market.<br/>') 
+                : colorSpan(`You must dock to use the ${blackMarket ? 'black market' : 'market'}.`, COLORS.Yellow) + '<br/>',
             createMarketCargoTable(blackMarket, fleet.cargo, market.cargo, buyPrices, sellPrices, onSelectCargoType),
             `Your Cargo Space: ${fleet.cargo.total}/${fleet.totalCargoSpace} | Your Credits: ${gs.credits}`,
-            createBuildingPriceInfo(market, blackMarket ? 'Black Market' : 'Market', {showBuyPrice: true, showSellPrice: true}),
+            marketPriceInfo,
         ]
     })
 

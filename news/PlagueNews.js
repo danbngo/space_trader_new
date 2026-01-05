@@ -22,7 +22,6 @@ class PlagueNews extends News {
                 army: CL.SLIGHTLY_LOW,
                 taxes: CL.HIGH,
                 reserves: CL.LOW,
-                inflation: CL.HIGH,
             },
             {
                 population: CL.EXTREMELY_LOW,

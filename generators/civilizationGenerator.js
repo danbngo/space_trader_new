@@ -119,10 +119,10 @@ function generateCivilization(planet) {
         // Add agnostic/non-religious population to the mix (no RELIGION_AGNOSTICISM or RELIGION_ATHEISM constants)
         // Just leave some percentage as non-religious by not adding up to 100%
         
-        // Normalize to percentages (0-100)
+        // Normalize to ratios (0-1, not percentages)
         const totalReligionWeight = religionWeights.reduce((sum, w) => sum + w, 0)
         for (let i = 0; i < selectedReligions.length; i++) {
-            religions.setAmount(selectedReligions[i], (religionWeights[i] / totalReligionWeight) * 100)
+            religions.setAmount(selectedReligions[i], religionWeights[i] / totalReligionWeight)
         }
     }
 

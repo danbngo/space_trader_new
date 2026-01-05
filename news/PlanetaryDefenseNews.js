@@ -12,7 +12,7 @@ class PlanetaryDefenseNews extends News {
             {
                 taxes: CL.VERY_HIGH,
                 wealth: CL.SLIGHTLY_LOW,
-                inflation: CL.SLIGHTLY_HIGH,
+                reserves: CL.SLIGHTLY_LOW,
                 navy: CL.SLIGHTLY_HIGH,
                 security: CL.SLIGHTLY_HIGH,
                 cargoPriceMultipliers: new CountsMap(new Map([

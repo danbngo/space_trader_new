@@ -28,7 +28,6 @@ class ConstructionNews extends News {
             {
                 reserves: CL.LOW,
                 taxes: CL.HIGH,
-                inflation: CL.SLIGHTLY_HIGH,
             }
         )
     }

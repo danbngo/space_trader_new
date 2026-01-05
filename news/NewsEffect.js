@@ -49,7 +49,6 @@ class NewsEffect extends Civilization {
         crime = 1,
         wealth = 1,
         reserves = 1,
-        inflation = 1,
         taxes = 1,
         religions = new CountsMap()
 
@@ -74,7 +73,6 @@ class NewsEffect extends Civilization {
             crime,
             wealth,
             reserves,
-            inflation,  
             taxes,
             religions
         });
@@ -195,7 +193,7 @@ class NewsEffect extends Civilization {
         
         if (planet && planet.civilization) {
             const {civilization} = planet
-            const {reserves, army, navy, crime, corruption, territory, population, culture, inflation, security, economy, industry, wealth, technology, education, prestige, cargoPriceMultipliers, } = this
+            const {reserves, army, navy, crime, corruption, territory, population, culture, security, economy, industry, wealth, technology, education, prestige, cargoPriceMultipliers, } = this
             if (governmentType) msg += `- GovernmentType: ${coloredName(civilization.governmentType)} ➜ ${coloredName(governmentType)}.<br/>`
             if (relationsReset) msg += `- All relationships reset to neutral.<br/>`
             if (forcePeace) msg += `- All hostilities towards this planet have ceased.<br/>`
@@ -227,7 +225,6 @@ class NewsEffect extends Civilization {
             if (education !== 1.0) msg += dscr('- Education', civilization.education, civilization.education*education)
             if (wealth !== 1.0) msg += dscr('- Wealth', civilization.wealth, civilization.wealth*wealth)
             if (reserves !== 1.0) msg += dscr('- Reserves', civilization.reserves, civilization.reserves*reserves)
-            if (inflation !== 1.0) msg += dscr('- Inflation', civilization.inflation, civilization.inflation*inflation, true)
             if (army !== 1.0) msg += dscr('- Army', civilization.army, civilization.army*army)
             if (navy !== 1.0) msg += dscr('- Navy', civilization.navy, civilization.navy*navy)
             if (crime !== 1.0) msg += dscr('- Crime', civilization.crime, civilization.crime*crime, true)

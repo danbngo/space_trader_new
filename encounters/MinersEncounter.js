@@ -58,7 +58,7 @@ class MinersEncounter extends NeutralsEncounter {
         const cargoType = rndMember(availableCargo)
         const amount = Math.min(this.fleet.cargo.getAmount(cargoType), rng(20, 5))
         const basePrice = cargoType.value * amount
-        const price = Math.round(basePrice * 0.8 * this.planet.c.inflation) // 80% of base price
+        const price = Math.round(basePrice * 0.8 * this.planet.c.inflationRate) // 80% of base price
         const canAfford = gs.credits >= price
         const hasSpace = gs.fleet.availableCargoSpace >= amount
         
@@ -107,7 +107,7 @@ class MinersEncounter extends NeutralsEncounter {
         const supplyType = rndMember(availableSupplies)
         const amount = Math.min(gs.fleet.cargo.getAmount(supplyType), rng(10, 3))
         const basePrice = supplyType.value * amount
-        const price = Math.round(basePrice * 1.2 * this.planet.c.inflation) // 120% of base price (premium)
+        const price = Math.round(basePrice * 1.2 * this.planet.c.inflationRate) // 120% of base price (premium)
         const hasEnough = gs.fleet.cargo.getAmount(supplyType) >= amount
         
         let message = `The ${coloredName(this.fleet)} hail you:<br/><br/>`

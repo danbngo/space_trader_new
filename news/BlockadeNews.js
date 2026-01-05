@@ -25,13 +25,11 @@ class BlockadeNews extends News {
             {
                 prestige: CL.SLIGHTLY_LOW,
                 economy: CL.SLIGHTLY_LOW,
-                inflation: CL.VERY_HIGH,
-                reserves: CL.SLIGHTLY_LOW,
+                reserves: CL.VERY_LOW,
             },
             {
                 prestige: CL.SLIGHTLY_LOW,
                 economy: CL.LOW,
-                inflation: CL.HIGH,
                 reserves: CL.LOW,
             },
             {

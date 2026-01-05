@@ -15,7 +15,6 @@ class ForeignAidNews extends News {
                 reserves: CL.HIGH,
                 wealth: CL.HIGH,
                 prestige: CL.SLIGHTLY_LOW,
-                inflation: CL.HIGH,
             },
             {
                 buildingsImproved,
@@ -25,13 +24,11 @@ class ForeignAidNews extends News {
                 industry: CL.HIGH,
                 education: CL.HIGH,
                 prestige: CL.SLIGHTLY_LOW,
-                inflation: CL.HIGH,
             },
             {
                 reserves: CL.SLIGHTLY_HIGH,
                 wealth: CL.SLIGHTLY_HIGH,
                 prestige: CL.LOW,
-                inflation: CL.HIGH,
             }
         )
 

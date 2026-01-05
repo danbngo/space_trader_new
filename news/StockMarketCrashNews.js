@@ -17,7 +17,7 @@ class StockMarketCrashNews extends News {
                 economy: CL.SLIGHTLY_HIGH,
                 wealth: CL.SLIGHTLY_HIGH,
                 taxes: CL.LOW,
-                inflation: CL.LOW
+                reserves: CL.LOW
             }
         )
     }

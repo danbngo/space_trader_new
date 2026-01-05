@@ -52,7 +52,7 @@ class PolicyChangeNews extends News {
 
         if (newPolicy.flavor === NF.ECONOMY) {
             baseParams.economy = CL.SLIGHTLY_LOW
-            baseParams.inflation = CL.SLIGHTLY_HIGH
+            baseParams.taxes = CL.SLIGHTLY_LOW
         } else if (newPolicy.flavor === NF.LABOR) {
             baseParams.industry = CL.SLIGHTLY_LOW
             baseParams.reserves = CL.SLIGHTLY_LOW

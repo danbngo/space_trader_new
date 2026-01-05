@@ -75,10 +75,11 @@ function showCourthouseMenu(courthouse = new Courthouse()) {
     const upgradePrice = courthouse.calcUpgradeRankPrice(gs.captain)
     const canUpgradeRank = upgradePrice !== null && planetReputation > 0 && planetBounty === 0 && gs.credits >= upgradePrice
 
+    /** @type {ButtonData[]} */
     const baseButtons = [
-        ...(isDocked && canPayBounty ? [['Pay Bounty', ()=>showPayBountySlider()]] : []),
-        ...(isDocked && planetBounty > 0 ? [['Serve Jail Time', ()=>showServeJailTimeModal(Math.ceil(planetBounty*JAIL_DAYS_PER_1000CR_FINE/1000))]] : []),
-        ...(isDocked && canUpgradeRank ? [['Upgrade Rank', ()=>showUpgradeRankModal()]] : []),
+        ['Pay Bounty', ()=>showPayBountySlider(), !isDocked || !canPayBounty],
+        ['Serve Jail Time', ()=>showServeJailTimeModal(Math.ceil(planetBounty*JAIL_DAYS_PER_1000CR_FINE/1000)), !isDocked || planetBounty <= 0],
+        ['Upgrade Rank', ()=>showUpgradeRankModal(), !isDocked || !canUpgradeRank],
     ]
 
     const nextRank = RANK_TYPES_ALL.find(r => r.level === currentRank.level + 1)
@@ -96,6 +97,12 @@ function showCourthouseMenu(courthouse = new Courthouse()) {
         ]
     })
 
+    /** @type {ButtonData[]} */
+    const buttons = [
+            ...baseButtons,
+            ['Back', ()=>showPlanetMenu(planet)]
+    ]
+
     showPlanetModal(
         planet,
         `${coloredName(planet)} - Courthouse`,
@@ -105,10 +112,7 @@ function showCourthouseMenu(courthouse = new Courthouse()) {
                 infoContainer,
             ]
         }),
-        [
-            ...baseButtons,
-            ['Back', ()=>showPlanetMenu(planet)]
-        ],
+        buttons,
         'courthouse_panel',
         (nextPlanet) => nextPlanet.settlement?.courthouse ? showCourthouseMenu(nextPlanet.settlement.courthouse) : showPlanetMenu(nextPlanet)
     );

@@ -12,14 +12,14 @@ class MinorResourceConcessionTreatyNews extends News {
             {
                 wealth: CL.HIGH,
                 economy: CL.SLIGHTLY_HIGH,
-                inflation: CL.LOW,
+                reserves: CL.SLIGHTLY_HIGH,
                 taxes: CL.LOW,
             },
             {
                 wealth: CL.HIGH,
                 economy: CL.HIGH,
-                inflation: CL.LOW,
                 taxes: CL.LOW,
+                reserves: CL.HIGH
             },
         )
 
@@ -28,14 +28,14 @@ class MinorResourceConcessionTreatyNews extends News {
                 wealth: CL.SLIGHTLY_HIGH,
                 economy: CL.SLIGHTLY_HIGH,
                 industry: CL.SLIGHTLY_LOW,
-                inflation: CL.LOW,
+                reserves: CL.SLIGHTLY_HIGH,
                 taxes: CL.LOW,
             },
             {
                 wealth: CL.HIGH,
                 economy: CL.HIGH,
                 industry: CL.LOW,
-                inflation: CL.LOW,
+                reserves: CL.LOW,
                 taxes: CL.LOW,
             },
         )

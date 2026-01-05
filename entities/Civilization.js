@@ -21,7 +21,6 @@
  * @property {number} [crime] - Higher crime means more crime events and black market activity.
  * @property {number} [wealth] - Overall wealth of the civilization.
  * @property {number} [reserves] - Higher reserves means more goods in markets, but lower prices
- * @property {number} [inflation] - Higher costs for everything but also higher sales prices in market
  * @property {number} [taxes] - Tax rate applied to most transactions (0 to MAX_TAX_RATE).
  * @property {CountsMap} [religions] - Religious representation on this planet (Religion -> adherent population ratio).
  * @property {CountsMap} [races] - Racial demographics of this civilization (Race -> population proportion).
@@ -41,7 +40,7 @@ class Civilization {
         planet = null, governmentType = null, cargoPriceMultipliers = new CountsMap(), skillPriceMultipliers = new CountsMap(),
         technology = 1.0, education = 1.0, territory = 1, population = 1, industry = 1, cultures = new CountsMap(),
         economy = 1, security = 1, culture = 1, prestige = 1, policies = new Policies(),
-        navy = 1, army = 1, corruption = 1, crime = 1, wealth = 1, reserves = 1, inflation = 1, taxes = 1,
+        navy = 1, army = 1, corruption = 1, crime = 1, wealth = 1, reserves = 1, taxes = 1,
         religions = new CountsMap(), races = new CountsMap(), stateReligion = null
     } = {}) {
         /** @type {Planet} */
@@ -95,20 +94,42 @@ class Civilization {
         /** @type {number} */
         this.reserves = reserves; //more goods in markets
         /** @type {number} */
-        this.inflation = inflation; //higher prices everywhere
-        /** @type {number} */
         this.taxes = taxes; //tax rate applied to most transactions (0 to MAX_TAX_RATE)
+    }
+
+    /**
+     * Dynamic inflation based on supply (reserves, industry) vs demand (population, economy).
+     * Low reserves = high inflation. Strong economy with weak industry = high inflation.
+     * @returns {number} Inflation multiplier (typically 0.8 - 2.0)
+     */
+    get inflation() {
+        // Supply: ability to produce goods (reserves * industry)
+        const supply = (this.reserves * this.industry) / 2;
+        // Demand: consumption pressure (population * economy)
+        const demand = (this.population * this.economy) / 2;
+        
+        // Base inflation even with perfect balance
+        const baseInflation = 0.8;
+        // Inflation pressure from demand/supply ratio
+        const inflationPressure = demand / Math.max(supply, 0.1);
+        
+        // Cap between 0.8 and 3.0
+        return Math.max(baseInflation, Math.min(inflationPressure, 3.0));
     }
 
     get score() {
         const positives = (this.technology + this.education + this.economy + this.industry + this.security + this.culture + this.prestige
             + this.army + this.navy + this.wealth + this.reserves) / 11
-        const negatives = (this.corruption + this.crime + this.inflation + this.taxes) / 4
+        const negatives = (this.corruption + this.crime + this.taxes) / 3
         return positives/negatives
     }
 
     get taxRate() {
         return this.taxes * AVERAGE_TAX_RATE //this.taxes ranges from 0-2
+    }
+
+    get inflationRate() {
+        return this.inflation * AVERAGE_INFLATION_RATE
     }
 
     get military() {

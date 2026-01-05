@@ -256,7 +256,7 @@ function assessFleets() {
         
         // Planet affiliation
         const planetName = fleet.planet?.name || 'No Planet'
-        if (planetName === 'No Planet') {
+        if (planetName === 'No Planet' && fleet !== gs.fleet) {
             console.log('WARNING FOUND A FLEET WITH NO HOME PLANET:',fleet)
             throw new Error('stopping here')
         }

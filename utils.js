@@ -368,32 +368,32 @@ function rndRound(fraction = 0.5) {
  * @param {Building} building - The building to create info for.
  * @param {string} buildingName - The display name of the building (e.g., "Market", "Shipyard").
  * @param {Object} options - Optional parameters.
- * @param {boolean} options.showBuyPrice - Whether to show buy price (default: true).
- * @param {boolean} options.showSellPrice - Whether to show sell price (default: false).
+ * @param {boolean} [options.showBuyPrice] - Whether to show buy price (default: true).
+ * @param {boolean} [options.showSellPrice] - Whether to show sell price (default: false).
  * @returns {HTMLElement} The info container element.
  */
-function createBuildingPriceInfo(building = new Building(), buildingName = "Building", options = {}) {
+function createBuildingPriceInfo(building = new Building(), buildingName = "Building", options = {showBuyPrice: true, showSellPrice: false}) {
     const {showBuyPrice = true, showSellPrice = false} = options;
     const {planet} = building;
-    const {corruption, inflation, taxRate} = planet.c;
+    const {corruption, inflationRate, taxRate} = planet.c;
     const barterSkill = gs.fleet.totalSkills.getAmount(SKILLS.Barter);
     const rake = building.rake;
     
     // Calculate base percentages
     const baseTaxPct = roundToPlaces(100 * taxRate, 1);
-    const baseInflationPct = roundToPlaces(100 * inflation, 1);
+    const baseInflationPct = roundToPlaces(100 * inflationRate, 1);
     
     // Calculate buy price components
     const buyCorruptionPct = roundToPlaces(100 * corruption, 1);
-    const buyCorruptionWithBarterPct = roundToPlaces(100 * (rake - 1), 1);
-    const barterReductionPct = buyCorruptionPct > 0 ? roundToPlaces(100 * (1 - rake / (1 + corruption)), 1) : 0;
-    const totalBuyPct = roundToPlaces(100 * ((1 + rake) * inflation * (1 + taxRate) - 1), 1);
+    const buyCorruptionWithBarterPct = roundToPlaces(100 * rake, 1);
+    const barterReductionPct = buyCorruptionPct > 0 ? roundToPlaces(buyCorruptionPct - buyCorruptionWithBarterPct, 1) : 0;
+    const totalBuyPct = roundToPlaces(100 * ((1 + rake) * (1 + inflationRate) * (1 + taxRate) - 1), 1);
     
     // Calculate sell price components
-    const sellCorruptionPct = roundToPlaces(100 * corruption / (1 + corruption), 1);
-    const sellCorruptionWithBarterPct = roundToPlaces(100 * rake / (1 + rake), 1);
-    const barterImprovementPct = sellCorruptionPct > 0 ? roundToPlaces(100 * (corruption / (1 + corruption) - rake / (1 + rake)), 1) : 0;
-    const totalSellPct = roundToPlaces(100 * (rake / (1 + rake) * inflation * (1 - taxRate)) - 100, 1);
+    const sellCorruptionPenaltyPct = roundToPlaces(100 * (corruption / (1 + corruption)), 1);
+    const sellCorruptionWithBarterPenaltyPct = roundToPlaces(100 * (rake / (1 + rake)), 1);
+    const barterImprovementPct = sellCorruptionPenaltyPct > 0 ? roundToPlaces(100 * (corruption / (1 + corruption) - rake / (1 + rake)), 1) : 0;
+    const totalSellPct = roundToPlaces(100 * (rake / (1 + rake) * (1 + inflationRate) * (1 - taxRate)) - 100, 1);
     
     // Create popover content for buy price
     const buyPricePopover = ce({
@@ -414,25 +414,34 @@ function createBuildingPriceInfo(building = new Building(), buildingName = "Buil
             `100% (base)<br/>`,
             baseTaxPct > 0 ? `${colorSpan(`-${baseTaxPct}%`, COLORS.Orange)} (taxes)<br/>` : '',
             baseInflationPct > 0 ? `${colorSpan(`+${baseInflationPct}%`, COLORS.Yellow)} (inflation)<br/>` : '',
-            sellCorruptionPct > 0 ? `${colorSpan(`-${sellCorruptionPct}%`, COLORS.LightRed)} (merchant greed)<br/>` : '',
+            sellCorruptionPenaltyPct > 0 ? `${colorSpan(`-${sellCorruptionPenaltyPct}%`, COLORS.LightRed)} (merchant greed)<br/>` : '',
             barterSkill > 0 && barterImprovementPct > 0 ? `${colorSpan(`+${barterImprovementPct}%`, COLORS.LightGreen)} (barter)<br/>` : '',
         ]
     });
     
-    // Create the main info line
-    const parts = [`${buildingName} Credits: ${building.credits}`];
+    // Create the main info line - build elements directly instead of using innerHTML
+    const container = ce({style: {display: 'flex', flexWrap: 'nowrap', alignItems: 'center', gap: '8px'}});
+    
+    // Add building credits text
+    container.appendChild(ce({innerHTML: `${buildingName} Credits: ${building.credits}`}));
     
     if (showBuyPrice) {
-        const buyText = `Buy Price: ${colorSpan(`${totalBuyPct >= 0 ? '+' : ''}${totalBuyPct}%`, totalBuyPct < 50 ? COLORS.LightGreen : totalBuyPct < 100 ? COLORS.Yellow : COLORS.LightRed)}`;
-        parts.push(createPopoverSpan(buyText, buyPricePopover));
+        container.appendChild(ce({innerHTML: ' | '}));
+        const buyText = `Buy Price: ${statColorSpan(`${totalBuyPct >= 0 ? '+' : ''}${totalBuyPct}%`, 100 / (100 + totalBuyPct))}`;
+        const buySpan = ce({innerHTML: buyText});
+        createPopoverElement(buySpan, buyPricePopover);
+        container.appendChild(buySpan);
     }
     
     if (showSellPrice) {
-        const sellText = `Sell Price: ${colorSpan(`${totalSellPct}%`, totalSellPct > -50 ? COLORS.LightGreen : totalSellPct > -75 ? COLORS.Yellow : COLORS.LightRed)}`;
-        parts.push(createPopoverSpan(sellText, sellPricePopover));
+        container.appendChild(ce({innerHTML: ' | '}));
+        const sellText = `Sell Price: ${statColorSpan(`${totalSellPct}%`, (100 + totalSellPct) / 100)}`;
+        const sellSpan = ce({innerHTML: sellText});
+        createPopoverElement(sellSpan, sellPricePopover);
+        container.appendChild(sellSpan);
     }
     
-    return ce({innerHTML: parts.join(' | ')});
+    return container;
 }
 
 /**
@@ -444,7 +453,7 @@ function createBuildingPriceInfo(building = new Building(), buildingName = "Buil
  */
 function createMarketCargoPriceInfo(market = new Market(), marketName = "Market", cargoType = CARGO_TYPES_ALL[0]) {
     const {planet, blackMarket} = market;
-    const {corruption, inflation, taxRate} = planet.c;
+    const {corruption, inflationRate, taxRate} = planet.c;
     const barterSkill = gs.fleet.totalSkills.getAmount(SKILLS.Barter);
     const rake = market.rake;
     
@@ -454,24 +463,24 @@ function createMarketCargoPriceInfo(market = new Market(), marketName = "Market"
     
     // Calculate base percentages (taxes don't apply to black market)
     const baseTaxPct = blackMarket ? 0 : roundToPlaces(100 * taxRate, 1);
-    const baseInflationPct = roundToPlaces(100 * inflation, 1);
+    const baseInflationPct = roundToPlaces(100 * inflationRate, 1);
     
     // Calculate buy price components
     const buyCorruptionPct = roundToPlaces(100 * corruption, 1);
-    const buyCorruptionWithBarterPct = roundToPlaces(100 * (rake - 1), 1);
-    const barterReductionPct = buyCorruptionPct > 0 ? roundToPlaces(100 * (1 - rake / (1 + corruption)), 1) : 0;
-    const totalBuyPct = roundToPlaces(100 * ((1 + rake) * inflation * demandMultiplier * (1 + (blackMarket ? 0 : taxRate)) - 1), 1);
+    const buyCorruptionWithBarterPct = roundToPlaces(100 * rake, 1);
+    const barterReductionPct = buyCorruptionPct > 0 ? roundToPlaces(buyCorruptionPct - buyCorruptionWithBarterPct, 1) : 0;
+    const totalBuyPct = roundToPlaces(100 * ((1 + rake) * (1 + inflationRate) * demandMultiplier * (1 + (blackMarket ? 0 : taxRate)) - 1), 1);
     
     // Calculate sell price components
     const sellCorruptionPct = roundToPlaces(100 * corruption / (1 + corruption), 1);
     const sellCorruptionWithBarterPct = roundToPlaces(100 * rake / (1 + rake), 1);
     const barterImprovementPct = sellCorruptionPct > 0 ? roundToPlaces(100 * (corruption / (1 + corruption) - rake / (1 + rake)), 1) : 0;
-    const totalSellPct = roundToPlaces(100 * (rake / (1 + rake) * inflation * demandMultiplier * (1 - (blackMarket ? 0 : taxRate))) - 100, 1);
+    const totalSellPct = roundToPlaces(100 * (rake / (1 + rake) * (1 + inflationRate) * demandMultiplier * (1 - (blackMarket ? 0 : taxRate))) - 100, 1);
     
     // Create popover content for buy price
     const buyPricePopover = ce({
         children: [
-            `${colorSpan(`Total Buy Price: ${totalBuyPct >= 0 ? '+' : ''}${totalBuyPct}%`, totalBuyPct < 50 ? COLORS.LightGreen : totalBuyPct < 100 ? COLORS.Yellow : COLORS.LightRed)}<br/>`,
+            `${statColorSpan(`Total Buy Price: ${totalBuyPct >= 0 ? '+' : ''}${totalBuyPct}%`, 100 / (100 + totalBuyPct))}<br/>`,
             `100% (base)<br/>`,
             demandPct !== 0 ? `${colorSpan(`${demandPct >= 0 ? '+' : ''}${demandPct}%`, demandPct > 0 ? COLORS.Orange : COLORS.LightGreen)} (demand)<br/>` : '',
             baseTaxPct > 0 ? `${colorSpan(`+${baseTaxPct}%`, COLORS.Orange)} (taxes)<br/>` : '',
@@ -484,7 +493,7 @@ function createMarketCargoPriceInfo(market = new Market(), marketName = "Market"
     // Create popover content for sell price
     const sellPricePopover = ce({
         children: [
-            `${colorSpan(`Total Sell Price: ${totalSellPct}%`, totalSellPct > -50 ? COLORS.LightGreen : totalSellPct > -75 ? COLORS.Yellow : COLORS.LightRed)}<br/>`,
+            `${statColorSpan(`Total Sell Price: ${totalSellPct}%`, (100 + totalSellPct) / 100)}<br/>`,
             `100% (base)<br/>`,
             demandPct !== 0 ? `${colorSpan(`${demandPct >= 0 ? '+' : ''}${demandPct}%`, demandPct > 0 ? COLORS.Orange : COLORS.LightGreen)} (demand)<br/>` : '',
             baseTaxPct > 0 ? `${colorSpan(`-${baseTaxPct}%`, COLORS.Orange)} (taxes)<br/>` : '',
@@ -494,15 +503,25 @@ function createMarketCargoPriceInfo(market = new Market(), marketName = "Market"
         ]
     });
     
-    // Create the main info line
-    const buyText = `Buy Price: ${colorSpan(`${totalBuyPct >= 0 ? '+' : ''}${totalBuyPct}%`, totalBuyPct < 50 ? COLORS.LightGreen : totalBuyPct < 100 ? COLORS.Yellow : COLORS.LightRed)}`;
-    const sellText = `Sell Price: ${colorSpan(`${totalSellPct}%`, totalSellPct > -50 ? COLORS.LightGreen : totalSellPct > -75 ? COLORS.Yellow : COLORS.LightRed)}`;
+    // Create the main info line - build elements directly instead of using innerHTML
+    const container = ce({style: {display: 'flex', flexWrap: 'nowrap', alignItems: 'center', gap: '8px'}});
     
-    const parts = [
-        `${marketName} Credits: ${market.credits}`,
-        createPopoverSpan(buyText, buyPricePopover),
-        createPopoverSpan(sellText, sellPricePopover)
-    ];
+    // Add market credits text
+    container.appendChild(ce({innerHTML: `${marketName} Credits: ${market.credits}`}));
     
-    return ce({innerHTML: parts.join(' | ')});
+    // Add buy price with popover
+    container.appendChild(ce({innerHTML: ' | '}));
+    const buyText = `Buy Price: ${statColorSpan(`${totalBuyPct >= 0 ? '+' : ''}${totalBuyPct}%`, 100 / (100 + totalBuyPct))}`;
+    const buySpan = ce({innerHTML: buyText});
+    createPopoverElement(buySpan, buyPricePopover);
+    container.appendChild(buySpan);
+    
+    // Add sell price with popover
+    container.appendChild(ce({innerHTML: ' | '}));
+    const sellText = `Sell Price: ${statColorSpan(`${totalSellPct}%`, (100 + totalSellPct) / 100)}`;
+    const sellSpan = ce({innerHTML: sellText});
+    createPopoverElement(sellSpan, sellPricePopover);
+    container.appendChild(sellSpan);
+    
+    return container;
 }

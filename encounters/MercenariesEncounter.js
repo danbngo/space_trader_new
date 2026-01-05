@@ -55,7 +55,7 @@ class MercenariesEncounter extends FleetEncounter {
         const officer = generateOfficer(this.planet, FACTION_TYPES.MERCENARIES)
         
         // Price is 70% of guild price (better deal)
-        const basePrice = Math.round(officer.value * (1 + this.planet.c.corruption) * this.planet.c.inflation / this.planet.c.army)
+        const basePrice = Math.round(officer.value * (1 + this.planet.c.corruption) * this.planet.c.inflationRate / this.planet.c.army)
         const price = Math.round(basePrice * 0.7)
         const canAfford = gs.credits >= price
         const canHire = gs.fleet.officers.length < gs.captain.maxSubordinates

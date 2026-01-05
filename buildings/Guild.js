@@ -15,7 +15,7 @@ class Guild extends Building {
         this.normalize(true)
     }
     calcHirePrice(officer) {
-        const basePrice = Math.round(officer.value * (1+this.planet.c.corruption) * this.planet.c.inflation / this.planet.c.army)
+        const basePrice = Math.round(officer.value * (1+this.planet.c.corruption) * this.planet.c.inflationRate / this.planet.c.army)
         return Math.round(basePrice * (1 + this.planet.c.taxes))
     }
     get baseNumOfficers() {

@@ -3,7 +3,7 @@
 // Creates a UI panel with title, text, and buttons
 
 /**
- * @typedef {[string, Function]|[string, Function, boolean]|[string, Function, boolean, string]} ButtonData
+ * @typedef {[string, Function|(()=>void)]|[string, Function|(()=>void), boolean]|[string, Function|(()=>void), boolean, string]} ButtonData
  * @property {string} 0 - Label text for the button
  * @property {Function} 1 - Handler function to call when button is clicked
  * @property {boolean} [2] - Whether the button is disabled
@@ -523,7 +523,7 @@ function createPopoverElement(element, popoverContent) {
         ]
     })
     
-    document.body.appendChild(popover)
+    document.body.appendChild(popover);
     
     let showTimeout = null
     

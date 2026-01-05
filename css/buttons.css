@@ -54,3 +54,23 @@ button.highlighted:not(:disabled):hover, .gameButton.highlighted:not(.disabled):
         box-shadow: 0 0 20px rgba(255,165,0,0.9), 0 0 30px rgba(255,165,0,0.4);
     }
 }
+
+/* Planet navigation buttons - minimal styling, no background */
+button.planet-nav-button {
+    background: none !important;
+    border: none !important;
+    color: black !important;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 5px 10px;
+    margin: 0 !important;
+    box-shadow: none !important;
+    transition: color 0.2s;
+}
+
+button.planet-nav-button:hover {
+    color: #0ff !important;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+}

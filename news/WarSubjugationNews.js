@@ -16,7 +16,6 @@ class WarSubjugationNews extends News {
                 economy: CL.HIGH,
                 industry: CL.SLIGHTLY_HIGH,
                 wealth: CL.HIGH,
-                inflation: CL.LOW,
                 taxes: CL.LOW, //tax them instead
                 army: CL.SLIGHTLY_LOW, //requires some troops to keep them in line
                 security: CL.LOW
@@ -41,7 +40,6 @@ class WarSubjugationNews extends News {
                 economy: CL.LOW, //boot goes on neck
                 industry: CL.SLIGHTLY_LOW,
                 wealth: CL.LOW,
-                inflation: CL.HIGH,
                 taxes: CL.HIGH, 
                 relationsReset: true,
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.EXTREMELY_LOW]])),

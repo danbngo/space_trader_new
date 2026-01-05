@@ -34,7 +34,7 @@ function showPlanetModal(planet = new Planet(), title = '', msg = '', options = 
     const titleEl = ce({
         style: {
             display: 'flex',
-            gap: '10px',
+            gap: '5px',
             flexAlign: 'center',
             justifyContent: 'center',
         },
@@ -43,8 +43,17 @@ function showPlanetModal(planet = new Planet(), title = '', msg = '', options = 
                 tag: 'button',
                 innerHTML: '◀',
                 onClick: () => onNavigate(prevPlanet),
+                classNames: ['planet-nav-button'],
                 style: {
-                    marginLeft: '10px', marginRight: '10px', marginTop: '0px'
+                    marginLeft: '0px', 
+                    marginRight: '0px', 
+                    marginTop: '0px',
+                    background: 'none',
+                    border: 'none',
+                    color: 'black',
+                    cursor: 'pointer',
+                    fontSize: '16px',
+                    padding: '5px 10px'
                 }
             }),
             ce({
@@ -56,8 +65,17 @@ function showPlanetModal(planet = new Planet(), title = '', msg = '', options = 
                 tag: 'button',
                 innerHTML: '▶',
                 onClick: () => onNavigate(nextPlanet),
+                classNames: ['planet-nav-button'],
                 style: {
-                    marginLeft: '10px', marginRight: '10px', marginTop: '0px'
+                    marginLeft: '0px', 
+                    marginRight: '0px', 
+                    marginTop: '0px',
+                    background: 'none',
+                    border: 'none',
+                    color: 'black',
+                    cursor: 'pointer',
+                    fontSize: '16px',
+                    padding: '5px 10px'
                 }
             })
         ]

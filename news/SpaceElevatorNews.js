@@ -15,7 +15,6 @@ class SpaceElevatorNews extends News {
                 taxes: CL.VERY_HIGH,
                 wealth: CL.SLIGHTLY_LOW,
                 reserves: CL.SLIGHTLY_LOW,
-                inflation: CL.SLIGHTLY_HIGH,
                 cargoPriceMultipliers: new CountsMap(new Map([
                     [CARGO_TYPES.METAL, CL.ASTRONOMICAL],
                     [CARGO_TYPES.NANITES, CL.VERY_HIGH]

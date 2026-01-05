@@ -13,31 +13,31 @@ class InvestmentNews extends News {
         this.addPlanetEffect(
             {
                 wealth: CL.LOW,
-                inflation: CL.LOW,
+                reserves: CL.HIGH,
                 prestige: CL.SLIGHTLY_HIGH
             },
             {
                 wealth: CL.HIGH,
-                inflation: CL.LOW,
+                reserves: CL.HIGH,
                 prestige: CL.SLIGHTLY_HIGH
             },
             {
                 wealth: CL.LOW,
-                inflation: CL.LOW
+                reserves: CL.HIGH
             },
         )
 
         this.addTargetPlanetEffect(
             {
                 wealth: CL.HIGH,
-                inflation: CL.HIGH,
+                reserves: CL.LOW,
                 industry: CL.SLIGHTLY_HIGH,
                 econommy: CL.SLIGHTLY_HIGH
             },
             {
                 buildingsImproved,
                 wealth: CL.HIGH,
-                inflation: CL.HIGH,
+                reserves: CL.LOW,
                 industry: CL.VERY_HIGH,
                 econommy: CL.HIGH,
                 taxes: CL.LOW

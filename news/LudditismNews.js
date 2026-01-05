@@ -13,7 +13,7 @@ class LudditismNews extends News {
                 technology: CL.LOW,
                 industry: CL.SLIGHTLY_LOW,
                 commerce: CL.SLIGHTLY_LOW,
-                inflation: CL.SLIGHTLY_LOW,
+                reserves: CL.SLIGHTLY_HIGH,
                 crime: CL.SLIGHTLY_LOW,
                 corruption: CL.SLIGHTLY_LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([

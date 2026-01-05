@@ -23,7 +23,6 @@ class RaidingNews extends News {
                 wealth: CL.VERY_HIGH,
                 prestige: CL.SLIGHTLY_LOW,
                 army: CL.SLIGHTLY_LOW,
-                inflation: CL.VERY_LOW,
                 taxes: CL.VERY_LOW
             },
             {

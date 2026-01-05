@@ -15,7 +15,6 @@ class AntimatterGridNews extends News {
                 taxes: CL.VERY_HIGH,
                 wealth: CL.SLIGHTLY_LOW,
                 reserves: CL.SLIGHTLY_LOW,
-                inflation: CL.SLIGHTLY_HIGH,
                 cargoPriceMultipliers: new CountsMap(new Map([
                     [CARGO_TYPES.ANTIMATTER, CL.ASTRONOMICAL],
                     [CARGO_TYPES.ISOTOPES, CL.VERY_HIGH],
@@ -27,7 +26,7 @@ class AntimatterGridNews extends News {
                 economy: CL.HIGH,
                 wealth: CL.HIGH,
                 taxes: CL.LOW,
-                inflation: CL.LOW,
+                reserves: CL.HIGH,
                 technology: CL.SLIGHTLY_HIGH,
                 prestige: CL.SLIGHTLY_HIGH
             },

@@ -4,6 +4,7 @@
  */
 function showPlanetDemographicsMenu(planet = new Planet()) {
     const {civilization} = planet
+    console.log('1',civilization)
     
     let contentContainer
     
@@ -19,6 +20,7 @@ function showPlanetDemographicsMenu(planet = new Planet()) {
             '<u>Racial Demographics</u>'
         ]
     })
+    console.log('2',civilization.races)
     
     if (civilization.races.size > 0) {
         // Sort races by proportion (highest first)
@@ -39,6 +41,7 @@ function showPlanetDemographicsMenu(planet = new Planet()) {
     } else {
         racialDemographicsSection.appendChild(ce({innerHTML:'(No demographic data available)'}))
     }
+    console.log('3',civilization.religions)
     
     // Religious Demographics
     const religiousDemographicsSection = ce({
@@ -70,9 +73,39 @@ function showPlanetDemographicsMenu(planet = new Planet()) {
         religiousDemographicsSection.appendChild(ce({innerHTML:'(No organized religions present)'}))
     }
     
-        // Use column layout: racial demographics on left, religious demographics on right
-        contentContainer.appendChild(createColumnLayout([racialDemographicsSection, religiousDemographicsSection]))
+    // Cultural Demographics
+    const culturalDemographicsSection = ce({
+        children: [
+            '<u>Cultural Demographics</u>'
+        ]
+    })
+    
+    if (civilization.cultures && civilization.cultures.counts.size > 0) {
+        // Sort cultures by proportion (highest first)
+        const sortedCultures = Array.from(civilization.cultures.counts.entries())
+            .sort((a, b) => b[1] - a[1])
+        
+        /** @type {Array<[string, string|HTMLElement]>} */
+        const cultureRows = [['Cultural Origin', '% of Population']]
+        for (const [culturePlanet, proportion] of sortedCultures) {
+            const percentage = (proportion * 100).toFixed(1)
+            const progressBar = new ProgressBar({
+                value: parseFloat(percentage),
+                fillColor: rgbArrayToString(culturePlanet.color),
+            })
+            cultureRows.push([coloredName(culturePlanet), progressBar.container])
+        }
+        culturalDemographicsSection.appendChild(createTable(cultureRows))
+    } else {
+        culturalDemographicsSection.appendChild(ce({innerHTML:'(No cultural data available)'}))
     }
+    
+        // Use column layout: racial + religious demographics on left, cultural demographics on right
+        const leftColumn = ce({children: [racialDemographicsSection, ce({innerHTML: '<br/>'}), religiousDemographicsSection]})
+        contentContainer.appendChild(createColumnLayout([leftColumn, culturalDemographicsSection]))
+    }
+
+    console.log('4')
     
     showPlanetModal(planet, `${coloredName(planet)} - Demographics`, contentContainer, [
         ["Society", () => showPlanetSocietyMenu(planet), !civilization],

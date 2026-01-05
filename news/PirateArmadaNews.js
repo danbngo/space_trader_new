@@ -22,7 +22,6 @@ class PirateArmadaNews extends News {
                 navy: CL.VERY_LOW,
                 prestige: CL.LOW,
                 territory: CL.LOW,
-                inflation: CL.SLIGHTLY_HIGH,
                 reserves: CL.LOW,
                 economy: CL.LOW,
             }

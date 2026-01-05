@@ -12,8 +12,7 @@ class MegacityNews extends News {
             {
                 taxes: CL.VERY_HIGH,
                 wealth: CL.SLIGHTLY_LOW,
-                reserves: CL.SLIGHTLY_LOW,
-                inflation: CL.HIGH,
+                reserves: CL.LOW,
                 cargoPriceMultipliers: new CountsMap(new Map([
                     [CARGO_TYPES.METAL, CL.VERY_HIGH],
                     [CARGO_TYPES.NANITES, CL.HIGH],
@@ -25,7 +24,7 @@ class MegacityNews extends News {
                 economy: CL.HIGH,
                 wealth: CL.HIGH,
                 taxes: CL.LOW,
-                inflation: CL.LOW,
+                reserves: CL.HIGH,
                 industry: CL.SLIGHTLY_HIGH,
                 culture: CL.SLIGHTLY_HIGH,
                 prestige: CL.SLIGHTLY_HIGH
@@ -36,7 +35,7 @@ class MegacityNews extends News {
                 security: CL.LOW,
                 wealth: CL.LOW,
                 taxes: CL.HIGH, // Reduced from VERY_HIGH
-                inflation: CL.HIGH, // Reduced from VERY_HIGH
+                reserves: CL.LOW, // Reduced from VERY_HIGH
                 prestige: CL.LOW,
             }
         )

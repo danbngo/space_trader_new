@@ -327,8 +327,8 @@ class Market extends Building {
             const climateModifier = this.calcClimateBasedPriceModifier(cargoType)
             const basePrice = cargoType.value * this.planet.c.cargoPriceMultipliers.getAmount(cargoType) * this.calcCargoPriceModifier(cargoType) * climateModifier
             let price = 
-                this.blackMarket ? Math.round(basePrice * (1+this.planet.c.corruption) * this.planet.c.inflation / this.planet.c.crime)
-                : Math.round(basePrice * (1+this.planet.c.corruption) * this.planet.c.inflation / this.planet.c.reserves)
+                this.blackMarket ? Math.round(basePrice * (1+this.planet.c.corruption) * this.planet.c.inflationRate / this.planet.c.crime)
+                : Math.round(basePrice * (1+this.planet.c.corruption) * this.planet.c.inflationRate / this.planet.c.reserves)
             // Apply taxes only to regular market
             if (!this.blackMarket) {
                 price = Math.round(price * (1 + this.planet.c.taxRate))
@@ -344,8 +344,8 @@ class Market extends Building {
             const climateModifier = this.calcClimateBasedPriceModifier(cargoType)
             const basePrice = cargoType.value * this.planet.c.cargoPriceMultipliers.getAmount(cargoType) * climateModifier
             let price = 
-                this.blackMarket ? Math.round(basePrice / (1+this.planet.c.corruption) * this.planet.c.inflation / this.planet.c.crime)
-                : Math.round(basePrice / (1+this.planet.c.corruption) * this.planet.c.inflation / this.planet.c.reserves)
+                this.blackMarket ? Math.round(basePrice / (1+this.planet.c.corruption) * this.planet.c.inflationRate / this.planet.c.crime)
+                : Math.round(basePrice / (1+this.planet.c.corruption) * this.planet.c.inflationRate / this.planet.c.reserves)
             // Apply taxes only to regular market
             if (!this.blackMarket) {
                 price = Math.round(price * (1 - this.planet.c.taxRate))

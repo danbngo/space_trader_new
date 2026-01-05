@@ -31,7 +31,7 @@ class MinorDebtTrapRestructuringNews extends News {
                 prestige: CL.SLIGHTLY_LOW,
                 economy: CL.SLIGHTLY_HIGH,
                 wealth: CL.HIGH,
-                inflation: CL.VERY_LOW,
+                reserves: CL.VERY_HIGH,
                 taxes: CL.VERY_LOW,
             },
             {
@@ -39,7 +39,7 @@ class MinorDebtTrapRestructuringNews extends News {
                 prestige: CL.LOW,
                 economy: CL.HIGH,
                 wealth: CL.VERY_HIGH,
-                inflation: CL.LOW,
+                reserves: CL.HIGH,
                 taxes: CL.LOW,
             },
         )

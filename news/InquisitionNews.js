@@ -68,7 +68,7 @@ class ReligionInquisitionNews extends News {
                 technology: CL.LOW,
                 security: CL.SLIGHTLY_HIGH,
                 wealth: CL.LOW,
-                inflation: CL.LOW,
+                reserves: CL.HIGH,
                 prestige: CL.LOW
             }
         )
