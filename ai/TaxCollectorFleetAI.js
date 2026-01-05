@@ -46,6 +46,12 @@ class TaxCollectorFleetAI extends FleetAI {
             if (roll < 0.5) {
                 // Collect taxes peacefully
                 this.transferCredits(this.target, this.fleet);
+                
+                // Reduce wealth on target's planet
+                if (this.target.planet && this.target.planet.civilization) {
+                    this.target.planet.c.wealth *= 0.99
+                }
+                
                 this.target = null;
                 this.fleet.route = null;
             } else if (roll < 0.9) {

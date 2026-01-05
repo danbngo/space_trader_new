@@ -209,12 +209,20 @@ class StarSystem extends SpaceObject {
             this.abandonedFleets.splice(abandonedIndex, 1);
         }
         
+        // Add back to active fleets array
+        if (!this.fleets.includes(fleet)) {
+            this.fleets.push(fleet);
+            console.log(`➕ Added ${fleet.name} back to active fleets array`);
+        }
+        
         // Restore fleet properties
         fleet.destroyed = false;
         fleet.destroyedBy = null; // Clear death record
         fleet.abandonedYear = null;
         fleet.color = fleet.color.map(c => c * 2); // Restore original brightness
-        fleet.name = fleet.fleetType.name; // Restore original name
+        // Restore original name if it was preserved, otherwise use fleet type name
+        fleet.name = fleet.originalName || fleet.fleetType.name;
+        fleet.originalName = null; // Clear the preserved name
         
         // Resurrected ships come back with half hull
         for (const ship of fleet.ships) {
@@ -223,6 +231,7 @@ class StarSystem extends SpaceObject {
         
         // Assign captain if none exists (pick first living officer)
         if (!fleet.captain || !fleet.officers.includes(fleet.captain)) {
+            throw new Error('fleet should always have a captain! even after abandoned!')
             fleet.captain = fleet.officers[0];
             console.log(`👤 Assigned ${fleet.captain.name} as new captain`);
         }

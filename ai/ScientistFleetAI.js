@@ -25,6 +25,11 @@ class ScientistFleetAI extends FleetAI {
     onNearTarget() {
         // If target is an anomaly, investigate it
         if (this.target && this.target instanceof Anomaly) {
+            // Home planet gains technology and education from research
+            if (this.fleet.planet && this.fleet.planet.civilization) {
+                this.fleet.planet.c.technology *= 1.01
+                this.fleet.planet.c.education *= 1.01
+            }
             this.investigateAnomaly(this.target, '🔬', COLORS.LightCyan)
         }
     }
@@ -32,11 +37,24 @@ class ScientistFleetAI extends FleetAI {
     onNearDestination() {
         // Unload relics at destination if it's a major planet
         if (this.destination instanceof Planet && this.fleet.cargo.total > 0) {
+            // Check if selling relics
+            const hasRelics = this.fleet.cargo.getAmount(CARGO_TYPES.RELICS) > 0
+            
             // Boost education and technology for scientific discoveries
             if (this.destination.civilization) {
                 this.destination.c.education *= 1.01;
                 this.destination.c.technology *= 1.01;
+                if (hasRelics) {
+                    this.destination.c.culture *= 1.01;
+                }
             }
+            
+            // Home planet gains wealth and reduces taxes when selling relics
+            if (hasRelics && this.fleet.planet && this.fleet.planet.civilization) {
+                this.fleet.planet.c.wealth *= 1.01
+                this.fleet.planet.c.taxes *= 0.99
+            }
+            
             this.sellCargoAtMarket(this.destination);
         }
         

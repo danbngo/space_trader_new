@@ -51,10 +51,16 @@ class PerformerFleetAI extends FleetAI {
             // Mark fleet as visited
             this.visited.push(this.target);
             
-            // Increase home planet's culture every performance
+            // Both sides gain culture from performance
             if (this.fleet.planet && this.fleet.planet.civilization) {
-                this.fleet.planet.c.culture *= 1.0001; // .01% increase
-                
+                this.fleet.planet.c.culture *= 1.01
+            }
+            if (this.target.planet && this.target.planet.civilization) {
+                this.target.planet.c.culture *= 1.01
+            }
+            
+            // Increase home planet's culture and prestige every performance
+            if (this.fleet.planet && this.fleet.planet.civilization) {
                 // 10% chance for prestige increase
                 if (Math.random() < 0.1) {
                     this.fleet.planet.c.prestige *= 1.01;
@@ -74,6 +80,14 @@ class PerformerFleetAI extends FleetAI {
                     const remainingCredits = this.target.captain.credits - creditsToTake;
                     this.transferCredits(this.target, this.fleet);
                     this.target.captain.credits = remainingCredits;
+                    
+                    // Home planet gains wealth, target loses wealth
+                    if (this.fleet.planet && this.fleet.planet.civilization) {
+                        this.fleet.planet.c.wealth *= 1.01
+                    }
+                    if (this.target.planet && this.target.planet.civilization) {
+                        this.target.planet.c.wealth *= 0.99
+                    }
                     
                     console.log(`🎭 ${this.fleet.name} performed brilliantly for ${this.target.name} and earned ${creditsToTake} credits!`);
                     

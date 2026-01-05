@@ -58,10 +58,10 @@ class SalvagerFleetAI extends FleetAI {
             // Salvage everything from abandoned fleet
             let itemsSalvaged = 0
             
-            // Rescue crew using utility function
+            // Take all crew
             if (this.target.officers.length > 0) {
                 const crewCount = this.target.officers.length
-                this.rescueCrew(this.target, '♻️', COLORS.Green)
+                this.transferOfficers(this.target, this.fleet, null, '♻️', COLORS.Green, '📦', COLORS.Gray)
                 itemsSalvaged += crewCount
             }
             
@@ -96,6 +96,15 @@ class SalvagerFleetAI extends FleetAI {
     onNearDestination() {
         // Sell all cargo at destination market for credits
         if (this.destination && this.destination instanceof Planet && this.fleet.cargo.total > 0) {
+            // Both sides gain industry and economy from salvage trade
+            if (this.destination.civilization) {
+                this.destination.c.industry *= 1.01
+                this.destination.c.economy *= 1.01
+            }
+            if (this.fleet.planet && this.fleet.planet.civilization) {
+                this.fleet.planet.c.industry *= 1.01
+                this.fleet.planet.c.economy *= 1.01
+            }
             this.sellCargoAtMarket(this.destination);
         }
         

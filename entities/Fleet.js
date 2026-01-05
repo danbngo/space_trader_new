@@ -6,6 +6,8 @@
  * @extends {SpaceObject}
  */
 class Fleet extends SpaceObject {
+    static numFleetsEver = 0; // Total number of fleets ever created
+    
     /**
      * @param {string} name - The name of the fleet.
      * @param {Planet} planet - The planet the fleet starts at.
@@ -17,6 +19,7 @@ class Fleet extends SpaceObject {
      */
     constructor(name = "Unnamed", planet = null, fleetType = FLEET_TYPES_ALL[0], factionType = null, color = COLORS.White, x = 0, y = 0) {
         super(name, OBJECT_TYPES.FLEET, color, FLEET_RADIUS, x, y);
+        Fleet.numFleetsEver++; // Increment global fleet counter
         /** @type {Planet} */
         this.planet = planet;
         /** @type {FleetType} */
@@ -51,6 +54,8 @@ class Fleet extends SpaceObject {
         this.destroyed = false; // Whether this fleet is destroyed/abandoned
         /** @type {number|null} */
         this.abandonedYear = null; // Year when fleet was destroyed
+        /** @type {string|null} */
+        this.originalName = null; // Original name before being abandoned
     }
 
     /**
@@ -254,6 +259,7 @@ class Fleet extends SpaceObject {
      * @param {Officer} officer - The officer to add.
      */
     addOfficer(officer = new Officer()) {
+        if (!officer) throw new Error('tried to add null officer!')
         if (!this.captain) this.captain = officer
         this.officers.push(officer)
         officer.fleet = this

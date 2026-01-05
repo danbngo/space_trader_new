@@ -80,12 +80,27 @@ class HackerFleetAI extends FleetAI {
         if (!abandonedFleet.destroyed) return;
         if (!abandonedFleet.officers || abandonedFleet.officers.length === 0) return;
         
+        // If fleet has no captain, salvage it instead of resurrecting
+        if (!abandonedFleet.captain) {
+            console.log(`💻 ${this.fleet.name} is salvaging captainless fleet ${abandonedFleet.name}`);
+            this.salvageAbandonedFleet(abandonedFleet);
+            return;
+        }
+        
         console.log(`💻 ${this.fleet.name} is resurrecting abandoned fleet ${abandonedFleet.name}`);
         
         // Use StarSystem.resurrectFleet function
         const resurrectedFleet = gs.system.resurrectFleet(abandonedFleet);
         
         if (resurrectedFleet) {
+            // Both sides gain technology from resurrection
+            if (this.fleet.planet && this.fleet.planet.civilization) {
+                this.fleet.planet.c.technology *= 1.01
+            }
+            if (resurrectedFleet.planet && resurrectedFleet.planet.civilization) {
+                resurrectedFleet.planet.c.technology *= 1.01
+            }
+            
             // Transfer credits from resurrected captain to hackers
             if (resurrectedFleet.captain && resurrectedFleet.captain.credits > 0) {
                 const credits = resurrectedFleet.captain.credits;
@@ -97,6 +112,48 @@ class HackerFleetAI extends FleetAI {
             this.addPopup('💻', COLORS.Cyan, abandonedFleet.x, abandonedFleet.y);
             this.addPopup('✨', COLORS.Green);
         }
+    }
+    
+    salvageAbandonedFleet(abandonedFleet) {
+        let itemsSalvaged = 0;
+        
+        // Take any remaining crew
+        if (abandonedFleet.officers.length > 0) {
+            const crewCount = abandonedFleet.officers.length;
+            this.transferOfficers(abandonedFleet, this.fleet, null, '💻', COLORS.Cyan, '📦', COLORS.Gray);
+            itemsSalvaged += crewCount;
+        }
+        
+        // Transfer cargo (respecting cargo limit)
+        if (abandonedFleet.cargo && abandonedFleet.cargo.total > 0 && this.fleet.availableCargoSpace > 0) {
+            const cargoTypes = [...abandonedFleet.cargo.counts.keys()];
+            let transferred = 0;
+            for (const cargoType of cargoTypes) {
+                if (transferred >= this.fleet.availableCargoSpace) break;
+                const amount = abandonedFleet.cargo.getAmount(cargoType);
+                const toTransfer = Math.min(amount, this.fleet.availableCargoSpace - transferred);
+                abandonedFleet.cargo.increment(cargoType, -toTransfer);
+                this.fleet.cargo.increment(cargoType, toTransfer);
+                transferred += toTransfer;
+            }
+            itemsSalvaged += transferred;
+            console.log(`📦 ${this.fleet.name} salvaged ${transferred} cargo from ${abandonedFleet.name}`);
+        }
+        
+        // Take credits from any remaining officers (shouldn't happen but just in case)
+        if (abandonedFleet.captain && abandonedFleet.captain.credits > 0) {
+            const credits = abandonedFleet.captain.credits;
+            this.fleet.captain.credits += credits;
+            abandonedFleet.captain.credits = 0;
+            console.log(`💰 ${this.fleet.name} took ${credits} CR from ${abandonedFleet.name}`);
+        }
+        
+        if (itemsSalvaged > 0) {
+            this.addPopup('📦', COLORS.Gray, abandonedFleet.x, abandonedFleet.y);
+        }
+        
+        console.log(`💻 ${this.fleet.name} completely salvaged ${abandonedFleet.name}`);
+        gs.system.removeAbandonedFleet(abandonedFleet);
     }
     
     offerRepairService(targetFleet) {
@@ -148,6 +205,19 @@ class HackerFleetAI extends FleetAI {
             const siphonAmount = Math.floor(targetFleet.captain.credits * 0.5);
             targetFleet.captain.credits -= siphonAmount;
             this.fleet.captain.credits += siphonAmount;
+            
+            // Target planet loses corruption, technology, and wealth
+            if (targetFleet.planet && targetFleet.planet.civilization) {
+                targetFleet.planet.c.corruption *= 0.99
+                targetFleet.planet.c.technology *= 0.99
+                targetFleet.planet.c.wealth *= 0.99
+            }
+            
+            // Hacker planet gains technology and crime
+            if (this.fleet.planet && this.fleet.planet.civilization) {
+                this.fleet.planet.c.technology *= 1.01
+                this.fleet.planet.c.crime *= 1.01
+            }
             
             console.log(`💻 ${this.fleet.name} siphoned ${siphonAmount} CR from ${targetFleet.name}`);
             this.addPopup('💻', COLORS.Cyan);

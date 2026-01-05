@@ -53,24 +53,9 @@ class InquisitorFleetAI extends FleetAI {
                 const captainIsHeretic = this.target.captain && this.target.captain.religion !== ourReligion;
                 const canRemoveCaptain = captainIsHeretic && coReligionists.length > 0; // At least 1 replacement
                 
-                const heretics = this.target.findOfficersMatching(o => {
-                    // Never remove captain unless there's a co-religionist to replace them
-                    if (o === this.target.captain) return canRemoveCaptain;
-                    // Remove all other heretics
-                    return o.religion !== ourReligion;
-                });
-                
-                if (heretics.length > 0) {
-                    // Abduct heretics for trial
-                    for (const heretic of heretics) {
-                        this.target.removeOfficer(heretic);
-                        this.fleet.officers.push(heretic);
-                    }
-                    
-                    const captainRemoved = heretics.includes(this.target.captain);
-                    console.log(`⚖️ ${this.fleet.name} abducted ${heretics.length} heretic${heretics.length > 1 ? 's' : ''} from ${this.target.name}${captainRemoved ? ' (including captain)' : ''}`);
-                    this.addPopup('⚖️', COLORS.DarkRed, this.target.x, this.target.y);
-                }
+                // Take ALL heretics regardless of rank using transferOfficers
+                const hereticFilter = (o) => o.religion !== ourReligion;
+                this.transferOfficers(this.target, this.fleet, hereticFilter, '⚖️', COLORS.DarkRed, '💔', COLORS.Gray);
                 
                 this.target = null;
                 this.fleet.route = null;
@@ -90,12 +75,32 @@ class InquisitorFleetAI extends FleetAI {
                 // Convert captain using utility
                 this.convertToReligion(this.target, ourReligion);
                 
+                // Home planet gains culture and prestige from successful conversion
+                if (this.fleet.planet && this.fleet.planet.civilization) {
+                    this.fleet.planet.c.culture *= 1.01
+                    this.fleet.planet.c.prestige *= 1.01
+                }
+                
                 this.target = null;
                 this.fleet.route = null;
             } else {
                 this.fightTarget();
             }
         }
+    }
+    
+    fightTarget() {
+        // Reduce corruption and culture for both sides when inquisitors fight
+        if (this.fleet.planet && this.fleet.planet.civilization) {
+            this.fleet.planet.c.corruption *= 0.99
+            this.fleet.planet.c.culture *= 0.99
+        }
+        if (this.target && this.target.planet && this.target.planet.civilization) {
+            this.target.planet.c.corruption *= 0.99
+            this.target.planet.c.culture *= 0.99
+        }
+        
+        return super.fightTarget()
     }
     
     calcDestination() {

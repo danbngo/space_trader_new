@@ -75,6 +75,12 @@ class ExplorerFleetAI extends FleetAI {
                     this.fleet.cargo.increment(CARGO_TYPES.RELICS, relicsFound);
                     console.log(`🧭 ${this.fleet.name} explored ${this.target.name} and discovered ${relicsFound} relics!`);
                     
+                    // Home planet gains technology and education from exploration
+                    if (this.fleet.planet && this.fleet.planet.civilization) {
+                        this.fleet.planet.c.technology *= 1.01
+                        this.fleet.planet.c.education *= 1.01
+                    }
+                    
                     // Show success popup
                     if (this.starMap) {
                         this.addPopup('💎', COLORS.Green)
@@ -127,10 +133,24 @@ class ExplorerFleetAI extends FleetAI {
     onNearDestination() {
         // Unload relics at destination if it's a major planet
         if (this.destination instanceof Planet && this.fleet.cargo.total > 0) {
+            // Check if selling relics
+            const hasRelics = this.fleet.cargo.getAmount(CARGO_TYPES.RELICS) > 0
+            
             // Boost technology for exploration discoveries
             if (this.destination.civilization) {
                 this.destination.c.technology *= 1.01;
+                if (hasRelics) {
+                    this.destination.c.culture *= 1.01;
+                    this.destination.c.education *= 1.01;
+                }
             }
+            
+            // Home planet gains wealth and reduces taxes when selling relics
+            if (hasRelics && this.fleet.planet && this.fleet.planet.civilization) {
+                this.fleet.planet.c.wealth *= 1.01
+                this.fleet.planet.c.taxes *= 0.99
+            }
+            
             this.sellCargoAtMarket(this.destination);
         }
         

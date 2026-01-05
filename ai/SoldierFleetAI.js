@@ -78,8 +78,8 @@ class SoldierFleetAI extends FleetAI {
             
             // Check if target is abandoned
             if (this.target.destroyed) {
-                // Rescue crew from abandoned fleet
-                this.rescueCrew(this.target);
+                // Rescue all crew from abandoned fleet
+                this.transferOfficers(this.target, this.fleet, null, '🪖', COLORS.Green, '🆘', COLORS.Cyan);
                 this.target = null
                 this.fleet.route = null
             } else {
@@ -91,6 +91,13 @@ class SoldierFleetAI extends FleetAI {
                 }
                 
                 if (Math.random() > 0.5) {
+                    // Soldiers fighting increases taxes, security, army, and navy on home planet
+                    if (this.fleet.planet && this.fleet.planet.civilization) {
+                        this.fleet.planet.c.taxes *= 1.01
+                        this.fleet.planet.c.security *= 1.01
+                        this.fleet.planet.c.army *= 1.01
+                        this.fleet.planet.c.navy *= 1.01
+                    }
                     this.fightTarget(true);
                 }
             }

@@ -57,6 +57,14 @@ class MercenaryFleetAI extends FleetAI {
             this.visited.push(this.target);
             
             if (Math.random() > 0.5) {
+                // Mercenaries fighting increases taxes, security, army, navy, and corruption on home planet
+                if (this.fleet.planet && this.fleet.planet.civilization) {
+                    this.fleet.planet.c.taxes *= 1.01
+                    this.fleet.planet.c.security *= 1.01
+                    this.fleet.planet.c.army *= 1.01
+                    this.fleet.planet.c.navy *= 1.01
+                    this.fleet.planet.c.corruption *= 1.01
+                }
                 this.fightTarget();
             }
         }

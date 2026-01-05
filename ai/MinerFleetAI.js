@@ -90,9 +90,14 @@ class MinerFleetAI extends FleetAI {
     onNearDestination() {
         // Sell all cargo at destination market for credits
         if (this.destination && this.destination instanceof Planet && this.fleet.cargo.total > 0) {
-            // Boost industry specifically for miners
+            // Both sides gain industry and economy from mining trade
             if (this.destination.civilization) {
                 this.destination.c.industry *= 1.01;
+                this.destination.c.economy *= 1.01;
+            }
+            if (this.fleet.planet && this.fleet.planet.civilization) {
+                this.fleet.planet.c.industry *= 1.01
+                this.fleet.planet.c.economy *= 1.01
             }
             this.sellCargoAtMarket(this.destination);
         }
@@ -103,9 +108,14 @@ class MinerFleetAI extends FleetAI {
     onNearOrigin() {
         // Sell all cargo at origin market for credits
         if (this.origin && this.origin instanceof Planet && this.fleet.cargo.total > 0) {
-            // Boost industry specifically for miners
+            // Both sides gain industry and economy from mining trade
             if (this.origin.civilization) {
                 this.origin.c.industry *= 1.01;
+                this.origin.c.economy *= 1.01;
+            }
+            if (this.fleet.planet && this.fleet.planet.civilization) {
+                this.fleet.planet.c.industry *= 1.01
+                this.fleet.planet.c.economy *= 1.01
             }
             this.sellCargoAtMarket(this.origin);
         }

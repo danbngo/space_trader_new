@@ -98,6 +98,7 @@ async function simulateFleetActivity(numYears) {
     const activityElapsedTimeElement = ce({tag: 'div', id: 'fleet_elapsed_time', children: ['Elapsed time: 0.0s']})
     const activeFleetCountElement = ce({tag: 'div', id: 'active_fleet_count', style: 'text-align: center; margin-top: 5px;', children: ['Active Fleets: 0']})
     const abandonedFleetCountElement = ce({tag: 'div', id: 'abandoned_fleet_count', style: 'text-align: center; margin-top: 5px;', children: ['Abandoned Fleets: 0']})
+    const totalFleetsEverElement = ce({tag: 'div', id: 'total_fleets_ever', style: 'text-align: center; margin-top: 5px;', children: ['Total Fleets Ever: 0']})
     const activeAnomalyCountElement = ce({tag: 'div', id: 'active_anomaly_count', style: 'text-align: center; margin-top: 5px;', children: ['Active Anomalies: 0']})
     
     const displayYears = numYears < 1 ? `${Math.round(numYears * 12)} months` : `${numYears} years`
@@ -112,6 +113,7 @@ async function simulateFleetActivity(numYears) {
             activityElapsedTimeElement,
             activeFleetCountElement,
             abandonedFleetCountElement,
+            totalFleetsEverElement,
             activeAnomalyCountElement
         ]}),
         []
@@ -140,6 +142,10 @@ async function simulateFleetActivity(numYears) {
         const abandonedCountEl = document.getElementById('abandoned_fleet_count')
         if (abandonedCountEl) {
             abandonedCountEl.textContent = `Abandoned Fleets: ${gs.system.abandonedFleets ? gs.system.abandonedFleets.length : 0}`
+        }
+        const totalFleetsEl = document.getElementById('total_fleets_ever')
+        if (totalFleetsEl) {
+            totalFleetsEl.textContent = `Total Fleets Ever: ${Fleet.numFleetsEver}`
         }
         const anomalyCountEl = document.getElementById('active_anomaly_count')
         if (anomalyCountEl) {
@@ -209,6 +215,14 @@ async function startNewGame() {
 
     gs.system.updatePositions(gs.year)
 
+    // Initialize anomalies before simulation starts
+    console.log('Initializing anomalies...')
+    if (!gs.system.anomalies) gs.system.anomalies = [];
+    while (gs.system.anomalies.length < MAX_NUM_ANOMALIES) {
+        const anomaly = generateAnomaly();
+        gs.system.anomalies.push(anomaly);
+    }
+
     // Simulate history
     try {
         await simulateHistory(SIMULATE_HISTORY_NUM_YEARS)
@@ -235,8 +249,8 @@ async function startNewGame() {
         return
     }
 
-    // Ensure maximum anomalies exist at game start
-    if (!gs.system.anomalies) gs.system.anomalies = [];
+    // Ensure maximum anomalies exist at end of simulation
+    console.log('Topping up anomalies after simulation...')
     while (gs.system.anomalies.length < MAX_NUM_ANOMALIES) {
         const anomaly = generateAnomaly();
         gs.system.anomalies.push(anomaly);

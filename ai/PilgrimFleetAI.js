@@ -46,6 +46,17 @@ class PilgrimFleetAI extends FleetAI {
             return super.onNearDestination()
         }
         
+        // Destination gains culture and population from pilgrims visiting
+        if (this.destination.civilization) {
+            this.destination.c.culture *= 1.01
+            this.destination.c.population *= 1.01
+        }
+        
+        // Home planet gains culture from pilgrimage
+        if (this.fleet.planet.civilization) {
+            this.fleet.planet.c.culture *= 1.01
+        }
+        
         // Calculate population transfer ratio (10% of origin's relative culture)
         const populationRatio = this.fleet.planet.c.culture / (this.fleet.planet.c.culture + this.destination.c.culture) * 0.1
         

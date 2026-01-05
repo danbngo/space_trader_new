@@ -1,12 +1,13 @@
 HOW WE'RE GONNA 'FIX' SATTELITES AND DWARF PLANETS
 
-dps are the equivalent of like... cuba. 
-they have news events specifically about being a minor power, and are barred from doing the major power ones
-
-
+satelites WILL NOT SEND OUT fleets, they are basically just outposts of the home planet and can only be run by major planets.
+they have less services etc.
+they can ONLY be effected by disasters, 
 
 COMPREHENSIVE TESTING PLAN WORK OUR WAY UP, THEN OUT
+
 the first priority is get rid of any actual bugs
+-player getting the drop on enemies based on positioning doesnt seem to work right
 
 next priority is to fully flesh out (but not BALANCE, that comes LATER) out every CORE part of the game
 -trading

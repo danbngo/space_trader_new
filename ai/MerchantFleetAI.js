@@ -13,6 +13,20 @@ class MerchantFleetAI extends FleetAI {
         if (this.destination && this.destination instanceof Planet) {
             this.sellCargoAtMarket(this.destination);
             this.buyCargoFromMarket(this.destination);
+            
+            // Both sides gain economy, culture, wealth, and taxes from trade
+            if (this.destination.civilization) {
+                this.destination.c.economy *= 1.01
+                this.destination.c.culture *= 1.01
+                this.destination.c.wealth *= 1.01
+                this.destination.c.taxes *= 1.01
+            }
+            if (this.fleet.planet && this.fleet.planet.civilization) {
+                this.fleet.planet.c.economy *= 1.01
+                this.fleet.planet.c.culture *= 1.01
+                this.fleet.planet.c.wealth *= 1.01
+                this.fleet.planet.c.taxes *= 1.01
+            }
         }
         
         // Spread minor culture when trading at destinations (0.1% influence)

@@ -39,8 +39,19 @@ class PoliceFleetAI extends FleetAI {
             
             // Check if target is abandoned
             if (this.target.destroyed) {
-                // Rescue crew from abandoned fleet
-                this.rescueCrew(this.target, '🚓', COLORS.Blue)
+                // Rescue all crew from abandoned fleet
+                this.transferOfficers(this.target, this.fleet, null, '🚓', COLORS.Blue, '🆘', COLORS.Cyan)
+                
+                // Both sides gain security and reduce crime
+                if (this.fleet.planet && this.fleet.planet.civilization) {
+                    this.fleet.planet.c.security *= 1.01
+                    this.fleet.planet.c.crime *= 0.99
+                }
+                if (this.target.planet && this.target.planet.civilization) {
+                    this.target.planet.c.security *= 1.01
+                    this.target.planet.c.crime *= 0.99
+                }
+                
                 this.target = null
                 this.fleet.route = null
             } else {
@@ -52,6 +63,15 @@ class PoliceFleetAI extends FleetAI {
                 }
                 
                 if (Math.random() > 0.5) {
+                    // Both sides gain security and reduce crime when police fight
+                    if (this.fleet.planet && this.fleet.planet.civilization) {
+                        this.fleet.planet.c.security *= 1.01
+                        this.fleet.planet.c.crime *= 0.99
+                    }
+                    if (this.target.planet && this.target.planet.civilization) {
+                        this.target.planet.c.security *= 1.01
+                        this.target.planet.c.crime *= 0.99
+                    }
                     this.fightTarget(true);
                 }
             }

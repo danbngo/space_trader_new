@@ -47,14 +47,42 @@ class SlaverFleetAI extends FleetAI {
             
             // Check if target is abandoned
             if (this.target.destroyed) {
-                // Take all crew from abandoned fleet using utility function
-                this.transferOfficers(this.target, this.fleet, '⛓️', COLORS.Orange, '🆘', COLORS.Gray);
+                // Take all crew from abandoned fleet (no filter = take all)
+                this.transferOfficers(this.target, this.fleet, null, '⛓️', COLORS.Orange, '🆘', COLORS.Gray);
+                
+                // Slaver home planet gains population but loses culture and prestige
+                if (this.fleet.planet && this.fleet.planet.civilization) {
+                    this.fleet.planet.c.population *= 1.01
+                    this.fleet.planet.c.culture *= 0.99
+                    this.fleet.planet.c.prestige *= 0.99
+                }
+                
+                // Target planet loses population and culture
+                if (this.target.planet && this.target.planet.civilization) {
+                    this.target.planet.c.population *= 0.99
+                    this.target.planet.c.culture *= 0.99
+                }
+                
                 this.target = null
                 this.fleet.route = null
             } else {
                 // 50% chance to capture officers peacefully, 50% chance to fight
                 if (Math.random() < 0.5) {
-                    this.transferOfficers(this.target, this.fleet);
+                    this.transferOfficers(this.target, this.fleet, null, '⛓️', COLORS.Orange);
+                    
+                    // Slaver home planet gains population but loses culture and prestige
+                    if (this.fleet.planet && this.fleet.planet.civilization) {
+                        this.fleet.planet.c.population *= 1.01
+                        this.fleet.planet.c.culture *= 0.99
+                        this.fleet.planet.c.prestige *= 0.99
+                    }
+                    
+                    // Target planet loses population and culture
+                    if (this.target.planet && this.target.planet.civilization) {
+                        this.target.planet.c.population *= 0.99
+                        this.target.planet.c.culture *= 0.99
+                    }
+                    
                     this.target = null;
                     this.fleet.route = null;
                 } else {

@@ -48,8 +48,20 @@ class BountyHunterFleetAI extends FleetAI {
             
             // Check if target is abandoned
             if (this.target.destroyed) {
-                // Abduct criminals from abandoned fleet
-                this.transferOfficers(this.target, this.fleet, '🎯', COLORS.Yellow, '⚖️', COLORS.Gray);
+                // Abduct all criminals from abandoned fleet (no filter = all are criminals)
+                this.transferOfficers(this.target, this.fleet, null, '🎯', COLORS.Yellow, '⚖️', COLORS.Gray);
+                
+                // Both sides gain security and reduce crime; bounty hunters also reduce corruption
+                if (this.fleet.planet && this.fleet.planet.civilization) {
+                    this.fleet.planet.c.security *= 1.01
+                    this.fleet.planet.c.crime *= 0.99
+                    this.fleet.planet.c.corruption *= 0.99
+                }
+                if (this.target.planet && this.target.planet.civilization) {
+                    this.target.planet.c.security *= 1.01
+                    this.target.planet.c.crime *= 0.99
+                }
+                
                 this.target = null
                 this.fleet.route = null
             } else {
@@ -73,9 +85,20 @@ class BountyHunterFleetAI extends FleetAI {
     }
     fightTarget() {
         const result = super.fightTarget(false)
-        // After combat, if we won, transfer officers from the defeated criminal
+        // After combat, if we won, transfer all officers from the defeated criminal
         if (result === this.fleet && this.target && this.target.officers && this.target.officers.length > 0) {
-            this.transferOfficers(this.target, this.fleet)
+            this.transferOfficers(this.target, this.fleet, null, '🎯', COLORS.Yellow)
+            
+            // Both sides gain security and reduce crime; bounty hunters also reduce corruption
+            if (this.fleet.planet && this.fleet.planet.civilization) {
+                this.fleet.planet.c.security *= 1.01
+                this.fleet.planet.c.crime *= 0.99
+                this.fleet.planet.c.corruption *= 0.99
+            }
+            if (this.target.planet && this.target.planet.civilization) {
+                this.target.planet.c.security *= 1.01
+                this.target.planet.c.crime *= 0.99
+            }
         }
         return result
     }

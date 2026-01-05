@@ -58,6 +58,12 @@ class MissionaryFleetAI extends FleetAI {
                 const ourReligion = this.fleet.captain.religion;
                 this.convertToReligion(this.target, ourReligion);
                 
+                // Home planet gains culture and prestige from successful conversion
+                if (this.fleet.planet && this.fleet.planet.civilization) {
+                    this.fleet.planet.c.culture *= 1.01
+                    this.fleet.planet.c.prestige *= 1.01
+                }
+                
                 // Spread culture to converted fleet's home planet (0.1% influence)
                 if (this.target.planet instanceof Planet) {
                     this.target.planet.addCulture(this.fleet.planet, 0.001);

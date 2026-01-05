@@ -428,12 +428,22 @@ class FleetAI {
         this.fleet.color = this.fleet.color.map(c => c * 0.5) // Dim color
         this.fleet.route = null // Clear route
         
+        // Remove from active fleets array
+        const activeIndex = gs.system.fleets.indexOf(this.fleet);
+        if (activeIndex >= 0) {
+            gs.system.fleets.splice(activeIndex, 1);
+            console.log(`🗑️ Removed ${this.fleet.name} from active fleets array`);
+        }
+        
         // Add to abandoned fleets array for salvagers/hackers to find
         if (!gs.system.abandonedFleets.includes(this.fleet)) {
             gs.system.abandonedFleets.push(this.fleet)
         }
         
-        // Change name to indicate abandoned status
+        // Preserve original name and change name to indicate abandoned status
+        if (!this.fleet.originalName) {
+            this.fleet.originalName = this.fleet.name
+        }
         this.fleet.name = `Abandoned ${this.fleet.fleetType.name}`
         
         console.log(`🔧 ${this.fleet.name} marked as destroyed at (${this.fleet.x.toFixed(2)}, ${this.fleet.y.toFixed(2)})`)
@@ -497,32 +507,53 @@ class FleetAI {
     }
 
     /**
-     * Transfer officers (excluding captain) from one fleet to another
+     * Transfer officers from one fleet to another. Takes ALL officers that match optional filter.
+     * If fromFleet has co-religionists/faction members, one becomes new captain.
+     * If no officers remain, fromFleet is destroyed and moved to abandonedFleets.
      * @param {Fleet} fromFleet - Fleet to take officers from (can be destroyed)
      * @param {Fleet} toFleet - Fleet to transfer officers to
+     * @param {(officer: Officer) => boolean} filter - Optional filter function (default: take all)
      * @param {string} emoji - Emoji to display for capture action (default 👥)
      * @param {number[]} color - Color for capture popup (default Orange)
      * @param {string} fromEmoji - Emoji to display at source fleet (default 💔)
      * @param {number[]} fromColor - Color for source popup (default DarkRed)
      */
-    transferOfficers(fromFleet, toFleet, emoji = '👥', color = COLORS.Orange, fromEmoji = '💔', fromColor = COLORS.DarkRed) {
-        if (!fromFleet.captain || !toFleet.captain) return;
+    transferOfficers(fromFleet, toFleet, filter = null, emoji = '👥', color = COLORS.Orange, fromEmoji = '💔', fromColor = COLORS.DarkRed) {
+        if (!fromFleet.officers || fromFleet.officers.length === 0) return;
+        if (!toFleet.captain) return;
         
-        // Only transfer subordinates, never the captain
-        const officersToTake = fromFleet.subordinates.slice(); // Copy array
+        // Determine which officers to take (all by default, or filtered)
+        const officersToTake = filter 
+            ? fromFleet.officers.filter(filter)
+            : [...fromFleet.officers]; // Take ALL officers
+        
         if (officersToTake.length === 0) return;
         
-        // Remove all subordinates from source fleet
+        // Transfer officers
         for (const officer of officersToTake) {
             fromFleet.removeOfficer(officer);
             toFleet.officers.push(officer);
         }
         
-        console.log(`${emoji} ${toFleet.name+' '+toFleet.uuid} captured ${officersToTake.length} officers from ${fromFleet.name+' '+fromFleet.uuid}`);
+        console.log(`${emoji} ${toFleet.name+' '+toFleet.uuid} took ${officersToTake.length} officer(s) from ${fromFleet.name+' '+fromFleet.uuid}`);
         
-        // Show crew capture popup
-            this.addPopup(emoji, color, toFleet.x, toFleet.y)
-            this.addPopup(fromEmoji, fromColor, fromFleet.x, fromFleet.y)
+        // Try to restore captain from remaining officers if possible
+        if (!fromFleet.captain && fromFleet.officers.length > 0) {
+            fromFleet.captain = fromFleet.officers[0];
+            console.log(`👤 ${fromFleet.officers[0].name} became new captain of ${fromFleet.name}`);
+        }
+        
+        // If no officers remain, destroy the fleet
+        if (fromFleet.officers.length === 0) {
+            console.log(`☠️ ${fromFleet.name} has no crew remaining - moving to abandoned fleets`);
+            if (fromFleet.fleetAI && !fromFleet.destroyed) {
+                fromFleet.fleetAI.onDestroyed(toFleet);
+            }
+        }
+        
+        // Show crew transfer popup
+        this.addPopup(emoji, color, toFleet.x, toFleet.y)
+        this.addPopup(fromEmoji, fromColor, fromFleet.x, fromFleet.y)
     }
 
     /**
@@ -664,27 +695,7 @@ class FleetAI {
         return purchasedCount;
     }
 
-    /**
-     * Rescue all crew from a destroyed fleet
-     * @param {Fleet} abandonedFleet - Destroyed fleet to rescue from
-     * @param {string} emoji - Emoji to display for rescue action (default 🚁)
-     * @param {number[]} color - Color for rescue popup (default Cyan)
-     */
-    rescueCrew(abandonedFleet, emoji = '🚁', color = COLORS.Cyan) {
-        if (!abandonedFleet.destroyed) return;
-        if (abandonedFleet.officers.length === 0) return;
-        
-        // Rescue all officers including the captain
-        const officersToRescue = [...abandonedFleet.officers];
-        for (const officer of officersToRescue) {
-            abandonedFleet.removeOfficer(officer);
-            this.fleet.officers.push(officer);
-        }
-        
-        console.log(`${emoji} ${this.fleet.name} rescued ${officersToRescue.length} survivors from ${abandonedFleet.name}`);
-        this.addPopup(emoji, color, this.fleet.x, this.fleet.y);
-        this.addPopup('✅', COLORS.Green, abandonedFleet.x, abandonedFleet.y);
-    }
+
 
     /**
      * Make scientific/exploration discoveries and award relics

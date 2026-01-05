@@ -38,6 +38,15 @@ class SyndicateFleetAI extends FleetAI {
             // 75% chance to extort credits peacefully, 25% chance to fight
             if (Math.random() < 0.5) {
                 this.transferCredits(this.target, this.fleet);
+                
+                // Syndicate home planet gains corruption, target loses wealth
+                if (this.fleet.planet && this.fleet.planet.civilization) {
+                    this.fleet.planet.c.corruption *= 1.01
+                }
+                if (this.target.planet && this.target.planet.civilization) {
+                    this.target.planet.c.wealth *= 0.99
+                }
+                
                 this.target = null;
                 this.fleet.route = null;
             } else {

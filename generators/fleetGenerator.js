@@ -124,6 +124,9 @@ async function addFleetActivity(numYears = 2, progress = {completePercentage: 0}
         if (gs.system.fleets.length > 100) throw new Error('TOO MANY FLEETS!')
         fleetsSpawned += (gs.system.fleets.length - fleetCountBefore)
         
+        // Check for anomalies (maintain anomaly pool as they get investigated)
+        checkForAnomalies(1)
+        
         // Tick NPC fleet AI (move fleets around with daily time increments)
         tickNPCFleets(YEARS_PER_DAY)
         

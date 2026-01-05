@@ -225,6 +225,9 @@ function assessFleets() {
     console.log("======================================")
     console.log("")
 
+    console.log('FLEETS:',gs.system.fleets)
+    console.log('ABANDONED FLEETS:',gs.system.abandonedFleets)
+
     // Get all fleets
     const allFleets = gs.system.fleets || []
     console.log('Total Fleets in System:', allFleets.length)

@@ -6,6 +6,62 @@
 class DiplomatFleetAI extends FleetAI {
     constructor(fleet = null, origin = null, starMap = null) {
         super(fleet, origin, starMap);
+        /** @type {Fleet[]} - Diplomat fleets already met to avoid repeat meetings */
+        this.metDiplomats = [];
+    }
+
+    calcValidTargets() {
+        // Target diplomat fleets from different planets that haven't been met yet
+        const otherDiplomats = gs.system.fleets.filter(fleet => {
+            // Must be a diplomat fleet
+            if (fleet.type !== FLEET_TYPES.DIPLOMATS) return false
+            // Don't target self
+            if (fleet === this.fleet) return false
+            // Don't target diplomats from the same planet
+            if (fleet.planet === this.fleet.planet) return false
+            // Don't target diplomats we've already met
+            if (this.metDiplomats.includes(fleet)) return false
+            return true
+        })
+        
+        return otherDiplomats
+    }
+
+    onNearTarget() {
+        // When meeting another diplomat fleet, improve relationships between their home planets
+        if (this.target && this.target instanceof Fleet && this.target.type === FLEET_TYPES.DIPLOMATS) {
+            this.metDiplomats.push(this.target)
+            
+            // Diplomatic meeting between two fleets
+            if (this.fleet.planet && this.fleet.planet.civilization && this.target.planet && this.target.planet.civilization) {
+                const planet1 = this.fleet.planet
+                const planet2 = this.target.planet
+                
+                // Both planets gain prestige from the meeting
+                planet1.c.prestige *= 1.01
+                planet2.c.prestige *= 1.01
+                
+                // 20% chance to improve relationship (higher than planet visits)
+                if (Math.random() < 0.2) {
+                    const currentRelationship = planet1.c.relationships.get(planet2)
+                    
+                    // Improve relationship by one step
+                    if (currentRelationship === RELATIONSHIP_TYPES.WAR) {
+                        planet1.c.relationships.set(planet2, RELATIONSHIP_TYPES.TENSE)
+                        planet2.c.relationships.set(planet1, RELATIONSHIP_TYPES.TENSE)
+                        console.log(`🕊️ ${this.fleet.name} met ${this.target.name}: ${planet1.name} and ${planet2.name} are no longer at war`)
+                    } else if (currentRelationship === RELATIONSHIP_TYPES.TENSE) {
+                        planet1.c.relationships.set(planet2, RELATIONSHIP_TYPES.NEUTRAL)
+                        planet2.c.relationships.set(planet1, RELATIONSHIP_TYPES.NEUTRAL)
+                        console.log(`🕊️ ${this.fleet.name} met ${this.target.name}: ${planet1.name} and ${planet2.name} are now neutral`)
+                    } else if (currentRelationship === RELATIONSHIP_TYPES.NEUTRAL) {
+                        planet1.c.relationships.set(planet2, RELATIONSHIP_TYPES.ALLY)
+                        planet2.c.relationships.set(planet1, RELATIONSHIP_TYPES.ALLY)
+                        console.log(`🕊️ ${this.fleet.name} met ${this.target.name}: ${planet1.name} and ${planet2.name} formed an alliance`)
+                    }
+                }
+            }
+        }
     }
     
     calcDestination() {

@@ -1,4 +1,4 @@
-let DEBUG_MODE = false
+let DEBUG_MODE = true //change this back before goign to prod
 const DEFAULT_FONT_SIZE = 16
 
 // Modeling the Solar System using Star and Planet classes
@@ -119,6 +119,6 @@ const CIVILIZATION_CULTURE_DISAPPEAR_THRESHOLD = 0.0001
 
 
 const SIMULATE_FLEET_ACTIVITY_YEARS = 10
-const SIMULATE_HISTORY_NUM_YEARS = 1
+const SIMULATE_HISTORY_NUM_YEARS = 100
 const CLOAK_REGEN_RATE = 30*4 //takes 1 week to fully cloak
 const NPC_FLEET_MAX_PURCHASE_CARGO_RATIO = 0.5 //max fraction of market cargo NPC fleets will buy when trading

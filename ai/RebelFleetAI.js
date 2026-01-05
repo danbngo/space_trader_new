@@ -72,18 +72,18 @@ class RebelFleetAI extends FleetAI {
                     return;
                 }
                 
-                // Reduce prestige and culture when rebels fight
-                if (this.fleet.planet && this.fleet.planet.civilization) {
-                    this.fleet.planet.c.prestige *= 0.999;
-                    this.fleet.planet.c.culture *= 0.999;
-                }
-                
                 // Always fight fleets from their home planet
                 this.fightTarget();
             }
         }
     }
     fightTarget() {
+        // Rebels fighting reduces prestige and culture on their home planet
+        if (this.fleet.planet && this.fleet.planet.civilization) {
+            this.fleet.planet.c.prestige *= 0.99
+            this.fleet.planet.c.culture *= 0.99
+        }
+        
         return super.fightTarget(true)
     }
     onDestroyed(destroyedBy = null) {
