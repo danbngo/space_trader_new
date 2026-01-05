@@ -145,11 +145,15 @@ function showBankMenu(bank = new Bank()) {
     const canWithdraw = bank.playerBalance > 0
     const canDeposit = gs.credits > 0
     const canBorrow = bank.calcLoanMaxAmount(gs.captain) > 0
+    
+    // Check access
+    const accessDeniedReason = BuildingType.getAccessDeniedReason(planet, bank)
+    const canAccess = accessDeniedReason === null
 
     const baseButtons = [
-        ...(isDocked && canWithdraw ? [['Withdraw', ()=>showWithdrawSlider()]] : []),
-        ...(isDocked && canDeposit ? [['Deposit', ()=>showDepositSlider()]] : []),
-        ...(isDocked && canBorrow ? [['Borrow', ()=>showBorrowSlider()]] : []),
+        ...(canAccess && isDocked && canWithdraw ? [['Withdraw', ()=>showWithdrawSlider()]] : []),
+        ...(canAccess && isDocked && canDeposit ? [['Deposit', ()=>showDepositSlider()]] : []),
+        ...(canAccess && isDocked && canBorrow ? [['Borrow', ()=>showBorrowSlider()]] : []),
     ]
 
     function onSelectLoan(loan = new BankLoan()) {
@@ -164,6 +168,7 @@ function showBankMenu(bank = new Bank()) {
 
     let infoContainer = ce({
         children: [
+            accessDeniedReason ? colorSpan(accessDeniedReason, COLORS.Orange) + '<br/>' : '',
             isDocked ? 'Welcome to the bank.<br/>' : colorSpan('You must dock to use the bank.', COLORS.Yellow) + '<br/>',
             `<u>Your loans</u>`,
             createBankLoansTable(gs.loans, onSelectLoan),

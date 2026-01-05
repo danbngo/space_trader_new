@@ -7,6 +7,8 @@ function showCourthouseMenu(courthouse = new Courthouse()) {
     const reloadMenu = ()=>showCourthouseMenu(courthouse)
     const isDocked = gs.location == planet
     const planetBounty = gs.captain.bounty.getAmount(planet)
+    const currentRank = gs.captain.ranks.get(planet) || RANK_TYPES.NO_RANK
+    const planetReputation = gs.captain.reputation.getAmount(planet)
 
     function payBounty(amount = 0) {
         const penalty = courthouse.calcPayBountyPenalty(amount)
@@ -48,12 +50,41 @@ function showCourthouseMenu(courthouse = new Courthouse()) {
         )
     }
 
+    function upgradeRank() {
+        const price = courthouse.calcUpgradeRankPrice(gs.captain)
+        const nextRank = RANK_TYPES_ALL.find(r => r.level === currentRank.level + 1)
+        gs.credits -= price
+        gs.captain.ranks.set(planet, nextRank)
+        reloadMenu()
+    }
+
+    function showUpgradeRankModal() {
+        const price = courthouse.calcUpgradeRankPrice(gs.captain)
+        const nextRank = RANK_TYPES_ALL.find(r => r.level === currentRank.level + 1)
+        showModal(`Upgrade Rank`,
+            `Upgrade your rank from ${colorSpan(currentRank.name, currentRank.color)} to ${colorSpan(nextRank.name, nextRank.color)} for ${price} CR?<br/>`,
+            [
+                ['Yes', ()=>{upgradeRank()}],
+                ['No', ()=>{reloadMenu()}],
+            ],
+            'upgrade_rank_modal'
+        )
+    }
+
     const canPayBounty = gs.credits > 0 && planetBounty > 0
+    const upgradePrice = courthouse.calcUpgradeRankPrice(gs.captain)
+    const canUpgradeRank = upgradePrice !== null && planetReputation > 0 && planetBounty === 0 && gs.credits >= upgradePrice
 
     const baseButtons = [
         ...(isDocked && canPayBounty ? [['Pay Bounty', ()=>showPayBountySlider()]] : []),
         ...(isDocked && planetBounty > 0 ? [['Serve Jail Time', ()=>showServeJailTimeModal(Math.ceil(planetBounty*JAIL_DAYS_PER_1000CR_FINE/1000))]] : []),
+        ...(isDocked && canUpgradeRank ? [['Upgrade Rank', ()=>showUpgradeRankModal()]] : []),
     ]
+
+    const nextRank = RANK_TYPES_ALL.find(r => r.level === currentRank.level + 1)
+    const rankUpgradeInfo = upgradePrice !== null 
+        ? `Rank Upgrade: ${colorSpan(currentRank.name, currentRank.color)} → ${colorSpan(nextRank.name, nextRank.color)} for ${upgradePrice} CR<br/>`
+        : `Rank: ${colorSpan(currentRank.name, currentRank.color)} (Max Rank)<br/>`
 
     let infoContainer = ce({
         children: [
@@ -61,6 +92,8 @@ function showCourthouseMenu(courthouse = new Courthouse()) {
             `Your CR: ${gs.credits} | Your Bounty (${coloredName(planet)}): ${planetBounty}<br/>`,
             `Your Total Bounty (All Planets): ${gs.captain.bounty.total}<br/>`,
             `Courthouse Pay Bounty Penalty: ${roundToPlaces(courthouse.calcPayBountyPenalty(100),2)}%<br/>`,
+            rankUpgradeInfo,
+            upgradePrice !== null && !canUpgradeRank && isDocked ? colorSpan(`Rank upgrade requires positive reputation, no bounty, and ${upgradePrice} CR.`, COLORS.Orange) + '<br/>' : '',
         ]
     })
 

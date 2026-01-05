@@ -8,60 +8,76 @@ class BuildingType {
      * @param {number[]} color - The color associated with this building type.
      * @param {RankType} minRank
      */
-    constructor(name = '', color = COLORS.White, baseCredits = 1, minRank) {
+    constructor(name = '', color = COLORS.White, minRank = RANK_TYPES.NO_RANK, baseCredits = 1) {
         /** @type {string} */
         this.name = name
         /** @type {number[]} */
         this.color = color;
-        /** @type {number} */
-        this.baseCredits = baseCredits
         /** @type {RankType} */
         this.minRank = minRank || RANK_TYPES.NO_RANK
+        /** @type {number} */
+        this.baseCredits = baseCredits
     }
-    /**
-     * Check if player can access this building (reputation + special conditions)
-     * @param {Planet} planet - The planet to check access for
-     * @param {boolean} isDocked - Whether the player is docked at the planet
-     * @returns {Object} {canShow: boolean, isDisabled: boolean}
-     */
-    canAccess(planet, isDocked) {
 
-        const playerRank = gs.captain.ranks.get(planet)
+    /**
+     * Gets the reason why player cannot access this building, or null if they can access it.
+     * Reasons are checked in priority order: not docked, insufficient rank, damaged.
+     * @param {Planet} planet - The planet the building is on.
+     * @param {Building} building - The building instance.
+     * @returns {string|null} The reason for denial, or null if access is allowed.
+     */
+    static getAccessDeniedReason(planet, building) {
+        const isDocked = gs.location === planet
+        const buildingType = building.buildingType
+        const playerRank = gs.captain.ranks.get(planet) || RANK_TYPES.NO_RANK
         
-        
-        // Check government blocks
-        const blockedBuildings = planet.civilization.governmentType.blockedBuildings || []
-        const isBlocked = blockedBuildings.includes(this)
-        
-        // Palace has special access requirements
-        if (this === BUILDING_TYPES.PALACE) {
-            const hasBounty = gs.captain.calcBountyForPlanet(planet) > 0
-            const hasInfamy = gs.captain.calcReputationForTarget(planet) < 0
-            const playerRank = gs.captain.ranks.get(planet) || RANK_TYPES.NO_RANK
-            const isElite = playerRank === RANK_TYPES.ELITE
-            const canEnter = !hasBounty && (!hasInfamy || isElite) && !isBlocked
-            return {canShow: true, isDisabled: !isDocked || !canEnter}
+        // Priority 1: Not docked
+        if (!isDocked) {
+            return 'You must dock to access this building.'
         }
         
-        return {canShow: true, isDisabled: isBlocked}
+        // Priority 2: Insufficient rank
+        // Check if player has sufficient rank with this planet OR with its sovereign (if it's a subject)
+        let hasAccess = playerRank.level >= buildingType.minRank.level
+        
+        // If player doesn't have access via planet rank, check if planet is a subject
+        if (!hasAccess && planet.c && planet.c.relationships) {
+            // Find the sovereign (if any) - the body where this planet has SUBJECT relationship
+            const allBodies = [...gs.system.planets, ...gs.system.dwarfPlanets, ...gs.system.moons, ...gs.system.spaceStations]
+            const sovereign = allBodies.find(body => planet.c.relationships.get(body) === RELATIONSHIP_TYPES.SUBJECT)
+            
+            if (sovereign) {
+                const sovereignRank = gs.captain.ranks.get(sovereign) || RANK_TYPES.NO_RANK
+                hasAccess = sovereignRank.level >= buildingType.minRank.level
+            }
+        }
+        
+        if (!hasAccess) {
+            return `Requires ${buildingType.minRank.name} rank or higher.`
+        }
+        
+        // Priority 3: Building damaged
+        if (building.damaged) {
+            return 'This building is closed for repairs.'
+        }
+        
+        return null
     }
 }
 
 const BUILDING_TYPES = {
-    SHIPYARD: new BuildingType('Shipyard', COLORS.LightGray, 20*1000),
-    MARKET: new BuildingType('Market', COLORS.LightBlue, 30*1000),
-    BANK: new BuildingType('Bank', COLORS.Yellow, 50*1000, FAME_LEVELS.LIKED),
-    BLACK_MARKET: new BuildingType('Black Market', COLORS.Red, 10*1000, FAME_LEVELS.UNKNOWN, INFAMY_LEVELS.DISLIKED),
-    GUILD: new BuildingType('Guild', COLORS.Purple, 10*1000, FAME_LEVELS.RENOWNED),
-    ACADEMY: new BuildingType('Academy', COLORS.Green, 10*1000, FAME_LEVELS.REPUTABLE),
-    TAVERN: new BuildingType('Tavern', COLORS.Orange, 5*1000, FAME_LEVELS.UNKNOWN, INFAMY_LEVELS.DISREPUTABLE),
-    COURTHOUSE: new BuildingType('Court House', COLORS.Brown, 10*1000, FAME_LEVELS.UNKNOWN, INFAMY_LEVELS.UNKNOWN, FAME_LEVELS.UNKNOWN, 1),
-    CYBER_SURGEON: new BuildingType('Cyber Surgeon', COLORS.DarkCyan, 15*1000, FAME_LEVELS.UNKNOWN, INFAMY_LEVELS.NOTORIOUS),
-    GENETICIST: new BuildingType('Geneticist', COLORS.LightGreen, 15*1000, FAME_LEVELS.UNKNOWN, INFAMY_LEVELS.NOTORIOUS),
-    PALACE: new BuildingType('Palace', COLORS.Gold, 10*1000, FAME_LEVELS.LEGENDARY),
-    TEMPLE: new BuildingType('Temple', COLORS.White, 5*1000, FAME_LEVELS.REPUTABLE),
-    ARMORY: new BuildingType('Armory', COLORS.DarkGray, 12*1000, FAME_LEVELS.UNKNOWN, INFAMY_LEVELS.DISLIKED),
-    OUTFITTER: new BuildingType('Outfitter', COLORS.LightGreen, 12*1000, FAME_LEVELS.UNKNOWN, INFAMY_LEVELS.DISLIKED),
-    CASINO: new BuildingType('Casino', COLORS.Magenta, 20*1000, FAME_LEVELS.UNKNOWN, INFAMY_LEVELS.UNKNOWN, FAME_LEVELS.REPUTABLE),
+    COURTHOUSE: new BuildingType('Court House', COLORS.Brown, RANK_TYPES.OUTLAW, 10*1000),
+    SHIPYARD: new BuildingType('Shipyard', COLORS.LightGray, RANK_TYPES.NO_RANK, 20*1000),
+    BLACK_MARKET: new BuildingType('Black Market', COLORS.Red, RANK_TYPES.VISA, 10*1000),
+    MARKET: new BuildingType('Market', COLORS.LightBlue, RANK_TYPES.VISA, 30*1000),
+    TAVERN: new BuildingType('Tavern', COLORS.Orange, RANK_TYPES.VISA, 5*1000),
+    BANK: new BuildingType('Bank', COLORS.Yellow, RANK_TYPES.CITIZEN, 50*1000),
+    GUILD: new BuildingType('Guild', COLORS.Purple, RANK_TYPES.CITIZEN, 10*1000),
+    ACADEMY: new BuildingType('Academy', COLORS.Green, RANK_TYPES.CITIZEN, 10*1000),
+    TEMPLE: new BuildingType('Temple', COLORS.White, RANK_TYPES.CITIZEN, 5*1000),
+    CASINO: new BuildingType('Casino', COLORS.Magenta, RANK_TYPES.ELITE, 20*1000),
+    CYBER_SURGEON: new BuildingType('Cyber Surgeon', COLORS.DarkCyan, RANK_TYPES.ELITE, 15*1000),
+    GENETICIST: new BuildingType('Geneticist', COLORS.LightGreen, RANK_TYPES.ELITE, 15*1000),
+    PALACE: new BuildingType('Palace', COLORS.Gold, RANK_TYPES.ELITE, 10*1000),
 }
 const BUILDING_TYPES_ALL = Object.values(BUILDING_TYPES)

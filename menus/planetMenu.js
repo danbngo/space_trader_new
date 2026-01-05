@@ -47,21 +47,40 @@ function showPlanetMenu(planet = new Planet()) {
         const damagedShips = gs.fleet.ships.filter(s=>s.isDamaged())
         if (damagedShips.length > 0) msg += colorSpan(`Your ships receive complementary repairs courtesy of the dock's nanite swarm.<br/>`, COLORS.LightGreen)
         for (const s of damagedShips) s.repairHull()
+        
+        // Check for damaged buildings
+        if (settlement) {
+            const damagedBuildings = []
+            for (const {type, prop} of buildingHandlerMapping) {
+                const building = settlement[prop]
+                if (building && building.damaged) {
+                    damagedBuildings.push(type.name)
+                }
+            }
+            if (damagedBuildings.length > 0) {
+                const buildingList = damagedBuildings.join(' and ')
+                const verb = damagedBuildings.length === 1 ? 'is' : 'are'
+                msg += colorSpan(`The ${buildingList} ${verb} closed for repairs.<br/>`, COLORS.Orange)
+            }
+        }
     }
-
+    /** @type {(ButtonData|HTMLElement)[]} */
     const options = []
     
     // Iterate through all buildings
     if (settlement) for (const {type, prop, menu} of buildingHandlerMapping) {
         const building = settlement[prop]
-        if (building) {
-            const access = 
-                building.permitted ? {canShow:false, canAccess: false} :
-                type.canAccess(planet, isDocked)
-            if (building.damaged) access.canAccess = false
-            if (access.canShow) {
-                const levelDisplay = building.level ? ` ${toRomanNumeral(building.level)}` : ''
-                options.push([type.name + levelDisplay, () => menu(building), access.isDisabled])
+        if (building && building.exists !== false) {
+            const accessDeniedReason = BuildingType.getAccessDeniedReason(planet, building)
+            const isDisabled = accessDeniedReason !== null
+            const levelDisplay = building.level ? ` ${toRomanNumeral(building.level)}` : ''
+            const buttonText = type.name + levelDisplay
+            
+            // Add tooltip for disabled buttons
+            if (isDisabled && accessDeniedReason) {
+                options.push([buttonText, () => menu(building), true, accessDeniedReason])
+            } else {
+                options.push([buttonText, () => menu(building), false])
             }
         }
     }
@@ -84,6 +103,7 @@ function showPlanetMenu(planet = new Planet()) {
 function showMoonsMenu(planet = new Planet()) {
     let msg = `${coloredName(planet)} has ${planet.children.length} major moon${planet.children.length > 1 ? 's' : ''}:<br/><br/>`
     
+    /** @type { (ButtonData|HTMLElement)[] } */
     const options = []
     for (const moon of planet.children) {
         if (moon instanceof Moon) options.push([moon.name, () => showPlanetMenu(moon)])
@@ -135,14 +155,14 @@ function showPlanetSocietyMenu(planet = new Planet()) {
             
             // Use specific describe functions where available
             switch(ratingName) {
-                case 'population': displayValue = describePopulation(value); break;
+                case 'population': displayValue = describePopulation(value, planet); break;
                 case 'territory': displayValue = describeTerritory(value); break;
-                case 'army': displayValue = describeArmy(value); break;
-                case 'navy': displayValue = describeNavy(value); break;
-                case 'industry': displayValue = describeIndustry(value); break;
-                case 'economy': displayValue = describeEconomy(value); break;
-                case 'security': displayValue = describeSecurity(value); break;
-                case 'culture': displayValue = describeCulture(value); break;
+                case 'army': displayValue = describeArmy(value, planet); break;
+                case 'navy': displayValue = describeNavy(value, planet); break;
+                case 'industry': displayValue = describeIndustry(value, planet); break;
+                case 'economy': displayValue = describeEconomy(value, planet); break;
+                case 'security': displayValue = describeSecurity(value, planet); break;
+                case 'culture': displayValue = describeCulture(value, planet); break;
                 case 'technology': displayValue = describeTechnology(value); break;
             }
             
@@ -178,10 +198,10 @@ function showPlanetSocietyMenu(planet = new Planet()) {
     }
     
         // Create layout using createColumnLayout
-        const topSection = createColumnLayout([overviewContent, policiesContent])
+        const topSection = createColumnLayout([ce({innerHTML: overviewContent}), ce({innerHTML: policiesContent})])
         const hr = ce({tag: 'hr', style: {margin: '20px 0', border: `1px solid ${rgbArrayToString(COLORS.Gray)}`}})
         const ratingsHeader = ce({children: ['<u>Ratings</u>']})
-        const ratingsSection = createColumnLayout([leftRatingsContent, rightRatingsContent])
+        const ratingsSection = createColumnLayout([ce({innerHTML: leftRatingsContent}), ce({innerHTML: rightRatingsContent})])
         
         content = ce({
             children: [topSection, hr, ratingsHeader, ratingsSection]
@@ -257,7 +277,7 @@ function showPlanetClimateMenu(planet = new Planet()) {
     rightContent += `Asteroid Impacts: ${asteroidImpact.coloredName}<br/>`
     
     // Create column layout
-    const columnLayout = createColumnLayout([leftContent, rightContent])
+    const columnLayout = createColumnLayout([ce({innerHTML: leftContent}), ce({innerHTML: rightContent})])
     
     // Planet features (outside the columns)
     const features = ce({children: []})

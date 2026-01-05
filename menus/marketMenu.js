@@ -37,6 +37,10 @@ function showMarketMenu(market = new Market()) {
     const buyPrices = market.calcCargoBuyPrices()
     const sellPrices = market.calcCargoSellPrices()
     const reloadMenu = ()=>showMarketMenu(market)
+    
+    // Check access
+    const accessDeniedReason = BuildingType.getAccessDeniedReason(planet, market)
+    const canAccess = accessDeniedReason === null
 
     function buyCargo(ct = CARGO_TYPES_ALL[0], amt = 0) {
         const buyPrice = buyPrices.getAmount(ct)
@@ -98,9 +102,10 @@ function showMarketMenu(market = new Market()) {
         const sellableAmount = Math.min(playerAmount, marketAffordableAmount)
         console.log({playerAmount,marketAmount,buyPrice,sellPrice,playerAffordableAmount,buyableAmount,marketAffordableAmount,sellableAmount})
         
-        const canBuy = isDocked && buyableAmount > 0
-        const canSell = isDocked && sellableAmount > 0
+        const canBuy = canAccess && isDocked && buyableAmount > 0
+        const canSell = canAccess && isDocked && sellableAmount > 0
         
+        /** @type {ButtonData[]} */
         const buttons = [
             ['Buy', ()=>showBuyCargoSlider(ct, buyableAmount, buyPrice), !canBuy],
             ['Sell', ()=>showSellCargoSlider(ct, sellableAmount, sellPrice), !canSell],
@@ -111,6 +116,7 @@ function showMarketMenu(market = new Market()) {
 
     let infoContainer = ce({
         children: [
+            accessDeniedReason ? colorSpan(accessDeniedReason, COLORS.Orange) + '<br/>' : '',
             isDocked 
                 ? (blackMarket ? 'You slip into the shadows of the black market.<br/>' : 'Welcome to the market.<br/>') 
                 : colorSpan(`You must dock to use the ${blackMarket ? 'black market' : 'market'}.`, COLORS.Yellow) + '<br/>',

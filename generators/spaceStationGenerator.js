@@ -47,6 +47,11 @@ function generateSpaceStation(name = "Station", lagrangePoint, asteroidBelts = [
     // Must be done after station is created so they can reference it
     station.civilization = generateCivilization(station)
     station.settlement = generateSettlement(station)
+    
+    // Assign this station as a subject of a random major planet
+    // This must be done after SOLAR_SYSTEM is created with all planets
+    // The actual relationship setup happens in generateSpaceStations after all stations exist
+    
     return station
 }
 
@@ -193,6 +198,28 @@ function generateSpaceStations(count = rng(5, 3), lagrangePoints = [], asteroidB
         
         const station = generateSpaceStation(name, lagrangePoint, asteroidBelts)
         stations.push(station)
+    }
+    
+    // Set up relationships for all stations after they're created
+    // Each station becomes a subject of a random major planet
+    const allBodies = [...SOLAR_SYSTEM.planets, ...SOLAR_SYSTEM.dwarfPlanets, ...SOLAR_SYSTEM.moons]
+    
+    for (const station of stations) {
+        // Pick a random planet to be this station's sovereign
+        const sovereign = SOLAR_SYSTEM.planets[Math.floor(Math.random() * SOLAR_SYSTEM.planets.length)]
+        
+        // Set up subject-sovereign relationship
+        station.c.relationships.set(sovereign, RELATIONSHIP_TYPES.SUBJECT)
+        sovereign.c.relationships.set(station, RELATIONSHIP_TYPES.SOVEREIGN)
+        
+        // Set neutral relationships with all other bodies
+        for (const body of allBodies) {
+            if (body !== sovereign && !station.c.relationships.has(body)) {
+                station.c.relationships.set(body, RELATIONSHIP_TYPES.NEUTRAL)
+            }
+        }
+        
+        console.log(`${station.name} is now a subject of ${sovereign.name}`)
     }
     
     return stations

@@ -17,4 +17,11 @@ class Courthouse extends Building {
         //OR, if you're caught with a bounty you pay it PLUS do jailtime.
         return Math.ceil( bountyAmount * this.planet.c.inflation * Math.pow(0.01, 1+this.planet.c.corruption) )
     }
+    calcUpgradeRankPrice(officer) {
+        const currentRank = officer.ranks.get(this.planet) || RANK_TYPES.NO_RANK
+        // Find next rank level
+        const nextRank = RANK_TYPES_ALL.find(r => r.level === currentRank.level + 1)
+        if (!nextRank) return null
+        return Math.ceil(nextRank.upgradeFee * (1 + this.planet.c.corruption + this.planet.c.prestige))
+    }
 }

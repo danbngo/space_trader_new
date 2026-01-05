@@ -18,7 +18,7 @@ class Building {
         /** @type {number} */
         this.credits = 1
         this.level = 1
-        this.permitted = true;
+        this.exists = true;
         //this.normalize() //danmod this causes errors because the extending child class tries to use ITS normalize function instead of the one below
     }
     normalize() {

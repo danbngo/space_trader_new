@@ -63,9 +63,9 @@ class Settlement {
         return [this.academy, this.armory, this.bank, this.blackMarket, this.casino, this.courthouse, this.cyberSurgeon, this.geneticist, this.guild, this.market, this.outfitter, this.palace, this.shipyard, this.tavern, this.temple]
     }
     get damagableBuildings() {
-        return this.buildings.filter(b=>(b.permitted && b.level > 0))
+        return this.buildings.filter(b=>(b.exists && b.level > 0))
     }
     get improvableBuildings() {
-        return this.buildings.filter(b=>(b.permitted))
+        return this.buildings.filter(b=>(b.exists))
     }
 }

@@ -3,7 +3,7 @@
  * @param {Planet} planet 
  * @param {string} title 
  * @param {string|HTMLElement} msg 
- * @param {ButtonData[]} options 
+ * @param {(ButtonData|HTMLElement)[]} options 
  * @param {string} modalId 
  * @param {(nextPlanet: Planet) => void} onNavigate 
  */

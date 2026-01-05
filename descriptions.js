@@ -104,9 +104,10 @@ function describeNumChange(delta = 0) {
 }
 const dnc = describeNumChange
 
-function describePopulation(populationRating = 0) {
+function describePopulation(populationRating = 0, planet = null) {
+    const multiplier = planet?.objectType?.powerMultiplier ?? 1
     const popCountB = Math.pow(10,populationRating)-1
-    const popCount = popCountB * 1*1000*1000*1000 //in billions
+    const popCount = popCountB * 1*1000*1000*1000 * multiplier //in billions
     return `${statColorSpan(describeLargeNumber(popCount), populationRating)}`
 }
 
@@ -114,33 +115,39 @@ function describeTerritory(territoryRating = 0) {
     return `${statColorSpan(roundToPlaces(territoryRating,2), territoryRating)} AU`
 }
 
-function describeArmy(armyRating = 0) {
-    const soldiers = Math.round(Math.pow(10, armyRating) * 100000)
+function describeArmy(armyRating = 0, planet = null) {
+    const multiplier = planet?.objectType?.powerMultiplier ?? 1
+    const soldiers = Math.round(Math.pow(10, armyRating) * 100000 * multiplier)
     return `${statColorSpan(describeLargeNumber(soldiers), armyRating)} soldiers`
 }
 
-function describeNavy(navyRating = 0) {
-    const ships = Math.round(Math.pow(10, navyRating) * 50)
+function describeNavy(navyRating = 0, planet = null) {
+    const multiplier = planet?.objectType?.powerMultiplier ?? 1
+    const ships = Math.round(Math.pow(10, navyRating) * 50 * multiplier)
     return `${statColorSpan(describeLargeNumber(ships), navyRating)} ships`
 }
 
-function describeIndustry(industryRating = 0) {
-    const factories = Math.round(Math.pow(10, industryRating) * 1000)
+function describeIndustry(industryRating = 0, planet = null) {
+    const multiplier = planet?.objectType?.powerMultiplier ?? 1
+    const factories = Math.round(Math.pow(10, industryRating) * 1000 * multiplier)
     return `${statColorSpan(describeLargeNumber(factories), industryRating)} facilities`
 }
 
-function describeEconomy(economyRating = 0) {
-    const gdp = Math.round(Math.pow(10, economyRating) * 1000000000) // billions
+function describeEconomy(economyRating = 0, planet = null) {
+    const multiplier = planet?.objectType?.powerMultiplier ?? 1
+    const gdp = Math.round(Math.pow(10, economyRating) * 1000000000 * multiplier) // billions
     return `${statColorSpan(describeLargeNumber(gdp), economyRating)}CR GDP`
 }
 
-function describeSecurity(securityRating = 0) {
-    const officers = Math.round(Math.pow(10, securityRating) * 10000)
+function describeSecurity(securityRating = 0, planet = null) {
+    const multiplier = planet?.objectType?.powerMultiplier ?? 1
+    const officers = Math.round(Math.pow(10, securityRating) * 10000 * multiplier)
     return `${statColorSpan(describeLargeNumber(officers), securityRating)} officers`
 }
 
-function describeCulture(cultureRating = 0) {
-    const sites = Math.round(Math.pow(10, cultureRating) * 500)
+function describeCulture(cultureRating = 0, planet = null) {
+    const multiplier = planet?.objectType?.powerMultiplier ?? 1
+    const sites = Math.round(Math.pow(10, cultureRating) * 500 * multiplier)
     return `${statColorSpan(describeLargeNumber(sites), cultureRating)} cultural sites`
 }
 

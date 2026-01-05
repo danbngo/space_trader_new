@@ -276,13 +276,19 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
             ["Finish", () => {
                 console.log('finishing captain creation',captain)
                 
+                // Initialize NO_RANK for all planets, dwarf planets, and moons
+                const places = [...gs.system.planets, ...gs.system.dwarfPlanets, ...gs.system.moons];
+                places.forEach(body => {
+                    captain.ranks.set(body, RANK_TYPES.NO_RANK);
+                });
+                
                 // Grant starting reputation with player's chosen attributes
                 const startingReputation = 10;
                 
                 // Reputation with starting planet
                 if (gs.fleet.location) {
                     captain.reputation.increment(gs.fleet.location, startingReputation);
-                    // Grant citizen rank on starting planet
+                    // Grant citizen rank on starting planet (overrides NO_RANK)
                     captain.ranks.set(gs.fleet.location, RANK_TYPES.CITIZEN);
                 }
                 
