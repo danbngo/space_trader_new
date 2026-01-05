@@ -46,7 +46,7 @@ class SlaverFleetAI extends FleetAI {
             this.visited.push(this.target);
             
             // Check if target is abandoned
-            if (this.target instanceof AbandonedFleet) {
+            if (this.target.destroyed) {
                 // Take all crew from abandoned fleet using utility function
                 this.transferOfficers(this.target, this.fleet, '⛓️', COLORS.Orange, '🆘', COLORS.Gray);
                 this.target = null

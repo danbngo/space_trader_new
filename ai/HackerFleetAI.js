@@ -53,8 +53,8 @@ class HackerFleetAI extends FleetAI {
     }
     
     onNearTarget() {
-        // Handle abandoned fleet resurrection
-        if (this.target instanceof AbandonedFleet) {
+        // Handle destroyed fleet resurrection
+        if (this.target.destroyed) {
             this.visited.push(this.target);
             this.resurrectAbandonedFleet(this.target);
             return;
@@ -77,7 +77,7 @@ class HackerFleetAI extends FleetAI {
     }
     
     resurrectAbandonedFleet(abandonedFleet) {
-        if (!(abandonedFleet instanceof AbandonedFleet)) return;
+        if (!abandonedFleet.destroyed) return;
         if (!abandonedFleet.officers || abandonedFleet.officers.length === 0) return;
         
         console.log(`💻 ${this.fleet.name} is resurrecting abandoned fleet ${abandonedFleet.name}`);

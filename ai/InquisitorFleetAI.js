@@ -49,8 +49,16 @@ class InquisitorFleetAI extends FleetAI {
             
             // If we have co-religionists aboard, 50% chance to abduct heretics
             if (coReligionists.length > 0 && Math.random() < 0.5) {
-                // Find heretics (exclude captain, they get converted instead)
-                const heretics = this.target.findOfficersMatching(o => o !== this.target.captain && o.religion !== ourReligion);
+                // Find heretics - can include captain IF there's a co-religionist to replace them
+                const captainIsHeretic = this.target.captain && this.target.captain.religion !== ourReligion;
+                const canRemoveCaptain = captainIsHeretic && coReligionists.length > 0; // At least 1 replacement
+                
+                const heretics = this.target.findOfficersMatching(o => {
+                    // Never remove captain unless there's a co-religionist to replace them
+                    if (o === this.target.captain) return canRemoveCaptain;
+                    // Remove all other heretics
+                    return o.religion !== ourReligion;
+                });
                 
                 if (heretics.length > 0) {
                     // Abduct heretics for trial
@@ -59,7 +67,8 @@ class InquisitorFleetAI extends FleetAI {
                         this.fleet.officers.push(heretic);
                     }
                     
-                    console.log(`⚖️ ${this.fleet.name} abducted ${heretics.length} heretics from ${this.target.name}`);
+                    const captainRemoved = heretics.includes(this.target.captain);
+                    console.log(`⚖️ ${this.fleet.name} abducted ${heretics.length} heretic${heretics.length > 1 ? 's' : ''} from ${this.target.name}${captainRemoved ? ' (including captain)' : ''}`);
                     this.addPopup('⚖️', COLORS.DarkRed, this.target.x, this.target.y);
                 }
                 

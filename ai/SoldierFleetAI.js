@@ -77,7 +77,7 @@ class SoldierFleetAI extends FleetAI {
             this.visited.push(this.target);
             
             // Check if target is abandoned
-            if (this.target instanceof AbandonedFleet) {
+            if (this.target.destroyed) {
                 // Rescue crew from abandoned fleet
                 this.rescueCrew(this.target);
                 this.target = null

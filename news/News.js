@@ -196,6 +196,13 @@ class News {
             //gs.system.newsFeed.push(fx.describe())
             fx.apply()
         }
+        
+        // Move news from active list to history
+        const newsIndex = gs.system.news.indexOf(this)
+        if (newsIndex !== -1) {
+            gs.system.news.splice(newsIndex, 1)
+            gs.system.history.push(this)
+        }
     }
 
     /**

@@ -39,7 +39,7 @@ class StarSystem extends SpaceObject {
         this.spaceStations = spaceStations
         /** @type {Fleet[]} */
         this.fleets = fleets
-        /** @type {AbandonedFleet[]} */
+        /** @type {Fleet[]} - Destroyed fleets that can be salvaged or resurrected */
         this.abandonedFleets = []
         /** @type {AsteroidBelt[]} */
         this.asteroidBelts = asteroidBelts
@@ -203,6 +203,12 @@ class StarSystem extends SpaceObject {
         
         console.log(`✨ Resurrecting destroyed fleet ${fleet.name}`);
         
+        // Remove from abandoned fleets array
+        const abandonedIndex = this.abandonedFleets.indexOf(fleet);
+        if (abandonedIndex >= 0) {
+            this.abandonedFleets.splice(abandonedIndex, 1);
+        }
+        
         // Restore fleet properties
         fleet.destroyed = false;
         fleet.destroyedBy = null; // Clear death record
@@ -221,11 +227,15 @@ class StarSystem extends SpaceObject {
             console.log(`👤 Assigned ${fleet.captain.name} as new captain`);
         }
         
-        // Assign appropriate AI based on fleet type
-        const aiType = getFleetAITypeForFleetType(fleet.fleetType);
-        if (aiType) {
-            fleet.fleetAI = new aiType.aiClass(fleet, fleet.planet, currentMap);
-            console.log(`🤖 Assigned ${aiType.name} to resurrected fleet`);
+        // Assign appropriate AI based on fleet type (if not already present)
+        if (!fleet.fleetAI) {
+            const aiType = getFleetAITypeForFleetType(fleet.fleetType);
+            if (aiType) {
+                fleet.fleetAI = new aiType.aiClass(fleet, fleet.planet, currentMap);
+                console.log(`🤖 Assigned ${aiType.name} to resurrected fleet`);
+            }
+        } else {
+            console.log(`🤖 Keeping existing AI for resurrected fleet`);
         }
         
         console.log(`✅ Successfully resurrected ${fleet.name} with ${fleet.officers.length} officers`);

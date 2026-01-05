@@ -37,6 +37,13 @@ async function simulateHistory(numYears) {
         style: 'text-align: center; margin-top: 5px;',
         children: ['Active News Events: 0']
     })
+
+    const historicalNewsCountElement = ce({
+        tag: 'div',
+        id: 'historical_news_count',
+        style: 'text-align: center; margin-top: 5px;',
+        children: ['Historical News Events: 0']
+    })
     
     showModal(
         'Loading Game',
@@ -46,7 +53,8 @@ async function simulateHistory(numYears) {
             progressBar.container,
             ce({tag:'br'}),
             elapsedTimeElement,
-            activeNewsCountElement
+            activeNewsCountElement,
+            historicalNewsCountElement
         ]}),
         []
     )
@@ -68,6 +76,10 @@ async function simulateHistory(numYears) {
         const newsCountEl = document.getElementById('active_news_count')
         if (newsCountEl) {
             newsCountEl.textContent = `Active News Events: ${gs.system.news ? gs.system.news.length : 0}`
+        }
+        const historyCountEl = document.getElementById('historical_news_count')
+        if (historyCountEl) {
+            historyCountEl.textContent = `Historical News Events: ${gs.system.history ? gs.system.history.length : 0}`
         }
     }, 50)
     

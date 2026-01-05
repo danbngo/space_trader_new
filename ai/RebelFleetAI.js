@@ -43,7 +43,7 @@ class RebelFleetAI extends FleetAI {
             this.visited.push(this.target);
             
             // Check if target is abandoned
-            if (this.target instanceof AbandonedFleet) {
+            if (this.target.destroyed) {
                 // Take cargo from abandoned fleet (respecting cargo limit)
                 if (this.target.cargo && this.target.cargo.total > 0 && this.fleet.availableCargoSpace > 0) {
                     const cargoTypes = [...this.target.cargo.counts.keys()]

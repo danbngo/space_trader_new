@@ -51,7 +51,7 @@ class SalvagerFleetAI extends FleetAI {
     }
     
     onNearTarget() {
-        if (this.target instanceof AbandonedFleet) {
+        if (this.target.destroyed) {
             // Mark as visited
             this.visited.push(this.target);
             

@@ -47,7 +47,7 @@ class BountyHunterFleetAI extends FleetAI {
             this.visited.push(this.target);
             
             // Check if target is abandoned
-            if (this.target instanceof AbandonedFleet) {
+            if (this.target.destroyed) {
                 // Abduct criminals from abandoned fleet
                 this.transferOfficers(this.target, this.fleet, '🎯', COLORS.Yellow, '⚖️', COLORS.Gray);
                 this.target = null

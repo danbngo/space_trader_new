@@ -392,13 +392,12 @@ class FleetAI {
         // Random crew survival (0-100%, average 50%)
         const crewSurvivalRate = Math.random()
         if (crewSurvivalRate < 0.5) {
-            // Remove all officers except captain
-            this.fleet.officers = this.fleet.officers.filter(o => o === this.fleet.captain)
-            // Remove captain too
-            if (this.fleet.captain) {
-                this.fleet.removeOfficer(this.fleet.captain)
+            // Remove all subordinate officers (never remove captain)
+            const subordinates = [...this.fleet.subordinates]
+            for (const officer of subordinates) {
+                this.fleet.removeOfficer(officer)
             }
-            console.log(`☠️ ${this.fleet.name} crew did not survive the destruction`)
+            console.log(`☠️ ${this.fleet.name} crew (except captain) did not survive the destruction`)
         } else {
             console.log(`🆘 ${this.fleet.name} crew survived in escape pods`)
         }
@@ -427,8 +426,15 @@ class FleetAI {
         this.fleet.destroyed = true
         this.fleet.abandonedYear = gs.year
         this.fleet.color = this.fleet.color.map(c => c * 0.5) // Dim color
-        this.fleet.fleetAI = null // Remove AI
         this.fleet.route = null // Clear route
+        
+        // Add to abandoned fleets array for salvagers/hackers to find
+        if (!gs.system.abandonedFleets.includes(this.fleet)) {
+            gs.system.abandonedFleets.push(this.fleet)
+        }
+        
+        // Change name to indicate abandoned status
+        this.fleet.name = `Abandoned ${this.fleet.fleetType.name}`
         
         console.log(`🔧 ${this.fleet.name} marked as destroyed at (${this.fleet.x.toFixed(2)}, ${this.fleet.y.toFixed(2)})`)
     }
@@ -492,7 +498,7 @@ class FleetAI {
 
     /**
      * Transfer officers (excluding captain) from one fleet to another
-     * @param {Fleet|AbandonedFleet} fromFleet - Fleet to take officers from
+     * @param {Fleet} fromFleet - Fleet to take officers from (can be destroyed)
      * @param {Fleet} toFleet - Fleet to transfer officers to
      * @param {string} emoji - Emoji to display for capture action (default 👥)
      * @param {number[]} color - Color for capture popup (default Orange)
@@ -502,13 +508,14 @@ class FleetAI {
     transferOfficers(fromFleet, toFleet, emoji = '👥', color = COLORS.Orange, fromEmoji = '💔', fromColor = COLORS.DarkRed) {
         if (!fromFleet.captain || !toFleet.captain) return;
         
-        const officersToTake = fromFleet.officers.slice(); // Copy array
+        // Only transfer subordinates, never the captain
+        const officersToTake = fromFleet.subordinates.slice(); // Copy array
         if (officersToTake.length === 0) return;
         
         // Remove all subordinates from source fleet
         for (const officer of officersToTake) {
             fromFleet.removeOfficer(officer);
-            toFleet.officers.push(officer); //no need.
+            toFleet.officers.push(officer);
         }
         
         console.log(`${emoji} ${toFleet.name+' '+toFleet.uuid} captured ${officersToTake.length} officers from ${fromFleet.name+' '+fromFleet.uuid}`);
@@ -658,15 +665,16 @@ class FleetAI {
     }
 
     /**
-     * Rescue all crew from an abandoned fleet
-     * @param {AbandonedFleet} abandonedFleet - Abandoned fleet to rescue from
+     * Rescue all crew from a destroyed fleet
+     * @param {Fleet} abandonedFleet - Destroyed fleet to rescue from
      * @param {string} emoji - Emoji to display for rescue action (default 🚁)
      * @param {number[]} color - Color for rescue popup (default Cyan)
      */
     rescueCrew(abandonedFleet, emoji = '🚁', color = COLORS.Cyan) {
-        if (!(abandonedFleet instanceof AbandonedFleet)) return;
+        if (!abandonedFleet.destroyed) return;
         if (abandonedFleet.officers.length === 0) return;
         
+        // Rescue all officers including the captain
         const officersToRescue = [...abandonedFleet.officers];
         for (const officer of officersToRescue) {
             abandonedFleet.removeOfficer(officer);

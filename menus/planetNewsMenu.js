@@ -15,23 +15,18 @@ function showPlanetNewsMenu(planet = null, activeOnly = true) {
         !news.planet || news.planet === planet || news.targetPlanet === planet
     );
     
-    // Filter by activeOnly if requested
-    const filteredNews = activeOnly 
-        ? relevantNews.filter(news => !news.ended)
-        : relevantNews;
-    
     const title = `${coloredName(planet)} - News`;
     
     let content;
-    if (filteredNews.length === 0) {
+    if (relevantNews.length === 0) {
         content = ce({children: [`No ${activeOnly ? 'recent' : 'historical'} news about ${coloredName(planet)}.`]});
     } else {
         // Sort by year (most recent first)
-        filteredNews.sort((a, b) => b.startYear - a.startYear);
+        relevantNews.sort((a, b) => b.startYear - a.startYear);
         
         /**@type {Array<[number, string, number]>} */
         const newsLines = [];
-        for (const news of filteredNews) {
+        for (const news of relevantNews) {
             if (news.started && news.startYear && news.startDescription) {
                 newsLines.push([news.startYear, news.startDescription, news.newsType ? news.newsType.displayPriority : 0]);
             }
