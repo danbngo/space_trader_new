@@ -23,7 +23,7 @@ class MissionariesEncounter extends NeutralsEncounter {
 
         // Check if player is infamous with their religion
         const isInfamousWithReligion = missionaryReligion && 
-            gs.captain.reputation.getAmount(missionaryReligion) < INFAMY_LEVELS.DISREPUTABLE.minReputation
+            gs.captain.reputation.getAmount(missionaryReligion) <= INFAMY_LEVELS.DISREPUTABLE.minReputation
 
         // If player is of the same religion, 25% chance for benediction
         if (playerReligion === missionaryReligion && Math.random() < 0.25) {
@@ -155,7 +155,6 @@ class MissionariesEncounter extends NeutralsEncounter {
         let dialogue
         if (religion) {
             const reputation = gs.captain.reputation.getAmount(religion)
-            
             if (reputation >= FAME_LEVELS.ADMIRED.minReputation) {
                 dialogue = rndMember(DIALOGUE_MISSIONARIES_FAMOUS)
             }

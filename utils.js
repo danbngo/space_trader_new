@@ -376,50 +376,23 @@ function createBuildingPriceInfo(building = new Building(), buildingName = "Buil
     const {showBuyPrice = true, showSellPrice = false} = options;
     const {planet} = building;
     const {corruption, inflationRate, taxRate} = planet.c;
-    const barterSkill = gs.fleet.totalSkills.getAmount(SKILLS.Barter);
     const rake = building.rake;
     
-    // Calculate base percentages
-    const baseTaxPct = roundToPlaces(100 * taxRate, 1);
-    const baseInflationPct = roundToPlaces(100 * inflationRate, 1);
+    // Build buy price calculation
+    const buyCalc = new Calculation();
+    buyCalc.addFactor('merchant greed', 1 + rake);
+    buyCalc.addFactor('inflation', 1 + inflationRate);
+    buyCalc.addFactor('taxes', 1 + taxRate);
+    const totalBuyMultiplier = buyCalc.getTotalMultiplier();
     
-    // Calculate buy price components
-    const buyCorruptionPct = roundToPlaces(100 * corruption, 1);
-    const buyCorruptionWithBarterPct = roundToPlaces(100 * rake, 1);
-    const barterReductionPct = buyCorruptionPct > 0 ? roundToPlaces(buyCorruptionPct - buyCorruptionWithBarterPct, 1) : 0;
-    const totalBuyPct = roundToPlaces(100 * ((1 + rake) * (1 + inflationRate) * (1 + taxRate) - 1), 1);
+    // Build sell price calculation
+    const sellCalc = new Calculation();
+    sellCalc.addFactor('merchant greed', 1 - rake / (1 + rake));
+    sellCalc.addFactor('inflation', 1 + inflationRate);
+    sellCalc.addFactor('taxes', 1 - taxRate);
+    const totalSellMultiplier = sellCalc.getTotalMultiplier();
     
-    // Calculate sell price components
-    const sellCorruptionPenaltyPct = roundToPlaces(100 * (corruption / (1 + corruption)), 1);
-    const sellCorruptionWithBarterPenaltyPct = roundToPlaces(100 * (rake / (1 + rake)), 1);
-    const barterImprovementPct = sellCorruptionPenaltyPct > 0 ? roundToPlaces(100 * (corruption / (1 + corruption) - rake / (1 + rake)), 1) : 0;
-    const totalSellPct = roundToPlaces(100 * (rake / (1 + rake) * (1 + inflationRate) * (1 - taxRate)) - 100, 1);
-    
-    // Create popover content for buy price
-    const buyPricePopover = ce({
-        children: [
-            `${colorSpan(`Total Buy Price: ${totalBuyPct >= 0 ? '+' : ''}${totalBuyPct}%`, totalBuyPct < 50 ? COLORS.LightGreen : totalBuyPct < 100 ? COLORS.Yellow : COLORS.LightRed)}<br/>`,
-            `100% (base)<br/>`,
-            baseTaxPct > 0 ? `${colorSpan(`+${baseTaxPct}%`, COLORS.Orange)} (taxes)<br/>` : '',
-            baseInflationPct > 0 ? `${colorSpan(`+${baseInflationPct}%`, COLORS.Yellow)} (inflation)<br/>` : '',
-            buyCorruptionPct > 0 ? `${colorSpan(`+${buyCorruptionPct}%`, COLORS.LightRed)} (merchant greed)<br/>` : '',
-            barterSkill > 0 && barterReductionPct > 0 ? `${colorSpan(`-${barterReductionPct}%`, COLORS.LightGreen)} (barter)<br/>` : '',
-        ]
-    });
-    
-    // Create popover content for sell price
-    const sellPricePopover = ce({
-        children: [
-            `${colorSpan(`Total Sell Price: ${totalSellPct}%`, totalSellPct > -50 ? COLORS.LightGreen : totalSellPct > -75 ? COLORS.Yellow : COLORS.LightRed)}<br/>`,
-            `100% (base)<br/>`,
-            baseTaxPct > 0 ? `${colorSpan(`-${baseTaxPct}%`, COLORS.Orange)} (taxes)<br/>` : '',
-            baseInflationPct > 0 ? `${colorSpan(`+${baseInflationPct}%`, COLORS.Yellow)} (inflation)<br/>` : '',
-            sellCorruptionPenaltyPct > 0 ? `${colorSpan(`-${sellCorruptionPenaltyPct}%`, COLORS.LightRed)} (merchant greed)<br/>` : '',
-            barterSkill > 0 && barterImprovementPct > 0 ? `${colorSpan(`+${barterImprovementPct}%`, COLORS.LightGreen)} (barter)<br/>` : '',
-        ]
-    });
-    
-    // Create the main info line - build elements directly instead of using innerHTML
+    // Create the main info line
     const container = ce({style: {display: 'flex', flexWrap: 'nowrap', alignItems: 'center', gap: '8px'}});
     
     // Add building credits text
@@ -427,17 +400,19 @@ function createBuildingPriceInfo(building = new Building(), buildingName = "Buil
     
     if (showBuyPrice) {
         container.appendChild(ce({innerHTML: ' | '}));
-        const buyText = `Buy Price: ${statColorSpan(`${totalBuyPct >= 0 ? '+' : ''}${totalBuyPct}%`, 100 / (100 + totalBuyPct))}`;
+        const totalBuyPct = roundToPlaces(100 * (totalBuyMultiplier - 1), 1);
+        const buyText = `Buy Price: ${statColorSpan(`${totalBuyPct >= 0 ? '+' : ''}${totalBuyPct}%`, 1 / totalBuyMultiplier)}`;
         const buySpan = ce({innerHTML: buyText});
-        createPopoverElement(buySpan, buyPricePopover);
+        createPopoverElement(buySpan, buyCalc.createPopover(100, 'base price'));
         container.appendChild(buySpan);
     }
     
     if (showSellPrice) {
         container.appendChild(ce({innerHTML: ' | '}));
-        const sellText = `Sell Price: ${statColorSpan(`${totalSellPct}%`, (100 + totalSellPct) / 100)}`;
+        const totalSellPct = roundToPlaces(100 * (totalSellMultiplier - 1), 1);
+        const sellText = `Sell Price: ${statColorSpan(`${totalSellPct >= 0 ? '+' : ''}${totalSellPct}%`, totalSellMultiplier)}`;
         const sellSpan = ce({innerHTML: sellText});
-        createPopoverElement(sellSpan, sellPricePopover);
+        createPopoverElement(sellSpan, sellCalc.createPopover(100, 'base price'));
         container.appendChild(sellSpan);
     }
     
@@ -454,56 +429,28 @@ function createBuildingPriceInfo(building = new Building(), buildingName = "Buil
 function createMarketCargoPriceInfo(market = new Market(), marketName = "Market", cargoType = CARGO_TYPES_ALL[0]) {
     const {planet, blackMarket} = market;
     const {corruption, inflationRate, taxRate} = planet.c;
-    const barterSkill = gs.fleet.totalSkills.getAmount(SKILLS.Barter);
     const rake = market.rake;
     
     // Get demand multiplier for this cargo type
     const demandMultiplier = planet.c.cargoPriceMultipliers.getAmount(cargoType);
-    const demandPct = roundToPlaces(100 * (demandMultiplier - 1), 1);
     
-    // Calculate base percentages (taxes don't apply to black market)
-    const baseTaxPct = blackMarket ? 0 : roundToPlaces(100 * taxRate, 1);
-    const baseInflationPct = roundToPlaces(100 * inflationRate, 1);
+    // Build buy price calculation
+    const buyCalc = new Calculation();
+    buyCalc.addFactor('merchant greed', 1 + rake);
+    buyCalc.addFactor('inflation', 1 + inflationRate);
+    buyCalc.addFactor('demand', demandMultiplier);
+    if (!blackMarket) buyCalc.addFactor('taxes', 1 + taxRate);
+    const totalBuyMultiplier = buyCalc.getTotalMultiplier();
     
-    // Calculate buy price components
-    const buyCorruptionPct = roundToPlaces(100 * corruption, 1);
-    const buyCorruptionWithBarterPct = roundToPlaces(100 * rake, 1);
-    const barterReductionPct = buyCorruptionPct > 0 ? roundToPlaces(buyCorruptionPct - buyCorruptionWithBarterPct, 1) : 0;
-    const totalBuyPct = roundToPlaces(100 * ((1 + rake) * (1 + inflationRate) * demandMultiplier * (1 + (blackMarket ? 0 : taxRate)) - 1), 1);
+    // Build sell price calculation
+    const sellCalc = new Calculation();
+    sellCalc.addFactor('merchant greed', 1 - rake / (1 + rake));
+    sellCalc.addFactor('inflation', 1 + inflationRate);
+    sellCalc.addFactor('demand', demandMultiplier);
+    if (!blackMarket) sellCalc.addFactor('taxes', 1 - taxRate);
+    const totalSellMultiplier = sellCalc.getTotalMultiplier();
     
-    // Calculate sell price components
-    const sellCorruptionPct = roundToPlaces(100 * corruption / (1 + corruption), 1);
-    const sellCorruptionWithBarterPct = roundToPlaces(100 * rake / (1 + rake), 1);
-    const barterImprovementPct = sellCorruptionPct > 0 ? roundToPlaces(100 * (corruption / (1 + corruption) - rake / (1 + rake)), 1) : 0;
-    const totalSellPct = roundToPlaces(100 * (rake / (1 + rake) * (1 + inflationRate) * demandMultiplier * (1 - (blackMarket ? 0 : taxRate))) - 100, 1);
-    
-    // Create popover content for buy price
-    const buyPricePopover = ce({
-        children: [
-            `${statColorSpan(`Total Buy Price: ${totalBuyPct >= 0 ? '+' : ''}${totalBuyPct}%`, 100 / (100 + totalBuyPct))}<br/>`,
-            `100% (base)<br/>`,
-            demandPct !== 0 ? `${colorSpan(`${demandPct >= 0 ? '+' : ''}${demandPct}%`, demandPct > 0 ? COLORS.Orange : COLORS.LightGreen)} (demand)<br/>` : '',
-            baseTaxPct > 0 ? `${colorSpan(`+${baseTaxPct}%`, COLORS.Orange)} (taxes)<br/>` : '',
-            baseInflationPct > 0 ? `${colorSpan(`+${baseInflationPct}%`, COLORS.Yellow)} (inflation)<br/>` : '',
-            buyCorruptionPct > 0 ? `${colorSpan(`+${buyCorruptionPct}%`, COLORS.LightRed)} (merchant greed)<br/>` : '',
-            barterSkill > 0 && barterReductionPct > 0 ? `${colorSpan(`-${barterReductionPct}%`, COLORS.LightGreen)} (barter)<br/>` : '',
-        ]
-    });
-    
-    // Create popover content for sell price
-    const sellPricePopover = ce({
-        children: [
-            `${statColorSpan(`Total Sell Price: ${totalSellPct}%`, (100 + totalSellPct) / 100)}<br/>`,
-            `100% (base)<br/>`,
-            demandPct !== 0 ? `${colorSpan(`${demandPct >= 0 ? '+' : ''}${demandPct}%`, demandPct > 0 ? COLORS.Orange : COLORS.LightGreen)} (demand)<br/>` : '',
-            baseTaxPct > 0 ? `${colorSpan(`-${baseTaxPct}%`, COLORS.Orange)} (taxes)<br/>` : '',
-            baseInflationPct > 0 ? `${colorSpan(`+${baseInflationPct}%`, COLORS.Yellow)} (inflation)<br/>` : '',
-            sellCorruptionPct > 0 ? `${colorSpan(`-${sellCorruptionPct}%`, COLORS.LightRed)} (merchant greed)<br/>` : '',
-            barterSkill > 0 && barterImprovementPct > 0 ? `${colorSpan(`+${barterImprovementPct}%`, COLORS.LightGreen)} (barter)<br/>` : '',
-        ]
-    });
-    
-    // Create the main info line - build elements directly instead of using innerHTML
+    // Create the main info line
     const container = ce({style: {display: 'flex', flexWrap: 'nowrap', alignItems: 'center', gap: '8px'}});
     
     // Add market credits text
@@ -511,16 +458,18 @@ function createMarketCargoPriceInfo(market = new Market(), marketName = "Market"
     
     // Add buy price with popover
     container.appendChild(ce({innerHTML: ' | '}));
-    const buyText = `Buy Price: ${statColorSpan(`${totalBuyPct >= 0 ? '+' : ''}${totalBuyPct}%`, 100 / (100 + totalBuyPct))}`;
+    const totalBuyPct = roundToPlaces(100 * (totalBuyMultiplier - 1), 1);
+    const buyText = `Buy Price: ${statColorSpan(`${totalBuyPct >= 0 ? '+' : ''}${totalBuyPct}%`, 1 / totalBuyMultiplier)}`;
     const buySpan = ce({innerHTML: buyText});
-    createPopoverElement(buySpan, buyPricePopover);
+    createPopoverElement(buySpan, buyCalc.createPopover(100, 'base price'));
     container.appendChild(buySpan);
     
     // Add sell price with popover
     container.appendChild(ce({innerHTML: ' | '}));
-    const sellText = `Sell Price: ${statColorSpan(`${totalSellPct}%`, (100 + totalSellPct) / 100)}`;
+    const totalSellPct = roundToPlaces(100 * (totalSellMultiplier - 1), 1);
+    const sellText = `Sell Price: ${statColorSpan(`${totalSellPct >= 0 ? '+' : ''}${totalSellPct}%`, totalSellMultiplier)}`;
     const sellSpan = ce({innerHTML: sellText});
-    createPopoverElement(sellSpan, sellPricePopover);
+    createPopoverElement(sellSpan, sellCalc.createPopover(100, 'base price'));
     container.appendChild(sellSpan);
     
     return container;

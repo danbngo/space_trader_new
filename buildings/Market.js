@@ -39,7 +39,8 @@ class Market extends Building {
             
             //simple supply and demand - as price goes up, availability goes down
             const baseAmount = Math.round(MARKET_AVERAGE_CARGO_PER_TYPE/this.planet.c.cargoPriceMultipliers.getAmount(cargoType))
-            const availabilityModifier = this.calcCargoAvailabilityModifier(cargoType)
+            const availabilityCalc = this.calcCargoAvailabilityModifier(cargoType)
+            const availabilityModifier = availabilityCalc.getTotalMultiplier()
             const amount = this.blackMarket 
                 ? baseAmount * this.planet.c.crime * availabilityModifier * this.level * multiplier
                 : baseAmount * this.planet.c.reserves * availabilityModifier * this.level * multiplier
@@ -49,309 +50,338 @@ class Market extends Building {
     }
 
     calcCargoAvailabilityModifier(ct = CARGO_TYPES_ALL[0]) {
+        const calc = new Calculation();
         const civ = this.planet.civilization
         const climate = this.planet.climate
+        
+        // Base availability
+        calc.addFactor('base', 1.0);
         
         // Each cargo type has different production/availability based on civilization attributes
         if (ct == CARGO_TYPES.FOOD) {
             // Food production based on territory, population, and favorable climate
-            // Earthlike planets with water oceans produce more food
-            let foodModifier = 0.5 + (civ.territory * 0.8) + (civ.economy * 0.5)
+            calc.addFactor('territory', 0.5 + civ.territory * 0.8);
+            calc.addFactor('economy', 0.5 + civ.economy * 0.5);
             
             // Ocean type affects food production
             if (climate.oceanType === PLANET_OCEAN_TYPES.WATER) {
-                foodModifier *= 1.8  // Water oceans enable fishing and agriculture
+                calc.addFactor('water oceans', 1.8);  // Water oceans enable fishing and agriculture
             } else if (climate.oceanType === PLANET_OCEAN_TYPES.BRINE) {
-                foodModifier *= 1.3  // Brine can support some aquaculture
+                calc.addFactor('brine oceans', 1.3);  // Brine can support some aquaculture
             } else if (climate.oceanType === PLANET_OCEAN_TYPES.SUBSURFACE_WATER) {
-                foodModifier *= 1.2  // Subsurface water can be used for hydroponics
+                calc.addFactor('subsurface water', 1.2);  // Subsurface water can be used for hydroponics
             }
             
             // Atmosphere type affects food production
             if (climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.OXYGEN_NITROGEN) {
-                foodModifier *= 1.5  // Breathable atmosphere ideal for farming
+                calc.addFactor('breathable atmosphere', 1.5);  // Breathable atmosphere ideal for farming
             } else if (climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.CARBONACEOUS_DIOXIDE) {
-                foodModifier *= 0.8  // CO2 atmosphere requires greenhouses
+                calc.addFactor('CO2 atmosphere', 0.8);  // CO2 atmosphere requires greenhouses
             }
             
             // Geology affects soil quality
             if (climate.geologyType === PLANET_GEOLOGY_TYPES.SILICATE_IRON || 
                 climate.geologyType === PLANET_GEOLOGY_TYPES.GRANITE) {
-                foodModifier *= 1.3  // Good soil composition
+                calc.addFactor('good soil', 1.3);  // Good soil composition
             } else if (climate.geologyType === PLANET_GEOLOGY_TYPES.BASALTIC) {
-                foodModifier *= 1.4  // Volcanic soil is very fertile
+                calc.addFactor('volcanic soil', 1.4);  // Volcanic soil is very fertile
             }
-            
-            return foodModifier
         }
-        
-        if (ct == CARGO_TYPES.METAL) {
+        else if (ct == CARGO_TYPES.METAL) {
             // Industrial planets produce more metal
-            // Higher industry and economy = more metal production
-            let metalModifier = 0.5 + (civ.industry * 1.8) + (civ.economy * 0.5)
+            calc.addFactor('industry', 0.5 + civ.industry * 1.8);
+            calc.addFactor('economy', 0.5 + civ.economy * 0.5);
             
             // Geology type affects metal availability
-            const climate = this.planet.climate
             if (climate.geologyType === PLANET_GEOLOGY_TYPES.METALLIC) {
-                metalModifier *= 2.0  // Metallic composition = abundant metal
+                calc.addFactor('metallic core', 2.0);  // Metallic composition = abundant metal
             } else if (climate.geologyType === PLANET_GEOLOGY_TYPES.SILICATE_IRON) {
-                metalModifier *= 1.5  // Iron-rich geology
+                calc.addFactor('iron-rich geology', 1.5);  // Iron-rich geology
             } else if (climate.geologyType === PLANET_GEOLOGY_TYPES.CARBONACEOUS) {
-                metalModifier *= 0.7  // Carbon-rich = less metal
+                calc.addFactor('carbon-rich geology', 0.7);  // Carbon-rich = less metal
             } else if (climate.geologyType === PLANET_GEOLOGY_TYPES.WATER_ICE || 
                        climate.geologyType === PLANET_GEOLOGY_TYPES.METHANE_ICE ||
                        climate.geologyType === PLANET_GEOLOGY_TYPES.NITROGEN_ICE) {
-                metalModifier *= 0.3  // Ice planets = very little metal
+                calc.addFactor('ice geology', 0.3);  // Ice planets = very little metal
             }
-            
-            return metalModifier
         }
-        
-        if (ct == CARGO_TYPES.WATER) {
+        else if (ct == CARGO_TYPES.WATER) {
             // Water availability based on reserves and infrastructure
-            // Higher reserves and territory = more water sources
-            let waterModifier = 0.5 + (civ.reserves * 1.5) + (civ.territory * 0.3)
+            calc.addFactor('reserves', 0.5 + civ.reserves * 1.5);
+            calc.addFactor('territory', 0.5 + civ.territory * 0.3);
             
             // Ocean and geology types dramatically affect water availability
-            const climate = this.planet.climate
             if (climate.oceanType === PLANET_OCEAN_TYPES.WATER) {
-                waterModifier *= 2.5  // Abundant liquid water
+                calc.addFactor('water oceans', 2.5);  // Abundant liquid water
             } else if (climate.oceanType === PLANET_OCEAN_TYPES.SUBSURFACE_WATER) {
-                waterModifier *= 1.8  // Hidden water requires extraction
+                calc.addFactor('subsurface water', 1.8);  // Hidden water requires extraction
             } else if (climate.oceanType === PLANET_OCEAN_TYPES.BRINE) {
-                waterModifier *= 1.2  // Salty water can be desalinated
+                calc.addFactor('brine oceans', 1.2);  // Salty water can be desalinated
             }
             
             if (climate.geologyType === PLANET_GEOLOGY_TYPES.WATER_ICE) {
-                waterModifier *= 2.0  // Ice can be melted for water
+                calc.addFactor('ice geology', 2.0);  // Ice can be melted for water
             } else if (climate.geologyType === PLANET_GEOLOGY_TYPES.MIXED_ICE) {
-                waterModifier *= 1.5  // Some water ice available
+                calc.addFactor('mixed ice', 1.5);  // Some water ice available
             }
-            
-            return waterModifier
         }
-        
-        if (ct == CARGO_TYPES.ISOTOPES) {
+        else if (ct == CARGO_TYPES.ISOTOPES) {
             // Scientific production - high tech civilizations produce isotopes
-            // Technology and industry enable isotope production
-            let isotopeModifier = 0.3 + (civ.technology * 1.5) + (civ.industry * 0.8)
+            calc.addFactor('technology', 0.3 + civ.technology * 1.5);
+            calc.addFactor('industry', 0.7 + civ.industry * 0.8);
             
             // Gas giant atmospheres contain useful isotopes
-            const climate = this.planet.climate
             if (climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.HYDROGEN_HELIUM) {
-                isotopeModifier *= 2.0  // Gas giants rich in isotopes
+                calc.addFactor('gas giant atmosphere', 2.0);  // Gas giants rich in isotopes
             } else if (climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.METHANE) {
-                isotopeModifier *= 1.3  // Methane atmospheres have some isotopes
+                calc.addFactor('methane atmosphere', 1.3);  // Methane atmospheres have some isotopes
             }
-            
-            return isotopeModifier
         }
-        
-        if (ct == CARGO_TYPES.NANITES) {
+        else if (ct == CARGO_TYPES.NANITES) {
             // Advanced manufacturing product
-            // Technology and industry drive nanite production
-            return 0.3 + (civ.technology * 1.2) + (civ.industry * 1.0) + (civ.economy * 0.5)
+            calc.addFactor('technology', 0.3 + civ.technology * 1.2);
+            calc.addFactor('industry', 0.7 + civ.industry * 1.0);
+            calc.addFactor('economy', 0.5 + civ.economy * 0.5);
         }
-        
-        if (ct == CARGO_TYPES.MEDICINE) {
+        else if (ct == CARGO_TYPES.MEDICINE) {
             // Medical production - education, wealth, and technology
-            // Advanced, wealthy civilizations produce more medicine
-            return 0.4 + (civ.education * 1.2) + (civ.wealth * 0.8) + (civ.technology * 0.5)
+            calc.addFactor('education', 0.4 + civ.education * 1.2);
+            calc.addFactor('wealth', 0.6 + civ.wealth * 0.8);
+            calc.addFactor('technology', 0.5 + civ.technology * 0.5);
         }
-        
-        if (ct == CARGO_TYPES.HOLOCUBES) {
+        else if (ct == CARGO_TYPES.HOLOCUBES) {
             // Entertainment production - culture and economy
-            // Cultural centers and wealthy economies produce entertainment
-            return 0.3 + (civ.culture * 1.8) + (civ.economy * 0.7) + (civ.wealth * 0.5)
+            calc.addFactor('culture', 0.3 + civ.culture * 1.8);
+            calc.addFactor('economy', 0.7 + civ.economy * 0.7);
+            calc.addFactor('wealth', 0.5 + civ.wealth * 0.5);
         }
-        
-        if (ct == CARGO_TYPES.WEAPONS) {
+        else if (ct == CARGO_TYPES.WEAPONS) {
             // Illegal - black market availability
-            // Crime, military production, low security = more weapons available
-            return 0.3 + (civ.crime * 2.0) + (civ.army * 1.2) + (civ.corruption * 1.0) + (1.0 / Math.max(0.5, civ.security))
+            calc.addFactor('crime', 0.3 + civ.crime * 2.0);
+            calc.addFactor('army', 0.7 + civ.army * 1.2);
+            calc.addFactor('corruption', 0.3 + civ.corruption * 1.0);
+            calc.addFactor('low security', 1.0 / Math.max(0.5, civ.security));
         }
-        
-        if (ct == CARGO_TYPES.DRUGS) {
+        else if (ct == CARGO_TYPES.DRUGS) {
             // Illegal - crime and corruption enable drug production/trade
-            // High crime, corruption, low security = more drugs
-            return 0.2 + (civ.crime * 2.5) + (civ.corruption * 1.5) + (1.0 / Math.max(0.5, civ.security)) + (1.0 / Math.max(0.5, civ.education))
+            calc.addFactor('crime', 0.2 + civ.crime * 2.5);
+            calc.addFactor('corruption', 0.5 + civ.corruption * 1.5);
+            calc.addFactor('low security', 1.0 / Math.max(0.5, civ.security));
+            calc.addFactor('low education', 1.0 / Math.max(0.5, civ.education));
         }
-        
-        if (ct == CARGO_TYPES.ANTIMATTER) {
+        else if (ct == CARGO_TYPES.ANTIMATTER) {
             // Highly restricted - only high tech military civilizations
-            // Navy, technology, and wealth enable antimatter production
-            return 0.2 + (civ.navy * 1.5) + (civ.technology * 1.5) + (civ.wealth * 0.5)
+            calc.addFactor('navy', 0.2 + civ.navy * 1.5);
+            calc.addFactor('technology', 0.5 + civ.technology * 1.5);
+            calc.addFactor('wealth', 0.5 + civ.wealth * 0.5);
         }
         
-        return 1.0
-    }
-
-    calcClimateBasedPriceModifier(ct = CARGO_TYPES_ALL[0]) {
-        const planetType = this.planet.planetType
-        const climate = this.planet.climate
-        
-        // Climate-based price adjustments based on planet type
-        
-        // Food is expensive on inhospitable worlds
-        if (ct === CARGO_TYPES.FOOD) {
-            if (planetType === PLANET_TYPES.GAS_GIANT || planetType === PLANET_TYPES.GAS_DWARF) {
-                return 3.0  // 200% more expensive - no surface for farming
-            }
-            if (planetType === PLANET_TYPES.ICE_GIANT || planetType === PLANET_TYPES.ICE_DWARF) {
-                return 2.5  // 150% more expensive - frozen wasteland
-            }
-            // Breathable atmosphere makes food cheaper
-            if (climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.OXYGEN_NITROGEN) {
-                return 0.7  // 30% cheaper with breathable air
-            }
-            // Toxic atmospheres make food expensive
-            if (climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.SULFURIC_ACID ||
-                climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.SULFUR_DIOXIDE) {
-                return 2.0  // 100% more expensive
-            }
-        }
-        
-        // Gas giants have abundant isotopes
-        if (planetType === PLANET_TYPES.GAS_GIANT || planetType === PLANET_TYPES.GAS_DWARF) {
-            if (ct === CARGO_TYPES.ISOTOPES) return 0.5  // 50% cheaper isotopes
-            if (ct === CARGO_TYPES.METAL) return 1.5     // 50% more expensive metals (scarce)
-            if (ct === CARGO_TYPES.WATER) return 1.3     // 30% more expensive water (scarce)
-        }
-        
-        // Ice giants have abundant water
-        if (planetType === PLANET_TYPES.ICE_GIANT || planetType === PLANET_TYPES.ICE_DWARF) {
-            if (ct === CARGO_TYPES.WATER) return 0.5     // 50% cheaper water
-            if (ct === CARGO_TYPES.METAL) return 1.4     // 40% more expensive metals (scarce)
-            if (ct === CARGO_TYPES.ISOTOPES) return 1.2  // 20% more expensive isotopes
-        }
-        
-        // Terrestrial/Earthlike planets have abundant metals
-        if (planetType === PLANET_TYPES.TERRESTRIAL || planetType === PLANET_TYPES.EARTHLIKE) {
-            if (ct === CARGO_TYPES.METAL) return 0.6     // 40% cheaper metals
-            if (ct === CARGO_TYPES.ISOTOPES) return 1.3  // 30% more expensive isotopes
-        }
-        
-        return 1.0  // No climate adjustment
+        return calc;
     }
 
     calcCargoPriceModifier(ct = CARGO_TYPES_ALL[0]) {
+        const calc = new Calculation();
         const civ = this.planet.civilization
+        const climate = this.planet.climate
         
-        // Each cargo type has different demand based on civilization attributes
-        if (ct == CARGO_TYPES.FOOD) {
-            // Food demand based on population and inability to produce locally
-            // Higher population = higher demand
-            let foodDemand = 0.8 + (civ.population * 1.2)
+        // Base price
+        calc.addFactor('base value', ct.value / 100); // Normalize to 1.0 scale
+        
+        // Availability affects price (inverse relationship - low availability = high price)
+        const availabilityCalc = this.calcCargoAvailabilityModifier(ct);
+        const availabilityMultiplier = availabilityCalc.getTotalMultiplier();
+        // Invert availability: low availability (0.5x) = high price (2x)
+        calc.addFactor('availability', 1.0 / Math.max(0.1, availabilityMultiplier));
+        
+        // Climate-based price adjustments
+        const planetType = this.planet.planetType;
+        
+        if (ct === CARGO_TYPES.FOOD) {
+            // Food demand based on population
+            calc.addFactor('population demand', 0.8 + civ.population * 1.2);
             
-            const climate = this.planet.climate
-            // Harsh environments increase food demand (can't produce locally)
+            // Climate effects on food prices
+            if (planetType === PLANET_TYPES.GAS_GIANT || planetType === PLANET_TYPES.GAS_DWARF) {
+                calc.addFactor('gas giant premium', 3.0);
+            } else if (planetType === PLANET_TYPES.ICE_GIANT || planetType === PLANET_TYPES.ICE_DWARF) {
+                calc.addFactor('ice giant premium', 2.5);
+            } else if (climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.OXYGEN_NITROGEN) {
+                calc.addFactor('breathable air discount', 0.7);
+            } else if (climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.SULFURIC_ACID ||
+                       climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.SULFUR_DIOXIDE) {
+                calc.addFactor('toxic atmosphere premium', 2.0);
+            }
+            
             if (climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.NONE ||
                 climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.SULFURIC_ACID ||
                 climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.SULFUR_DIOXIDE) {
-                foodDemand *= 1.8  // Must import all food
+                calc.addFactor('import dependency', 1.8);
             }
             
             if (climate.geologyType === PLANET_GEOLOGY_TYPES.METALLIC ||
                 climate.geologyType === PLANET_GEOLOGY_TYPES.WATER_ICE ||
                 climate.geologyType === PLANET_GEOLOGY_TYPES.NITROGEN_ICE) {
-                foodDemand *= 1.5  // Poor soil = higher food prices
+                calc.addFactor('poor soil', 1.5);
             }
             
-            // Lower reserves means food scarcity
-            foodDemand += (1.0 / Math.max(0.5, civ.reserves)) * 0.5
+            // Low reserves means scarcity
+            calc.addFactor('low reserves', 1.0 + (1.0 / Math.max(0.5, civ.reserves)) * 0.5);
+        }
+        else if (ct === CARGO_TYPES.METAL) {
+            calc.addFactor('industrial demand', 0.5 + civ.industry * 1.5);
             
-            return foodDemand
+            if (planetType === PLANET_TYPES.GAS_GIANT || planetType === PLANET_TYPES.GAS_DWARF) {
+                calc.addFactor('gas giant scarcity', 1.5);
+            } else if (planetType === PLANET_TYPES.ICE_GIANT || planetType === PLANET_TYPES.ICE_DWARF) {
+                calc.addFactor('ice giant scarcity', 1.4);
+            } else if (planetType === PLANET_TYPES.TERRESTRIAL || planetType === PLANET_TYPES.EARTHLIKE) {
+                calc.addFactor('terrestrial abundance', 0.6);
+            }
+        }
+        else if (ct === CARGO_TYPES.WATER) {
+            calc.addFactor('population demand', 0.5 + civ.population * 1.0);
+            calc.addFactor('low reserves', 1.0 / Math.max(0.5, civ.reserves));
+            
+            if (planetType === PLANET_TYPES.ICE_GIANT || planetType === PLANET_TYPES.ICE_DWARF) {
+                calc.addFactor('ice abundance', 0.5);
+            } else if (planetType === PLANET_TYPES.GAS_GIANT || planetType === PLANET_TYPES.GAS_DWARF) {
+                calc.addFactor('gas giant scarcity', 1.3);
+            }
+        }
+        else if (ct === CARGO_TYPES.ISOTOPES) {
+            calc.addFactor('tech demand', 0.5 + civ.technology * 1.5);
+            calc.addFactor('education demand', 0.5 + civ.education * 0.5);
+            
+            if (planetType === PLANET_TYPES.GAS_GIANT || planetType === PLANET_TYPES.GAS_DWARF) {
+                calc.addFactor('gas giant abundance', 0.5);
+            } else if (planetType === PLANET_TYPES.ICE_GIANT || planetType === PLANET_TYPES.ICE_DWARF) {
+                calc.addFactor('ice giant premium', 1.2);
+            } else if (planetType === PLANET_TYPES.TERRESTRIAL || planetType === PLANET_TYPES.EARTHLIKE) {
+                calc.addFactor('terrestrial scarcity', 1.3);
+            }
+        }
+        else if (ct === CARGO_TYPES.NANITES) {
+            calc.addFactor('economic demand', 0.5 + civ.economy * 1.0);
+            calc.addFactor('expansion demand', 0.5 + civ.territory * 0.5);
+        }
+        else if (ct === CARGO_TYPES.MEDICINE) {
+            calc.addFactor('population need', 0.5 + civ.population * 0.8);
+            calc.addFactor('wealth demand', 0.5 + civ.wealth * 0.5);
+            calc.addFactor('insecurity', 1.0 + (1.0 / Math.max(0.5, civ.security)) * 0.5);
+        }
+        else if (ct === CARGO_TYPES.HOLOCUBES) {
+            calc.addFactor('cultural demand', 0.3 + civ.culture * 1.5);
+            calc.addFactor('wealth demand', 0.7 + civ.wealth * 0.8);
+        }
+        else if (ct === CARGO_TYPES.WEAPONS) {
+            calc.addFactor('military demand', 0.5 + civ.army * 1.2);
+            calc.addFactor('naval demand', 0.5 + civ.navy * 0.8);
+            calc.addFactor('criminal demand', 0.5 + civ.crime * 1.0);
+            calc.addFactor('low security', 1.0 / Math.max(0.5, civ.security));
+        }
+        else if (ct === CARGO_TYPES.DRUGS) {
+            calc.addFactor('criminal demand', 0.5 + civ.crime * 2.0);
+            calc.addFactor('corruption', 0.5 + civ.corruption * 1.0);
+            calc.addFactor('wealth', 0.5 + civ.wealth * 0.5);
+            calc.addFactor('low education', 1.0 / Math.max(0.5, civ.education));
+        }
+        else if (ct === CARGO_TYPES.ANTIMATTER) {
+            calc.addFactor('naval demand', 0.5 + civ.navy * 1.5);
+            calc.addFactor('tech demand', 0.5 + civ.technology * 1.0);
+            calc.addFactor('military demand', 0.5 + civ.army * 0.5);
         }
         
-        if (ct == CARGO_TYPES.METAL) {
-            // Industrial planets need more metal for manufacturing
-            // Higher industry = higher demand = higher prices
-            return 0.5 + (civ.industry * 1.5)
-        }
-        
-        if (ct == CARGO_TYPES.WATER) {
-            // Essential for life - higher population = higher demand
-            // Low reserves also increases demand
-            return 0.5 + (civ.population * 1.0) + (1.0 / Math.max(0.5, civ.reserves))
-        }
-        
-        if (ct == CARGO_TYPES.ISOTOPES) {
-            // Used for research and technology
-            // High tech civilizations need more isotopes
-            return 0.5 + (civ.technology * 1.5) + (civ.education * 0.5)
-        }
-        
-        if (ct == CARGO_TYPES.NANITES) {
-            // Used for construction and infrastructure
-            // Growing economies and territories need more nanites
-            return 0.5 + (civ.economy * 1.0) + (civ.territory * 0.5)
-        }
-        
-        if (ct == CARGO_TYPES.MEDICINE) {
-            // Healthcare demand - population, wealth, and education affect it
-            // Lower security can mean more injuries/illness
-            return 0.5 + (civ.population * 0.8) + (civ.wealth * 0.5) + (1.0 / Math.max(0.5, civ.security))
-        }
-        
-        if (ct == CARGO_TYPES.HOLOCUBES) {
-            // Entertainment - culture and wealth drive demand
-            // Higher culture = more entertainment consumption
-            return 0.3 + (civ.culture * 1.5) + (civ.wealth * 0.8)
-        }
-        
-        if (ct == CARGO_TYPES.WEAPONS) {
-            // Illegal - high military, low security, or conflict increases demand
-            // Army and navy need weapons, crime creates black market demand
-            return 0.5 + (civ.army * 1.2) + (civ.navy * 0.8) + (civ.crime * 1.0) + (1.0 / Math.max(0.5, civ.security))
-        }
-        
-        if (ct == CARGO_TYPES.DRUGS) {
-            // Illegal - crime, low education, and corruption drive demand
-            // Wealthier planets can afford more expensive drugs
-            return 0.5 + (civ.crime * 2.0) + (civ.corruption * 1.0) + (civ.wealth * 0.5) + (1.0 / Math.max(0.5, civ.education))
-        }
-        
-        if (ct == CARGO_TYPES.ANTIMATTER) {
-            // Military fuel and weapons - navy and technology drive demand
-            // High tech militaries need antimatter for advanced ships/weapons
-            return 0.5 + (civ.navy * 1.5) + (civ.technology * 1.0) + (civ.army * 0.5)
-        }
-        
-        return 1.0
+        return calc;
     }
 
     //sticking with having corruption raise prices even at the black market
     calcCargoBuyPrices() {
         const prices = new CountsMap()
         for (const cargoType of CARGO_TYPES_ALL) {
-            const climateModifier = this.calcClimateBasedPriceModifier(cargoType)
-            const basePrice = cargoType.value * this.planet.c.cargoPriceMultipliers.getAmount(cargoType) * this.calcCargoPriceModifier(cargoType) * climateModifier
-            let price = 
-                this.blackMarket ? Math.round(basePrice * (1+this.planet.c.corruption) * this.planet.c.inflationRate / this.planet.c.crime)
-                : Math.round(basePrice * (1+this.planet.c.corruption) * this.planet.c.inflationRate / this.planet.c.reserves)
-            // Apply taxes only to regular market
-            if (!this.blackMarket) {
-                price = Math.round(price * (1 + this.planet.c.taxRate))
+            const priceCalc = this.calcCargoPriceModifier(cargoType);
+            const basePrice = priceCalc.calculate(100); // Calculate from base 100
+            
+            // Add market-specific factors
+            priceCalc.addFactor('merchant greed', 1 + this.planet.c.corruption);
+            priceCalc.addFactor('inflation', this.planet.c.inflationRate);
+            
+            if (this.blackMarket) {
+                priceCalc.addFactor('black market risk', 1 / this.planet.c.crime);
+            } else {
+                priceCalc.addFactor('reserves', 1 / this.planet.c.reserves);
+                priceCalc.addFactor('taxes', 1 + this.planet.c.taxRate);
             }
-            prices.setAmount(cargoType, price)
+            
+            const price = Math.round(priceCalc.calculate(100));
+            prices.setAmount(cargoType, price);
         }
-        return prices
+        return prices;
     }
 
     calcCargoSellPrices() {
         const prices = new CountsMap()
-            for (const cargoType of CARGO_TYPES_ALL) {
-            const climateModifier = this.calcClimateBasedPriceModifier(cargoType)
-            const basePrice = cargoType.value * this.planet.c.cargoPriceMultipliers.getAmount(cargoType) * climateModifier
-            let price = 
-                this.blackMarket ? Math.round(basePrice / (1+this.planet.c.corruption) * this.planet.c.inflationRate / this.planet.c.crime)
-                : Math.round(basePrice / (1+this.planet.c.corruption) * this.planet.c.inflationRate / this.planet.c.reserves)
-            // Apply taxes only to regular market
-            if (!this.blackMarket) {
-                price = Math.round(price * (1 - this.planet.c.taxRate))
+        for (const cargoType of CARGO_TYPES_ALL) {
+            const priceCalc = this.calcCargoPriceModifier(cargoType);
+            const basePrice = priceCalc.calculate(100); // Calculate from base 100
+            
+            // Add market-specific factors (sell prices are lower than buy)
+            priceCalc.addFactor('merchant greed', 1 / (1 + this.planet.c.corruption));
+            priceCalc.addFactor('inflation', this.planet.c.inflationRate);
+            
+            if (this.blackMarket) {
+                priceCalc.addFactor('black market risk', 1 / this.planet.c.crime);
+            } else {
+                priceCalc.addFactor('reserves', 1 / this.planet.c.reserves);
+                priceCalc.addFactor('taxes', 1 - this.planet.c.taxRate);
             }
-            prices.setAmount(cargoType, price)
+            
+            const price = Math.round(priceCalc.calculate(100));
+            prices.setAmount(cargoType, price);
         }
-        return prices
+        return prices;
+    }
+
+    /**
+     * Get the full price calculation breakdown for a specific cargo type (buy).
+     * @param {CargoType} cargoType - The cargo type to calculate for.
+     * @returns {Calculation} The calculation showing all price factors.
+     */
+    getCargoBuyPriceCalculation(cargoType = CARGO_TYPES_ALL[0]) {
+        const priceCalc = this.calcCargoPriceModifier(cargoType);
+        
+        // Add market-specific factors
+        priceCalc.addFactor('merchant greed', 1 + this.planet.c.corruption);
+        priceCalc.addFactor('inflation', this.planet.c.inflationRate);
+        
+        if (this.blackMarket) {
+            priceCalc.addFactor('black market risk', 1 / this.planet.c.crime);
+        } else {
+            priceCalc.addFactor('reserves', 1 / this.planet.c.reserves);
+            priceCalc.addFactor('taxes', 1 + this.planet.c.taxRate);
+        }
+        
+        return priceCalc;
+    }
+
+    /**
+     * Get the full price calculation breakdown for a specific cargo type (sell).
+     * @param {CargoType} cargoType - The cargo type to calculate for.
+     * @returns {Calculation} The calculation showing all price factors.
+     */
+    getCargoSellPriceCalculation(cargoType = CARGO_TYPES_ALL[0]) {
+        const priceCalc = this.calcCargoPriceModifier(cargoType);
+        
+        // Add market-specific factors (sell prices are lower than buy)
+        priceCalc.addFactor('merchant greed', 1 / (1 + this.planet.c.corruption));
+        priceCalc.addFactor('inflation', this.planet.c.inflationRate);
+        
+        if (this.blackMarket) {
+            priceCalc.addFactor('black market risk', 1 / this.planet.c.crime);
+        } else {
+            priceCalc.addFactor('reserves', 1 / this.planet.c.reserves);
+            priceCalc.addFactor('taxes', 1 - this.planet.c.taxRate);
+        }
+        
+        return priceCalc;
     }
 }

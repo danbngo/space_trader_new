@@ -1,5 +1,6 @@
 /**
  * Creates an HTML table displaying market cargo with buy/sell prices.
+ * @param {Market} market - The market building.
  * @param {boolean} blackMarket - Whether this is a black market (shows only illegal goods).
  * @param {CountsMap} playerCargo - The player's current cargo.
  * @param {CountsMap} marketCargo - The market's available cargo.
@@ -8,7 +9,7 @@
  * @param {(cargoType: CargoType) => void} onSelectCargoType - Callback when cargo type is selected.
  * @returns {HTMLTableElement} The market cargo table.
  */
-function createMarketCargoTable(blackMarket = false, playerCargo = new CountsMap(), marketCargo = new CountsMap(), buyPrices = new CountsMap(), sellPrices = new CountsMap(), onSelectCargoType = (ct = CARGO_TYPES_ALL[0])=>{}) {
+function createMarketCargoTable(market = new Market(), blackMarket = false, playerCargo = new CountsMap(), marketCargo = new CountsMap(), buyPrices = new CountsMap(), sellPrices = new CountsMap(), onSelectCargoType = (ct = CARGO_TYPES_ALL[0])=>{}) {
     /** @type {any[]} */
     const rows = [
         ['Cargo Type', 'Market Amt.', 'Buy Price', 'Your Amt.', 'Sell Price']
@@ -24,7 +25,44 @@ function createMarketCargoTable(blackMarket = false, playerCargo = new CountsMap
         ])
     }
     console.log('creating cargo table w rows:',rows)
-    return createTable(rows, (rowIndex = 0)=>onSelectCargoType(cargoTypes[rowIndex]))
+    const table = createTable(rows, (rowIndex = 0)=>onSelectCargoType(cargoTypes[rowIndex]));
+    
+    // Add popovers to various columns
+    const tableRows = table.querySelectorAll('tr');
+    tableRows.forEach((row, rowIndex) => {
+        if (rowIndex === 0) return; // Skip header row
+        const ct = cargoTypes[rowIndex - 1];
+        
+        // Add popover to Cargo Type column (column 0)
+        const cargoTypeCell = row.cells[0];
+        if (cargoTypeCell && ct.description) {
+            createPopoverElement(cargoTypeCell, ct.description);
+        }
+        
+        // Add popover to Market Amt. column (column 1)
+        const marketAmtCell = row.cells[1];
+        if (marketAmtCell) {
+            const availabilityCalc = market.calcCargoAvailabilityModifier(ct);
+            const baseAmount = MARKET_AVERAGE_CARGO_PER_TYPE;
+            createPopoverElement(marketAmtCell, availabilityCalc.createPopover(baseAmount, 'base availability'));
+        }
+        
+        // Add popover to Buy Price column (column 2)
+        const buyPriceCell = row.cells[2];
+        if (buyPriceCell) {
+            const buyPriceCalc = market.getCargoBuyPriceCalculation(ct);
+            createPopoverElement(buyPriceCell, buyPriceCalc.createPopover(100, 'base price'));
+        }
+        
+        // Add popover to Sell Price column (column 4)
+        const sellPriceCell = row.cells[4];
+        if (sellPriceCell) {
+            const sellPriceCalc = market.getCargoSellPriceCalculation(ct);
+            createPopoverElement(sellPriceCell, sellPriceCalc.createPopover(100, 'base price'));
+        }
+    });
+    
+    return table;
 }
 /**
  * Displays the market menu for buying and selling cargo.
@@ -132,7 +170,7 @@ function showMarketMenu(market = new Market()) {
             isDocked 
                 ? (blackMarket ? 'You slip into the shadows of the black market.<br/>' : 'Welcome to the market.<br/>') 
                 : colorSpan(`You must dock to use the ${blackMarket ? 'black market' : 'market'}.`, COLORS.Yellow) + '<br/>',
-            createMarketCargoTable(blackMarket, fleet.cargo, market.cargo, buyPrices, sellPrices, onSelectCargoType),
+            createMarketCargoTable(market, blackMarket, fleet.cargo, market.cargo, buyPrices, sellPrices, onSelectCargoType),
             `Your Cargo Space: ${fleet.cargo.total}/${fleet.totalCargoSpace} | Your Credits: ${gs.credits}`,
             marketPriceInfo,
         ]

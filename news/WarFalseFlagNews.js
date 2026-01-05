@@ -27,17 +27,6 @@ class WarFalseFlagNews extends News {
                         p.c.relationships.set(targetPlanet, RELATIONSHIP_TYPES.NEUTRAL)
                     }
                     console.log('war ended between', this.planet.name, 'and', this.targetPlanet.name)
-                    
-                    // Check if world war should end
-                    const numWarsRemaining = gs.system.news.filter(n => ([NT.WAR, NT.WAR_SNEAK_ATTACK, NT.WAR_FALSE_FLAG].includes(n.newsType) && !n.ended)).length
-                    if (numWarsRemaining == 0) {
-                        const systemAtWarNews = gs.system.news.find(n => (n.newsType == META_NT.SYSTEM_AT_WAR && !n.ended))
-                        if (systemAtWarNews) {
-                            console.log('cleaning up world war prematurely')
-                            systemAtWarNews.endAsap = true
-                            if (systemAtWarNews.shouldEnd()) systemAtWarNews.end()
-                        }
-                    }
                 }
             }
         )

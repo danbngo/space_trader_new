@@ -46,8 +46,11 @@ class Academy extends Building {
         if (officerDiffFromBase > 0) {
             this.officers.splice(0, officerDiffFromBase)
         } else if (officerDiffFromBase < 0) {
-            // Get valid faction types (not criminal or religious)
-            const validFactionTypes = FACTION_TYPES_ALL.filter(f => !f.criminal && !f.religious)
+            // Filter for player-available factions only, and filter by criminal status (tavern = criminals, academy = non-criminals)
+            // Neither stocks religious people
+            const validFactionTypes = PLAYER_FACTIONS.filter(f => 
+                !f.religious && (this.isTavern ? f.criminal : !f.criminal)
+            )
             
             for (let i = 0; i < -officerDiffFromBase; i++) {
                 const factionType = rndMember(validFactionTypes)

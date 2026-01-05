@@ -22,7 +22,6 @@ const PLANET_ENCOUNTER_CHANCE_PER_DAY = 0//0.01; //chance of random encounter pe
 const ASTEROIDS_ENCOUNTER_CHANCE_PER_DAY = 0.01//0.5; //chance of fooroid storms when in the middle of an asteroid belt
 const BANK_BOUNTY_CHANCE_PER_DAY = 0.01;
 const NEWS_CHANCE_PER_DAY = 1/30;
-const META_NEWS_CHANCE_PER_DAY = 1/365;
 const ANOMALY_CHANCE_PER_DAY = 1/30;
 const MAX_NUM_ANOMALIES = 5;
 const FLEET_SPAWN_CHANCE_PER_DAY = 1/365

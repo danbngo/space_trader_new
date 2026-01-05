@@ -21,18 +21,20 @@ class FameLevel {
 
 const FAME_LEVELS = {
     UNKNOWN: new FameLevel('Unknown', 0, COLORS.LightGray),
-    LIKED: new FameLevel('Liked', 1, COLORS.LightGreen),
-    REPUTABLE: new FameLevel('Reputable', 10, COLORS.YellowGreen),
-    RENOWNED: new FameLevel('Renowned', 50, COLORS.Green),
-    LOVED: new FameLevel('Loved', 100, COLORS.Yellow),
-    LEGENDARY: new FameLevel('Legendary', 200, COLORS.Gold),
+    LIKED: new FameLevel('Liked', 5, COLORS.LightGreen),
+    REPUTABLE: new FameLevel('Reputable', 25, COLORS.YellowGreen),
+    ADMIRED: new FameLevel('Admired', 100, COLORS.YellowGreen),
+    RENOWNED: new FameLevel('Renowned', 250, COLORS.Green),
+    LOVED: new FameLevel('Loved', 1000, COLORS.Yellow),
+    LEGENDARY: new FameLevel('Legendary', 2500, COLORS.Gold),
 }
 
 const INFAMY_LEVELS = {
     UNKNOWN: new FameLevel('Unknown', 0, COLORS.LightGray),
-    DISLIKED: new FameLevel('Disliked', 1, COLORS.Orange),
-    DISREPUTABLE: new FameLevel('Disreputable', 10, COLORS.OrangeRed),
-    NOTORIOUS: new FameLevel('Notorious', 50, COLORS.OrangeRed),
-    HATED: new FameLevel('Hated', 100, COLORS.Red),
-    VILIFIED: new FameLevel('Vilified', 200, COLORS.DarkRed),
+    DISLIKED: new FameLevel('Disliked', 5, COLORS.Orange),
+    DISREPUTABLE: new FameLevel('Disreputable', 25, COLORS.OrangeRed),
+    LOATHED: new FameLevel('Loathed', 100, COLORS.OrangeRed),
+    NOTORIOUS: new FameLevel('Notorious', 250, COLORS.OrangeRed),
+    HATED: new FameLevel('Hated', 1000, COLORS.Red),
+    VILIFIED: new FameLevel('Vilified', 2500, COLORS.DarkRed),
 }

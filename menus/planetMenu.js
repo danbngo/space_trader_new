@@ -1,17 +1,17 @@
 const buildingHandlerMapping = [
     {type: BUILDING_TYPES.SHIPYARD, prop: 'shipyard', menu: (b) => showShipyardBuyMenu(b)},
+    {type: BUILDING_TYPES.COURTHOUSE, prop: 'courthouse', menu: (b) => showCourthouseMenu(b)},
     {type: BUILDING_TYPES.MARKET, prop: 'market', menu: (b) => showMarketMenu(b)},
     {type: BUILDING_TYPES.BLACK_MARKET, prop: 'blackMarket', menu: (b) => showMarketMenu(b)},
-    {type: BUILDING_TYPES.GUILD, prop: 'guild', menu: (b) => showGuildMenu(b)},
-    {type: BUILDING_TYPES.BANK, prop: 'bank', menu: (b) => showBankMenu(b)},
-    {type: BUILDING_TYPES.COURTHOUSE, prop: 'courthouse', menu: (b) => showCourthouseMenu(b)},
-    {type: BUILDING_TYPES.ACADEMY, prop: 'academy', menu: (b) => showAcademyMenu(b)},
     {type: BUILDING_TYPES.TAVERN, prop: 'tavern', menu: (b) => showAcademyMenu(b)},
+    {type: BUILDING_TYPES.GUILD, prop: 'guild', menu: (b) => showGuildMenu(b)},
+    {type: BUILDING_TYPES.ACADEMY, prop: 'academy', menu: (b) => showAcademyMenu(b)},
+    {type: BUILDING_TYPES.BANK, prop: 'bank', menu: (b) => showBankMenu(b)},
+    {type: BUILDING_TYPES.TEMPLE, prop: 'temple', menu: (b) => showModal("Temple", "The temple is quiet and serene.", [["Close", () => showPlanetMenu(b.planet)]])},
+    {type: BUILDING_TYPES.CASINO, prop: 'casino', menu: (b) => showCasinoMenu(b)},
     {type: BUILDING_TYPES.CYBER_SURGEON, prop: 'cyberSurgeon', menu: (b) => showCyberSurgeonBuyMenu(b)},
     {type: BUILDING_TYPES.GENETICIST, prop: 'geneticist', menu: (b) => showGeneticistBuyMenu(b)},
     {type: BUILDING_TYPES.PALACE, prop: 'palace', menu: (b) => showPalaceMenu(b)},
-    {type: BUILDING_TYPES.TEMPLE, prop: 'temple', menu: (b) => showModal("Temple", "The temple is quiet and serene.", [["Close", () => showPlanetMenu(b.planet)]])},
-    {type: BUILDING_TYPES.CASINO, prop: 'casino', menu: (b) => showCasinoMenu(b)},
 ]
 
 

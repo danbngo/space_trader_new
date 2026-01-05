@@ -47,19 +47,6 @@ class WarNews extends News {
                     if (tp.c.relationships.get(this.planet) == RELATIONSHIP_TYPES.WAR) {
                         tp.c.relationships.set(this.planet, RELATIONSHIP_TYPES.NEUTRAL)
                     }
-                    console.log('2 war ended between', this.planet.name, 'and', this.targetPlanet.name)
-                    console.log('2 new diplomatic status:', p.c.relationships.get(this.targetPlanet))
-                    console.log('2 target new diplomatic status:', tp.c.relationships.get(this.planet))
-                    // If there are no more wars remaining, and there was a world war, end the world war
-                    const numWarsRemaining = gs.system.news.filter(n => (n.newsType == NT.WAR && !n.ended)).length
-                    if (numWarsRemaining == 0) {
-                        const systemAtWarNews = gs.system.news.find(n => (n.newsType == META_NT.SYSTEM_AT_WAR && !n.ended))
-                        if (systemAtWarNews) {
-                            console.log('cleaning up world war prematurely')
-                            systemAtWarNews.endAsap = true
-                            if (systemAtWarNews.shouldEnd()) systemAtWarNews.end()
-                        }
-                    }
                 }
             }
         )

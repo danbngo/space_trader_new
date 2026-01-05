@@ -190,7 +190,7 @@ const FACTION_TYPES = {
         false,
         [FLEET_TYPES.SLAVERS],
         -5,  // reputationMultiplier (highest gain for defeating slavers - heroes)
-        [SKILLS.Stealth, SKILLS.Barter]
+        []
     ),
     COLONISTS: new FactionType(
         'Colonists',

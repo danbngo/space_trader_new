@@ -153,14 +153,6 @@ const NEWS_TYPE_CLASSES = [
 
 const NEWS_TYPE_CLASSES_ARRAY = Object.freeze(NEWS_TYPE_CLASSES.map(pair => pair[1]))
 
-// @ts-ignore
-const META_NEWS_TYPE_CLASSES = [
-    [META_NT.SYSTEM_AT_WAR, SystemAtWarNews],
-    [META_NT.SYSTEM_WIDE_PLAGUE, SystemWidePlague],
-]
-
-const META_NEWS_TYPE_CLASSES_ARRAY = Object.freeze(META_NEWS_TYPE_CLASSES.map(pair => pair[1]))
-
 /**
  * Generates a random news event that affects planets.
  * @param {number} attemptsRemaining - Maximum attempts to generate valid news.
@@ -222,22 +214,7 @@ function generateNews(attemptsRemaining = 100, weights = []) {//only needs to be
     if (attemptsRemaining <= 0) return null
     return generateNews(attemptsRemaining - 1, weights)
 }
-/**
- * Generates system-wide meta news events.
- * @param {any[]} newsTypesAttempted - Array of news types already attempted.
- * @returns {News|null} The generated meta news event or null.
- */
-function generateMetaNews(newsTypesAttempted = []) {
-    if (newsTypesAttempted.length >= META_NEWS_TYPE_CLASSES_ARRAY.length) return null
-    const newsTypesNotAttempted = META_NEWS_TYPE_CLASSES_ARRAY.filter(cls=>(!newsTypesAttempted.includes(cls)))
-    const cls = rndMember([...newsTypesNotAttempted])
-    newsTypesAttempted.push(cls)
-    // @ts-ignore
-    const news = new cls()
-    //danmod we will eventually need to check if there's already meta news of this type ongoing, or maybe any meta news at all.
-    if (!news.isValid()) return null
-    return news
-}
+
 
 /**
  * Generates historical news events for a time period.
@@ -269,11 +246,7 @@ async function addHistory(startYear = 3000, endYear = 3000, progress = {complete
         if (gs.system.news.length > 3000) {
             throw new Error('TOO MANY ACTIVE NEWS!!!!!!!!!!!!!!!!!!!!!!')
         }
-        /*if (Math.random() < META_NEWS_CHANCE_PER_DAY * 7) {
-            const news = generateMetaNews()
-            if (!news) continue
-            news.start()
-        }*/
+
         News.processNews(YEARS_PER_WEEK)
         
         // Update progress and yield control more frequently for smooth animations

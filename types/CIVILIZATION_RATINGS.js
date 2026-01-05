@@ -28,7 +28,7 @@ const CIVILIZATION_RATINGS = {
     NAVY: new CivilizationRating('Navy', '🚀', COLORS.LightBlue, 'More shipyard ships and larger naval patrols.'),
     WEALTH: new CivilizationRating('Wealth', '💎', COLORS.Gold, 'Overall wealth of the civilization. Higher credits in stores.'),
     RESERVES: new CivilizationRating('Reserves', '📦', COLORS.Brown, 'Higher reserves means more goods in markets, but lower prices.'),
-    INFLATION: new CivilizationRating('Inflation', '📈', COLORS.Orange, 'Higher costs for everything but also higher sales prices in market.'),
+    //INFLATION: new CivilizationRating('Inflation', '📈', COLORS.Orange, 'Higher costs for everything but also higher sales prices in market.'),
     TAXES: new CivilizationRating('Taxes', '🏛️', COLORS.Green, 'Tax rate applied to most transactions (0 to MAX_TAX_RATE).'),
 }
 

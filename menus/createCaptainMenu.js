@@ -4,9 +4,7 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
 
     // State tracking for dropdowns - read from current captain/fleet state
     let selectedRace = captain.race || RACES.HUMAN
-    let selectedPlanet = gs.fleet.location || EARTH
     let selectedFaction = gs.fleet.captain.factionType || PLAYER_FACTIONS[0]
-    let selectedReligion = captain.religion || null
 
     // Helper to set fleet location and position
     function setFleetLocation(planet) {
@@ -35,10 +33,10 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
         captain.skills = new CountsMap()
         captain.skillPoints = STARTING_SKILL_POINTS;
         captain.race = rndMember(Object.values(RACES))
-        captain.religion = gs.system.religions.length > 0 ? (Math.random() < 0.3 ? null : rndMember(gs.system.religions)) : null
+        captain.religion = null
         gs.fleet.captain.factionType = rndMember(PLAYER_FACTIONS)
         gs.fleet.factionType = gs.fleet.captain.factionType
-        setFleetLocation(rndMember(gs.system.planets))
+        setFleetLocation(EARTH)
         
         // Randomly spend all skill points
         while (captain.skillPoints > 0) {
@@ -169,51 +167,6 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
                     })()
                 ]
             }),
-            
-            // Starting Planet dropdown
-            ce({
-                style: {display: 'flex', flexDirection: 'column', gap: '4px'},
-                children: [
-                    new Dropdown(
-                        gs.system.planets.map(planet => [
-                            coloredName(planet),
-                            () => {
-                                selectedPlanet = planet
-                                setFleetLocation(planet)
-                                showCaptainCreationMenu(captain, onClose, selectedSkill)
-                            }
-                        ]),
-                        false,
-                        gs.system.planets.indexOf(selectedPlanet),
-                        250
-                    ).container
-                ]
-            }),
-            
-            // Religion dropdown
-            ce({
-                style: {display: 'flex', flexDirection: 'column', gap: '4px'},
-                children: [
-                    new Dropdown(
-                        [['Agnostic', () => {
-                            selectedReligion = null
-                            captain.religion = null
-                            showCaptainCreationMenu(captain, onClose, selectedSkill)
-                        }], ...gs.system.religions.map(religion => [
-                            coloredName(religion),
-                            () => {
-                                selectedReligion = religion
-                                captain.religion = religion
-                                // Apply religion stat modifiers if needed
-                                showCaptainCreationMenu(captain, onClose, selectedSkill)
-                            }
-                        ])],
-                        false,
-                        selectedReligion ? gs.system.religions.indexOf(selectedReligion) + 1 : 0,
-                        250
-                    ).container
-                ]
-            }),
 
             // Perks section
             ce({
@@ -295,11 +248,6 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
                 // Reputation with race
                 if (captain.race) {
                     captain.reputation.increment(captain.race, startingReputation);
-                }
-                
-                // Reputation with religion
-                if (captain.religion) {
-                    captain.reputation.increment(captain.religion, startingReputation);
                 }
                 
                 // Reputation with faction
