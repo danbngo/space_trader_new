@@ -30,8 +30,6 @@ class Fleet extends SpaceObject {
         this.ships = []
         /** @type {CountsMap} */
         this.cargo = new CountsMap();
-        /** @type {Equipment[]} */
-        this.equipment = [];
         /** @type {CyberImplant[]} */
         this.cyberModules = [];
         /** @type {Officer} */
@@ -258,14 +256,14 @@ class Fleet extends SpaceObject {
      * Adds an officer to the fleet.
      * @param {Officer} officer - The officer to add.
      */
-    addOfficer(officer = new Officer()) {
+    addOfficer(officer) {
         if (!officer) throw new Error('tried to add null officer!')
         if (!this.captain) this.captain = officer
         this.officers.push(officer)
         officer.fleet = this
     }
 
-    removeOfficer(officer = new Officer()) {
+    removeOfficer(officer) {
         //assign a new captain if needed
         if (officer === this.captain) {
             const newCaptain = this.officers.find(o => o !== officer);

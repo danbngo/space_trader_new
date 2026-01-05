@@ -26,14 +26,14 @@
  * @param {number[]} averageColor - The average RGBA color for asteroids.
  * @param {number} numAsteroids - Number of asteroids to generate.
  * @param {number} maxRadius - Maximum radius for asteroids.
- * @param {number} maxOrbitalRadiusDifference - Max variation in orbital radius.
  * @param {number|null} startingProgress - Starting orbital progress or null for random.
  * @param {number} maxProgressDifference - Max variation in orbital progress.
  * @returns {Asteroid[]} Array of generated asteroids.
  */
-function generateAsteroids(asteroidBelt = new AsteroidBelt(), averageColor = COLORS.Gray, numAsteroids = 1000, maxRadius = 3, maxOrbitalRadiusDifference = 0.2, startingProgress = null, maxProgressDifference = 1) {
+function generateAsteroids(asteroidBelt = new AsteroidBelt(), averageColor = COLORS.Gray, numAsteroids = 1000, maxRadius = 3, startingProgress = null, maxProgressDifference = 1) {
     const asteroids = []
     const beltDistance = asteroidBelt.orbit.radius
+    const maxOrbitalRadiusDifference = asteroidBelt.maxOrbitalRadiusDifference
 
     function randomizeColor(baseColor = [128,128,128,255], variation = 32) {
         const r = Math.max(Math.min(baseColor[0] + rng(-variation, variation), 255), 0)

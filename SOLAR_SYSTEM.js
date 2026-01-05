@@ -67,12 +67,12 @@ const KUIPER_BELT = new AsteroidBelt("Kuiper Belt", ASTEROID_BELT_TYPES.Icy, hex
 const OORT_CLOUD = new AsteroidBelt("Oort Cloud", ASTEROID_BELT_TYPES.Icy, hexToRgba('#ddeeff'), 100, new Orbit(75), [ENCOUNTER_TYPES.CRYOIDS_CALM, ENCOUNTER_TYPES.CRYOIDS_STORM], [EFFECT_TYPES.ICE_CLOUD])
 const ASTEROID_BELTS_ALL = [CORONA, ASTEROID_BELT, TROJANS, GREEKS, KUIPER_BELT, OORT_CLOUD]
 
-const ASTEROIDS = generateAsteroids(ASTEROID_BELT, COLORS.Brown, 500, 3, 0.2)
-const KUIPER_ASTEROIDS = generateAsteroids(KUIPER_BELT, COLORS.LightBlue, 2500, 3, 2/5)
-const OORT_ASTEROIDS = generateAsteroids(OORT_CLOUD, COLORS.White, 2000, 2, 3/5)
-const TROJAN_ASTEROIDS = generateAsteroids(TROJANS, COLORS.Gray, 100, 2, 0.1, JUPITER.orbit.progressOffset + 0.15, 0.1)
-const GREEK_ASTEROIDS = generateAsteroids(GREEKS, COLORS.Gray, 100, 2, 0.1, JUPITER.orbit.progressOffset - 0.15, 0.1)
-const SOLAR_FLARES = generateAsteroids(CORONA, COLORS.LightOrange, 100, 0.1, 0.25)
+const ASTEROIDS = generateAsteroids(ASTEROID_BELT, COLORS.Brown, 500, 3)
+const KUIPER_ASTEROIDS = generateAsteroids(KUIPER_BELT, COLORS.LightBlue, 2500, 3)
+const OORT_ASTEROIDS = generateAsteroids(OORT_CLOUD, COLORS.White, 2000, 2)
+const TROJAN_ASTEROIDS = generateAsteroids(TROJANS, COLORS.Gray, 100, 2, JUPITER.orbit.progressOffset + 0.15, 0.1)
+const GREEK_ASTEROIDS = generateAsteroids(GREEKS, COLORS.Gray, 100, 2, JUPITER.orbit.progressOffset - 0.15, 0.1)
+const SOLAR_FLARES = generateAsteroids(CORONA, COLORS.LightOrange, 100, 0.1)
 
 const ASTEROIDS_ALL = [...ASTEROIDS, ...KUIPER_ASTEROIDS, ...OORT_ASTEROIDS, ...TROJAN_ASTEROIDS, ...GREEK_ASTEROIDS, ...SOLAR_FLARES]
 

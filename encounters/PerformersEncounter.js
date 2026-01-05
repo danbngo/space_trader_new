@@ -146,11 +146,10 @@ class PerformersEncounter extends NeutralsEncounter {
                 message += `${colorSpan(`🎉 GRAND PRIZE! You won a ${ship.shipType.name}!`, COLORS.Purple)}<br/><br/>`
             }
             else {
-                // High quality equipment
-                prize = equipmentGenerator(this.planet)
-                prize.quality = rng(2.5, 1.5, false) * (this.planet.c?.technology || 1)
-                gs.fleet.equipment.push(prize)
-                message += `${colorSpan(`🎉 GRAND PRIZE! You won ${prize.name}!`, COLORS.Purple)}<br/><br/>`
+                // Credits prize instead
+                const creditPrize = rng(5000, 1000)
+                gs.credits += creditPrize
+                message += `${colorSpan(`\ud83c\udf89 GRAND PRIZE! You won ${creditPrize} CR!`, COLORS.Purple)}<br/><br/>`
             }
         }
         

@@ -5,7 +5,7 @@
  * @param {(officer: Officer) => void} onSelectOfficer - Callback when an officer is selected.
  * @returns {HTMLTableElement|string} The table element or "(None)" if no officers.
  */
-function createAcademyHireOfficerMenu(officers = [new Officer()], academy = new Academy(), onSelectOfficer = (officer = new Officer())=>{}) {
+function createAcademyHireOfficerMenu(officers = [], academy = new Academy(), onSelectOfficer = (officer)=>{}) {
     if (officers.length == 0) return `(None)`
     const rows = [
         ['Name', 'Race', 'Age', 'Level', 'CR Share', ...SKILLS_ALL, 'Implants', 'Hire Price']
@@ -84,7 +84,7 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0],
         refreshPanelButtons('academy_panel', buttons)
     }
 
-    function hireOfficer(officer = new Officer()) {
+    function hireOfficer(officer) {
         const hirePrice = academy.calcHirePrice(officer)
         gs.credits -= hirePrice
         gs.fleet.addOfficer(officer)
@@ -92,7 +92,7 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0],
         reloadMenu(selectedSkill, true)
     }
 
-    function showHireOfficerModal(officer = new Officer()) {
+    function showHireOfficerModal(officer) {
         const hirePrice = academy.calcHirePrice(officer)
         const implantsText = officer.implants.length > 0 
             ? '<br/><b>Cybernetic Implants:</b><br/>' + officer.implants.map(i => colorSpan(i.implantType.name, i.implantType.color) + ` (${roundToPlaces(i.quality*100, 1)}%)`).join(', ')
@@ -112,7 +112,7 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0],
         )
     }
 
-    function onSelectOfficer(officer = new Officer()) {
+    function onSelectOfficer(officer) {
         const hirePrice = academy.calcHirePrice(officer)
         const canHire = isDocked && gs.credits >= hirePrice && gs.fleet.officers.length < gs.captain.maxSubordinates
         const buttons = [

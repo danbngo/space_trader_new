@@ -81,7 +81,7 @@ function showGeneticistApplyModificationMenu(geneticist = new Geneticist(), modi
     const {fleet} = gs
     const buyPrice = geneticist.calcBuyModificationPrice(modification)
 
-    function buyModification(modification = new GeneticModification(), officer = new Officer()) {
+    function buyModification(modification = new GeneticModification(), officer) {
         const buyPrice = geneticist.calcBuyModificationPrice(modification)
         gs.credits -= buyPrice;
         geneticist.credits += buyPrice;
@@ -109,7 +109,7 @@ function showGeneticistApplyModificationMenu(geneticist = new Geneticist(), modi
         return createTable(rows, (rowIndex) => onSelectOfficer(allCrew[rowIndex]), selectedOfficer ? allCrew.indexOf(selectedOfficer) + 1 : null)
     }
 
-    function onSelectOfficer(officer = new Officer()) {
+    function onSelectOfficer(officer) {
         const alreadyHasModification = officer.geneticModifications.some(m => m.modificationType === modification.modificationType)
         const canApply = !alreadyHasModification && gs.credits >= buyPrice
         

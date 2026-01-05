@@ -4,7 +4,7 @@
  * @param {(officer: Officer) => void} onSelectOfficer - Callback when officer is selected.
  * @returns {HTMLTableElement|string} The officers table or "(None)" if no officers.
  */
-function createOfficersTable(officers = [new Officer()], onSelectOfficer = (officer = new Officer())=>{}) {
+function createOfficersTable(officers = [], onSelectOfficer = (officer)=>{}) {
     if (officers.length == 0) return colorSpan('(No officers hired yet)', COLORS.Gray)
     /** @type {(HTMLElement|string|number|SkillType)[][]} */
     const rows = [
@@ -40,7 +40,7 @@ function createOfficersTable(officers = [new Officer()], onSelectOfficer = (offi
  * Shows equipment management menu for a specific officer.
  * @param {Officer} officer - The officer to manage equipment for.
  */
-function showEquipmentMenu(officer = new Officer()) {
+function showEquipmentMenu(officer) {
     const reloadMenu = () => showEquipmentMenu(officer)
 
     function equipItem(equipment) {
@@ -157,12 +157,12 @@ function showEquipmentMenu(officer = new Officer()) {
 function showOfficersMenu(officers = gs.fleet.officers.filter(o => o !== gs.captain)) {
     const reloadMenu = ()=>showOfficersMenu(gs.fleet.officers.filter(o => o !== gs.captain))
 
-    function fireOfficer(officer = new Officer()) {
+    function fireOfficer(officer) {
         safeRemove(gs.fleet.officers, officer)
         showOfficersMenu(gs.fleet.officers.filter(o => o !== gs.captain)) //DONT use reloadMenu here, wont reflect changes to ship list
     }
 
-    function showFireOfficerModal(officer = new Officer()) {
+    function showFireOfficerModal(officer) {
         showModal(`Fire ${officer.name}`, 
             `Fire ${officer.name}?`,
             [
@@ -174,7 +174,7 @@ function showOfficersMenu(officers = gs.fleet.officers.filter(o => o !== gs.capt
 
     let selectedOfficer = null
 
-    function onSelectOfficer(officer = new Officer()) {
+    function onSelectOfficer(officer) {
         selectedOfficer = officer
         const isCaptain = officer === gs.captain
         const notEnoughPilots = gs.fleet.numPilots <= gs.fleet.ships.length

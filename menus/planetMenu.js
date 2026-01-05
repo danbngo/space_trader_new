@@ -12,8 +12,6 @@ const buildingHandlerMapping = [
     {type: BUILDING_TYPES.PALACE, prop: 'palace', menu: (b) => showPalaceMenu(b)},
     {type: BUILDING_TYPES.TEMPLE, prop: 'temple', menu: (b) => showModal("Temple", "The temple is quiet and serene.", [["Close", () => showPlanetMenu(b.planet)]])},
     {type: BUILDING_TYPES.CASINO, prop: 'casino', menu: (b) => showCasinoMenu(b)},
-    {type: BUILDING_TYPES.ARMORY, prop: 'armory', menu: (b) => showArmoryMenu(b)},
-    {type: BUILDING_TYPES.OUTFITTER, prop: 'outfitter', menu: (b) => showOutfitterMenu(b)},
 ]
 
 

@@ -17,16 +17,16 @@ class Academy extends Building {
         this.officers = [];
         this.normalize(true)
     }
-    calcSkillUpgradeCost(officer = new Officer(), skill = SKILLS_ALL[0]) {
+    calcSkillUpgradeCost(officer, skill = SKILLS_ALL[0]) {
         // Base cost scales exponentially with current skill level
         const baseCost = 250 * officer.calcSkillPointsToUpgrade(skill, false)
         const skillModifier = this.planet.c.skillPriceMultipliers.getAmount(skill) || 1
         return Math.ceil(baseCost * skillModifier * (1 + this.planet.c.corruption) * this.planet.c.inflation)
     }
-    calcCanUpgradeSkill(officer = new Officer(), targetLevel = 1) {
+    calcCanUpgradeSkill(officer, targetLevel = 1) {
         return this.planet.c.education * this.level * officer.level >= targetLevel
     }
-    calcHirePrice(officer = new Officer()) {
+    calcHirePrice(officer) {
         const basePrice = Math.round(officer.value * (1+this.planet.c.corruption) * this.planet.c.inflation / (this.isTavern ? this.planet.c.crime : this.planet.c.army))
         // Taverns don't charge taxes (similar to black market)
         if (this.isTavern) {

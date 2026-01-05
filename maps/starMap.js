@@ -700,8 +700,8 @@ class StarMap extends BaseMap {
             if (gs.location) ce({parent:container, tag:'button', innerHTML:`Dock (${coloredName(gs.location)})`, onClick:()=>this.explore(gs.location)})
             
             // Check if player is near an asteroid for mining
-            const nearbyBelt = checkNearbyAsteroid()
-            if (nearbyBelt) {
+            const nearbyData = checkNearbyAsteroid()
+            if (nearbyData) {
                 ce({parent:container, tag:'button', innerHTML:'⛏️ Mine', onClick: () => startMining()})
             }
         }

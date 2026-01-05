@@ -5,7 +5,7 @@
  * @param {(officer: Officer) => void} onSelectOfficer - Callback when an officer is selected.
  * @returns {HTMLTableElement|string} The table element or "(None)" if no officers.
  */
-function createHireOfficerMenu(officers = [new Officer()], guild = new Guild(), onSelectOfficer = (officer = new Officer())=>{}) {
+function createHireOfficerMenu(officers = [], guild = new Guild(), onSelectOfficer = (officer)=>{}) {
     console.log('creating hire officer menu:',officers)
     if (officers.length == 0) return `(None)`
     /** @type {any[]} */
@@ -43,7 +43,7 @@ function showGuildMenu(guild = new Guild()) {
     const isDocked = fleet.location == planet
     const rebuildMenu = ()=>showGuildMenu(guild)
 
-    function hireOfficer(officer = new Officer()) {
+    function hireOfficer(officer) {
         const hirePrice = guild.calcHirePrice(officer)
         gs.credits -= hirePrice;
         //guild.credits += hirePrice;
@@ -52,7 +52,7 @@ function showGuildMenu(guild = new Guild()) {
         rebuildMenu()
     }
 
-    function showHireOfficerModal(officer = new Officer()) {
+    function showHireOfficerModal(officer) {
         const hirePrice = guild.calcHirePrice(officer)
         const reputationText = officer.reputation.total !== 0 
             ? `<br/><b>Reputation:</b> ${officer.reputation.total} (${coloredName(officer.reputation.keys[0])})`
@@ -68,7 +68,7 @@ function showGuildMenu(guild = new Guild()) {
         )
     }
     
-    function onSelectGuildOfficer(officer = new Officer()) {
+    function onSelectGuildOfficer(officer) {
         console.log('selected guild officer:',officer)
         const hirePrice = guild.calcHirePrice(officer)
         const canHire = isDocked && gs.credits >= hirePrice && fleet.officers.length < captain.maxSubordinates

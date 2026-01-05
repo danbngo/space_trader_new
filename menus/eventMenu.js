@@ -81,7 +81,7 @@ function checkDebtCollections(elapsedDays = 1) {
 }
 
 
-function payDebtsRandomly(officer = new Officer(), amount = 0) {
+function payDebtsRandomly(officer, amount = 0) {
     const overdueLoans = officer.loans.filter(l=>l.overdue && l.outstandingBalance > 0)
     if (overdueLoans.length == 0) return
     const loan = rndMember(overdueLoans)

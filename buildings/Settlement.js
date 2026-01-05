@@ -19,11 +19,9 @@ class Settlement {
      * @param {Geneticist} params.geneticist - The geneticist building.
      * @param {Palace} params.palace - The palace building.
      * @param {Temple} params.temple - The temple building.
-     * @param {Armory} params.armory - The armory building.
-     * @param {Outfitter} params.outfitter - The outfitter building.
      * @param {Casino} params.casino - The casino building.
      */
-    constructor({planet = new Planet(), settlementType = null, shipyard = null, market = null, blackMarket = null, guild = null, bank = null, courthouse = null, academy = null, tavern = null, cyberSurgeon = null, geneticist = null, palace = null, temple = null, armory = null, outfitter = null, casino = null}) {
+    constructor({planet = new Planet(), settlementType = null, shipyard = null, market = null, blackMarket = null, guild = null, bank = null, courthouse = null, academy = null, tavern = null, cyberSurgeon = null, geneticist = null, palace = null, temple = null, casino = null}) {
         /** @type {Planet} */
         this.planet = planet;
         /** @type {SettlementType} */
@@ -52,10 +50,6 @@ class Settlement {
         this.palace = palace;
         /** @type {Temple} */
         this.temple = temple;
-        /** @type {Armory} */
-        this.armory = armory;
-        /** @type {Outfitter} */
-        this.outfitter = outfitter;
         /** @type {Casino} */
         this.casino = casino;
     }

@@ -8,15 +8,18 @@ class Officer {
      * @param {string} name - The name of the officer.
      * @param {Planet|null} planet - The planet the officer is from.
      * @param {FactionType} factionType - The faction type of the officer.
+     * @param {Race} race - The race of the officer
      * @param {number} credits - The credits owned by the officer.
      */
-    constructor(name = "Unnamed", planet = new Planet(), factionType = FACTION_TYPES_ALL[0], credits = 0) {
+    constructor(name = "Unnamed", planet = new Planet(), factionType = FACTION_TYPES_ALL[0], race = RACES_ALL[0], credits = 0) {
         /** @type {string} */
         this.name = name;
         /** @type {Planet} */
         this.planet = planet;
         /** @type {FactionType} */
         this.factionType = factionType;
+        /** @type {Race} */
+        this.race = race
         /** @type {number} */
         this.credits = credits;
         // Convert old number values to CountsMap if needed (for backwards compatibility)
@@ -47,14 +50,6 @@ class Officer {
         this.ranks = new Map();
         /** @type {PerkType[]} */
         this.perks = [];
-        /** @type {number} */
-        this.age = 25; // Default age
-        /** @type {Race} */
-        this.race = RACES.HUMAN; // Default race
-        /** @type {Religion} */
-        this.religion = RELIGION_AGNOSTICISM; // Religion affiliation, default to Agnosticism
-        /** @type {Map<EquipmentSlot, Equipment>} */
-        this.equipment = new Map();
     }
 
     get bonusSkills() {

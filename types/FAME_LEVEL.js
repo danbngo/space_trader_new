@@ -8,13 +8,13 @@ class FameLevel {
         this.color = color;
     }
 
-    static hasFameLevel(officer = new Officer(), planet = new Planet(), fameLevel = FAME_LEVELS.UNKNOWN) {
+    static hasFameLevel(officer, planet = new Planet(), fameLevel = FAME_LEVELS.UNKNOWN) {
         return officer.reputation.getAmount(planet) >= fameLevel.minReputation;
     }
-    static hasInfamyLevel(officer = new Officer(), planet = new Planet(),  infamyLevel = INFAMY_LEVELS.UNKNOWN) {
+    static hasInfamyLevel(officer, planet = new Planet(),  infamyLevel = INFAMY_LEVELS.UNKNOWN) {
         return officer.reputation.getAmount(planet) <= -infamyLevel.minReputation;
     }
-    static hasFameOrInfamyLevel(officer = new Officer(), planet = new Planet(), fameOrInfamyLevel = FAME_LEVELS.UNKNOWN) {
+    static hasFameOrInfamyLevel(officer, planet = new Planet(), fameOrInfamyLevel = FAME_LEVELS.UNKNOWN) {
         return Math.abs(officer.reputation.getAmount(planet)) >= fameOrInfamyLevel.minReputation;
     }
 }

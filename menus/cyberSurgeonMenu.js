@@ -136,7 +136,7 @@ function showCyberSurgeonInstallImplantMenu(cyberSurgeon = new CyberSurgeon(), i
     const {fleet} = gs
     const buyPrice = isFromFleet ? 0 : cyberSurgeon.calcBuyImplantPrice(implant)
 
-    function buyImplant(implant = new CyberImplant(), officer = new Officer()) {
+    function buyImplant(implant = new CyberImplant(), officer) {
         const buyPrice = isFromFleet ? 0 : cyberSurgeon.calcBuyImplantPrice(implant)
         gs.credits -= buyPrice;
         if (!isFromFleet) {
@@ -168,7 +168,7 @@ function showCyberSurgeonInstallImplantMenu(cyberSurgeon = new CyberSurgeon(), i
         return createTable(rows, (rowIndex) => onSelectOfficer(allCrew[rowIndex]), selectedOfficer ? allCrew.indexOf(selectedOfficer) + 1 : null)
     }
 
-    function onSelectOfficer(officer = new Officer()) {
+    function onSelectOfficer(officer) {
         const alreadyHasImplant = officer.implants.some(i => i.implantType === implant.implantType)
         const canInstall = !alreadyHasImplant && (isFromFleet || gs.credits >= buyPrice)
         /** @type {ButtonData[]} */

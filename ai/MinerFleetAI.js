@@ -76,9 +76,9 @@ class MinerFleetAI extends FleetAI {
                 this.fleet.cargo.increment(cargoType, mineAmount);
                 console.log(`⛏️ ${this.fleet.name} mined ${mineAmount} ${cargoType.name}`);
                 
-                // Randomize asteroid orbit after mining
-                if (this.target.orbit) {
-                    this.target.orbit.progressOffset = Math.random();
+                // Randomize asteroid position after mining
+                if (this.target.belt) {
+                    this.target.belt.randomizeAsteroid(this.target);
                 }
                 
                 // Show mining popup

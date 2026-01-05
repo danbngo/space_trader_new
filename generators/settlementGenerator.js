@@ -167,21 +167,17 @@ function generateSettlement(planet) {
     
     const casino = new Casino(planet, getRandomMoon())
     
-    const armory = new Armory(planet, getRandomMoon())
-    
-    const outfitter = new Outfitter(planet, getRandomMoon())
-    
 
     console.log('disabling some buildings...')
 
     // Dwarf planets have much lower chance of having buildings (95% disabled vs 80% for others)
     const disableChance = planet.objectType == OBJECT_TYPES.PLANET ? 0.8 : planet.objectType == OBJECT_TYPES.DWARF_PLANET ? 0.4 : 0.2
-    const buildings = [shipyard, market, blackMarket, guild, bank, courthouse, academy, tavern, cyberSurgeon, geneticist, palace, temple, casino, armory, outfitter]
+    const buildings = [shipyard, market, blackMarket, guild, bank, courthouse, academy, tavern, cyberSurgeon, geneticist, palace, temple, casino]
     for (const building of buildings) {
         if (Math.random() < disableChance) building.exists = false
         // Randomize building level from 1-3
         building.level = Math.floor(Math.random() * 3) + 1
     }
 
-    return new Settlement({planet, settlementType, shipyard, market, blackMarket, guild, bank, courthouse, academy, tavern, cyberSurgeon, geneticist, palace, temple, casino, armory, outfitter})
+    return new Settlement({planet, settlementType, shipyard, market, blackMarket, guild, bank, courthouse, academy, tavern, cyberSurgeon, geneticist, palace, temple, casino})
 }

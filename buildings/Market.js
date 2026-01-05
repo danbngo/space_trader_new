@@ -32,6 +32,7 @@ class Market extends Building {
 
     calcBaseCargo() {
         const baseCargo = new CountsMap()
+        const multiplier = this.planet?.objectType?.powerMultiplier ?? 1
         for (const cargoType of CARGO_TYPES_ALL) {
             // Skip RELICS - they are never available in standard markets
             if (cargoType === CARGO_TYPES.RELICS) continue
@@ -40,8 +41,8 @@ class Market extends Building {
             const baseAmount = Math.round(MARKET_AVERAGE_CARGO_PER_TYPE/this.planet.c.cargoPriceMultipliers.getAmount(cargoType))
             const availabilityModifier = this.calcCargoAvailabilityModifier(cargoType)
             const amount = this.blackMarket 
-                ? baseAmount * this.planet.c.crime * availabilityModifier * this.level
-                : baseAmount * this.planet.c.reserves * availabilityModifier * this.level
+                ? baseAmount * this.planet.c.crime * availabilityModifier * this.level * multiplier
+                : baseAmount * this.planet.c.reserves * availabilityModifier * this.level * multiplier
             baseCargo.setAmount(cargoType, amount)
         }
         return baseCargo

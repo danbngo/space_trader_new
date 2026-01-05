@@ -4,7 +4,7 @@
 
 /**
  * Check if player fleet is near any asteroid
- * @returns {AsteroidBelt|null} The nearest asteroid belt if within mining range, null otherwise
+ * @returns {{belt: AsteroidBelt, asteroid: Asteroid}|null} The nearest asteroid and its belt if within mining range, null otherwise
  */
 function checkNearbyAsteroid() {
     const playerFleet = gs.fleet
@@ -23,18 +23,18 @@ function checkNearbyAsteroid() {
     
     if (nearbyAsteroids.length === 0) return null
     
-    // Return the closest asteroid's belt
+    // Return the closest asteroid and its belt
     const closest = nearbyAsteroids.sort((a, b) => a.distance - b.distance)[0]
-    return closest.asteroid.belt
+    return {belt: closest.asteroid.belt, asteroid: closest.asteroid}
 }
 
 /**
  * Initiate mining operation at nearby asteroid belt
  */
 function startMining() {
-    const belt = checkNearbyAsteroid()
+    const nearbyData = checkNearbyAsteroid()
     
-    if (!belt) {
+    if (!nearbyData) {
         showModal('No Asteroids Nearby', 
             `You need to be near an asteroid belt to mine.<br/>Navigate closer to an asteroid field on the star map.`,
             [['OK', () => closeModal()]]
@@ -42,15 +42,18 @@ function startMining() {
         return
     }
     
-    console.log('🪨 STARTING MINING OPERATION', {belt, asteroidBeltType: belt.asteroidBeltType})
+    const {belt, asteroid} = nearbyData
+    console.log('🪨 STARTING MINING OPERATION', {belt, asteroid, asteroidBeltType: belt.asteroidBeltType})
     
     const encounterType = rndMember(belt.encounterTypes)
     
     console.log('Mining encounter type:', encounterType.name)
     
     // Generate the mining encounter
-    //const encounter = generateEncounterForFleet(encounterType, null, belt.effectTypes)
     const encounter = generateRandomEncounter(encounterType, null)
+    
+    // Store reference to the asteroid being mined so we can randomize it after the encounter
+    encounter.minedAsteroid = asteroid
     
     // Start the encounter
     encounter.startEncounter()

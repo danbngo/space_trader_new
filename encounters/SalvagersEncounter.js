@@ -19,20 +19,18 @@ class SalvagersEncounter extends NeutralsEncounter {
     }
     
     offerMysteryItem() {
-        // Roll all 4 possible items to calculate average price
-        const equipment = equipmentGenerator(this.planet)
+        // Roll all 3 possible items to calculate average price
         const cyberImplant = generateCyberImplant(this.planet)
         const shipModuleType = rndMember(SHIP_MODULE_TYPES_ALL)
         const shipModule = new ShipModule(shipModuleType, this.planet.c?.technology || 1)
         const naniteValue = CARGO_TYPES.NANITES.value
         
         // Calculate average value
-        const averageValue = Math.round((equipment.value + cyberImplant.value + (shipModule.moduleType.value * shipModule.quality) + naniteValue) / 4)
+        const averageValue = Math.round((cyberImplant.value + (shipModule.moduleType.value * shipModule.quality) + naniteValue) / 3)
         const canAfford = gs.credits >= averageValue
         
         // Store the rolled items for later
         this.rolledItems = [
-            { type: 'equipment', item: equipment },
             { type: 'cyber', item: cyberImplant },
             { type: 'shipModule', item: shipModule },
             { type: 'nanite', item: null }
@@ -40,8 +38,8 @@ class SalvagersEncounter extends NeutralsEncounter {
         
         let message = `The ${coloredName(this.fleet)} hail you with an offer:<br/><br/>`
         message += `"Hey there! We just pulled something really nice from a wreck. Don't have time to appraise it properly, but it's valuable. `
-        message += `Could be equipment, could be cyberware, could be a ship module... hell, might even be junk. ${averageValue} CR and it's yours - sight unseen."<br/><br/>`
-        message += `<span style="color: #ff9999">⚠️ The item will be randomly selected from: Equipment, Cyber Implant, Ship Module, or Nanites!</span>`
+        message += `Could be cyberware, could be a ship module... hell, might even be junk. ${averageValue} CR and it's yours - sight unseen."<br/><br/>`
+        message += `<span style="color: #ff9999">⚠️ The item will be randomly selected from: Cyber Implant, Ship Module, or Nanites!</span>`
         
         showModal(coloredName(this.fleet), message, [
             ['Buy', () => {
@@ -50,9 +48,7 @@ class SalvagersEncounter extends NeutralsEncounter {
                 // Randomly pick one of the 4 items
                 const chosen = rndMember(this.rolledItems)
                 
-                if (chosen.type === 'equipment') {
-                    this.giveEquipment(chosen.item, averageValue)
-                } else if (chosen.type === 'cyber') {
+                if (chosen.type === 'cyberImplant') {
                     this.giveCyberImplant(chosen.item, averageValue)
                 } else if (chosen.type === 'shipModule') {
                     this.giveShipModule(chosen.item, averageValue)
@@ -63,28 +59,6 @@ class SalvagersEncounter extends NeutralsEncounter {
             ['Decline', () => this.showStandardGreeting()],
             ['Ignore', () => this.endEncounter()],
         ])
-    }
-    
-    giveEquipment(equipment, price) {
-        // Equipment goes to settlement armory if docked
-        if (gs.fleet.location && gs.fleet.location.settlement && gs.fleet.location.settlement.armory) {
-            gs.fleet.location.settlement.armory.inventory.push(equipment)
-            
-            showModal('Equipment Acquired',
-                `You transfer ${price} CR and receive:<br/><br/>` +
-                `<b>${equipment.name}</b><br/>` +
-                `${equipment.equipmentType.description}<br/>` +
-                `Value: ${equipment.value} CR<br/><br/>` +
-                `"Not bad! Stored at the local armory for you."`,
-                [['Continue', () => this.endEncounter()]]
-            )
-        } else {
-            showModal('Not Docked',
-                `The salvager shakes their head:<br/><br/>` +
-                `"Can't hand over equipment while you're not docked at a settlement. Come back when you've landed somewhere."`,
-                [['Continue', () => this.endEncounter()]]
-            )
-        }
     }
     
     giveCyberImplant(cyberImplant, price) {
@@ -102,22 +76,22 @@ class SalvagersEncounter extends NeutralsEncounter {
     }
     
     giveShipModule(shipModule, price) {
-        // Ship module goes to outfitter if docked
-        if (gs.fleet.location && gs.fleet.location.settlement && gs.fleet.location.settlement.outfitter) {
-            gs.fleet.location.settlement.outfitter.inventory.push(shipModule)
+        // Ship module goes to shipyard if docked
+        if (gs.fleet.location && gs.fleet.location.settlement && gs.fleet.location.settlement.shipyard) {
+            gs.fleet.location.settlement.shipyard.modules.push(shipModule)
             
             showModal('Ship Module Acquired',
                 `You transfer ${price} CR and receive:<br/><br/>` +
                 `<b>${shipModule.moduleType.name}</b> (Quality: ${shipModule.quality.toFixed(2)})<br/>` +
                 `${shipModule.moduleType.description}<br/>` +
                 `Value: ${Math.round(shipModule.moduleType.value * shipModule.quality)} CR<br/><br/>` +
-                `"Nice find! Check the outfitter to install it."`,
+                `"Nice find! Check the shipyard to install it."`,
                 [['Continue', () => this.endEncounter()]]
             )
         } else {
             showModal('Not Docked',
                 `The salvager shakes their head:<br/><br/>` +
-                `"Can't hand over ship modules while you're not docked at a settlement. Come back when you've landed somewhere."`,
+                `"Can't hand over ship modules while you're not docked at a settlement with a shipyard. Come back when you've landed somewhere."`,
                 [['Continue', () => this.endEncounter()]]
             )
         }
