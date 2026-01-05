@@ -34,11 +34,11 @@ class RefugeeFleetAI extends FleetAI {
         super.onNearDestination()
     }
     
-    onDestroyed() {
+    onDestroyed(destroyedBy = null) {
         // Losing refugees has humanitarian impact, slight population loss
         if (this.fleet.planet && this.fleet.planet.civilization) {
             this.fleet.planet.c.population *= 0.98;
         }
-        super.onDestroyed()
+        super.onDestroyed(destroyedBy)
     }
 }

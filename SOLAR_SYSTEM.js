@@ -91,7 +91,7 @@ const SOLAR_SYSTEM = new StarSystem(
     SOL, [SOL],
     PLANETS,
     DWARF_PLANETS,
-    ALL_MOONS,
+    [], //moons added in MOONS.js
     [],
     [],
     [CORONA, ASTEROID_BELT, TROJANS, GREEKS, KUIPER_BELT, OORT_CLOUD], [...ASTEROIDS_ALL],
@@ -102,4 +102,21 @@ const SOLAR_SYSTEM = new StarSystem(
 console.log("Generated solar system:", SOLAR_SYSTEM)
 console.log("Generated religions:", RELIGIONS)
 console.log("Generated space stations:", SPACE_STATIONS)
+
+// Log body counts
+console.log("=== SOLAR SYSTEM BODY COUNTS ===")
+console.log("Stars:", SOLAR_SYSTEM.stars.length)
+console.log("Regular Planets:", SOLAR_SYSTEM.planets.length)
+console.log("Dwarf Planets:", SOLAR_SYSTEM.dwarfPlanets.length)
+console.log("Space Stations:", SOLAR_SYSTEM.spaceStations.length)
+console.log("Asteroid Belts:", SOLAR_SYSTEM.asteroidBelts.length)
+console.log("Asteroids:", SOLAR_SYSTEM.asteroids.length)
+console.log("  - Main Belt Asteroids:", ASTEROIDS.length)
+console.log("  - Kuiper Belt Asteroids:", KUIPER_ASTEROIDS.length)
+console.log("  - Oort Cloud Asteroids:", OORT_ASTEROIDS.length)
+console.log("  - Trojan Asteroids:", TROJAN_ASTEROIDS.length)
+console.log("  - Greek Asteroids:", GREEK_ASTEROIDS.length)
+console.log("  - Solar Flares (Corona):", SOLAR_FLARES.length)
+console.log("Background Stars:", SOLAR_SYSTEM.backgroundStars.length)
+console.log("=================================")
 

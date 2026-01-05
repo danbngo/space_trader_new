@@ -158,7 +158,7 @@ async function startNewGame() {
     console.log("Generated space stations:", SPACE_STATIONS)
 
     // Generate civilizations and settlements for all planets, dwarf planets, and moons
-    const allPlanets = [...gs.system.planets, ...gs.system.dwarfPlanets, ...ALL_MOONS]
+    const allPlanets = [...gs.system.planets, ...gs.system.dwarfPlanets, ...MOONS_ALL]
     for (const planet of allPlanets) {
         //dont modify order, settlement depends on civilization
         planet.civilization = generateCivilization(planet)
@@ -191,11 +191,31 @@ async function startNewGame() {
     gs.system.updatePositions(gs.year)
 
     // Simulate history
-    await simulateHistory(SIMULATE_HISTORY_NUM_YEARS)
+    try {
+        await simulateHistory(SIMULATE_HISTORY_NUM_YEARS)
+    }
+    catch (e) {
+        console.error("Error during history simulation:", e)
+        alert("An error occurred during history simulation. Please try starting a new game again.")
+        console.log(gs.system.news)
+        assessPlanets()
+        closeModal()
+        return
+    }
     
     // Simulate fleet activity (daily ticks for better efficiency)
 
-    await simulateFleetActivity(SIMULATE_FLEET_ACTIVITY_YEARS)
+    try {
+        await simulateFleetActivity(SIMULATE_FLEET_ACTIVITY_YEARS)
+    }
+    catch (e) {
+        console.error("Error during fleet activity simulation:", e)
+        alert("An error occurred during fleet activity simulation. Please try starting a new game again.")
+        console.log(gs.system.fleets)
+        assessFleets()
+        closeModal()
+        return
+    }
 
     // Ensure maximum anomalies exist at game start
     if (!gs.system.anomalies) gs.system.anomalies = [];

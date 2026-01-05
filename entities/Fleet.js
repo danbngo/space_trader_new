@@ -45,6 +45,12 @@ class Fleet extends SpaceObject {
         this.angle = 0
         /** @type {number} */
         this.cloakLevel = 0; // 0 = visible, 1.0 = fully cloaked
+        /** @type {Fleet|Asteroid|Anomaly|string|null} */
+        this.destroyedBy = null; // Track what destroyed this fleet
+        /** @type {boolean} */
+        this.destroyed = false; // Whether this fleet is destroyed/abandoned
+        /** @type {number|null} */
+        this.abandonedYear = null; // Year when fleet was destroyed
     }
 
     /**

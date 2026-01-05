@@ -57,11 +57,11 @@ class DiplomatFleetAI extends FleetAI {
         
         super.onNearDestination()
     }
-    onDestroyed() {
+    onDestroyed(destroyedBy = null) {
         // Losing diplomats hurts prestige and diplomatic standing
         if (this.fleet.planet && this.fleet.planet.civilization) {
             this.fleet.planet.c.prestige *= 0.98;
         }
-        super.onDestroyed()
+        super.onDestroyed(destroyedBy)
     }
 }

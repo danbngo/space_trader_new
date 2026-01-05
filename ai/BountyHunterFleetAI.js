@@ -79,11 +79,11 @@ class BountyHunterFleetAI extends FleetAI {
         }
         return result
     }
-    onDestroyed() {
+    onDestroyed(destroyedBy = null) {
         // Losing bounty hunters increases crime (less law enforcement)
         if (this.fleet.planet && this.fleet.planet.civilization) {
             this.fleet.planet.c.crime *= 1.01;
         }
-        super.onDestroyed()
+        super.onDestroyed(destroyedBy)
     }
 }

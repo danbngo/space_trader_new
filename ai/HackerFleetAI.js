@@ -167,11 +167,11 @@ class HackerFleetAI extends FleetAI {
         return super.fightTarget(true);
     }
     
-    onDestroyed() {
+    onDestroyed(destroyedBy = null) {
         // Losing hackers slightly reduces technology in their origin civilization
         if (this.fleet.planet && this.fleet.planet.civilization) {
             this.fleet.planet.c.technology *= 0.99;
         }
-        super.onDestroyed();
+        super.onDestroyed(destroyedBy);
     }
 }

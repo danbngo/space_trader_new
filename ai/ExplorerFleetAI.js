@@ -137,11 +137,11 @@ class ExplorerFleetAI extends FleetAI {
         super.onNearDestination();
     }
     
-    onDestroyed() {
+    onDestroyed(destroyedBy = null) {
         // Losing explorers reduces knowledge and exploration efforts
         if (this.fleet.planet && this.fleet.planet.civilization) {
             this.fleet.planet.c.technology *= 0.99;
         }
-        super.onDestroyed()
+        super.onDestroyed(destroyedBy)
     }
 }

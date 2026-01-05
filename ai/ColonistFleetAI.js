@@ -75,11 +75,11 @@ class ColonistFleetAI extends FleetAI {
 
         super.onNearDestination()
     }
-    onDestroyed() {
+    onDestroyed(destroyedBy = null) {
         // Losing colonists hurts population growth and morale
         if (this.fleet.planet && this.fleet.planet.civilization) {
             this.fleet.planet.c.population *= 0.98;
         }
-        super.onDestroyed()
+        super.onDestroyed(destroyedBy)
     }
 }

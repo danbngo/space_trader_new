@@ -109,13 +109,13 @@ class InquisitorFleetAI extends FleetAI {
         // Fallback to any planet
         return rndMember([...gs.system.planets].filter(p => p !== this.origin));
     }
-    onDestroyed() {
+    onDestroyed(destroyedBy = null) {
         // Losing inquisitors weakens religious authority and control
         if (this.fleet.planet && this.fleet.planet.civilization) {
             this.fleet.planet.c.culture *= 1.01;
             this.fleet.planet.c.education *= 1.01;
             this.fleet.planet.c.security *= 0.98;
         }
-        super.onDestroyed()
+        super.onDestroyed(destroyedBy)
     }
 }

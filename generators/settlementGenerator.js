@@ -142,35 +142,35 @@ function generateSettlement(planet) {
     console.log('generating buildings...')
     
     const shipyard = new Shipyard(planet, getRandomMoon())
-    console.log('1')
+    
     const market =  new Market(planet, false, getRandomMoon())
-    console.log('1')
+    
     const blackMarket =  new Market(planet, true, getRandomMoon()) 
-    console.log('1')
+    
     const guild =  new Guild(planet, getRandomMoon()) 
-    console.log('1')
+    
     const bank =  new Bank(planet, getRandomMoon()) 
-    console.log('1')
+    
     const courthouse = new Courthouse(planet, getRandomMoon())
-    console.log('1')
+    
     const academy = new Academy(planet, false, getRandomMoon())
-    console.log('1')
+    
     const tavern = new Academy(planet, true, getRandomMoon())
-    console.log('1')
+    
     const cyberSurgeon = new CyberSurgeon(planet, getRandomMoon())
-    console.log('1')
+    
     const geneticist = new Geneticist(planet, getRandomMoon())
-    console.log('1')
+    
     const palace = new Palace(planet, getRandomMoon())
-    console.log('1')
+    
     const temple = new Temple(planet, getRandomMoon())
-    console.log('1')
+    
     const casino = new Casino(planet, getRandomMoon())
-    console.log('1')
+    
     const armory = new Armory(planet, getRandomMoon())
-    console.log('1')
+    
     const outfitter = new Outfitter(planet, getRandomMoon())
-    console.log('1')
+    
 
     console.log('disabling some buildings...')
 

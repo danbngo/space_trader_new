@@ -102,12 +102,12 @@ class SalvagerFleetAI extends FleetAI {
         super.onNearDestination()
     }
     
-    onDestroyed() {
+    onDestroyed(destroyedBy = null) {
         // Losing salvagers hurts resource recovery and industry
         if (this.fleet.planet && this.fleet.planet.civilization) {
             this.fleet.planet.c.industry *= 0.99;
             this.fleet.planet.c.economy *= 0.99;
         }
-        super.onDestroyed()
+        super.onDestroyed(destroyedBy)
     }
 }

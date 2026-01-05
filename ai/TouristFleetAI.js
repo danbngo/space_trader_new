@@ -18,11 +18,11 @@ class TouristFleetAI extends FleetAI {
         super.onNearDestination()
     }
     
-    onDestroyed() {
+    onDestroyed(destroyedBy = null) {
         // Losing tourists hurts tourism economy and prestige
         if (this.fleet.planet && this.fleet.planet.civilization) {
             this.fleet.planet.c.wealth *= 0.98;
         }
-        super.onDestroyed()
+        super.onDestroyed(destroyedBy)
     }
 }

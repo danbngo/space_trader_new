@@ -23,15 +23,6 @@ class FleetAI {
         /** @type {SpaceObject[]} */
         this.visited = []
         if (!Number.isFinite(this.voyageYearsRemaining)) throw new Error('fleetAI must have a finite voyage duration!!')
-        //console.log('created fleet AI with props:', {fleet: this.fleet, home: this.home, destination: this.destination, voyageYearsRemaining: this.voyageYearsRemaining})
-        /*if (!this.destination) {
-            console.log('Warning: Could not find a valid destination for fleet type, going to remove it immediately')
-            this.origin = null
-            this.destination = null
-            this.target = null
-            this.voyageYearsRemaining - -Infinity
-            gs.system.destroyFleet(this.fleet)
-        }*/
     }
 
     addPopup(text = '', color = COLORS.WHITE, overrideX = this.fleet.x, overrideY = this.fleet.y) {
@@ -128,7 +119,7 @@ class FleetAI {
                     if (allShipsDisabled) {
                         console.log(`💥 ${this.fleet.name} was destroyed by asteroid collision!`)
                         this.addPopup('💥', COLORS.Red)
-                        this.onDestroyed()
+                        this.onDestroyed(asteroid)
                         return
                     }
                 }
@@ -169,7 +160,7 @@ class FleetAI {
         else if (roll < 0.66) {
             console.log(`💥 ${this.fleet.name} was destroyed investigating ${anomaly.name}!`)
             this.addPopup('💥', COLORS.Red)
-            this.onDestroyed()
+            this.onDestroyed(anomaly)
             return false
         }
         // 33% chance: Fleet is teleported away
@@ -374,7 +365,7 @@ class FleetAI {
         
         // Loser is destroyed
 
-        loser.fleetAI.onDestroyed()
+        loser.fleetAI.onDestroyed(winner)
         winner.fleetAI.target = null
         console.log('🏆', `${winner.name+' '+winner.uuid} has defeated ${loser.name+' '+loser.uuid} in combat!`)
 
@@ -387,7 +378,10 @@ class FleetAI {
         return winner
     }
 
-    onDestroyed() {
+    onDestroyed(destroyedBy = null) {
+        // Track what destroyed this fleet
+        this.fleet.destroyedBy = destroyedBy;
+        
         // Disable all ships in the fleet
         for (const ship of this.fleet.ships) {
             ship.hull[0] = 0
@@ -429,13 +423,14 @@ class FleetAI {
             }
         }
         
-        // Create abandoned fleet before removing from active fleets
-        const abandonedFleet = new AbandonedFleet(this.fleet)
-        abandonedFleet.name = 'Wreckage' // Obscure identifying information
-        gs.system.abandonedFleets.push(abandonedFleet)
-        console.log(`🔧 ${this.fleet.name} added to abandoned fleets at (${this.fleet.x.toFixed(2)}, ${this.fleet.y.toFixed(2)})`)
+        // Mark fleet as destroyed and dim its color
+        this.fleet.destroyed = true
+        this.fleet.abandonedYear = gs.year
+        this.fleet.color = this.fleet.color.map(c => c * 0.5) // Dim color
+        this.fleet.fleetAI = null // Remove AI
+        this.fleet.route = null // Clear route
         
-        gs.system.destroyFleet(this.fleet)
+        console.log(`🔧 ${this.fleet.name} marked as destroyed at (${this.fleet.x.toFixed(2)}, ${this.fleet.y.toFixed(2)})`)
     }
 
     /**

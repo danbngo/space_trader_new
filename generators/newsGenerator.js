@@ -258,6 +258,10 @@ async function addHistory(startYear = 3000, endYear = 3000, progress = {complete
                 news.start()
             }
         }
+
+        if (gs.system.news.length > 3000) {
+            throw new Error('TOO MANY ACTIVE NEWS!!!!!!!!!!!!!!!!!!!!!!')
+        }
         /*if (Math.random() < META_NEWS_CHANCE_PER_DAY * 7) {
             const news = generateMetaNews()
             if (!news) continue

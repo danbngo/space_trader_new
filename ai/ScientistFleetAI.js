@@ -42,13 +42,13 @@ class ScientistFleetAI extends FleetAI {
         
         super.onNearDestination();
     }
-    onDestroyed() {
+    onDestroyed(destroyedBy = null) {
         // Losing scientists hurts research and education
         if (this.fleet.planet && this.fleet.planet.civilization) {
             this.fleet.planet.c.education *= 0.99;
             this.fleet.planet.c.technology *= 0.99;
         }
-        super.onDestroyed()
+        super.onDestroyed(destroyedBy)
     }
 }
 

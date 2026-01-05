@@ -102,11 +102,11 @@ class PerformerFleetAI extends FleetAI {
         super.onNearDestination()
     }
     
-    onDestroyed() {
+    onDestroyed(destroyedBy = null) {
         // Losing performers slightly reduces culture and morale
         if (this.fleet.planet && this.fleet.planet.civilization) {
             this.fleet.planet.c.culture *= 0.98;
         }
-        super.onDestroyed()
+        super.onDestroyed(destroyedBy)
     }
 }

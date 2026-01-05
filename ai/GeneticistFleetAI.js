@@ -51,11 +51,11 @@ class GeneticistFleetAI extends FleetAI {
         }
     }
     
-    onDestroyed() {
+    onDestroyed(destroyedBy = null) {
         // Losing geneticists slightly reduces health/technology in their origin civilization
         if (this.fleet.planet && this.fleet.planet.civilization) {
             this.fleet.planet.civilization.population *= 0.98;
         }
-        super.onDestroyed();
+        super.onDestroyed(destroyedBy);
     }
 }

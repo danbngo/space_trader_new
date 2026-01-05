@@ -100,6 +100,8 @@ function checkForFleetSpawning(elapsedDays = 1, planetMaxFleets = null) {
     for (const planet of allPlanets) {
         if (!planet.civilization) continue
 
+        let numFleetsRemaining = AVG_NUM_FLEETS_PER_PLANET*planet.c.population*planet.c.score
+
         // Calculate existing fleet counts per faction for this planet
         const existingNumFleetsPerFaction = new Map()
         for (const fleet of gs.system.fleets) {
@@ -109,6 +111,7 @@ function checkForFleetSpawning(elapsedDays = 1, planetMaxFleets = null) {
                 existingNumFleetsPerFaction.set(faction, 0)
             }
             existingNumFleetsPerFaction.set(faction, existingNumFleetsPerFaction.get(faction)+1)
+            if (numFleetsRemaining-- < 0) continue //dont spawn more than the max allowed
         }
 
         // Use pre-calculated max fleets if provided, otherwise calculate dynamically
@@ -122,7 +125,11 @@ function checkForFleetSpawning(elapsedDays = 1, planetMaxFleets = null) {
             if ((numExisting >= weight)) {
                 continue
             }
-            if (calcOccurrencesPerTimespan(FLEET_SPAWN_CHANCE_PER_DAY, Math.min(weight/(1+numExisting), weight-numExisting)*elapsedDays)) {
+            //i think this was bad math. would result in just 1 fleet per type under some conditions
+            //const spawnMod = Math.min(weight/(1+numExisting), weight-numExisting)
+            const spawnMod = weight/Math.pow(1+numExisting, 2)
+            if (spawnMod < 0) continue
+            if (calcOccurrencesPerTimespan(FLEET_SPAWN_CHANCE_PER_DAY, spawnMod*elapsedDays)) {
                 // Spawn the fleet
                 const fleetType = rndMember(faction.fleetTypes)
                 const spawnAt = calcRandomSpawnPlanet(fleetType, faction, planet)
@@ -236,7 +243,7 @@ function calculateMaxFleetsForPlanet(planet) {
             continue
         }
         
-        let maxNumFleets = 1 * planet.objectType.powerMultiplier
+        let maxNumFleets = 0.1 * planet.objectType.powerMultiplier
         //modify based on policies
         for (const p of c.policies.all) {
             if (p.factionSpawnModifiers && p.factionSpawnModifiers.has(factionType)) {

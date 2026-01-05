@@ -86,12 +86,12 @@ class RebelFleetAI extends FleetAI {
     fightTarget() {
         return super.fightTarget(true)
     }
-    onDestroyed() {
+    onDestroyed(destroyedBy = null) {
         // Increase prestige and culture when rebels are destroyed (restores order)
         if (this.fleet.planet && this.fleet.planet.civilization) {
             this.fleet.planet.c.prestige *= 1.01;
             this.fleet.planet.c.culture *= 1.01;
         }
-        super.onDestroyed()
+        super.onDestroyed(destroyedBy)
     }
 }

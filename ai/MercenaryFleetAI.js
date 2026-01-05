@@ -64,12 +64,12 @@ class MercenaryFleetAI extends FleetAI {
     fightTarget() {
         return super.fightTarget(true)
     }
-    onDestroyed() {
+    onDestroyed(destroyedBy = null) {
         // Losing mercenaries hurts military capacity
         if (this.fleet.planet && this.fleet.planet.civilization) {
             this.fleet.planet.c.army *= 0.99;
             this.fleet.planet.c.taxes *= 0.99;
         }
-        super.onDestroyed()
+        super.onDestroyed(destroyedBy)
     }
 }

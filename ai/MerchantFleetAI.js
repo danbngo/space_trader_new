@@ -32,12 +32,12 @@ class MerchantFleetAI extends FleetAI {
         
         super.onNearOrigin()
     }
-    onDestroyed() {
+    onDestroyed(destroyedBy = null) {
         // Losing merchants hurts trade and economy
         if (this.fleet.planet && this.fleet.planet.civilization) {
             this.fleet.planet.c.economy *= 0.98;
             this.fleet.planet.c.wealth *= 0.99;
         }
-        super.onDestroyed()
+        super.onDestroyed(destroyedBy)
     }
 }

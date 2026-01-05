@@ -121,7 +121,7 @@ HAUMEA.children = []
 MAKEMAKE.children = []*/
 
 // All moons collection
-const ALL_MOONS = [
+const MOONS_ALL = [
     ...EARTH_MOONS,
     ...MARS_MOONS,
     ...JUPITER_MOONS,
@@ -130,3 +130,17 @@ const ALL_MOONS = [
     ...NEPTUNE_MOONS,
     ...PLUTO_MOONS
 ]
+
+SOLAR_SYSTEM.moons = MOONS_ALL
+
+// Log moon counts
+console.log("=== MOON COUNTS ===")
+console.log("Total Moons:", MOONS_ALL.length)
+console.log("  - Earth Moons:", EARTH_MOONS.length)
+console.log("  - Mars Moons:", MARS_MOONS.length)
+console.log("  - Jupiter Moons:", JUPITER_MOONS.length)
+console.log("  - Saturn Moons:", SATURN_MOONS.length)
+console.log("  - Uranus Moons:", URANUS_MOONS.length)
+console.log("  - Neptune Moons:", NEPTUNE_MOONS.length)
+console.log("  - Pluto Moons:", PLUTO_MOONS.length)
+console.log("===================")

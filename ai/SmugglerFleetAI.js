@@ -39,13 +39,13 @@ class SmugglerFleetAI extends FleetAI {
         super.onNearDestination()
     }
 
-    onDestroyed() {
+    onDestroyed(destroyedBy = null) {
         // Destroying smugglers reduces criminal activity
         if (this.fleet.planet && this.fleet.planet.civilization) {
             this.fleet.planet.c.crime *= 0.99;
             this.fleet.planet.c.corruption *= 0.99
             this.fleet.planet.c.economy *= 0.99;
         }
-        super.onDestroyed()
+        super.onDestroyed(destroyedBy)
     }
 }

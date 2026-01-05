@@ -119,7 +119,7 @@ function showPlanetsMenu(backFunction = () => closeModal(), dwarfOnly = false, s
     contentContainer.appendChild(table)
     
     function updateButtons() {
-        console.log('1')
+        
         const buttons = [["Back", backFunction]]
         
         if (selectedPlanet) {

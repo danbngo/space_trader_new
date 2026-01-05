@@ -21,7 +21,7 @@ function showNewsTimelineMenu(planet = null, backFunction = null, activeOnly = t
 
     if (!planet) filteredNews.push(...gs.system.simpleNews)
 
-        console.log('1')
+        
     
     const title = planet ? `${coloredName(planet)} - News` : 'Galactic News'
     const defaultBack = planet ? () => showPlanetMenu(planet) : () => showStarMap()

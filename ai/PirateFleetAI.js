@@ -53,11 +53,11 @@ class PirateFleetAI extends FleetAI {
     fightTarget() {
         return super.fightTarget(true)
     }
-    onDestroyed() {
+    onDestroyed(destroyedBy = null) {
         // Destroying pirates improves security (reduces crime)
         if (this.fleet.planet && this.fleet.planet.civilization) {
             this.fleet.planet.c.crime *= 0.98;
         }
-        super.onDestroyed()
+        super.onDestroyed(destroyedBy)
     }
 }

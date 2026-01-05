@@ -25,7 +25,8 @@ const NEWS_CHANCE_PER_DAY = 1/30;
 const META_NEWS_CHANCE_PER_DAY = 1/365;
 const ANOMALY_CHANCE_PER_DAY = 1/30;
 const MAX_NUM_ANOMALIES = 5;
-const FLEET_SPAWN_CHANCE_PER_DAY = 1/30 / 20 //about 20 fleet types
+const FLEET_SPAWN_CHANCE_PER_DAY = 1/365/5
+const AVG_NUM_FLEETS_PER_PLANET = 7;
 const ENCOUNTER_IMMUNITY_DAYS = 2; //days of immunity after an encounter ends
 const ENCOUNTER_DENIED_DAYS = 0.25; //days player can't bump into fleets after denying an encounter (0.25 = 6 hours)
 
@@ -118,6 +119,6 @@ const CIVILIZATION_CULTURE_DISAPPEAR_THRESHOLD = 0.0001
 
 
 const SIMULATE_FLEET_ACTIVITY_YEARS = 2
-const SIMULATE_HISTORY_NUM_YEARS = 1
+const SIMULATE_HISTORY_NUM_YEARS = 100
 const CLOAK_REGEN_RATE = 30*4 //takes 1 week to fully cloak
 const NPC_FLEET_MAX_PURCHASE_CARGO_RATIO = 0.5 //max fraction of market cargo NPC fleets will buy when trading

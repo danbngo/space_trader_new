@@ -67,12 +67,12 @@ class PilgrimFleetAI extends FleetAI {
 
         super.onNearDestination()
     }
-    onDestroyed() {
+    onDestroyed(destroyedBy = null) {
         // Losing pilgrims reduces religious devotion and culture
         if (this.fleet.planet && this.fleet.planet.civilization) {
             this.fleet.planet.c.culture *= 0.99;
             this.fleet.planet.c.population *= 0.99;
         }
-        super.onDestroyed()
+        super.onDestroyed(destroyedBy)
     }
 }

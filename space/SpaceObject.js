@@ -42,7 +42,7 @@ class SpaceObject {
             child.detachFromParent()
             child.parent = this
         }
-        console.log('assigning children:',this,children)
+        //console.log('assigning children:',this,children)
         this.children.push(...children)
     }
     

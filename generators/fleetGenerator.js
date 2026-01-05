@@ -121,6 +121,7 @@ async function addFleetActivity(numYears = 2, progress = {completePercentage: 0}
         // Spawn fleets from planets (using pre-calculated max fleets for performance)
         const fleetCountBefore = gs.system.fleets.length
         checkForFleetSpawning(1, planetMaxFleets) // 1 day at a time
+        if (gs.system.fleets.length > 100) throw new Error('TOO MANY FLEETS!')
         fleetsSpawned += (gs.system.fleets.length - fleetCountBefore)
         
         // Tick NPC fleet AI (move fleets around with daily time increments)
@@ -138,7 +139,6 @@ async function addFleetActivity(numYears = 2, progress = {completePercentage: 0}
             await new Promise(resolve => setTimeout(resolve, 0))
         }
     }
-    
     // Final update to 100%
     progress.completePercentage = 100
     

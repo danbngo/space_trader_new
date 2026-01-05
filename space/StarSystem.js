@@ -186,65 +186,49 @@ class StarSystem extends SpaceObject {
     }
 
     /**
-     * Resurrects an abandoned fleet back into a normal active fleet.
-     * @param {AbandonedFleet} abandonedFleet - The abandoned fleet to resurrect.
+     * Resurrects a destroyed fleet back into active status.
+     * @param {Fleet} fleet - The destroyed fleet to resurrect.
      * @returns {Fleet|null} The resurrected fleet, or null if resurrection failed.
      */
-    resurrectFleet(abandonedFleet) {
-        if (!(abandonedFleet instanceof AbandonedFleet)) {
-            console.error('resurrectFleet: Not an AbandonedFleet');
+    resurrectFleet(fleet) {
+        if (!fleet || !fleet.destroyed) {
+            console.error('resurrectFleet: Not a destroyed fleet');
             return null;
         }
         
-        if (!abandonedFleet.officers || abandonedFleet.officers.length === 0) {
+        if (!fleet.officers || fleet.officers.length === 0) {
             console.error('resurrectFleet: No officers to resurrect fleet');
             return null;
         }
         
-        console.log(`✨ Resurrecting abandoned fleet ${abandonedFleet.name}`);
+        console.log(`✨ Resurrecting destroyed fleet ${fleet.name}`);
         
-        // Create new Fleet from the abandoned one
-        const resurrectedFleet = new Fleet(
-            abandonedFleet.fleetType.name, // Restore original name from fleet type
-            abandonedFleet.planet,
-            abandonedFleet.fleetType,
-            abandonedFleet.factionType,
-            abandonedFleet.color.map(c => c * 2), // Restore original brightness
-            abandonedFleet.x,
-            abandonedFleet.y
-        );
-        
-        // Transfer properties from abandoned fleet
-        resurrectedFleet.ships = abandonedFleet.ships;
-        resurrectedFleet.cargo = abandonedFleet.cargo;
-        resurrectedFleet.equipment = abandonedFleet.equipment;
-        resurrectedFleet.officers = abandonedFleet.officers;
-        resurrectedFleet.flagship = abandonedFleet.flagship;
-        resurrectedFleet.angle = abandonedFleet.angle;
+        // Restore fleet properties
+        fleet.destroyed = false;
+        fleet.destroyedBy = null; // Clear death record
+        fleet.abandonedYear = null;
+        fleet.color = fleet.color.map(c => c * 2); // Restore original brightness
+        fleet.name = fleet.fleetType.name; // Restore original name
         
         // Resurrected ships come back with half hull
-        for (const ship of resurrectedFleet.ships) {
+        for (const ship of fleet.ships) {
             ship.hull[0] = Math.ceil(ship.hull[1] / 2);
         }
         
         // Assign captain if none exists (pick first living officer)
-        if (!resurrectedFleet.captain || !resurrectedFleet.officers.includes(resurrectedFleet.captain)) {
-            resurrectedFleet.captain = resurrectedFleet.officers[0];
-            console.log(`👤 Assigned ${resurrectedFleet.captain.name} as new captain`);
+        if (!fleet.captain || !fleet.officers.includes(fleet.captain)) {
+            fleet.captain = fleet.officers[0];
+            console.log(`👤 Assigned ${fleet.captain.name} as new captain`);
         }
         
         // Assign appropriate AI based on fleet type
-        const aiType = getFleetAITypeForFleetType(resurrectedFleet.fleetType);
+        const aiType = getFleetAITypeForFleetType(fleet.fleetType);
         if (aiType) {
-            resurrectedFleet.fleetAI = new aiType.aiClass(resurrectedFleet, resurrectedFleet.planet, currentMap);
+            fleet.fleetAI = new aiType.aiClass(fleet, fleet.planet, currentMap);
             console.log(`🤖 Assigned ${aiType.name} to resurrected fleet`);
         }
         
-        // Remove from abandonedFleets and add to active fleets
-        this.removeAbandonedFleet(abandonedFleet);
-        this.fleets.push(resurrectedFleet);
-        
-        console.log(`✅ Successfully resurrected ${resurrectedFleet.name} with ${resurrectedFleet.officers.length} officers`);
-        return resurrectedFleet;
+        console.log(`✅ Successfully resurrected ${fleet.name} with ${fleet.officers.length} officers`);
+        return fleet;
     }
 }

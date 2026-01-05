@@ -63,13 +63,13 @@ class SlaverFleetAI extends FleetAI {
             }
         }
     }
-    onDestroyed() {
+    onDestroyed(destroyedBy = null) {
         // Destroying slavers improves freedom and reduces crime
         if (this.fleet.planet && this.fleet.planet.civilization) {
             this.fleet.planet.c.population *= 0.99;
             this.fleet.planet.c.industry *= 0.99;
             this.fleet.planet.c.corruption *= 0.98;
         }
-        super.onDestroyed()
+        super.onDestroyed(destroyedBy)
     }
 }

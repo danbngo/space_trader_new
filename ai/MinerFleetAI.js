@@ -112,11 +112,11 @@ class MinerFleetAI extends FleetAI {
         
         super.onNearOrigin()
     }
-    onDestroyed() {
+    onDestroyed(destroyedBy = null) {
         // Losing miners hurts industrial production
         if (this.fleet.planet && this.fleet.planet.civilization) {
             this.fleet.planet.c.industry *= 0.98;
         }
-        super.onDestroyed()
+        super.onDestroyed(destroyedBy)
     }
 }

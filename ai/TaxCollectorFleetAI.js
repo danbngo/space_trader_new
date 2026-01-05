@@ -58,12 +58,12 @@ class TaxCollectorFleetAI extends FleetAI {
             }
         }
     }
-    onDestroyed() {
+    onDestroyed(destroyedBy = null) {
         // Losing tax collectors reduces government revenue capacity
         if (this.fleet.planet && this.fleet.planet.civilization) {
             this.fleet.planet.c.taxes *= 0.98;
             this.fleet.planet.c.wealth *= 0.99;
         }
-        super.onDestroyed()
+        super.onDestroyed(destroyedBy)
     }
 }

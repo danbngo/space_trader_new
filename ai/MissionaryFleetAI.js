@@ -50,7 +50,7 @@ class MissionaryFleetAI extends FleetAI {
             if (roll < 0.1) {
                 console.log(`☠️ ${this.fleet.name} was destroyed by ${this.target.name} while proselytizing!`);
                 
-                this.onDestroyed()
+                this.onDestroyed(this.target)
                 return;
             }
             // 20% chance to convert
@@ -81,12 +81,12 @@ class MissionaryFleetAI extends FleetAI {
         super.onNearDestination()
     }
     
-    onDestroyed() {
+    onDestroyed(destroyedBy = null) {
         // Losing missionaries reduces religious cultural influence
         if (this.fleet.planet && this.fleet.planet.civilization) {
             this.fleet.planet.c.culture *= 0.99;
             this.fleet.planet.c.prestige *= 0.99;
         }
-        super.onDestroyed()
+        super.onDestroyed(destroyedBy)
     }
 }

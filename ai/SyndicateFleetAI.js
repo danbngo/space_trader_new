@@ -48,13 +48,13 @@ class SyndicateFleetAI extends FleetAI {
     fightTarget() {
         return super.fightTarget(true)
     }
-    onDestroyed() {
+    onDestroyed(destroyedBy = null) {
         // Destroying syndicates reduces organized crime and corruption
         if (this.fleet.planet && this.fleet.planet.civilization) {
             this.fleet.planet.c.crime *= 0.99;
             this.fleet.planet.c.corruption *= 0.99;
             this.fleet.planet.c.wealth *= 0.99;
         }
-        super.onDestroyed()
+        super.onDestroyed(destroyedBy)
     }
 }
