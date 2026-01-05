@@ -11,7 +11,8 @@ function showCourthouseMenu(courthouse = new Courthouse()) {
     const planetReputation = gs.captain.reputation.getAmount(planet)
 
     function payBounty(amount = 0) {
-        const penalty = courthouse.calcPayBountyPenalty(amount)
+        const penaltyCalc = courthouse.calcPayBountyPenalty(amount)
+        const penalty = Math.ceil(penaltyCalc.calculate(amount))
         gs.credits -= amount + penalty
         gs.captain.bounty.increment(planet, -amount)
         reloadMenu()
@@ -29,7 +30,8 @@ function showCourthouseMenu(courthouse = new Courthouse()) {
             1, maxBountyRepayment, `Bounty Payment`,
             `How much of your bounty would you like to pay off?`,
             (amt)=>{
-                const penalty = courthouse.calcPayBountyPenalty(amt)
+                const penaltyCalc = courthouse.calcPayBountyPenalty(amt)
+                const penalty = Math.ceil(penaltyCalc.calculate(amt))
                 return `
                     Bounty Payment Penalty: ${penalty}<br/>
                     Your CR After Paying: ${gs.credits-amt-penalty}<br/>
@@ -107,23 +109,35 @@ function showCourthouseMenu(courthouse = new Courthouse()) {
 
     const nextRank = RANK_TYPES_ALL.find(r => r.level === currentRank.level + 1)
     
-    // Create rank display with popover
-    const rankSpan = ce({tag: 'span', innerHTML: colorSpan(currentRank.name, currentRank.color)});
-    createPopoverElement(rankSpan, currentRank.description);
+    // Create current rank display with popover
+    const currentRankSpan = ce({tag: 'span', innerHTML: colorSpan(currentRank.name, currentRank.color)});
+    createPopoverElement(currentRankSpan, currentRank.description);
     
-    const rankUpgradeInfo = upgradePrice !== null 
-        ? ce({children: ['Rank Upgrade: ', rankSpan, ` → ${colorSpan(nextRank.name, nextRank.color)} for ${upgradePrice} CR`, ce({tag: 'br'})]})
-        : ce({children: ['Rank: ', rankSpan, ' (Max Rank)', ce({tag: 'br'})]});
+    // Create next rank display with popover (if there is a next rank)
+    let nextRankDisplay;
+    if (upgradePrice !== null && nextRank) {
+        const nextRankSpan = ce({tag: 'span', innerHTML: colorSpan(nextRank.name, nextRank.color)});
+        createPopoverElement(nextRankSpan, nextRank.description);
+        nextRankDisplay = ce({children: [' | Next Rank: ', nextRankSpan, ` (${upgradePrice} CR)`]});
+    } else {
+        nextRankDisplay = ce({tag: 'span', innerHTML: ' (Max Rank)'});
+    }
+    
+    // Create penalty calculation popover
+    const penaltyCalc = courthouse.calcPayBountyPenalty(100);
+    const penaltyPercent = roundToPlaces(penaltyCalc.calculate(100), 2);
+    const penaltySpan = ce({tag: 'span', innerHTML: `${penaltyPercent}%`, style: 'cursor: help; text-decoration: underline dotted;'});
+    createPopoverElement(penaltySpan, penaltyCalc.toString());
 
-    let infoContainer = ce({
-        children: [
-            `Your CR: ${gs.credits} | Your Bounty (${coloredName(planet)}): ${planetBounty}<br/>`,
-            `Your Total Bounty (All Planets): ${gs.captain.bounty.total}<br/>`,
-            `Courthouse Pay Bounty Penalty: ${roundToPlaces(courthouse.calcPayBountyPenalty(100),2)}%<br/>`,
-            rankUpgradeInfo,
-            upgradePrice !== null && !canUpgradeRank && isDocked ? colorSpan(`Rank upgrade requires positive reputation, no bounty, and ${upgradePrice} CR.`, COLORS.Orange) + '<br/>' : '',
-        ]
-    })
+    let infoContainer = ce({children: [
+        ce({children: ['Your Rank: ', currentRankSpan, nextRankDisplay], style: 'white-space: nowrap;'}),
+        ce({tag: 'br'}),
+        `Your CR: ${gs.credits} | Your Bounty: ${planetBounty}`,
+        ce({tag: 'br'}),
+        ce({children: ['Pay Bounty Penalty: ', penaltySpan]}),
+        ce({tag: 'br'}),
+        upgradePrice !== null && !canUpgradeRank && isDocked ? colorSpan(`Rank upgrade requires positive reputation, no bounty, and ${upgradePrice} CR.`, COLORS.Orange) + '<br/>' : '',
+    ]})
 
     /** @type {ButtonData[]} */
     const buttons = [

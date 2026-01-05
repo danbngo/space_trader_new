@@ -229,8 +229,7 @@ function tickNPCFleets(elapsedYears = 1) {
 
 function tickPlanets(elapsedYears = 1) {
     //for planets and dwarf planets, apply some gradual bonuses over time based on GovernmentType civBonuses
-    //dont apply to dwarf planets yet - we dont have a disasters, etc mechanism to balance their growth
-    const allPlanets = [...gs.system.planets]
+    const allPlanets = [...gs.system.planets, ...gs.system.dwarfPlanets]
     for (const planet of allPlanets) {
         if (!planet.civilization || !planet.civilization.governmentType) continue
         const govBonuses = planet.civilization.governmentType.civBonuses
@@ -240,6 +239,7 @@ function tickPlanets(elapsedYears = 1) {
                 planet.c[key] *= (1 + value * CIVILIZATION_BONUS_RATE_PER_YEAR * elapsedYears) // very small gradual bonus
             }
         }
+
         //convert some of our planetary culture to our culture
         for (const [key,value] of planet.c.cultures.counts) {
             if (value < CIVILIZATION_CULTURE_DISAPPEAR_THRESHOLD) {

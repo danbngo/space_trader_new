@@ -11,7 +11,6 @@ class GovernmentType {
      * @param {Religion[]} favoredReligions - Array of religions favored by this government.
      * @param {Religion[]} forbiddenReligions - Array of religions forbidden by this government.
      * @property {GovernmentType|null} opposingType - The opposing government type (if any).
-     * @property {CivilizationParams} civBonuses - Bonuses applied over time
      */
     constructor(
         name = '',

@@ -185,6 +185,16 @@ function generateNews(attemptsRemaining = 100, weights = []) {//only needs to be
             }
         }
         
+        // Check if the planet's settlement type favors or forbids this news type
+        if (planet.settlement.settlementType) {
+            if (planet.settlement.settlementType.favoriteNewsTypes.includes(newsType)) {
+                weight *= 3
+            }
+            if (planet.settlement.settlementType.forbiddenNewsTypes.includes(newsType)) {
+                weight = 0
+            }
+        }
+        
         return weight
     })
     const index = rndIndexWeighted(weights)

@@ -195,6 +195,24 @@ class Market extends Building {
             calc.addFactor(planetType.name.toLowerCase(), planetType.cargoModifiers.get(ct));
         }
         
+        // Apply atmosphere type modifiers
+        const atmosphereType = this.planet.climate.atmosphereType;
+        if (atmosphereType && atmosphereType.cargoModifiers.has(ct)) {
+            calc.addFactor(atmosphereType.name.toLowerCase(), atmosphereType.cargoModifiers.get(ct));
+        }
+        
+        // Apply geology type modifiers
+        const geologyType = this.planet.climate.geologyType;
+        if (geologyType && geologyType.cargoModifiers.has(ct)) {
+            calc.addFactor(geologyType.name.toLowerCase(), geologyType.cargoModifiers.get(ct));
+        }
+        
+        // Apply ocean type modifiers
+        const oceanType = this.planet.climate.oceanType;
+        if (oceanType && oceanType.cargoModifiers.has(ct)) {
+            calc.addFactor(oceanType.name.toLowerCase(), oceanType.cargoModifiers.get(ct));
+        }
+        
         // Cargo-specific demand factors
         if (ct === CARGO_TYPES.FOOD) {
             calc.addFactor('population demand', 0.8 + civ.population * 1.2);

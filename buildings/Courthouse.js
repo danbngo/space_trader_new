@@ -14,7 +14,10 @@ class Courthouse extends Building {
         //higher corruption = EASIER to pay off bounties.
         //maybe examine logic for this later. it might make more sense for player to have to pay a fraction of his total bounty
         //OR, if you're caught with a bounty you pay it PLUS do jailtime.
-        return Math.ceil( bountyAmount * this.planet.c.inflationRate * Math.pow(0.01, 1+this.planet.c.corruption) )
+        const calc = new Calculation();
+        calc.addFactor('inflation', this.planet.c.inflationRate);
+        calc.addFactor('corruption ease', Math.pow(0.01, 1+this.planet.c.corruption));
+        return calc;
     }
     calcUpgradeRankPrice(officer) {
         const currentRank = officer.ranks.get(this.planet) || RANK_TYPES.NO_RANK
