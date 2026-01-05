@@ -26,11 +26,7 @@ class SpaceElevatorNews extends News {
                 economy: CL.HIGH,
                 wealth: CL.SLIGHTLY_HIGH,
                 technology: CL.SLIGHTLY_HIGH,
-                taxes: CL.SLIGHTLY_HIGH,
-                cargoPriceMultipliers: new CountsMap(new Map([
-                    [CARGO_TYPES.METAL, CL.LOW],
-                    [CARGO_TYPES.WATER, CL.LOW]
-                ]))
+                taxes: CL.SLIGHTLY_HIGH
             },
             {
                 buildingsDamaged,
@@ -41,11 +37,7 @@ class SpaceElevatorNews extends News {
                 wealth: CL.VERY_LOW,
                 reserves: CL.VERY_LOW,
                 taxes: CL.VERY_HIGH,
-                prestige: CL.LOW,
-                cargoPriceMultipliers: new CountsMap(new Map([
-                    [CARGO_TYPES.METAL, CL.VERY_HIGH],
-                    [CARGO_TYPES.MEDICINE, CL.VERY_HIGH]
-                ]))
+                prestige: CL.LOW
             }
         )
     }

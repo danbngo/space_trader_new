@@ -17,7 +17,7 @@ class RevolutionNews extends News {
                 governmentType: GT.ANARCHY ? null : GT.ANARCHY,
                 military: CL.VERY_LOW,
                 security: CL.VERY_LOW,
-                crime: CL.VERY_HIGH,
+                crime: CL.HIGH, // Reduced from VERY_HIGH
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.WEAPONS, CL.VERY_HIGH], [CARGO_TYPES.HOLOCUBES, CL.VERY_HIGH]]))
             },
             {

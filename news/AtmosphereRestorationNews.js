@@ -31,15 +31,12 @@ class AtmosphereRestorationNews extends News {
                 }
             },
             {
-                population: CL.SLIGHTLY_LOW,
-                wealth: CL.LOW,
-                reserves: CL.LOW,
+                population: CL.SLIGHTLY_HIGH, // Reduced from SLIGHTLY_LOW
+                wealth: CL.SLIGHTLY_LOW, // Reduced from LOW
+                reserves: CL.SLIGHTLY_LOW, // Reduced from LOW
                 economy: CL.SLIGHTLY_LOW,
-                prestige: CL.SLIGHTLY_LOW,
-                cargoPriceMultipliers: new CountsMap(new Map([
-                    [CARGO_TYPES.MEDICINE, CL.HIGH],
-                    [CARGO_TYPES.FOOD, CL.SLIGHTLY_HIGH]
-                ]))
+                prestige: CL.SLIGHTLY_LOW
+                // Removed permanent cargo price effects - these are temporary only
             }
         )
     }

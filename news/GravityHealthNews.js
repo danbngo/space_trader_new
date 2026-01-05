@@ -26,7 +26,7 @@ class GravityHealthNews extends News {
                 technology: CL.SLIGHTLY_HIGH
             },
             {
-                population: CL.VERY_LOW,
+                population: CL.LOW, // Reduced from VERY_LOW
                 army: CL.LOW,
                 economy: CL.LOW,
                 wealth: CL.LOW,

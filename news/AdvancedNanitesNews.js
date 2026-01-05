@@ -19,33 +19,24 @@ class AdvancedNanitesNews extends News {
             },
             {
                 // Success: Industrial revolution
-                industry: CL.ASTRONOMICAL,
-                economy: CL.VERY_HIGH,
-                technology: CL.HIGH,
-                reserves: CL.HIGH,
-                wealth: CL.HIGH,
-                territory: CL.SLIGHTLY_HIGH,
-                cargoPriceMultipliers: new CountsMap(new Map([
-                    [CARGO_TYPES.NANITES, CL.VERY_LOW],
-                    [CARGO_TYPES.METAL, CL.VERY_LOW]
-                ]))
+                industry: CL.VERY_HIGH, // Reduced from ASTRONOMICAL
+                economy: CL.HIGH, // Reduced from VERY_HIGH
+                technology: CL.SLIGHTLY_HIGH, // Reduced from HIGH
+                reserves: CL.SLIGHTLY_HIGH, // Reduced from HIGH
+                wealth: CL.SLIGHTLY_HIGH, // Reduced from HIGH
+                territory: CL.SLIGHTLY_HIGH
             },
             {
                 // Failure: Gray goo disaster
-                population: CL.VERY_LOW,
-                army: CL.VERY_LOW,
-                industry: CL.VERY_LOW,
-                economy: CL.VERY_LOW,
+                population: CL.LOW, // Reduced from VERY_LOW
+                army: CL.LOW, // Reduced from VERY_LOW
+                industry: CL.LOW, // Reduced from VERY_LOW
+                economy: CL.LOW, // Reduced from VERY_LOW
                 territory: CL.LOW,
-                reserves: CL.VERY_LOW,
-                wealth: CL.VERY_LOW,
+                reserves: CL.LOW, // Reduced from VERY_LOW
+                wealth: CL.LOW, // Reduced from VERY_LOW
                 prestige: CL.LOW,
-                technology: CL.LOW,
-                cargoPriceMultipliers: new CountsMap(new Map([
-                    [CARGO_TYPES.FOOD, CL.VERY_HIGH],
-                    [CARGO_TYPES.WATER, CL.VERY_HIGH],
-                    [CARGO_TYPES.METAL, CL.VERY_HIGH]
-                ]))
+                technology: CL.LOW
             }
         )
     }

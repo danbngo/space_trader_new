@@ -19,12 +19,14 @@ class MinorMissileCrisisNews extends News {
             {
                 prestige: CL.VERY_HIGH,
                 territory: CL.SLIGHTLY_HIGH,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.VERY_LOW]])), // Invert temporary price increase
             },
             {
                 prestige: CL.LOW,
                 territory: CL.SLIGHTLY_LOW,
                 navy: CL.LOW,
                 army: CL.SLIGHTLY_LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.VERY_LOW]])), // Invert temporary price increase
             },
         )
 
@@ -41,6 +43,14 @@ class MinorMissileCrisisNews extends News {
                 prestige: CL.SLIGHTLY_HIGH,
             },
         )
+
+        // Cancel effects should also remove cargo price modifiers
+        this.cancelEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.VERY_LOW]])), // Invert temporary price increase
+            })
+        ]
     }
 
     shouldCancel() {

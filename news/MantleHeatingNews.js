@@ -37,11 +37,7 @@ class MantleHeatingNews extends News {
                 wealth: CL.EXTREMELY_LOW,
                 reserves: CL.EXTREMELY_LOW,
                 industry: CL.LOW,
-                prestige: CL.LOW,
-                cargoPriceMultipliers: new CountsMap(new Map([
-                    [CARGO_TYPES.CONSTRUCTION, CL.VERY_HIGH],
-                    [CARGO_TYPES.MEDICINE, CL.HIGH]
-                ]))
+                prestige: CL.LOW
             }
         )
     }

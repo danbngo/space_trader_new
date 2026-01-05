@@ -20,7 +20,7 @@ class AutomationCrisisNews extends News {
                 culture: CL.SLIGHTLY_LOW
             },
             {
-                crime: CL.VERY_HIGH,
+                crime: CL.HIGH, // Reduced from VERY_HIGH
                 education: CL.HIGH,
                 culture: CL.VERY_HIGH,
                 economy: CL.HIGH

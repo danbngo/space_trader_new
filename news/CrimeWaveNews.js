@@ -22,8 +22,8 @@ class CrimeWaveNews extends News {
             },
             {
                 security: CL.LOW,
-                crime: CL.EXTREMELY_HIGH,
-                corruption: CL.VERY_HIGH,
+                crime: CL.HIGH, // Reduced from EXTREMELY_HIGH
+                corruption: CL.HIGH, // Reduced from VERY_HIGH
             }
         )
     }

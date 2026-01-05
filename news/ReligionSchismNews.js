@@ -17,6 +17,7 @@ class ReligionSchismNews extends News {
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.VERY_HIGH], [CARGO_TYPES.WEAPONS, CL.HIGH]]))
             },
             {
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.VERY_LOW], [CARGO_TYPES.WEAPONS, CL.LOW]])), // Invert temporary price increases
                 onApply: () => {
                     if (this.planet.c.relationships.get(this.targetPlanet) == RELATIONSHIP_TYPES.TENSE) {
                         this.planet.c.relationships.set(this.targetPlanet, RELATIONSHIP_TYPES.NEUTRAL)
@@ -34,6 +35,7 @@ class ReligionSchismNews extends News {
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.VERY_HIGH], [CARGO_TYPES.WEAPONS, CL.HIGH]]))
             },
             {
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.VERY_LOW], [CARGO_TYPES.WEAPONS, CL.LOW]])), // Invert temporary price increases
                 onApply: () => {
                     if (this.targetPlanet.c.relationships.get(this.planet) == RELATIONSHIP_TYPES.TENSE) {
                         this.targetPlanet.c.relationships.set(this.planet, RELATIONSHIP_TYPES.NEUTRAL)
@@ -42,7 +44,17 @@ class ReligionSchismNews extends News {
             }
         )
 
-        this.cancelEffects = this.completeEffects.map(effect => effect.clone())
+        // Set up cancelEffects to remove cargo price modifiers
+        this.cancelEffects = [
+            new NewsEffect({
+                planet: this.planet,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.VERY_LOW], [CARGO_TYPES.WEAPONS, CL.LOW]])),
+            }),
+            new NewsEffect({
+                planet: this.targetPlanet,
+                cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.ANTIMATTER, CL.VERY_LOW], [CARGO_TYPES.WEAPONS, CL.LOW]])),
+            })
+        ]
     }
 
     shouldCancel() {

@@ -26,9 +26,9 @@ class PollutionFamineNews extends News {
                 commerce: CL.SLIGHTLY_HIGH
             },
             {
-                population: CL.VERY_LOW,
+                population: CL.LOW, // Reduced from VERY_LOW
                 army: CL.LOW,
-                economy: CL.VERY_LOW,
+                economy: CL.LOW, // Reduced from VERY_LOW
                 wealth: CL.LOW,
                 reserves: CL.LOW,
                 culture: CL.LOW,

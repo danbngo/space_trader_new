@@ -97,6 +97,7 @@ async function simulateFleetActivity(numYears) {
     const activityProgressBar = new ProgressBar({value: 0, width: 50})
     const activityElapsedTimeElement = ce({tag: 'div', id: 'fleet_elapsed_time', children: ['Elapsed time: 0.0s']})
     const activeFleetCountElement = ce({tag: 'div', id: 'active_fleet_count', style: 'text-align: center; margin-top: 5px;', children: ['Active Fleets: 0']})
+    const abandonedFleetCountElement = ce({tag: 'div', id: 'abandoned_fleet_count', style: 'text-align: center; margin-top: 5px;', children: ['Abandoned Fleets: 0']})
     const activeAnomalyCountElement = ce({tag: 'div', id: 'active_anomaly_count', style: 'text-align: center; margin-top: 5px;', children: ['Active Anomalies: 0']})
     
     const displayYears = numYears < 1 ? `${Math.round(numYears * 12)} months` : `${numYears} years`
@@ -110,6 +111,7 @@ async function simulateFleetActivity(numYears) {
             ce({tag:'br'}),
             activityElapsedTimeElement,
             activeFleetCountElement,
+            abandonedFleetCountElement,
             activeAnomalyCountElement
         ]}),
         []
@@ -132,7 +134,12 @@ async function simulateFleetActivity(numYears) {
         }
         const fleetCountEl = document.getElementById('active_fleet_count')
         if (fleetCountEl) {
-            fleetCountEl.textContent = `Active Fleets: ${gs.system.fleets.length}`
+            const activeFleets = gs.system.fleets.filter(f => !f.destroyed).length
+            fleetCountEl.textContent = `Active Fleets: ${activeFleets}`
+        }
+        const abandonedCountEl = document.getElementById('abandoned_fleet_count')
+        if (abandonedCountEl) {
+            abandonedCountEl.textContent = `Abandoned Fleets: ${gs.system.abandonedFleets ? gs.system.abandonedFleets.length : 0}`
         }
         const anomalyCountEl = document.getElementById('active_anomaly_count')
         if (anomalyCountEl) {
@@ -223,7 +230,6 @@ async function startNewGame() {
     catch (e) {
         console.error("Error during fleet activity simulation:", e)
         alert("An error occurred during fleet activity simulation. Please try starting a new game again.")
-        console.log(gs.system.fleets)
         assessFleets()
         closeModal()
         return
@@ -284,6 +290,7 @@ async function startNewGame() {
     createCharacter()
 
     assessPlanets()
+    assessFleets()
 }
 
 function createCharacter() {

@@ -26,11 +26,11 @@ class RadiationSicknessNews extends News {
                 prestige: CL.SLIGHTLY_HIGH
             },
             {
-                population: CL.VERY_LOW,
+                population: CL.LOW, // Reduced from VERY_LOW
                 army: CL.LOW,
                 economy: CL.LOW,
                 wealth: CL.LOW,
-                reserves: CL.VERY_LOW,
+                reserves: CL.LOW, // Reduced from VERY_LOW
                 culture: CL.SLIGHTLY_LOW
             }
         )

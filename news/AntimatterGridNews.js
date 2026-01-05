@@ -29,10 +29,7 @@ class AntimatterGridNews extends News {
                 taxes: CL.LOW,
                 inflation: CL.LOW,
                 technology: CL.SLIGHTLY_HIGH,
-                prestige: CL.SLIGHTLY_HIGH,
-                cargoPriceMultipliers: new CountsMap(new Map([
-                    [CARGO_TYPES.ANTIMATTER, CL.VERY_LOW]
-                ]))
+                prestige: CL.SLIGHTLY_HIGH
             },
             {
                 buildingsDamaged,
@@ -47,12 +44,7 @@ class AntimatterGridNews extends News {
                 climateAlterations: () => {
                     // Catastrophic failure releases massive radiation
                     planet.climate.incrementClimateValue(RADIATION_LEVELS, 2)
-                },
-                cargoPriceMultipliers: new CountsMap(new Map([
-                    [CARGO_TYPES.ANTIMATTER, CL.VERY_HIGH],
-                    [CARGO_TYPES.MEDICINE, CL.VERY_HIGH],
-                    [CARGO_TYPES.FOOD, CL.VERY_HIGH]
-                ]))
+                }
             }
         )
     }

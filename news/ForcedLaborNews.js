@@ -18,19 +18,19 @@ class ForcedLaborNews extends News {
                 cargoPriceMultipliers: new CountsMap(new Map([[CARGO_TYPES.NANITES, CL.LOW], [CARGO_TYPES.METAL, CL.HIGH]])),
             },
             {
-                industry: CL.VERY_HIGH,
+                industry: CL.HIGH, // Reduced from VERY_HIGH
                 economy: CL.SLIGHTLY_HIGH,
                 population: CL.SLIGHTLY_LOW,
                 prestige: CL.LOW,
                 education: CL.SLIGHTLY_LOW,
-                reserves: CL.VERY_HIGH,
+                reserves: CL.HIGH, // Reduced from VERY_HIGH
                 taxes: CL.LOW,
                 culture: CL.LOW
             },
             {
                 prestige: CL.LOW,
                 education: CL.SLIGHTLY_LOW,
-                reserves: CL.VERY_HIGH,
+                reserves: CL.SLIGHTLY_HIGH, // Reduced from VERY_HIGH
                 taxes: CL.LOW,
                 culture: CL.LOW
             }

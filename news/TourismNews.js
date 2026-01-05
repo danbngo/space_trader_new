@@ -14,12 +14,12 @@ class TourismNews extends News {
             },
             {
                 taxes: CL.SLIGHTLY_HIGH,
-                economy: CL.VERY_HIGH,
-                culture: CL.HIGH,
+                economy: CL.HIGH, // Reduced from VERY_HIGH
+                culture: CL.SLIGHTLY_HIGH, // Reduced from HIGH
                 inflation: CL.SLIGHTLY_HIGH,
                 crime: CL.SLIGHTLY_HIGH,
                 prestige: CL.SLIGHTLY_HIGH,
-                wealth: CL.HIGH
+                wealth: CL.SLIGHTLY_HIGH // Reduced from HIGH
             },
             {
                 taxes: CL.SLIGHTLY_HIGH,

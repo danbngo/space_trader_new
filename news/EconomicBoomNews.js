@@ -20,10 +20,10 @@ class EconomicBoomNews extends News {
             },
             {
                 buildingsImproved,
-                economy: CL.HIGH,
-                wealth: CL.EXTREMELY_HIGH,
-                reserves: CL.VERY_HIGH,
-                taxes: CL.EXTREMELY_LOW
+                economy: CL.SLIGHTLY_HIGH, // Reduced from HIGH
+                wealth: CL.HIGH, // Reduced from EXTREMELY_HIGH
+                reserves: CL.HIGH, // Reduced from VERY_HIGH
+                taxes: CL.VERY_LOW // Reduced from EXTREMELY_LOW
             },
             {
                 wealth: CL.LOW,

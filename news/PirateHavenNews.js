@@ -26,12 +26,12 @@ class PirateHavenNews extends News {
             {
                 security: CL.VERY_HIGH,
                 navy: CL.HIGH,
-                economy: CL.HIGH,
-                commerce: CL.VERY_HIGH,
-                taxes: CL.VERY_HIGH,
-                prestige: CL.HIGH,
+                economy: CL.SLIGHTLY_HIGH, // Reduced from HIGH
+                commerce: CL.HIGH, // Reduced from VERY_HIGH
+                taxes: CL.HIGH, // Reduced from VERY_HIGH
+                prestige: CL.SLIGHTLY_HIGH, // Reduced from HIGH
                 corruption: CL.SLIGHTLY_HIGH,
-                crime: CL.VERY_HIGH
+                crime: CL.HIGH // Reduced from VERY_HIGH
             }
         )
     }

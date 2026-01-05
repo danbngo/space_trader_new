@@ -25,16 +25,16 @@ class ScarcityNews extends News {
                 reserves: CL.SLIGHTLY_LOW
             },
             {
-                population: CL.VERY_LOW,
+                population: CL.LOW, // Reduced from VERY_LOW
                 army: CL.SLIGHTLY_LOW,
-                economy: CL.VERY_LOW,
+                economy: CL.LOW, // Reduced from VERY_LOW
                 industry: CL.LOW,
                 wealth: CL.LOW,
-                reserves: CL.EXTREMELY_LOW,
+                reserves: CL.VERY_LOW, // Reduced from EXTREMELY_LOW
                 culture: CL.LOW,
                 security: CL.LOW,
-                crime: CL.HIGH,
-                corruption: CL.HIGH
+                crime: CL.SLIGHTLY_HIGH, // Reduced from HIGH
+                corruption: CL.SLIGHTLY_HIGH // Reduced from HIGH
             }
         )
     }

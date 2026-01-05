@@ -33,14 +33,11 @@ class OceanRestorationNews extends News {
             {
                 population: CL.LOW,
                 territory: CL.LOW,
-                wealth: CL.VERY_LOW,
-                reserves: CL.VERY_LOW,
+                wealth: CL.LOW, // Reduced from VERY_LOW
+                reserves: CL.LOW, // Reduced from VERY_LOW
                 industry: CL.SLIGHTLY_LOW,
-                prestige: CL.LOW,
-                cargoPriceMultipliers: new CountsMap(new Map([
-                    [CARGO_TYPES.CONSTRUCTION, CL.VERY_HIGH],
-                    [CARGO_TYPES.FOOD, CL.HIGH]
-                ]))
+                prestige: CL.LOW
+                // Removed permanent cargo price effects - these are temporary only
             }
         )
     }

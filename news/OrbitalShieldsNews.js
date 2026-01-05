@@ -34,10 +34,7 @@ class OrbitalShieldsNews extends News {
                 wealth: CL.VERY_LOW,
                 reserves: CL.VERY_LOW,
                 technology: CL.SLIGHTLY_LOW,
-                prestige: CL.LOW,
-                cargoPriceMultipliers: new CountsMap(new Map([
-                    [CARGO_TYPES.MEDICINE, CL.HIGH]
-                ]))
+                prestige: CL.LOW
             }
         )
     }

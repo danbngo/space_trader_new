@@ -17,9 +17,9 @@ class MinorJointStockCompanyNews extends News {
                 inflation: CL.LOW,
             },
             {
-                economy: CL.VERY_HIGH,
-                prestige: CL.HIGH,
-                territory: CL.HIGH,
+                economy: CL.HIGH, // Reduced from VERY_HIGH
+                prestige: CL.SLIGHTLY_HIGH, // Reduced from HIGH
+                territory: CL.SLIGHTLY_HIGH, // Reduced from HIGH
                 taxes: CL.LOW,
                 inflation: CL.LOW,
             },

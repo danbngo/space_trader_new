@@ -31,12 +31,12 @@ class MegacityNews extends News {
                 prestige: CL.SLIGHTLY_HIGH
             },
             {
-                crime: CL.VERY_HIGH,
-                corruption: CL.HIGH,
+                crime: CL.HIGH, // Reduced from VERY_HIGH
+                corruption: CL.SLIGHTLY_HIGH, // Reduced from HIGH
                 security: CL.LOW,
                 wealth: CL.LOW,
-                taxes: CL.VERY_HIGH,
-                inflation: CL.VERY_HIGH,
+                taxes: CL.HIGH, // Reduced from VERY_HIGH
+                inflation: CL.HIGH, // Reduced from VERY_HIGH
                 prestige: CL.LOW,
             }
         )
