@@ -73,7 +73,10 @@ class RaidingNews extends News {
     }
 
     determineOutcome() {
-        this.rollOutcome((this.planet.c.army/this.targetPlanet.c.military), CL.MEDIUM)
+        const {planet: p, targetPlanet: tp} = this
+        const aggressorScore = p.c.army * p.objectType.powerMultiplier
+        const victimScore = tp.c.military * tp.objectType.powerMultiplier
+        this.rollOutcome(aggressorScore / victimScore, CL.MEDIUM)
     }
 
     isValid() {

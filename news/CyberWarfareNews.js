@@ -53,8 +53,11 @@ class CyberWarfareNews extends News {
     }
 
     determineOutcome() {
+        const {planet: p, targetPlanet: tp} = this
         // Can resist with strong education or culture
-        this.rollOutcome((this.planet.c.technology / this.targetPlanet.c.education / this.targetPlanet.c.culture / this.targetPlanet.c.technology), CL.MEDIUM)
+        const aggressorScore = p.c.technology * p.objectType.powerMultiplier
+        const victimScore = (tp.c.education * tp.c.culture * tp.c.technology) * tp.objectType.powerMultiplier
+        this.rollOutcome(aggressorScore / victimScore, CL.MEDIUM)
     }
 
     isValid() {

@@ -40,7 +40,10 @@ class WarSurrenderNews extends News {
 
     determineOutcome() {
         //could fail if everyone really hates us
-        this.rollOutcome(this.planet.c.prestige * this.planet.c.military / this.targetPlanet.c.military, CL.EXTREMELY_LOW)
+        const {planet: p, targetPlanet: tp} = this
+        const aggressorScore = (p.c.prestige * p.c.military) * p.objectType.powerMultiplier
+        const victimScore = tp.c.military * tp.objectType.powerMultiplier
+        this.rollOutcome(aggressorScore / victimScore, CL.EXTREMELY_LOW)
     }
 
     isValid() {

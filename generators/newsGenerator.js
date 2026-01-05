@@ -66,6 +66,8 @@ const NEWS_TYPE_CLASSES = [
     [NT.RELIGION_CONQUEST, ReligionConquestNews],
     [NT.RELIGIOUS_TURMOIL, ReligiousTurmoilNews],
     [NT.RELIGIOUS_CONVERSION, ReligiousConversionNews],
+    [NT.RELIGION_SACRED_SITE, ReligionSacredSiteNews],
+    [NT.RELIGION_SCHISM, ReligionSchismNews],
     [NT.REVOLUTION, RevolutionNews],
     [NT.SANCTIONS, SanctionsNews],
     [NT.SCARCITY, ScarcityNews],
@@ -129,6 +131,17 @@ const NEWS_TYPE_CLASSES = [
     [NT.WAR_SCORCHED_EARTH, WarScorchedEarthNews],
     [NT.WAR_SUBJUGATION, WarSubjugationNews],
     [NT.WAR_SURRENDER, WarSurrenderNews],
+    [NT.MINOR_MISSILE_CRISIS, MinorMissileCrisisNews],
+    [NT.MINOR_RESOURCE_CONCESSION_TREATY, MinorResourceConcessionTreatyNews],
+    [NT.MINOR_DEBT_TRAP_RESTRUCTURING, MinorDebtTrapRestructuringNews],
+    [NT.MINOR_JOINT_STOCK_COMPANY, MinorJointStockCompanyNews],
+    [NT.MINOR_FORCED_DEMILITARIZATION, MinorForcedDemilitarizationNews],
+    [NT.ANNEXATION_REFERENDUM, AnnexationReferendumNews],
+    [NT.DIPLOMATIC_RECOGNITION_CRISIS, DiplomaticRecognitionCrisisNews],
+    [NT.MINOR_CULTURAL_INTEGRATION_PROGRAM, MinorCulturalIntegrationProgramNews],
+    [NT.MINOR_COLOR_REVOLUTION, MinorColorRevolutionNews],
+    [NT.MINOR_IDEALOGICAL_SPREAD, MinorIdealogicalSpreadNews],
+    [NT.MINOR_RELIGIOUS_PURGE, MinorReligiousPurgeNews],
 ]
 
 const NEWS_TYPE_CLASSES_ARRAY = Object.freeze(NEWS_TYPE_CLASSES.map(pair => pair[1]))
@@ -147,11 +160,11 @@ const META_NEWS_TYPE_CLASSES_ARRAY = Object.freeze(META_NEWS_TYPE_CLASSES.map(pa
  * @returns {News|null} The generated news event or null if unable to generate.
  */
 function generateNews(attemptsRemaining = 100, weights = []) {//only needs to be computed once) {
-    // Exclude dwarf planets - they are small outposts that don't trigger major news events
-    const planets = gs.system.planets
-    if (planets.length === 0) return null // No valid planets
-    const planet = rndMember(planets)
-    const targetPlanet = rndMember(planets.filter(p=>(p !== planet)))
+    // Get all celestial bodies that can participate in news events (planets, dwarf planets, moons)
+    const allBodies = [...gs.system.planets, ...gs.system.dwarfPlanets, ...gs.system.moons]
+    if (allBodies.length === 0) return null // No valid bodies
+    const planet = rndMember(allBodies)
+    const targetPlanet = rndMember(allBodies.filter(p=>(p !== planet)))
     
     // Use weighted selection based on news type weights, with 3x multiplier for favorite govs and policies
     if (weights.length == 0) weights = NEWS_TYPE_CLASSES.map(([newsType, cls]) => {
@@ -177,6 +190,18 @@ function generateNews(attemptsRemaining = 100, weights = []) {//only needs to be
     })
     const index = rndIndexWeighted(weights)
     const [newsType, cls] = NEWS_TYPE_CLASSES[index]
+    
+    // Check if the initiator planet's object type is allowed for this news type
+    if (newsType.planetObjectTypes && !newsType.planetObjectTypes.includes(planet.objectType)) {
+        if (attemptsRemaining <= 0) return null
+        return generateNews(attemptsRemaining - 1, weights)
+    }
+    
+    // Check if the target planet's object type is allowed for this news type
+    if (newsType.targetPlanetObjectTypes && !newsType.targetPlanetObjectTypes.includes(targetPlanet.objectType)) {
+        if (attemptsRemaining <= 0) return null
+        return generateNews(attemptsRemaining - 1, weights)
+    }
     
     if (!newsType.forbiddenGovs.includes(planet.c.governmentType)) {
         if (!newsType.immuneGovs.includes(targetPlanet.c.governmentType)) {

@@ -46,7 +46,10 @@ class LandGrabNews extends News {
     }
 
     determineOutcome() {
-        this.rollOutcome((this.planet.c.navy + this.planet.c.army) / (this.targetPlanet.c.navy + this.targetPlanet.c.army), CL.SLIGHTLY_HIGH)
+        const {planet: p, targetPlanet: tp} = this
+        const aggressorScore = (p.c.navy + p.c.army) * p.objectType.powerMultiplier
+        const victimScore = (tp.c.navy + tp.c.army) * tp.objectType.powerMultiplier
+        this.rollOutcome(aggressorScore / victimScore, CL.SLIGHTLY_HIGH)
     }
 
     isValid() {

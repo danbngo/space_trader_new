@@ -19,7 +19,7 @@ class FleetAI {
         this.destination = null
         /** @type {any} */
         this.target = null
-        this.voyageYearsRemaining = rng(2,0.5,false)*this.fleet.fleetType.voyageYears
+        this.voyageYearsRemaining = rng(2,0.5,false)*this.fleet.fleetType.voyageYears * this.fleet.planet.c.territory
         /** @type {SpaceObject[]} */
         this.visited = []
         if (!Number.isFinite(this.voyageYearsRemaining)) throw new Error('fleetAI must have a finite voyage duration!!')
@@ -200,10 +200,6 @@ class FleetAI {
     calcDestination() {
         return rndMember(gs.system.planets.filter(p=>(p !== this.origin)))
     }
-
-    /*resetVoyageDuration() {
-        this.voyageYearsRemaining = this.fleet.fleetType.voyageYears;
-    }*/
 
     setTarget(target) {
         const route = target instanceof Fleet ? new InterceptionRoute(this.fleet, target) : new Route(this.fleet, target)

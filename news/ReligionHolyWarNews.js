@@ -102,7 +102,9 @@ class ReligionHolyWarNews extends News {
         
         // Success based on culture (religious fervor), army strength, and number of potential allies
         const allyBonus = 1 + (religiousAllies.length * 0.2)
-        this.rollOutcome(p.c.culture * p.c.army * p.c.technology * allyBonus / tp.c.army / tp.c.technology, CL.MEDIUM)
+        const aggressorScore = (p.c.culture * p.c.army * p.c.technology * allyBonus) * p.objectType.powerMultiplier
+        const victimScore = (tp.c.army * tp.c.technology) * tp.objectType.powerMultiplier
+        this.rollOutcome(aggressorScore / victimScore, CL.MEDIUM)
     }
 
     isValid() {

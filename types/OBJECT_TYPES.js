@@ -1,16 +1,17 @@
 class ObjectType {
-    constructor(name = '', color = '#ffffff', symbol = '●') {
+    constructor(name = '', color = '#ffffff', symbol = '●', powerMultiplier = 0) {
         this.name = name
         this.color = color
         this.symbol = symbol
+        this.powerMultiplier = powerMultiplier
     }
 }
 
 const OBJECT_TYPES = Object.freeze({
-    PLANET: new ObjectType('Planet', '#4a9eff', '●'),
-    DWARF_PLANET: new ObjectType('Dwarf Planet', '#8b7355', '◐'),
-    MOON: new ObjectType('Moon', '#c0c0c0', '○'),
-    SPACE_STATION: new ObjectType('Space Station', '#00ff00', '⊕'),
+    PLANET: new ObjectType('Planet', '#4a9eff', '●', 1),
+    DWARF_PLANET: new ObjectType('Dwarf Planet', '#8b7355', '◐', 0.25),
+    MOON: new ObjectType('Moon', '#c0c0c0', '○', 0.5),
+    SPACE_STATION: new ObjectType('Space Station', '#00ff00', '⊕', 0), //no news participation
     ASTEROID_BELT: new ObjectType('Asteroid Belt', '#8b8b8b', '∴'),
     ASTEROID: new ObjectType('Asteroid', '#6b5b4a', '◆'),
     STAR: new ObjectType('Star', '#ffff00', '★'),

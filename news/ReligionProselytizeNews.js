@@ -50,7 +50,9 @@ class ReligionProselytizeNews extends News {
     determineOutcome() {
         const {planet: p, targetPlanet: tp} = this
         // Success depends on cultural strength and existing religious tolerance
-        this.rollOutcome(p.c.culture * p.c.prestige / tp.c.culture, CL.MEDIUM)
+        const aggressorScore = (p.c.culture * p.c.prestige) * p.objectType.powerMultiplier
+        const victimScore = tp.c.culture * tp.objectType.powerMultiplier
+        this.rollOutcome(aggressorScore / victimScore, CL.MEDIUM)
     }
 
     isValid() {

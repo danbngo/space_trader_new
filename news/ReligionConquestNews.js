@@ -66,7 +66,9 @@ class ReligionConquestNews extends News {
         if (religiousAllies.length < 2) return
         
         // Success based on culture (religious fervor) and prestige
-        this.rollOutcome(p.c.culture * p.c.prestige / tp.c.prestige, CL.MEDIUM)
+        const aggressorScore = (p.c.culture * p.c.prestige) * p.objectType.powerMultiplier
+        const victimScore = tp.c.prestige * tp.objectType.powerMultiplier
+        this.rollOutcome(aggressorScore / victimScore, CL.MEDIUM)
     }
 
     isValid() {

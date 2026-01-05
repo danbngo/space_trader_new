@@ -26,6 +26,7 @@ const NF = Object.freeze({
     RELIGION: new NewsFlavor('Religion', '⛪', COLORS.Brown, 2),
     OPPRESSION: new NewsFlavor('Oppression', '🔒', COLORS.Gray, 3),
     ESPIONAGE: new NewsFlavor('Espionage', '🕵️', COLORS.DarkGray, 2),
+    HEGEMONY: new NewsFlavor('Hegemony', '👑', COLORS.DarkPurple, 5),
 })
 
 const NF_ALL = Object.values(NF)

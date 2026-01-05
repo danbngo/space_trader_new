@@ -45,7 +45,9 @@ class WarCodeBreakNews extends News {
     determineOutcome() {
         const {planet: p, targetPlanet: tp} = this
         // Success depends on planet's technology/education vs target's technology
-        this.rollOutcome(p.c.technology * p.c.education / (tp.c.technology * tp.c.technology), CL.HIGH)
+        const aggressorScore = (p.c.technology * p.c.education) * p.objectType.powerMultiplier
+        const victimScore = (tp.c.technology * tp.c.technology) * tp.objectType.powerMultiplier
+        this.rollOutcome(aggressorScore / victimScore, CL.HIGH)
     }
 
     isValid() {

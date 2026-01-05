@@ -62,7 +62,12 @@ class EnslavementNews extends News {
 
     determineOutcome() {
         const {planet: p, targetPlanet: tp} = this
-        this.rollOutcome((p.c.army + p.c.navy + p.c.security)/(tp.c.army + tp.c.navy + p.c.corruption), CL.HIGH)
+        
+        //old version
+        //this.rollOutcome((p.c.army + p.c.navy + p.c.security)/(tp.c.army + tp.c.navy + p.c.corruption), CL.HIGH)
+        const aggressorScore = (p.c.army + p.c.navy + p.c.security)*p.objectType.powerMultiplier
+        const victimScore = (tp.c.army + tp.c.navy + p.c.corruption)*tp.objectType.powerMultiplier
+        this.rollOutcome(aggressorScore/victimScore, CL.HIGH)
     }
 
     isValid() {

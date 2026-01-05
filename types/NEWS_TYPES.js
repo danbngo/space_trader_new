@@ -12,12 +12,12 @@ class NewsType {
      * @param {GovernmentType[]} forbiddenGovs - Government types that cannot have this news event.
      * @param {GovernmentType[]} favoriteGovs - Government types that are more likely to have this news event.
      * @param {GovernmentType[]} immuneGovs - Government types that are immune to this news event.
-     * @param {GovernmentType|undefined} planetObjectType - If specified the planet must be of this type
-     * @param {GovernmentType|undefined} targetPlanetObjectType - If specified the target must be of this type
+     * @param {ObjectType[]|undefined} planetObjectTypes - If specified, only these object types can INITIATE this event (e.g., MAJOR_POWERS for geopolitics/war)
+     * @param {ObjectType[]|undefined} targetPlanetObjectTypes - If specified, only these object types can be TARGETS of this event
      */
     constructor(
         name = '', newsFlavor = NF_ALL[0], minYears = null, maxYears = null, displayPriority = 0, 
-        forbiddenGovs = [], favoriteGovs = [], immuneGovs = [], planetObjectType = undefined, targetPlanetObjectType = undefined
+        forbiddenGovs = [], favoriteGovs = [], immuneGovs = [], planetObjectTypes = undefined, targetPlanetObjectTypes = undefined
     ) {
         /** @type {string} */
         this.name = name
@@ -36,23 +36,42 @@ class NewsType {
         /** @type {GovernmentType[]} */
         this.immuneGovs = immuneGovs //cannot be the target/victim/planet who fares less well of the event
         this.weight = this.newsFlavor.weight
-        this.planetObjectType = planetObjectType
-        this.targetPlanetObjectType = targetPlanetObjectType
+        this.planetObjectTypes = planetObjectTypes
+        this.targetPlanetObjectTypes = targetPlanetObjectTypes
     }
 }
 
+
+const MAJOR_POWERS = [OBJECT_TYPES.PLANET]
+const MINOR_POWERS = [OBJECT_TYPES.DWARF_PLANET, OBJECT_TYPES.MOON]
+
+/**
+ * NEWS TYPES
+ * 
+ * MAJOR vs MINOR POWER SYSTEM:
+ * - MAJOR_POWERS (planets) can INITIATE 'big moves' on the solar stage: alliances, wars, colonization, 
+ *   blockades, sanctions, religious crusades, etc. - any event with WAR, GEOPOLITICS, EXPLORATION, 
+ *   TENSIONS, or RELIGION flavor.
+ * - MINOR_POWERS (dwarf planets, moons) can still be TARGETS/VICTIMS of these events, but cannot 
+ *   initiate them.
+ * - Both major and minor powers can initiate and be targeted by local events: internal politics, 
+ *   disasters, economic changes, cultural events, etc.
+ * 
+ * TODO: Add news types specific to minor powers (e.g., autonomy movements, petition major powers, 
+ * resource discoveries that attract major power attention, etc.)
+ */
 const NT = {
     ADDICTION: new NewsType('Addiction', NF.HEALTH_HAZARD, 3, 8, 1, [], [], [GT.POLICE_STATE]),
-    ALLIANCE: new NewsType('Alliance', NF.GEOPOLITICS, 10, 40, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.DEMOCRACY], []), //two neutral planets become allies
-    ALLIANCE_RELIGIOUS: new NewsType('Religious Alliance', NF.GEOPOLITICS, 10, 40, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.THEOCRACY, GT.DEMOCRACY], []), //two neutral planets with same state religion
-    ALLIANCE_GOVERNMENT: new NewsType('Political Alliance', NF.GEOPOLITICS, 10, 40, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.DEMOCRACY, GT.ARISTOCRACY], []), //two neutral planets with same government type
-    ALLIANCE_ETHNIC: new NewsType('Ethnic Alliance', NF.GEOPOLITICS, 10, 40, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.DEMOCRACY], []), //two neutral planets with same majority ethnicity
-    ALLIANCE_CULTURAL: new NewsType('Cultural Alliance', NF.GEOPOLITICS, 10, 40, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.DEMOCRACY], []), //two neutral planets with same majority culture
-    ARMS_DEAL: new NewsType('Arms Deal', NF.GEOPOLITICS, 2, 5, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.CORPORATISM], []), //one planet sends military equipment to another
+    ALLIANCE: new NewsType('Alliance', NF.GEOPOLITICS, 10, 40, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.DEMOCRACY], [], MAJOR_POWERS), //two neutral planets become allies
+    ALLIANCE_RELIGIOUS: new NewsType('Religious Alliance', NF.GEOPOLITICS, 10, 40, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.THEOCRACY, GT.DEMOCRACY], [], MAJOR_POWERS), //two neutral planets with same state religion
+    ALLIANCE_GOVERNMENT: new NewsType('Political Alliance', NF.GEOPOLITICS, 10, 40, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.DEMOCRACY, GT.ARISTOCRACY], [], MAJOR_POWERS), //two neutral planets with same government type
+    ALLIANCE_ETHNIC: new NewsType('Ethnic Alliance', NF.GEOPOLITICS, 10, 40, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.DEMOCRACY], [], MAJOR_POWERS), //two neutral planets with same majority ethnicity
+    ALLIANCE_CULTURAL: new NewsType('Cultural Alliance', NF.GEOPOLITICS, 10, 40, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.DEMOCRACY], [], MAJOR_POWERS), //two neutral planets with same majority culture
+    ARMS_DEAL: new NewsType('Arms Deal', NF.GEOPOLITICS, 2, 5, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.CORPORATISM], [], MAJOR_POWERS), //one planet sends military equipment to another
     CIVIL_STRIFE: new NewsType('Civil Strife', NF.UNREST, 3, 8, 1, [GT.POLICE_STATE], [], []),
     CIVIL_WAR: new NewsType('Civil War', NF.UNREST, 3, 15, 1, [GT.ANARCHY, GT.PUPPET_STATE], [], []),
-    COALITION: new NewsType('Coalition', NF.GEOPOLITICS, 10, 30, 300, [GT.PUPPET_STATE], [], []),
-    COLONIZATION: new NewsType('Colonization', NF.EXPLORATION, 7, 15, 1, [GT.PUPPET_STATE], [GT.ARISTOCRACY, GT.TECHNOCRACY], []),
+    COALITION: new NewsType('Coalition', NF.GEOPOLITICS, 10, 30, 300, [GT.PUPPET_STATE], [], [], MAJOR_POWERS),
+    COLONIZATION: new NewsType('Colonization', NF.EXPLORATION, 7, 15, 1, [GT.PUPPET_STATE], [GT.ARISTOCRACY, GT.TECHNOCRACY], [], MAJOR_POWERS),
     CONSCRIPTION: new NewsType('Conscription', NF.MILITARY, 3, 8, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.POLICE_STATE, GT.ARISTOCRACY], []),
     CONSTRUCTION: new NewsType('Construction', NF.LABOR, 3, 8, 1, [], [GT.CORPORATISM, GT.TECHNOCRACY], []),
     COUP_DETAT: new NewsType('Coup d\'Etat', NF.POLITICS, 2, 5, 1, [GT.ANARCHY, GT.PUPPET_STATE], [], []),
@@ -60,20 +79,20 @@ const NT = {
     CRIME_WAVE: new NewsType('Crime Wave', NF.CRIME, 3, 8, 1, [GT.POLICE_STATE], [GT.ANARCHY], []),
     CULTURAL_PURGE: new NewsType('Cultural Purge', NF.OPPRESSION, 5, 15, 1, [GT.DEMOCRACY, GT.ANARCHY], [GT.POLICE_STATE, GT.THEOCRACY], []),
     CULTURAL_RENAISSANCE: new NewsType('Cultural Renaissance', NF.CULTURE, 5, 12, 1, [], [GT.DEMOCRACY, GT.ARISTOCRACY], []),
-    CYBER_WARFARE: new NewsType('Cyber Warfare', NF.GEOPOLITICS, 3, 10, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.TECHNOCRACY], []),
+    CYBER_WARFARE: new NewsType('Cyber Warfare', NF.GEOPOLITICS, 3, 10, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.TECHNOCRACY], [], MAJOR_POWERS),
     DEPRESSION: new NewsType('Depression', NF.ECONOMY, 7, 15, 1, [], [GT.DEMOCRACY, GT.CORPORATISM], []),
-    DISARMAMENT: new NewsType('Disarmament', NF.GEOPOLITICS, 5, 10, 1, [GT.POLICE_STATE], [], []),
+    DISARMAMENT: new NewsType('Disarmament', NF.GEOPOLITICS, 5, 10, 1, [GT.POLICE_STATE], [], [], MAJOR_POWERS),
     ECONOMIC_BOOM: new NewsType('Economic Boom', NF.ECONOMY, 5, 10, 1, [], [GT.CORPORATISM], []),
-    BLOCKADE: new NewsType('Blockade', NF.GEOPOLITICS, 3, 30, 1, [GT.ANARCHY, GT.PUPPET_STATE, GT.CORPORATISM], [], []),
+    BLOCKADE: new NewsType('Blockade', NF.GEOPOLITICS, 3, 30, 1, [GT.ANARCHY, GT.PUPPET_STATE, GT.CORPORATISM], [], [], MAJOR_POWERS),
     CLONING: new NewsType('Cloning', NF.SCIENCE, 5, 15, 1, [GT.DEMOCRACY, GT.THEOCRACY], [GT.TECHNOCRACY, GT.CORPORATISM], []),
-    ENSLAVEMENT: new NewsType('Enslavement', NF.GEOPOLITICS, 10, 30, 1, [GT.ANARCHY, GT.PUPPET_STATE, GT.DEMOCRACY], [GT.POLICE_STATE, GT.ARISTOCRACY], []),
+    ENSLAVEMENT: new NewsType('Enslavement', NF.GEOPOLITICS, 10, 30, 1, [GT.ANARCHY, GT.PUPPET_STATE, GT.DEMOCRACY], [GT.POLICE_STATE, GT.ARISTOCRACY], [], MAJOR_POWERS),
     EUGENICS: new NewsType('Eugenics', NF.OPPRESSION, 5, 15, 1, [GT.DEMOCRACY, GT.ANARCHY], [GT.POLICE_STATE, GT.TECHNOCRACY, GT.ARISTOCRACY], []),
     ENVIRONMENTAL_DISASTER: new NewsType('Environmental Disaster', NF.DISASTER, 2, 6, 1, [], [], []),
     ENVIRONMENTALISM: new NewsType('Environmentalism', NF.POLITICS, 5, 15, 1, [GT.CORPORATISM], [GT.DEMOCRACY, GT.THEOCRACY], []),
-    EXPLORATION: new NewsType('Exploration', NF.EXPLORATION, 5, 15, 1, [], [GT.TECHNOCRACY], []),
+    EXPLORATION: new NewsType('Exploration', NF.EXPLORATION, 5, 15, 1, [], [GT.TECHNOCRACY], [], MAJOR_POWERS),
     FESTIVAL: new NewsType('Festival', NF.CULTURE, 2, 5, 1, [GT.POLICE_STATE], [], []),
     FORCED_LABOR: new NewsType('Forced Labor', NF.OPPRESSION, 10, 30, 1, [GT.DEMOCRACY, GT.ANARCHY], [GT.POLICE_STATE, GT.COMMUNISM, GT.CORPORATISM], []),
-    FOREIGN_AID: new NewsType('Foreign Aid', NF.GEOPOLITICS, 3, 8, 1, [], [GT.DEMOCRACY, GT.THEOCRACY], []),
+    FOREIGN_AID: new NewsType('Foreign Aid', NF.GEOPOLITICS, 3, 8, 1, [], [GT.DEMOCRACY, GT.THEOCRACY], [], MAJOR_POWERS),
     GENOCIDE: new NewsType('Genocide', NF.OPPRESSION, 5, 15, 1, [GT.ANARCHY, GT.DEMOCRACY], [GT.POLICE_STATE, GT.ARISTOCRACY], []),
     IMMIGRATION: new NewsType('Immigration', NF.CULTURE, 5, 10, 1, [], [GT.DEMOCRACY, GT.CORPORATISM], [GT.POLICE_STATE, GT.COMMUNISM]),
     REFUGEES: new NewsType('Refugees', NF.CULTURE, 3, 10, 1, [], [GT.DEMOCRACY, GT.THEOCRACY], [GT.POLICE_STATE]),
@@ -81,9 +100,9 @@ const NT = {
     ASYLUM_POLICY: new NewsType('Asylum Policy', NF.CULTURE, 5, 12, 1, [GT.ANARCHY], [GT.DEMOCRACY], [GT.POLICE_STATE]),
     DIASPORA_RETURNS: new NewsType('Diaspora Returns', NF.CULTURE, 5, 15, 1, [], [GT.DEMOCRACY, GT.CORPORATISM], []),
     INDUSTRIAL_ACCIDENT: new NewsType('Industrial Accident', NF.HEALTH_HAZARD, 2, 5, 1, [], [GT.CORPORATISM], []),
-    RELIGION_INQUISITION: new NewsType('Inquisition', NF.RELIGION, 5, 12, 1, [GT.DEMOCRACY, GT.ANARCHY], [GT.THEOCRACY, GT.POLICE_STATE], []),
+    RELIGION_INQUISITION: new NewsType('Inquisition', NF.RELIGION, 5, 12, 1, [GT.DEMOCRACY, GT.ANARCHY], [GT.THEOCRACY, GT.POLICE_STATE], [], MAJOR_POWERS),
     BANKRUPTCY: new NewsType('Bankruptcy', NF.ECONOMY, 3, 8, 1, [GT.COMMUNISM], [GT.CORPORATISM, GT.DEMOCRACY], []),
-    LAND_GRAB: new NewsType('Imperialism', NF.GEOPOLITICS, 10, 30, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.ARISTOCRACY, GT.POLICE_STATE, GT.THEOCRACY], []),
+    LAND_GRAB: new NewsType('Imperialism', NF.GEOPOLITICS, 10, 30, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.ARISTOCRACY, GT.POLICE_STATE, GT.THEOCRACY], [], MAJOR_POWERS),
     INVESTMENT: new NewsType('Investment', NF.ECONOMY, 5, 10, 1, [], [GT.CORPORATISM], []),
     LUDDITISM: new NewsType('Ludditism', NF.UNREST, 3, 8, 1, [GT.TECHNOCRACY, GT.CORPORATISM], [GT.THEOCRACY], []),
     MILITARY_BUILDUP: new NewsType('Military Buildup', NF.MILITARY, 5, 10, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.POLICE_STATE, GT.ARISTOCRACY], []),
@@ -95,17 +114,19 @@ const NT = {
     PLAGUE_SPREAD: new NewsType('Plague Spread', NF.HEALTH_HAZARD, 2, 6, 1, [], [], []),
     PLAGUE_VACCINE: new NewsType('Plague Vaccine', NF.SCIENCE, 5, 15, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.DEMOCRACY, GT.TECHNOCRACY], []),
     POLICY_CHANGE: new NewsType('Policy Change', NF.POLITICS, 3, 8, 1, [GT.ANARCHY, GT.PUPPET_STATE], [], []),
-    RAIDING: new NewsType('Raiding', NF.GEOPOLITICS, 15, 30, 1, [GT.DEMOCRACY, GT.PUPPET_STATE], [GT.ANARCHY, GT.ARISTOCRACY, GT.THEOCRACY], []),
-    RESEARCH_AGREEMENT: new NewsType('Research Agreement', NF.GEOPOLITICS, 2, 8, 1, [], [GT.TECHNOCRACY, GT.DEMOCRACY], []),
+    RAIDING: new NewsType('Raiding', NF.GEOPOLITICS, 15, 30, 1, [GT.DEMOCRACY, GT.PUPPET_STATE], [GT.ANARCHY, GT.ARISTOCRACY, GT.THEOCRACY], [], MAJOR_POWERS),
+    RESEARCH_AGREEMENT: new NewsType('Research Agreement', NF.GEOPOLITICS, 2, 8, 1, [], [GT.TECHNOCRACY, GT.DEMOCRACY], [], MAJOR_POWERS),
     RELIGION_REVIVAL: new NewsType('Religious Revival', NF.RELIGION, 10, 20, 1, [GT.TECHNOCRACY], [GT.THEOCRACY], []),
-    RELIGION_PROSELYTIZE: new NewsType('Religious Proselytization', NF.RELIGION, 5, 15, 1, [GT.TECHNOCRACY], [GT.THEOCRACY, GT.ARISTOCRACY], []),
-    RELIGION_HOLY_WAR: new NewsType('Holy War', NF.RELIGION, 10, 30, 100, [GT.TECHNOCRACY, GT.DEMOCRACY, GT.PUPPET_STATE], [GT.THEOCRACY, GT.ARISTOCRACY], []),
-    RELIGION_GRAND_COUNCIL: new NewsType('Grand Religious Council', NF.RELIGION, 2, 8, 1, [GT.TECHNOCRACY], [GT.THEOCRACY], []),
-    RELIGION_CONQUEST: new NewsType('Religious Conquest', NF.RELIGION, 15, 40, 150, [GT.TECHNOCRACY, GT.DEMOCRACY, GT.PUPPET_STATE, GT.ANARCHY], [GT.THEOCRACY, GT.ARISTOCRACY, GT.POLICE_STATE], []),
+    RELIGION_PROSELYTIZE: new NewsType('Religious Proselytization', NF.RELIGION, 5, 15, 1, [GT.TECHNOCRACY], [GT.THEOCRACY, GT.ARISTOCRACY], [], MAJOR_POWERS),
+    RELIGION_HOLY_WAR: new NewsType('Holy War', NF.RELIGION, 10, 30, 100, [GT.TECHNOCRACY, GT.DEMOCRACY, GT.PUPPET_STATE], [GT.THEOCRACY, GT.ARISTOCRACY], [], MAJOR_POWERS),
+    RELIGION_GRAND_COUNCIL: new NewsType('Grand Religious Council', NF.RELIGION, 2, 8, 1, [GT.TECHNOCRACY], [GT.THEOCRACY], [], MAJOR_POWERS),
+    RELIGION_CONQUEST: new NewsType('Religious Conquest', NF.RELIGION, 15, 40, 150, [GT.TECHNOCRACY, GT.DEMOCRACY, GT.PUPPET_STATE, GT.ANARCHY], [GT.THEOCRACY, GT.ARISTOCRACY, GT.POLICE_STATE], [], MAJOR_POWERS),
     RELIGIOUS_TURMOIL: new NewsType('Religious Turmoil', NF.RELIGION, 5, 15, 1, [GT.TECHNOCRACY, GT.DEMOCRACY], [GT.THEOCRACY, GT.POLICE_STATE], []),
-    RELIGIOUS_CONVERSION: new NewsType('Religious Conversion', NF.RELIGION, 8, 20, 1, [GT.TECHNOCRACY], [GT.THEOCRACY, GT.ARISTOCRACY], []),
+    RELIGIOUS_CONVERSION: new NewsType('Religious Conversion', NF.RELIGION, 8, 20, 1, [GT.TECHNOCRACY], [GT.THEOCRACY, GT.ARISTOCRACY], [], MAJOR_POWERS),
+    RELIGION_SACRED_SITE: new NewsType('Sacred Site', NF.RELIGION, 10, 30, 1, [GT.ANARCHY], [GT.THEOCRACY], []),
+    RELIGION_SCHISM: new NewsType('Religious Schism', NF.RELIGION, 10, 30, 150, [GT.ANARCHY, GT.PUPPET_STATE], [GT.THEOCRACY], [], MAJOR_POWERS, MAJOR_POWERS),
     REVOLUTION: new NewsType('Revolution', NF.POLITICS, 3, 8, 1, [GT.PUPPET_STATE], [], []),
-    SANCTIONS: new NewsType('Sanctions', NF.GEOPOLITICS, 3, 15, 1, [GT.ANARCHY, GT.PUPPET_STATE, GT.CORPORATISM], [GT.DEMOCRACY], []),
+    SANCTIONS: new NewsType('Sanctions', NF.GEOPOLITICS, 3, 15, 1, [GT.ANARCHY, GT.PUPPET_STATE, GT.CORPORATISM], [GT.DEMOCRACY], [], MAJOR_POWERS),
     SCARCITY: new NewsType('Scarcity', NF.ECONOMY, 3, 8, 1, [], [], []),
     SCIENTIFIC_BREAKTHROUGH: new NewsType('Scientific Breakthrough', NF.SCIENCE, 1, 4, 1, [], [GT.TECHNOCRACY], []),
     SUPER_SOLDIERS: new NewsType('Super Soldiers', NF.MILITARY, 7, 15, 1, [GT.DEMOCRACY, GT.ANARCHY], [GT.POLICE_STATE, GT.TECHNOCRACY], []),
@@ -121,22 +142,22 @@ const NT = {
     MEGACITY: new NewsType('Megacity', NF.LABOR, 10, 25, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.CORPORATISM, GT.DEMOCRACY], []),
     LABOR_STRIKES: new NewsType('Labor Strikes', NF.LABOR, 2, 8, 1, [GT.PUPPET_STATE], [GT.DEMOCRACY, GT.CORPORATISM], []),
     AUTOMATION_CRISIS: new NewsType('Automation Crisis', NF.LABOR, 3, 10, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.TECHNOCRACY, GT.CORPORATISM], []),
-    ARTIFACTS_DISCOVERED: new NewsType('Artifacts Discovered', NF.EXPLORATION, 4, 12, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.TECHNOCRACY], []),
-    ALIEN_LIFE_DISCOVERED: new NewsType('Alien Life Discovered', NF.EXPLORATION, 3, 10, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.TECHNOCRACY, GT.DEMOCRACY], []),
-    RUINS_DISCOVERED: new NewsType('Ruins Discovered', NF.EXPLORATION, 5, 15, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.TECHNOCRACY], []),
+    ARTIFACTS_DISCOVERED: new NewsType('Artifacts Discovered', NF.EXPLORATION, 4, 12, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.TECHNOCRACY], [], MAJOR_POWERS),
+    ALIEN_LIFE_DISCOVERED: new NewsType('Alien Life Discovered', NF.EXPLORATION, 3, 10, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.TECHNOCRACY, GT.DEMOCRACY], [], MAJOR_POWERS),
+    RUINS_DISCOVERED: new NewsType('Ruins Discovered', NF.EXPLORATION, 5, 15, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.TECHNOCRACY], [], MAJOR_POWERS),
     INDOCTRINATION_PROGRAM: new NewsType('Indoctrination Program', NF.OPPRESSION, 3, 10, 1, [GT.DEMOCRACY, GT.ANARCHY], [GT.POLICE_STATE, GT.THEOCRACY], []),
-    BRAIN_DRAIN: new NewsType('Brain Drain', NF.GEOPOLITICS, 4, 12, 1, [GT.PUPPET_STATE], [GT.POLICE_STATE, GT.THEOCRACY], [GT.ANARCHY, GT.TECHNOCRACY, GT.DEMOCRACY]),
+    BRAIN_DRAIN: new NewsType('Brain Drain', NF.GEOPOLITICS, 4, 12, 1, [GT.PUPPET_STATE], [GT.POLICE_STATE, GT.THEOCRACY], [GT.ANARCHY, GT.TECHNOCRACY, GT.DEMOCRACY], MAJOR_POWERS),
     PHILOSOPHICAL_DEBATES: new NewsType('Philosophical Debates', NF.CULTURE, 3, 8, 1, [GT.POLICE_STATE, GT.ANARCHY], [GT.DEMOCRACY, GT.ARISTOCRACY], []),
     KNOWLEDGE_CODEX: new NewsType('Knowledge Codex', NF.SCIENCE, 5, 15, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.TECHNOCRACY, GT.DEMOCRACY], []),
     PROPAGANDA_CAMPAIGN: new NewsType('Propaganda Campaign', NF.POLITICS, 3, 10, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.POLICE_STATE, GT.CORPORATISM], []),
     SOLAR_HARVESTERS: new NewsType('Solar Harvesters', NF.SCIENCE, 8, 20, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.TECHNOCRACY, GT.CORPORATISM], []),
     EXPERIMENTAL_ENERGY: new NewsType('Experimental Energy', NF.SCIENCE, 5, 15, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.TECHNOCRACY], []),
     BLACK_MARKET: new NewsType('Black Market', NF.CRIME, 5, 12, 1, [GT.ANARCHY], [GT.POLICE_STATE, GT.THEOCRACY], []),
-    GUNBOAT_DIPLOMACY: new NewsType('Gunboat Diplomacy', NF.GEOPOLITICS, 3, 10, 1, [GT.ANARCHY, GT.PUPPET_STATE, GT.DEMOCRACY], [GT.POLICE_STATE, GT.ARISTOCRACY], []),
+    GUNBOAT_DIPLOMACY: new NewsType('Gunboat Diplomacy', NF.GEOPOLITICS, 3, 10, 1, [GT.ANARCHY, GT.PUPPET_STATE, GT.DEMOCRACY], [GT.POLICE_STATE, GT.ARISTOCRACY], [], MAJOR_POWERS),
     OPPRESSED_MINORITY: new NewsType('Oppressed Minority', NF.OPPRESSION, 5, 15, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.POLICE_STATE, GT.THEOCRACY], []),
     SPY_NETWORK: new NewsType('Spy Network', NF.ESPIONAGE, 5, 15, 1, [GT.ANARCHY, GT.PUPPET_STATE, GT.DEMOCRACY], [GT.POLICE_STATE, GT.TECHNOCRACY], []),
     SURVEILLANCE_NETWORK: new NewsType('Surveillance Network', NF.ESPIONAGE, 3, 10, 1, [GT.DEMOCRACY, GT.ANARCHY], [GT.POLICE_STATE, GT.TECHNOCRACY], []),
-    WAR_CODE_BREAK: new NewsType('War Code Break', NF.ESPIONAGE, 2, 8, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.TECHNOCRACY], []),
+    WAR_CODE_BREAK: new NewsType('War Code Break', NF.WAR, 2, 8, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.TECHNOCRACY], []),
     DISASTER_FLARE: new NewsType('Solar Flare', NF.DISASTER, 1, 3, 1, [], [], []),
     DISASTER_ASTEROID: new NewsType('Asteroid Impact', NF.DISASTER, 2, 5, 1, [], [], []),
     DISASTER_VOLCANO: new NewsType('Volcanic Eruptions', NF.DISASTER, 2, 6, 1, [], [], []),
@@ -158,14 +179,14 @@ const NT = {
     PIRATE_ARMADA: new NewsType('Pirate Armada', NF.CRIME, 3, 10, 1, [GT.ANARCHY], [GT.CORPORATISM, GT.ARISTOCRACY], []),
     MUTATIONS: new NewsType('Mutations', NF.HEALTH_HAZARD, 5, 15, 1, [], [], []),
     TERRORISM: new NewsType('Terrorism', NF.CRIME, 5, 15, 1, [GT.DEMOCRACY, GT.PUPPET_STATE], [GT.POLICE_STATE, GT.THEOCRACY, GT.ANARCHY], [GT.POLICE_STATE]),
-    TENSIONS: new NewsType('Tensions', NF.GEOPOLITICS, 5, 40, 1, [GT.PUPPET_STATE, GT.ANARCHY], [], []), //two neutral planets have relations changed to hostile
-    TENSIONS_RELIGIOUS: new NewsType('Religious Tensions', NF.GEOPOLITICS, 5, 40, 1, [GT.PUPPET_STATE, GT.ANARCHY], [], []), //two neutral planets with different state religions and majority religions
-    TENSIONS_ETHNIC: new NewsType('Ethnic Tensions', NF.GEOPOLITICS, 5, 40, 1, [GT.PUPPET_STATE, GT.ANARCHY], [], []), //two neutral planets with different majority races
-    TENSIONS_ECONOMIC: new NewsType('Economic Tensions', NF.GEOPOLITICS, 5, 40, 1, [GT.PUPPET_STATE, GT.ANARCHY], [], []), //the two strongest economies clash
-    TENSIONS_BORDERS: new NewsType('Border Tensions', NF.GEOPOLITICS, 5, 40, 1, [GT.PUPPET_STATE, GT.ANARCHY], [], []), //two nearby planets with large territories
+    TENSIONS: new NewsType('Tensions', NF.GEOPOLITICS, 5, 40, 1, [GT.PUPPET_STATE, GT.ANARCHY], [], [], MAJOR_POWERS), //two neutral planets have relations changed to hostile
+    TENSIONS_RELIGIOUS: new NewsType('Religious Tensions', NF.GEOPOLITICS, 5, 40, 1, [GT.PUPPET_STATE, GT.ANARCHY], [], [], MAJOR_POWERS), //two neutral planets with different state religions and majority religions
+    TENSIONS_ETHNIC: new NewsType('Ethnic Tensions', NF.GEOPOLITICS, 5, 40, 1, [GT.PUPPET_STATE, GT.ANARCHY], [], [], MAJOR_POWERS), //two neutral planets with different majority races
+    TENSIONS_ECONOMIC: new NewsType('Economic Tensions', NF.GEOPOLITICS, 5, 40, 1, [GT.PUPPET_STATE, GT.ANARCHY], [], [], MAJOR_POWERS), //the two strongest economies clash
+    TENSIONS_BORDERS: new NewsType('Border Tensions', NF.GEOPOLITICS, 5, 40, 1, [GT.PUPPET_STATE, GT.ANARCHY], [], [], MAJOR_POWERS), //two nearby planets with large territories
     TERRAFORMING: new NewsType('Terraforming', NF.SCIENCE, 5, 40, 1, [], [GT.TECHNOCRACY, GT.CORPORATISM], []), //two neutral planets have relations changed to hostile
     TOURISM: new NewsType('Tourism', NF.CULTURE, 3, 8, 1, [], [GT.DEMOCRACY, GT.CORPORATISM], []),
-    TRADE_AGREEMENT: new NewsType('Trade Agreement', NF.GEOPOLITICS, 10, 20, 1, [], [GT.CORPORATISM, GT.DEMOCRACY], []), //two neutral or allied planets have improved trade relations
+    TRADE_AGREEMENT: new NewsType('Trade Agreement', NF.GEOPOLITICS, 10, 20, 1, [], [GT.CORPORATISM, GT.DEMOCRACY], [], MAJOR_POWERS), //two neutral or allied planets have improved trade relations
     ATMOSPHERE_RESTORATION: new NewsType('Atmosphere Restoration', NF.SCIENCE, 8, 20, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.TECHNOCRACY, GT.DEMOCRACY], []),
     POLLUTION_CLEANUP: new NewsType('Pollution Cleanup', NF.SCIENCE, 5, 15, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.DEMOCRACY, GT.TECHNOCRACY], []),
     OCEAN_RESTORATION: new NewsType('Ocean Restoration', NF.SCIENCE, 10, 25, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.TECHNOCRACY, GT.CORPORATISM], []),
@@ -173,20 +194,31 @@ const NT = {
     ASTEROID_STEERING: new NewsType('Asteroid Steering', NF.SCIENCE, 5, 15, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.TECHNOCRACY], []),
     MANTLE_HEATING: new NewsType('Mantle Heating', NF.SCIENCE, 10, 30, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.TECHNOCRACY], []),
     HEAT_RADIATOR: new NewsType('Heat Radiator', NF.SCIENCE, 8, 20, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.TECHNOCRACY, GT.CORPORATISM], []),
-    WAR: new NewsType('War', NF.WAR, 5, 20, 100, [GT.ANARCHY, GT.PUPPET_STATE], [GT.POLICE_STATE, GT.ARISTOCRACY], []), //two planets where at least one was hostile go to war
-    WAR_ALLY: new NewsType('War Ally', NF.WAR, 3, 15, 150, [], [GT.ARISTOCRACY, GT.DEMOCRACY], []),
-    WAR_BOMBARDMENT: new NewsType('War: Bombardment', NF.WAR, 0.1, 0.5, 200, [], [GT.TECHNOCRACY], []), //the target planet loses some buildings (temporarily disabled)
-    WAR_CONVERT_INDUSTRY: new NewsType('War Industry', NF.WAR, 999, 999, 1, [], [], []),
-    WAR_FALSE_FLAG: new NewsType('War: False Flag', NF.WAR, 5, 20, 100, [GT.ANARCHY, GT.PUPPET_STATE], [GT.POLICE_STATE, GT.ARISTOCRACY], []),
-    WAR_HUMAN_WAVE: new NewsType('War: Human Wave', NF.WAR, 0.5, 2, 150, [GT.DEMOCRACY], [GT.POLICE_STATE, GT.COMMUNISM], []),
-    WAR_INVASION: new NewsType('War: Invasion', NF.WAR, 1, 5, 150, [], [GT.POLICE_STATE, GT.ARISTOCRACY], []),
-    WAR_OFFENSIVE: new NewsType('War: Offensive', NF.WAR, 1, 5, 150, [], [], []),
-    WAR_SABOTAGE: new NewsType('War: Sabotage', NF.WAR, 0.5, 2, 150, [], [GT.TECHNOCRACY, GT.ANARCHY], []),
-    WAR_SCORCHED_EARTH: new NewsType('War: Scorched Earth', NF.WAR, 0.5, 2, 150, [], [GT.COMMUNISM], []),
-    WAR_SNEAK_ATTACK: new NewsType('War: Sneak Attack', NF.WAR, 5, 20, 100, [GT.ANARCHY, GT.PUPPET_STATE], [GT.POLICE_STATE, GT.TECHNOCRACY], []),
-    WAR_SUBJUGATION: new NewsType('War: Subjugation', NF.WAR, 25, 100, 200, [], [GT.POLICE_STATE, GT.ARISTOCRACY, GT.COMMUNISM], []),
-    WAR_SURRENDER: new NewsType('War: Surrender', NF.WAR, 0.1, 0.5, 250, [], [], []),
-    PROXY_WAR: new NewsType('Proxy War', NF.GEOPOLITICS, 5, 20, 150, [GT.ANARCHY, GT.PUPPET_STATE], [GT.DEMOCRACY, GT.CORPORATISM], []),
+    WAR: new NewsType('War', NF.WAR, 5, 20, 100, [GT.ANARCHY, GT.PUPPET_STATE], [GT.POLICE_STATE, GT.ARISTOCRACY], [], MAJOR_POWERS), //two planets where at least one was hostile go to war
+    WAR_ALLY: new NewsType('War Ally', NF.WAR, 3, 15, 150, [], [GT.ARISTOCRACY, GT.DEMOCRACY], [], MAJOR_POWERS),
+    WAR_BOMBARDMENT: new NewsType('War: Bombardment', NF.WAR, 0.1, 0.5, 200, [], [GT.TECHNOCRACY], [], MAJOR_POWERS), //the target planet loses some buildings (temporarily disabled)
+    WAR_CONVERT_INDUSTRY: new NewsType('War Industry', NF.WAR, 999, 999, 1, [], [], [], MAJOR_POWERS),
+    WAR_FALSE_FLAG: new NewsType('War: False Flag', NF.WAR, 5, 20, 100, [GT.ANARCHY, GT.PUPPET_STATE], [GT.POLICE_STATE, GT.ARISTOCRACY], [], MAJOR_POWERS),
+    WAR_HUMAN_WAVE: new NewsType('War: Human Wave', NF.WAR, 0.5, 2, 150, [GT.DEMOCRACY], [GT.POLICE_STATE, GT.COMMUNISM], [], MAJOR_POWERS),
+    WAR_INVASION: new NewsType('War: Invasion', NF.WAR, 1, 5, 150, [], [GT.POLICE_STATE, GT.ARISTOCRACY], [], MAJOR_POWERS),
+    WAR_OFFENSIVE: new NewsType('War: Offensive', NF.WAR, 1, 5, 150, [], [], [], MAJOR_POWERS),
+    WAR_SABOTAGE: new NewsType('War: Sabotage', NF.WAR, 0.5, 2, 150, [], [GT.TECHNOCRACY, GT.ANARCHY], [], MAJOR_POWERS),
+    WAR_SCORCHED_EARTH: new NewsType('War: Scorched Earth', NF.WAR, 0.5, 2, 150, [], [GT.COMMUNISM], [], MAJOR_POWERS),
+    WAR_SNEAK_ATTACK: new NewsType('War: Sneak Attack', NF.WAR, 5, 20, 100, [GT.ANARCHY, GT.PUPPET_STATE], [GT.POLICE_STATE, GT.TECHNOCRACY], [], MAJOR_POWERS),
+    WAR_SUBJUGATION: new NewsType('War: Subjugation', NF.WAR, 25, 100, 200, [], [GT.POLICE_STATE, GT.ARISTOCRACY, GT.COMMUNISM], [], MAJOR_POWERS),
+    WAR_SURRENDER: new NewsType('War: Surrender', NF.WAR, 0.1, 0.5, 250, [], [], [], MAJOR_POWERS),
+    PROXY_WAR: new NewsType('Proxy War', NF.GEOPOLITICS, 5, 20, 150, [GT.ANARCHY, GT.PUPPET_STATE], [GT.DEMOCRACY, GT.CORPORATISM], [], MAJOR_POWERS),
+    MINOR_MISSILE_CRISIS: new NewsType('Missile Crisis', NF.HEGEMONY, 3, 10, 150, [GT.ANARCHY, GT.PUPPET_STATE], [], [], MAJOR_POWERS, MINOR_POWERS),
+    MINOR_RESOURCE_CONCESSION_TREATY: new NewsType('Resource Concession Treaty', NF.HEGEMONY, 5, 15, 1, [GT.ANARCHY], [GT.CORPORATISM, GT.TECHNOCRACY], [], MAJOR_POWERS, MINOR_POWERS),
+    MINOR_DEBT_TRAP_RESTRUCTURING: new NewsType('Debt Trap Restructuring', NF.HEGEMONY, 10, 30, 1, [GT.ANARCHY], [GT.CORPORATISM, GT.TECHNOCRACY], [], MAJOR_POWERS, MINOR_POWERS),
+    MINOR_JOINT_STOCK_COMPANY: new NewsType('Joint Stock Company', NF.HEGEMONY, 15, 40, 1, [GT.COMMUNISM, GT.ANARCHY], [GT.CORPORATISM], [], MAJOR_POWERS, MINOR_POWERS),
+    MINOR_FORCED_DEMILITARIZATION: new NewsType('Forced Demilitarization', NF.HEGEMONY, 5, 15, 1, [GT.ANARCHY, GT.PUPPET_STATE], [], [], MAJOR_POWERS, MINOR_POWERS),
+    ANNEXATION_REFERENDUM: new NewsType('Annexation Referendum', NF.HEGEMONY, 8, 25, 150, [GT.ANARCHY, GT.PUPPET_STATE], [], [], MAJOR_POWERS, MINOR_POWERS),
+    DIPLOMATIC_RECOGNITION_CRISIS: new NewsType('Recognition Crisis', NF.HEGEMONY, 5, 20, 200, [GT.ANARCHY, GT.PUPPET_STATE], [], [], MAJOR_POWERS, MINOR_POWERS),
+    MINOR_CULTURAL_INTEGRATION_PROGRAM: new NewsType('Cultural Integration Program', NF.HEGEMONY, 10, 30, 1, [GT.ANARCHY, GT.PUPPET_STATE], [], [], MAJOR_POWERS, MINOR_POWERS),
+    MINOR_COLOR_REVOLUTION: new NewsType('Color Revolution', NF.HEGEMONY, 5, 20, 150, [GT.ANARCHY, GT.PUPPET_STATE], [], [], MAJOR_POWERS, MINOR_POWERS),
+    MINOR_IDEALOGICAL_SPREAD: new NewsType('Ideological Spread', NF.HEGEMONY, 8, 25, 1, [GT.ANARCHY, GT.PUPPET_STATE], [], [], MAJOR_POWERS, MINOR_POWERS),
+    MINOR_RELIGIOUS_PURGE: new NewsType('Religious Purge', NF.HEGEMONY, 10, 30, 150, [GT.ANARCHY, GT.PUPPET_STATE], [], [], MAJOR_POWERS, MINOR_POWERS),
     //more to come later: environmental disasters, terraforming, etc.
 }
 

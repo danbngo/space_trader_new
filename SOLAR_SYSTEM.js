@@ -91,6 +91,7 @@ const SOLAR_SYSTEM = new StarSystem(
     SOL, [SOL],
     PLANETS,
     DWARF_PLANETS,
+    ALL_MOONS,
     [],
     [],
     [CORONA, ASTEROID_BELT, TROJANS, GREEKS, KUIPER_BELT, OORT_CLOUD], [...ASTEROIDS_ALL],

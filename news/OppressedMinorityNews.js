@@ -38,7 +38,9 @@ class OppressedMinorityNews extends News {
     determineOutcome() {
         const {planet: p, targetPlanet: tp} = this
         // Success depends on planet's prestige/navy vs target's corruption/security
-        this.rollOutcome(p.c.prestige * p.c.navy / (tp.c.corruption * tp.c.security), CL.MEDIUM)
+        const aggressorScore = (p.c.prestige * p.c.navy) * p.objectType.powerMultiplier
+        const victimScore = (tp.c.corruption * tp.c.security) * tp.objectType.powerMultiplier
+        this.rollOutcome(aggressorScore / victimScore, CL.MEDIUM)
     }
 
     isValid() {

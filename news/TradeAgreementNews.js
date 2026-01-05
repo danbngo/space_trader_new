@@ -58,12 +58,7 @@ class TradeAgreementNews extends News {
     }
 
     determineOutcome() {
-        const {planet: p, targetPlanet: tp} = this
-        // Check for economic collapse
-        const economyCheck = (p.c.economy < CL.LOW) || (tp.c.economy < CL.LOW)
-        if (economyCheck) {
-            this.failed = true
-        }
+        //never fails
     }
 
     isValid() {

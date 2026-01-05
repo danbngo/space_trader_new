@@ -39,7 +39,10 @@ class WarOffensiveNews extends News {
 
     determineOutcome() {
         //simple as
-        return (this.planet.c.navy * this.planet.c.technology) / (this.targetPlanet.c.navy * this.targetPlanet.c.technology)
+        const {planet: p, targetPlanet: tp} = this
+        const aggressorScore = (p.c.navy * p.c.technology) * p.objectType.powerMultiplier
+        const victimScore = (tp.c.navy * tp.c.technology) * tp.objectType.powerMultiplier
+        return aggressorScore / victimScore
     }
 
     shouldCancel() {

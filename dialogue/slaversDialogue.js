@@ -2,13 +2,14 @@
 /** @type {Dialogue[]} */
 const DIALOGUE_SLAVERS_GREETING = [
     `Wait... are we the baddies?`,
+    `It's not enough to be evil. One must be CARTOONISHLY evil.`,
     `How do I sleep at night? On a bed made of credits, of course.`,
     `Some people are just better than others.`,
     `It's good for them, if you really think about it. Edifying.`,
     `What were they accomplishing before? That's the question you really have to ask yourself.`,
     `You ever try to reason with a slave? It's no use.`,
     `Freedom is a luxury some just aren't cut out for.`,
-    `They'll thank us one day. Just you wait and see.`,
+    `They'll thank me one day. Just you wait and see.`,
     `Better than the alternatives, isn't it?`,
     `A life of servitude builds character.`,
     `Some people just need a firm hand.`,
@@ -18,7 +19,7 @@ const DIALOGUE_SLAVERS_GREETING = [
 const DIALOGUE_SLAVERS_DEMAND_SURRENDER = [
     `Do I have an opportunity for you, friend!`,
     `You look like someone who could use a change of career.`,
-    `Don't look at it as losing your freedom. Look at it as gaining purpose.`,
+    `Don't look at it as losing freedom. Look at it as gaining purpose.`,
 ]
 
 const DIALOGUE_SLAVERS_FAMOUS = [

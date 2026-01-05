@@ -48,7 +48,10 @@ class WarScorchedEarthNews extends News {
     }
 
     determineOutcome() {
-        this.rollOutcome(this.planet.c.territory*this.planet.c.army / this.targetPlanet.c.military / this.targetPlanet.c.economy, CL.LOW)
+        const {planet: p, targetPlanet: tp} = this
+        const aggressorScore = (p.c.territory * p.c.army) * p.objectType.powerMultiplier
+        const victimScore = (tp.c.military * tp.c.economy) * tp.objectType.powerMultiplier
+        this.rollOutcome(aggressorScore / victimScore, CL.LOW)
     }
 
     isValid() {

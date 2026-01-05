@@ -63,7 +63,10 @@ class WarSubjugationNews extends News {
     }
 
     determineOutcome() {
-        this.rollOutcome((this.planet.c.military + this.planet.c.army)/2/(this.targetPlanet.c.military), CL.HIGH)
+        const {planet: p, targetPlanet: tp} = this
+        const aggressorScore = ((p.c.military + p.c.army) / 2) * p.objectType.powerMultiplier
+        const victimScore = tp.c.military * tp.objectType.powerMultiplier
+        this.rollOutcome(aggressorScore / victimScore, CL.HIGH)
     }
 
     isValid() {

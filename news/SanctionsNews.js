@@ -51,8 +51,10 @@ class SanctionsNews extends News {
     }
 
     determineOutcome() {
-        this.rollOutcome(this.planet.c.economy*this.planet.c.wealth*this.planet.c.prestige
-            /this.targetPlanet.c.economy/this.targetPlanet.c.economy/this.targetPlanet.c.prestige)
+        const {planet: p, targetPlanet: tp} = this
+        const aggressorScore = (p.c.economy * p.c.wealth * p.c.prestige) * p.objectType.powerMultiplier
+        const victimScore = (tp.c.economy * tp.c.economy * tp.c.prestige) * tp.objectType.powerMultiplier
+        this.rollOutcome(aggressorScore / victimScore)
     }
 
     isValid() {

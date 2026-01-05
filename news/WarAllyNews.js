@@ -41,7 +41,11 @@ class WarAllyNews extends News {
         if (pan.length == 0) {
             this.failed = true
         }
-        else this.rollOutcome(this.planet.c.prestige/this.targetPlanet.c.prestige, CL.MEDIUM)
+        else {
+            const aggressorScore = this.planet.c.prestige * this.planet.objectType.powerMultiplier
+            const victimScore = this.targetPlanet.c.prestige * this.targetPlanet.objectType.powerMultiplier
+            this.rollOutcome(aggressorScore / victimScore, CL.MEDIUM)
+        }
     }
 
     isValid() {

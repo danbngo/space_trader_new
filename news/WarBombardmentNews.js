@@ -66,8 +66,10 @@ class WarBombardmentNews extends News {
     }
 
     determineOutcome() {
-        this.rollOutcome(this.planet.c.navy * this.planet.c.technology * this.planet.c.reserves
-            / this.targetPlanet.c.navy / this.targetPlanet.c.technology, CL.SLIGHTLY_HIGH)
+        const {planet: p, targetPlanet: tp} = this
+        const aggressorScore = (p.c.navy * p.c.technology * p.c.reserves) * p.objectType.powerMultiplier
+        const victimScore = (tp.c.navy * tp.c.technology) * tp.objectType.powerMultiplier
+        this.rollOutcome(aggressorScore / victimScore, CL.SLIGHTLY_HIGH)
     }
 
     isValid() {

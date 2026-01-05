@@ -63,7 +63,10 @@ class WarInvasionNews extends News {
     }
 
     determineOutcome() {
-        this.rollOutcome(this.planet.c.army*this.planet.c.technology/this.targetPlanet.c.army/this.targetPlanet.c.technology, CL.SLIGHTLY_HIGH)
+        const {planet: p, targetPlanet: tp} = this
+        const aggressorScore = (p.c.army * p.c.technology) * p.objectType.powerMultiplier
+        const victimScore = (tp.c.army * tp.c.technology) * tp.objectType.powerMultiplier
+        this.rollOutcome(aggressorScore / victimScore, CL.SLIGHTLY_HIGH)
     }
 
     isValid() {

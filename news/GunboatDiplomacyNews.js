@@ -36,7 +36,9 @@ class GunboatDiplomacyNews extends News {
     determineOutcome() {
         const {planet: p, targetPlanet: tp} = this
         // Success depends on attacker's navy/army vs target's navy/army
-        this.rollOutcome(p.c.navy * p.c.army / (tp.c.navy * tp.c.army), CL.MEDIUM)
+        const aggressorScore = (p.c.navy * p.c.army) * p.objectType.powerMultiplier
+        const victimScore = (tp.c.navy * tp.c.army) * tp.objectType.powerMultiplier
+        this.rollOutcome(aggressorScore / victimScore, CL.MEDIUM)
     }
 
     isValid() {

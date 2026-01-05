@@ -157,8 +157,8 @@ async function startNewGame() {
     console.log("Generated religions:", RELIGIONS)
     console.log("Generated space stations:", SPACE_STATIONS)
 
-    // Generate civilizations and settlements for all planets and dwarf planets
-    const allPlanets = [...gs.system.planets, ...gs.system.dwarfPlanets]
+    // Generate civilizations and settlements for all planets, dwarf planets, and moons
+    const allPlanets = [...gs.system.planets, ...gs.system.dwarfPlanets, ...ALL_MOONS]
     for (const planet of allPlanets) {
         //dont modify order, settlement depends on civilization
         planet.civilization = generateCivilization(planet)

@@ -49,7 +49,10 @@ class WarHumanWaveNews extends News {
 
     determineOutcome() {
         //it tends never to work based on what i've read
-        this.rollOutcome(this.planet.c.population*this.planet.c.army / this.targetPlanet.c.army, CL.HIGH)
+        const {planet: p, targetPlanet: tp} = this
+        const aggressorScore = (p.c.population * p.c.army) * p.objectType.powerMultiplier
+        const victimScore = tp.c.army * tp.objectType.powerMultiplier
+        this.rollOutcome(aggressorScore / victimScore, CL.HIGH)
     }
 
     isValid() {

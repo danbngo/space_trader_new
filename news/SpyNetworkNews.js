@@ -38,7 +38,9 @@ class SpyNetworkNews extends News {
     determineOutcome() {
         const {planet: p, targetPlanet: tp} = this
         // Success depends on planet's technology/corruption vs target's security/technology
-        this.rollOutcome(p.c.technology * p.c.corruption / (tp.c.security * tp.c.technology), CL.SLIGHTLY_HIGH)
+        const aggressorScore = (p.c.technology * p.c.corruption) * p.objectType.powerMultiplier
+        const victimScore = (tp.c.security * tp.c.technology) * tp.objectType.powerMultiplier
+        this.rollOutcome(aggressorScore / victimScore, CL.SLIGHTLY_HIGH)
     }
 
     isValid() {

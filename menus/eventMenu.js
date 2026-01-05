@@ -236,7 +236,7 @@ function calculateMaxFleetsForPlanet(planet) {
             continue
         }
         
-        let maxNumFleets = c.population
+        let maxNumFleets = 1 * planet.objectType.powerMultiplier
         //modify based on policies
         for (const p of c.policies.all) {
             if (p.factionSpawnModifiers && p.factionSpawnModifiers.has(factionType)) {
