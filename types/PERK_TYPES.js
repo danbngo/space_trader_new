@@ -64,33 +64,11 @@ const PERK_TYPES = {
     GENE_SOLDIER_4: new PerkType('Gene Soldier IV', COLORS.Cyan, 'Increases effectiveness of mutations by 80%.', 15),
     GENE_SOLDIER_5: new PerkType('Gene Soldier V', COLORS.Cyan, 'Increases effectiveness of mutations by 100%.', 20),
 
-    TECH_SAVVY_1: new PerkType('Tech Savvy I', COLORS.LightGray, 'Increases effectiveness of equipment by 20%', 1),
-    TECH_SAVVY_2: new PerkType('Tech Savvy II', COLORS.LightGray, 'Increases effectiveness of equipment by 40%', 5),
-    TECH_SAVVY_3: new PerkType('Tech Savvy III', COLORS.LightGray, 'Increases effectiveness of equipment by 60%', 10),
-    TECH_SAVVY_4: new PerkType('Tech Savvy IV', COLORS.LightGray, 'Increases effectiveness of equipment by 80%', 15),
-    TECH_SAVVY_5: new PerkType('Tech Savvy V', COLORS.LightGray, 'Increases effectiveness of equipment by 100%', 20),
-
     LIFE_EXTENSION_1: new PerkType('Long Lived I', COLORS.LightGray, 'Increases maximum age of retirement by 20%', 1),
     LIFE_EXTENSION_2: new PerkType('Long Lived II', COLORS.LightGray, 'Increases maximum age of retirement by 40%', 5),
     LIFE_EXTENSION_3: new PerkType('Long Lived III', COLORS.LightGray, 'Increases maximum age of retirement by 60%', 10),
     LIFE_EXTENSION_4: new PerkType('Long Lived IV', COLORS.LightGray, 'Increases maximum age of retirement by 80%', 15),
     LIFE_EXTENSION_5: new PerkType('Long Lived V', COLORS.LightGray, 'Increases maximum age of retirement by 100%', 20),
-
-    HARDENED: new PerkType('Hardened', COLORS.Gray, 'Reduces damage taken from all sources by 10%.', 3),
-    SHARPSHOOTER: new PerkType('Sharpshooter', COLORS.Red, 'Increases laser accuracy and damage by 15%.', 4),
-    ACE_PILOT: new PerkType('Ace Pilot', COLORS.Blue, 'Increases ship maneuverability and evasion.', 5),
-    ENGINEER: new PerkType('Engineer', COLORS.Orange, 'Repairs hull 20% faster and more efficiently.', 3),
-    NEGOTIATOR: new PerkType('Negotiator', COLORS.Green, 'Improves prices when trading and hiring.', 6),
-    TACTICIAN: new PerkType('Tactician', COLORS.Purple, 'Grants combat initiative bonus in encounters.', 8),
-    SURVIVOR: new PerkType('Survivor', COLORS.LightGreen, 'Reduces chance of being disabled in combat.', 7),
-    LUCKY: new PerkType('Lucky', COLORS.Gold, 'Increases chance of finding rare items and better loot.', 5),
-    INTIMIDATING: new PerkType('Intimidating', COLORS.DarkRed, 'Enemies more likely to surrender or flee.', 9),
-    CHARISMATIC: new PerkType('Charismatic', COLORS.Pink, 'Improves relations with factions and NPCs.', 4),
-    SCAVENGER: new PerkType('Scavenger', COLORS.Brown, 'Finds extra cargo and resources from encounters.', 2),
-    QUICK_LEARNER: new PerkType('Quick Learner', COLORS.LightBlue, 'Gains experience 25% faster.', 1),
-    WEALTHY: new PerkType('Wealthy', COLORS.Yellow, 'Starts with extra credits and earns more from missions.', 1),
-    CONNECTED: new PerkType('Connected', COLORS.Magenta, 'Has better access to exclusive markets and contracts.', 12),
-    COMBAT_VETERAN: new PerkType('Combat Veteran', COLORS.DarkGray, 'Bonus to all combat-related skills and actions.', 10),
 }
 
 const PERK_TYPES_ALL = Object.values(PERK_TYPES)

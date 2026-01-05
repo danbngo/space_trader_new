@@ -268,7 +268,7 @@ function colorSpan(text = '', color = '') {
     }
 
     // return HTML string instead of DOM element
-    return `<span style="color: ${color}">${text}</span>`;
+    return `<span style="color: ${color}; white-space: nowrap">${text}</span>`;
 }
 
 /**

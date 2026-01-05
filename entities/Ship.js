@@ -77,6 +77,12 @@ class Ship {
         this.hull[1] = Math.ceil(statModifier*this.hull[1])
     }
 
+    get quality() {
+        let totalStats = this.lasers + 
+        let expectedStats = this.shipType.lasers +
+        return totalStats / expectedStats
+    }
+
     get modules() {
         return [...this.shipType.modules, ...this.localModules]
     }

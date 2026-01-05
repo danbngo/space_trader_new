@@ -9,12 +9,13 @@ function createBuyShipMenu(ships = [new Ship()], shipyard = new Shipyard(), onSe
     if (ships.length == 0) return `(None)`
     /** @type {any[]} */
     const rows = [
-        ['Ship Name', 'Hull', 'Shields', 'Lasers', 'Engine', 'Cargo Space', 'Buy Price']
+        ['Ship Name', 'Quality', 'Hull', 'Shields', 'Lasers', 'Engine', 'Cargo Space', 'Buy Price']
     ]
     for (const ship of ships) {
         const buyPrice = shipyard.calcBuyPrice(ship)
         rows.push([
             ship.name,
+            statColorSpan(roundToPlaces(ship.quality * 100, 1) + '%', ship.quality),
             statColorSpan(ship.hull[1], ship.hull[1]/10),
             statColorSpan(ship.shields[1], ship.shields[1]/10),
             statColorSpan(ship.lasers, ship.lasers/10),
@@ -23,7 +24,38 @@ function createBuyShipMenu(ships = [new Ship()], shipyard = new Shipyard(), onSe
             statColorSpan(buyPrice, ship.value/buyPrice)
         ])
     }
-    return createTable(rows, (rowIndex = 0)=>onSelectShip(ships[rowIndex]))
+    const table = createTable(rows, (rowIndex = 0)=>onSelectShip(ships[rowIndex]))
+    
+    // Add popovers to stat header cells
+    const headerRow = table.rows[0];
+    if (headerRow) {
+        createPopoverElement(headerRow.cells[2], SHIP_STATS.HULL.description); // Hull
+        createPopoverElement(headerRow.cells[3], SHIP_STATS.SHIELDS.description); // Shields
+        createPopoverElement(headerRow.cells[4], SHIP_STATS.LASERS.description); // Lasers
+        createPopoverElement(headerRow.cells[5], SHIP_STATS.ENGINES.description); // Engine
+        createPopoverElement(headerRow.cells[6], SHIP_STATS.CARGO_CAPACITY.description); // Cargo Space
+    }
+    
+    // Add popovers to each row
+    ships.forEach((ship, index) => {
+        const row = table.rows[index + 1]; // +1 to skip header
+        if (!row) return;
+        
+        // Ship name popover (column 0)
+        const shipNameCell = row.cells[0];
+        if (shipNameCell && ship.shipType && ship.shipType.description) {
+            createPopoverElement(shipNameCell, ship.shipType.description);
+        }
+        
+        // Buy price popover (column 7)
+        const buyPriceCell = row.cells[7];
+        if (buyPriceCell) {
+            const buyPriceCalc = shipyard.getBuyPriceCalculation(ship);
+            createPopoverElement(buyPriceCell, buyPriceCalc.createPopover(ship.value, 'price', true)); // true = lower is better for buying
+        }
+    });
+    
+    return table;
 }
 /**
  * Creates an HTML table displaying ship modules available for purchase.
@@ -41,13 +73,28 @@ function createBuyModuleMenu(modules = [new ShipModule()], shipyard = new Shipya
     for (const module of modules) {
         const buyPrice = shipyard.calcBuyModulePrice(module)
         rows.push([
-            module.moduleType.name,
+            coloredName(module.moduleType),
             statColorSpan(roundToPlaces(module.quality*100, 1)+'%', module.quality),
             statColorSpan(buyPrice, module.moduleType.value/buyPrice),
             module.moduleType.description
         ])
     }
-    return createTable(rows, (rowIndex = 0)=>onSelectModule(modules[rowIndex]))
+    const table = createTable(rows, (rowIndex = 0)=>onSelectModule(modules[rowIndex]))
+    
+    // Add popovers to each row's buy price
+    modules.forEach((module, index) => {
+        const row = table.rows[index + 1]; // +1 to skip header
+        if (!row) return;
+        
+        // Buy price popover (column 2)
+        const buyPriceCell = row.cells[2];
+        if (buyPriceCell) {
+            const buyPriceCalc = shipyard.getBuyModulePriceCalculation(module);
+            createPopoverElement(buyPriceCell, buyPriceCalc.createPopover(module.moduleType.value, 'price', true)); // true = lower is better for buying
+        }
+    });
+    
+    return table;
 }
 /**
  * Creates an HTML table displaying player ships available for sale.
@@ -60,12 +107,13 @@ function createSellShipMenu(ships = [new Ship()], shipyard = new Shipyard(), onS
     if (ships.length == 0) return `(None)`
     /** @type {any[]} */
     const rows = [
-        ['Ship Name', 'Hull', 'Shields', 'Lasers', 'Engine', 'Cargo Space', 'Sell Price']
+        ['Ship Name', 'Quality', 'Hull', 'Shields', 'Lasers', 'Engine', 'Cargo Space', 'Sell Price']
     ]
     for (const ship of ships) {
         const sellPrice = shipyard.calcSellPrice(ship)
         rows.push([
             ship.name,
+            statColorSpan(roundToPlaces(ship.quality * 100, 1) + '%', ship.quality),
             statColorSpan(ship.hull[1], ship.hull[1]/10),
             statColorSpan(ship.shields[1], ship.shields[1]/10),
             statColorSpan(ship.lasers, ship.lasers/10),
@@ -74,7 +122,38 @@ function createSellShipMenu(ships = [new Ship()], shipyard = new Shipyard(), onS
             statColorSpan(sellPrice, sellPrice/ship.value)
         ])
     }
-    return createTable(rows, (rowIndex = 0)=>onSelectShip(ships[rowIndex]))
+    const table = createTable(rows, (rowIndex = 0)=>onSelectShip(ships[rowIndex]))
+    
+    // Add popovers to stat header cells
+    const headerRow = table.rows[0];
+    if (headerRow) {
+        createPopoverElement(headerRow.cells[2], SHIP_STATS.HULL.description); // Hull
+        createPopoverElement(headerRow.cells[3], SHIP_STATS.SHIELDS.description); // Shields
+        createPopoverElement(headerRow.cells[4], SHIP_STATS.LASERS.description); // Lasers
+        createPopoverElement(headerRow.cells[5], SHIP_STATS.ENGINES.description); // Engine
+        createPopoverElement(headerRow.cells[6], SHIP_STATS.CARGO_CAPACITY.description); // Cargo Space
+    }
+    
+    // Add popovers to each row
+    ships.forEach((ship, index) => {
+        const row = table.rows[index + 1]; // +1 to skip header
+        if (!row) return;
+        
+        // Ship name popover (column 0)
+        const shipNameCell = row.cells[0];
+        if (shipNameCell && ship.shipType && ship.shipType.description) {
+            createPopoverElement(shipNameCell, ship.shipType.description);
+        }
+        
+        // Sell price popover (column 7)
+        const sellPriceCell = row.cells[7];
+        if (sellPriceCell) {
+            const sellPriceCalc = shipyard.getSellPriceCalculation(ship);
+            createPopoverElement(sellPriceCell, sellPriceCalc.createPopover(ship.value, 'price', false)); // false = higher is better for selling
+        }
+    });
+    
+    return table;
 }
 
 function leaveShipyard(shipyard = new Shipyard()) {
@@ -148,8 +227,7 @@ function showShipyardBuyMenu(shipyard = new Shipyard()) {
         `${coloredName(planet)} - Shipyard`,
         ce({children:[
             createBuyShipMenu(shipyard.ships, shipyard, (ship)=>onSelectShipyardShip(ship)),
-            `Your # ships: ${fleet.ships.length}/${fleet.numPilots} | Your credits: ${gs.credits}`,
-            createBuildingPriceInfo(shipyard, 'Shipyard', {showBuyPrice: true, showSellPrice: false}),
+            `Shipyard Credits: ${shipyard.credits} | Your # ships: ${fleet.ships.length}/${fleet.numPilots} | Your Credits: ${gs.credits}`,
         ]}),
         [
             ["Buy Modules", ()=>showShipyardBuyModulesMenu(shipyard)],
@@ -223,7 +301,7 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
         ce({children:[
             `<b>Your ships</b>`,
             createSellShipMenu(fleet.ships, shipyard, (ship)=>onSelectPlayerShip(ship)),
-            `Your # ships: ${fleet.ships.length}/${fleet.numPilots}` + (fleet.ships.length < 2 ? colorSpan(` (You can't sell your last ship!)`, COLORS.Yellow) : ''),
+            `Shipyard Credits: ${shipyard.credits} | Your # ships: ${fleet.ships.length}/${fleet.numPilots} | Your Credits: ${gs.credits}` + (fleet.ships.length < 2 ? colorSpan(` (You can't sell your last ship!)`, COLORS.Yellow) : ''),
             colorSpan(`Your credits: ${gs.credits}`, gs.credits == 0 ? COLORS.Red : ''),
             createBuildingPriceInfo(shipyard, 'Shipyard', {showBuyPrice: false, showSellPrice: true}),
         ]}),
@@ -253,9 +331,16 @@ function showShipyardBuyModulesMenu(shipyard = new Shipyard()) {
         const hasEligibleShip = fleet.ships.filter(s=>s.unusedModuleSlots > 0).length > 0
         
         const canBuy = canAfford && hasEligibleShip && isDocked
+        
+        // Get disabled reason
+        let disabledReason = null;
+        if (!isDocked) disabledReason = 'Must be docked to buy modules';
+        else if (!canAfford) disabledReason = `Insufficient credits (need ${buyPrice} CR)`;
+        else if (!hasEligibleShip) disabledReason = 'No ships with available module slots';
+        
         /** @type {ButtonData[]} */
         const buttons = [
-            [`Buy & Install`, ()=>showShipyardInstallModuleMenu(shipyard, module), !canBuy],
+            [`Buy & Install`, ()=>showShipyardInstallModuleMenu(shipyard, module), !canBuy, disabledReason],
             ["Buy Ships", ()=>showShipyardBuyMenu(shipyard)],
             ["Sell Ships", ()=>showShipyardSellMenu(shipyard)],
             ["Back", () => leave()],
@@ -269,8 +354,7 @@ function showShipyardBuyModulesMenu(shipyard = new Shipyard()) {
         ce({children:[
             `<b>Available Modules</b>`,
             createBuyModuleMenu(shipyard.modules, shipyard, (module)=>onSelectModule(module)),
-            `Your credits: ${gs.credits} | Your Ships With Open Slots: ${fleet.ships.filter(s => s.unusedModuleSlots > 0).length} / ${fleet.ships.length}`,
-            createBuildingPriceInfo(shipyard, 'Shipyard', {showBuyPrice: true, showSellPrice: false}),
+            `Shipyard Credits: ${shipyard.credits} | Your Credits: ${gs.credits} | Open Slots: ${fleet.ships.filter(s => s.unusedModuleSlots > 0).length} / ${fleet.ships.length}`,
         ]}),
         [
             ["Buy Ships", ()=>showShipyardBuyMenu(shipyard)],

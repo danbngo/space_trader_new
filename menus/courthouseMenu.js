@@ -74,18 +74,46 @@ function showCourthouseMenu(courthouse = new Courthouse()) {
     const canPayBounty = gs.credits > 0 && planetBounty > 0
     const upgradePrice = courthouse.calcUpgradeRankPrice(gs.captain)
     const canUpgradeRank = upgradePrice !== null && planetReputation > 0 && planetBounty === 0 && gs.credits >= upgradePrice
+    
+    // Helper functions to get disabled reasons
+    function getPayBountyDisabledReason() {
+        if (!isDocked) return "Must be docked to pay bounty";
+        if (planetBounty <= 0) return "No bounty to pay";
+        if (gs.credits <= 0) return "Insufficient credits";
+        return null;
+    }
+    
+    function getServeJailTimeDisabledReason() {
+        if (!isDocked) return "Must be docked to serve jail time";
+        if (planetBounty <= 0) return "No bounty to clear";
+        return null;
+    }
+    
+    function getUpgradeRankDisabledReason() {
+        if (!isDocked) return "Must be docked to upgrade rank";
+        if (upgradePrice === null) return "Already at maximum rank";
+        if (planetBounty > 0) return "Must clear bounty first";
+        if (planetReputation <= 0) return "Requires positive reputation";
+        if (gs.credits < upgradePrice) return `Insufficient credits (need ${upgradePrice} CR)`;
+        return null;
+    }
 
     /** @type {ButtonData[]} */
     const baseButtons = [
-        ['Pay Bounty', ()=>showPayBountySlider(), !isDocked || !canPayBounty],
-        ['Serve Jail Time', ()=>showServeJailTimeModal(Math.ceil(planetBounty*JAIL_DAYS_PER_1000CR_FINE/1000)), !isDocked || planetBounty <= 0],
-        ['Upgrade Rank', ()=>showUpgradeRankModal(), !isDocked || !canUpgradeRank],
+        ['Pay Bounty', ()=>showPayBountySlider(), !isDocked || !canPayBounty, getPayBountyDisabledReason()],
+        ['Serve Jail Time', ()=>showServeJailTimeModal(Math.ceil(planetBounty*JAIL_DAYS_PER_1000CR_FINE/1000)), !isDocked || planetBounty <= 0, getServeJailTimeDisabledReason()],
+        ['Upgrade Rank', ()=>showUpgradeRankModal(), !isDocked || !canUpgradeRank, getUpgradeRankDisabledReason()],
     ]
 
     const nextRank = RANK_TYPES_ALL.find(r => r.level === currentRank.level + 1)
+    
+    // Create rank display with popover
+    const rankSpan = ce({tag: 'span', innerHTML: colorSpan(currentRank.name, currentRank.color)});
+    createPopoverElement(rankSpan, currentRank.description);
+    
     const rankUpgradeInfo = upgradePrice !== null 
-        ? `Rank Upgrade: ${colorSpan(currentRank.name, currentRank.color)} → ${colorSpan(nextRank.name, nextRank.color)} for ${upgradePrice} CR<br/>`
-        : `Rank: ${colorSpan(currentRank.name, currentRank.color)} (Max Rank)<br/>`
+        ? ce({children: ['Rank Upgrade: ', rankSpan, ` → ${colorSpan(nextRank.name, nextRank.color)} for ${upgradePrice} CR`, ce({tag: 'br'})]})
+        : ce({children: ['Rank: ', rankSpan, ' (Max Rank)', ce({tag: 'br'})]});
 
     let infoContainer = ce({
         children: [

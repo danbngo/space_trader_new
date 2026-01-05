@@ -42,31 +42,35 @@ class Calculation {
      * Create a popover element showing the calculation breakdown.
      * @param {number} baseValue - The base value before modifications.
      * @param {string} baseValueLabel - Label for the base value (e.g., "base price").
+     * @param {boolean} lowerIsBetter - If true, lower multipliers are colored green (e.g., buying). If false, higher is better (e.g., selling).
      * @returns {HTMLElement} A popover content element.
      */
-    createPopover(baseValue, baseValueLabel = 'base value') {
+    createPopover(baseValue, baseValueLabel = 'base value', lowerIsBetter = false) {
         const totalMultiplier = this.getTotalMultiplier();
         const finalValue = baseValue * totalMultiplier;
-        const totalPct = roundToPlaces(100 * (totalMultiplier - 1), 1);
 
-        // Determine color for total based on whether it's good or bad
-        // For prices (player buying), lower is better (green). For selling/availability, higher is better.
-        // We'll use a neutral coloring: green for positive, red for negative
-        const totalColor = totalPct >= 0 ? COLORS.LightGreen : COLORS.LightRed;
+        // Color the total multiplier based on whether lower or higher is better
+        const totalMultiplierStr = `${roundToPlaces(totalMultiplier, 3)}x`;
+        const coloredTotal = lowerIsBetter 
+            ? statColorSpan(totalMultiplierStr, 1/totalMultiplier) 
+            : statColorSpan(totalMultiplierStr, totalMultiplier);
 
         const lines = [
-            `${colorSpan(`Total: ${totalPct >= 0 ? '+' : ''}${totalPct}%`, totalColor)} (${roundToPlaces(finalValue, 1)})<br/>`,
-            `${baseValueLabel}: ${roundToPlaces(baseValue, 1)}<br/>`
+            `Actual ${baseValueLabel}: ${roundToPlaces(finalValue, 1)}<br/>`,
+            `Base ${baseValueLabel}: ${roundToPlaces(baseValue, 1)}<br/>`,
+            `Total modifier: ${coloredTotal}<br/>`,
+            `<span style="color: ${rgbArrayToString(COLORS.Gray)}; font-size: 0.9em;">Factors (multiply together):</span><br/>`
         ];
 
-        // Add each factor
+        // Add each factor with indentation, showing colored multiplier
         for (const factor of this.factors) {
-            const pct = roundToPlaces(100 * (factor.multiplier - 1), 1);
-            if (pct === 0) continue; // Skip factors with no effect
+            if (factor.multiplier === 1.0) continue; // Skip factors with no effect
 
-            const sign = pct >= 0 ? '+' : '';
-            const color = pct >= 0 ? COLORS.LightGreen : COLORS.LightRed;
-            lines.push(`${colorSpan(`${sign}${pct}%`, color)} (${factor.reason})<br/>`);
+            const multiplierStr = `${roundToPlaces(factor.multiplier, 3)}x`;
+            const coloredMultiplier = lowerIsBetter
+                ? statColorSpan(multiplierStr, 1/factor.multiplier)
+                : statColorSpan(multiplierStr, factor.multiplier);
+            lines.push(`&nbsp;&nbsp;${coloredMultiplier} - ${factor.reason}<br/>`);
         }
 
         return ce({innerHTML: lines.join('')});

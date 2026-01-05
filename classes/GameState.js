@@ -22,10 +22,14 @@ class GameState {
     }
 
     get captain() {
-        return this.fleet.captain;
+        return this.fleet?.captain;
     }
 
     set captain(captain) {
+        if (!this.fleet) {
+            console.error('Cannot set captain: fleet is null');
+            return;
+        }
         this.fleet.captain = captain
     }
 

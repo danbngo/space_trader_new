@@ -61,17 +61,69 @@ class Shipyard extends Building {
         this.credits = this.state.shipyardCredits
     }
 
+    /**
+     * Get the full buy price calculation breakdown for a ship.
+     * @param {Ship} ship - The ship to calculate for.
+     * @returns {Calculation} The calculation showing all price factors.
+     */
+    getBuyPriceCalculation(ship = new Ship()) {
+        const calc = new Calculation();
+        
+        calc.addFactor('merchant markup', 1 + this.planet.c.corruption / 4);
+        calc.addFactor('inflation', 1 + this.planet.c.inflationRate / 4);
+        calc.addFactor('base taxes', 1 + this.planet.c.taxes / 4);
+        calc.addFactor('naval supply', 1 / this.planet.c.navy);
+        calc.addFactor('purchase tax', 1 + this.planet.c.taxRate);
+        
+        return calc;
+    }
+
     calcBuyPrice(ship = new Ship()) {
-        const basePrice = Math.round(ship.value * (1+this.planet.c.corruption/4) * (1+this.planet.c.inflationRate/4) * (1+this.planet.c.taxes/4) / this.planet.c.navy)
-        return Math.round(basePrice * (1 + this.planet.c.taxRate))
+        const calc = this.getBuyPriceCalculation(ship);
+        return Math.round(calc.calculate(ship.value));
     }
+    /**
+     * Get the full sell price calculation breakdown for a ship.
+     * @param {Ship} ship - The ship to calculate for.
+     * @returns {Calculation} The calculation showing all price factors.
+     */
+    getSellPriceCalculation(ship = new Ship()) {
+        const calc = new Calculation();
+        
+        calc.addFactor('merchant discount', 1 / (1 + this.planet.c.corruption / 4));
+        calc.addFactor('inflation', 1 + this.planet.c.inflationRate / 4);
+        calc.addFactor('base taxes', 1 + this.planet.c.taxes / 4);
+        calc.addFactor('naval supply', 1 / this.planet.c.navy);
+        calc.addFactor('sale tax', 1 - this.planet.c.taxRate);
+        
+        return calc;
+    }
+
     calcSellPrice(ship = new Ship()) {
-        const basePrice = Math.round(ship.value / (1+this.planet.c.corruption/4) * (1+this.planet.c.inflationRate/4)  * (1+this.planet.c.taxes/4) / this.planet.c.navy)
-        return Math.round(basePrice * (1 - this.planet.c.taxRate))
+        const calc = this.getSellPriceCalculation(ship);
+        return Math.round(calc.calculate(ship.value));
     }
+    
+    /**
+     * Get the full buy module price calculation breakdown.
+     * @param {ShipModule} module - The module to calculate for.
+     * @returns {Calculation} The calculation showing all price factors.
+     */
+    getBuyModulePriceCalculation(module = new ShipModule()) {
+        const calc = new Calculation();
+        
+        calc.addFactor('module quality', module.quality);
+        calc.addFactor('merchant markup', 1 + this.planet.c.corruption / 4);
+        calc.addFactor('inflation', 1 + this.planet.c.inflationRate / 4);
+        calc.addFactor('base taxes', 1 + this.planet.c.taxes / 4);
+        calc.addFactor('purchase tax', 1 + this.planet.c.taxRate);
+        
+        return calc;
+    }
+    
     calcBuyModulePrice(module = new ShipModule()) {
-        const basePrice = Math.round(module.moduleType.value * module.quality * (1+this.planet.c.corruption/4) * (1+this.planet.c.inflationRate/4) * (1+this.planet.c.taxes/4) )
-        return Math.round(basePrice * (1 + this.planet.c.taxRate))
+        const calc = this.getBuyModulePriceCalculation(module);
+        return Math.round(calc.calculate(module.moduleType.value));
     }
 }
 

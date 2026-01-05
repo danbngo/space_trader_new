@@ -105,10 +105,10 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0],
         const currentLevel = gs.captain.skills.getAmount(skill)
         
         showModal(
-            `${trainVerb} ${skill}?`,
-            `${trainVerb} <b>${skill}</b> from level ${currentLevel} to ${currentLevel + 1} for <b>${cost} CR</b>?<br/><br/>Your CR after training: ${gs.credits - cost}`,
+            `${trainVerb} ${skill.name}?`,
+            `${trainVerb} <b>${skill.name}</b> from level ${currentLevel} to ${currentLevel + 1} for <b>${cost} CR</b>?<br/><br/>Your CR after training: ${gs.credits - cost}`,
             [
-                [trainVerb, () => upgradeSkill(skill)],
+                [`${trainVerb} ${skill.name}`, () => upgradeSkill(skill)],
                 ['Cancel', () => reloadMenu(skill)]
             ]
         )
@@ -126,7 +126,11 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0],
         const buttons = [
             ['Upgrade', () => showUpgradeConfirmation(skill), !canTrain || !isDocked]
         ]
-        if (!academy.isTavern) buttons.push(['Sell Discoveries', () => showSellDiscoveriesMenu(), sellableAnomalies.length > 0])
+        if (!academy.isTavern) {
+            const canSell = sellableAnomalies.length > 0
+            const sellDisabledReason = canSell ? null : 'No unsold anomaly discoveries to sell'
+            buttons.push(['Sell Discoveries', () => showSellDiscoveriesMenu(), !canSell, sellDisabledReason])
+        }
         buttons.push(['Back', () => showPlanetMenu(planet)])
         refreshPanelButtons('academy_panel', buttons)
     }
@@ -216,7 +220,11 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0],
     const buttons = [
             [showHiring ? 'Train Skills' : 'Hire Officers', ()=>reloadMenu(selectedSkill, !showHiring)],
     ]
-    if (!academy.isTavern) buttons.push(['Sell Discoveries', () => showSellDiscoveriesMenu(), (!showHiring && sellableAnomalies.length > 0)])
+    if (!academy.isTavern) {
+        const canSell = !showHiring && sellableAnomalies.length > 0
+        const sellDisabledReason = showHiring ? 'Switch to Train Skills tab to sell discoveries' : 'No unsold anomaly discoveries to sell'
+        buttons.push(['Sell Discoveries', () => showSellDiscoveriesMenu(), !canSell, sellDisabledReason])
+    }
     buttons.push(
             ['Back', ()=>showPlanetMenu(planet)]
     )
