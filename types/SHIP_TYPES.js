@@ -70,6 +70,7 @@ const SHIP_TYPES = {
     DRILLING_RIG: new ShipType('Drilling Rig', 'Industrial vessel with a heavy drill for asteroid mining and resource extraction.', SHAPES.FilledTriangle, 3, 0.1, 2, 1, 3, 0.5, [SHIP_MODULE_TYPES.DRILL], 2),
     ESCORT_SHIP: new ShipType('Escort Ship', 'Defensive support vessel with smoke bombs and strong shields to protect allied ships.', SHAPES.FilledTriangle, 1, 1.5, 1.5, 0.5, 0.25, 1.5, [SHIP_MODULE_TYPES.SMOKE_BOMB], 2),
     INTERCEPTOR: new ShipType('Interceptor', 'Fast pursuit craft with magnetic grapples for capturing or disabling enemy vessels.', SHAPES.FilledTriangle, 1.5, 1.5, 1.5, 2, 0.25, 2, [SHIP_MODULE_TYPES.MAGNETIZE], 2),
+    UTILITY_SHIP: new ShipType('Utility Ship', 'Support vessel equipped with nanite repair systems to fix damaged ships in the field.', SHAPES.FilledTriangle, 1, 2, 0.5, 1, 0.5, 2, [SHIP_MODULE_TYPES.NANITE_BEAM], 3),
 }
 
 const SHIP_TYPES_ALL = Object.values(SHIP_TYPES)

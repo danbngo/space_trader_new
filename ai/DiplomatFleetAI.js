@@ -14,7 +14,7 @@ class DiplomatFleetAI extends FleetAI {
         // Target diplomat fleets from different planets that haven't been met yet
         const otherDiplomats = gs.system.fleets.filter(fleet => {
             // Must be a diplomat fleet
-            if (fleet.type !== FLEET_TYPES.DIPLOMATS) return false
+            if (fleet.fleetType !== FLEET_TYPES.DIPLOMATS) return false
             // Don't target self
             if (fleet === this.fleet) return false
             // Don't target diplomats from the same planet
@@ -29,7 +29,7 @@ class DiplomatFleetAI extends FleetAI {
 
     onNearTarget() {
         // When meeting another diplomat fleet, improve relationships between their home planets
-        if (this.target && this.target instanceof Fleet && this.target.type === FLEET_TYPES.DIPLOMATS) {
+        if (this.target && this.target instanceof Fleet && this.target.fleetType === FLEET_TYPES.DIPLOMATS) {
             this.metDiplomats.push(this.target)
             
             // Diplomatic meeting between two fleets

@@ -42,6 +42,7 @@ const FLEET_AI_TYPES = {
     SYNDICATE: new FleetAIType('Syndicate AI', SyndicateFleetAI, FLEET_TYPES.SYNDICATES),
     EXPLORER: new FleetAIType('Explorer AI', ExplorerFleetAI, FLEET_TYPES.EXPLORERS),
     HACKER: new FleetAIType('Hacker AI', HackerFleetAI, FLEET_TYPES.HACKERS),
+    MEDIA: new FleetAIType('Media AI', MediaFleetAI, FLEET_TYPES.MEDIA),
 }
 
 const FLEET_AI_TYPES_ALL = Object.values(FLEET_AI_TYPES)

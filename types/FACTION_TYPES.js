@@ -376,6 +376,20 @@ const FACTION_TYPES = {
         0,  // reputationMultiplier
         [SKILLS.Engineer, SKILLS.Science]
     ),
+    MEDIA: new FactionType(
+        'Media',
+        '📡',
+        COLORS.Orange,
+        'Reporters, advertisers, social media influencers, and celebrities creating content across the system.',
+        false,
+        false,
+        false,
+        false,  // not criminal
+        true,  // cloaked (one of the few non-criminal cloaked factions)
+        [FLEET_TYPES.MEDIA],
+        1,  // reputationMultiplier
+        [SKILLS.Negotiation, SKILLS.Stealth]
+    ),
 }
 
 const FACTION_TYPES_ALL = Object.values(FACTION_TYPES)

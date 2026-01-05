@@ -72,6 +72,13 @@ class FleetAI {
             if (!this.target || Number.isFinite(this.fleet.fleetType.targetMaxDistance)) { 
                 if (Math.random() < .9) return //wait around a bit to avoid "turning jitter"
                 const validTargets = this.calcValidTargets()
+                    .filter(target => {
+                        // 90% of the time, non-media fleets ignore media fleets (they're protected by their status)
+                        if (target instanceof Fleet && target.fleetType === FLEET_TYPES.MEDIA) {
+                            return Math.random() < 0.1; // Only 10% chance to target media
+                        }
+                        return true;
+                    });
                 const target = this.findNearest(validTargets, this.fleet.fleetType.targetMaxDistance || Infinity);
                 if (target && target !== this.target) {
                     // Show interest popup when finding a new target

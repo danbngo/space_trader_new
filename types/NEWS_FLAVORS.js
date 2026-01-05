@@ -11,10 +11,13 @@ class NewsFlavor {
 const NF = Object.freeze({
     ECONOMY: new NewsFlavor('Economy', '💰', COLORS.Gold, 1),
     LABOR: new NewsFlavor('Labor', '⛏️', COLORS.LightGreen, 1),
+    CONSTRUCTION: new NewsFlavor('Construction', '🛠️', COLORS.Orange, 1),
     POLITICS: new NewsFlavor('Politics', '🏛️', COLORS.Blue, 3),
     GEOPOLITICS: new NewsFlavor('Geopolitics', '🌍', COLORS.DarkBlue, 10),
     MILITARY: new NewsFlavor('Military', '⚔️', COLORS.Red, 2),
     SCIENCE: new NewsFlavor('Science', '🔬', COLORS.Green, 1),
+    HEALTH: new NewsFlavor('Health', '🩺', COLORS.LightMagenta, 1),
+    ECOLOGY: new NewsFlavor('Ecology', '🌿', COLORS.LightGreen, 1),
     CULTURE: new NewsFlavor('Civilization', '🎭', COLORS.Purple, 1),
     UNREST: new NewsFlavor('Unrest', '✊', COLORS.LightRed, 3),
     PEACE: new NewsFlavor('Peace', '🕊️', COLORS.LightBlue, 3),
