@@ -128,6 +128,16 @@ class StarSystem extends SpaceObject {
                 if (fleet == gs.fleet) {
                     if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
                     if (currentMap && currentMap.selectObject && fleet == gs.fleet) currentMap.selectObject(fleet)
+                    
+                    // Check if destination is a fleet (for encounters)
+                    if (fleet.route.destination instanceof Fleet) {
+                        const targetFleet = fleet.route.destination
+                        // Trigger encounter with the fleet
+                        const encounter = generateEncounterForFleet(targetFleet)
+                        if (encounter) {
+                            encounter.startEncounter()
+                        }
+                    }
                 }
                 //only dock if player fleet near the destination, otherwise its handled by ai
                 if (fleet.route.destination instanceof Planet) fleet.dock(fleet.route.destination)

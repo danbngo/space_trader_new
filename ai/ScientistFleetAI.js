@@ -7,7 +7,7 @@ class ScientistFleetAI extends FleetAI {
     calcValidTargets() {
         // Target detectable anomalies and icy asteroids
         const detectableAnomalies = (gs.system.anomalies || []).filter(anomaly => anomaly.detectable(this.fleet))
-        const icyAsteroids = gs.system.asteroids.filter(a => a.belt.asteroidBeltType == ASTEROID_BELT_TYPES.Icy && Math.random() < .2)
+        const icyAsteroids = gs.system.asteroids.filter(a => a.belt.asteroidBeltType == ASTEROID_BELT_TYPES.Icy)
         return [...detectableAnomalies, ...icyAsteroids]
     }
     calcDestination() {

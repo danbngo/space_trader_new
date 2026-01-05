@@ -282,6 +282,8 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
                 // Reputation with starting planet
                 if (gs.fleet.location) {
                     captain.reputation.increment(gs.fleet.location, startingReputation);
+                    // Grant citizen rank on starting planet
+                    captain.ranks.set(gs.fleet.location, RANK_TYPES.CITIZEN);
                 }
                 
                 // Reputation with race

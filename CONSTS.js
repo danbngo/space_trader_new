@@ -26,6 +26,8 @@ const META_NEWS_CHANCE_PER_DAY = 1/365;
 const ANOMALY_CHANCE_PER_DAY = 1/30;
 const MAX_NUM_ANOMALIES = 5;
 const FLEET_SPAWN_CHANCE_PER_DAY = 1/365
+const ABANDONED_OFFICER_DEATH_CHANCE_PER_DAY = 1/100
+const ABANDONED_SHIP_DESTROYED_CHANCE_PER_DAY = 1/100
 const AVG_NUM_FLEETS_PER_PLANET = 7;
 const ENCOUNTER_IMMUNITY_DAYS = 2; //days of immunity after an encounter ends
 const ENCOUNTER_DENIED_DAYS = 0.25; //days player can't bump into fleets after denying an encounter (0.25 = 6 hours)

@@ -9,6 +9,7 @@ function checkForEvents(elapsedYears = 1) {
     checkForNews()
     checkForAnomalies(elapsedDays)
     checkForFleetSpawning(elapsedDays)
+    checkForAbandonedFleetDecay(elapsedDays)
     tickNPCFleets(elapsedYears)
     tickPlanets(elapsedYears)
     if (checkForEncounter(elapsedDays)) return
@@ -145,6 +146,45 @@ function checkForFleetSpawning(elapsedDays = 1, planetMaxFleets = null) {
 }
 
 /**
+ * Checks if abandoned fleets should decay (officers die, ships destroyed).
+ * @param {number} elapsedDays - Days that have elapsed.
+ */
+function checkForAbandonedFleetDecay(elapsedDays = 1) {
+    if (!gs.system || !gs.system.abandonedFleets) return
+    
+    // Iterate backwards so we can safely remove fleets
+    for (let i = gs.system.abandonedFleets.length - 1; i >= 0; i--) {
+        const fleet = gs.system.abandonedFleets[i]
+        
+        // Check if officers die
+        if (fleet.officers && fleet.officers.length > 0) {
+            for (let j = fleet.officers.length - 1; j >= 0; j--) {
+                if (calcOccurrencesPerTimespan(ABANDONED_OFFICER_DEATH_CHANCE_PER_DAY, elapsedDays)) {
+                    //console.log(`☠️ Officer ${fleet.officers[j].name} died on abandoned ${fleet.name}`)
+                    fleet.officers.splice(j, 1)
+                }
+            }
+        }
+        
+        // Check if ships are destroyed
+        if (fleet.ships && fleet.ships.length > 0) {
+            for (let j = fleet.ships.length - 1; j >= 0; j--) {
+                if (calcOccurrencesPerTimespan(ABANDONED_SHIP_DESTROYED_CHANCE_PER_DAY, elapsedDays)) {
+                    //console.log(`💥 Ship destroyed on abandoned ${fleet.name}`)
+                    fleet.ships.splice(j, 1)
+                }
+            }
+        }
+        
+        // If no ships remain, remove the abandoned fleet
+        if (!fleet.ships || fleet.ships.length === 0) {
+            //console.log(`🗑️ Abandoned fleet ${fleet.name} has completely decayed`)
+            gs.system.removeAbandonedFleet(fleet)
+        }
+    }
+}
+
+/**
  * @param {FleetType} fleetType 
  * @param {FactionType} faction 
  * @param {Planet} planet 
@@ -222,6 +262,8 @@ function tickPlanets(elapsedYears = 1) {
             }
         }
         planet.c.cultures.normalize()
+        planet.c.religions.normalize()
+        planet.c.races.normalize()
     }
 }
 

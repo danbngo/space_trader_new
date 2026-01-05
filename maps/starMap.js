@@ -688,7 +688,9 @@ class StarMap extends BaseMap {
                 if (testRoute.valid) {
                     const travelTime = testRoute.travelTime
                     ce({parent:container, innerHTML:`ETA: ${describeTimespan(travelTime)}`})
-                    ce({parent:container, tag:'button', innerHTML:'Intercept', onClick:()=>this.setDestination(obj, true), disabled: gs.fleet.stranded})
+                    // Abandoned (destroyed) fleets use "Travel" instead of "Intercept"
+                    const buttonText = obj.destroyed ? 'Travel' : 'Intercept'
+                    ce({parent:container, tag:'button', innerHTML:buttonText, onClick:()=>this.setDestination(obj, true), disabled: gs.fleet.stranded})
                 } else {
                     ce({parent:container, innerHTML:`Cannot intercept (too fast)`})
                 }
@@ -755,9 +757,8 @@ class StarMap extends BaseMap {
         if (obj instanceof Planet) {
             route = new Route(gs.fleet, obj)
         } else if (obj instanceof Fleet) {
-            // Attempt to intercept another fleet
-            route = obj instanceof Fleet ? new InterceptionRoute(gs.fleet, obj) : new Route(gs.fleet, obj)
-            //route = new Route(gs.fleet, obj)
+            // Abandoned (destroyed) fleets use normal Route, active fleets use InterceptionRoute
+            route = obj.destroyed ? new Route(gs.fleet, obj) : new InterceptionRoute(gs.fleet, obj)
             if (!route.valid) {
                 console.log('!!!! Cannot intercept fleet - target is too fast or too far')
                 return

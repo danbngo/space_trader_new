@@ -6,39 +6,18 @@ class BuildingType {
     /**
      * @param {string} name - The name of the building type.
      * @param {number[]} color - The color associated with this building type.
+     * @param {RankType} minRank
      */
-    constructor(name = '', color = COLORS.White, baseCredits = 1, minFame = FAME_LEVELS.UNKNOWN, minInfamy = INFAMY_LEVELS.UNKNOWN, minFameOrInfamy = FAME_LEVELS.UNKNOWN, minBounty = 0) {
+    constructor(name = '', color = COLORS.White, baseCredits = 1, minRank) {
         /** @type {string} */
         this.name = name
         /** @type {number[]} */
         this.color = color;
-        /** @type {FameLevel} */
-        this.minFame = minFame
-        /** @type {FameLevel} */
-        this.minInfamy = minInfamy
-        /** @type {FameLevel} */
-        this.minFameOrInfamy = minFameOrInfamy
-        /** @type {number} */
-        this.minBounty = minBounty
         /** @type {number} */
         this.baseCredits = baseCredits
+        /** @type {RankType} */
+        this.minRank = minRank || RANK_TYPES.NO_RANK
     }
-    
-    /**
-     * Check if player meets reputation requirements for this building
-     * @param {Planet} planet - The planet to check reputation for
-     * @returns {boolean} True if player meets at least one requirement
-     */
-    meetsReputationRequirement(planet) {
-        // Player must meet at least ONE of the requirements
-        const result = FameLevel.hasFameLevel(gs.captain, planet, this.minFame) && FameLevel.hasInfamyLevel(gs.captain, planet, this.minInfamy) &&
-            FameLevel.hasFameOrInfamyLevel(gs.captain, planet, this.minFameOrInfamy) && (gs.captain.bounty.getAmount(planet) >= this.minBounty)
-
-        console.log('checking captain meets requirement for building:',{planet,result,building:this})
-        return result
-
-        }
-    
     /**
      * Check if player can access this building (reputation + special conditions)
      * @param {Planet} planet - The planet to check access for
@@ -46,10 +25,9 @@ class BuildingType {
      * @returns {Object} {canShow: boolean, isDisabled: boolean}
      */
     canAccess(planet, isDocked) {
-        // First check reputation requirement
-        if (!this.meetsReputationRequirement(planet)) {
-            return {canShow: false, isDisabled: false}
-        }
+
+        const playerRank = gs.captain.ranks.get(planet)
+        
         
         // Check government blocks
         const blockedBuildings = planet.civilization.governmentType.blockedBuildings || []

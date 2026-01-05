@@ -5,6 +5,7 @@
 class RankType {
     /**
      * @param {string} name - The name of the rank.
+     * @param {number} level
      * @param {number[]} color - The color associated with this rank.
      * @param {string} description - A description of the rank's benefits or status.
      */
@@ -20,6 +21,7 @@ class RankType {
 
 const RANK_TYPES = {
     NO_RANK: new RankType('No Rank', COLORS.Gray, 'No official status with this planet.'),
+    VISA: new RankType('Visa', COLORS.Green, 'Licensed to trade and do business on this planet.'),
     CITIZEN: new RankType('Citizen', COLORS.LightBlue, 'Recognized citizen with basic rights and privileges.'),
     ELITE: new RankType('Elite', COLORS.Gold, 'Distinguished individual with special privileges and respect.'),
 }
