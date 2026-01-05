@@ -23,6 +23,18 @@ function checkForCollisionEncounter() {
  */
 function checkForFleetCollision(collisionDistance) {
     const playerFleet = gs.fleet
+    
+    // Check if player is near any planet - if so, they're safe from collisions
+    const nearPlanet = gs.system.planets.some(planet => {
+        const distance = calcDistance(playerFleet.x, playerFleet.y, planet.x, planet.y)
+        return distance < FLEET_COLLISION_DISTANCE
+    })
+    
+    if (nearPlanet) {
+        console.log('Player near planet - safe from fleet collisions')
+        return false
+    }
+    
     const nearbyFleets = gs.system.fleets.filter(fleet => {
         if (fleet === playerFleet) return false
         const distance = calcDistance(playerFleet.x, playerFleet.y, fleet.x, fleet.y)

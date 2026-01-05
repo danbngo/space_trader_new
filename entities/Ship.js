@@ -68,6 +68,8 @@ class Ship {
         this.uuid = generateUUID('ship_');
         /** @type {number} */
         this.radiusModifier = this.shipType ? rng(this.shipType.maxRadiusModifier, this.shipType.minRadiusModifier, false) : 1;
+        /** @type {number} */
+        this.widthModifier = Math.random() + 0.5; // Random width between 0.5 and 1.5 for oval shapes
 
         const statModifier = Math.sqrt(this.radiusModifier)
         this.engine = Math.ceil(this.engine/statModifier)

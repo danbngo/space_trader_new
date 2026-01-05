@@ -141,7 +141,7 @@ class EncounterMap extends BaseMap {
                 shipObj = cvs.addFilledTriangle(shipId, ship.x, ship.y, ship.radius, ship.radius, 12, ship.color, ship.angle, ()=>this.selectObject(ship))
             }
             else if (ship.shipType.shape == SHAPES.FilledOval) {
-                shipObj = cvs.addFilledOval(shipId, ship.x, ship.y, ship.radius, (ship.radius*(Math.random()+0.5)), 0.5, ship.color, ship.angle, ()=>this.selectObject(ship))
+                shipObj = cvs.addFilledOval(shipId, ship.x, ship.y, ship.radius, ship.radius * ship.widthModifier, 0.5, ship.color, ship.angle, ()=>this.selectObject(ship))
                 console.log('ship obj:', shipObj)
             }
             else if (ship.shipType.shape == SHAPES.FilledCircle) {
@@ -217,7 +217,7 @@ class EncounterMap extends BaseMap {
                     cvsShipObject = cvs.addFilledTriangle(shipId, ship.x, ship.y, ship.radius, ship.radius, 12, ship.color, ship.angle, ()=>this.selectObject(ship))
                 }
                 else if (ship.shipType.shape == SHAPES.FilledOval) {
-                    cvsShipObject = cvs.addFilledOval(shipId, ship.x, ship.y, ship.radius, (ship.radius*(Math.random()+0.5)), 0.5, ship.color, ship.angle, ()=>this.selectObject(ship))
+                    cvsShipObject = cvs.addFilledOval(shipId, ship.x, ship.y, ship.radius, ship.radius * ship.widthModifier, 0.5, ship.color, ship.angle, ()=>this.selectObject(ship))
                 }
                 else if (ship.shipType.shape == SHAPES.FilledCircle) {
                     cvsShipObject = cvs.addFilledCircle(shipId, ship.x, ship.y, ship.radius, 12, ship.color, ()=>this.selectObject(ship))
@@ -402,7 +402,14 @@ class EncounterMap extends BaseMap {
 
         if (this.targetingLabel && this.targetingLabel.length > 0 && obj instanceof Ship) {
             ce({parent:container, innerHTML: `${obj.shipType.name}: Targeting ${this.targetingLabel}`})
-            ce({parent:container, innerHTML: '(Select target)'})
+            
+            // Show helpful message based on whether there are valid targets
+            if (this.validTargets.length === 0) {
+                ce({parent:container, innerHTML: colorSpan('No valid targets in range', COLORS.Red)})
+            } else {
+                ce({parent:container, innerHTML: '(Select target)'})
+            }
+            
             ce({parent:container, tag:'button', innerHTML:'Cancel', onClick: ()=>{
                 this.stopTargeting()
             }})
@@ -469,6 +476,16 @@ class EncounterMap extends BaseMap {
     /** @param {Ship|Effect} obj */
     selectObject(obj = new Ship()) {
         console.log('selected:',obj)
+        
+        // During targeting mode, only allow selecting valid targets
+        if (this.targetingLabel && this.validTargets.length > 0 && obj instanceof Ship) {
+            if (!this.validTargets.includes(obj)) {
+                // Show feedback that this isn't a valid target
+                console.log('Invalid target:', obj.shipType.name)
+                return
+            }
+        }
+        
         if (this.onSelectObject) this.onSelectObject(obj);
         //if (this.uiMode !== UI_MODE.Default) return
         this.selectedObject = obj;
@@ -508,6 +525,19 @@ class EncounterMap extends BaseMap {
         this.targetingLabel = label
         this.targetingAreas = targetingAreas
         this.validTargets = validTargets
+        
+        // Change targeting area colors to gray/red when no valid targets
+        if (validTargets.length === 0) {
+            for (const area of targetingAreas) {
+                if (area.strokeColor) {
+                    area.strokeColor = COLORS.Gray
+                }
+                if (area.fillColor) {
+                    area.fillColor = [128, 128, 128, 0.1]
+                }
+            }
+        }
+        
         this.refresh()
         this.refreshStrokeColors()
         this.refreshCanvas(true)

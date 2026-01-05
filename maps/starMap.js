@@ -234,7 +234,9 @@ class StarMap extends BaseMap {
                 // Use exponent 0.4 instead of 0.5 (sqrt) to compress larger planets more
                 const displaySize = Math.pow(body.radius/EARTH_RADII_PER_AU, 0.4) * 3.5
                 planetObj = cvs.addFilledCircle(planetId, body.x, body.y, displaySize, 8, body.color, () => this.selectObject(body))
+                planetObj.clickPriority = 10 // Planets have higher click priority than ships
                 labelObj = cvs.addText(labelId, body.x, body.y, 0, -32, body.name, body.color, DEFAULT_FONT_SIZE, 2, () => this.selectObject(body))
+                labelObj.clickPriority = 10 // Planet labels also have high priority
                 
                 const objs = [planetObj, labelObj]
                 for (const obj of objs) {
@@ -278,7 +280,7 @@ class StarMap extends BaseMap {
              
             // Create objects if they don't exist
             if (!stationObj) {
-                stationObj = cvs.addFilledRectangle(stationId, station.x, station.y, station.radius * 16, station.radius * 16, 6, station.color, 0, () => this.selectObject(station))
+                stationObj = cvs.addFilledRectangle(stationId, station.x, station.y, station.radius * 16, station.radius * 16, 12, station.color, 0, () => this.selectObject(station))
                 labelObj = cvs.addText(labelId, station.x, station.y, 0, -24, station.name, station.color, DEFAULT_FONT_SIZE, 2, () => this.selectObject(station))
                 
                 const objs = [stationObj, labelObj]
@@ -509,6 +511,8 @@ class StarMap extends BaseMap {
             if (fleetAngle !== undefined) fleetObj.angle = fleetAngle
             fleetObj.strokeColor = (fleet == this.selectedObject) ? COLORS.Green : COLORS.Black
             fleetObj.fillColor[3] = 1-(fleet.cloakLevel*0.95)
+            // Update onClick handler - docked fleets should not be clickable
+            fleetObj.onClick = fleet.location ? null : () => this.selectObject(fleet)
             
             // Update label
             if (fleet.location || !fleet.route) {

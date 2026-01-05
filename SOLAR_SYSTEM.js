@@ -58,21 +58,21 @@ const DWARF_PLANETS = [CERES, PLUTO, ERIS, HAUMEA, MAKEMAKE] //getting rid of fa
 SOL.addChildren([...PLANETS, ...DWARF_PLANETS])
 
 
-const CORONA = new AsteroidBelt("Corona", ASTEROID_BELT_TYPES.Plasma, hexToRgba('#ffff00'), 0.1, new Orbit(0.1), [ENCOUNTER_TYPES.PLASMOIDS_CALM, ENCOUNTER_TYPES.PLASMOIDS_STORM], [EFFECT_TYPES.ION_CLOUD, EFFECT_TYPES.PLASMA_TRAIL])
+const CORONA = new AsteroidBelt("Corona", ASTEROID_BELT_TYPES.Plasma, hexToRgba('#ffaa0022'), 0.1, new Orbit(0.2), [ENCOUNTER_TYPES.PLASMOIDS_CALM, ENCOUNTER_TYPES.PLASMOIDS_STORM], [EFFECT_TYPES.ION_CLOUD, EFFECT_TYPES.PLASMA_TRAIL])
 const ASTEROID_BELT = new AsteroidBelt("Asteroid Belt", ASTEROID_BELT_TYPES.Rocky, hexToRgba('#bb8844'), 0.2*2.8, new Orbit(2.8), [ENCOUNTER_TYPES.ASTEROIDS_CALM, ENCOUNTER_TYPES.ASTEROIDS_STORM], [EFFECT_TYPES.DEBRIS_CLOUD])
 const TROJANS = new AsteroidBelt("Trojan Asteroids", ASTEROID_BELT_TYPES.Rocky, hexToRgba('#bbbb88'), 0.5, new Orbit(5.2, 0.25), [ENCOUNTER_TYPES.ASTEROIDS_CALM, ENCOUNTER_TYPES.ASTEROIDS_STORM], [EFFECT_TYPES.DEBRIS_CLOUD])
 const GREEKS = new AsteroidBelt("Greek Asteroids", ASTEROID_BELT_TYPES.Rocky, hexToRgba('#bbbb88'), 0.5, new Orbit(5.2, -0.25), [ENCOUNTER_TYPES.ASTEROIDS_CALM, ENCOUNTER_TYPES.ASTEROIDS_STORM], [EFFECT_TYPES.DEBRIS_CLOUD])
-const KUIPER_BELT = new AsteroidBelt("Kuiper Belt", ASTEROID_BELT_TYPES.Icy, hexToRgba('#bbbbdd'), 50*4/5, new Orbit(50), [ENCOUNTER_TYPES.CRYOIDS_CALM, ENCOUNTER_TYPES.CRYOIDS_STORM], [EFFECT_TYPES.ICE_CLOUD])
+const KUIPER_BELT = new AsteroidBelt("Kuiper Belt", ASTEROID_BELT_TYPES.Icy, hexToRgba('#bbbbdd'), 50*1/5, new Orbit(50), [ENCOUNTER_TYPES.CRYOIDS_CALM, ENCOUNTER_TYPES.CRYOIDS_STORM], [EFFECT_TYPES.ICE_CLOUD])
 //not going to make this particularly accurate for gameplay/processor limitation reasons
-const OORT_CLOUD = new AsteroidBelt("Oort Cloud", ASTEROID_BELT_TYPES.Icy, hexToRgba('#ddeeff'), 100, new Orbit(75), [ENCOUNTER_TYPES.CRYOIDS_CALM, ENCOUNTER_TYPES.CRYOIDS_STORM], [EFFECT_TYPES.ICE_CLOUD])
+const OORT_CLOUD = new AsteroidBelt("Oort Cloud", ASTEROID_BELT_TYPES.Icy, hexToRgba('#ddeeff'), 75*1/5, new Orbit(75), [ENCOUNTER_TYPES.CRYOIDS_CALM, ENCOUNTER_TYPES.CRYOIDS_STORM], [EFFECT_TYPES.ICE_CLOUD], 0.5)
 const ASTEROID_BELTS_ALL = [CORONA, ASTEROID_BELT, TROJANS, GREEKS, KUIPER_BELT, OORT_CLOUD]
 
-const ASTEROIDS = generateAsteroids(ASTEROID_BELT, COLORS.Brown, 50, 10)
-const KUIPER_ASTEROIDS = generateAsteroids(KUIPER_BELT, COLORS.LightBlue, 250, 10)
-const OORT_ASTEROIDS = generateAsteroids(OORT_CLOUD, COLORS.White, 200, 8)
-const TROJAN_ASTEROIDS = generateAsteroids(TROJANS, COLORS.Gray, 10, 8, JUPITER.orbit.progressOffset + 0.15, 0.1)
-const GREEK_ASTEROIDS = generateAsteroids(GREEKS, COLORS.Gray, 10, 8, JUPITER.orbit.progressOffset - 0.15, 0.1)
-const SOLAR_FLARES = generateAsteroids(CORONA, COLORS.LightOrange, 10, 1)
+const ASTEROIDS = generateAsteroids(ASTEROID_BELT, COLORS.Brown, 330, 6)
+const KUIPER_ASTEROIDS = generateAsteroids(KUIPER_BELT, COLORS.LightBlue, 1670, 6)
+const OORT_ASTEROIDS = generateAsteroids(OORT_CLOUD, COLORS.White, 2500, 4)
+const TROJAN_ASTEROIDS = generateAsteroids(TROJANS, COLORS.Gray, 66, 5, JUPITER.orbit.progressOffset + 0.15, 5)
+const GREEK_ASTEROIDS = generateAsteroids(GREEKS, COLORS.Gray, 66, 5, JUPITER.orbit.progressOffset - 0.15, 5)
+const SOLAR_FLARES = generateAsteroids(CORONA, COLORS.LightOrange, 66, 2)
 
 const ASTEROIDS_ALL = [...ASTEROIDS, ...KUIPER_ASTEROIDS, ...OORT_ASTEROIDS, ...TROJAN_ASTEROIDS, ...GREEK_ASTEROIDS, ...SOLAR_FLARES]
 

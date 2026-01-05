@@ -78,6 +78,7 @@ class CanvasObject {
         this.screenOffsetY = screenOffsetY;
         this.minScreenSize = minScreenSize;
         this.visible = visible
+        this.clickPriority = 0; // Higher priority = clicked first (planets: 10, default: 0)
 
         this.startMs = Date.now();
         this.durationMs = durationMs;

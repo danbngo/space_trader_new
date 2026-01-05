@@ -11,6 +11,7 @@ class CanvasWrapper {
         /** @type {HTMLElement} */
         this.root = ce({classNames:['canvas-root']})
         /** @type {HTMLCanvasElement} */
+        // @ts-ignore
         this.canvas = ce({parent:this.root, tag:'canvas'})
         
         this.ctx = this.canvas.getContext('2d');
@@ -306,14 +307,17 @@ class CanvasWrapper {
             }
         }
         
-        // Check objects in reverse draw order (top-most first)
-        if (this.objClickEnabled) for (let i = this.drawOrder.length - 1; i >= 0; i--) {
-            const obj = this.drawOrder[i];
-            if (!obj.visible) continue;
-            if (!obj.onClick) continue;
-            if (this.isMouseOverObject(obj, mouseX, mouseY)) {
-                obj.onClick(obj);
-                return
+        // Check objects by click priority (higher priority first), then reverse draw order
+        if (this.objClickEnabled) {
+            const clickableObjects = this.drawOrder
+                .filter(obj => obj.visible && obj.onClick)
+                .sort((a, b) => b.clickPriority - a.clickPriority || this.drawOrder.indexOf(b) - this.drawOrder.indexOf(a));
+            
+            for (const obj of clickableObjects) {
+                if (this.isMouseOverObject(obj, mouseX, mouseY)) {
+                    obj.onClick(obj);
+                    return
+                }
             }
         }
         
