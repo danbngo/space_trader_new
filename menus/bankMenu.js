@@ -171,7 +171,6 @@ function showBankMenu(bank = new Bank()) {
     let infoContainer = ce({
         children: [
             accessDeniedReason ? colorSpan(accessDeniedReason, COLORS.Orange) + '<br/>' : '',
-            isDocked ? 'Welcome to the bank.<br/>' : colorSpan('You must dock to use the bank.', COLORS.Yellow) + '<br/>',
             `<u>Your loans</u>`,
             createBankLoansTable(gs.loans, onSelectLoan),
             `Your CR: ${gs.credits} | Your Balance: ${bank.playerBalance}<br/>`,

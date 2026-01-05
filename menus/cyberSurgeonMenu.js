@@ -63,15 +63,11 @@ function showCyberSurgeonBuyMenu(cyberSurgeon = new CyberSurgeon()) {
         planet,
         `${coloredName(planet)} - Cyber Surgeon`,
         ce({children:[
-            isDocked ? 'Welcome to the cyber surgeon clinic.<br/>' : colorSpan('You must dock to use the cyber surgeon.', COLORS.Yellow) + '<br/>',
             `<b>Available Implants</b>`,
             createBuyImplantMenu(cyberSurgeon.implants, cyberSurgeon, (implant)=>onSelectImplant(implant)),
             `<br/><b>Your Fleet's Implants:</b> ${fleet.cyberModules.length > 0 ? fleet.cyberModules.map(i => i.implantType.name).join(', ') : '(None)'}<br/>`,
             `Your credits: ${gs.credits} | Your Crew: Captain + ${fleet.officers.length} Officers`,
-            `Buy Fee: ${statColorSpan(roundToPlaces(100*planet.c.corruption, 2), 2/(1+planet.c.corruption))}%`,
-            (gs.fleet.totalSkills.getAmount(SKILLS.Barter) > 0) ? `Fee After Barter | ${statColorSpan(roundToPlaces(100*(1+cyberSurgeon.rake) - 100, 2), 2/(1+cyberSurgeon.rake))}% Buy` : '',
-            planet.civilization ? `Inflation: ${statColorSpan(roundToPlaces(100*planet.c.inflation, 2), 2/(1+planet.c.inflation))}%`
-            +` | Tax Rate: ${statColorSpan(roundToPlaces(100*planet.c.taxes, 2), 2/(1+planet.c.taxes))}%` : '',
+            createBuildingPriceInfo(cyberSurgeon, 'Cyber Surgeon', {showBuyPrice: true, showSellPrice: false}),
         ]}),
         [
             ["Install Fleet Implant", () => showFleetImplantsMenu(cyberSurgeon), fleet.cyberModules.length === 0],

@@ -117,18 +117,9 @@ function showMarketMenu(market = new Market()) {
     let infoContainer = ce({
         children: [
             accessDeniedReason ? colorSpan(accessDeniedReason, COLORS.Orange) + '<br/>' : '',
-            isDocked 
-                ? (blackMarket ? 'You slip into the shadows of the black market.<br/>' : 'Welcome to the market.<br/>') 
-                : colorSpan(`You must dock to use the ${blackMarket ? 'black market' : 'market'}.`, COLORS.Yellow) + '<br/>',
             createMarketCargoTable(blackMarket, fleet.cargo, market.cargo, buyPrices, sellPrices, onSelectCargoType),
             `Your Cargo Space: ${fleet.cargo.total}/${fleet.totalCargoSpace} | Your Credits: ${gs.credits}`,
-            `Market Credits: ${market.credits}`
-            +` | Buy Fee: ${statColorSpan(roundToPlaces(100*planet.c.corruption, 2), 2/(1+planet.c.corruption))}%`
-            +` | Sell Fee: ${statColorSpan(roundToPlaces(100*planet.c.corruption/(planet.c.corruption+1), 2), 2/(planet.c.corruption+1))}%`,
-            (gs.fleet.totalSkills.getAmount(SKILLS.Barter) > 0) ? `Fee After Barter | ${statColorSpan(roundToPlaces(100*(1+market.rake) - 100, 2), 2/(1+market.rake))}% Buy`
-            +` | ${statColorSpan(roundToPlaces(100*market.rake/(market.rake+1), 2), 2/(market.rake+1))}% Sell` : '',
-            planet.civilization ? `Inflation: ${statColorSpan(roundToPlaces(100*planet.c.inflation, 2), 2/(1+planet.c.inflation))}%`
-            +` | Tax Rate: ${statColorSpan(roundToPlaces(100*planet.c.taxes, 2), 2/(1+planet.c.taxes))}%` : '',
+            createBuildingPriceInfo(market, blackMarket ? 'Black Market' : 'Market', {showBuyPrice: true, showSellPrice: true}),
         ]
     })
 

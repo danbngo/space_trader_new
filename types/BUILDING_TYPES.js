@@ -27,16 +27,10 @@ class BuildingType {
      * @returns {string|null} The reason for denial, or null if access is allowed.
      */
     static getAccessDeniedReason(planet, building) {
-        const isDocked = gs.location === planet
         const buildingType = building.buildingType
         const playerRank = gs.captain.ranks.get(planet) || RANK_TYPES.NO_RANK
         
-        // Priority 1: Not docked
-        if (!isDocked) {
-            return 'You must dock to access this building.'
-        }
-        
-        // Priority 2: Insufficient rank
+        // Priority 1: Insufficient rank
         // Check if player has sufficient rank with this planet OR with its sovereign (if it's a subject)
         let hasAccess = playerRank.level >= buildingType.minRank.level
         
@@ -56,7 +50,7 @@ class BuildingType {
             return `Requires ${buildingType.minRank.name} rank or higher.`
         }
         
-        // Priority 3: Building damaged
+        // Priority 2: Building damaged
         if (building.damaged) {
             return 'This building is closed for repairs.'
         }

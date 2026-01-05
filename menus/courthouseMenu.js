@@ -88,7 +88,6 @@ function showCourthouseMenu(courthouse = new Courthouse()) {
 
     let infoContainer = ce({
         children: [
-            isDocked ? 'Welcome to the courthouse.<br/>' : colorSpan('You must dock to use the courthouse.', COLORS.Yellow) + '<br/>',
             `Your CR: ${gs.credits} | Your Bounty (${coloredName(planet)}): ${planetBounty}<br/>`,
             `Your Total Bounty (All Planets): ${gs.captain.bounty.total}<br/>`,
             `Courthouse Pay Bounty Penalty: ${roundToPlaces(courthouse.calcPayBountyPenalty(100),2)}%<br/>`,

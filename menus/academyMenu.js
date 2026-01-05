@@ -198,20 +198,17 @@ function showAcademyMenu(academy = new Academy(), selectedSkill = SKILLS_ALL[0],
 
     let trainingContainer = ce({
         children: [
-            `<br/>${isDocked ? welcomeMsg : colorSpan(academy.isTavern ? 'You must dock to use the tavern.' : 'You must dock to use the academy.', COLORS.Yellow)}`,
             skillTable,
             `Your CR: ${gs.credits}<br/>`,
-            `Training Fee: ${statColorSpan(roundToPlaces(100*academy.rake, 2), 1/(1+academy.rake))}%<br/>`,
+            createBuildingPriceInfo(academy, academy.isTavern ? 'Tavern' : 'Academy', {showBuyPrice: true, showSellPrice: false}),
         ]
     })
 
     let hiringContainer = ce({
         children: [
-            `<br/>${isDocked ? hireMsg : colorSpan(academy.isTavern ? 'You must dock to use the tavern.' : 'You must dock to use the academy.', COLORS.Yellow)}<br/>`,
             createAcademyHireOfficerMenu(academy.officers, academy, (officer)=>onSelectOfficer(officer)),
             `Your # officers: ${gs.fleet.officers.length}/${gs.captain.maxSubordinates} | Your credits: ${gs.credits}<br/>`,
-            `Local Officer Level: ${roundToPlaces(100*academy.planet.c.education, 2)}%<br/>`,
-            `Hire Fee: ${academy.isTavern ? colorSpan('None', COLORS.Green) : statColorSpan(roundToPlaces(100*planet.c.taxRate, 2), 2/(1+planet.c.taxRate))+'%'}<br/>`,
+            `${academy.isTavern ? 'Tavern' : 'Academy'} Credits: ${academy.credits} | Hire Price: ${academy.isTavern ? colorSpan('No Fee', COLORS.Green) : statColorSpan(`+${roundToPlaces(100*planet.c.taxRate, 1)}%`, 1/(1+planet.c.taxRate))}<br/>`,
         ]
     })
 

@@ -55,14 +55,10 @@ function showGeneticistBuyMenu(geneticist = new Geneticist()) {
         planet,
         `${coloredName(planet)} - Geneticist`,
         ce({children:[
-            isDocked ? 'Welcome to the genetic engineering clinic.<br/>' : colorSpan('You must dock to use the geneticist.', COLORS.Yellow) + '<br/>',
             `<b>Available Modifications</b>`,
             createBuyModificationMenu(geneticist.modifications, geneticist, (modification)=>onSelectModification(modification)),
             `Your credits: ${gs.credits} | Your Crew: Captain + ${fleet.officers.length} Officers`,
-            `Buy Fee: ${statColorSpan(roundToPlaces(100*planet.c.corruption, 2), 2/(1+planet.c.corruption))}%`,
-            (gs.fleet.totalSkills.getAmount(SKILLS.Barter) > 0) ? `Fee After Barter | ${statColorSpan(roundToPlaces(100*(1+geneticist.rake) - 100, 2), 2/(1+geneticist.rake))}% Buy` : '',
-            planet.civilization ? `Inflation: ${statColorSpan(roundToPlaces(100*planet.c.inflation, 2), 2/(1+planet.c.inflation))}%`
-            +` | Tax Rate: ${statColorSpan(roundToPlaces(100*planet.c.taxes, 2), 2/(1+planet.c.taxes))}%` : '',
+            createBuildingPriceInfo(geneticist, 'Geneticist', {showBuyPrice: true, showSellPrice: false}),
         ]}),
         [
             ["Back", () => leave()],
