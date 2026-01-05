@@ -15,7 +15,7 @@ class BountyHuntersEncounter extends AuthoritiesEncounter {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} glide past your fleet in eerie silence.`, [
                 //['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackFleetModal()],
+                ['Attack', ()=>this.showPlayerAttackModal()],
             ])
         }
     }

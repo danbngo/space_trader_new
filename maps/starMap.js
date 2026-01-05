@@ -278,7 +278,7 @@ class StarMap extends BaseMap {
              
             // Create objects if they don't exist
             if (!stationObj) {
-                stationObj = cvs.addFilledRectangle(stationId, station.x, station.y, station.radius * 4, station.radius * 4, 6, station.color, 0, () => this.selectObject(station))
+                stationObj = cvs.addFilledRectangle(stationId, station.x, station.y, station.radius * 16, station.radius * 16, 6, station.color, 0, () => this.selectObject(station))
                 labelObj = cvs.addText(labelId, station.x, station.y, 0, -24, station.name, station.color, DEFAULT_FONT_SIZE, 2, () => this.selectObject(station))
                 
                 const objs = [stationObj, labelObj]
@@ -762,7 +762,7 @@ class StarMap extends BaseMap {
                 console.log('!!!! Cannot intercept fleet - target is too fast or too far')
                 return
             }
-            unpause = false //these routes can be wonky, so player needs to confirm
+            if (obj instanceof Fleet && !obj.destroyed) unpause = false //these routes can be wonky, so player needs to confirm
         } else if (obj.isWaypoint) {
             // Create a route to arbitrary coordinates
             route = new Route(gs.fleet, obj)

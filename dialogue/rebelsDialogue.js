@@ -2,20 +2,18 @@
 /** @type {Dialogue[]} */
 const DIALOGUE_REBELS_GREETING = [
     `Down with the MAN!`,
-    `You can't tell me how to live my life!`,
     `Freedom isn't free!`,
     `Silence is violence!`,
     `We TRIED non-violence once. Didn't work out so well.`,
     `The revolution is coming!`,
-    `And they call US criminals.`,
     `Remember, remember! The cause of our endeavor!`,
     `The more they tighten their grip, the more systems will slip through their fingers.`,
-    `I am a leaf on the wind. Watch how I soar.`,
 ]
 
 const DIALOGUE_REBELS_DEMAND_SURRENDER = [
     `Any friend of ${gs.encounter.fleet.planet} is an enemy of ours!`,
-    `If you're not with US, you're with THEM!`
+    `If you're not with US, you're with THEM!`,
+    `I'll make you famous.`,
 ]
 
 const DIALOGUE_REBELS_FAMOUS = [
@@ -31,6 +29,7 @@ const DIALOGUE_REBELS_INFAMOUS = [
 
 const DIALOGUE_REBELS_SURRENDERING = [
     `We'll never truly surrender! The cause lives on!`,
+    `And they call US criminals.`,
 ]
 
 const DIALOGUE_REBELS_VICTORIOUS = [

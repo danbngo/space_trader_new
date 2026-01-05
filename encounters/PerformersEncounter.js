@@ -4,6 +4,12 @@
  */
 class PerformersEncounter extends NeutralsEncounter {
     onStart() {
+        // Check if already met to prevent repeated entertainment bonuses
+        if (this.hasAlreadyVisitedPlayer()) {
+            this.showAlreadyMetMessage()
+            return
+        }
+        
         const rand = Math.random()
         
         // 50% chance to offer entertainment

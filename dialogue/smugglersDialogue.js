@@ -22,6 +22,21 @@ const DIALOGUE_SMUGGLERS_FAMOUS = [
 
 ]
 
+const DIALOGUE_SMUGGLERS_OFFER_TRADE = [
+    `I was voted drug dealer of the year two years running!`,
+    `Can I like, interest you in some drugs?`,
+    `I've got stuff NO ONE else does.`,
+]
+
+const DIALOGUE_SMUGGLERS_BUY = [
+]
+
+const DIALOGUE_SMUGGLERS_SELL = [
+    `Don't smoke that all in one go.`,
+    `That stuff's potent. Handle with care.`,
+    `That'll put some hair on your chest!`,
+]
+
 const DIALOGUE_SMUGGLERS_INFAMOUS = [
 ]
 

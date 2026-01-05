@@ -79,7 +79,7 @@ class MercenariesEncounter extends FleetEncounter {
                 )
             }, !canAfford || !canHire],
             ['Decline', () => this.endEncounter()],
-            ['Attack', () => this.showPlayerAttackFleetModal()],
+            ['Attack', () => this.showPlayerAttackModal()],
         ])
     }
 

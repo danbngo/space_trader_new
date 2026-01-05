@@ -4,6 +4,12 @@
  */
 class ExplorersEncounter extends MercantileEncounter {
     onStart() {
+        // Check if already met to prevent repeated anomaly sharing
+        if (this.hasAlreadyVisitedPlayer()) {
+            this.showAlreadyMetMessage()
+            return
+        }
+        
         // 50% chance to offer anomaly information
         if (Math.random() > 0.5) {
             this.offerAnomalyInformation();

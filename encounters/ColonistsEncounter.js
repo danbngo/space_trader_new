@@ -17,11 +17,17 @@ class ColonistsEncounter extends MercantileEncounter {
      * @override
      */
     onStart() {
+        // Check if already met
+        if (this.hasAlreadyVisitedPlayer()) {
+            this.showAlreadyMetMessage()
+            return
+        }
+        
         if (FameLevel.hasInfamyLevel(gs.captain, this.planet, INFAMY_LEVELS.VILIFIED)) {
             showModal(coloredName(this.fleet), 'The colonists have heard of your fearsome deeds and start fleeing immediately!', [
                 //['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackNeutralsModal()],
+                ['Attack', ()=>this.showPlayerAttackModal()],
             ])
         }
         else if (Math.random() > .5) {
@@ -34,7 +40,7 @@ class ColonistsEncounter extends MercantileEncounter {
             showModal(coloredName(this.fleet), 'The colonists send a friendly greeting and wave as they continue on their journey.', [
                 //['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackNeutralsModal()],
+                ['Attack', ()=>this.showPlayerAttackModal()],
             ])
         }
     }

@@ -289,9 +289,37 @@ class Encounter {
     }
 
     /**
+     * Checks if this fleet has already visited the player before.
+     * @returns {boolean} True if the fleet has already visited the player.
+     */
+    hasAlreadyVisitedPlayer() {
+        return this.fleet && this.fleet.fleetAI && this.fleet.fleetAI.visited.includes(gs.fleet)
+    }
+
+    /**
+     * Shows a message indicating the fleet doesn't want to interact again.
+     * Use this to prevent player abuse of resource-granting encounters.
+     */
+    showAlreadyMetMessage() {
+        const greeting = this.getGreetingDialogue?.() || null
+        const message = greeting
+            ? `"${greeting}" The ${coloredName(this.fleet)} seem to recognize you and politely decline further interaction.`
+            : `The ${coloredName(this.fleet)} acknowledge you but seem disinterested in further interaction.`
+        
+        showModal(coloredName(this.fleet), message, [
+            ['Continue', ()=>this.endEncounter()],
+            ['Attack', ()=>this.showPlayerAttackModal()],
+        ])
+    }
+
+    /**
      * Called when the encounter starts. Override in subclasses.
      */
     onStart() {
+        // Mark player as visited so AI won't immediately re-encounter them
+        if (this.fleet && this.fleet.fleetAI && !this.fleet.fleetAI.visited.includes(gs.fleet)) {
+            this.fleet.fleetAI.visited.push(gs.fleet)
+        }
         // Override in subclass
     }
 
@@ -609,6 +637,56 @@ class Encounter {
         showModal(fleetName, msg, [['Continue', ()=>this.onSurrender()]])
     }
 
+
+    /**
+     * Unified attack modal that handles both militant and non-militant factions.
+     * Militant factions go straight to combat, non-militant may attempt to bribe.
+     */
+    showPlayerAttackModal() {
+        const {playerUndetected} = this
+        const isMilitant = this.fleet.factionType?.militant || false
+        
+        console.log('showPlayerAttackModal', { playerUndetected, isMilitant });
+        const fleetName = coloredName(this.fleet)
+        const planet = this.planet
+        const faction = this.fleet.factionType
+        const reputationMultiplier = faction.reputationMultiplier
+        const reputation = Math.ceil(ENCOUNTER_BASE_REPUTATION_EFFECT_ON_ATTACK * reputationMultiplier)
+        const bounty = reputationMultiplier > 0 ? ENCOUNTER_BASE_FINE_ON_ATTACK * reputationMultiplier : 0
+
+        if (playerUndetected) {
+            // Drop shields after repositioning
+            for (const ship of this.ships) ship.shields[0] = 0
+        }
+
+        let msg = `You ${playerUndetected ? 'sneakily ' : ''}attack the ${fleetName}!<br/>`
+        if (playerUndetected) msg += `The ${fleetName} are caught with their shields down!<br/>`
+        if (reputation) {
+            if (planet) msg += gs.captain.grantReputation(planet, reputation)
+            if (faction) msg += gs.captain.grantReputation(faction, reputation)
+        }
+        if (bounty > 0 && planet) {
+            msg += gs.captain.grantBounty(planet, bounty)
+        }
+
+        showModal(fleetName, msg, [['Continue', ()=>{
+            // Militant factions fight to the death
+            if (isMilitant) {
+                this.startCombat(true)
+            } else {
+                // Non-militant factions may try to bribe if outmatched
+                let combatAdvantage = gs.fleet.combatRating / this.fleet.combatRating
+                // Combat advantage varies from 0.5x to 2x based on player's infamy
+                combatAdvantage *= 2 - (75/(50 + Math.abs(Math.min(0, gs.captain.calcReputationForTarget(this.fleet.planet)))))
+                
+                if (combatAdvantage * Math.random() > 1.5) {
+                    this.showNeutralsBribePlayerModal?.(this.fleet.captain.credits)
+                } else {
+                    this.startCombat(true)
+                }
+            }
+        }]])
+    }
 
     showPlayerAttackFleetModal(onContinue = ()=>this.startCombat(true)) {
         const {playerUndetected} = this

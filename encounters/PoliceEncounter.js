@@ -8,7 +8,7 @@ class PoliceEncounter extends AuthoritiesEncounter {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} greet you respectfully, having heard of your good deeds.<br/>They don't even trouble you with the routine inspection.`, [
                 //['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackFleetModal()],
+                ['Attack', ()=>this.showPlayerAttackModal()],
             ])
         }
         if (FameLevel.hasInfamyLevel(gs.captain, this.planet, INFAMY_LEVELS.NOTORIOUS) && gs.captain.calcBountyForPlanet(this.planet) > 0) {
@@ -29,7 +29,7 @@ class PoliceEncounter extends AuthoritiesEncounter {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} ships speed past your fleet, perhaps responding to some other incident.`, [
                 //['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackFleetModal()],
+                ['Attack', ()=>this.showPlayerAttackModal()],
             ])
         }
     }

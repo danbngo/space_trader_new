@@ -17,7 +17,7 @@ class InquisitorsEncounter extends AuthoritiesEncounter {
         if (gs.captain.religion === inquisitorReligion) {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} scan your vessel and detect your religious affiliation.<br/><br/>"You are one of the faithful. Go in peace, sibling."`, [
                 ['Continue', () => this.endEncounter()],
-                ['Attack', () => this.showPlayerAttackFleetModal()],
+                ['Attack', () => this.showPlayerAttackModal()],
             ]);
             return;
         }
@@ -125,7 +125,7 @@ class InquisitorsEncounter extends AuthoritiesEncounter {
         
         showModal(fleetName, `The ${fleetName} broadcast a religious sermon extolling the virtues of ${religionName}.`, [
             ['Ignore', () => this.endEncounter()],
-            ['Attack', () => this.showPlayerAttackFleetModal()],
+            ['Attack', () => this.showPlayerAttackModal()],
         ]);
     }
 

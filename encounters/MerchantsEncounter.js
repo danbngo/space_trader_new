@@ -4,6 +4,12 @@
  */
 class MerchantsEncounter extends MercantileEncounter {
     onStart() {
+        // Check if already met to prevent repeated trading abuse
+        if (this.hasAlreadyVisitedPlayer()) {
+            this.showAlreadyMetMessage()
+            return
+        }
+        
         const greeting = this.getGreetingDialogue()
         
         if (FameLevel.hasInfamyLevel(gs.captain, this.planet, INFAMY_LEVELS.INFAMOUS)) {
@@ -14,7 +20,7 @@ class MerchantsEncounter extends MercantileEncounter {
             
             showModal(coloredName(this.fleet), message, [
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackNeutralsModal()],
+                ['Attack', ()=>this.showPlayerAttackModal()],
             ])
         }
         else if (Math.random() > .5) {
@@ -29,7 +35,7 @@ class MerchantsEncounter extends MercantileEncounter {
             showModal(coloredName(this.fleet), message, [
                 ['Trade', ()=>showAdHocMarketMenu(this.fleet, ()=>this.endEncounter(), this)],
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackNeutralsModal()],
+                ['Attack', ()=>this.showPlayerAttackModal()],
             ])
         }
         else {
@@ -40,7 +46,7 @@ class MerchantsEncounter extends MercantileEncounter {
             
             showModal(coloredName(this.fleet), message, [
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackNeutralsModal()],
+                ['Attack', ()=>this.showPlayerAttackModal()],
             ])
         }
     }

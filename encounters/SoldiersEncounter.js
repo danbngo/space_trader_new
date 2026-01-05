@@ -8,7 +8,7 @@ class SoldiersEncounter extends AuthoritiesEncounter {
         if (Math.random()*gs.captain.calcReputationForTarget(this.planet) > 300) {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} salute you over comms, having heard of your good deeds.`, [
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackFleetModal()],
+                ['Attack', ()=>this.showPlayerAttackModal()],
             ])
         }
         // Soldiers demand surrender if player is from enemy planet
@@ -24,7 +24,7 @@ class SoldiersEncounter extends AuthoritiesEncounter {
         else {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} ships blare a patriotic jingle extolling the greatness of ${coloredName(this.planet)}.`, [
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackFleetModal()],
+                ['Attack', ()=>this.showPlayerAttackModal()],
             ])
         }
     }

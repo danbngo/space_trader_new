@@ -4,6 +4,12 @@
  */
 class TaxCollectorsEncounter extends NeutralsEncounter {
     onStart() {
+        // Check if already met to prevent repeated tax collection
+        if (this.hasAlreadyVisitedPlayer()) {
+            this.showAlreadyMetMessage()
+            return
+        }
+        
         // Check if player's nearest planet matches tax collector's origin
         const [playerNearestPlanet] = gs.system.calcNearestPlanet(gs.fleet)
         const taxCollectorPlanet = this.fleet.fleetAI?.origin

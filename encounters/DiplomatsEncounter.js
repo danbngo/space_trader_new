@@ -4,12 +4,17 @@
  */
 class DiplomatsEncounter extends NeutralsEncounter {
     onStart() {
+        if (this.hasAlreadyVisitedPlayer()) {
+            this.showAlreadyMetMessage()
+            return
+        }
+        
         const homePlanet = this.fleet.planet
         const greeting = this.getGreetingDialogue()
         const rand = Math.random()
         
         // 50% chance to offer reputation increase
-        if (rand < 0.5 && homePlanet) {
+        if (Math.random() < 0.5 && homePlanet) {
             this.offerReputationIncrease(greeting)
             return
         }
@@ -21,7 +26,7 @@ class DiplomatsEncounter extends NeutralsEncounter {
         
         showModal(coloredName(this.fleet), message, [
             ['Ignore', ()=>this.endEncounter()],
-            ['Attack', ()=>this.showPlayerAttackFleetModal()],
+            ['Attack', ()=>this.showPlayerAttackModal()],
         ])
     }
     
@@ -66,7 +71,7 @@ class DiplomatsEncounter extends NeutralsEncounter {
             
             showModal(coloredName(this.fleet), message, [
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackFleetModal()],
+                ['Attack', ()=>this.showPlayerAttackModal()],
             ])
             return
         }

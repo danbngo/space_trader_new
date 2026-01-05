@@ -4,11 +4,17 @@
  */
 class MinersEncounter extends NeutralsEncounter {
     onStart() {
+        // Check if already met to prevent repeated resource exchanges
+        if (this.hasAlreadyVisitedPlayer()) {
+            this.showAlreadyMetMessage()
+            return
+        }
+        
         if (FameLevel.hasInfamyLevel(gs.captain, this.planet, INFAMY_LEVELS.VILIFIED)) {
             showModal(coloredName(this.fleet), 'The miners have heard of your fearsome deeds and start fleeing immediately!', [
                 //['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackNeutralsModal()],
+                ['Attack', ()=>this.showPlayerAttackModal()],
             ])
         }
         else {
@@ -29,7 +35,7 @@ class MinersEncounter extends NeutralsEncounter {
         showModal(coloredName(this.fleet), 'The miners transmit a surly, perfunctory greeting, but otherwise ignore you.', [
             //['View', ()=>closeModal()],
             ['Ignore', ()=>this.endEncounter()],
-            ['Attack', ()=>this.showPlayerAttackNeutralsModal()],
+            ['Attack', ()=>this.showPlayerAttackModal()],
         ])
     }
 
@@ -44,7 +50,7 @@ class MinersEncounter extends NeutralsEncounter {
             // No cargo to sell, fall back to default behavior
             showModal(coloredName(this.fleet), 'The miners transmit a surly, perfunctory greeting, but otherwise ignore you.', [
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackNeutralsModal()],
+                ['Attack', ()=>this.showPlayerAttackModal()],
             ])
             return
         }
@@ -93,7 +99,7 @@ class MinersEncounter extends NeutralsEncounter {
             // Player has no supplies, fall back to default behavior
             showModal(coloredName(this.fleet), 'The miners transmit a surly, perfunctory greeting, but otherwise ignore you.', [
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackNeutralsModal()],
+                ['Attack', ()=>this.showPlayerAttackModal()],
             ])
             return
         }

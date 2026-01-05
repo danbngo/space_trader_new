@@ -4,6 +4,12 @@
  */
 class RebelsEncounter extends NeutralsEncounter {
     onStart() {
+        // Check if already met to prevent repeated benefits
+        if (this.hasAlreadyVisitedPlayer()) {
+            this.showAlreadyMetMessage()
+            return
+        }
+        
         // Check if player is from the same planet as the rebels
         const playerPlanet = gs.fleet.planet
         const rebelPlanet = this.fleet.planet

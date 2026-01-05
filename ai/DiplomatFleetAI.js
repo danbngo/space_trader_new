@@ -6,8 +6,6 @@
 class DiplomatFleetAI extends FleetAI {
     constructor(fleet = null, origin = null, starMap = null) {
         super(fleet, origin, starMap);
-        /** @type {Fleet[]} - Diplomat fleets already met to avoid repeat meetings */
-        this.metDiplomats = [];
     }
 
     calcValidTargets() {
@@ -20,7 +18,7 @@ class DiplomatFleetAI extends FleetAI {
             // Don't target diplomats from the same planet
             if (fleet.planet === this.fleet.planet) return false
             // Don't target diplomats we've already met
-            if (this.metDiplomats.includes(fleet)) return false
+            if (this.visited.includes(fleet)) return false
             return true
         })
         
@@ -30,7 +28,7 @@ class DiplomatFleetAI extends FleetAI {
     onNearTarget() {
         // When meeting another diplomat fleet, improve relationships between their home planets
         if (this.target && this.target instanceof Fleet && this.target.fleetType === FLEET_TYPES.DIPLOMATS) {
-            this.metDiplomats.push(this.target)
+            this.visited.push(this.target)
             
             // Diplomatic meeting between two fleets
             if (this.fleet.planet && this.fleet.planet.civilization && this.target.planet && this.target.planet.civilization) {

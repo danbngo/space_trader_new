@@ -49,8 +49,8 @@ function showAbandonedFleetsMenu(backFunction = () => closeModal()) {
         // Distance from sun in AU
         const distanceFromSun = Math.sqrt(fleet.x * fleet.x + fleet.y * fleet.y).toFixed(2)
         
-        // Year abandoned
-        const yearAbandoned = fleet.abandonedYear || '-'
+        // Destroyed by
+        const destroyedBy = fleet.destroyedBy ? coloredName(fleet.destroyedBy) : '-'
         
         // Years since abandoned
         const yearsSince = fleet.abandonedYear ? (gs.year - fleet.abandonedYear).toFixed(2) : '-'
@@ -65,12 +65,12 @@ function showAbandonedFleetsMenu(backFunction = () => closeModal()) {
             numShips,
             cargoInfo,
             distanceFromSun,
-            yearAbandoned,
+            destroyedBy,
             yearsSince
         ]
     })
 
-    tableData.unshift(['Name', 'Origin', 'Faction', 'Race', 'Religion', '# Crew', '# Ships', 'Cargo', 'Distance (AU)', 'Abandoned', 'Years Ago'])
+    tableData.unshift(['Name', 'Origin', 'Faction', 'Race', 'Religion', '# Crew', '# Ships', 'Cargo', 'Distance (AU)', 'Destroyed By', 'Years Ago'])
     
     // Create table with selection (row 1 is first data row, after header row 0)
     const table = createTable(

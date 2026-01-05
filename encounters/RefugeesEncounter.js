@@ -4,6 +4,12 @@
  */
 class RefugeesEncounter extends NeutralsEncounter {
     onStart() {
+        // Check if already met to prevent repeated supply requests
+        if (this.hasAlreadyVisitedPlayer()) {
+            this.showAlreadyMetMessage()
+            return
+        }
+        
         // 50% chance to ask for supplies
         if (Math.random() < 0.5) {
             this.askForSupplies()

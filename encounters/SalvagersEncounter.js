@@ -4,6 +4,12 @@
  */
 class SalvagersEncounter extends NeutralsEncounter {
     onStart() {
+        // Check if already met to prevent repeated item offers
+        if (this.hasAlreadyVisitedPlayer()) {
+            this.showAlreadyMetMessage()
+            return
+        }
+        
         // 50% chance to offer mystery item
         if (Math.random() < 0.5) {
             this.offerMysteryItem()

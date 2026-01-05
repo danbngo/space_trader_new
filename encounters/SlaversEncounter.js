@@ -26,7 +26,7 @@ class SlaversEncounter extends FleetEncounter {
             showModal('Recognized', `The ${coloredName(enemyFleet)} recognize you as an ally.<br/>They signal that you may pass freely.`,
             [
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackFleetModal()],
+                ['Attack', ()=>this.showPlayerAttackModal()],
             ])
         }
         else if (gs.captain.reputation.getAmount(FACTION_TYPES.SLAVERS) > 0) {

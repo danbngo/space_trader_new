@@ -43,6 +43,7 @@ const FLEET_AI_TYPES = {
     EXPLORER: new FleetAIType('Explorer AI', ExplorerFleetAI, FLEET_TYPES.EXPLORERS),
     HACKER: new FleetAIType('Hacker AI', HackerFleetAI, FLEET_TYPES.HACKERS),
     MEDIA: new FleetAIType('Media AI', MediaFleetAI, FLEET_TYPES.MEDIA),
+    AGENTS: new FleetAIType('Agents AI', AgentsFleetAI, FLEET_TYPES.AGENTS),
 }
 
 const FLEET_AI_TYPES_ALL = Object.values(FLEET_AI_TYPES)

@@ -4,6 +4,12 @@
  */
 class ScientistsEncounter extends NeutralsEncounter {
     onStart() {
+        // Check if already met to prevent repeated benefits
+        if (this.hasAlreadyVisitedPlayer()) {
+            this.showAlreadyMetMessage()
+            return
+        }
+        
         const rand = Math.random()
         
         // 33% chance to share anomaly knowledge
@@ -267,7 +273,7 @@ class ScientistsEncounter extends NeutralsEncounter {
                 ])
             }],
             ['Ignore', ()=>this.endEncounter()],
-            ['Attack', ()=>this.showPlayerAttackNeutralsModal()],
+            ['Attack', ()=>this.showPlayerAttackModal()],
         ])
     }
 }

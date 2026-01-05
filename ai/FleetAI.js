@@ -432,6 +432,7 @@ class FleetAI {
         // Mark fleet as destroyed and dim its color
         this.fleet.destroyed = true
         this.fleet.abandonedYear = gs.year
+        this.fleet.cloakLevel = 0 // Disable cloaking
         this.fleet.color = this.fleet.color.map(c => c * 0.5) // Dim color
         this.fleet.route = null // Clear route
         

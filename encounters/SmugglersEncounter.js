@@ -4,6 +4,12 @@
  */
 class SmugglersEncounter extends MercantileEncounter {
     onStart() {
+        // Check if already met to prevent repeated trading
+        if (this.hasAlreadyVisitedPlayer()) {
+            this.showAlreadyMetMessage()
+            return
+        }
+        
         // Check if player is infamous on smuggler's home planet
         const isInfamous = this.planet && FameLevel.hasInfamyLevel(gs.captain, this.planet, INFAMY_LEVELS.DISLIKED);
         
@@ -11,7 +17,7 @@ class SmugglersEncounter extends MercantileEncounter {
             // Player is loved by the planet - smugglers flee
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} have heard of your hostility towards the criminal community and quickly flee!`, [
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackFleetModal()],
+                ['Attack', ()=>this.showPlayerAttackModal()],
             ])
         }
         else if (isInfamous && Math.random() < 0.5) {
@@ -21,14 +27,14 @@ class SmugglersEncounter extends MercantileEncounter {
                 `"We deal with people like you. We'll buy your cargo - no questions asked. But we're not selling anything to outsiders."`, [
                 ['Trade', ()=>showAdHocMarketMenu(this.fleet, ()=>this.endEncounter(), this, true)],
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackFleetModal()],
+                ['Attack', ()=>this.showPlayerAttackModal()],
             ])
         }
         else {
             // Otherwise, smugglers are cautious and flee
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} take no chances and start moving quickly away from you.`, [
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackFleetModal()],
+                ['Attack', ()=>this.showPlayerAttackModal()],
             ])
         }
     }

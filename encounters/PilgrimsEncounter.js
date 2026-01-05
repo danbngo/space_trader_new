@@ -4,11 +4,17 @@
  */
 class PilgrimsEncounter extends NeutralsEncounter {
     onStart() {
+        // Check if already met
+        if (this.hasAlreadyVisitedPlayer()) {
+            this.showAlreadyMetMessage()
+            return
+        }
+        
         if (FameLevel.hasInfamyLevel(gs.captain, this.planet, INFAMY_LEVELS.VILIFIED)) {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} have heard of your fearsome deeds and start fleeing immediately!`, [
                 //['View', ()=>closeModal()],
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackNeutralsModal()],
+                ['Attack', ()=>this.showPlayerAttackModal()],
             ])
         }
         else {
@@ -202,19 +208,19 @@ class PilgrimsEncounter extends NeutralsEncounter {
         if (rand < 0.33) {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} greet you with peaceful blessings and continue their journey.`, [
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackNeutralsModal()],
+                ['Attack', ()=>this.showPlayerAttackModal()],
             ])
         }
         else if (rand < 0.66) {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} broadcast prayers and hymns as they journey to their holy destination.`, [
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackNeutralsModal()],
+                ['Attack', ()=>this.showPlayerAttackModal()],
             ])
         }
         else {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} acknowledge you with a respectful nod before continuing their pilgrimage.`, [
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackNeutralsModal()],
+                ['Attack', ()=>this.showPlayerAttackModal()],
             ])
         }
     }

@@ -4,10 +4,16 @@
  */
 class MissionariesEncounter extends NeutralsEncounter {
     onStart() {
+        // Check if already met
+        if (this.hasAlreadyVisitedPlayer()) {
+            this.showAlreadyMetMessage()
+            return
+        }
+        
         if (FameLevel.hasInfamyLevel(gs.captain, this.planet, INFAMY_LEVELS.VILIFIED)) {
             showModal(coloredName(this.fleet), `The ${coloredName(this.fleet)} have heard of your fearsome deeds and start fleeing immediately!`, [
                 ['Ignore', ()=>this.endEncounter()],
-                ['Attack', ()=>this.showPlayerAttackNeutralsModal()],
+                ['Attack', ()=>this.showPlayerAttackModal()],
             ])
             return
         }
@@ -67,7 +73,7 @@ class MissionariesEncounter extends NeutralsEncounter {
                 ])
             }],
             ['Decline', () => this.showStandardGreeting()],
-            ['Attack', () => this.showPlayerAttackNeutralsModal()],
+            ['Attack', () => this.showPlayerAttackModal()],
         ])
     }
 
@@ -129,7 +135,7 @@ class MissionariesEncounter extends NeutralsEncounter {
                 ])
             }],
             ['Decline', () => this.showStandardGreeting()],
-            ['Attack', () => this.showPlayerAttackNeutralsModal()],
+            ['Attack', () => this.showPlayerAttackModal()],
         ])
     }
 
@@ -138,7 +144,7 @@ class MissionariesEncounter extends NeutralsEncounter {
         showModal(coloredName(this.fleet), `"${greeting}"`, [
             ['Greet them', ()=>this.endEncounter()],
             ['Ignore', ()=>this.endEncounter()],
-            ['Attack', ()=>this.showPlayerAttackNeutralsModal()],
+            ['Attack', ()=>this.showPlayerAttackModal()],
         ])
     }
 

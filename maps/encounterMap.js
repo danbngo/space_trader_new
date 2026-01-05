@@ -614,7 +614,7 @@ class EncounterMap extends BaseMap {
                 ['Bypass', ()=>gs.encounter.endEncounter()],
                 ['Hail', ()=>gs.encounter.onStart()],
                 ['Sneak Attack', ()=>{
-                    gs.encounter.showPlayerAttackFleetModal()
+                    gs.encounter.showPlayerAttackModal()
                 }],
             ])
         }

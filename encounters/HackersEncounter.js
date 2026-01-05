@@ -4,6 +4,12 @@
  */
 class HackersEncounter extends FleetEncounter {
     onStart() {
+        // Check if already met to prevent repeated interactions
+        if (this.hasAlreadyVisitedPlayer()) {
+            this.showAlreadyMetMessage()
+            return
+        }
+        
         const greeting = this.getGreetingDialogue()
         const rand = Math.random()
         
@@ -87,7 +93,7 @@ class HackersEncounter extends FleetEncounter {
                 showModal('Ship Upgraded', resultMessage, [['Continue', () => this.endEncounter()]])
             }, !canAfford],
             ['Decline', () => this.showStandardHackerGreeting(greeting)],
-            ['Attack', () => this.showPlayerAttackFleetModal()],
+            ['Attack', () => this.showPlayerAttackModal()],
         ])
     }
     
@@ -217,7 +223,7 @@ class HackersEncounter extends FleetEncounter {
                 )
             }, !canAfford],
             ['Decline', () => this.showStandardHackerGreeting(greeting)],
-            ['Attack', () => this.showPlayerAttackFleetModal()],
+            ['Attack', () => this.showPlayerAttackModal()],
         ])
     }*/
     
@@ -252,7 +258,7 @@ class HackersEncounter extends FleetEncounter {
                 )
             }, !canAfford],
             ['Decline', () => this.showStandardHackerGreeting(greeting)],
-            ['Attack', () => this.showPlayerAttackFleetModal()],
+            ['Attack', () => this.showPlayerAttackModal()],
         ])
     }
     
@@ -263,7 +269,7 @@ class HackersEncounter extends FleetEncounter {
         
         showModal(coloredName(this.fleet), message, [
             ['Ignore', () => this.endEncounter()],
-            ['Attack', () => this.showPlayerAttackFleetModal()],
+            ['Attack', () => this.showPlayerAttackModal()],
         ])
     }
 

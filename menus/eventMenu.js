@@ -96,7 +96,7 @@ function payDebtsRandomly(officer = new Officer(), amount = 0) {
 function checkForFleetSpawning(elapsedDays = 1, planetMaxFleets = null) {
     if (!gs.system || !gs.system.planets) return
     
-    const allPlanets = [...gs.system.planets]
+    const allPlanets = [...gs.system.planets, ...gs.system.dwarfPlanets]
     for (const planet of allPlanets) {
         if (!planet.civilization) continue
 
@@ -277,6 +277,7 @@ function calculateMaxFleetsForPlanet(planet) {
     maxNumFleetsPerFaction.multiply(FACTION_TYPES.SYNDICATES, c.crime*c.corruption)
     maxNumFleetsPerFaction.multiply(FACTION_TYPES.TAX_COLLECTORS, c.taxes)
     maxNumFleetsPerFaction.multiply(FACTION_TYPES.TOURISTS, c.wealth)
+    maxNumFleetsPerFaction.multiply(FACTION_TYPES.MEDIA, c.culture*c.education)
 
     // a few types are less common, a bit exotic
     for (const ft of [FACTION_TYPES.INQUISITORS, FACTION_TYPES.PILGRIMS, FACTION_TYPES.MISSIONARIES, FACTION_TYPES.PERFORMERS, FACTION_TYPES.DIPLOMATS]) {
@@ -284,7 +285,7 @@ function calculateMaxFleetsForPlanet(planet) {
     }
 
     // a few types are more common, throwback to OG space trader
-    for (const ft of [FACTION_TYPES.MERCHANTS, FACTION_TYPES.POLICE, FACTION_TYPES.PIRATES, FACTION_TYPES.MINERS]) {
+    for (const ft of [FACTION_TYPES.MERCHANTS, FACTION_TYPES.POLICE, FACTION_TYPES.PIRATES]) {
         maxNumFleetsPerFaction.multiply(ft, 3)
     }
     
