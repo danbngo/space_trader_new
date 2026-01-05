@@ -42,8 +42,8 @@ class FleetEncounter extends Encounter {
         const loot = enemyFleet.cargo.randomSubset(lootAmt)
         const disabledPlayerShips = this.playerShips.filter(s=>s.disabled)
 
-        // Award experience points based on enemy fleet strength
-        const expGained = Math.round(AVERAGE_EXP_FROM_COMBAT * (enemyFleet.combatRating / this.playerFleet.combatRating))
+        // Award experience points based on enemy fleet strength (minimum 1 exp)
+        const expGained = Math.max(1, Math.round(AVERAGE_EXP_FROM_COMBAT * (enemyFleet.combatRating / this.playerFleet.combatRating)))
 
         const surrenderDialogue = this.getSurrenderingDialogue()
         

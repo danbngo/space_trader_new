@@ -113,18 +113,21 @@ function createSellShipMenu(ships = [new Ship()], shipyard = new Shipyard(), onS
     if (ships.length == 0) return `(None)`
     /** @type {any[]} */
     const rows = [
-        ['Ship Name', 'Quality', 'Hull', 'Shields', 'Lasers', 'Engine', 'Cargo Space', 'Sell Price']
+        ['Ship Name', 'Quality', 'Hull', 'Shields', 'Lasers', 'Engine', 'Cargo Space', 'Repair Cost', 'Sell Price']
     ]
     for (const ship of ships) {
         const sellPrice = shipyard.calcSellPrice(ship)
+        const damageAmount = ship.hull[1] - ship.hull[0]
+        const repairCost = damageAmount > 0 ? shipyard.calculateRepairCost(ship, damageAmount) : 0
         rows.push([
             ship.name,
             statColorSpan(roundToPlaces(ship.quality * 100, 1) + '%', ship.quality),
-            statColorSpan(ship.hull[1], ship.hull[1]/10),
+            statColorSpan(`${ship.hull[0]}/${ship.hull[1]}`, ship.hull[0]/ship.hull[1]),
             statColorSpan(ship.shields[1], ship.shields[1]/10),
             statColorSpan(ship.lasers, ship.lasers/10),
             statColorSpan(ship.engine, ship.engine/10),
             statColorSpan(ship.cargoSpace, ship.cargoSpace/10),
+            damageAmount > 0 ? statColorSpan(repairCost, 1/repairCost*100) : colorSpan('—', COLORS.Gray),
             statColorSpan(sellPrice, sellPrice/ship.value)
         ])
     }
@@ -138,6 +141,7 @@ function createSellShipMenu(ships = [new Ship()], shipyard = new Shipyard(), onS
         createPopoverElement(headerRow.cells[4], SHIP_STATS.LASERS.description); // Lasers
         createPopoverElement(headerRow.cells[5], SHIP_STATS.ENGINES.description); // Engine
         createPopoverElement(headerRow.cells[6], SHIP_STATS.CARGO_CAPACITY.description); // Cargo Space
+        createPopoverElement(headerRow.cells[7], 'The total cost to fully repair this ship at this shipyard'); // Repair Cost
     }
     
     // Add popovers to each row
@@ -151,8 +155,16 @@ function createSellShipMenu(ships = [new Ship()], shipyard = new Shipyard(), onS
             createPopoverElement(shipNameCell, ship.shipType.description);
         }
         
-        // Sell price popover (column 7)
-        const sellPriceCell = row.cells[7];
+        // Repair cost popover (column 7)
+        const repairCostCell = row.cells[7];
+        const damageAmount = ship.hull[1] - ship.hull[0];
+        if (repairCostCell && damageAmount > 0) {
+            const repairCostCalc = shipyard.getRepairCostCalculation(ship, damageAmount);
+            createPopoverElement(repairCostCell, repairCostCalc.createPopover(REPAIR_COST_PER_1_HULL, 'repair cost', true)); // true = lower is better
+        }
+        
+        // Sell price popover (column 8)
+        const sellPriceCell = row.cells[8];
         if (sellPriceCell) {
             const sellPriceCalc = shipyard.getSellPriceCalculation(ship);
             createPopoverElement(sellPriceCell, sellPriceCalc.createPopover(ship.value, 'price', false)); // false = higher is better for selling
@@ -222,7 +234,7 @@ function showShipyardBuyMenu(shipyard = new Shipyard()) {
         if (canBuy) buttons.push([`Buy`, ()=>showBuyShipModal(ship)])
         buttons.push(
             ["Buy Modules", ()=>showShipyardBuyModulesMenu(shipyard)],
-            ["Sell Ships", ()=>showShipyardSellMenu(shipyard)],
+            ["Your Ships", ()=>showShipyardSellMenu(shipyard)],
             ["Back", () => leave()],
         )
         refreshPanelButtons('shipyard_buy_panel', buttons)
@@ -237,7 +249,7 @@ function showShipyardBuyMenu(shipyard = new Shipyard()) {
         ]}),
         [
             ["Buy Modules", ()=>showShipyardBuyModulesMenu(shipyard)],
-            ["Sell Ships", ()=>showShipyardSellMenu(shipyard)],
+            ["Your Ships", ()=>showShipyardSellMenu(shipyard)],
             ["Back", () => leave()],
         ],
         `shipyard_buy_panel`,
@@ -271,20 +283,73 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
         const isLastShip = fleet.ships.length < 2;
         const shipyardCanAfford = shipyard.credits >= shipyard.calcSellPrice(ship);
         const canSell = isDocked && shipyardCanAfford && !isLastShip;
+        const damageAmount = ship.hull[1] - ship.hull[0];
+        const canRepair = isDocked && damageAmount > 0;
+        const repairCost = canRepair ? shipyard.calculateRepairCost(ship, damageAmount) : 0;
         
         let disabledReason = null;
         if (!isDocked) disabledReason = 'Must be docked to sell ships';
         else if (isLastShip) disabledReason = "You can't sell your last ship!";
         else if (!shipyardCanAfford) disabledReason = `Shipyard cannot afford this ship (has ${shipyard.credits} CR)`;
         
+        let repairDisabledReason = null;
+        if (!isDocked) repairDisabledReason = 'Must be docked to repair ships';
+        else if (damageAmount <= 0) repairDisabledReason = 'Ship is not damaged';
+        
         /** @type {ButtonData[]} */
         const buttons = [
             [`Sell`, ()=>showSellShipModal(ship), !canSell, disabledReason],
+            [`Repair`, ()=>showRepairShipModal(ship), !canRepair, repairDisabledReason],
             ["Buy Modules", ()=>showShipyardBuyModulesMenu(shipyard)],
             ["Buy Ships", ()=>showShipyardBuyMenu(shipyard)],
             ["Back", () => leave()],
         ]
         refreshPanelButtons('shipyard_buy_panel', buttons)
+    }
+
+    function showRepairShipModal(ship = new Ship()) {
+        const maxDamage = ship.hull[1] - ship.hull[0];
+        if (maxDamage <= 0) {
+            rebuildMenu();
+            return;
+        }
+        
+        showSliderModal(
+            1,
+            maxDamage,
+            `Repair ${coloredName(ship)}`,
+            ce({children: [
+                `Ship Hull: ${ship.hull[0]}/${ship.hull[1]}`,
+                `Damage: ${maxDamage} hull points`,
+                ``,
+            ]}),
+            (repairAmount) => {
+                const cost = shipyard.calculateRepairCost(ship, repairAmount);
+                const canAfford = gs.credits >= cost;
+                const afterCredits = gs.credits - cost;
+                const repairCalc = shipyard.getRepairCostCalculation(ship, repairAmount);
+                
+                const costSpan = ce({innerHTML: colorSpan(`${cost}CR`, canAfford ? COLORS.White : COLORS.Red)});
+                createPopoverElement(costSpan, repairCalc.createPopover(REPAIR_COST_PER_1_HULL, 'repair cost', true));
+                
+                return ce({children: [
+                    `Repair ${repairAmount} hull point${repairAmount > 1 ? 's' : ''} → ${ship.hull[0] + repairAmount}/${ship.hull[1]}`,
+                    ce({children: [`Cost: `, costSpan]}),
+                    canAfford ? `Your credits after: ${afterCredits}CR` : colorSpan(`Insufficient credits!`, COLORS.Red),
+                ]});
+            },
+            'Repair',
+            'Cancel',
+            (repairAmount) => {
+                const cost = shipyard.calculateRepairCost(ship, repairAmount);
+                if (gs.credits >= cost) {
+                    gs.credits -= cost;
+                    ship.hull[0] = Math.min(ship.hull[1], ship.hull[0] + repairAmount);
+                    rebuildMenu();
+                }
+            },
+            () => rebuildMenu()
+        );
     }
 
     function showSellShipModal(ship = new Ship()) {
@@ -352,7 +417,7 @@ function showShipyardBuyModulesMenu(shipyard = new Shipyard()) {
         const buttons = [
             [`Buy & Install`, ()=>showShipyardInstallModuleMenu(shipyard, module), !canBuy, disabledReason],
             ["Buy Ships", ()=>showShipyardBuyMenu(shipyard)],
-            ["Sell Ships", ()=>showShipyardSellMenu(shipyard)],
+            ["Your Ships", ()=>showShipyardSellMenu(shipyard)],
             ["Back", () => leave()],
         ]
         refreshPanelButtons('shipyard_modules_panel', buttons)
@@ -368,7 +433,7 @@ function showShipyardBuyModulesMenu(shipyard = new Shipyard()) {
         ]}),
         [
             ["Buy Ships", ()=>showShipyardBuyMenu(shipyard)],
-            ["Sell Ships", ()=>showShipyardSellMenu(shipyard)],
+            ["Your Ships", ()=>showShipyardSellMenu(shipyard)],
             ["Back", () => leave()],
         ],
         `shipyard_modules_panel`,

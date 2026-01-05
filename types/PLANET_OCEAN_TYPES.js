@@ -26,21 +26,21 @@ class PlanetOceanType {
 
 const PLANET_OCEAN_TYPES = Object.freeze({
     WATER: new PlanetOceanType("Water Oceans", "Liquid water covering portions of the surface", COLORS.Blue, new Map([
-        [CARGO_TYPES.WATER, CL.SLIGHTLY_LOW],
-        [CARGO_TYPES.FOOD, CL.SLIGHTLY_LOW]
+        [CARGO_TYPES.WATER, CL.SLIGHTLY_HIGH],
+        [CARGO_TYPES.FOOD, CL.SLIGHTLY_HIGH]
     ])),
     SUBSURFACE_WATER: new PlanetOceanType("Subsurface Water Ocean", "Liquid water ocean hidden beneath ice crust", COLORS.DarkBlue, new Map([
-        [CARGO_TYPES.WATER, CL.SLIGHTLY_LOW]
+        [CARGO_TYPES.WATER, CL.SLIGHTLY_HIGH]
     ])),
     HYDROCARBONACEOUS: new PlanetOceanType("Liquid Hydrocarbons", "Lakes and seas of liquid methane and ethane", COLORS.Orange, new Map()),
     LIQUID_NITROGEN: new PlanetOceanType("Liquid Nitrogen", "Pools of liquid nitrogen at extremely low temperatures", COLORS.LightBlue, new Map()),
     MOLTEN_LAVA: new PlanetOceanType("Molten Lava Seas", "Vast oceans of molten rock on the surface", COLORS.Red, new Map([
-        [CARGO_TYPES.METAL, CL.SLIGHTLY_LOW]
+        [CARGO_TYPES.METAL, CL.SLIGHTLY_HIGH]
     ])),
     SULFURIC_ACID: new PlanetOceanType("Sulfuric Acid", "Pools of concentrated sulfuric acid", COLORS.Yellow, new Map()),
     BRINE: new PlanetOceanType("Briny Ocean", "Salty water with high concentrations of dissolved minerals", COLORS.LightGreen, new Map([
-        [CARGO_TYPES.WATER, CL.SLIGHTLY_HIGH],
-        [CARGO_TYPES.METAL, CL.SLIGHTLY_LOW]
+        [CARGO_TYPES.WATER, CL.SLIGHTLY_LOW],
+        [CARGO_TYPES.METAL, CL.SLIGHTLY_HIGH]
     ])),
 });
 

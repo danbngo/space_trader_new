@@ -31,6 +31,22 @@ class Guild extends Building {
             this.officers = []
             this.contracts = []
         }
+        
+        // Normalize officers
+        const officerDiffFromBase = this.officers.length - this.baseNumOfficers
+        if (officerDiffFromBase > 0) {
+            this.officers.splice(0, officerDiffFromBase)
+        } else if (officerDiffFromBase < 0) {
+            // Guilds stock non-criminal, non-religious officers
+            const validFactionTypes = PLAYER_FACTIONS.filter(f => !f.religious && !f.criminal)
+            
+            for (let i = 0; i < -officerDiffFromBase; i++) {
+                const factionType = rndMember(validFactionTypes)
+                this.officers.push(generateOfficer(this.planet, factionType))
+            }
+        }
+        
+        // Normalize contracts
         const contractDiffFromBase = this.contracts.length - this.baseNumContracts
         if (contractDiffFromBase > 0) {
             this.contracts.splice(0, contractDiffFromBase)

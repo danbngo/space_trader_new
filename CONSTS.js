@@ -17,6 +17,8 @@ const ANOMALY_RADIUS = 1/10 * 1/EARTH_RADII_PER_AU
 
 const FLEET_COLLISION_DISTANCE = FLEET_RADIUS * 1000000
 const ASTEROID_MINING_DISTANCE = FLEET_RADIUS * 2000000 // 2x easier to mine than fleet collision range
+const MINING_HAZARD_CHANCE = 0.1 // 10% chance of encountering a hazard when mining
+const REPAIR_COST_PER_1_HULL = 10 // Base cost to repair 1 hull point at shipyard
 
 const PLANET_ENCOUNTER_CHANCE_PER_DAY = 0//0.01; //chance of random encounter per day when right next to an 'average' planet
 const ASTEROIDS_ENCOUNTER_CHANCE_PER_DAY = 0.01//0.5; //chance of fooroid storms when in the middle of an asteroid belt

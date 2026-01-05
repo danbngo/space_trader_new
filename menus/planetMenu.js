@@ -45,9 +45,13 @@ function showPlanetMenu(planet = new Planet()) {
     }
 
     if (isDocked) {
-        const damagedShips = gs.fleet.ships.filter(s=>s.isDamaged())
-        if (damagedShips.length > 0) msg += colorSpan(`Your ships receive complementary repairs courtesy of the dock's nanite swarm.<br/>`, COLORS.LightGreen)
-        for (const s of damagedShips) s.repairHull()
+        const disabledShips = gs.fleet.ships.filter(s=>s.disabled)
+        if (disabledShips.length > 0) {
+            msg += colorSpan(`The dock's nanite swarm restores 1 hull to each disabled ship.<br/>`, COLORS.LightGreen)
+            for (const s of disabledShips) {
+                s.hull[0] = 1  // Only restore 1 hull to make ship non-disabled
+            }
+        }
         
         // Check for damaged buildings
         if (settlement) {

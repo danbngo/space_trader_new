@@ -174,7 +174,8 @@ class EncounterMap extends BaseMap {
     }
 
     addEffectCanvasObject(effect = new Effect()) {
-        const onClick = ()=>{ this.selectObject(effect) }
+        // Don't allow clicking effects when targeting an ability/laser/ram
+        const onClick = this.targetingLabel ? null : ()=>{ this.selectObject(effect) }
 
         if (effect.effectType.shape == SHAPES.FilledOval) {
             const minorAxis = effect.radius * 0.5

@@ -51,90 +51,54 @@ class Market extends Building {
     calcCargoAvailabilityModifier(ct = CARGO_TYPES_ALL[0]) {
         const calc = new Calculation();
         const civ = this.planet.civilization
-        const climate = this.planet.climate
         
         // Base availability
         calc.addFactor('base', 1.0);
         
+        // Apply planet type modifiers from cargoModifiers map
+        const planetType = this.planet.planetType;
+        if (planetType && planetType.cargoModifiers.has(ct)) {
+            calc.addFactor(planetType.name.toLowerCase(), planetType.cargoModifiers.get(ct));
+        }
+        
+        // Apply atmosphere type modifiers
+        const atmosphereType = this.planet.climate.atmosphereType;
+        if (atmosphereType && atmosphereType.cargoModifiers.has(ct)) {
+            calc.addFactor(atmosphereType.name.toLowerCase(), atmosphereType.cargoModifiers.get(ct));
+        }
+        
+        // Apply geology type modifiers
+        const geologyType = this.planet.climate.geologyType;
+        if (geologyType && geologyType.cargoModifiers.has(ct)) {
+            calc.addFactor(geologyType.name.toLowerCase(), geologyType.cargoModifiers.get(ct));
+        }
+        
+        // Apply ocean type modifiers
+        const oceanType = this.planet.climate.oceanType;
+        if (oceanType && oceanType.cargoModifiers.has(ct)) {
+            calc.addFactor(oceanType.name.toLowerCase(), oceanType.cargoModifiers.get(ct));
+        }
+        
         // Each cargo type has different production/availability based on civilization attributes
         if (ct == CARGO_TYPES.FOOD) {
-            // Food production based on territory, population, and favorable climate
+            // Food production based on territory, population, and economy
             calc.addFactor('territory', 0.5 + civ.territory * 0.8);
             calc.addFactor('economy', 0.5 + civ.economy * 0.5);
-            
-            // Ocean type affects food production
-            if (climate.oceanType === PLANET_OCEAN_TYPES.WATER) {
-                calc.addFactor('water oceans', 1.8);  // Water oceans enable fishing and agriculture
-            } else if (climate.oceanType === PLANET_OCEAN_TYPES.BRINE) {
-                calc.addFactor('brine oceans', 1.3);  // Brine can support some aquaculture
-            } else if (climate.oceanType === PLANET_OCEAN_TYPES.SUBSURFACE_WATER) {
-                calc.addFactor('subsurface water', 1.2);  // Subsurface water can be used for hydroponics
-            }
-            
-            // Atmosphere type affects food production
-            if (climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.OXYGEN_NITROGEN) {
-                calc.addFactor('breathable atmosphere', 1.5);  // Breathable atmosphere ideal for farming
-            } else if (climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.CARBONACEOUS_DIOXIDE) {
-                calc.addFactor('CO2 atmosphere', 0.8);  // CO2 atmosphere requires greenhouses
-            }
-            
-            // Geology affects soil quality
-            if (climate.geologyType === PLANET_GEOLOGY_TYPES.SILICATE_IRON || 
-                climate.geologyType === PLANET_GEOLOGY_TYPES.GRANITE) {
-                calc.addFactor('good soil', 1.3);  // Good soil composition
-            } else if (climate.geologyType === PLANET_GEOLOGY_TYPES.BASALTIC) {
-                calc.addFactor('volcanic soil', 1.4);  // Volcanic soil is very fertile
-            }
         }
         else if (ct == CARGO_TYPES.METAL) {
             // Industrial planets produce more metal
             calc.addFactor('industry', 0.5 + civ.industry * 1.8);
             calc.addFactor('economy', 0.5 + civ.economy * 0.5);
-            
-            // Geology type affects metal availability
-            if (climate.geologyType === PLANET_GEOLOGY_TYPES.METALLIC) {
-                calc.addFactor('metallic core', 2.0);  // Metallic composition = abundant metal
-            } else if (climate.geologyType === PLANET_GEOLOGY_TYPES.SILICATE_IRON) {
-                calc.addFactor('iron-rich geology', 1.5);  // Iron-rich geology
-            } else if (climate.geologyType === PLANET_GEOLOGY_TYPES.CARBONACEOUS) {
-                calc.addFactor('carbon-rich geology', 0.7);  // Carbon-rich = less metal
-            } else if (climate.geologyType === PLANET_GEOLOGY_TYPES.WATER_ICE || 
-                       climate.geologyType === PLANET_GEOLOGY_TYPES.METHANE_ICE ||
-                       climate.geologyType === PLANET_GEOLOGY_TYPES.NITROGEN_ICE) {
-                calc.addFactor('ice geology', 0.3);  // Ice planets = very little metal
-            }
         }
         else if (ct == CARGO_TYPES.WATER) {
             // Water availability based on reserves and infrastructure
             calc.addFactor('reserves', 0.5 + civ.reserves * 1.5);
             calc.addFactor('territory', 0.5 + civ.territory * 0.3);
-            
-            // Ocean and geology types dramatically affect water availability
-            if (climate.oceanType === PLANET_OCEAN_TYPES.WATER) {
-                calc.addFactor('water oceans', 2.5);  // Abundant liquid water
-            } else if (climate.oceanType === PLANET_OCEAN_TYPES.SUBSURFACE_WATER) {
-                calc.addFactor('subsurface water', 1.8);  // Hidden water requires extraction
-            } else if (climate.oceanType === PLANET_OCEAN_TYPES.BRINE) {
-                calc.addFactor('brine oceans', 1.2);  // Salty water can be desalinated
-            }
-            
-            if (climate.geologyType === PLANET_GEOLOGY_TYPES.WATER_ICE) {
-                calc.addFactor('ice geology', 2.0);  // Ice can be melted for water
-            } else if (climate.geologyType === PLANET_GEOLOGY_TYPES.MIXED_ICE) {
-                calc.addFactor('mixed ice', 1.5);  // Some water ice available
-            }
         }
         else if (ct == CARGO_TYPES.ISOTOPES) {
             // Scientific production - high tech civilizations produce isotopes
             calc.addFactor('technology', 0.3 + civ.technology * 1.5);
             calc.addFactor('industry', 0.7 + civ.industry * 0.8);
-            
-            // Gas giant atmospheres contain useful isotopes
-            if (climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.HYDROGEN_HELIUM) {
-                calc.addFactor('gas giant atmosphere', 2.0);  // Gas giants rich in isotopes
-            } else if (climate.atmosphereType === PLANET_ATMOSPHERE_TYPES.METHANE) {
-                calc.addFactor('methane atmosphere', 1.3);  // Methane atmospheres have some isotopes
-            }
         }
         else if (ct == CARGO_TYPES.NANITES) {
             // Advanced manufacturing product
@@ -181,37 +145,12 @@ class Market extends Building {
     calcCargoPriceModifier(ct = CARGO_TYPES_ALL[0]) {
         const calc = new Calculation();
         const civ = this.planet.civilization
-        const climate = this.planet.climate
         
         // Availability affects price (inverse relationship - low availability = high price)
         const availabilityCalc = this.calcCargoAvailabilityModifier(ct);
         const availabilityMultiplier = availabilityCalc.getTotalMultiplier();
         // Invert availability: low availability (0.5x) = high price (2x)
         calc.addFactor('availability', 1.0 / Math.max(0.1, availabilityMultiplier));
-        
-        // Apply planet type modifiers from cargoModifiers map
-        const planetType = this.planet.planetType;
-        if (planetType && planetType.cargoModifiers.has(ct)) {
-            calc.addFactor(planetType.name.toLowerCase(), planetType.cargoModifiers.get(ct));
-        }
-        
-        // Apply atmosphere type modifiers
-        const atmosphereType = this.planet.climate.atmosphereType;
-        if (atmosphereType && atmosphereType.cargoModifiers.has(ct)) {
-            calc.addFactor(atmosphereType.name.toLowerCase(), atmosphereType.cargoModifiers.get(ct));
-        }
-        
-        // Apply geology type modifiers
-        const geologyType = this.planet.climate.geologyType;
-        if (geologyType && geologyType.cargoModifiers.has(ct)) {
-            calc.addFactor(geologyType.name.toLowerCase(), geologyType.cargoModifiers.get(ct));
-        }
-        
-        // Apply ocean type modifiers
-        const oceanType = this.planet.climate.oceanType;
-        if (oceanType && oceanType.cargoModifiers.has(ct)) {
-            calc.addFactor(oceanType.name.toLowerCase(), oceanType.cargoModifiers.get(ct));
-        }
         
         // Cargo-specific demand factors
         if (ct === CARGO_TYPES.FOOD) {

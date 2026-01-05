@@ -125,7 +125,7 @@ function showPanel(title = '', text = '', buttons = [], id = '') {
  * @param {number} max - Maximum value for the slider
  * @param {string|HTMLElement} title - Modal title
  * @param {string|HTMLElement} description - Description text
- * @param {(value: number) => string} footerGenerator - Function to generate footer text based on current value
+ * @param {(value: number) => string|HTMLElement} footerGenerator - Function to generate footer text based on current value
  * @param {string} acceptLabel - Label for accept button
  * @param {string} cancelLabel - Label for cancel button
  * @param {(value: number) => void} onAccept - Callback when accept button is clicked
@@ -146,7 +146,15 @@ function showSliderModal(min = 0, max = 10, title = '', description = '', footer
         currentValue = parseInt(e.target.value);
         const footerText = footerGenerator ? footerGenerator(currentValue) : ''
         document.getElementById('slider-value').textContent = `${currentValue} / ${max}`;
-        document.getElementById('slider-footer').innerHTML = footerText;
+        const sliderFooter = document.getElementById('slider-footer');
+        if (sliderFooter) {
+            if (typeof footerText === 'string') {
+                sliderFooter.innerHTML = footerText;
+            } else {
+                sliderFooter.innerHTML = '';
+                sliderFooter.appendChild(footerText);
+            }
+        }
     };
     slider.disabled = (min >= max)
 

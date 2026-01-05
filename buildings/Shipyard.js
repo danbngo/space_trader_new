@@ -124,6 +124,34 @@ class Shipyard extends Building {
         const calc = this.getBuyModulePriceCalculation(module);
         return Math.round(calc.calculate(module.moduleType.value));
     }
+
+    /**
+     * Get the full repair cost calculation breakdown for a ship.
+     * @param {Ship} ship - The ship to calculate for.
+     * @param {number} amount - Amount of hull to repair.
+     * @returns {Calculation} The calculation showing all price factors.
+     */
+    getRepairCostCalculation(ship = new Ship(), amount = 1) {
+        const calc = new Calculation();
+        
+        calc.addFactor('hull points', amount);
+        calc.addFactor('merchant markup', 1 + this.planet.c.corruption / 4);
+        calc.addFactor('inflation', 1 + this.planet.c.inflationRate / 4);
+        calc.addFactor('base taxes', 1 + this.planet.c.taxes / 4);
+        
+        return calc;
+    }
+
+    /**
+     * Calculate the cost to repair a ship.
+     * @param {Ship} ship - The ship to repair.
+     * @param {number} amount - Amount of hull to repair.
+     * @returns {number} The repair cost in credits.
+     */
+    calculateRepairCost(ship = new Ship(), amount = 1) {
+        const calc = this.getRepairCostCalculation(ship, amount);
+        return Math.round(calc.calculate(REPAIR_COST_PER_1_HULL));
+    }
 }
 
 

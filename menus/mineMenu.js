@@ -45,9 +45,12 @@ function startMining() {
     const {belt, asteroid} = nearbyData
     console.log('🪨 STARTING MINING OPERATION', {belt, asteroid, asteroidBeltType: belt.asteroidBeltType})
     
-    const encounterType = rndMember(belt.encounterTypes)
+    // Determine if this is a hazard encounter or normal mining
+    const isHazard = Math.random() < MINING_HAZARD_CHANCE
+    const encounterTypeArray = isHazard ? belt.hazardEncounterTypes : belt.miningEncounterTypes
+    const encounterType = rndMember(encounterTypeArray)
     
-    console.log('Mining encounter type:', encounterType.name)
+    console.log('Mining encounter type:', encounterType.name, isHazard ? '(HAZARD)' : '(NORMAL)')
     
     // Generate the mining encounter
     const encounter = generateRandomEncounter(encounterType, null)

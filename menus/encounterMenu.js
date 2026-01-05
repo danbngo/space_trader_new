@@ -39,7 +39,7 @@ function checkForAsteroidBeltEncounters(elapsedDays = 1) {
     const selectedAsteroidIndex = rndIndexWeighted(proximityFactors)
     const selectedAsteroid = asteroids[selectedAsteroidIndex]
     const selectedBelt = selectedAsteroid.belt
-    const encounterType = rndMember(selectedBelt.encounterTypes)
+    const encounterType = rndMember(selectedBelt.hazardEncounterTypes)
     
     console.log(`🚨 ASTEROID ENCOUNTER TRIGGERED`, {selectedAsteroidIndex, selectedAsteroid, selectedBelt, encounterType, proximityFactors, totalProximityFactor});
     
