@@ -78,8 +78,9 @@ class Ship {
     }
 
     get quality() {
-        let totalStats = this.lasers + 
-        let expectedStats = this.shipType.lasers +
+        let totalStats = this.lasers + this.hull[1] + this.shields[1] + this.engine + this.cargoSpace + this.radars
+        let expectedStats = this.shipType.lasers * AVERAGE_SHIP_LASERS + this.shipType.hull * AVERAGE_SHIP_HULL + this.shipType.shields * AVERAGE_SHIP_SHIELDS + this.shipType.engine * AVERAGE_SHIP_ENGINE + this.shipType.cargoSpace * AVERAGE_SHIP_CARGO_SPACE + this.shipType.radars * AVERAGE_SHIP_RADARS  
+        console.log('getting quality:',totalStats, expectedStats, totalStats / expectedStats)
         return totalStats / expectedStats
     }
 

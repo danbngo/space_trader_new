@@ -86,6 +86,12 @@ function createBuyModuleMenu(modules = [new ShipModule()], shipyard = new Shipya
         const row = table.rows[index + 1]; // +1 to skip header
         if (!row) return;
         
+        // Module name popover (column 0)
+        const moduleNameCell = row.cells[0];
+        if (moduleNameCell && module.moduleType && module.moduleType.description) {
+            createPopoverElement(moduleNameCell, module.moduleType.description);
+        }
+        
         // Buy price popover (column 2)
         const buyPriceCell = row.cells[2];
         if (buyPriceCell) {
@@ -262,15 +268,22 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
     }
 
     function onSelectPlayerShip(ship = new Ship()) {
-        const canSell = isDocked && shipyard.credits > 0
+        const isLastShip = fleet.ships.length < 2;
+        const shipyardCanAfford = shipyard.credits >= shipyard.calcSellPrice(ship);
+        const canSell = isDocked && shipyardCanAfford && !isLastShip;
+        
+        let disabledReason = null;
+        if (!isDocked) disabledReason = 'Must be docked to sell ships';
+        else if (isLastShip) disabledReason = "You can't sell your last ship!";
+        else if (!shipyardCanAfford) disabledReason = `Shipyard cannot afford this ship (has ${shipyard.credits} CR)`;
+        
         /** @type {ButtonData[]} */
-        const buttons = []
-        if (canSell) buttons.push([`Sell`, ()=>showSellShipModal(ship)])
-        buttons.push(
+        const buttons = [
+            [`Sell`, ()=>showSellShipModal(ship), !canSell, disabledReason],
             ["Buy Modules", ()=>showShipyardBuyModulesMenu(shipyard)],
             ["Buy Ships", ()=>showShipyardBuyMenu(shipyard)],
             ["Back", () => leave()],
-        )
+        ]
         refreshPanelButtons('shipyard_buy_panel', buttons)
     }
 
@@ -285,8 +298,7 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
             ce({children:[
                 !shipyardCanAfford ? `${colorSpan('Warning', COLORS.Yellow)}: Your ${coloredName(ship)} is worth ${salePrice}CR but the shipyard only has ${shipyard.credits} credits!` : ``,
                 `Sell ${coloredName(ship)} for ${Math.min(salePrice, shipyard.credits)} credits?`,
-                `Sale Price: ${finalSale}CR ${officersShare ? `(-${officersShare}CR for officers)` : ''}`,
-                `CR After Sale: ${gs.credits+finalSale}CR`,
+                `Your CR After Sale: ${gs.credits+finalSale}CR ${officersShare ? `(-${officersShare}CR officers' share)` : ''}`,
             ]}),
             [
                 ['Sell', () => sellShip(ship, salePrice)],
@@ -301,9 +313,7 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
         ce({children:[
             `<b>Your ships</b>`,
             createSellShipMenu(fleet.ships, shipyard, (ship)=>onSelectPlayerShip(ship)),
-            `Shipyard Credits: ${shipyard.credits} | Your # ships: ${fleet.ships.length}/${fleet.numPilots} | Your Credits: ${gs.credits}` + (fleet.ships.length < 2 ? colorSpan(` (You can't sell your last ship!)`, COLORS.Yellow) : ''),
-            colorSpan(`Your credits: ${gs.credits}`, gs.credits == 0 ? COLORS.Red : ''),
-            createBuildingPriceInfo(shipyard, 'Shipyard', {showBuyPrice: false, showSellPrice: true}),
+            `Shipyard Credits: ${shipyard.credits}`,
         ]}),
         [
             ["Buy Modules", ()=>showShipyardBuyModulesMenu(shipyard)],

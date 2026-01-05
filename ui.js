@@ -123,8 +123,8 @@ function showPanel(title = '', text = '', buttons = [], id = '') {
  * Shows a slider modal for selecting a numeric value within a range.
  * @param {number} min - Minimum value for the slider
  * @param {number} max - Maximum value for the slider
- * @param {string} title - Modal title
- * @param {string} description - Description text
+ * @param {string|HTMLElement} title - Modal title
+ * @param {string|HTMLElement} description - Description text
  * @param {(value: number) => string} footerGenerator - Function to generate footer text based on current value
  * @param {string} acceptLabel - Label for accept button
  * @param {string} cancelLabel - Label for cancel button
@@ -508,11 +508,12 @@ function createColumnLayout(columnItems = []) {
 
 /**
  * Creates a popover element that appears on hover
- * @param {HTMLElement} element - The element that triggers the popover on hover
+ * @param {HTMLElement|string} element - The element that triggers the popover on hover
  * @param {string|HTMLElement} popoverContent - The content to display in the popover
  * @returns {HTMLElement} The original element with popover functionality
  */
 function createPopoverElement(element, popoverContent) {
+    const content = element instanceof HTMLElement ? element : ce({innerHTML: ''+element})
     const popover = ce({
         classNames: ['popover'],
         children: [
@@ -554,18 +555,18 @@ function createPopoverElement(element, popoverContent) {
         popover.style.top = top + 'px'
     }
     
-    element.addEventListener('mouseenter', (e) => {
+    content.addEventListener('mouseenter', (e) => {
         updatePopoverPosition(e)
         showTimeout = setTimeout(() => {
             popover.classList.add('visible')
         }, 500)
     })
     
-    element.addEventListener('mousemove', (e) => {
+    content.addEventListener('mousemove', (e) => {
         updatePopoverPosition(e)
     })
     
-    element.addEventListener('mouseleave', () => {
+    content.addEventListener('mouseleave', () => {
         if (showTimeout) {
             clearTimeout(showTimeout)
             showTimeout = null
@@ -574,14 +575,14 @@ function createPopoverElement(element, popoverContent) {
     })
     
     const observer = new MutationObserver((mutations) => {
-        if (!document.body.contains(element)) {
+        if (!document.body.contains(content)) {
             popover.remove()
             observer.disconnect()
         }
     })
     observer.observe(document.body, { childList: true, subtree: true })
     
-    element.classList.add('popover-trigger')
+    content.classList.add('popover-trigger')
     
-    return element
+    return content
 }

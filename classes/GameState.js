@@ -19,6 +19,8 @@ class GameState {
         this.encounterImmunityUntilYear = 0;
         /** @type {number} */
         this.encounterDeniedUntilYear = 0;
+        /** @type {number} */
+        this.nextTitheYear = 0;
     }
 
     get captain() {

@@ -7,7 +7,10 @@ const buildingHandlerMapping = [
     {type: BUILDING_TYPES.GUILD, prop: 'guild', menu: (b) => showGuildMenu(b)},
     {type: BUILDING_TYPES.ACADEMY, prop: 'academy', menu: (b) => showAcademyMenu(b)},
     {type: BUILDING_TYPES.BANK, prop: 'bank', menu: (b) => showBankMenu(b)},
-    {type: BUILDING_TYPES.TEMPLE, prop: 'temple', menu: (b) => showModal("Temple", "The temple is quiet and serene.", [["Close", () => showPlanetMenu(b.planet)]])},
+    {type: BUILDING_TYPES.TEMPLE, prop: 'temple', menu: (b) => showTempleMenu(b), getDisabledReason: (b) => {
+        const stateReligion = b.planet.settlement?.government?.stateReligion;
+        return stateReligion ? null : 'No state religion in this settlement';
+    }},
     {type: BUILDING_TYPES.CASINO, prop: 'casino', menu: (b) => showCasinoMenu(b)},
     {type: BUILDING_TYPES.CYBER_SURGEON, prop: 'cyberSurgeon', menu: (b) => showCyberSurgeonBuyMenu(b)},
     {type: BUILDING_TYPES.GENETICIST, prop: 'geneticist', menu: (b) => showGeneticistBuyMenu(b)},
@@ -66,11 +69,17 @@ function showPlanetMenu(planet = new Planet()) {
     const options = []
     
     // Iterate through all buildings
-    if (settlement) for (const {type, prop, menu} of buildingHandlerMapping) {
+    if (settlement) for (const {type, prop, menu, getDisabledReason} of buildingHandlerMapping) {
         const building = settlement[prop]
         if (building && building.exists !== false) {
             console.log('building, type:',building, type)
-            const accessDeniedReason = BuildingType.getAccessDeniedReason(planet, building)
+            let accessDeniedReason = BuildingType.getAccessDeniedReason(planet, building)
+            
+            // Check for custom disabled reason
+            if (!accessDeniedReason && getDisabledReason) {
+                accessDeniedReason = getDisabledReason(building);
+            }
+            
             const isDisabled = accessDeniedReason !== null
             const levelDisplay = building.level ? ` ${toRomanNumeral(building.level)}` : ''
             const buttonText = type.name + levelDisplay

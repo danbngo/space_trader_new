@@ -102,17 +102,30 @@ function showMarketMenu(market = new Market()) {
     //TODO: colorize buy and sell penalties
     
     function showSellCargoSlider(ct = CARGO_TYPES_ALL[0], sellableAmount = 0, sellPrice = 0) {
-        const credits = gs.credits
+        const currentAmount = fleet.cargo.getAmount(ct);
+        const currentCredits = gs.credits;
+        const currentCargoTotal = fleet.cargo.total;
+        const maxCargoSpace = fleet.totalCargoSpace;
+        
+        // Create hoverable cargo name
+        createPopoverElement(coloredName(ct), ct.description);
+        
+        const titleEl = ce({children: ['Sell ', coloredName(ct)]});
+        
         showSliderModal(
-            1, sellableAmount, `Sell ${coloredName(ct)}`, 
-            `How many ${coloredName(ct)} would you like to sell?`,
+            1, sellableAmount, titleEl, 
+            ce({children: [`How many ${coloredName(ct)} would you like to sell?`]}),
             (amt)=>{
                 const totalSalePrice = amt*sellPrice
                 const officersShare = gs.fleet.calcTotalCRShare(totalSalePrice, true)
                 const finalSale = totalSalePrice - officersShare
                 return `
-                    Sale Price: ${finalSale}CR ${officersShare ? `(-${officersShare}CR for officers)` : ''}<br/>
-                    CR After Sale: ${credits+finalSale}CR <br/>
+                    Current Amount: ${currentAmount}<br/>
+                    After Sale: ${currentAmount - amt}<br/><br/>
+                    Current Credits: ${currentCredits}CR<br/>
+                    After Sale: ${currentCredits + finalSale}CR ${officersShare ? `(-${officersShare}CR officers)` : ''}<br/><br/>
+                    Current Cargo: ${currentCargoTotal}/${maxCargoSpace}<br/>
+                    After Sale: ${currentCargoTotal - amt}/${maxCargoSpace}<br/>
                 `
             },
             'Sell', 'Cancel', (amt = 0)=>sellCargo(ct, amt, amt*sellPrice), ()=>reloadMenu(),
@@ -120,10 +133,31 @@ function showMarketMenu(market = new Market()) {
     }
 
     function showBuyCargoSlider(ct = CARGO_TYPES_ALL[0], buyableAmount = 0, buyPrice = 0) {
+        const currentAmount = fleet.cargo.getAmount(ct);
+        const currentCredits = gs.credits;
+        const currentCargoTotal = fleet.cargo.total;
+        const maxCargoSpace = fleet.totalCargoSpace;
+        
+        // Create hoverable cargo name
+        const cargoNameSpan = ce({tag: 'span', innerHTML: coloredName(ct)});
+        createPopoverElement(cargoNameSpan, ct.description);
+        
+        const titleEl = ce({children: ['Buy ', cargoNameSpan]});
+        
         showSliderModal(
-            1, buyableAmount, `Buy ${coloredName(ct)}`, 
-            `How many ${coloredName(ct)} would you like to buy?`,
-            (amt)=>`Price: ${amt*buyPrice}CR`,
+            1, buyableAmount, titleEl, 
+            ce({children: [`How many ${coloredName(ct)} would you like to buy?`]}),
+            (amt)=>{
+                const totalPrice = amt * buyPrice;
+                return `
+                    Current Amount: ${currentAmount}<br/>
+                    After Purchase: ${currentAmount + amt}<br/><br/>
+                    Current Credits: ${currentCredits}CR<br/>
+                    After Purchase: ${currentCredits - totalPrice}CR<br/><br/>
+                    Current Cargo: ${currentCargoTotal}/${maxCargoSpace}<br/>
+                    After Purchase: ${currentCargoTotal + amt}/${maxCargoSpace}<br/>
+                `
+            },
             'Buy', 'Cancel', (amt = 0)=>buyCargo(ct, amt), ()=>reloadMenu(),
         )
     }
