@@ -29,6 +29,7 @@ function createBuyShipMenu(ships = [new Ship()], shipyard = new Shipyard(), onSe
     // Add popovers to stat header cells
     const headerRow = table.rows[0];
     if (headerRow) {
+        createPopoverElement(headerRow.cells[1], "Represents how high this ship's stats are compared to average ships"); // Quality
         createPopoverElement(headerRow.cells[2], SHIP_STATS.HULL.description); // Hull
         createPopoverElement(headerRow.cells[3], SHIP_STATS.SHIELDS.description); // Shields
         createPopoverElement(headerRow.cells[4], SHIP_STATS.LASERS.description); // Lasers
@@ -80,6 +81,15 @@ function createBuyModuleMenu(modules = [new ShipModule()], shipyard = new Shipya
         ])
     }
     const table = createTable(rows, (rowIndex = 0)=>onSelectModule(modules[rowIndex]))
+    
+    // Add popovers to header columns
+    if (table.rows[0]) {
+        const headerRow = table.rows[0];
+        if (headerRow.cells[0]) createPopoverElement(headerRow.cells[0], 'Type of ship module');
+        if (headerRow.cells[1]) createPopoverElement(headerRow.cells[1], 'Quality affects module effectiveness. Higher is better.');
+        if (headerRow.cells[2]) createPopoverElement(headerRow.cells[2], 'Price to purchase this module');
+        if (headerRow.cells[3]) createPopoverElement(headerRow.cells[3], 'Module description and effects');
+    }
     
     // Add popovers to each row's buy price
     modules.forEach((module, index) => {
@@ -136,12 +146,15 @@ function createSellShipMenu(ships = [new Ship()], shipyard = new Shipyard(), onS
     // Add popovers to stat header cells
     const headerRow = table.rows[0];
     if (headerRow) {
+        if (headerRow.cells[0]) createPopoverElement(headerRow.cells[0], 'Ship name and type');
+        if (headerRow.cells[1]) createPopoverElement(headerRow.cells[1], "Represents how high this ship's stats are compared to average ships");
         createPopoverElement(headerRow.cells[2], SHIP_STATS.HULL.description); // Hull
         createPopoverElement(headerRow.cells[3], SHIP_STATS.SHIELDS.description); // Shields
         createPopoverElement(headerRow.cells[4], SHIP_STATS.LASERS.description); // Lasers
         createPopoverElement(headerRow.cells[5], SHIP_STATS.ENGINES.description); // Engine
         createPopoverElement(headerRow.cells[6], SHIP_STATS.CARGO_CAPACITY.description); // Cargo Space
         createPopoverElement(headerRow.cells[7], 'The total cost to fully repair this ship at this shipyard'); // Repair Cost
+        if (headerRow.cells[8]) createPopoverElement(headerRow.cells[8], 'Price the shipyard will pay you for this ship');
     }
     
     // Add popovers to each row

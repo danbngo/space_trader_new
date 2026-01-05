@@ -138,7 +138,22 @@ class EncounterMap extends BaseMap {
             let shipObj = cvs.getObject(shipId)
             if (shipObj) return
             console.log('rebuilding ship:',shipId,shipObj,ship)
-            if (ship.shipType.shape == SHAPES.FilledTriangle) {
+            
+            // Special handling for asteroids - use polygon shape
+            if (ship instanceof AsteroidShip) {
+                // Generate asteroid shape if not already generated
+                if (!ship.asteroidVertices) {
+                    ship.asteroidVertices = AsteroidShip.generateShape();
+                }
+                shipObj = cvs.addPolygon(shipId, ship.x, ship.y, ship.asteroidVertices, ship.radius, 12, ship.color, COLORS.Gray, ship.angle, ()=>this.selectObject(ship));
+            }
+            // Use custom polygon shape if ship type has a shape generator
+            else if (ship.shipType.shapeGenerator) {
+                const vertices = ship.shipType.shapeGenerator();
+                shipObj = cvs.addPolygon(shipId, ship.x, ship.y, vertices, ship.radius, 12, ship.color, COLORS.White, ship.angle, ()=>this.selectObject(ship));
+            }
+            // Fallback to legacy shapes
+            else if (ship.shipType.shape == SHAPES.FilledTriangle) {
                 shipObj = cvs.addFilledTriangle(shipId, ship.x, ship.y, ship.radius, ship.radius, 12, ship.color, ship.angle, ()=>this.selectObject(ship))
             }
             else if (ship.shipType.shape == SHAPES.FilledOval) {
@@ -215,7 +230,22 @@ class EncounterMap extends BaseMap {
             // Create ship canvas objects if they don't exist (for dynamically added ships)
             if (!cvsShipObject) {
                 console.log('dynamically adding new ship to canvas:', shipId, ship)
-                if (ship.shipType.shape == SHAPES.FilledTriangle) {
+                
+                // Special handling for asteroids - use polygon shape
+                if (ship instanceof AsteroidShip) {
+                    // Generate asteroid shape if not already generated
+                    if (!ship.asteroidVertices) {
+                        ship.asteroidVertices = AsteroidShip.generateShape();
+                    }
+                    cvsShipObject = cvs.addPolygon(shipId, ship.x, ship.y, ship.asteroidVertices, ship.radius, 12, ship.color, COLORS.Gray, ship.angle, ()=>this.selectObject(ship));
+                }
+                // Use custom polygon shape if ship type has a shape generator
+                else if (ship.shipType.shapeGenerator) {
+                    const vertices = ship.shipType.shapeGenerator();
+                    cvsShipObject = cvs.addPolygon(shipId, ship.x, ship.y, vertices, ship.radius, 12, ship.color, COLORS.White, ship.angle, ()=>this.selectObject(ship));
+                }
+                // Fallback to legacy shapes
+                else if (ship.shipType.shape == SHAPES.FilledTriangle) {
                     cvsShipObject = cvs.addFilledTriangle(shipId, ship.x, ship.y, ship.radius, ship.radius, 12, ship.color, ship.angle, ()=>this.selectObject(ship))
                 }
                 else if (ship.shipType.shape == SHAPES.FilledOval) {

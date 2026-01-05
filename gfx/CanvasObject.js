@@ -23,6 +23,8 @@ class CanvasObject {
     * @param {number[] | null} [params.fillColor]
     * @param {number[] | null} [params.strokeColor]
     * @param {number | null} [params.durationMs]
+    * @param {number} [params.zIndex] - Draw order priority (higher values draw on top)
+    * @param {Array<[number, number]>} [params.vertices] - Array of [x, y] coordinates for polygon shape
     */
     constructor({
         id = '',
@@ -47,7 +49,9 @@ class CanvasObject {
         screenOffsetY = 0,
         minScreenSize = 1,
         visible = true,
-        durationMs = null
+        durationMs = null,
+        zIndex = 0,
+        vertices = []
     }) {
         this.id = id;
         this.shape = shape;
@@ -79,6 +83,10 @@ class CanvasObject {
         this.minScreenSize = minScreenSize;
         this.visible = visible
         this.clickPriority = 0; // Higher priority = clicked first (planets: 10, default: 0)
+        this.zIndex = zIndex; // Higher values draw on top
+        
+        /** @type {Array<[number, number]>} */
+        this.vertices = vertices || [];
 
         this.startMs = Date.now();
         this.durationMs = durationMs;
@@ -256,6 +264,23 @@ class CanvasObject {
             ctx.moveTo(0, 0); // start point
             ctx.lineTo(x2Offset, y2Offset); // end point
             ctx.stroke();       // actually draw it
+            break;
+            
+            case SHAPES.Polygon:
+            if (this.vertices && this.vertices.length > 2) {
+                if (this.angle) ctx.rotate(this.angle);
+                ctx.beginPath();
+                // Scale vertices by size
+                const scaledVertices = this.vertices.map(([vx, vy]) => [vx * size, vy * size]);
+                ctx.moveTo(scaledVertices[0][0], scaledVertices[0][1]);
+                for (let i = 1; i < scaledVertices.length; i++) {
+                    ctx.lineTo(scaledVertices[i][0], scaledVertices[i][1]);
+                }
+                ctx.closePath();
+                if (this.fillColor) ctx.fill();
+                if (this.strokeColor) ctx.stroke();
+            }
+            break;
         }
         
         ctx.restore();

@@ -3,7 +3,7 @@ const buildingHandlerMapping = [
     {type: BUILDING_TYPES.COURTHOUSE, prop: 'courthouse', menu: (b) => showCourthouseMenu(b)},
     {type: BUILDING_TYPES.MARKET, prop: 'market', menu: (b) => showMarketMenu(b)},
     {type: BUILDING_TYPES.BLACK_MARKET, prop: 'blackMarket', menu: (b) => showMarketMenu(b)},
-    {type: BUILDING_TYPES.TAVERN, prop: 'tavern', menu: (b) => showAcademyMenu(b)},
+    {type: BUILDING_TYPES.TAVERN, prop: 'tavern', menu: (b) => showTavernMenu(b)},
     {type: BUILDING_TYPES.GUILD, prop: 'guild', menu: (b) => showGuildMenu(b)},
     {type: BUILDING_TYPES.ACADEMY, prop: 'academy', menu: (b) => showAcademyMenu(b)},
     {type: BUILDING_TYPES.BANK, prop: 'bank', menu: (b) => showBankMenu(b)},
@@ -72,12 +72,21 @@ function showPlanetMenu(planet = new Planet()) {
     /** @type {(ButtonData|HTMLElement)[]} */
     const options = []
     
+    // Check if player has active bounty on this planet
+    const activeBounty = gs.captain.bounty.getAmount(planet)
+    const hasBounty = activeBounty > 0
+    
     // Iterate through all buildings
     if (settlement) for (const {type, prop, menu, getDisabledReason} of buildingHandlerMapping) {
         const building = settlement[prop]
         if (building && building.exists !== false) {
             console.log('building, type:',building, type)
             let accessDeniedReason = BuildingType.getAccessDeniedReason(planet, building)
+            
+            // Check for active bounty blocking access (unless building allows outlaws)
+            if (!accessDeniedReason && hasBounty && !type.allowOutlaw) {
+                accessDeniedReason = `You have an active bounty here! (${activeBounty}CR)`
+            }
             
             // Check for custom disabled reason
             if (!accessDeniedReason && getDisabledReason) {

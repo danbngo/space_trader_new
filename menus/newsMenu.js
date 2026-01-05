@@ -25,16 +25,44 @@ function showNewsTimelineMenu(planet = null, backFunction = null, activeOnly = t
     // Sort by year (most recent first)
     relevantNews.sort((a, b) => b.startYear - a.startYear)
 
-    /**@type {Array<[number, string, number]>} */
+    /**@type {Array<[number, string, number, News|null, string]>} */
     const newsLines = []
     for (const news of relevantNews) {
-        if (news.started && news.startYear && news.startDescription) newsLines.push([news.startYear, news.startDescription, news.newsType ? news.newsType.displayPriority : 0])
-        if (news.ended && news.endedYear && news.endDescription) newsLines.push([news.endedYear, news.endDescription, news.newsType ? news.newsType.displayPriority : 0])
+        if (news.started && news.startYear && news.startDescription) {
+            newsLines.push([news.startYear, news.startDescription, news.newsType ? news.newsType.displayPriority : 0, news, 'start'])
+        }
+        if (news.ended && news.endedYear && news.endDescription) {
+            const eventType = news.cancelled ? 'cancelled' : news.failed ? 'failed' : 'end';
+            newsLines.push([news.endedYear, news.endDescription, news.newsType ? news.newsType.displayPriority : 0, news, eventType])
+        }
     }
 
-    newsLines.sort((a, b) => b[0] - a[0] || a[2] - b[2]) //sort by year descending, then by displayPriority ascending
-    const msg = newsLines.map(line => line[1]).join('<br/>')
+    newsLines.sort((a, b) => b[0] - a[0] || a[2] - b[2]) // sort by year descending, then by displayPriority ascending
     
+    // Create hoverable news entries
+    const newsElements = newsLines.map(([year, description, priority, newsObj, eventType]) => {
+        const span = ce({tag: 'span', innerHTML: description});
+        if (newsObj) {
+            let popoverContent;
+            if (eventType === 'start') {
+                popoverContent = newsObj.getPopoverContentStart();
+            } else if (eventType === 'cancelled') {
+                popoverContent = newsObj.getPopoverContentCancelled();
+            } else if (eventType === 'failed') {
+                popoverContent = newsObj.getPopoverContentFailed();
+            } else if (eventType === 'end') {
+                popoverContent = newsObj.getPopoverContentEnd();
+            }
+            if (popoverContent) {
+                createPopoverElement(span, popoverContent);
+            }
+        }
+        return span;
+    });
+    
+    const msg = ce({children: newsElements.flatMap(el => [el, ce({tag: 'br'})])});
+    
+    /** @type {ButtonData[]} */
     const buttons = []
     const toggleLabel = activeOnly ? "Show Historical" : "Show Active Only"
     buttons.push([toggleLabel, () => showNewsTimelineMenu(planet, backFunction, !activeOnly)])

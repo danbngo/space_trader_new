@@ -20,7 +20,20 @@ function createBankLoansTable(loans = [new BankLoan()], onSelectLoan = (loan = n
             loan.interest
         ])
     }
-    return createTable(rows, (rowIndex = 0)=>onSelectLoan(loans[rowIndex]))
+    const table = createTable(rows, (rowIndex = 0)=>onSelectLoan(loans[rowIndex]));
+    
+    // Add popovers to header columns
+    if (table.rows[0]) {
+        const headerRow = table.rows[0];
+        if (headerRow.cells[0]) createPopoverElement(headerRow.cells[0], 'Year when the loan must be fully repaid. Late payment incurs penalties.');
+        if (headerRow.cells[1]) createPopoverElement(headerRow.cells[1], 'Length of time until the loan is due');
+        if (headerRow.cells[2]) createPopoverElement(headerRow.cells[2], 'Amount still owed on this loan');
+        if (headerRow.cells[3]) createPopoverElement(headerRow.cells[3], 'Total amount to repay (principal + interest)');
+        if (headerRow.cells[4]) createPopoverElement(headerRow.cells[4], 'Original borrowed amount');
+        if (headerRow.cells[5]) createPopoverElement(headerRow.cells[5], 'Interest charged on the loan');
+    }
+    
+    return table;
 }
 
 /**

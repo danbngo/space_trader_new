@@ -1,21 +1,30 @@
 class BackgroundMap extends BaseMap {
     constructor() {
         super()
+        this.paused = false // Never pause the background animation
         this.lastTickMs = Date.now()
         this.gameYearsPerMs = 1/365/24/60 * 2
 
         this.cvs = new CanvasWrapper(100, 10, 1000, NEPTUNE.orbit.radius)
         this.root = ce({classNames: ['starmap-root'], children: [this.cvs.root]})
         this.outerRadius = 20
-        this.innerRadius = 3
+        this.innerRadius = 0.1
 
-        this.bgStars = generateBackgroundStars(this.outerRadius, 500)
-        this.starTrails = new Map() // Store trail history externally
-
+        // Generate background stars for parallax effect
+        this.bgStars = generateBackgroundStars(this.outerRadius * 2, 500)
         for (const bgStar of this.bgStars) {
             bgStar.reset()
-            this.starTrails.set(bgStar, [])
         }
+
+        // Generate 3D asteroids instead of flat stars
+        this.asteroids = []
+        const numAsteroids = 50
+        for (let i = 0; i < numAsteroids; i++) {
+            this.asteroids.push(this.createAsteroid())
+        }
+
+        // Track which asteroid UUIDs are currently on canvas
+        this.activeAsteroidIds = new Set()
 
         this.refresh()
 
@@ -29,6 +38,36 @@ class BackgroundMap extends BaseMap {
         this.tick()
     }
 
+    createAsteroid() {
+        // Start at random position across the entire field, avoiding center
+        const angle = Math.random() * Math.PI * 2
+        const minDistance = 1.5 // Avoid spawning too close to center
+        const distance = minDistance + Math.random() * (this.outerRadius * 0.8 - minDistance)
+        const z = 2.5 + Math.random() * 2.5 // Random depth from close (2.5) to far (5.0) - spawn farther away
+        
+        // Brown-ish colors with variation
+        const baseR = 160
+        const baseG = 120
+        const baseB = 80
+        
+        return {
+            uuid: generateUUID(), // Unique ID for tracking
+            x: Math.cos(angle) * distance,
+            y: Math.sin(angle) * distance,
+            z: z, // Depth: high values (far) to low values (close)
+            angle: angle, // Direction from center
+            rotation: Math.random() * Math.PI * 2, // Current rotation
+            rotationSpeed: (Math.random() - 0.5) * 0.05, // Rotation per frame
+            vertices: AsteroidShip.generateShape(1.0, 0.4, 0.5),
+            color: [
+                baseR + rng(40, -40),
+                baseG + rng(40, -40),
+                baseB + rng(40, -40),
+                255
+            ]
+        }
+    }
+
     refresh() {
         this.rebuildCanvas();
         this.refreshBackground(gs.year)
@@ -36,39 +75,96 @@ class BackgroundMap extends BaseMap {
     }
 
     rebuildCanvas() {
-        const {bgStars, cvs, starTrails} = this
-        cvs.clear()
+        const {asteroids, bgStars, cvs, activeAsteroidIds} = this
         
-        // Draw trails first (so they appear behind stars)
-        bgStars.forEach((bgStar, starIndex) => {
-            const trail = starTrails.get(bgStar)
-            if (trail && trail.length > 1) {
-                for (let i = 1; i < trail.length; i++) {
-                    const curr = trail[i]
-                    const prev = trail[i - 1]
-                    
-                    // Calculate brightness for trail segment based on distance from center
-                    const segmentDist = calcDistance(0, 0, curr.x, curr.y)
-                    const segmentNormalized = segmentDist / this.outerRadius
-                    const segmentBrightness = segmentNormalized * 4
-                    
-                    const fadeFactor = i / trail.length
-                    const trailAlpha = Math.round(255 * fadeFactor * 0.3 * segmentBrightness)
-                    const trailColor = [...bgStar.color.slice(0, 3), trailAlpha]
-                    cvs.addLine(`trail_${starIndex}_${i}`, prev.x, prev.y, curr.x, curr.y, trailColor, bgStar.radius * 0.5)
-                }
+        // Draw background stars with parallax - only add if not already present
+        const sizeOffset = Math.max(cvs.canvas.width, cvs.canvas.height) / this.outerRadius * 4
+        bgStars.forEach((bgStar, index) => {
+            bgStar.twinkle(Date.now() / 50000)
+            // Only add pixel if it doesn't already exist
+            if (cvs.pixels[index] == undefined) {
+                const pixel = cvs.addPixel(0, 0, [255,255,255,255], 2, bgStar.x * sizeOffset, bgStar.y * sizeOffset, true)
+                console.log('added pixel;', index, bgStar, pixel)
+            } else {
+                // Update existing pixel's color for twinkling
+                cvs.pixels[index].color = [...bgStar.color]
             }
         })
         
-        // Draw stars
-        bgStars.forEach((bgStar, index) => {
-            // Calculate brightness multiplier based on distance from center
-            const distanceFromCenter = calcDistance(0, 0, bgStar.x, bgStar.y)
-            const normalizedDistance = distanceFromCenter / this.outerRadius
-            const brightnessFactor = normalizedDistance * 4
+        // Track current asteroid UUIDs
+        const currentAsteroidIds = new Set()
+        
+        // Sort asteroids by z-depth (far to near for proper rendering)
+        const sortedAsteroids = [...asteroids].sort((a, b) => b.z - a.z)
+        
+        // Draw asteroids with 3D projection
+        sortedAsteroids.forEach((asteroid) => {
+            currentAsteroidIds.add(asteroid.uuid)
             
-            cvs.addPixel(bgStar.x, bgStar.y, [bgStar.color[0], bgStar.color[1], bgStar.color[2], Math.round(255 * brightnessFactor)], bgStar.radius*1)
-        });
+            // 3D to 2D projection: as z decreases (closer), projected position moves away from center
+            const scale = 1 / asteroid.z // Inverse: smaller z = larger scale
+            const projectedX = asteroid.x * scale
+            const projectedY = asteroid.y * scale
+            
+            // Size increases as asteroid gets closer (smaller z)
+            const baseSize = 0.2
+            const size = baseSize * scale
+            
+            // Brightness increases as asteroid gets closer (smaller z)
+            const maxZ = 5.0
+            const brightness = Math.min(1, (maxZ - asteroid.z) / maxZ + 0.2)
+            const color = [
+                Math.round(asteroid.color[0] * brightness),
+                Math.round(asteroid.color[1] * brightness),
+                Math.round(asteroid.color[2] * brightness),
+                Math.round(255 * brightness)
+            ]
+            
+            const asteroidId = `asteroid_${asteroid.uuid}`
+            
+            // Calculate zIndex: farther asteroids (higher z) get lower zIndex (draw behind)
+            // We use inverse of z so closer objects have higher zIndex and draw on top
+            const zIndex = Math.round(1000 / asteroid.z)
+            
+            // Only add if it doesn't exist, otherwise update existing
+            const existingObj = cvs.drawOrder.find(obj => obj.id === asteroidId)
+            if (!existingObj) {
+                cvs.addPolygon(
+                    asteroidId,
+                    projectedX,
+                    projectedY,
+                    asteroid.vertices,
+                    size,
+                    2, // min screen size
+                    color,
+                    COLORS.White, // white stroke
+                    asteroid.rotation,
+                    null, // no click handler
+                    zIndex // closer asteroids (smaller z) have higher zIndex
+                )
+                activeAsteroidIds.add(asteroid.uuid)
+            } else {
+                // Update existing asteroid position, size, brightness, rotation, and zIndex
+                existingObj.x = projectedX
+                existingObj.y = projectedY
+                existingObj.size = size
+                existingObj.color = [...color]
+                existingObj.rotation = asteroid.rotation
+                existingObj.zIndex = zIndex
+            }
+        })
+        
+        // Remove canvas objects for asteroids that no longer exist
+        const idsToRemove = [...activeAsteroidIds].filter(id => !currentAsteroidIds.has(id))
+        for (const uuid of idsToRemove) {
+            const asteroidId = `asteroid_${uuid}`
+            const index = cvs.drawOrder.findIndex(obj => obj.id === asteroidId)
+            if (index !== -1) {
+                cvs.drawOrder.splice(index, 1)
+            }
+            activeAsteroidIds.delete(uuid)
+        }
+        
         cvs.recalculateDrawOrder()
     }
 
@@ -78,45 +174,61 @@ class BackgroundMap extends BaseMap {
     }
 
     refreshBackground(year = 0) {
-        const {bgStars, cvs, starTrails} = this
-        const trailLength = 5
+        const {asteroids} = this
         
-        bgStars.forEach( (bgStar, index) => {
-            //bgStar.twinkle(year)
-
-            // Store previous position in trail history
-            const trail = starTrails.get(bgStar) || []
-            trail.push({x: bgStar.x, y: bgStar.y})
-            if (trail.length > trailLength) {
-                trail.shift()
+        asteroids.forEach((asteroid, index) => {
+            // Move asteroid closer (decrease z)
+            asteroid.z -= 0.02
+            
+            // Rotate asteroid
+            asteroid.rotation += asteroid.rotationSpeed
+            
+            // Calculate projected position to check if off screen
+            const scale = 1 / asteroid.z
+            const projectedX = asteroid.x * scale
+            const projectedY = asteroid.y * scale
+            const projectedDist = calcDistance(0, 0, projectedX, projectedY)
+            
+            // Reset asteroid if it's too close (z < 0.3) or off screen
+            if (asteroid.z < 0.3 || projectedDist > this.outerRadius) {
+                // Reset to new random position at far distance, avoiding center
+                const newAngle = Math.random() * Math.PI * 2
+                const minDistance = 1.5
+                const distance = minDistance + Math.random() * (this.outerRadius * 0.8 - minDistance)
+                asteroid.x = Math.cos(newAngle) * distance
+                asteroid.y = Math.sin(newAngle) * distance
+                asteroid.z = 3.0 + Math.random() * 2.0 // Reset to far distance (high z)
+                asteroid.angle = newAngle
+                asteroid.rotation = Math.random() * Math.PI * 2
+                asteroid.rotationSpeed = (Math.random() - 0.5) * 0.05
+                asteroid.vertices = AsteroidShip.generateShape(1.0, 0.4, 0.5)
+                
+                // Brown-ish colors with variation
+                const baseR = 160
+                const baseG = 120
+                const baseB = 80
+                asteroid.color = [
+                    baseR + rng(40, -40),
+                    baseG + rng(40, -40),
+                    baseB + rng(40, -40),
+                    255
+                ]
             }
-            starTrails.set(bgStar, trail)
-
-            bgStar.x *= 1.01
-            bgStar.y *= 1.01
-
-            if (calcDistance(0, 0, bgStar.x, bgStar.y) >= this.outerRadius) {
-                const distance = rng(this.innerRadius, 0, false)
-                const [x,y] = rotatePoint(distance, 0, 0, 0, Math.PI*4*Math.random())
-                bgStar.x = x
-                bgStar.y = y
-                starTrails.set(bgStar, []) // Clear trail on reset
-            }
-        });
+        })
     }
 
     tick() {
-        if (this.paused) return
-        
         const currentTime = Date.now()
-        this.refreshBackground(currentTime/200000) //hack to make stars twinkle at a reasonable speed
-        this.rebuildCanvas() // Rebuild to update trails
+        this.refreshBackground(currentTime / 200000)
+        this.rebuildCanvas()
         this.refreshCanvas()
 
-        // Only continue animation loop if not paused
-        if (!this.paused) {
-            requestAnimationFrame(()=>this.tick())
-        }
+        requestAnimationFrame(()=>this.tick())
+    }
+
+    // Override togglePause to do nothing - background always animates
+    togglePause(newPausedState) {
+        // Do nothing - background map never pauses
     }
 }
 

@@ -7,6 +7,7 @@
  */
 function createAcademyHireOfficerMenu(officers = [], academy, onSelectOfficer = (officer)=>{}) {
     if (officers.length == 0) return `(None)`
+    /** @type {Array<Array<string|HTMLElement|SkillType>>} */
     const rows = [
         ['Name', 'Race', 'Age', 'Level', 'CR Share', ...SKILLS_ALL, 'Implants', 'Hire Price']
     ]
@@ -15,8 +16,14 @@ function createAcademyHireOfficerMenu(officers = [], academy, onSelectOfficer = 
         const hirePrice = academy.calcHirePrice(officer)
         const implantCount = officer.implants.length
         const raceDisplay = officer.race ? `${officer.race.symbol} ${officer.race.name}` : 'Human'
+        
+        // Create hoverable officer name
+        const nameSpan = ce({tag: 'span', innerHTML: officer.name});
+        const officerDesc = `Level ${officer.level} officer<br/>Faction: ${officer.factionType.name}<br/>Skills: ${SKILLS_ALL.map(sk => `${sk.name}: ${officer.skills.getAmount(sk)}`).join(', ')}`;
+        createPopoverElement(nameSpan, officerDesc);
+        
         rows.push([
-            officer.name,
+            nameSpan,
             raceDisplay,
             ''+officer.age,
             statColorSpan(officer.level, officer.level/5),
@@ -26,7 +33,23 @@ function createAcademyHireOfficerMenu(officers = [], academy, onSelectOfficer = 
             statColorSpan(hirePrice, officer.value/hirePrice)
         ])
     }
-    return createTable(rows, (rowIndex = 0)=>onSelectOfficer(officers[rowIndex]))
+    const table = createTable(rows, (rowIndex = 0)=>onSelectOfficer(officers[rowIndex]));
+    
+    // Add popovers to header columns
+    if (table.rows[0]) {
+        const headerRow = table.rows[0];
+        if (headerRow.cells[4]) createPopoverElement(headerRow.cells[4], 'CR Share: Percentage of credits this officer takes from sales and bounties');
+        SKILLS_ALL.forEach((skill, idx) => {
+            if (headerRow.cells[5 + idx]) {
+                createPopoverElement(headerRow.cells[5 + idx], skill.description);
+            }
+        });
+        if (headerRow.cells[5 + SKILLS_ALL.length]) {
+            createPopoverElement(headerRow.cells[5 + SKILLS_ALL.length], 'Cybernetic implants installed in this officer');
+        }
+    }
+    
+    return table;
 }
 
 /**
@@ -198,8 +221,12 @@ function showAcademyMenu(academy, selectedSkill = SKILLS_ALL[0], showHiring = fa
             // Higher = red (ratio < 1), Lower = green (ratio > 1)
             const statRatio = 1 / totalMultiplier
             
+            // Create hoverable skill name
+            const skillNameSpan = ce({tag: 'span', innerHTML: skill.name});
+            createPopoverElement(skillNameSpan, skill.description);
+            
             return [
-                skill.name,
+                skillNameSpan,
                 currentLevel,
                 colorSpan(canUpgrade ? 'Yes' : 'No', canUpgrade ? COLORS.Green : COLORS.Red),
                 ''+statColorSpan(cost, statRatio) + ' CR'
@@ -208,6 +235,14 @@ function showAcademyMenu(academy, selectedSkill = SKILLS_ALL[0], showHiring = fa
     ] : [['Skill', 'Current Lvl', 'Can Upgrade?', 'CR to Upgrade']]
 
     const skillTable = createTable(skillTableRows, (rowIndex) => onSelectSkill(SKILLS_ALL[rowIndex]), selectedSkill ? SKILLS_ALL.indexOf(selectedSkill) + 1 : null)
+    
+    // Add popover to Skill header column
+    if (skillTable.rows[0]) {
+        const headerRow = skillTable.rows[0];
+        if (headerRow.cells[0]) {
+            createPopoverElement(headerRow.cells[0], 'Skills improve your captain\'s effectiveness in various activities. Click to select a skill to upgrade.');
+        }
+    }
 
     let trainingContainer = ce({
         children: [

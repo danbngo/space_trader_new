@@ -33,6 +33,7 @@ const SHAPES = Object.freeze({
     EmptyOval: 'EmptyOval',
     FilledRectangle: 'FilledRectangle',
     EmptyRectangle: 'EmptyRectangle',
+    Polygon: 'Polygon', // For custom polygons defined by vertices
 })
 
 /**

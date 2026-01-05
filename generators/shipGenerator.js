@@ -2,7 +2,7 @@
  * Generates a ship with stats based on planet quality and ship type.
  * @param {Planet} planet - The planet determining ship quality.
  * @param {ShipType} shipType - The type of ship to generate.
- * @returns {Ship} The generated ship.
+ * @returns {Ship|AsteroidShip} The generated ship.
  */
 function generateShip(planet = new Planet(), shipType = rndMember(SHIP_TYPES_ALL)) {
     const technology = planet ? planet.c.technology : 1
@@ -19,5 +19,12 @@ function generateShip(planet = new Planet(), shipType = rndMember(SHIP_TYPES_ALL
 
     const name = planet ? `${coloredIanName(planet)} ${shipType.name}` : shipType.name
 
-    return new Ship(name, shipType, COLORS.LightGray, hull, shields, lasers, engine, cargoSpace, radars, maxActionsPerTurn);
+    // Check if this is an asteroid ship type
+    const isAsteroid = ASTEROID_SHIP_TYPES_ALL.includes(shipType);
+    
+    if (isAsteroid) {
+        return new AsteroidShip(name, shipType, COLORS.LightGray, hull, shields, lasers, engine, cargoSpace, radars, maxActionsPerTurn);
+    } else {
+        return new Ship(name, shipType, COLORS.LightGray, hull, shields, lasers, engine, cargoSpace, radars, maxActionsPerTurn);
+    }
 }

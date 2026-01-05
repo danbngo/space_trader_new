@@ -7,8 +7,9 @@ class BuildingType {
      * @param {string} name - The name of the building type.
      * @param {number[]} color - The color associated with this building type.
      * @param {RankType} minRank
+     * @param {boolean} allowOutlaw - Whether outlaws with active bounties can access this building
      */
-    constructor(name = '', color = COLORS.White, minRank = RANK_TYPES.NO_RANK, baseCredits = 1) {
+    constructor(name = '', color = COLORS.White, minRank = RANK_TYPES.NO_RANK, baseCredits = 1, allowOutlaw = false) {
         /** @type {string} */
         this.name = name
         /** @type {number[]} */
@@ -17,6 +18,8 @@ class BuildingType {
         this.minRank = minRank || RANK_TYPES.NO_RANK
         /** @type {number} */
         this.baseCredits = baseCredits
+        /** @type {boolean} */
+        this.allowOutlaw = allowOutlaw
     }
 
     /**
@@ -60,11 +63,11 @@ class BuildingType {
 }
 
 const BUILDING_TYPES = {
-    COURTHOUSE: new BuildingType('Court House', COLORS.Brown, RANK_TYPES.OUTLAW, 10*1000),
+    COURTHOUSE: new BuildingType('Court House', COLORS.Brown, RANK_TYPES.OUTLAW, 10*1000, true),
+    BLACK_MARKET: new BuildingType('Black Market', COLORS.Red, RANK_TYPES.VISA, 10*1000, true),
     
     SHIPYARD: new BuildingType('Shipyard', COLORS.LightGray, RANK_TYPES.NO_RANK, 20*1000),
     
-    BLACK_MARKET: new BuildingType('Black Market', COLORS.Red, RANK_TYPES.VISA, 10*1000),
     MARKET: new BuildingType('Market', COLORS.LightBlue, RANK_TYPES.VISA, 30*1000),
     TAVERN: new BuildingType('Tavern', COLORS.Orange, RANK_TYPES.VISA, 5*1000),
     

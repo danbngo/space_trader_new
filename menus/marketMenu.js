@@ -27,6 +27,16 @@ function createMarketCargoTable(market = new Market(), blackMarket = false, play
     console.log('creating cargo table w rows:',rows)
     const table = createTable(rows, (rowIndex = 0)=>onSelectCargoType(cargoTypes[rowIndex]));
     
+    // Add popovers to header columns
+    if (table.rows[0]) {
+        const headerRow = table.rows[0];
+        if (headerRow.cells[0]) createPopoverElement(headerRow.cells[0], 'Type of cargo available for trade');
+        if (headerRow.cells[1]) createPopoverElement(headerRow.cells[1], 'Amount of this cargo available at the market. Affected by planet production and consumption.');
+        if (headerRow.cells[2]) createPopoverElement(headerRow.cells[2], 'Price to purchase one unit from the market. Lower is better.');
+        if (headerRow.cells[3]) createPopoverElement(headerRow.cells[3], 'Amount of this cargo in your fleet\'s hold');
+        if (headerRow.cells[4]) createPopoverElement(headerRow.cells[4], 'Price the market will pay you per unit. Higher is better.');
+    }
+    
     // Add popovers to various columns
     const tableRows = table.querySelectorAll('tr');
     tableRows.forEach((row, rowIndex) => {
@@ -107,26 +117,26 @@ function showMarketMenu(market = new Market()) {
         const currentCargoTotal = fleet.cargo.total;
         const maxCargoSpace = fleet.totalCargoSpace;
         
-        // Create hoverable cargo name
-        createPopoverElement(coloredName(ct), ct.description);
+        const titleEl = ce({children: ['Sell ', coloredName(ct)], style: {whiteSpace: 'nowrap'}});
         
-        const titleEl = ce({children: ['Sell ', coloredName(ct)]});
+        // Create hoverable label for "How many X"
+        const labelCargoSpan = ce({tag: 'span', innerHTML: coloredName(ct)});
+        createPopoverElement(labelCargoSpan, ct.description);
         
         showSliderModal(
             1, sellableAmount, titleEl, 
-            ce({children: [`How many ${coloredName(ct)} would you like to sell?`]}),
+            ce({children: ['How many ', labelCargoSpan, ' would you like to sell?']}),
             (amt)=>{
                 const totalSalePrice = amt*sellPrice
                 const officersShare = gs.fleet.calcTotalCRShare(totalSalePrice, true)
                 const finalSale = totalSalePrice - officersShare
-                return `
-                    Current Amount: ${currentAmount}<br/>
-                    After Sale: ${currentAmount - amt}<br/><br/>
-                    Current Credits: ${currentCredits}CR<br/>
-                    After Sale: ${currentCredits + finalSale}CR ${officersShare ? `(-${officersShare}CR officers)` : ''}<br/><br/>
-                    Current Cargo: ${currentCargoTotal}/${maxCargoSpace}<br/>
-                    After Sale: ${currentCargoTotal - amt}/${maxCargoSpace}<br/>
-                `
+                return ce({children: [
+                    `Your Amount: ${currentAmount} → ${currentAmount - amt}`,
+                    ce({tag: 'br'}),
+                    `Your Credits: ${currentCredits}CR → ${currentCredits + finalSale}CR ${officersShare ? `(-${officersShare}CR officers)` : ''}`,
+                    ce({tag: 'br'}),
+                    `Cargo Space: ${currentCargoTotal}/${maxCargoSpace} → ${currentCargoTotal - amt}/${maxCargoSpace}`,
+                ]});
             },
             'Sell', 'Cancel', (amt = 0)=>sellCargo(ct, amt, amt*sellPrice), ()=>reloadMenu(),
         )
@@ -142,21 +152,24 @@ function showMarketMenu(market = new Market()) {
         const cargoNameSpan = ce({tag: 'span', innerHTML: coloredName(ct)});
         createPopoverElement(cargoNameSpan, ct.description);
         
-        const titleEl = ce({children: ['Buy ', cargoNameSpan]});
+        const titleEl = ce({children: ['Buy ', cargoNameSpan], style: {whiteSpace: 'nowrap'}});
+        
+        // Create hoverable label for "How many X"
+        const labelCargoSpan = ce({tag: 'span', innerHTML: coloredName(ct)});
+        createPopoverElement(labelCargoSpan, ct.description);
         
         showSliderModal(
             1, buyableAmount, titleEl, 
-            ce({children: [`How many ${coloredName(ct)} would you like to buy?`]}),
+            ce({children: ['How many ', labelCargoSpan, ' would you like to buy?']}),
             (amt)=>{
                 const totalPrice = amt * buyPrice;
-                return `
-                    Current Amount: ${currentAmount}<br/>
-                    After Purchase: ${currentAmount + amt}<br/><br/>
-                    Current Credits: ${currentCredits}CR<br/>
-                    After Purchase: ${currentCredits - totalPrice}CR<br/><br/>
-                    Current Cargo: ${currentCargoTotal}/${maxCargoSpace}<br/>
-                    After Purchase: ${currentCargoTotal + amt}/${maxCargoSpace}<br/>
-                `
+                return ce({children: [
+                    `Your Amount: ${currentAmount} → ${currentAmount + amt}`,
+                    ce({tag: 'br'}),
+                    `Your Credits: ${currentCredits}CR → ${currentCredits - totalPrice}CR`,
+                    ce({tag: 'br'}),
+                    `Cargo Space: ${currentCargoTotal}/${maxCargoSpace} → ${currentCargoTotal + amt}/${maxCargoSpace}`,
+                ]});
             },
             'Buy', 'Cancel', (amt = 0)=>buyCargo(ct, amt), ()=>reloadMenu(),
         )

@@ -37,7 +37,8 @@ class ShipType {
     constructor(name = '', description = '', shape, hull = 1, shields = 1, lasers = 1, engine = 1, cargoSpace = 1, radars = 1, modules = [], moduleSlots = 0, maxActionsPerTurn = SHIP_NUM_MOVES_PER_TURN) {
         this.name = name
         this.description = description
-        this.shape = shape;
+        this.shape = shape; // Legacy shape enum (deprecated)
+        this.shapeGenerator = null; // Function that generates polygon vertices
         this.hull = hull
         this.shields = shields
         this.lasers = lasers
@@ -76,6 +77,26 @@ const SHIP_TYPES = {
 const SHIP_TYPES_ALL = Object.values(SHIP_TYPES)
 
 const STARTING_SHIP_TYPE = new ShipType('Starting Ship', 'A basic ship with balanced capabilities suitable for beginning your journey.', SHAPES.FilledTriangle, 1, 1, 1, 1, 1, 1, [], 1, 1)
+
+// Assign shape generators to ship types
+SHIP_TYPES.COURIER_SHIP.shapeGenerator = SHIP_SHAPES.COURIER_SHIP
+SHIP_TYPES.FIRE_SHIP.shapeGenerator = SHIP_SHAPES.FIRE_SHIP
+SHIP_TYPES.PASSENGER_SHIP.shapeGenerator = SHIP_SHAPES.PASSENGER_SHIP
+SHIP_TYPES.SUPPLY_SHIP.shapeGenerator = SHIP_SHAPES.SUPPLY_SHIP
+SHIP_TYPES.TANKER.shapeGenerator = SHIP_SHAPES.TANKER
+SHIP_TYPES.BLOCKADE_RUNNER.shapeGenerator = SHIP_SHAPES.BLOCKADE_RUNNER
+SHIP_TYPES.SCOUT.shapeGenerator = SHIP_SHAPES.SCOUT
+SHIP_TYPES.FIGHTER.shapeGenerator = SHIP_SHAPES.FIGHTER
+SHIP_TYPES.FRIGATE.shapeGenerator = SHIP_SHAPES.FRIGATE
+SHIP_TYPES.DESTROYER.shapeGenerator = SHIP_SHAPES.DESTROYER
+SHIP_TYPES.JAMMER.shapeGenerator = SHIP_SHAPES.JAMMER
+SHIP_TYPES.BATTLESHIP.shapeGenerator = SHIP_SHAPES.BATTLESHIP
+SHIP_TYPES.TUG_SHIP.shapeGenerator = SHIP_SHAPES.TUG_SHIP
+SHIP_TYPES.DRILLING_RIG.shapeGenerator = SHIP_SHAPES.DRILLING_RIG
+SHIP_TYPES.ESCORT_SHIP.shapeGenerator = SHIP_SHAPES.ESCORT_SHIP
+SHIP_TYPES.INTERCEPTOR.shapeGenerator = SHIP_SHAPES.INTERCEPTOR
+SHIP_TYPES.UTILITY_SHIP.shapeGenerator = SHIP_SHAPES.UTILITY_SHIP
+STARTING_SHIP_TYPE.shapeGenerator = SHIP_SHAPES.STARTING_SHIP
 
 const ASTEROID_SHIP_TYPES = {
     ASTEROID: new ShipType('Asteroid', 'Rocky space debris drifting through the void, can be mined for valuable minerals.', SHAPES.FilledOval, 0.3, 0, 0, 0.25, 0.5, 1, [], 0, 1),
@@ -154,7 +175,7 @@ function spawnSmallerAsteroids(died, encounter) {
         const newY = died.y + Math.sin(angle) * offsetDist
         const newEngine = died.engine * 2
         
-        const smallAsteroid = new Ship(died.name, died.shipType, died.color, [newHull,newHull], [0,0], died.lasers, newEngine, 0, died.radars, died.maxActionsPerTurn)
+        const smallAsteroid = new AsteroidShip(died.name, died.shipType, died.color, [newHull,newHull], [0,0], died.lasers, newEngine, 0, died.radars, died.maxActionsPerTurn)
         smallAsteroid.hull = [newHull, newHull]
         smallAsteroid.x = newX
         smallAsteroid.y = newY

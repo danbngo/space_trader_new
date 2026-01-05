@@ -149,6 +149,11 @@ class CanvasWrapper {
         return this.addObject(obj)
     }
     
+    addPolygon(id = "", x = 0, y = 0, vertices = [], size = 1, minScreenSize = 0, fillColor = COLORS.LightGray, strokeColor = null, angle = 0, onClick = null, zIndex = 0) {
+        const obj = new CanvasObject({ id, shape: SHAPES.Polygon, x, y, vertices, size, minScreenSize, fillColor, strokeColor, angle, onClick, zIndex });
+        return this.addObject(obj)
+    }
+    
     addEmptyTriangle(id = "", x = 0, y = 0, size = 0, minorSize = 0, minScreenSize = 0, strokeColor = COLORS.LightGray, angle = 0, lineWidth = 1, onClick = null) {
         const obj = new CanvasObject({ id, shape: SHAPES.EmptyTriangle, x, y, size, minorSize, minScreenSize, strokeColor, angle, onClick, lineWidth });
         return this.addObject(obj)
@@ -330,10 +335,15 @@ class CanvasWrapper {
     }
     
     recalculateDrawOrder() {
-        // Sort so dots at bottom, text at top
+        // Sort by zIndex first (higher z = on top), then by shape type as fallback
         const sorted = [...this.drawOrder].sort((a, b) => {
-            const order = { Line: 0, EmptyCircle: 1, EmptyOval: 2, EmptyRectangle: 3, EmptyTriangle: 4, FilledRectangle: 5, FilledCircle: 6, FilledOval: 7, Triangle: 8, Text: 9 };
-            return order[a.shape] - order[b.shape];
+            // Primary sort: by zIndex (lower values draw first/behind)
+            if (a.zIndex !== b.zIndex) {
+                return a.zIndex - b.zIndex;
+            }
+            // Secondary sort: by shape type for objects with same zIndex
+            const order = { Line: 0, EmptyCircle: 1, EmptyOval: 2, EmptyRectangle: 3, EmptyTriangle: 4, FilledRectangle: 5, FilledCircle: 6, FilledOval: 7, Triangle: 8, Polygon: 9, Text: 10 };
+            return (order[a.shape] || 0) - (order[b.shape] || 0);
         });
         this.drawOrder = sorted
     }

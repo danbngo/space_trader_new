@@ -126,6 +126,129 @@ class News {
     }
 
     /**
+     * Gets a detailed multiline description of the news event and its effects for use in popovers.
+     * @returns {string} HTML formatted description of the news event
+     */
+    getPopoverContentStart() {
+        const lines = [];
+        
+        // Basic info
+        lines.push(`<b>Type:</b> ${this.newsType.name}`);
+        lines.push(`<b>Origin:</b> ${coloredName(this.planet)}`);
+        if (this.targetPlanet) {
+            lines.push(`<b>Target:</b> ${coloredName(this.targetPlanet)}`);
+        }
+        
+        // Status and timing
+        lines.push(`<b>Status:</b> Starting`);
+        lines.push(`<b>Started:</b> ${describeDate(this.startYear)}`);
+        lines.push(`<b>Expected End:</b> ${describeDate(this.endYear)}`);
+        
+        // Start effects
+        if (this.startEffects.length > 0) {
+            lines.push('');
+            lines.push('<b>Immediate Effects:</b>');
+            for (const fx of this.startEffects) {
+                const desc = fx.describe();
+                if (desc) lines.push(`• ${desc}`);
+            }
+        }
+        
+        // Expected end effects
+        if (this.completeEffects.length > 0) {
+            lines.push('');
+            lines.push('<b>Effects on Completion:</b>');
+            for (const fx of this.completeEffects) {
+                const desc = fx.describe();
+                if (desc) lines.push(`• ${desc}`);
+            }
+        }
+        
+        return lines.join('<br/>');
+    }
+
+    getPopoverContentEnd() {
+        const lines = [];
+        
+        // Basic info
+        lines.push(`<b>Type:</b> ${this.newsType.name}`);
+        lines.push(`<b>Origin:</b> ${coloredName(this.planet)}`);
+        if (this.targetPlanet) {
+            lines.push(`<b>Target:</b> ${coloredName(this.targetPlanet)}`);
+        }
+        
+        // Status and timing
+        lines.push(`<b>Status:</b> Completed`);
+        lines.push(`<b>Duration:</b> ${describeDate(this.startYear)} - ${describeDate(this.endedYear)}`);
+        
+        // Completed effects
+        if (this.completeEffects.length > 0) {
+            lines.push('');
+            lines.push('<b>Effects Applied:</b>');
+            for (const fx of this.completeEffects) {
+                const desc = fx.describe();
+                if (desc) lines.push(`• ${desc}`);
+            }
+        }
+        
+        return lines.join('<br/>');
+    }
+
+    getPopoverContentCancelled() {
+        const lines = [];
+        
+        // Basic info
+        lines.push(`<b>Type:</b> ${this.newsType.name}`);
+        lines.push(`<b>Origin:</b> ${coloredName(this.planet)}`);
+        if (this.targetPlanet) {
+            lines.push(`<b>Target:</b> ${coloredName(this.targetPlanet)}`);
+        }
+        
+        // Status and timing
+        lines.push(`<b>Status:</b> Cancelled`);
+        lines.push(`<b>Duration:</b> ${describeDate(this.startYear)} - ${describeDate(this.endedYear)}`);
+        
+        // Cancellation effects
+        if (this.cancelEffects.length > 0) {
+            lines.push('');
+            lines.push('<b>Cancellation Effects:</b>');
+            for (const fx of this.cancelEffects) {
+                const desc = fx.describe();
+                if (desc) lines.push(`• ${desc}`);
+            }
+        }
+        
+        return lines.join('<br/>');
+    }
+
+    getPopoverContentFailed() {
+        const lines = [];
+        
+        // Basic info
+        lines.push(`<b>Type:</b> ${this.newsType.name}`);
+        lines.push(`<b>Origin:</b> ${coloredName(this.planet)}`);
+        if (this.targetPlanet) {
+            lines.push(`<b>Target:</b> ${coloredName(this.targetPlanet)}`);
+        }
+        
+        // Status and timing
+        lines.push(`<b>Status:</b> Failed`);
+        lines.push(`<b>Duration:</b> ${describeDate(this.startYear)} - ${describeDate(this.endedYear)}`);
+        
+        // Failure effects
+        if (this.failEffects.length > 0) {
+            lines.push('');
+            lines.push('<b>Failure Effects:</b>');
+            for (const fx of this.failEffects) {
+                const desc = fx.describe();
+                if (desc) lines.push(`• ${desc}`);
+            }
+        }
+        
+        return lines.join('<br/>');
+    }
+
+    /**
      * Starts the news event, applying all start effects.
      * @throws {Error} If the event has already started or ended.
      */

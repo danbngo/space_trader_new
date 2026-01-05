@@ -350,38 +350,119 @@ function createTable(rows = [[ce()]], onSelectRow = null, firstSelectedIndex = o
         ...rows.map(row => Array.isArray(row) ? row.length : 1)
     );
 
-    let selectedRow = undefined
-    rows.forEach((row, index) => {
-        const isFirstSelected = (index) === firstSelectedIndex
-
-        const onRowClicked = ()=>{
-            if (!onSelectRow) return
-            if (selectedRow) selectedRow.classList.remove('selected')
-            tr.classList.add('selected')
-            selectedRow = tr
-            onSelectRow(index-1); //-1 for header
+    // Track current sort state: {columnIndex: number, ascending: boolean}
+    let currentSort = {columnIndex: -1, ascending: true};
+    
+    // Store original row data with indices for sorting
+    const dataRows = rows.slice(1).map((row, idx) => ({row, originalIndex: idx}));
+    
+    /**
+     * Sorts the table by the specified column
+     * @param {number} columnIndex - The column to sort by
+     */
+    function sortTable(columnIndex) {
+        // Toggle sort direction if clicking the same column
+        if (currentSort.columnIndex === columnIndex) {
+            currentSort.ascending = !currentSort.ascending;
+        } else {
+            currentSort.columnIndex = columnIndex;
+            currentSort.ascending = true;
         }
-
-        const tr = ce({
-            parent: table,
-            tag:'tr',
-            classNames: [index == 0 ? 'ui-table-first-row' : 'ui-table-row', isFirstSelected ? 'selected' : null],
-            onClick: (index == 0 ? undefined : onRowClicked)
-        })
-        if (isFirstSelected) selectedRow = tr
-
-        for (let i = 0; i < colCount; i++) {
-            ce({
-                parent: tr,
-                tag:index == 0 ? 'th' : 'td',
-                classNames:['ui-table-cell'],
-                children: [row[i]],
-                onClick: (index == 0 ? undefined : onRowClicked)
-            })
-        }
+        
+        // Sort data rows
+        dataRows.sort((a, b) => {
+            let aVal = a.row[columnIndex];
+            let bVal = b.row[columnIndex];
+            
+            // Extract text content from HTML elements
+            if (aVal instanceof HTMLElement) aVal = aVal.textContent || aVal.innerText || '';
+            if (bVal instanceof HTMLElement) bVal = bVal.textContent || bVal.innerText || '';
+            
+            // Convert to string for comparison
+            aVal = String(aVal);
+            bVal = String(bVal);
+            
+            // Try numeric comparison first
+            const aNum = parseFloat(aVal.replace(/[^0-9.-]/g, ''));
+            const bNum = parseFloat(bVal.replace(/[^0-9.-]/g, ''));
+            
+            if (!isNaN(aNum) && !isNaN(bNum)) {
+                return currentSort.ascending ? aNum - bNum : bNum - aNum;
+            }
+            
+            // Fall back to string comparison
+            return currentSort.ascending ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+        });
+        
+        // Rebuild table body
+        const tbody = table.querySelector('tbody') || table;
+        const existingRows = Array.from(tbody.querySelectorAll('tr.ui-table-row'));
+        existingRows.forEach(row => row.remove());
+        
+        // Re-render sorted rows
+        renderDataRows();
+    }
+    
+    let selectedRow = undefined;
+    
+    /**
+     * Renders the data rows into the table
+     */
+    function renderDataRows() {
+        dataRows.forEach(({row, originalIndex}, displayIndex) => {
+            const isFirstSelected = originalIndex === firstSelectedIndex;
+            
+            const onRowClicked = () => {
+                if (!onSelectRow) return;
+                if (selectedRow) selectedRow.classList.remove('selected');
+                tr.classList.add('selected');
+                selectedRow = tr;
+                onSelectRow(originalIndex); // Use original index for callback
+            };
+            
+            const tr = ce({
+                parent: table,
+                tag: 'tr',
+                classNames: ['ui-table-row', isFirstSelected ? 'selected' : null],
+                onClick: onRowClicked
+            });
+            if (isFirstSelected) selectedRow = tr;
+            
+            for (let i = 0; i < colCount; i++) {
+                ce({
+                    parent: tr,
+                    tag: 'td',
+                    classNames: ['ui-table-cell'],
+                    children: [row[i]],
+                    onClick: onRowClicked
+                });
+            }
+        });
+    }
+    
+    // Render header row
+    const headerRow = rows[0];
+    const tr = ce({
+        parent: table,
+        tag: 'tr',
+        classNames: ['ui-table-first-row']
     });
-
-    //if (firstSelectedIndex !== undefined && firstSelectedIndex !== null) onSelectRow(firstSelectedIndex);
+    
+    for (let i = 0; i < colCount; i++) {
+        const th = ce({
+            parent: tr,
+            tag: 'th',
+            classNames: ['ui-table-cell', 'sortable'],
+            children: [headerRow[i]],
+            onClick: () => sortTable(i)
+        });
+        th.style.cursor = 'pointer';
+        th.style.userSelect = 'none';
+        th.title = 'Click to sort';
+    }
+    
+    // Render data rows
+    renderDataRows();
 
     return table;
 }

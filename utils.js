@@ -1,4 +1,15 @@
 /**
+ * Forces an element and all its children to stay on one line by setting appropriate CSS.
+ * @param {HTMLElement} element - The element to force onto one line.
+ * @returns {HTMLElement} The same element (for chaining).
+ */
+function forceOneLine(element) {
+    element.style.whiteSpace = 'nowrap';
+    element.style.display = 'inline-block';
+    return element;
+}
+
+/**
  * Generates a random number between min and max.
  * @param {number} max - The maximum value (inclusive if rounded).
  * @param {number} min - The minimum value (inclusive).
@@ -473,4 +484,38 @@ function createMarketCargoPriceInfo(market = new Market(), marketName = "Market"
     container.appendChild(sellSpan);
     
     return container;
+}
+
+/**
+ * Generates a randomized asteroid shape as an array of vertices.
+ * Creates an octagon-like shape with triangle chunks cut out for a rough, rocky appearance.
+ * @param {number} baseRadius - The approximate radius of the asteroid (default: 1.0)
+ * @param {number} irregularity - How irregular the shape is (0-1, default: 0.3)
+ * @param {number} chunkiness - How many chunks are cut out (0-1, default: 0.4)
+ * @returns {Array<[number, number]>} Array of [x, y] vertex coordinates normalized to baseRadius
+ */
+function asteroidShapeGenerator(baseRadius = 1.0, irregularity = 0.3, chunkiness = 0.4) {
+    // Start with 8-12 points around a circle (octagon-ish base)
+    const numPoints = rng(12, 8);
+    const angleStep = (Math.PI * 2) / numPoints;
+    /** @type {Array<[number, number]>} */
+    const vertices = [];
+    
+    for (let i = 0; i < numPoints; i++) {
+        const angle = angleStep * i;
+        // Add irregularity to radius (each point varies)
+        const radiusVariation = 1.0 + (Math.random() - 0.5) * irregularity;
+        const r = baseRadius * radiusVariation;
+        
+        // Randomly decide if this should be a "chunk" (indentation)
+        const isChunk = Math.random() < chunkiness;
+        const chunkDepth = isChunk ? 0.6 + Math.random() * 0.3 : 1.0; // 60-90% depth for chunks
+        
+        const x = Math.cos(angle) * r * chunkDepth;
+        const y = Math.sin(angle) * r * chunkDepth;
+        
+        vertices.push([x, y]);
+    }
+    
+    return vertices;
 }
