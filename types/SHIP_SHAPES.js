@@ -9,10 +9,10 @@ const SHIP_SHAPES = {
      * @returns {Array<[number, number]>}
      */
     SCOUT: () => [
-        [0, 1.2],      // Sharp nose
-        [-0.3, -1],    // Left rear
-        [0, -0.8],     // Center rear notch
-        [0.3, -1]      // Right rear
+        [1.2, 0],      // Sharp nose (rotated 90° CCW)
+        [-1, 0.3],     // Left rear
+        [-0.8, 0],     // Center rear notch
+        [-1, -0.3]     // Right rear
     ],
 
     /**
@@ -20,12 +20,12 @@ const SHIP_SHAPES = {
      * @returns {Array<[number, number]>}
      */
     TANKER: () => [
-        [-0.3, 0.8],   // Left front
-        [0.3, 0.8],    // Right front
-        [0.6, 0],      // Right middle
-        [0.6, -0.8],   // Right rear
-        [-0.6, -0.8],  // Left rear
-        [-0.6, 0]      // Left middle
+        [0.8, 0.3],    // Left front (rotated 90° CCW)
+        [0.8, -0.3],   // Right front
+        [0, -0.6],     // Right middle
+        [-0.8, -0.6],  // Right rear
+        [-0.8, 0.6],   // Left rear
+        [0, 0.6]       // Left middle
     ],
 
     /**
@@ -33,11 +33,11 @@ const SHIP_SHAPES = {
      * @returns {Array<[number, number]>}
      */
     FIGHTER: () => [
-        [0, 0.9],      // Nose
-        [-0.8, -0.3],  // Left wing
-        [-0.3, -0.8],  // Left rear
-        [0.3, -0.8],   // Right rear
-        [0.8, -0.3]    // Right wing
+        [0.9, 0],      // Nose (rotated 90° CCW)
+        [-0.3, 0.8],   // Left wing
+        [-0.8, 0.3],   // Left rear
+        [-0.8, -0.3],  // Right rear
+        [-0.3, -0.8]   // Right wing
     ],
 
     /**
@@ -45,12 +45,12 @@ const SHIP_SHAPES = {
      * @returns {Array<[number, number]>}
      */
     BATTLESHIP: () => [
-        [0, 1],        // Front
-        [0.7, 0.5],    // Right front
-        [0.7, -0.5],   // Right rear
-        [0, -1],       // Rear
-        [-0.7, -0.5],  // Left rear
-        [-0.7, 0.5]    // Left front
+        [1, 0],        // Front (rotated 90° CCW)
+        [0.5, -0.7],   // Right front
+        [-0.5, -0.7],  // Right rear
+        [-1, 0],       // Rear
+        [-0.5, 0.7],   // Left rear
+        [0.5, 0.7]     // Left front
     ],
 
     /**
@@ -58,10 +58,10 @@ const SHIP_SHAPES = {
      * @returns {Array<[number, number]>}
      */
     FRIGATE: () => [
-        [0, 1],        // Nose
-        [-0.5, -0.7],  // Left rear
-        [0, -0.5],     // Center rear indent
-        [0.5, -0.7]    // Right rear
+        [1, 0],        // Nose (rotated 90° CCW)
+        [-0.7, 0.5],   // Left rear
+        [-0.5, 0],     // Center rear indent
+        [-0.7, -0.5]   // Right rear
     ],
 
     /**
@@ -69,11 +69,11 @@ const SHIP_SHAPES = {
      * @returns {Array<[number, number]>}
      */
     DESTROYER: () => [
-        [0, 1.1],      // Front point
-        [0.6, 0.2],    // Right weapon pod
-        [0.4, -0.9],   // Right rear
-        [-0.4, -0.9],  // Left rear
-        [-0.6, 0.2]    // Left weapon pod
+        [1.1, 0],      // Front point (rotated 90° CCW)
+        [0.2, -0.6],   // Right weapon pod
+        [-0.9, -0.4],  // Right rear
+        [-0.9, 0.4],   // Left rear
+        [0.2, 0.6]     // Left weapon pod
     ],
 
     /**
@@ -81,9 +81,9 @@ const SHIP_SHAPES = {
      * @returns {Array<[number, number]>}
      */
     COURIER_SHIP: () => [
-        [0, 1.3],      // Long nose
-        [-0.4, -0.9],  // Left
-        [0.4, -0.9]    // Right
+        [1.3, 0],      // Long nose (rotated 90° CCW)
+        [-0.9, 0.4],   // Left
+        [-0.9, -0.4]   // Right
     ],
 
     /**
@@ -91,12 +91,12 @@ const SHIP_SHAPES = {
      * @returns {Array<[number, number]>}
      */
     PASSENGER_SHIP: () => [
-        [0, 0.9],      // Front
-        [0.6, 0.3],    // Right front
-        [0.6, -0.3],   // Right rear
-        [0, -0.9],     // Rear
-        [-0.6, -0.3],  // Left rear
-        [-0.6, 0.3]    // Left front
+        [0.9, 0],      // Front (rotated 90° CCW)
+        [0.3, -0.6],   // Right front
+        [-0.3, -0.6],  // Right rear
+        [-0.9, 0],     // Rear
+        [-0.3, 0.6],   // Left rear
+        [0.3, 0.6]     // Left front
     ],
 
     /**
@@ -104,14 +104,14 @@ const SHIP_SHAPES = {
      * @returns {Array<[number, number]>}
      */
     SUPPLY_SHIP: () => [
-        [-0.5, 0.7],   // Left front
-        [0.5, 0.7],    // Right front
-        [0.7, 0.5],    // Right front corner
-        [0.7, -0.5],   // Right rear corner
-        [0.5, -0.7],   // Right rear
-        [-0.5, -0.7],  // Left rear
-        [-0.7, -0.5],  // Left rear corner
-        [-0.7, 0.5]    // Left front corner
+        [0.7, 0.5],    // Left front (rotated 90° CCW)
+        [0.7, -0.5],   // Right front
+        [0.5, -0.7],   // Right front corner
+        [-0.5, -0.7],  // Right rear corner
+        [-0.7, -0.5],  // Right rear
+        [-0.7, 0.5],   // Left rear
+        [-0.5, 0.7],   // Left rear corner
+        [0.5, 0.7]     // Left front corner
     ],
 
     /**
@@ -119,9 +119,9 @@ const SHIP_SHAPES = {
      * @returns {Array<[number, number]>}
      */
     BLOCKADE_RUNNER: () => [
-        [0, 1.1],      // Sharp nose
-        [-0.25, -1],   // Left rear (narrow)
-        [0.25, -1]     // Right rear (narrow)
+        [1.1, 0],      // Sharp nose (rotated 90° CCW)
+        [-1, 0.25],    // Left rear (narrow)
+        [-1, -0.25]    // Right rear (narrow)
     ],
 
     /**
@@ -129,12 +129,12 @@ const SHIP_SHAPES = {
      * @returns {Array<[number, number]>}
      */
     INTERCEPTOR: () => [
-        [0, 0.9],      // Front
-        [0.7, 0.2],    // Right wing
-        [0.5, -0.8],   // Right rear
-        [0, -0.6],     // Center notch
-        [-0.5, -0.8],  // Left rear
-        [-0.7, 0.2]    // Left wing
+        [0.9, 0],      // Front (rotated 90° CCW)
+        [0.2, -0.7],   // Right wing
+        [-0.8, -0.5],  // Right rear
+        [-0.6, 0],     // Center notch
+        [-0.8, 0.5],   // Left rear
+        [0.2, 0.7]     // Left wing
     ],
 
     /**
@@ -142,14 +142,14 @@ const SHIP_SHAPES = {
      * @returns {Array<[number, number]>}
      */
     JAMMER: () => [
-        [0, 0.7],      // Front
-        [0.5, 0.5],    // Right front antenna
-        [0.7, 0],      // Right side
-        [0.5, -0.5],   // Right rear antenna
-        [0, -0.7],     // Rear
-        [-0.5, -0.5],  // Left rear antenna
-        [-0.7, 0],     // Left side
-        [-0.5, 0.5]    // Left front antenna
+        [0.7, 0],      // Front (rotated 90° CCW)
+        [0.5, -0.5],   // Right front antenna
+        [0, -0.7],     // Right side
+        [-0.5, -0.5],  // Right rear antenna
+        [-0.7, 0],     // Rear
+        [-0.5, 0.5],   // Left rear antenna
+        [0, 0.7],      // Left side
+        [0.5, 0.5]     // Left front antenna
     ],
 
     /**
@@ -157,13 +157,13 @@ const SHIP_SHAPES = {
      * @returns {Array<[number, number]>}
      */
     FIRE_SHIP: () => [
-        [0, 1],        // Front point
-        [0.4, 0.3],    // Right flame
-        [0.7, -0.5],   // Right wing
-        [0.2, -0.9],   // Right rear
-        [-0.2, -0.9],  // Left rear
-        [-0.7, -0.5],  // Left wing
-        [-0.4, 0.3]    // Left flame
+        [1, 0],        // Front point (rotated 90° CCW)
+        [0.3, -0.4],   // Right flame
+        [-0.5, -0.7],  // Right wing
+        [-0.9, -0.2],  // Right rear
+        [-0.9, 0.2],   // Left rear
+        [-0.5, 0.7],   // Left wing
+        [0.3, 0.4]     // Left flame
     ],
 
     /**
@@ -171,14 +171,14 @@ const SHIP_SHAPES = {
      * @returns {Array<[number, number]>}
      */
     TUG_SHIP: () => [
-        [-0.4, 0.6],   // Left arm front
-        [-0.8, 0.3],   // Left arm
-        [-0.8, -0.3],  // Left arm rear
-        [-0.4, -0.6],  // Left body rear
-        [0.4, -0.6],   // Right body rear
-        [0.8, -0.3],   // Right arm rear
-        [0.8, 0.3],    // Right arm
-        [0.4, 0.6]     // Right arm front
+        [0.6, 0.4],    // Left arm front (rotated 90° CCW)
+        [0.3, 0.8],    // Left arm
+        [-0.3, 0.8],   // Left arm rear
+        [-0.6, 0.4],   // Left body rear
+        [-0.6, -0.4],  // Right body rear
+        [-0.3, -0.8],  // Right arm rear
+        [0.3, -0.8],   // Right arm
+        [0.6, -0.4]    // Right arm front
     ],
 
     /**
@@ -186,13 +186,13 @@ const SHIP_SHAPES = {
      * @returns {Array<[number, number]>}
      */
     DRILLING_RIG: () => [
-        [0, 1.2],      // Drill point
-        [0.3, 0.8],    // Right drill side
-        [0.6, 0.5],    // Right body
-        [0.6, -0.8],   // Right rear
-        [-0.6, -0.8],  // Left rear
-        [-0.6, 0.5],   // Left body
-        [-0.3, 0.8]    // Left drill side
+        [1.2, 0],      // Drill point (rotated 90° CCW)
+        [0.8, -0.3],   // Right drill side
+        [0.5, -0.6],   // Right body
+        [-0.8, -0.6],  // Right rear
+        [-0.8, 0.6],   // Left rear
+        [0.5, 0.6],    // Left body
+        [0.8, 0.3]     // Left drill side
     ],
 
     /**
@@ -200,13 +200,13 @@ const SHIP_SHAPES = {
      * @returns {Array<[number, number]>}
      */
     ESCORT_SHIP: () => [
-        [0, 0.8],      // Front
-        [0.7, 0.4],    // Right front
-        [0.8, -0.2],   // Right side
-        [0.5, -0.8],   // Right rear
-        [-0.5, -0.8],  // Left rear
-        [-0.8, -0.2],  // Left side
-        [-0.7, 0.4]    // Left front
+        [0.8, 0],      // Front (rotated 90° CCW)
+        [0.4, -0.7],   // Right front
+        [-0.2, -0.8],  // Right side
+        [-0.8, -0.5],  // Right rear
+        [-0.8, 0.5],   // Left rear
+        [-0.2, 0.8],   // Left side
+        [0.4, 0.7]     // Left front
     ],
 
     /**
@@ -214,13 +214,13 @@ const SHIP_SHAPES = {
      * @returns {Array<[number, number]>}
      */
     UTILITY_SHIP: () => [
-        [0, 0.9],      // Front
-        [0.6, 0.4],    // Right front
-        [0.7, -0.2],   // Right tool
-        [0.4, -0.9],   // Right rear
-        [-0.4, -0.9],  // Left rear
-        [-0.7, -0.2],  // Left tool
-        [-0.6, 0.4]    // Left front
+        [0.9, 0],      // Front (rotated 90° CCW)
+        [0.4, -0.6],   // Right front
+        [-0.2, -0.7],  // Right tool
+        [-0.9, -0.4],  // Right rear
+        [-0.9, 0.4],   // Left rear
+        [-0.2, 0.7],   // Left tool
+        [0.4, 0.6]     // Left front
     ],
 
     /**
@@ -228,8 +228,8 @@ const SHIP_SHAPES = {
      * @returns {Array<[number, number]>}
      */
     STARTING_SHIP: () => [
-        [0, 0.9],      // Nose
-        [-0.5, -0.8],  // Left
-        [0.5, -0.8]    // Right
+        [0.9, 0],      // Nose (rotated 90° CCW)
+        [-0.8, 0.5],   // Left
+        [-0.8, -0.5]   // Right
     ]
 }

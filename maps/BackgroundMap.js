@@ -6,12 +6,13 @@ class BackgroundMap extends BaseMap {
         this.gameYearsPerMs = 1/365/24/60 * 2
 
         this.cvs = new CanvasWrapper(100, 10, 1000, NEPTUNE.orbit.radius)
+        this.lastKnownDimensions = {width: this.cvs.canvas.width, height: this.cvs.canvas.height}
         this.root = ce({classNames: ['starmap-root'], children: [this.cvs.root]})
         this.outerRadius = 20
         this.innerRadius = 0.1
 
         // Generate background stars for parallax effect
-        this.bgStars = generateBackgroundStars(this.outerRadius * 2, 500)
+        this.bgStars = generateBackgroundStars(this.outerRadius * 2, 5000)
         for (const bgStar of this.bgStars) {
             bgStar.reset()
         }
@@ -32,8 +33,9 @@ class BackgroundMap extends BaseMap {
 
         requestAnimationFrame(()=> requestAnimationFrame(()=>{
             this.cvs.autoResize();
-            this.refresh();
+            this.refresh()
         }));
+
 
         this.tick()
     }
@@ -76,15 +78,24 @@ class BackgroundMap extends BaseMap {
 
     rebuildCanvas() {
         const {asteroids, bgStars, cvs, activeAsteroidIds} = this
+
+        //if last known dims changed refresh bg stars
+        if (this.lastKnownDimensions.width != cvs.canvas.width || this.lastKnownDimensions.height != cvs.canvas.height) {
+            console.log('BackgroundMap: canvas size changed, resetting background stars.', this.lastKnownDimensions, {width: cvs.canvas.width, height: cvs.canvas.height})
+            this.lastKnownDimensions.width = cvs.canvas.width
+            this.lastKnownDimensions.height = cvs.canvas.height
+            cvs.pixels = []
+        }
         
         // Draw background stars with parallax - only add if not already present
-        const sizeOffset = Math.max(cvs.canvas.width, cvs.canvas.height) / this.outerRadius * 4
         bgStars.forEach((bgStar, index) => {
             bgStar.twinkle(Date.now() / 50000)
             // Only add pixel if it doesn't already exist
             if (cvs.pixels[index] == undefined) {
-                const pixel = cvs.addPixel(0, 0, [255,255,255,255], 2, bgStar.x * sizeOffset, bgStar.y * sizeOffset, true)
-                console.log('added pixel;', index, bgStar, pixel)
+                // Initialize with random position within screen bounds
+                const screenX = Math.random() * cvs.canvas.width / cvs.pixelRatio
+                const screenY = Math.random() * cvs.canvas.height / cvs.pixelRatio
+                cvs.addPixel(0, 0, bgStar.color, bgStar.radius, screenX, screenY, true)
             } else {
                 // Update existing pixel's color for twinkling
                 cvs.pixels[index].color = [...bgStar.color]
@@ -110,9 +121,11 @@ class BackgroundMap extends BaseMap {
             const baseSize = 0.2
             const size = baseSize * scale
             
-            // Brightness increases as asteroid gets closer (smaller z)
+            // Brightness increases more dramatically as asteroid gets closer (smaller z)
+            // Using squared distance for more pronounced brightness change
             const maxZ = 5.0
-            const brightness = Math.min(1, (maxZ - asteroid.z) / maxZ + 0.2)
+            const distanceRatio = (maxZ - asteroid.z) / maxZ // 0 when far, 1 when close
+            const brightness = Math.min(1, Math.pow(distanceRatio, 0.5) + 0.3) // Square root for stronger effect, +0.3 min brightness
             const color = [
                 Math.round(asteroid.color[0] * brightness),
                 Math.round(asteroid.color[1] * brightness),
@@ -174,7 +187,44 @@ class BackgroundMap extends BaseMap {
     }
 
     refreshBackground(year = 0) {
-        const {asteroids} = this
+        const {asteroids, bgStars, cvs} = this
+        
+        // Update background stars - they move slower than asteroids
+        const screenWidth = cvs.canvas.width / cvs.pixelRatio
+        const screenHeight = cvs.canvas.height / cvs.pixelRatio
+        
+        bgStars.forEach((bgStar, index) => {
+            const pixel = cvs.pixels[index]
+            if (!pixel) return
+            
+            // Slowly move the star outward from center (much slower than asteroid movement)
+            const centerX = screenWidth / 2
+            const centerY = screenHeight / 2
+            const dx = pixel.screenOffsetX - centerX
+            const dy = pixel.screenOffsetY - centerY
+            const distance = Math.sqrt(dx * dx + dy * dy)
+            const xOver0 = distance > 0 ? 1 : -1
+            const yOver0 = distance > 0 ? 1 : -1
+            
+            if (distance > 0) {
+                // Move outward along the vector from center
+                const moveSpeed = 0.002*(1+0.5*distance)// Pixels per frame (asteroids move at ~0.02 in z-space)
+                pixel.screenOffsetX += (dx / distance) * moveSpeed + xOver0 * 0.01
+                pixel.screenOffsetY += (dy / distance) * moveSpeed + yOver0 * 0.01
+            }
+            
+            // Check if star is off screen (with some margin)
+            const margin = 50
+            const isOffScreen = pixel.screenOffsetX < -margin || pixel.screenOffsetX > screenWidth + margin ||
+                               pixel.screenOffsetY < -margin || pixel.screenOffsetY > screenHeight + margin
+            
+            if (isOffScreen) {
+                // Reset to random position within screen bounds
+                pixel.screenOffsetX = Math.random() * screenWidth
+                pixel.screenOffsetY = Math.random() * screenHeight
+                bgStar.reset() // Reset twinkle
+            }
+        })
         
         asteroids.forEach((asteroid, index) => {
             // Move asteroid closer (decrease z)

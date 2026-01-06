@@ -484,7 +484,16 @@ class StarMap extends BaseMap {
             // Create objects if they don't exist
             if (!fleetObj) {
                 const fleetSize = Math.sqrt(fleet.radius/EARTH_RADII_PER_AU) * 2.5
-                fleetObj = cvs.addFilledTriangle(fleetId, fleet.x, fleet.y, fleetSize, fleetSize, 12, fleet.color, fleetAngle, () => this.selectObject(fleet))
+                
+                // Use custom polygon shape if flagship has a shape generator
+                const flagship = fleet.flagship || (fleet.ships && fleet.ships[0])
+                if (flagship && flagship.shipType && flagship.shipType.shapeGenerator) {
+                    const vertices = flagship.shipType.shapeGenerator()
+                    fleetObj = cvs.addPolygon(fleetId, fleet.x, fleet.y, vertices, fleetSize, 12, fleet.color, COLORS.White, fleetAngle, () => this.selectObject(fleet))
+                } else {
+                    fleetObj = cvs.addFilledTriangle(fleetId, fleet.x, fleet.y, fleetSize, fleetSize, 12, fleet.color, fleetAngle, () => this.selectObject(fleet))
+                }
+                
                 pathObj = cvs.addLine(pathId, 0, 0, 0, 0, fleet.color, 1)
                 thrusterObj = cvs.addFilledTriangle(thrusterId, fleet.x, fleet.y, fleetSize*0.5, fleetSize*0.5, 6, COLORS.Orange)
                 labelObj = cvs.addText(labelId, fleet.x, fleet.y, 0, -32, fleet.name, fleet.color, DEFAULT_FONT_SIZE, 2, () => this.selectObject(fleet))
@@ -583,7 +592,16 @@ class StarMap extends BaseMap {
             // Create objects if they don't exist
             if (!fleetObj) {
                 const fleetSize = Math.sqrt(fleet.radius/EARTH_RADII_PER_AU) * 2.5
-                fleetObj = cvs.addFilledTriangle(fleetId, fleet.x, fleet.y, fleetSize, fleetSize, 12, fleet.color, fleetAngle, () => this.selectObject(fleet))
+                
+                // Use custom polygon shape if flagship has a shape generator
+                const flagship = fleet.flagship || (fleet.ships && fleet.ships[0])
+                if (flagship && flagship.shipType && flagship.shipType.shapeGenerator) {
+                    const vertices = flagship.shipType.shapeGenerator()
+                    fleetObj = cvs.addPolygon(fleetId, fleet.x, fleet.y, vertices, fleetSize, 12, fleet.color, COLORS.White, fleetAngle, () => this.selectObject(fleet))
+                } else {
+                    fleetObj = cvs.addFilledTriangle(fleetId, fleet.x, fleet.y, fleetSize, fleetSize, 12, fleet.color, fleetAngle, () => this.selectObject(fleet))
+                }
+                
                 pathObj = cvs.addLine(pathId, 0, 0, 0, 0, fleet.color, 1)
                 labelObj = cvs.addText(labelId, fleet.x, fleet.y, 0, -32, fleet.name + ' (Abandoned)', fleet.color, DEFAULT_FONT_SIZE, 2, () => this.selectObject(fleet))
                 
