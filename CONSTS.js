@@ -131,3 +131,10 @@ const SIMULATE_FLEET_ACTIVITY_YEARS = 0.1
 const SIMULATE_HISTORY_NUM_YEARS = 1
 const CLOAK_REGEN_RATE = 30*4 //takes 1 week to fully cloak
 const NPC_FLEET_MAX_PURCHASE_CARGO_RATIO = 0.5 //max fraction of market cargo NPC fleets will buy when trading
+
+const STAR_MAP_AVERAGE_VIEW_DISTANCE = 5 // in au 
+
+const SUN_MIN_SCREEN_SIZE = 18
+const PLANET_MIN_SCREEN_SIZE = 14
+const DWARF_PLANET_MIN_SCREEN_SIZE = 12
+const SPACE_STATION_MIN_SCREEN_SIZE = 10

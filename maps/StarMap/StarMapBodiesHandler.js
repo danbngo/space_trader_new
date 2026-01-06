@@ -15,6 +15,7 @@ class StarMapBodiesHandler {
         this.handleBackgroundStars()
         this.handleAsteroids()
         this.handleOrbits()
+        this.handleViewDistanceCircle()
         this.handleStars()
         this.handlePlanets()
         this.handleSpaceStations()
@@ -71,6 +72,31 @@ class StarMapBodiesHandler {
         })
     }
 
+    handleViewDistanceCircle() {
+        const {cvs} = this.starMap
+        const viewDistanceId = 'playerViewDistance'
+        
+        if (!gs.fleet || !gs.fleet.x || !gs.fleet.y) {
+            // Hide circle if player fleet doesn't exist or isn't positioned
+            const circle = cvs.getObject(viewDistanceId)
+            if (circle) circle.visible = false
+            return
+        }
+        
+        let circle = cvs.getObject(viewDistanceId)
+        
+        if (!circle) {
+            // Create the view distance circle
+            circle = cvs.addEmptyCircle(viewDistanceId, gs.fleet.x, gs.fleet.y, gs.fleet.mapViewDistance, 1, COLORS.Cyan, 1.0)
+        }
+        
+        // Update position and radius
+        circle.visible = true
+        circle.x = gs.fleet.x
+        circle.y = gs.fleet.y
+        circle.radius = gs.fleet.mapViewDistance
+    }
+
     handleStars() {
         const {starSystem, cvs, selectedObject, selectObject} = this.starMap
         const {stars} = starSystem
@@ -81,7 +107,7 @@ class StarMapBodiesHandler {
             
             if (!cvsObject) {
                 const displaySize = Math.sqrt(body.radius/EARTH_RADII_PER_AU) * 3
-                cvsObject = cvs.addFilledCircle(id, body.x, body.y, displaySize, 12, body.color, () => selectObject.call(this.starMap, body))
+                cvsObject = cvs.addFilledCircle(id, body.x, body.y, displaySize, SUN_MIN_SCREEN_SIZE, body.color, () => selectObject.call(this.starMap, body))
             }
             
             cvsObject.x = body.x
@@ -106,7 +132,7 @@ class StarMapBodiesHandler {
             
             // Create objects if they don't exist
             if (!planetObj) {
-                const minScreenSize = body.objectType == OBJECT_TYPES.DWARF_PLANET ? 8 : 10
+                const minScreenSize = body.objectType == OBJECT_TYPES.DWARF_PLANET ? DWARF_PLANET_MIN_SCREEN_SIZE : PLANET_MIN_SCREEN_SIZE
                 const displaySize = Math.pow(body.radius/EARTH_RADII_PER_AU, 0.4) * 3.5
                 planetObj = cvs.addFilledCircle(planetId, body.x, body.y, displaySize, minScreenSize, body.color, () => selectObject.call(this.starMap, body))
                 planetObj.clickPriority = 10
@@ -184,7 +210,7 @@ class StarMapBodiesHandler {
             let labelObj = cvs.getObject(labelId)
              
             if (!stationObj) {
-                stationObj = cvs.addFilledRectangle(stationId, station.x, station.y, station.radius * 16, station.radius * 16, 12, station.color, 0, () => selectObject.call(this.starMap, station))
+                stationObj = cvs.addFilledRectangle(stationId, station.x, station.y, station.radius * 16, station.radius * 16, SPACE_STATION_MIN_SCREEN_SIZE, station.color, 0, () => selectObject.call(this.starMap, station))
                 
                 labelObj = cvs.addText(labelId, station.x, station.y, 0, -24, station.name, station.color, DEFAULT_FONT_SIZE, 2, () => selectObject.call(this.starMap, station))
                 

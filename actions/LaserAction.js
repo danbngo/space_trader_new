@@ -13,8 +13,11 @@ class LaserAction extends ShipAction {
         
         let didMiss = false
         if (!isTargeted) {
-            //flat 25% miss chance (75% hit chance) regardless of distance
-            const baseMissChance = 0.25
+            // Distance-based miss chance: miss = 0.5 * (distance/maxRange)
+            // At half range: 25% miss, at max range: 50% miss
+            const distance = calcDistance(this.actor.x, this.actor.y, this.target.x, this.target.y)
+            const maxRange = (1 + this.actor.maxAttackDistance) * 2 // 2x multiplier for doubled range
+            const baseMissChance = 0.5 * (distance / maxRange)
             
             // Apply Gunner skill (reduces miss chance, 0.5x at 50 skill)
             const gunnerSkill = this.actor.fleet.totalSkills.getAmount(SKILLS.Gunner)

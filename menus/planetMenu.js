@@ -25,11 +25,14 @@ const buildingHandlerMapping = [
 function showPlanetMenu(planet = new Planet()) {
     console.log('opening planet menu for:',planet)
     const isDocked = gs.location == planet
-    const {settlement} = planet
+    const settlement = getDisplaySettlement(planet)
 
     let msg = isDocked ?
         `You have arrived at ${coloredName(planet)}.<br/>`
         : ''+colorSpan(`You are scanning ${coloredName(planet)}.<br/>`, COLORS.Yellow)
+    
+    // Add scanning mode message with last visit date
+    msg += getScanningModeMessage(planet)
 
     // Check if planet is closed
     if (planet.closed) {

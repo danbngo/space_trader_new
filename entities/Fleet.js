@@ -67,6 +67,13 @@ class Fleet extends SpaceObject {
         this.y = planet.y
         this.route = null
         planet.addChildren([this])
+        
+        // If this is the player's fleet, memorize the settlement and visit date
+        if (this === gs.fleet && planet.settlement) {
+            gs.memorizedSettlements.set(planet, planet.settlement.clone())
+            gs.lastVisitedDates.set(planet, gs.year)
+            console.log(`📝 Memorized settlement at ${planet.name} (year ${gs.year})`)
+        }
     }
 
     /** @param {Route} route */
@@ -98,6 +105,10 @@ class Fleet extends SpaceObject {
         console.log('share ratio:',shareRatio,this.officers)
         const share = Math.min(1, shareRatio) * ofCR
         return rounded ? Math.round(share) : share
+    }
+
+    get mapViewDistance() {
+        return 0.5 + STAR_MAP_AVERAGE_VIEW_DISTANCE * (this.totalRadar)/AVERAGE_SHIP_RADARS
     }
 
     get totalCargoSpace() {

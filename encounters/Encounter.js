@@ -444,10 +444,36 @@ class Encounter {
         else if (formationType == FORMATION_TYPES.PlayerEncircled) {
             //enemy ships should be in a half circle around the players fleet
             const angleStep = (Math.PI * 2)/enemyShips.length
+            const buffer = 1.5 // Buffer space between ships
             enemyShips.forEach((ship, i) => {
-                const angle = angleStep * i + (enemyFleet.angle || 0)
-                const dist = rng(maxSpawnDistance,minSpawnDistance)
-                const [x, y] = rotatePoint(dist, 0, 0, 0, angle)
+                let validPosition = false
+                let attempts = 0
+                let x, y, angle, dist
+                
+                // Try up to 10 times to find a non-overlapping position
+                while (!validPosition && attempts < 10) {
+                    angle = angleStep * i + (enemyFleet.angle || 0) + (attempts > 0 ? rng(Math.PI/4, -Math.PI/4, false) : 0)
+                    dist = rng(maxSpawnDistance, minSpawnDistance)
+                    ;[x, y] = rotatePoint(dist, 0, 0, 0, angle)
+                    
+                    // Check if this position overlaps with any player ship
+                    validPosition = true
+                    for (const playerShip of playerShips) {
+                        const distance = calcDistance(x, y, playerShip.x, playerShip.y)
+                        const minDistance = ship.radius + playerShip.radius + buffer
+                        if (distance < minDistance) {
+                            validPosition = false
+                            break
+                        }
+                    }
+                    attempts++
+                }
+                
+                // If we couldn't find a valid position after 10 attempts, use the last attempted position anyway
+                if (!validPosition) {
+                    console.log(`Warning: Could not find non-overlapping position for enemy ship ${ship.shipType.name} after 10 attempts`)
+                }
+                
                 Object.assign(ship, {x, y})
             })
         }
@@ -455,9 +481,37 @@ class Encounter {
             const [cx, cy] = rotatePoint(avgDist, 0, 0, 0, angleEnemyFleetToPlayer+Math.PI)
             enemyFleet.ships.forEach((ship,i)=>{
                 const distFromCenter = rng(distMargin, distMargin/8)
-                const [dx,dy] = rotatePoint(distFromCenter, 0, 0, 0, rng(Math.PI*2, 0, false))
+                const buffer = 1.5 // Buffer space between ships
+                let validPosition = false
+                let attempts = 0
+                let x, y, dx, dy
+                
+                // Try up to 10 times to find a non-overlapping position
+                while (!validPosition && attempts < 10) {
+                    [dx, dy] = rotatePoint(distFromCenter, 0, 0, 0, rng(Math.PI*2, 0, false))
+                    x = cx + dx
+                    y = cy + dy
+                    
+                    // Check if this position overlaps with any player ship
+                    validPosition = true
+                    for (const playerShip of playerShips) {
+                        const distance = calcDistance(x, y, playerShip.x, playerShip.y)
+                        const minDistance = ship.radius + playerShip.radius + buffer
+                        if (distance < minDistance) {
+                            validPosition = false
+                            break
+                        }
+                    }
+                    attempts++
+                }
+                
+                // If we couldn't find a valid position after 10 attempts, use the last attempted position anyway
+                if (!validPosition) {
+                    console.log(`Warning: Could not find non-overlapping position for enemy ship ${ship.shipType.name} after 10 attempts`)
+                }
+                
                 const angleDiff = rng(Math.PI/8)
-                Object.assign(ship, {x: cx+dx, y: cy+dy, angle: enemyFacingAngle + angleDiff})
+                Object.assign(ship, {x, y, angle: enemyFacingAngle + angleDiff})
             })
         }
         if (formationType == FORMATION_TYPES.PlayerEncircle) {

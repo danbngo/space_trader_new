@@ -30,4 +30,14 @@ class Building {
     get damaged() {
         return this.level <= 0
     }
+
+    /**
+     * Creates a clone of this building for memory/scanning purposes.
+     * @returns {Building} A cloned copy of this building.
+     */
+    clone() {
+        const cloned = Object.create(Object.getPrototypeOf(this))
+        Object.assign(cloned, this)
+        return cloned
+    }
 }

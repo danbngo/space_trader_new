@@ -333,7 +333,8 @@ class Ship {
      * @returns {Triangle[]} Array of two targeting triangles.
      */
     calcLaserAreas(overrideX = this.x, overrideY = this.y, areaMultiplier = 1.0) {
-        const attackRange = (1+this.maxAttackDistance) * areaMultiplier
+        // Base range is 2x the original maxAttackDistance
+        const attackRange = (1+this.maxAttackDistance) * 2 * areaMultiplier
         const targetingAngle = this.angle+Math.PI/2
         const targetingAngle2 = this.angle-Math.PI/2
         const [tx,ty] = rotatePoint(overrideX + attackRange/2, overrideY, overrideX, overrideY, targetingAngle)

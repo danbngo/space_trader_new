@@ -45,22 +45,41 @@ class StarMapFleetsHandler {
         const existingFleetIds = new Set()
         
         fleets.forEach((fleet, fleetIndex) => {
+            // Calculate distance from player fleet for fog-of-war
+            const isPlayerFleet = fleet === gs.fleet
+            let distanceToPlayer = 0
+            let visibilityState = 'visible' // 'hidden', 'unknown', or 'visible'
+            
+            if (!isPlayerFleet && gs.fleet && gs.fleet.mapViewDistance) {
+                distanceToPlayer = calcDistance(fleet.x, fleet.y, gs.fleet.x, gs.fleet.y)
+                const viewDistance = gs.fleet.mapViewDistance
+                
+                if (distanceToPlayer > viewDistance * 2) {
+                    visibilityState = 'hidden'
+                } else if (distanceToPlayer > viewDistance) {
+                    visibilityState = 'unknown'
+                } else {
+                    visibilityState = 'visible'
+                }
+            }
             existingFleetIds.add(`fleet${fleet.uuid}`)
             existingFleetIds.add(`fleetlabel${fleet.uuid}`)
             existingFleetIds.add(`fleetpath${fleet.uuid}`)
             existingFleetIds.add(`fleetthruster${fleet.uuid}`)
+            existingFleetIds.add(`fleetunknown${fleet.uuid}`)
             const fleetId = `fleet${fleet.uuid}`
             const labelId = `fleetlabel${fleet.uuid}`
             const pathId = `fleetpath${fleet.uuid}`
             const thrusterId = `fleetthruster${fleet.uuid}`
+            const unknownId = `fleetunknown${fleet.uuid}`
             
             let fleetObj = cvs.getObject(fleetId)
             let labelObj = cvs.getObject(labelId)
             let pathObj = cvs.getObject(pathId)
             let thrusterObj = cvs.getObject(thrusterId)
+            let unknownObj = cvs.getObject(unknownId)
             
             const fleetAngle = fleet.route && fleet.route.path ? fleet.route.path.angle : undefined
-            const isPlayerFleet = fleet === gs.fleet
             
             // Create objects if they don't exist
             if (!fleetObj) {
@@ -89,6 +108,10 @@ class StarMapFleetsHandler {
                 labelObj = cvs.addText(labelId, fleet.x, fleet.y, 0, -32, fleet.name, fillColor, DEFAULT_FONT_SIZE, 2, () => selectObject.call(this.starMap, fleet))
                 labelObj.clickPriority = 5 // Fleet labels also have medium priority
                 
+                // Create unknown marker (question mark) for fog-of-war
+                unknownObj = cvs.addText(unknownId, fleet.x, fleet.y, 0, 0, '?', COLORS.White, DEFAULT_FONT_SIZE * 1.5, 2)
+                unknownObj.visible = false
+                
                 labelObj.visible = isPlayerFleet
                 
                 const objs = [fleetObj, labelObj]
@@ -105,6 +128,41 @@ class StarMapFleetsHandler {
                     }
                     if (!isPlayerFleet) obj.onHoverEnd()
                 }
+            }
+            
+            // Update visibility based on distance
+            if (visibilityState === 'hidden') {
+                // Completely hidden - hide all objects
+                fleetObj.visible = false
+                labelObj.visible = false
+                pathObj.visible = false
+                thrusterObj.visible = false
+                unknownObj.visible = false
+                // Skip remaining updates for hidden fleets
+                return
+            } else if (visibilityState === 'unknown') {
+                // Show only question mark, hide everything else
+                fleetObj.visible = false
+                labelObj.visible = false
+                pathObj.visible = false
+                thrusterObj.visible = false
+                unknownObj.visible = true
+                unknownObj.x = fleet.x
+                unknownObj.y = fleet.y
+                
+                // Interpolate color from white (at 1x distance) to gray (64,64,64) at 2x distance
+                const viewDistance = gs.fleet.mapViewDistance
+                // t = 0 at 1x distance (inner edge), t = 1 at 2x distance (outer edge)
+                const t = (distanceToPlayer - viewDistance) / viewDistance
+                const gray = Math.round(255 - (255 - 64) * t)
+                unknownObj.fillColor = [gray, gray, gray, 1]
+                
+                // Skip remaining updates
+                return
+            } else {
+                // Visible - show fleet normally, hide question mark
+                fleetObj.visible = true
+                unknownObj.visible = false
             }
             
             // Update fleet position and angle
@@ -191,7 +249,7 @@ class StarMapFleetsHandler {
         
         // Remove canvas objects for fleets that no longer exist
         for (const [id, obj] of cvs.objectMap.entries()) {
-            if ((id.startsWith('fleet') || id.startsWith('fleetthruster') || id.startsWith('fleetpath') || id.startsWith('fleetlabel')) && !existingFleetIds.has(id)) {
+            if ((id.startsWith('fleet') || id.startsWith('fleetthruster') || id.startsWith('fleetpath') || id.startsWith('fleetlabel') || id.startsWith('fleetunknown')) && !existingFleetIds.has(id)) {
                 cvs.deleteObject(id)
             }
         }
@@ -205,16 +263,35 @@ class StarMapFleetsHandler {
         const existingAbandonedFleetIds = new Set()
         
         abandonedFleets.forEach((fleet) => {
+            // Calculate distance from player fleet for fog-of-war
+            let distanceToPlayer = 0
+            let visibilityState = 'visible' // 'hidden', 'unknown', or 'visible'
+            
+            if (gs.fleet && gs.fleet.mapViewDistance) {
+                distanceToPlayer = calcDistance(fleet.x, fleet.y, gs.fleet.x, gs.fleet.y)
+                const viewDistance = gs.fleet.mapViewDistance
+                
+                if (distanceToPlayer > viewDistance * 2) {
+                    visibilityState = 'hidden'
+                } else if (distanceToPlayer > viewDistance) {
+                    visibilityState = 'unknown'
+                } else {
+                    visibilityState = 'visible'
+                }
+            }
             existingAbandonedFleetIds.add(`abandonedfleet${fleet.uuid}`)
             existingAbandonedFleetIds.add(`abandonedfleetlabel${fleet.uuid}`)
             existingAbandonedFleetIds.add(`abandonedfleetpath${fleet.uuid}`)
+            existingAbandonedFleetIds.add(`abandonedfleetunknown${fleet.uuid}`)
             const fleetId = `abandonedfleet${fleet.uuid}`
             const labelId = `abandonedfleetlabel${fleet.uuid}`
             const pathId = `abandonedfleetpath${fleet.uuid}`
+            const unknownId = `abandonedfleetunknown${fleet.uuid}`
             
             let fleetObj = cvs.getObject(fleetId)
             let labelObj = cvs.getObject(labelId)
             let pathObj = cvs.getObject(pathId)
+            let unknownObj = cvs.getObject(unknownId)
             
             const fleetAngle = fleet.angle
             
@@ -244,6 +321,10 @@ class StarMapFleetsHandler {
                 labelObj = cvs.addText(labelId, fleet.x, fleet.y, 0, -32, fleet.name + ' (Abandoned)', fillColor, DEFAULT_FONT_SIZE, 2, () => selectObject.call(this.starMap, fleet))
                 labelObj.clickPriority = 5 // Fleet labels also have medium priority
                 
+                // Create unknown marker (question mark) for fog-of-war
+                unknownObj = cvs.addText(unknownId, fleet.x, fleet.y, 0, 0, '?', COLORS.White, DEFAULT_FONT_SIZE * 1.5, 2)
+                unknownObj.visible = false
+                
                 const objs = [fleetObj, labelObj]
                 for (const obj of objs) {
                     obj.onHover = () => {
@@ -258,6 +339,37 @@ class StarMapFleetsHandler {
                     }
                     obj.onHoverEnd()
                 }
+            }
+            
+            // Update visibility based on distance
+            if (visibilityState === 'hidden') {
+                // Completely hidden - hide all objects
+                fleetObj.visible = false
+                labelObj.visible = false
+                pathObj.visible = false
+                unknownObj.visible = false
+                return
+            } else if (visibilityState === 'unknown') {
+                // Show only question mark, hide everything else
+                fleetObj.visible = false
+                labelObj.visible = false
+                pathObj.visible = false
+                unknownObj.visible = true
+                unknownObj.x = fleet.x
+                unknownObj.y = fleet.y
+                
+                // Interpolate color from white (at 1x distance) to gray (64,64,64) at 2x distance
+                const viewDistance = gs.fleet.mapViewDistance
+                // t = 0 at 1x distance (inner edge), t = 1 at 2x distance (outer edge)
+                const t = (distanceToPlayer - viewDistance) / viewDistance
+                const gray = Math.round(255 - (255 - 64) * t)
+                unknownObj.fillColor = [gray, gray, gray, 1]
+                
+                return
+            } else {
+                // Visible - show fleet normally, hide question mark
+                fleetObj.visible = true
+                unknownObj.visible = false
             }
             
             // Update fleet position and angle
@@ -281,10 +393,11 @@ class StarMapFleetsHandler {
         
         // Remove canvas objects for abandoned fleets that no longer exist
         for (const [id, obj] of cvs.objectMap.entries()) {
-            if ((id.startsWith('abandonedfleet') || id.startsWith('abandonedfleetpath') || id.startsWith('abandonedfleetlabel')) && !existingAbandonedFleetIds.has(id)) {
+            if ((id.startsWith('abandonedfleet') || id.startsWith('abandonedfleetpath') || id.startsWith('abandonedfleetlabel') || id.startsWith('abandonedfleetunknown')) && !existingAbandonedFleetIds.has(id)) {
                 cvs.deleteObject(id)
             }
         }
+
     }
 
     handleWaypoint() {

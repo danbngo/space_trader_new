@@ -61,12 +61,18 @@ class ActionHandler {
         const isPlayerAction = action.actor.fleet === gs.fleet
         const isStillPlayerTurn = this.encounter.activeTurnFleet === gs.fleet
         const hasActionsRemaining = action.actor.actionsRemaining > 0
+        const isNotDisabled = !action.actor.disabled
         
-        if (isPlayerAction && isStillPlayerTurn && hasActionsRemaining && this.encounterMap.lastPlayerActionType) {
+        if (isPlayerAction && isStillPlayerTurn && hasActionsRemaining && isNotDisabled && this.encounterMap.lastPlayerActionType) {
             const handler = this.encounterMap.moveHandlerMap.get(this.encounterMap.lastPlayerActionType)
             if (handler && handler.startTargeting) {
-                console.log('Auto-reopening targeting for:', this.encounterMap.lastPlayerActionType)
-                handler.startTargeting(action.actor)
+                console.log('Auto-reopening targeting for:', this.encounterMap.lastPlayerActionType, 'with', action.actor.actionsRemaining, 'actions remaining')
+                // Use setTimeout to ensure the refresh completes before reopening targeting
+                setTimeout(() => {
+                    if (action.actor.actionsRemaining > 0 && !action.actor.disabled) {
+                        handler.startTargeting(action.actor)
+                    }
+                }, 0)
             }
         }
     }

@@ -101,8 +101,8 @@ SHIP_TYPES.OBSERVER.shapeGenerator = SHIP_SHAPES.OBSERVER
 STARTING_SHIP_TYPE.shapeGenerator = SHIP_SHAPES.STARTING_SHIP
 
 const ASTEROID_SHIP_TYPES = {
-    ASTEROID: new ShipType('Asteroid', 'Rocky space debris drifting through the void, can be mined for valuable minerals.', null, 0.3, 0, 0, 0.25, 0.5, 1, [], 0, 1),
-    CRYOID: new ShipType('Cryoid', 'Frozen comet fragment containing water ice, leaves a freezing vapor trail when destroyed.', null, 0.3, 0, 0, 0.25, 0.5, 1, [SHIP_MODULE_TYPES.SMOKE_BOMB], 0, 1),
+    ASTEROID: new ShipType('Asteroid', 'Rocky space debris drifting through the void, can be mined for valuable minerals.', null, 0.2, 0, 0, 0.25, 0.5, 1, [], 0, 1),
+    CRYOID: new ShipType('Cryoid', 'Frozen comet fragment containing water ice, leaves a freezing vapor trail when destroyed.', null, 0.2, 0, 0, 0.25, 0.5, 1, [SHIP_MODULE_TYPES.SMOKE_BOMB], 0, 1),
     PLASMOID: new ShipType('Plasmoid', 'Energetic plasma sphere moving at high velocity, highly volatile and dangerous.', null, 0.2, 0.5, 0, 0.5, 0.5, 1, [SHIP_MODULE_TYPES.BOOSTER], 0, 1),
     MAGNETOID: new ShipType('Magnetoid', 'Magnetically-charged metallic fragment that can disrupt ship systems and pull objects.', null, 0.2, 0.3, 0, 0.5, 0.5, 1, [SHIP_MODULE_TYPES.MAGNETIZE], 0, 1),
 }

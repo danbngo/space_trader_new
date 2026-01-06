@@ -293,8 +293,14 @@ class EncounterMap extends BaseMap {
                 // Create scrollable buttons container
                 const buttonsContainer = ce({parent:container, style: {maxHeight: '600px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px'}})
                 
-                ce({parent:buttonsContainer, tag:'button', innerHTML:'Shoot', disabled: !canAct || !obj.canShoot, onClick: ()=>this.moveHandlerMap.get(MOVE_TYPES.Laser).startTargeting(obj)})
-                ce({parent:buttonsContainer, tag:'button', innerHTML:'Move', disabled: !canAct, onClick: ()=>this.moveHandlerMap.get(MOVE_TYPES.Move).startTargeting(obj)})
+                ce({parent:buttonsContainer, tag:'button', innerHTML:'Shoot', disabled: !canAct || !obj.canShoot, onClick: ()=>{
+                    this.lastPlayerActionType = MOVE_TYPES.Laser
+                    this.moveHandlerMap.get(MOVE_TYPES.Laser).startTargeting(obj)
+                }})
+                ce({parent:buttonsContainer, tag:'button', innerHTML:'Move', disabled: !canAct, onClick: ()=>{
+                    this.lastPlayerActionType = MOVE_TYPES.Move
+                    this.moveHandlerMap.get(MOVE_TYPES.Move).startTargeting(obj)
+                }})
                 ce({parent:buttonsContainer, tag:'button', innerHTML:'Recharge', disabled: !canAct || !obj.canRecharge, onClick: ()=>this.moveHandlerMap.get(MOVE_TYPES.Recharge).attempt(obj)})
                 ce({parent:buttonsContainer, tag:'button', innerHTML:'Wait', disabled: !canAct, onClick: ()=>this.moveHandlerMap.get(MOVE_TYPES.Wait).attempt(obj)})
                 
@@ -310,6 +316,7 @@ class EncounterMap extends BaseMap {
                     const onCooldown = cooldown > 0
                     const label = cooldown > 0 ? `${move} (${cooldown})` : module.name
                     ce({parent:buttonsContainer, tag:'button', innerHTML:label, disabled: !canAct || onCooldown || !obj.canUseModules, onClick: ()=>{
+                        this.lastPlayerActionType = move
                         handler.startTargeting(obj)
                     }})
                 }

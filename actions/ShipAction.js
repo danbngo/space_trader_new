@@ -187,7 +187,7 @@ class ShipAction {
                 const basePushDistance = (this.actor.radius + otherShip.radius + COLLISION_BUFFER) * PUSH_DISTANCE_MULTIPLIER
                 
                 // Push the other ship away (proportional to its mass ratio)
-                const otherShipPushDistance = basePushDistance * otherShipMassRatio
+                const otherShipPushDistance = Math.sqrt(basePushDistance * otherShipMassRatio)
                 const x = otherShip.x + Math.cos(angle) * otherShipPushDistance
                 const y = otherShip.y + Math.sin(angle) * otherShipPushDistance
                 
@@ -195,7 +195,7 @@ class ShipAction {
                 pseudoActions.push(...this.encounter.checkShipMovementEffects(otherShip))
                 
                 // Push the actor ship back (proportional to its mass ratio)
-                const actorPushDistance = basePushDistance * actorMassRatio
+                const actorPushDistance = Math.sqrt(basePushDistance * actorMassRatio)
                 const actorX = this.actor.x - Math.cos(angle) * actorPushDistance
                 const actorY = this.actor.y - Math.sin(angle) * actorPushDistance
                 

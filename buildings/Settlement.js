@@ -62,4 +62,16 @@ class Settlement {
     get improvableBuildings() {
         return this.buildings.filter(b=>(b.exists))
     }
+
+    /**
+     * Creates a deep clone of this settlement for memory/scanning purposes.
+     * Clones all buildings but keeps references to planet and types.
+     * @returns {Settlement} A cloned copy of this settlement.
+     */
+    clone() {
+        return new Settlement({
+            // @ts-ignore
+            planet: this.planet, settlementType: this.settlementType, shipyard: this.shipyard ? this.shipyard.clone() : null, market: this.market ? this.market.clone() : null, blackMarket: this.blackMarket ? this.blackMarket.clone() : null, guild: this.guild ? this.guild.clone() : null, bank: this.bank ? this.bank.clone() : null, courthouse: this.courthouse ? this.courthouse.clone() : null, academy: this.academy ? this.academy.clone() : null, tavern: this.tavern ? this.tavern.clone() : null, cyberSurgeon: this.cyberSurgeon ? this.cyberSurgeon.clone() : null, geneticist: this.geneticist ? this.geneticist.clone() : null, palace: this.palace ? this.palace.clone() : null, temple: this.temple ? this.temple.clone() : null, casino: this.casino ? this.casino.clone() : null
+        })
+    }
 }
