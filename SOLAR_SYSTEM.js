@@ -67,12 +67,19 @@ const KUIPER_BELT = new AsteroidBelt("Kuiper Belt", ASTEROID_BELT_TYPES.Icy, hex
 const OORT_CLOUD = new AsteroidBelt("Oort Cloud", ASTEROID_BELT_TYPES.Icy, hexToRgba('#ddeeff'), 75*1/5, new Orbit(75), [ENCOUNTER_TYPES.CRYOIDS_CALM], [ENCOUNTER_TYPES.CRYOIDS_STORM], [EFFECT_TYPES.ICE_CLOUD], 0.5)
 const ASTEROID_BELTS_ALL = [CORONA, ASTEROID_BELT, TROJANS, GREEKS, KUIPER_BELT, OORT_CLOUD]
 
-const ASTEROIDS = generateAsteroids(ASTEROID_BELT, COLORS.Brown, 330, 6)
-const KUIPER_ASTEROIDS = generateAsteroids(KUIPER_BELT, COLORS.LightBlue, 1670, 6)
-const OORT_ASTEROIDS = generateAsteroids(OORT_CLOUD, COLORS.White, 2500, 4)
-const TROJAN_ASTEROIDS = generateAsteroids(TROJANS, COLORS.Gray, 66, 5, JUPITER.orbit.progressOffset + 0.15, 5)
-const GREEK_ASTEROIDS = generateAsteroids(GREEKS, COLORS.Gray, 66, 5, JUPITER.orbit.progressOffset - 0.15, 5)
-const SOLAR_FLARES = generateAsteroids(CORONA, COLORS.LightOrange, 66, 2)
+// Dimmed asteroid colors (half brightness)
+const DIM_BROWN = [80, 60, 40, 1]
+const DIM_LIGHT_BLUE = [86, 108, 115, 1]
+const DIM_WHITE = [127, 127, 127, 1]
+const DIM_GRAY = [80, 80, 80, 1]
+const DIM_LIGHT_ORANGE = [127, 100, 50, 1]
+
+const ASTEROIDS = generateAsteroids(ASTEROID_BELT, DIM_BROWN, 330, 6)
+const KUIPER_ASTEROIDS = generateAsteroids(KUIPER_BELT, DIM_LIGHT_BLUE, 1670, 6)
+const OORT_ASTEROIDS = generateAsteroids(OORT_CLOUD, DIM_WHITE, 2500, 4)
+const TROJAN_ASTEROIDS = generateAsteroids(TROJANS, DIM_GRAY, 66, 5, JUPITER.orbit.progressOffset + 0.15, 5)
+const GREEK_ASTEROIDS = generateAsteroids(GREEKS, DIM_GRAY, 66, 5, JUPITER.orbit.progressOffset - 0.15, 5)
+const SOLAR_FLARES = generateAsteroids(CORONA, DIM_LIGHT_ORANGE, 66, 2)
 
 const ASTEROIDS_ALL = [...ASTEROIDS, ...KUIPER_ASTEROIDS, ...OORT_ASTEROIDS, ...TROJAN_ASTEROIDS, ...GREEK_ASTEROIDS, ...SOLAR_FLARES]
 

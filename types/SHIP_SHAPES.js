@@ -41,16 +41,16 @@ const SHIP_SHAPES = {
     ]),
 
     /**
-     * Battleship - Large hexagonal shape
+     * Battleship - Large angular forward shape with broad shoulders
      * @returns {Polygon}
      */
     BATTLESHIP: () => new Polygon([
-        [1, 0],        // Front (rotated 90° CCW)
-        [0.5, -0.7],   // Right front
-        [-0.5, -0.7],  // Right rear
-        [-1, 0],       // Rear
-        [-0.5, 0.7],   // Left rear
-        [0.5, 0.7]     // Left front
+        [1, 0],        // Front point (rotated 90° CCW)
+        [0.3, -0.8],   // Right shoulder
+        [-0.6, -0.7],  // Right rear
+        [-0.9, 0],     // Center rear notch
+        [-0.6, 0.7],   // Left rear
+        [0.3, 0.8]     // Left shoulder
     ]),
 
     /**
@@ -87,31 +87,31 @@ const SHIP_SHAPES = {
     ]),
 
     /**
-     * Passenger Ship - Wide oval/ellipse shape
+     * Passenger Ship - Wide forward-swept passenger cruiser
      * @returns {Polygon}
      */
     PASSENGER_SHIP: () => new Polygon([
-        [0.9, 0],      // Front (rotated 90° CCW)
-        [0.3, -0.6],   // Right front
-        [-0.3, -0.6],  // Right rear
-        [-0.9, 0],     // Rear
-        [-0.3, 0.6],   // Left rear
-        [0.3, 0.6]     // Left front
+        [1, 0],        // Front nose (rotated 90° CCW)
+        [0.2, -0.7],   // Right mid-section
+        [-0.7, -0.6],  // Right rear
+        [-0.9, 0],     // Rear center
+        [-0.7, 0.6],   // Left rear
+        [0.2, 0.7]     // Left mid-section
     ]),
 
     /**
-     * Supply Ship - Box-like with rounded corners
+     * Supply Ship - Broad cargo hauler with forward taper
      * @returns {Polygon}
      */
     SUPPLY_SHIP: () => new Polygon([
-        [0.7, 0.5],    // Left front (rotated 90° CCW)
-        [0.7, -0.5],   // Right front
-        [0.5, -0.7],   // Right front corner
-        [-0.5, -0.7],  // Right rear corner
-        [-0.7, -0.5],  // Right rear
-        [-0.7, 0.5],   // Left rear
-        [-0.5, 0.7],   // Left rear corner
-        [0.5, 0.7]     // Left front corner
+        [0.9, 0],      // Front center (rotated 90° CCW)
+        [0.5, -0.6],   // Right front
+        [0, -0.8],     // Right cargo hold
+        [-0.7, -0.7],  // Right rear
+        [-0.9, 0],     // Rear center
+        [-0.7, 0.7],   // Left rear
+        [0, 0.8],      // Left cargo hold
+        [0.5, 0.6]     // Left front
     ]),
 
     /**
@@ -138,18 +138,18 @@ const SHIP_SHAPES = {
     ]),
 
     /**
-     * Jammer - Dish-like shape with protrusions
+     * Jammer - Forward antenna array with emitter dishes
      * @returns {Polygon}
      */
     JAMMER: () => new Polygon([
-        [0.7, 0],      // Front (rotated 90° CCW)
-        [0.5, -0.5],   // Right front antenna
-        [0, -0.7],     // Right side
-        [-0.5, -0.5],  // Right rear antenna
-        [-0.7, 0],     // Rear
-        [-0.5, 0.5],   // Left rear antenna
-        [0, 0.7],      // Left side
-        [0.5, 0.5]     // Left front antenna
+        [1.1, 0],      // Front antenna (rotated 90° CCW)
+        [0.4, -0.6],   // Right front dish
+        [0, -0.8],     // Right side emitter
+        [-0.6, -0.5],  // Right rear
+        [-0.9, 0],     // Rear center
+        [-0.6, 0.5],   // Left rear
+        [0, 0.8],      // Left side emitter
+        [0.4, 0.6]     // Left front dish
     ]),
 
     /**
@@ -167,18 +167,17 @@ const SHIP_SHAPES = {
     ]),
 
     /**
-     * Tug Ship - Compact rectangular with arms
+     * Tug Ship - Forward gripping arms with main body
      * @returns {Polygon}
      */
     TUG_SHIP: () => new Polygon([
-        [0.6, 0.4],    // Left arm front (rotated 90° CCW)
-        [0.3, 0.8],    // Left arm
-        [-0.3, 0.8],   // Left arm rear
-        [-0.6, 0.4],   // Left body rear
-        [-0.6, -0.4],  // Right body rear
-        [-0.3, -0.8],  // Right arm rear
-        [0.3, -0.8],   // Right arm
-        [0.6, -0.4]    // Right arm front
+        [1, 0],        // Front grip center (rotated 90° CCW)
+        [0.7, -0.5],   // Right grip arm
+        [0.2, -0.7],   // Right body
+        [-0.8, -0.5],  // Right rear
+        [-0.8, 0.5],   // Left rear
+        [0.2, 0.7],    // Left body
+        [0.7, 0.5]     // Left grip arm
     ]),
 
     /**
@@ -224,19 +223,18 @@ const SHIP_SHAPES = {
     ]),
 
     /**
-     * Observer - Scientific vessel with sensor pods
+     * Observer - Forward scanning vessel with sensor arrays
      * @returns {Polygon}
      */
     OBSERVER: () => new Polygon([
-        [0.8, 0],      // Front nose (rotated 90° CCW)
-        [0.3, -0.5],   // Right front sensor
-        [0, -0.7],     // Right sensor pod
-        [-0.4, -0.6],  // Right side
-        [-0.8, -0.3],  // Right rear
-        [-0.8, 0.3],   // Left rear
-        [-0.4, 0.6],   // Left side
-        [0, 0.7],      // Left sensor pod
-        [0.3, 0.5]     // Left front sensor
+        [1, 0],        // Front scanner (rotated 90° CCW)
+        [0.4, -0.6],   // Right front sensor
+        [0.1, -0.8],   // Right sensor array
+        [-0.5, -0.6],  // Right side
+        [-0.9, 0],     // Rear center
+        [-0.5, 0.6],   // Left side
+        [0.1, 0.8],    // Left sensor array
+        [0.4, 0.6]     // Left front sensor
     ]),
 
     /**

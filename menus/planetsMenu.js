@@ -21,6 +21,9 @@ function showPlanetsMenu(backFunction = () => closeModal(), dwarfOnly = false, s
         emptyMessage = 'No planets detected in this star system.'
     }
     
+    // Filter to only planets that have been seen
+    planets = planets.filter(p => gs.lastSeenDates.has(p))
+    
     if (planets.length === 0) {
         showModal(title, emptyMessage, [["Back", backFunction]])
         return
@@ -89,6 +92,21 @@ function showPlanetsMenu(backFunction = () => closeModal(), dwarfOnly = false, s
     const tableData = planets.map(planet => {
         const c = planet.civilization
         const distanceAU = Math.round(calcDistance(planet.x, planet.y, 0, 0) * 100) / 100
+        const hasVisited = gs.lastVisitedDates.has(planet)
+        
+        // If only seen but not visited, show limited info
+        if (!hasVisited) {
+            return [
+                planet.descriptor,
+                '?',
+                `${distanceAU} AU`,
+                '?',
+                '?',
+                '?',
+                '?',
+                '?'
+            ]
+        }
         
         return [
             coloredName(planet),

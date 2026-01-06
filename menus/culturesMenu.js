@@ -3,30 +3,31 @@
  * @param {Function} backFunction - Function to call when back button is pressed.
  */
 function showCulturesMenu(backFunction = () => closeModal()) {
-    const cultures = gs.system.planets.filter(p => p.civilization)
+    // Filter to only visited civilized planets
+    const visitedCultures = gs.system.planets.filter(p => p.civilization && gs.lastVisitedDates.has(p))
     
-    if (cultures.length === 0) {
+    if (visitedCultures.length === 0) {
         showModal(
             'Cultures Database',
-            'No civilizations with distinct cultures detected in this star system.',
+            'No civilizations with distinct cultures detected in visited locations.',
             [["Back", backFunction]]
         )
         return
     }
 
-    // Calculate total system population
-    let totalSystemPopulation = 0
-    for (const planet of gs.system.planets) {
-        if (planet.c && planet.c.population) {
-            totalSystemPopulation += planet.c.population
-        }
-    }
+    // Calculate data completeness
+    const totalPopulation = gs.system.getTotalPopulation(false)
+    const visitedPopulation = gs.system.getTotalPopulation(true)
+    const completeness = totalPopulation > 0 ? (visitedPopulation / totalPopulation) * 100 : 0
+    
+    // Filter to only visited planets for calculations
+    const visitedPlanets = gs.system.planets.filter(p => gs.lastVisitedDates.has(p))
 
-    // Calculate each culture's total population across all planets
+    // Calculate each culture's total population across visited planets only
     const culturePopulation = new Map()
-    for (const culturePlanet of cultures) {
+    for (const culturePlanet of visitedCultures) {
         let population = 0
-        for (const planet of gs.system.planets) {
+        for (const planet of visitedPlanets) {
             if (planet.c && planet.c.population && planet.c.cultures) {
                 const culturePercent = planet.c.cultures.getAmount(culturePlanet)
                 population += planet.c.population * culturePercent
@@ -36,9 +37,9 @@ function showCulturesMenu(backFunction = () => closeModal()) {
     }
 
     // Split cultures into two columns
-    const midpoint = Math.ceil(cultures.length / 2)
-    const leftCultures = cultures.slice(0, midpoint)
-    const rightCultures = cultures.slice(midpoint)
+    const midpoint = Math.ceil(visitedCultures.length / 2)
+    const leftCultures = visitedCultures.slice(0, midpoint)
+    const rightCultures = visitedCultures.slice(midpoint)
 
     // Create left column
     const leftColumn = ce({style: 'display: flex; flex-direction: column; gap: 20px;'})
@@ -57,10 +58,22 @@ function showCulturesMenu(backFunction = () => closeModal()) {
     }
 
     const columnLayout = createColumnLayout([leftColumn, rightColumn])
+    
+    // Create data completeness indicator
+    const completenessText = completeness >= 100 
+        ? colorSpan('Data 100% complete!', COLORS.Green)
+        : `Data ${Math.round(completeness)}% complete, visit more locations to increase accuracy`
+    
+    const content = ce({
+        children: [
+            ce({innerHTML: completenessText, style: 'margin-bottom: 15px; font-style: italic;'}),
+            columnLayout
+        ]
+    })
 
     showModal(
         'Cultures Database',
-        columnLayout,
+        content,
         [["Back", backFunction]]
     )
 }

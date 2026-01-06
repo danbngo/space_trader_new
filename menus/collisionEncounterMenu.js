@@ -99,33 +99,44 @@ function checkForAbandonedFleetCollision(collisionDistance) {
     
     console.log('🚨 COLLISION WITH ABANDONED FLEET', {abandonedFleet, distance: calcDistance(playerFleet.x, playerFleet.y, abandonedFleet.x, abandonedFleet.y)})
     
-    // 25% chance for trap, 75% chance for normal loot
-    const isTrap = Math.random() < 0.25
+    // Check if crew is still aboard
+    const hasCrew = abandonedFleet.officers && abandonedFleet.officers.length > 0
     
-    if (isTrap) {
-        // Spring a trap - pirates or slavers ambush
-        const isPirates = Math.random() < 0.5
-        const randomPlanet = rndMember([...gs.system.planets, ...gs.system.dwarfPlanets])
-        
-        // Generate encounter with random planet's pirates/slavers
-        const encounterType = isPirates ? ENCOUNTER_TYPES.PIRATES : ENCOUNTER_TYPES.SLAVERS
-        const encounter = generateRandomEncounter(encounterType, randomPlanet)
-        
-        // Manually add abandoned fleet's ships to enemy fleet so player sees them
-        for (const ship of abandonedFleet.ships) {
-            encounter.fleet.addShip(ship)
-        }
-        
-        // Use appropriate trap encounter class
-        const TrapEncounterClass = isPirates ? PirateTrapEncounter : SlaverTrapEncounter
-        encounter.constructor = TrapEncounterClass
-        Object.setPrototypeOf(encounter, TrapEncounterClass.prototype)
-        
+    if (hasCrew) {
+        // Crew rescue encounter - player can rescue or attack
+        const encounterType = ENCOUNTER_TYPES.NEUTRALS // Use neutral type as base
+        const encounter = new CrewRescueEncounter(encounterType, abandonedFleet.planet, abandonedFleet, [], null)
         encounter.startEncounter()
     } else {
-        // Normal loot - no trap
-        const encounter = generateEncounterForFleet(abandonedFleet)
-        encounter.startEncounter()
+        // No crew - can be trap or free loot
+        // 25% chance for trap, 75% chance for normal loot
+        const isTrap = Math.random() < 0.25
+        
+        if (isTrap) {
+            // Spring a trap - pirates or slavers ambush
+            const isPirates = Math.random() < 0.5
+            const randomPlanet = rndMember([...gs.system.planets, ...gs.system.dwarfPlanets])
+            
+            // Generate encounter with random planet's pirates/slavers
+            const encounterType = isPirates ? ENCOUNTER_TYPES.PIRATES : ENCOUNTER_TYPES.SLAVERS
+            const encounter = generateRandomEncounter(encounterType, randomPlanet)
+            
+            // Manually add abandoned fleet's ships to enemy fleet so player sees them
+            for (const ship of abandonedFleet.ships) {
+                encounter.fleet.addShip(ship)
+            }
+            
+            // Use appropriate trap encounter class
+            const TrapEncounterClass = isPirates ? PirateTrapEncounter : SlaverTrapEncounter
+            encounter.constructor = TrapEncounterClass
+            Object.setPrototypeOf(encounter, TrapEncounterClass.prototype)
+            
+            encounter.startEncounter()
+        } else {
+            // Normal loot - no trap, no crew
+            const encounter = generateEncounterForFleet(abandonedFleet)
+            encounter.startEncounter()
+        }
     }
     
     return true

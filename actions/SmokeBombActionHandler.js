@@ -29,7 +29,7 @@ class SmokeBombActionHandler extends ActionHandler {
         this.cvs.onClickWorldXY = (x, y) => this.attempt(attacker, targetArea, x, y)
         this.cvs.onMouseMoveWorldXY = (x, y) => this.target(attacker, x, y, targetArea)
         this.encounterMap.cvs.objClickEnabled = false
-        this.encounterMap.startTargeting('Smoke Bomb', [targetingAreaCircle, targetingCvsEllipse], [])
+        this.encounterMap.startTargeting('Smoke', [targetingAreaCircle, targetingCvsEllipse], [])
     }
 
     target(attacker = new Ship(), x = 0, y = 0, targetArea = new Circle()) {

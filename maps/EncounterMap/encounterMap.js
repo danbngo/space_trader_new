@@ -243,21 +243,7 @@ class EncounterMap extends BaseMap {
             return;
         }
 
-        if (this.targetingLabel && this.targetingLabel.length > 0 && obj instanceof Ship) {
-            ce({parent:container, innerHTML: `${obj.shipType.name}: Targeting ${this.targetingLabel}`})
-            
-            // Show helpful message based on whether there are valid targets
-            if (this.validTargets.length === 0) {
-                ce({parent:container, innerHTML: colorSpan('No valid targets in range', COLORS.Red)})
-            } else {
-                ce({parent:container, innerHTML: '(Select target)'})
-            }
-            
-            ce({parent:container, tag:'button', innerHTML:'Cancel', onClick: ()=>{
-                this.stopTargeting()
-            }})
-            return;
-        }
+        const isTargeting = this.targetingLabel && this.targetingLabel.length > 0 && obj instanceof Ship
 
         ce({
             parent:container, tag:'h3', innerHTML: coloredName(obj), classNames: ['clickable-text'],
@@ -289,36 +275,93 @@ class EncounterMap extends BaseMap {
             if (obj.radars) ce({parent:container, innerHTML: `Radars: ${statColorSpan(obj.radars, obj.radars/AVERAGE_SHIP_RADARS)}`})
             ce({parent:container, innerHTML: `Actions: ${statColorSpan(obj.actionsRemaining, obj.actionsRemaining/2)}`})
             ce({parent:container, innerHTML: obj.disabled ? `(Disabled)` : obj.escaped ? '(Escaped)' : ''})
+            
+            // Show targeting message if in targeting mode
+            if (isTargeting) {
+                if (this.validTargets.length === 0) {
+                    ce({parent:container, innerHTML: colorSpan('No targets', COLORS.Red)})
+                } else {
+                    ce({parent:container, innerHTML: colorSpan(`Targeting ${this.targetingLabel}`, COLORS.Cyan)})
+                }
+            }
+            else {
+                ce({parent:container, innerHTML: colorSpan(`Actions:`, COLORS.Cyan)})
+            }
+            
             if (showActions) {
                 // Create scrollable buttons container
                 const buttonsContainer = ce({parent:container, style: {maxHeight: '600px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px'}})
                 
-                ce({parent:buttonsContainer, tag:'button', innerHTML:'Shoot', disabled: !canAct || !obj.canShoot, onClick: ()=>{
-                    this.lastPlayerActionType = MOVE_TYPES.Laser
-                    this.moveHandlerMap.get(MOVE_TYPES.Laser).startTargeting(obj)
-                }})
-                ce({parent:buttonsContainer, tag:'button', innerHTML:'Move', disabled: !canAct, onClick: ()=>{
-                    this.lastPlayerActionType = MOVE_TYPES.Move
-                    this.moveHandlerMap.get(MOVE_TYPES.Move).startTargeting(obj)
-                }})
-                ce({parent:buttonsContainer, tag:'button', innerHTML:'Recharge', disabled: !canAct || !obj.canRecharge, onClick: ()=>this.moveHandlerMap.get(MOVE_TYPES.Recharge).attempt(obj)})
-                ce({parent:buttonsContainer, tag:'button', innerHTML:'Wait', disabled: !canAct, onClick: ()=>this.moveHandlerMap.get(MOVE_TYPES.Wait).attempt(obj)})
+                // Helper to determine if a button should be the active "Cancel" button
+                const isActiveAction = (moveType) => {
+                    if (!isTargeting) return false
+                    return this.lastPlayerActionType === moveType
+                }
+                
+                // Shoot button
+                const shootActive = isActiveAction(MOVE_TYPES.Laser)
+                ce({parent:buttonsContainer, tag:'button', 
+                    innerHTML: shootActive ? 'Cancel' : 'Shoot', 
+                    disabled: isTargeting ? !shootActive : (!canAct || !obj.canShoot),
+                    classNames: shootActive ? ['highlighted'] : [],
+                    onClick: ()=>{
+                        if (shootActive) {
+                            this.stopTargeting()
+                        } else {
+                            this.lastPlayerActionType = MOVE_TYPES.Laser
+                            this.moveHandlerMap.get(MOVE_TYPES.Laser).startTargeting(obj)
+                        }
+                    }
+                })
+                
+                // Move button
+                const moveActive = isActiveAction(MOVE_TYPES.Move)
+                ce({parent:buttonsContainer, tag:'button', 
+                    innerHTML: moveActive ? 'Cancel' : 'Move', 
+                    disabled: isTargeting ? !moveActive : !canAct,
+                    classNames: moveActive ? ['highlighted'] : [],
+                    onClick: ()=>{
+                        if (moveActive) {
+                            this.stopTargeting()
+                        } else {
+                            this.lastPlayerActionType = MOVE_TYPES.Move
+                            this.moveHandlerMap.get(MOVE_TYPES.Move).startTargeting(obj)
+                        }
+                    }
+                })
+                
+                // Recharge button
+                ce({parent:buttonsContainer, tag:'button', innerHTML:'Recharge', disabled: isTargeting || !canAct || !obj.canRecharge, onClick: ()=>this.moveHandlerMap.get(MOVE_TYPES.Recharge).attempt(obj)})
+                
+                // Wait button
+                ce({parent:buttonsContainer, tag:'button', innerHTML:'Wait', disabled: isTargeting || !canAct, onClick: ()=>this.moveHandlerMap.get(MOVE_TYPES.Wait).attempt(obj)})
                 
                 // Auto-control buttons
-                ce({parent:buttonsContainer, tag:'button', innerHTML:'Auto-Fight', disabled: !canAct, onClick: ()=>this.autoFightShip(obj)})
-                ce({parent:buttonsContainer, tag:'button', innerHTML:'Auto-Flee', disabled: !canAct, onClick: ()=>this.autoFleeShip(obj)})
+                ce({parent:buttonsContainer, tag:'button', innerHTML:'Auto-Fight', disabled: isTargeting || !canAct, onClick: ()=>this.autoFightShip(obj)})
+                ce({parent:buttonsContainer, tag:'button', innerHTML:'Auto-Flee', disabled: isTargeting || !canAct, onClick: ()=>this.autoFleeShip(obj)})
                 
+                // Module buttons
                 for (const [move, handler] of this.moveHandlerMap) {
                     const module = SHIP_MODULE_TYPES_ALL.find(m => m.moveType === move)
                     if (!module) continue
                     if (!obj.moduleTypes.includes(module)) continue
                     const cooldown = obj.moduleCooldowns.getAmount(module)
                     const onCooldown = cooldown > 0
-                    const label = cooldown > 0 ? `${move} (${cooldown})` : module.name
-                    ce({parent:buttonsContainer, tag:'button', innerHTML:label, disabled: !canAct || onCooldown || !obj.canUseModules, onClick: ()=>{
-                        this.lastPlayerActionType = move
-                        handler.startTargeting(obj)
-                    }})
+                    const moduleActive = isActiveAction(move)
+                    const label = moduleActive ? 'Cancel' : (cooldown > 0 ? `${move} (${cooldown})` : module.name)
+                    ce({parent:buttonsContainer, tag:'button', 
+                        innerHTML:label, 
+                        disabled: isTargeting ? !moduleActive : (!canAct || onCooldown || !obj.canUseModules),
+                        classNames: moduleActive ? ['highlighted'] : [],
+                        onClick: ()=>{
+                            if (moduleActive) {
+                                this.stopTargeting()
+                            } else {
+                                this.lastPlayerActionType = move
+                                handler.startTargeting(obj)
+                            }
+                        }
+                    })
                 }
             }
         }
@@ -449,8 +492,8 @@ class EncounterMap extends BaseMap {
         const originalAiType = ship.aiType
         ship.aiType = AI_TYPES.Ship
         
-        // Use the encounter AI to determine the best move
-        const action = this.encounter.ai.calcMoveForShip(ship)
+        // Use the encounter AI to determine the best move, with basicCombatOnly=true to restrict to lasers and movement
+        const action = this.encounter.ai.calcMoveForShip(ship, true)
         
         // Restore original values
         ship.aiType = originalAiType

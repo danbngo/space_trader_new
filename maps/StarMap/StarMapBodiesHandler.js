@@ -72,6 +72,15 @@ class StarMapBodiesHandler {
             pixel.x = asteroid.x
             pixel.y = asteroid.y
             
+            // Calculate screen radius and hide if too small when zoomed out
+            const screenRadius = asteroid.radius * cvs.zoom
+            if (screenRadius < ASTEROID_MIN_SCREEN_RADIUS) {
+                pixel.visible = false
+                return
+            }
+            
+            pixel.visible = true
+            
             // Check if within player's vision range
             if (gs.fleet && gs.fleet.mapViewDistance) {
                 const distance = calcDistance(asteroid.x, asteroid.y, gs.fleet.x, gs.fleet.y)
@@ -228,9 +237,8 @@ class StarMapBodiesHandler {
                 const objs = [planetObj, labelObj]
                 for (const obj of objs) {
                     obj.onHover = () => {
-                        // Show Unknown if not visited
-                        const hasBeenVisited = gs.lastVisitedDates.has(body)
-                        labelObj.textContent = hasBeenVisited ? body.name : `Unknown ${body.objectType.name}`
+                        // Use descriptor property
+                        labelObj.textContent = body.descriptor
                         labelObj.visible = true
                         for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
                     }
@@ -315,9 +323,8 @@ class StarMapBodiesHandler {
                 const objs = [stationObj, labelObj]
                 for (const obj of objs) {
                     obj.onHover = () => {
-                        // Show Unknown Station if not visited
-                        const hasBeenVisited = gs.lastVisitedDates.has(station)
-                        labelObj.textContent = hasBeenVisited ? station.name : 'Unknown Station'
+                        // Use descriptor property
+                        labelObj.textContent = station.descriptor
                         labelObj.visible = true
                         for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
                     }

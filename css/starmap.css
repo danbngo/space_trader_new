@@ -30,6 +30,7 @@
 }
 
 .starmap-object-panel {
+    min-width: 200px;
     background-color: rgba(0,0,0,0.33);
     padding: 10px;
     display: flex;

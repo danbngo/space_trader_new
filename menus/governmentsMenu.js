@@ -3,16 +3,22 @@
  * @param {Function} backFunction - Function to call when back button is pressed.
  */
 function showGovernmentsMenu(backFunction = () => closeModal()) {
-    const civilizedPlanets = gs.system.planets.filter(p => p.c)
+    // Filter to only visited civilized planets
+    const civilizedPlanets = gs.system.planets.filter(p => p.c && gs.lastVisitedDates.has(p))
     
     if (civilizedPlanets.length === 0) {
         showModal(
             'Governments Database',
-            'No civilizations detected in this star system.',
+            'No civilizations detected in visited locations.',
             [["Back", backFunction]]
         )
         return
     }
+
+    // Calculate data completeness
+    const totalPopulation = gs.system.getTotalPopulation(false)
+    const visitedPopulation = gs.system.getTotalPopulation(true)
+    const completeness = totalPopulation > 0 ? (visitedPopulation / totalPopulation) * 100 : 0
 
     // Count planets by government type
     const governmentCounts = new Map()
@@ -62,8 +68,17 @@ function showGovernmentsMenu(backFunction = () => closeModal()) {
         ]
     })
 
+    // Create data completeness indicator
+    const completenessText = completeness >= 100 
+        ? colorSpan('Data 100% complete!', COLORS.Green)
+        : `Data ${Math.round(completeness)}% complete, visit more locations to increase accuracy`
+    
     const content = ce({
-        children: [columnLayout, policyAdoptionSection]
+        children: [
+            ce({innerHTML: completenessText, style: 'margin-bottom: 15px; font-style: italic;'}),
+            columnLayout, 
+            policyAdoptionSection
+        ]
     })
 
     showModal(

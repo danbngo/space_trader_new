@@ -25,7 +25,7 @@ class PlasmaSprayActionHandler extends ActionHandler {
         this.encounterMap.onHoverObject = (hoveredObj) => this.target(hoveredObj)
         this.encounterMap.onSelectObject = (selectedObj) => this.attempt(ship, selectedObj)
         
-        this.encounterMap.startTargeting('Plasma Spray', [targetingArea1, targetingArea2], validTargets)
+        this.encounterMap.startTargeting('Plasma', [targetingArea1, targetingArea2], validTargets)
     }
 
     target(target = new Ship()) {

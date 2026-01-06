@@ -17,6 +17,7 @@ const ANOMALY_RADIUS = 1/10 * 1/EARTH_RADII_PER_AU
 
 const FLEET_COLLISION_DISTANCE = FLEET_RADIUS * 1000*1000
 const ASTEROID_MINING_DISTANCE = FLEET_RADIUS * 2000*1000 // 2x easier to mine than fleet collision range
+const ASTEROID_MIN_SCREEN_RADIUS = 1 // Hide asteroids when they would appear smaller than 1px radius
 const MINING_HAZARD_CHANCE = 0.1 // 10% chance of encountering a hazard when mining
 const REPAIR_COST_PER_1_HULL = 10 // Base cost to repair 1 hull point at shipyard
 const WARN_INTERCEPT_DURATION_YEARS = 1/30 // Show confirmation modal for intercept routes longer than this (1 day)

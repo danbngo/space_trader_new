@@ -14,19 +14,19 @@ function showReligionsMenu(backFunction = () => closeModal()) {
         return
     }
 
-    // Calculate total system population
-    let totalSystemPopulation = 0
-    for (const planet of gs.system.planets) {
-        if (planet.c && planet.c.population) {
-            totalSystemPopulation += planet.c.population
-        }
-    }
+    // Calculate data completeness based on visited population
+    const totalPopulation = gs.system.getTotalPopulation(false)
+    const visitedPopulation = gs.system.getTotalPopulation(true)
+    const completeness = totalPopulation > 0 ? (visitedPopulation / totalPopulation) * 100 : 0
+    
+    // Filter to only visited planets
+    const visitedPlanets = gs.system.planets.filter(p => gs.lastVisitedDates.has(p))
 
-    // Calculate each religion's total followers across all planets
+    // Calculate each religion's total followers across visited planets only
     const religionFollowers = new Map()
     for (const religion of religions) {
         let followers = 0
-        for (const planet of gs.system.planets) {
+        for (const planet of visitedPlanets) {
             if (planet.c && planet.c.population && planet.c.religions) {
                 const religionPercent = planet.c.religions.getAmount(religion)
                 followers += planet.c.population * (religionPercent / 100)
@@ -57,10 +57,22 @@ function showReligionsMenu(backFunction = () => closeModal()) {
     }
 
     const columnLayout = createColumnLayout([leftColumn, rightColumn])
+    
+    // Create data completeness indicator
+    const completenessText = completeness >= 100 
+        ? colorSpan('Data 100% complete!', COLORS.Green)
+        : `Data ${Math.round(completeness)}% complete, visit more locations to increase accuracy`
+    
+    const content = ce({
+        children: [
+            ce({innerHTML: completenessText, style: 'margin-bottom: 15px; font-style: italic;'}),
+            columnLayout
+        ]
+    })
 
     showModal(
         'Religions Database',
-        columnLayout,
+        content,
         [["Back", backFunction]]
     )
 }

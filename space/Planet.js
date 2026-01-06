@@ -42,6 +42,21 @@ class Planet extends OrbitingObject {
     get s() {
         return this.settlement
     }
+    /**
+     * Returns a display name based on whether the player has visited this planet
+     * @returns {string} - Either the planet name or "Unknown [Type]" descriptor
+     */
+    get descriptor() {
+        const hasVisited = gs.lastVisitedDates.has(this)
+        if (hasVisited) {
+            return this.name
+        }
+        // Return generic type-based descriptor if not visited
+        if (this instanceof SpaceStation) {
+            return 'Unknown Space Station'
+        }
+        return `Unknown ${this.planetType.name}`
+    }
     get ianName() {
         let baseName = this.name+'ian'
         if (baseName.endsWith('yian')) baseName = baseName.replace('yian', 'ian') //mercury

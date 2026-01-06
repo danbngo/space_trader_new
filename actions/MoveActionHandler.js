@@ -34,7 +34,7 @@ class MoveActionHandler extends ActionHandler {
             }
         }
         
-        this.encounterMap.startTargeting('Move (click enemy to ram)', [targetingCvsObject, targetingCvsCircle], validRamTargets)
+        this.encounterMap.startTargeting('Move', [targetingCvsObject, targetingCvsCircle], validRamTargets)
     }
 
     target(x = 0, y = 0, ellipse = new Ellipse(), mover = new Ship()) {

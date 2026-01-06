@@ -24,7 +24,7 @@ class NaniteBeamActionHandler extends ActionHandler {
         this.encounterMap.onHoverObject = (hoveredObj) => this.target(hoveredObj)
         this.encounterMap.onSelectObject = (selectedObj) => this.attempt(attacker, selectedObj)
         
-        this.encounterMap.startTargeting('Nanite Beam', [targetingCvsTriangle, targetingCvsCircle], validTargets)
+        this.encounterMap.startTargeting('Nanites', [targetingCvsTriangle, targetingCvsCircle], validTargets)
     }
 
     target(target = new Ship()) {

@@ -21,7 +21,7 @@ class LaserActionHandler extends ActionHandler {
         this.encounterMap.onHoverObject = (hoveredObj) => this.target(hoveredObj)
         this.encounterMap.onSelectObject = (selectedObj) => this.attempt(attacker, selectedObj)
         
-        this.encounterMap.startTargeting('Attack', [targetingCvsObject1, targetingCvsObject2, targetingCvsCircle], validTargets)
+        this.encounterMap.startTargeting('Laser', [targetingCvsObject1, targetingCvsObject2, targetingCvsCircle], validTargets)
     }
 
     target(target = new Ship()) {

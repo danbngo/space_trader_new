@@ -57,6 +57,34 @@ class StarSystem extends SpaceObject {
         this.simpleNews = []
         /** @type {Religion[]} */
         this.religions = religions
+        /**
+         * Calculate total population across all planets, dwarf planets, and space stations
+         * @param {boolean} visitedOnly - If true, only count visited locations
+         * @returns {number} - Total population
+         */
+        this.getTotalPopulation = (visitedOnly = false) => {
+            let total = 0
+            const allBodies = [...this.planets, ...this.dwarfPlanets, ...this.spaceStations]
+            for (const body of allBodies) {
+                if (visitedOnly && !gs.lastVisitedDates.has(body)) continue
+                if (body.c && body.c.population) {
+                    total += body.c.population
+                }
+            }
+            return total
+        }
+        
+        /**
+         * Calculate what percentage of total system population this planet represents
+         * @param {Planet} planet - The planet to get share for
+         * @returns {number} - Percentage (0-100) of total population
+         */
+        this.getPopulationShare = (planet) => {
+            const totalPop = this.getTotalPopulation(false)
+            if (totalPop === 0 || !planet.c || !planet.c.population) return 0
+            return (planet.c.population / totalPop) * 100
+        }
+        
         /** @type {Anomaly[]} */
         this.anomalies = anomalies
         /** @type {Ruins[]} */

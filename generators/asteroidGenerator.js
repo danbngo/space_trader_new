@@ -46,9 +46,9 @@ function generateAsteroids(asteroidBelt = new AsteroidBelt(), averageColor = COL
         const distMod = 1 + (maxOrbitalRadiusDifference*(inverseNormalCurve( Math.random() )-0.5)) - (maxOrbitalRadiusDifference*(inverseNormalCurve( Math.random() )-0.5))
         const distance = beltDistance * distMod
         //y *= Math.random()
-        const color = randomizeColor(averageColor, 32)
+        const color = randomizeColor(averageColor, 16)
         //minutes
-        const radius = Math.min(rng(maxRadius, 0.5, false), rng(maxRadius, 0.5, false), rng(maxRadius, 0.5, false), rng(maxRadius, 0.5, false), rng(maxRadius, 0.5, false))
+        const radius = Math.min(rng(maxRadius, maxRadius/3, false), rng(maxRadius, maxRadius/3, false), rng(maxRadius, maxRadius/3, false), rng(maxRadius, maxRadius/3, false), rng(maxRadius, maxRadius/3, false))
         const progress = startingProgress !== null ? startingProgress + rng(maxProgressDifference, 0, false) - rng(maxProgressDifference, 0, false) : Math.random()
         const asteroid = new Asteroid("", color, radius, new Orbit(distance, progress), asteroidBelt)
         asteroids.push(asteroid)

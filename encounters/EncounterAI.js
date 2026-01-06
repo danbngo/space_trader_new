@@ -367,8 +367,8 @@ class EncounterAI {
         return isFacing
     }
 
-    calcMoveForShip(ship = new Ship()) {
-        console.log('EncounterAI.calcMoveForShip', { ship });
+    calcMoveForShip(ship = new Ship(), basicCombatOnly = false) {
+        console.log('EncounterAI.calcMoveForShip', { ship, basicCombatOnly });
         const {encounter} = this
         const strategy = this.calcCombatStrategy(ship)
         const opposingFleet = this.encounter.calcOpposingFleet(ship.fleet)
@@ -379,8 +379,8 @@ class EncounterAI {
 
         console.log('deciding move for ship with strategy:', { strategy, nearestTarget, attackableTargets, rammableTargets, targets, opposingFleet });
 
-        // First, try to use ship modules if available and off cooldown
-        if (ship.canUseModules && ship.modules.length > 0 && Math.random() > .75) {
+        // First, try to use ship modules if available and off cooldown (skip if basicCombatOnly)
+        if (!basicCombatOnly && ship.canUseModules && ship.modules.length > 0 && Math.random() > .75) {
             //dont use abilities if out of bounds - mostly applies to asteroids
             if (calcDistance(0, 0, ship.x, ship.y) < encounter.mapRadius) {
                 const moduleAction = this.calcModuleAction(ship, strategy, targets)
@@ -408,8 +408,8 @@ class EncounterAI {
                 //attack targets if any available
                 return new LaserAction(encounter, ship, rndMember(attackableTargets))
             }
-            else if (rammableTargets.length > 0 && ship.canRam) {
-                //ram targets if any available - but don't ram if they have more hull than us
+            else if (!basicCombatOnly && rammableTargets.length > 0 && ship.canRam) {
+                //ram targets if any available - but don't ram if they have more hull than us (skip in basicCombatOnly)
                 const safeRammableTargets = rammableTargets.filter(t => t.hull[0]*Math.random() < ship.hull[0]*Math.random())
                 if (safeRammableTargets.length > 0) {
                     return new RamAction(encounter, ship, rndMember(safeRammableTargets))
@@ -434,8 +434,8 @@ class EncounterAI {
             if (bestMove) return new MoveAction(this.encounter, ship, bestMove[0], bestMove[1])
         }
         
-        //if all else fails, recharge
-        if ((ship.shields[0] < ship.shields[1]) && ship.canRecharge) {
+        //if all else fails, recharge (skip in basicCombatOnly mode)
+        if (!basicCombatOnly && (ship.shields[0] < ship.shields[1]) && ship.canRecharge) {
             return new RechargeAction(this.encounter, ship)
         }
         else return new WaitAction(this.encounter, ship)

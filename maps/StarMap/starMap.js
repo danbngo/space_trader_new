@@ -138,7 +138,7 @@ class StarMap extends BaseMap {
             parent:this.controls,
             classNames: ['starmap-buttons'],
             children: [
-                ce({tag:'button', classNames: [(this.paused && !gs.location) || (!this.paused && gs.location) ? 'highlighted' : null] , innerHTML:this.paused ? '▶' : '⏸', onClick: () => this.togglePause()}),
+                ce({tag:'button', classNames: [(this.paused && !gs.fleet.route) || (!this.paused && gs.location) ? 'highlighted' : null] , innerHTML:this.paused ? '▶' : '⏸', onClick: () => this.togglePause()}),
                 ce({tag:'button', innerHTML:'+', onClick: () => this.adjustZoom(1.33)}),
                 ce({tag:'button', innerHTML:'-', onClick: () => this.adjustZoom(0.66)}),
                 ce({tag:'button', classNames: [gs.captain.skillPoints > 0 ? 'highlighted' : null], innerHTML:'?', onClick: () => showAssistantMenu()}),
@@ -208,9 +208,13 @@ class StarMap extends BaseMap {
         let displayName
         if (obj === gs.fleet) {
             displayName = 'You'
-        } else if (obj instanceof Planet && !hasBeenVisited) {
-            // Planets and stations show as unknown until visited, even if seen
-            displayName = obj instanceof SpaceStation ? 'Unknown Station' : `Unknown ${obj.objectType.name}`
+        } else if (obj instanceof Planet) {
+            // Use descriptor property for planets/stations
+            if (!hasBeenVisited) {
+                displayName = obj.descriptor
+            } else {
+                displayName = coloredName(obj)
+            }
         } else if (!isDiscovered && obj.objectType) {
             displayName = `Undiscovered ${obj.objectType.name}`
         } else {

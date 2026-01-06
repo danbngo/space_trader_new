@@ -3,16 +3,22 @@
  * @param {Function} backFunction - Function to call when back button is pressed.
  */
 function showPoliticsMenu(backFunction = () => closeModal()) {
-    const planets = gs.system.planets.filter(p => p.civilization)
+    // Filter to only visited civilized planets
+    const planets = gs.system.planets.filter(p => p.civilization && gs.lastVisitedDates.has(p))
     
     if (planets.length === 0) {
         showModal(
             'Political Database',
-            'No civilizations detected in this star system.',
+            'No civilizations detected in visited locations.',
             [["Back", backFunction]]
         )
         return
     }
+
+    // Calculate data completeness
+    const totalPopulation = gs.system.getTotalPopulation(false)
+    const visitedPopulation = gs.system.getTotalPopulation(true)
+    const completeness = totalPopulation > 0 ? (visitedPopulation / totalPopulation) * 100 : 0
 
     const contentContainer = ce({style: 'overflow-y: auto; max-height: 70vh;'})
     
@@ -63,6 +69,14 @@ function showPoliticsMenu(backFunction = () => closeModal()) {
         null  // selectedRow
     )
     
+    // Create data completeness indicator
+    const completenessText = completeness >= 100 
+        ? colorSpan('Data 100% complete!', COLORS.Green)
+        : `Data ${Math.round(completeness)}% complete, visit more locations to increase accuracy`
+    
+    const completenessDiv = ce({innerHTML: completenessText, style: 'margin-bottom: 15px; font-style: italic;'})
+    
+    contentContainer.insertBefore(completenessDiv, contentContainer.firstChild)
     contentContainer.appendChild(table)
     
     showModal(
