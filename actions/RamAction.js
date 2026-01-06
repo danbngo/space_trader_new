@@ -33,7 +33,8 @@ class RamAction extends ShipAction {
             const [kx,ky] = rotatePoint(knockback, 0, 0, 0, this.angle)
             target.x += kx
             target.y += ky
-            target.incrementAngle(rng(Math.PI/2, -Math.PI/2, false))
+            // Ramming has lower impact on angle than drill - max 45 degrees in either direction
+            target.incrementAngle(rng(Math.PI/4, -Math.PI/4, false))
 
             pseudoActions.push(...this.encounter.checkShipMovementEffects(target))
 

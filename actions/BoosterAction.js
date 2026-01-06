@@ -1,7 +1,12 @@
 class BoosterAction extends ShipAction {
     constructor(encounter, actor = new Ship()) {
         super(encounter, actor, MOVE_TYPES.Booster)
-        const boostDistance = actor.maxMoveDistance * 4
+        
+        // Scale boost distance with module quality (1.0 = baseline 4x move distance)
+        const quality = actor.getModuleQuality(SHIP_MODULE_TYPES.BOOSTER)
+        const boostMultiplier = 4 * quality
+        const boostDistance = actor.maxMoveDistance * boostMultiplier
+        
         const [dx, dy] = rotatePoint(boostDistance, 0, 0, 0, actor.angle)
         this.toX = actor.x + dx
         this.toY = actor.y + dy

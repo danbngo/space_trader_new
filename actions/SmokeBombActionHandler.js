@@ -9,16 +9,19 @@ class SmokeBombActionHandler extends ActionHandler {
 
         this.encounterMap.targetingAreas = []
         
-        // Get targeting area (circle in front of ship)
-        const targetArea = attacker.calcPulseArea()
+        // Scale targeting distance and size with module quality (1.0 = baseline)
+        const quality = attacker.getModuleQuality(SHIP_MODULE_TYPES.SMOKE_BOMB)
+        const baseArea = attacker.calcPulseArea()
+        const targetRadius = baseArea.radius * quality
+        const targetArea = new Circle(baseArea.x, baseArea.y, targetRadius)
         
         // Show the targeting area boundary
         const targetingAreaCircle = this.cvs.addEmptyCircle('targetingarea', targetArea.x, targetArea.y, targetArea.radius, 12, COLORS.Targeting, 2)
         
-        // Show the smoke cloud preview (ellipse that follows mouse)
+        // Show the smoke cloud preview (ellipse that follows mouse) - scaled with quality
         const avgDebrisRadius = (EFFECT_TYPES.DEBRIS_CLOUD.maxSize + EFFECT_TYPES.DEBRIS_CLOUD.minSize)/2
-        const majorAxis = avgDebrisRadius
-        const minorAxis = avgDebrisRadius * 0.5
+        const majorAxis = avgDebrisRadius * quality
+        const minorAxis = avgDebrisRadius * 0.5 * quality
         // Initial angle perpendicular to ship's forward direction
         const initialAngle = attacker.angle + Math.PI / 2
         const targetingCvsEllipse = this.cvs.addEmptyOval('targetingcircle', targetArea.x, targetArea.y, majorAxis, minorAxis, 2, COLORS.TargetingConfirm, initialAngle, 2)

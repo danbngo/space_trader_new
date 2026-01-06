@@ -24,9 +24,12 @@ class DrillAction extends ShipAction {
             Object.assign(actor, {x: this.toX, y: this.toY, angle: this.angle})
 
             const dmgModifier = this.path.distance/actor.maxMoveDistance
+            
+            // Scale drill damage with module quality (1.0 = baseline)
+            const quality = actor.getModuleQuality(SHIP_MODULE_TYPES.DRILL)
 
             // Drill does more hull damage than ramming but less total damage
-            const drillDmg = 1.5 + rng(actor.maxRamDamage * dmgModifier * 1.2)
+            const drillDmg = (1.5 + rng(actor.maxRamDamage * dmgModifier * 1.2)) * quality
             const selfDmg = 0.5 + rng(actor.maxRamDamage/4 * dmgModifier) // Less self damage than ramming
             
             // Drill primarily damages hull (bypasses shields partially)

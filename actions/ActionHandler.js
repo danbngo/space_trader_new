@@ -56,6 +56,19 @@ class ActionHandler {
             a.addPopups(this.encounterMap.cvs)
         }
         this.encounterMap.refresh()
+        
+        // Reopen last action's targeting if player has moves left and it's still their turn
+        const isPlayerAction = action.actor.fleet === gs.fleet
+        const isStillPlayerTurn = this.encounter.activeTurnFleet === gs.fleet
+        const hasActionsRemaining = action.actor.actionsRemaining > 0
+        
+        if (isPlayerAction && isStillPlayerTurn && hasActionsRemaining && this.encounterMap.lastPlayerActionType) {
+            const handler = this.encounterMap.moveHandlerMap.get(this.encounterMap.lastPlayerActionType)
+            if (handler && handler.startTargeting) {
+                console.log('Auto-reopening targeting for:', this.encounterMap.lastPlayerActionType)
+                handler.startTargeting(action.actor)
+            }
+        }
     }
 
     static checkOnDisabledEffects(action = new ShipAction()) {

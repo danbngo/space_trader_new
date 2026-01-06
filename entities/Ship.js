@@ -86,6 +86,16 @@ class Ship {
     get moduleTypes() {
         return this.modules.map(m => m.moduleType)
     }
+    
+    /**
+     * Get the quality of a specific module installed on this ship
+     * @param {ShipModuleType} moduleType
+     * @returns {number} Quality multiplier (default 1.0)
+     */
+    getModuleQuality(moduleType) {
+        const module = this.modules.find(m => m.moduleType === moduleType)
+        return module ? (module.quality || 1.0) : 1.0
+    }
 
     get isFlagship() {
         if (!this.fleet) return false
@@ -305,10 +315,11 @@ class Ship {
      * Calculates the attack areas for laser weapons (two triangles).
      * @param {number} overrideX - Override x position (defaults to ship.x).
      * @param {number} overrideY - Override y position (defaults to ship.y).
+     * @param {number} areaMultiplier - Scale factor for attack range (defaults to 1.0).
      * @returns {Triangle[]} Array of two targeting triangles.
      */
-    calcLaserAreas(overrideX = this.x, overrideY = this.y) {
-        const attackRange = 1+this.maxAttackDistance
+    calcLaserAreas(overrideX = this.x, overrideY = this.y, areaMultiplier = 1.0) {
+        const attackRange = (1+this.maxAttackDistance) * areaMultiplier
         const targetingAngle = this.angle+Math.PI/2
         const targetingAngle2 = this.angle-Math.PI/2
         const [tx,ty] = rotatePoint(overrideX + attackRange/2, overrideY, overrideX, overrideY, targetingAngle)

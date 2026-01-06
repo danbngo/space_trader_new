@@ -191,7 +191,7 @@ function spawnSmallerAsteroids(died, encounter) {
             const newY = died.y + Math.sin(angle) * offsetDist
             smallAsteroid.x = newX
             smallAsteroid.y = newY
-            smallAsteroid.angle = Math.random() * Math.PI * 2
+            smallAsteroid.angle = angle
         }, 1)
 
     }

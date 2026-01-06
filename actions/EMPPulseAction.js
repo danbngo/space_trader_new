@@ -10,7 +10,11 @@ class EMPPulseAction extends ShipAction {
         this.actor.statusEffects.setAmount(STATUS_EFFECTS.CLOAKED, 0)
         const pseudoActions = []
         const attacker = this.actor
-        const pulseRadius = attacker.calcPulseArea().radius
+        
+        // Scale pulse radius with module quality (1.0 = baseline)
+        const quality = attacker.getModuleQuality(SHIP_MODULE_TYPES.EMP_PULSE)
+        const basePulseRadius = attacker.calcPulseArea().radius
+        const pulseRadius = basePulseRadius * quality
         
         // Find all ships within pulse radius
         const affectedShips = this.encounter.ships.filter(ship => {

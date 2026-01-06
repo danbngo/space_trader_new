@@ -7,7 +7,12 @@ class PlasmaSprayActionHandler extends ActionHandler {
         console.log('PlasmaSprayActionHandler.startTargeting', { ship });
         this.sourceShip = ship
         const encounter = this.encounterMap.encounter
-        const validTargets = encounter.calcPlasmaSprayTargets(ship)
+        
+        // Scale area with module quality (1.0 = baseline)
+        const quality = ship.getModuleQuality(SHIP_MODULE_TYPES.PLASMA_SPRAY)
+        this.areaMultiplier = quality
+        
+        const validTargets = encounter.calcPlasmaSprayTargets(ship, this.areaMultiplier)
         
         if (validTargets.length === 0) {
             showModal('No Valid Targets', 'No targets in plasma spray range.', [['OK', () => closeModal()]])
@@ -24,15 +29,15 @@ class PlasmaSprayActionHandler extends ActionHandler {
         const map = this.encounterMap.map
         const encounter = this.encounterMap.encounter
         
-        // Get the triangular spray areas (one on each side of ship)
-        const [triangle1, triangle2] = this.sourceShip.calcLaserAreas()
+        // Get the triangular spray areas (one on each side of ship) - scaled with quality
+        const [triangle1, triangle2] = this.sourceShip.calcLaserAreas(this.sourceShip.x, this.sourceShip.y, this.areaMultiplier)
         
         // Draw both triangular spray zones
         map.addEmptyTriangle('plasmaSprayArea1', triangle1.x, triangle1.y, triangle1.base, triangle1.height, 0.1, COLORS.Orange, triangle1.angle, () => this.confirmAction())
         map.addEmptyTriangle('plasmaSprayArea2', triangle2.x, triangle2.y, triangle2.base, triangle2.height, 0.1, COLORS.Orange, triangle2.angle, () => this.confirmAction())
         
         // Highlight all targets in range
-        const validTargets = encounter.calcPlasmaSprayTargets(this.sourceShip)
+        const validTargets = encounter.calcPlasmaSprayTargets(this.sourceShip, this.areaMultiplier)
         for (const target of validTargets) {
             map.addEmptyCircle(`plasmaSprayTarget_${target.id}`, target.x, target.y, target.size * 1.3, 0.1, COLORS.Orange, () => this.confirmAction())
         }
@@ -42,7 +47,7 @@ class PlasmaSprayActionHandler extends ActionHandler {
         if (!this.targetingMode || !this.sourceShip) return
         
         const encounter = this.encounterMap.encounter
-        const validTargets = encounter.calcPlasmaSprayTargets(this.sourceShip)
+        const validTargets = encounter.calcPlasmaSprayTargets(this.sourceShip, this.areaMultiplier)
         
         if (validTargets.length === 0) {
             this.cancelTargeting()

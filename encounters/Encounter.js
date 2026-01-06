@@ -245,10 +245,10 @@ class Encounter {
         return validTargets
     }
 
-    calcPlasmaSprayTargets(attacker = new Ship()) {
-        console.log('Encounter.calcPlasmaSprayTargets', { attacker });
+    calcPlasmaSprayTargets(attacker = new Ship(), areaMultiplier = 1.0) {
+        console.log('Encounter.calcPlasmaSprayTargets', { attacker, areaMultiplier });
         const validTargets = []
-        const [t1, t2] = attacker.calcLaserAreas()
+        const [t1, t2] = attacker.calcLaserAreas(areaMultiplier)
         for (const target of this.calcHarmableTargets(attacker)) {
             if (!t1.containsPoint(target.x, target.y) && !t2.containsPoint(target.x, target.y)) continue
             validTargets.push(target)
@@ -274,10 +274,10 @@ class Encounter {
         return validTargets
     }
 
-    calcBeamTargets(attacker = new Ship()) {
+    calcBeamTargets(attacker = new Ship(), targetArea = null) {
         console.log('Encounter.calcBeamTargets', { attacker });
         const validTargets = []
-        const targetingArea = attacker.calcBeamArea()
+        const targetingArea = targetArea || attacker.calcBeamArea()
         for (const target of this.calcHarmableTargets(attacker)) {
             if (targetingArea.containsPoint(target.x, target.y)) validTargets.push(target)
         }

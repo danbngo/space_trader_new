@@ -9,8 +9,11 @@ class EMPPulseActionHandler extends ActionHandler {
 
         this.encounterMap.targetingAreas = []
         
-        // Get EMP pulse area (circle centered on ship)
-        const pulseArea = ship.calcPulseArea()
+        // Scale EMP pulse area with module quality (1.0 = baseline)
+        const quality = ship.getModuleQuality(SHIP_MODULE_TYPES.EMP_PULSE)
+        const basePulseArea = ship.calcPulseArea()
+        const scaledRadius = basePulseArea.radius * quality
+        const pulseArea = new Circle(basePulseArea.x, basePulseArea.y, scaledRadius)
         
         // Show the pulse radius that will be affected
         const pulseCircle = this.cvs.addEmptyCircle('targetingarea', pulseArea.x, pulseArea.y, pulseArea.radius, 12, COLORS.Targeting)
@@ -46,10 +49,13 @@ class EMPPulseActionHandler extends ActionHandler {
         const ship = action.actor
         const pulseDuration = 1000
         
-        // Expanding pulse ring
+        // Expanding pulse ring - use quality-scaled radius
+        const quality = ship.getModuleQuality(SHIP_MODULE_TYPES.EMP_PULSE)
+        const basePulseRadius = ship.calcPulseArea().radius
+        const maxRadius = basePulseRadius * quality
+        
         const popupId = `emppulse_${Date.now()}_${Math.random()}`
         const pulseRing = this.cvs.addEmptyCircle(popupId, ship.x, ship.y, 0, 12, COLORS.LightPurple, 3)
-        const maxRadius = ship.calcPulseArea().radius
         
         const animation = new Loop(pulseDuration, (progressRatio) => {
             pulseRing.size = maxRadius * progressRatio

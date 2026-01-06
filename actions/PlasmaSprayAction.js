@@ -11,8 +11,11 @@ class PlasmaSprayAction extends ShipAction {
         // Clear cloak status when attacking
         attacker.statusEffects.setAmount(STATUS_EFFECTS.CLOAKED, 0)
         
+        // Scale area of effect with module quality (1.0 = baseline)
+        const quality = attacker.getModuleQuality(SHIP_MODULE_TYPES.PLASMA_SPRAY)
+        
         // Get all targets in the triangular spray pattern (similar to laser targeting)
-        const sprayTargets = this.encounter.calcPlasmaSprayTargets(attacker)
+        const sprayTargets = this.encounter.calcPlasmaSprayTargets(attacker, quality)
         
         const pseudoActions = []
         

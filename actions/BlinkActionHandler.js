@@ -9,8 +9,9 @@ class BlinkActionHandler extends ActionHandler {
 
         this.encounterMap.targetingAreas = []
         
-        // Blink distance from BlinkAction.js
-        const blinkDistance = 25
+        // Scale blink distance with module quality (1.0 = baseline 25)
+        const quality = ship.getModuleQuality(SHIP_MODULE_TYPES.BLINK)
+        const blinkDistance = 25 * quality
         
         // Show the blink radius circle centered on ship to indicate where they might blink
         const blinkCircle = this.cvs.addEmptyCircle('targetingarea', ship.x, ship.y, blinkDistance, 12, COLORS.Targeting)

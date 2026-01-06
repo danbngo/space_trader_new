@@ -37,7 +37,6 @@ class EncounterMap extends BaseMap {
             [MOVE_TYPES.Booster, new BoosterActionHandler(this)],
             [MOVE_TYPES.SmokeBomb, new SmokeBombActionHandler(this)],
             [MOVE_TYPES.Drill, new DrillActionHandler(this)],
-            [MOVE_TYPES.Detonate, new DetonateActionHandler(this)],
             [MOVE_TYPES.NaniteBeam, new NaniteBeamActionHandler(this)],
             [MOVE_TYPES.PlasmaSpray, new PlasmaSprayActionHandler(this)],
         ])
@@ -46,6 +45,10 @@ class EncounterMap extends BaseMap {
         
         // Track fade-out progress for escaped ships (shipId -> progress from 1.0 to 0.0)
         this.fadeOutProgress = new Map()
+        
+        // Track last action type to reopen after action completes (if still player turn and actions remain)
+        this.lastPlayerActionType = null
+        this.currentPlayerTurn = encounter.activeTurnFleet === encounter.playerFleet
 
         this.rebuildCanvas()
         this.refresh()
@@ -761,6 +764,15 @@ class EncounterMap extends BaseMap {
         const isComplete = encounter.isTurnComplete()
         if (!isComplete) return false
         encounter.handleTurnComplete()
+        
+        // Clear last action type when turn changes (new turn starts)
+        const wasPlayerTurn = this.currentPlayerTurn
+        this.currentPlayerTurn = encounter.activeTurnFleet === encounter.playerFleet
+        if (wasPlayerTurn !== this.currentPlayerTurn) {
+            console.log('Turn changed, clearing last action type')
+            this.lastPlayerActionType = null
+        }
+        
         for (const ship of encounter.activeTurnFleet.activeShips) {
             if (ship.actionsRemaining > ship.maxActionsPerTurn) {
                 const txt = this.cvs.addText(`fast_${ship.uuid}`, ship.x, ship.y, 0, -DEFAULT_FONT_SIZE, 'Fast!', COLORS.LightGreen)

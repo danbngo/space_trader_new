@@ -9,7 +9,11 @@ class BlinkAction extends ShipAction {
         // Clear cloak status when using blink module
         this.actor.statusEffects.setAmount(STATUS_EFFECTS.CLOAKED, 0)
         const ship = this.actor
-        const blinkDistance = 25
+        
+        // Scale blink distance with module quality (1.0 = baseline 25)
+        const quality = ship.getModuleQuality(SHIP_MODULE_TYPES.BLINK)
+        const blinkDistance = 25 * quality
+        this.blinkDistance = blinkDistance // Store for handler animation
         
         // Teleport to random nearby position
         const randomAngle = rng(Math.PI * 2, 0, false)

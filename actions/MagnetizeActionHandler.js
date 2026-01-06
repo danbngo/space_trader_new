@@ -9,13 +9,18 @@ class MagnetizeActionHandler extends ActionHandler {
 
         this.encounterMap.targetingAreas = []
         
+        // Scale targeting distance with module quality (1.0 = baseline)
+        const quality = attacker.getModuleQuality(SHIP_MODULE_TYPES.MAGNETIZE)
+        const baseArea = attacker.calcBeamArea()
+        const scaledHeight = baseArea.height * quality
+        const targetArea = new Triangle(baseArea.x, baseArea.y, baseArea.base, scaledHeight, baseArea.angle)
+        
         // Show targeting triangle in front of ship
-        const targetArea = attacker.calcBeamArea()
         const targetingCvsTriangle = this.cvs.addEmptyTriangle('targetingarea', targetArea.x, targetArea.y, targetArea.base, targetArea.height, 4, COLORS.Targeting, targetArea.angle)
         const targetingCvsCircle = this.cvs.addEmptyCircle('targetingcircle', 0, 0, 0, 12, COLORS.TargetingConfirm, 2)
         targetingCvsCircle.visible = false
 
-        const validTargets = this.encounter.calcBeamTargets(attacker)
+        const validTargets = this.encounter.calcBeamTargets(attacker, targetArea)
         if (validTargets.length > 0) this.target(validTargets[0])
         
         this.encounterMap.onHoverObject = (hoveredObj) => this.target(hoveredObj)

@@ -14,6 +14,9 @@ class WarheadAction extends ShipAction {
         const explosionRadius = attacker.maxAttackDistance * 0.25
         const pseudoActions = []
         
+        // Scale damage and knockback with module quality (1.0 = baseline)
+        const quality = attacker.getModuleQuality(SHIP_MODULE_TYPES.WARHEAD)
+        
         // Find all ships within explosion radius
         const affectedShips = this.encounter.ships.filter(ship => {
             if (ship === attacker || ship.disabled || ship.escaped) return false
@@ -26,11 +29,11 @@ class WarheadAction extends ShipAction {
             const dist = calcDistance(explosionX, explosionY, ship.x, ship.y)
             // Damage falls off with distance
             const damageRatio = 1 - (dist / explosionRadius)
-            const damage = 1+rng(20 * damageRatio) //attacker.maxLaserDamage * 2 * damageRatio
+            const damage = (1+rng(20 * damageRatio)) * quality
             
             const [hullDamage, shieldDamage, disabled] = ship.takeDamage(damage, false, false, attacker)
             // Apply knockback
-            const knockbackDistance = 15 * damageRatio
+            const knockbackDistance = 15 * damageRatio * quality
             const angle = Math.atan2(ship.y - explosionY, ship.x - explosionX)
             const [kx, ky] = rotatePoint(knockbackDistance, 0, 0, 0, angle)
             ship.x += kx
