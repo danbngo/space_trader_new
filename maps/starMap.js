@@ -225,16 +225,45 @@ class StarMap extends BaseMap {
         allPlanets.forEach((body) => {
             const planetId = `planet${body.uuid}`
             const labelId = `planetlabel${body.uuid}`
+            const nightSideId = `planetnightside${body.uuid}`
             
             let planetObj = cvs.getObject(planetId)
             let labelObj = cvs.getObject(labelId)
+            let nightSideObj = cvs.getObject(nightSideId)
             
             // Create objects if they don't exist
             if (!planetObj) {
+                const minScreenSize = body.objectType == OBJECT_TYPES.DWARF_PLANET ? 8 : 10
                 // Use exponent 0.4 instead of 0.5 (sqrt) to compress larger planets more
                 const displaySize = Math.pow(body.radius/EARTH_RADII_PER_AU, 0.4) * 3.5
-                planetObj = cvs.addFilledCircle(planetId, body.x, body.y, displaySize, 8, body.color, () => this.selectObject(body))
+                planetObj = cvs.addFilledCircle(planetId, body.x, body.y, displaySize, minScreenSize, body.color, () => this.selectObject(body))
                 planetObj.clickPriority = 10 // Planets have higher click priority than ships
+                
+                // Create night side overlay as a crescent/gibbous shape
+                // This creates a curved terminator by using two circular arcs
+                const crescentVertices = []
+                const numPoints = 25
+                const terminatorOffset = 0.3 // How much the terminator curves (0 = straight line, 1 = full circle)
+                
+                // First arc: outer edge of planet (right half)
+                for (let i = 0; i <= numPoints; i++) {
+                    const angle = Math.PI * i / numPoints - Math.PI / 2 // -90° to +90°
+                    const x = Math.cos(angle)
+                    const y = Math.sin(angle)
+                    crescentVertices.push([x, y])
+                }
+                
+                // Second arc: curved terminator line (going back from bottom to top)
+                for (let i = numPoints; i >= 0; i--) {
+                    const angle = Math.PI * i / numPoints - Math.PI / 2 // +90° to -90° (reversed)
+                    const x = Math.cos(angle) * terminatorOffset - terminatorOffset // Offset inward
+                    const y = Math.sin(angle)
+                    crescentVertices.push([x, y])
+                }
+                
+                const nightColor = [0, 0, 0, 0.7] // Semi-transparent black
+                nightSideObj = cvs.addPolygon(nightSideId, body.x, body.y, crescentVertices, displaySize, minScreenSize, nightColor, null, 0, null, 11)
+                
                 labelObj = cvs.addText(labelId, body.x, body.y, 0, -32, body.name, body.color, DEFAULT_FONT_SIZE, 2, () => this.selectObject(body))
                 labelObj.clickPriority = 10 // Planet labels also have high priority
                 
@@ -257,6 +286,15 @@ class StarMap extends BaseMap {
             planetObj.y = body.y
             labelObj.x = body.x
             labelObj.y = body.y
+            
+            // Update night side position and rotation
+            if (nightSideObj && body.orbit) {
+                nightSideObj.x = body.x
+                nightSideObj.y = body.y
+                // Angle from planet to sun (parent) - rotate 180° to show dark side
+                const angleToSun = calcAngleTowardsPoint(body.x, body.y, body.parent.x, body.parent.y)
+                nightSideObj.angle = angleToSun + Math.PI // Dark side faces away from sun
+            }
             
             if (body == this.selectedObject) {
                 planetObj.strokeColor = COLORS.Green
@@ -483,20 +521,24 @@ class StarMap extends BaseMap {
             
             // Create objects if they don't exist
             if (!fleetObj) {
-                const fleetSize = Math.sqrt(fleet.radius/EARTH_RADII_PER_AU) * 2.5
+                // Use exponent 0.4 instead of 0.5 (sqrt) to compress larger fleets more (same as planets)
+                const fleetSize = Math.pow(fleet.radius/EARTH_RADII_PER_AU, 0.4) * 2.5 * 100
                 
                 // Use custom polygon shape if flagship has a shape generator
                 const flagship = fleet.flagship || (fleet.ships && fleet.ships[0])
                 if (flagship && flagship.shipType && flagship.shipType.shapeGenerator) {
                     const vertices = flagship.shipType.shapeGenerator()
-                    fleetObj = cvs.addPolygon(fleetId, fleet.x, fleet.y, vertices, fleetSize, 12, fleet.color, COLORS.White, fleetAngle, () => this.selectObject(fleet))
+                    fleetObj = cvs.addPolygon(fleetId, fleet.x, fleet.y, vertices, fleetSize, 10, fleet.color, COLORS.White, fleetAngle, () => this.selectObject(fleet))
                 } else {
-                    fleetObj = cvs.addFilledTriangle(fleetId, fleet.x, fleet.y, fleetSize, fleetSize, 12, fleet.color, fleetAngle, () => this.selectObject(fleet))
+                    fleetObj = cvs.addFilledTriangle(fleetId, fleet.x, fleet.y, fleetSize, fleetSize, 10, fleet.color, fleetAngle, () => this.selectObject(fleet))
                 }
+                
+                fleetObj.clickPriority = 5 // Fleets have medium priority (lower than planets, higher than default)
                 
                 pathObj = cvs.addLine(pathId, 0, 0, 0, 0, fleet.color, 1)
                 thrusterObj = cvs.addFilledTriangle(thrusterId, fleet.x, fleet.y, fleetSize*0.5, fleetSize*0.5, 6, COLORS.Orange)
                 labelObj = cvs.addText(labelId, fleet.x, fleet.y, 0, -32, fleet.name, fleet.color, DEFAULT_FONT_SIZE, 2, () => this.selectObject(fleet))
+                labelObj.clickPriority = 5 // Fleet labels also have medium priority
                 
                 labelObj.visible = isPlayerFleet
                 
@@ -517,7 +559,22 @@ class StarMap extends BaseMap {
             // Update fleet position and angle
             fleetObj.x = fleet.x
             fleetObj.y = fleet.y
-            if (fleetAngle !== undefined) fleetObj.angle = fleetAngle
+            
+            // Smoothly rotate towards target angle instead of snapping
+            let isTurning = false
+            if (fleetAngle !== undefined) {
+                const currentAngle = fleetObj.angle || fleetAngle
+                const angleDiff = normalizeAngle(fleetAngle - currentAngle)
+                const rotationSpeed = Math.PI / 60 // Rotate up to ~3 degrees per frame (2x slower)
+                
+                if (Math.abs(angleDiff) < rotationSpeed) {
+                    fleetObj.angle = fleetAngle // Close enough, snap to target
+                } else {
+                    fleetObj.angle = currentAngle + Math.sign(angleDiff) * rotationSpeed
+                    isTurning = true
+                }
+            }
+            
             fleetObj.strokeColor = (fleet == this.selectedObject) ? COLORS.Green : COLORS.Black
             fleetObj.fillColor[3] = 1-(fleet.cloakLevel*0.95)
             // Update onClick handler - docked fleets should not be clickable
@@ -546,17 +603,25 @@ class StarMap extends BaseMap {
             }
             
             // Update thruster
-            if (fleet.location || !fleet.route) {
+            if (fleet.location || !fleet.route || isTurning) {
                 thrusterObj.visible = false
             } else {
-                const [screenOffsetX, screenOffsetY] = rotatePoint(10, 0, 0, 0, fleetAngle - Math.PI)
+                // Position thruster behind fleet, offset by fleet size + small gap
+                const thrusterOffset = 15
+                const [screenOffsetX, screenOffsetY] = rotatePoint(thrusterOffset, 0, 0, 0, fleetAngle - Math.PI)
                 if (fleetAngle !== undefined) thrusterObj.angle = fleetAngle - Math.PI
                 thrusterObj.visible = true
                 thrusterObj.x = fleet.x
                 thrusterObj.y = fleet.y
                 thrusterObj.screenOffsetX = screenOffsetX
                 thrusterObj.screenOffsetY = screenOffsetY
-                thrusterObj.fillColor[3] = 1-(fleet.cloakLevel*0.95)
+                
+                // Oscillate thruster transparency
+                const currentMs = Date.now()
+                const oscillationFreq = 0.003 // Slower oscillation for fleet thrusters
+                const baseAlpha = 1 - (fleet.cloakLevel * 0.95)
+                const oscillation = 0.1 * Math.sin(currentMs * oscillationFreq)
+                thrusterObj.fillColor[3] = Math.min(1, baseAlpha + oscillation)
             }
         })
         
@@ -591,7 +656,8 @@ class StarMap extends BaseMap {
             
             // Create objects if they don't exist
             if (!fleetObj) {
-                const fleetSize = Math.sqrt(fleet.radius/EARTH_RADII_PER_AU) * 2.5
+                // Use exponent 0.4 instead of 0.5 (sqrt) to compress larger fleets more (same as planets)
+                const fleetSize = Math.pow(fleet.radius/EARTH_RADII_PER_AU, 0.4) * 2.5
                 
                 // Use custom polygon shape if flagship has a shape generator
                 const flagship = fleet.flagship || (fleet.ships && fleet.ships[0])
@@ -602,8 +668,11 @@ class StarMap extends BaseMap {
                     fleetObj = cvs.addFilledTriangle(fleetId, fleet.x, fleet.y, fleetSize, fleetSize, 12, fleet.color, fleetAngle, () => this.selectObject(fleet))
                 }
                 
+                fleetObj.clickPriority = 5 // Fleets have medium priority (lower than planets, higher than default)
+                
                 pathObj = cvs.addLine(pathId, 0, 0, 0, 0, fleet.color, 1)
                 labelObj = cvs.addText(labelId, fleet.x, fleet.y, 0, -32, fleet.name + ' (Abandoned)', fleet.color, DEFAULT_FONT_SIZE, 2, () => this.selectObject(fleet))
+                labelObj.clickPriority = 5 // Fleet labels also have medium priority
                 
                 const objs = [fleetObj, labelObj]
                 for (const obj of objs) {
@@ -657,6 +726,14 @@ class StarMap extends BaseMap {
             waypointMarker.visible = true
             waypointMarker.x = this.selectedObject.x
             waypointMarker.y = this.selectedObject.y
+            
+            // Oscillate the green color component over time
+            const currentMs = Date.now()
+            const oscillationFreq = 0.003
+            const minGreen = 150
+            const maxGreen = 255
+            const greenValue = minGreen + (maxGreen - minGreen) * (0.5 + 0.5 * Math.sin(currentMs * oscillationFreq))
+            waypointMarker.fillColor[1] = greenValue
         } else {
             waypointMarker.visible = false
         }

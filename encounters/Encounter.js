@@ -231,7 +231,15 @@ class Encounter {
         const [t1, t2] = attacker.calcLaserAreas()
         for (const target of this.calcHarmableTargets(attacker)) {
             if (target.statusEffects.has(STATUS_EFFECTS.DUSTY)) continue
-            if (!t1.containsPoint(target.x, target.y) && !t2.containsPoint(target.x, target.y)) continue
+            
+            // Check if target center is in range OR if closest edge of target is in range
+            const inRange = t1.containsPoint(target.x, target.y) || t2.containsPoint(target.x, target.y)
+            if (!inRange) {
+                // Check if the edge of the target ship closest to attacker is within laser range
+                const angleToTarget = calcAngleTowardsPoint(attacker.x, attacker.y, target.x, target.y)
+                const [edgeX, edgeY] = rotatePoint(target.radius, 0, target.x, target.y, angleToTarget + Math.PI)
+                if (!t1.containsPoint(edgeX, edgeY) && !t2.containsPoint(edgeX, edgeY)) continue
+            }
             validTargets.push(target)
         }
         return validTargets
@@ -253,7 +261,15 @@ class Encounter {
         const validTargets = []
         const a1 = attacker.calcMoveArea()
         for (const target of this.calcHarmableTargets(attacker)) {
-            if (a1.containsPoint(target.x, target.y)) validTargets.push(target)
+            // Check if target center is in range OR if closest edge of target is in range
+            const inRange = a1.containsPoint(target.x, target.y)
+            if (!inRange) {
+                // Check if the edge of the target ship closest to attacker is within ram range
+                const angleToTarget = calcAngleTowardsPoint(attacker.x, attacker.y, target.x, target.y)
+                const [edgeX, edgeY] = rotatePoint(target.radius, 0, target.x, target.y, angleToTarget + Math.PI)
+                if (!a1.containsPoint(edgeX, edgeY)) continue
+            }
+            validTargets.push(target)
         }
         return validTargets
     }
@@ -396,6 +412,30 @@ class Encounter {
                 const angle = rng(Math.PI * 2, 0, false)
                 let [x, y] = rotatePoint(dist, 0, 0, 0, angle)
                 Object.assign(ship, {x, y, angle: rng(Math.PI * 2, 0, false)})
+            }
+            
+            // Remove asteroids that are too close to player ships
+            const buffer = 2
+            const asteroidsToRemove = []
+            for (const asteroid of enemyShips) {
+                for (const playerShip of playerShips) {
+                    const distance = calcDistance(asteroid.x, asteroid.y, playerShip.x, playerShip.y)
+                    const minDistance = asteroid.radius + playerShip.radius + buffer
+                    if (distance < minDistance) {
+                        asteroidsToRemove.push(asteroid)
+                        break
+                    }
+                }
+            }
+            
+            // Remove the asteroids from the fleet
+            for (const asteroid of asteroidsToRemove) {
+                safeRemove(enemyShips, asteroid)
+                safeRemove(enemyFleet.ships, asteroid)
+            }
+            
+            if (asteroidsToRemove.length > 0) {
+                console.log(`Removed ${asteroidsToRemove.length} asteroids that were too close to player ships`)
             }
         }
         else if (formationType == FORMATION_TYPES.PlayerEncircled) {

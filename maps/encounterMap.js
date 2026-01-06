@@ -182,7 +182,10 @@ class EncounterMap extends BaseMap {
                 obj.onHoverEnd()
             }
             const thrusterColor = ship.aiType == AI_TYPES.Asteroid ? COLORS.Transparent : COLORS.Orange
-            const animThruster = this.cvs.addFilledTriangle(shipId+'thruster', ship.x, ship.y, ship.radius*0.5, ship.radius*0.5, 6, thrusterColor, ship.angle - Math.PI)
+            // Place thruster behind ship, offset by ship radius + small gap
+            const thrusterOffset = ship.radius * 1.3
+            const [thrusterX, thrusterY] = rotatePoint(thrusterOffset, 0, ship.x, ship.y, ship.angle - Math.PI)
+            const animThruster = this.cvs.addFilledTriangle(shipId+'thruster', thrusterX, thrusterY, ship.radius*0.5, ship.radius*0.5, 6, thrusterColor, ship.angle - Math.PI)
         })
 
         cvs.recalculateDrawOrder()
@@ -310,9 +313,36 @@ class EncounterMap extends BaseMap {
             const shieldsRatio = ship.shields[0] <= 0 ? 0 : 0.25+(0.75*ship.shields[0]/ship.shields[1])
             const hullRatio = 0.25 + (0.75*ship.hull[0]/ship.hull[1])
 
-            cvsShipObject.x = ship.x
-            cvsShipObject.y = ship.y
-            cvsShipObject.angle = ship.angle
+            // Smooth interpolation for position and angle (similar to starmap)
+            const interpSpeed = 0.15 // Interpolation speed (0-1, higher = faster)
+            const positionThreshold = 0.5 // Snap if within this distance
+            const angleThreshold = 0.05 // Snap if within this angle
+            
+            // Smooth position interpolation
+            const dx = ship.x - cvsShipObject.x
+            const dy = ship.y - cvsShipObject.y
+            const distance = Math.sqrt(dx*dx + dy*dy)
+            
+            if (distance > positionThreshold) {
+                cvsShipObject.x += dx * interpSpeed
+                cvsShipObject.y += dy * interpSpeed
+            } else {
+                cvsShipObject.x = ship.x
+                cvsShipObject.y = ship.y
+            }
+            
+            // Smooth angle interpolation
+            const targetAngle = ship.angle
+            let angleDiff = targetAngle - cvsShipObject.angle
+            // Normalize angle difference to [-PI, PI]
+            while (angleDiff > Math.PI) angleDiff -= 2 * Math.PI
+            while (angleDiff < -Math.PI) angleDiff += 2 * Math.PI
+            
+            if (Math.abs(angleDiff) > angleThreshold) {
+                cvsShipObject.angle += angleDiff * interpSpeed
+            } else {
+                cvsShipObject.angle = targetAngle
+            }
             
             // Display cloaked ships as white with low alpha
             if (cloaked) {
@@ -321,22 +351,23 @@ class EncounterMap extends BaseMap {
                 cvsShipObject.fillColor[3] = hullRatio
             }
             
-            cvsShieldObject.x = ship.x
-            cvsShieldObject.y = ship.y
+            cvsShieldObject.x = cvsShipObject.x
+            cvsShieldObject.y = cvsShipObject.y
             cvsShieldObject.strokeColor[3] = shieldsRatio
             cvsShieldObject.fillColor[3] = shieldsRatio
 
-            cvsLabelObject.x = ship.x
-            cvsLabelObject.y = ship.y
+            cvsLabelObject.x = cvsShipObject.x
+            cvsLabelObject.y = cvsShipObject.y
 
             if (ship.aiType !== AI_TYPES.Asteroid) {
-                const [xo, yo] = rotatePoint(ship.radius, 0, 0, 0, ship.angle-Math.PI)
-                cvsThrusterObject.x = ship.x+xo
-                cvsThrusterObject.y = ship.y+yo
-                const [sxo, syo] = rotatePoint(4, 0, 0, 0, ship.angle-Math.PI)
-                cvsThrusterObject.screenOffsetX = sxo
-                cvsThrusterObject.screenOffsetY = syo
-                cvsThrusterObject.angle = ship.angle - Math.PI
+                // Position thruster behind ship, offset by ship radius + small gap
+                const thrusterOffset = ship.radius * 1.3
+                const [xo, yo] = rotatePoint(thrusterOffset, 0, 0, 0, cvsShipObject.angle-Math.PI)
+                cvsThrusterObject.x = cvsShipObject.x+xo
+                cvsThrusterObject.y = cvsShipObject.y+yo
+                cvsThrusterObject.screenOffsetX = 0
+                cvsThrusterObject.screenOffsetY = 0
+                cvsThrusterObject.angle = cvsShipObject.angle - Math.PI
             }
             else cvsThrusterObject.visible = false
             
@@ -479,11 +510,18 @@ class EncounterMap extends BaseMap {
             ce({parent:container, innerHTML: `Actions: ${statColorSpan(obj.actionsRemaining, obj.actionsRemaining/2)}`})
             ce({parent:container, innerHTML: obj.disabled ? `(Disabled)` : obj.escaped ? '(Escaped)' : ''})
             if (showActions) {
-                ce({parent:container, tag:'button', innerHTML:'Shoot', disabled: !canAct || !obj.canShoot, onClick: ()=>this.moveHandlerMap.get(MOVE_TYPES.Laser).startTargeting(obj)})
-                ce({parent:container, tag:'button', innerHTML:'Move', disabled: !canAct, onClick: ()=>this.moveHandlerMap.get(MOVE_TYPES.Move).startTargeting(obj)})
-                ce({parent:container, tag:'button', innerHTML:'Ram', disabled: !canAct || !obj.canRam, onClick: ()=>this.moveHandlerMap.get(MOVE_TYPES.Ram).startTargeting(obj)})
-                ce({parent:container, tag:'button', innerHTML:'Recharge', disabled: !canAct || !obj.canRecharge, onClick: ()=>this.moveHandlerMap.get(MOVE_TYPES.Recharge).attempt(obj)})
-                ce({parent:container, tag:'button', innerHTML:'Wait', disabled: !canAct, onClick: ()=>this.moveHandlerMap.get(MOVE_TYPES.Wait).attempt(obj)})
+                // Create scrollable buttons container
+                const buttonsContainer = ce({parent:container, style: {maxHeight: '300px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px'}})
+                
+                ce({parent:buttonsContainer, tag:'button', innerHTML:'Shoot', disabled: !canAct || !obj.canShoot, onClick: ()=>this.moveHandlerMap.get(MOVE_TYPES.Laser).startTargeting(obj)})
+                ce({parent:buttonsContainer, tag:'button', innerHTML:'Move', disabled: !canAct, onClick: ()=>this.moveHandlerMap.get(MOVE_TYPES.Move).startTargeting(obj)})
+                ce({parent:buttonsContainer, tag:'button', innerHTML:'Ram', disabled: !canAct || !obj.canRam, onClick: ()=>this.moveHandlerMap.get(MOVE_TYPES.Ram).startTargeting(obj)})
+                ce({parent:buttonsContainer, tag:'button', innerHTML:'Recharge', disabled: !canAct || !obj.canRecharge, onClick: ()=>this.moveHandlerMap.get(MOVE_TYPES.Recharge).attempt(obj)})
+                ce({parent:buttonsContainer, tag:'button', innerHTML:'Wait', disabled: !canAct, onClick: ()=>this.moveHandlerMap.get(MOVE_TYPES.Wait).attempt(obj)})
+                
+                // Auto-control buttons
+                ce({parent:buttonsContainer, tag:'button', innerHTML:'Auto-Fight', disabled: !canAct, onClick: ()=>this.autoFightShip(obj)})
+                ce({parent:buttonsContainer, tag:'button', innerHTML:'Auto-Flee', disabled: !canAct, onClick: ()=>this.autoFleeShip(obj)})
                 
                 for (const [move, handler] of this.moveHandlerMap) {
                     const module = SHIP_MODULE_TYPES_ALL.find(m => m.moveType === move)
@@ -492,7 +530,7 @@ class EncounterMap extends BaseMap {
                     const cooldown = obj.moduleCooldowns.getAmount(module)
                     const onCooldown = cooldown > 0
                     const label = cooldown > 0 ? `${move} (${cooldown})` : module.name
-                    ce({parent:container, tag:'button', innerHTML:label, disabled: !canAct || onCooldown || !obj.canUseModules, onClick: ()=>{
+                    ce({parent:buttonsContainer, tag:'button', innerHTML:label, disabled: !canAct || onCooldown || !obj.canUseModules, onClick: ()=>{
                         handler.startTargeting(obj)
                     }})
                 }
@@ -613,6 +651,64 @@ class EncounterMap extends BaseMap {
         // Only continue animation loop if not paused
         if (!this.paused) {
             requestAnimationFrame(()=>this.tick())
+        }
+    }
+
+    /**
+     * Uses AI to automatically control a player ship with Attack strategy
+     * @param {Ship} ship - The player ship to auto-control
+     */
+    autoFightShip(ship) {
+        console.log('autoFightShip', { ship })
+        if (!this.calcCanBeControlled(ship)) return
+        
+        // Temporarily override the ship's AI type and fleet combat strategy to force Attack behavior
+        const originalAiType = ship.aiType
+        //const originalCombatStrategy = ship.fleet.combatStrategy
+        
+        //ship.aiType = AI_TYPES.Ship
+        //ship.fleet.combatStrategy = COMBAT_STRATEGIES.Attack
+        
+        // Use the encounter AI to determine the best move
+        const action = this.encounter.ai.calcMoveForShip(ship)
+        
+        // Restore original values
+        //ship.aiType = originalAiType
+        //ship.fleet.combatStrategy = originalCombatStrategy
+        
+        if (action) {
+            console.log('Auto-Fight executing action:', action)
+            this.moveHandlerMap.get(action.actionType).execute(action)
+        }
+    }
+
+    /**
+     * Uses AI to automatically control a player ship with Escape strategy
+     * @param {Ship} ship - The player ship to auto-control
+     */
+    autoFleeShip(ship) {
+        console.log('autoFleeShip', { ship })
+        if (!this.calcCanBeControlled(ship)) return
+        
+        // Temporarily force the ship to use Escape strategy
+        // We'll do this by temporarily modifying the ship's hull to appear damaged
+        const originalHull = ship.hull[0]
+        const originalAiType = ship.aiType
+        
+        ship.aiType = AI_TYPES.Ship
+        // Make it think it's badly damaged to trigger escape behavior
+        ship.hull[0] = ship.hull[1] * 0.3
+        
+        // Use the encounter AI to determine the best move
+        const action = this.encounter.ai.calcMoveForShip(ship)
+        
+        // Restore original values
+        ship.hull[0] = originalHull
+        ship.aiType = originalAiType
+        
+        if (action) {
+            console.log('Auto-Flee executing action:', action)
+            this.moveHandlerMap.get(action.actionType).execute(action)
         }
     }
 
