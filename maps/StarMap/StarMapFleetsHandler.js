@@ -71,7 +71,8 @@ class StarMapFleetsHandler {
                 // Use custom polygon shape if flagship has a shape generator
                 const flagship = fleet.flagship || (fleet.ships && fleet.ships[0])
                 if (flagship && flagship.shipType && flagship.shipType.shapeGenerator) {
-                    const vertices = flagship.shipType.shapeGenerator()
+                    const shapePolygon = flagship.shipType.shapeGenerator()
+                    const vertices = shapePolygon.vertices
                     fleetObj = cvs.addPolygon(fleetId, fleet.x, fleet.y, vertices, fleetSize, 10, fillColor, strokeColor, fleetAngle, () => selectObject.call(this.starMap, fleet))
                 } else {
                     fleetObj = cvs.addFilledTriangle(fleetId, fleet.x, fleet.y, fleetSize, fleetSize, 10, fillColor, fleetAngle, () => selectObject.call(this.starMap, fleet))
@@ -226,7 +227,8 @@ class StarMapFleetsHandler {
                 // Use custom polygon shape if flagship has a shape generator
                 const flagship = fleet.flagship || (fleet.ships && fleet.ships[0])
                 if (flagship && flagship.shipType && flagship.shipType.shapeGenerator) {
-                    const vertices = flagship.shipType.shapeGenerator()
+                    const shapePolygon = flagship.shipType.shapeGenerator()
+                    const vertices = shapePolygon.vertices
                     fleetObj = cvs.addPolygon(fleetId, fleet.x, fleet.y, vertices, fleetSize, 12, fillColor, strokeColor, fleetAngle, () => selectObject.call(this.starMap, fleet))
                 } else {
                     fleetObj = cvs.addFilledTriangle(fleetId, fleet.x, fleet.y, fleetSize, fleetSize, 12, fillColor, fleetAngle, () => selectObject.call(this.starMap, fleet))

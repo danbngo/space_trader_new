@@ -95,7 +95,8 @@ class EncounterMapRenderer {
                 }
                 // Use custom polygon shape if ship type has a shape generator
                 else if (ship.shipType.shapeGenerator) {
-                    const vertices = ship.shipType.shapeGenerator()
+                    const shapePolygon = ship.shipType.shapeGenerator()
+                    const vertices = shapePolygon.vertices
                     cvsShipObject = cvs.addPolygon(shipId, ship.x, ship.y, vertices, ship.radius, 12, ship.color, COLORS.White, ship.angle, () => this.encounterMap.selectObject(ship))
                 }
                 // Fallback to legacy shapes
