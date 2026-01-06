@@ -47,10 +47,8 @@ class NeutralsEncounter extends FleetEncounter {
         msg += `The ${coloredName(enemyFleet)} seem shocked to have defeated you.<br/>`
         msg += `They quickly depart the scene in case there are other attackers nearby.<br/>`
 
-        if (reputationShrink) {
-            if (planet) msg += gs.captain.grantReputation(planet, gs.captain.reputation.getAmount(planet) > 0 ? -reputationShrink : reputationShrink)
-            if (faction) msg += gs.captain.grantReputation(faction, gs.captain.reputation.getAmount(faction) > 0 ? -reputationShrink : reputationShrink)
-        }
+        // No reputation change on defeat by neutrals
+        
         if (disabledPlayerShips.length > 0) {
             msg += `${disabledPlayerShips.length} of your ships were disabled in the fighting.<br/>`
             msg += this.loseCargoFromDisabledShips(disabledPlayerShips)

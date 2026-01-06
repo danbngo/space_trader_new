@@ -34,6 +34,8 @@ class EncounterType {
         this.aiType = aiType
         this.encounterClass = encounterClass;
         this.mapRadius = mapRadius;
+        /** @type {function} */
+        this.onStart = function(encounter) {}
     }
     /**
      * @param {FactionType} factionType
@@ -85,3 +87,18 @@ const ENCOUNTER_TYPES = {
 }
 const ENCOUNTER_TYPES_ALL = Object.values(ENCOUNTER_TYPES)
 
+
+
+const ASTEROID_ENCOUNTER_TYPES_ALL = [
+    ENCOUNTER_TYPES.ASTEROIDS_STORM, ENCOUNTER_TYPES.ASTEROIDS_CALM, ENCOUNTER_TYPES.CRYOIDS_STORM, ENCOUNTER_TYPES.CRYOIDS_CALM, 
+    ENCOUNTER_TYPES.PLASMOIDS_STORM, ENCOUNTER_TYPES.PLASMOIDS_CALM, ENCOUNTER_TYPES.MAGNETOIDS_STORM, ENCOUNTER_TYPES.MAGNETOIDS_CALM
+]
+for (const et of ASTEROID_ENCOUNTER_TYPES_ALL) {
+    et.onStart = function(encounter) {
+        for (let i = 0; i < encounter.fleet.ships.length; i++) {
+            const ratio = i / encounter.fleet.ships.length
+            const ship = encounter.fleet.ships[i]
+            if (ship instanceof AsteroidShip) ship.radiusModifier *= ratio
+        }
+    }
+}

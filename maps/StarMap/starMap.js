@@ -220,13 +220,21 @@ class StarMap extends BaseMap {
             style: {filter: `drop-shadow(1px 0 0 ${colorArrToRgbaString(COLORS.Green)}) drop-shadow(0 1px 0 ${colorArrToRgbaString(COLORS.Green)})  drop-shadow(0 -0.5px 0 ${colorArrToRgbaString(COLORS.Green)})  drop-shadow(-0.5px 0 0 ${colorArrToRgbaString(COLORS.Green)})`}
         })
         //const allPlanets = [...this.starSystem.planets, ...this.starSystem.dwarfPlanets]
-        const cvsId = obj instanceof SpaceStation ? `station${obj.uuid}`
-            : obj instanceof Planet ? `planet${obj.uuid}`
-            : obj instanceof Star ? `star${obj.uuid}` 
-            : obj instanceof Fleet ? `fleet${obj.uuid}`
-            : ''
+        
+        // Determine which canvas object to show as image
+        let imageObject = null
+        if (obj instanceof SpaceStation) {
+            imageObject = hasBeenSeen ? this.cvs.getObject(`station${obj.uuid}`) : this.cvs.getObject(`unknown${obj.uuid}`)
+        } else if (obj instanceof Planet) {
+            imageObject = hasBeenSeen ? this.cvs.getObject(`planet${obj.uuid}`) : this.cvs.getObject(`unknown${obj.uuid}`)
+        } else if (obj instanceof Star) {
+            imageObject = hasBeenSeen ? this.cvs.getObject(`star${obj.uuid}`) : this.cvs.getObject(`unknown${obj.uuid}`)
+        } else if (obj instanceof Fleet) {
+            imageObject = this.cvs.getObject(`fleet${obj.uuid}`)
+        }
+        
         ce({parent:container, style: {margin: 'auto'}, onClick: ()=>this.selectObject(obj), children:[
-            this.cvs.getObject(cvsId)?.asImage(25, COLORS.LightGreen) || null
+            imageObject?.asImage(25, COLORS.LightGreen) || null
         ]})
         if (obj instanceof Fleet) {
             const totalShips = obj.ships.length

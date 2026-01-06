@@ -15,8 +15,8 @@ const FLEET_RADIUS = 1/1000 * 1/EARTH_RADII_PER_AU
 const RUINS_RADIUS = 1/100 * 1/EARTH_RADII_PER_AU
 const ANOMALY_RADIUS = 1/10 * 1/EARTH_RADII_PER_AU
 
-const FLEET_COLLISION_DISTANCE = FLEET_RADIUS * 1000000
-const ASTEROID_MINING_DISTANCE = FLEET_RADIUS * 2000000 // 2x easier to mine than fleet collision range
+const FLEET_COLLISION_DISTANCE = FLEET_RADIUS * 1000*1000
+const ASTEROID_MINING_DISTANCE = FLEET_RADIUS * 2000*1000 // 2x easier to mine than fleet collision range
 const MINING_HAZARD_CHANCE = 0.1 // 10% chance of encountering a hazard when mining
 const REPAIR_COST_PER_1_HULL = 10 // Base cost to repair 1 hull point at shipyard
 
@@ -39,7 +39,7 @@ const ENCOUNTER_SHIP_MAX_SPAWN_DISTANCE_RATIO = 0.66
 const ENCOUNTER_MAP_RADIUS_MILES = 100
 const BASE_SHIP_RADIUS_IN_MILES = 1/2
 const AVERAGE_SHIP_MASS = 1
-const AVERAGE_FLEET_SPEED = Math.pow(1000,2) //in AU per year. must be pow2 as its sqrted later
+const AVERAGE_FLEET_SPEED = Math.pow(250,2) //in AU per year. must be pow2 as its sqrted later
 const AVERGE_RAMMING_KNOCKBACK_DISTANCE = 1 //in miles
 const ASTEROID_STORM_SPEED_MULTIPLIER = 8
 

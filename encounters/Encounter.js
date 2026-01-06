@@ -743,10 +743,7 @@ class Encounter {
         if (surrenderDialogue) {
             msg += `"${surrenderDialogue}"<br/>`
         }
-        if (reputationShrink) {
-            if (planet) msg += gs.captain.grantReputation(planet, gs.captain.reputation.getAmount(planet) > 0 ? -reputationShrink : reputationShrink)
-            if (faction) msg += gs.captain.grantReputation(faction, gs.captain.reputation.getAmount(faction) > 0 ? -reputationShrink : reputationShrink)
-        }
+        // No reputation change on surrender
 
         showModal(fleetName, msg, [['Continue', ()=>this.onSurrender()]])
     }

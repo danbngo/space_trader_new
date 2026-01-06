@@ -159,7 +159,7 @@ class StarMapBodiesHandler {
             // Show star only if discovered or in vision range
             const isDiscovered = hasBeenSeen || isInVisionRange
             cvsObject.visible = isDiscovered
-            unknownObj.visible = isInVisionRange && !hasBeenSeen
+            unknownObj.visible = !hasBeenSeen // Show unknown circle for all unseen stars
             
             cvsObject.x = body.x
             cvsObject.y = body.y
@@ -252,7 +252,7 @@ class StarMapBodiesHandler {
             planetObj.visible = isDiscovered
             labelObj.visible = false
             nightSideObj.visible = isDiscovered
-            unknownObj.visible = isInVisionRange && !hasBeenSeen
+            unknownObj.visible = !hasBeenSeen // Show unknown circle for all unseen planets
             
             // Update positions
             planetObj.x = body.x
@@ -329,7 +329,7 @@ class StarMapBodiesHandler {
             const isDiscovered = hasBeenSeen || isInVisionRange
             stationObj.visible = isDiscovered
             labelObj.visible = false
-            unknownObj.visible = isInVisionRange && !hasBeenSeen
+            unknownObj.visible = !hasBeenSeen // Show unknown circle for all unseen stations
             
             // Update positions
             stationObj.x = station.x
