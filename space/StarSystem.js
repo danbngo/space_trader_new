@@ -167,6 +167,45 @@ class StarSystem extends SpaceObject {
         }
     }
 
+    /**
+     * Updates what objects the player has discovered/seen based on vision range.
+     * Should be called periodically (e.g., every 30 ticks).
+     */
+    updateDiscoveries() {
+        if (!gs.fleet || !gs.fleet.mapViewDistance) return
+        
+        const viewDistance = gs.fleet.mapViewDistance
+        const fleetX = gs.fleet.x
+        const fleetY = gs.fleet.y
+        
+        // Helper function to check if object is in vision range
+        const isInVisionRange = (obj) => {
+            const distance = calcDistance(fleetX, fleetY, obj.x, obj.y)
+            return distance <= viewDistance
+        }
+        
+        // Update last seen dates for all visible objects
+        const objectsToCheck = [
+            ...this.stars,
+            ...this.planets,
+            ...this.dwarfPlanets,
+            ...(this.spaceStations || []),
+            ...(this.anomalies || [])
+        ]
+        
+        for (const obj of objectsToCheck) {
+            if (isInVisionRange(obj)) {
+                gs.lastSeenDates.set(obj, gs.year)
+                
+                // Special handling for anomalies - mark as discovered
+                if (obj instanceof Anomaly && obj.discoveredYear === null) {
+                    obj.discoveredYear = gs.year
+                    console.log(`🔍 Discovered anomaly: ${obj.name} at ${Math.round(gs.year * 10) / 10}`)
+                }
+            }
+        }
+    }
+
     destroyFleet(fleet) {
         console.log(`🗑️ Removing fleet ${fleet.name}`)
         this.fleets.splice(gs.system.fleets.indexOf(fleet), 1)

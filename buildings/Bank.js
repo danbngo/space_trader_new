@@ -28,6 +28,8 @@ class Bank extends Building {
         maxLoanAmount += this.playerBalance
         maxLoanAmount -= officer.bounty.total
         maxLoanAmount -= officer.calcTotalDebts()
+        // Cap the max loan by the bank's available credits
+        maxLoanAmount = Math.min(maxLoanAmount, this.credits)
         return Math.floor(maxLoanAmount)
     }
 }

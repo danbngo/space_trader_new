@@ -25,6 +25,8 @@ class GameState {
         this.memorizedSettlements = new Map();
         /** @type {Map<Planet, number>} - Last visit dates (year) for each planet */
         this.lastVisitedDates = new Map();
+        /** @type {Map<SpaceObject, number>} - Last seen dates (year) for each space object */
+        this.lastSeenDates = new Map();
     }
 
     get captain() {

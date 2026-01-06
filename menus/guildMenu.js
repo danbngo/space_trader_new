@@ -7,7 +7,7 @@
  */
 function createHireOfficerMenu(officers = [], guild = new Guild(), onSelectOfficer = (officer)=>{}) {
     console.log('creating hire officer menu:',officers)
-    if (officers.length == 0) return `(None)`
+    if (officers.length == 0) return `(No officers available)`
     /** @type {any[]} */
     const rows = [
         ['Name', 'Age', 'Level', 'CR Share', ...SKILLS_ALL, 'Hire Price']
@@ -27,7 +27,7 @@ function createHireOfficerMenu(officers = [], guild = new Guild(), onSelectOffic
                     : baseSkill;
                 return statColorSpan(displayLevel, baseSkill*SKILLS_ALL.length/5/SKILL_POINTS_PER_LEVEL);
             }),
-            statColorSpan(hirePrice, officer.value/hirePrice)
+            statColorSpan(hirePrice, hirePrice/officer.value)
         ])
     }
     console.log('creating hire officer table')

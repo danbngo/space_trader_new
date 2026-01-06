@@ -40,7 +40,7 @@ class FleetAI {
         if (!gs.system.stars || gs.system.stars.length === 0) return false
         
         const sun = gs.system.stars[0]
-        const sunCircle = new Circle(sun.x, sun.y, sun.radius/SOLAR_RADII_PER_AU * 1.25)
+        const sunCircle = new Circle(sun.x, sun.y, sun.radius/SOLAR_RADII_PER_AU * 0.625)
         
         // If the ship is already inside the sun, allow it to escape
         const startInsideSun = sunCircle.containsPoint(route.path.startX, route.path.startY)

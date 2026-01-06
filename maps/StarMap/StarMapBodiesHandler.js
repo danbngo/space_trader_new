@@ -33,7 +33,26 @@ class StarMapBodiesHandler {
             if (!cvs.pixels[index]) {
                 cvs.addPixel(0, 0, bgStar.color, bgStar.radius, bgStar.x * sizeOffset, bgStar.y * sizeOffset, true)
             }
-            cvs.pixels[index].a = bgStar.color[3]
+            
+            /** @type {CanvasPixel} */
+            const pixel = cvs.pixels[index]
+            
+            // Check if background star is within player's vision circle on screen
+            if (gs.fleet && gs.fleet.mapViewDistance) {
+                // Get player's screen position
+                const fleetScreenPos = cvs.worldToScreen(gs.fleet.x, gs.fleet.y)
+                
+                // Calculate vision radius in screen pixels
+                const visionRadiusScreen = gs.fleet.mapViewDistance * cvs.zoom / cvs.pixelRatio
+                
+                const screenDistance = calcDistance(pixel.screenOffsetX, pixel.screenOffsetY, fleetScreenPos[0], fleetScreenPos[1])
+                
+                if (screenDistance > visionRadiusScreen) {
+                    pixel.color[3] = 64 // Dim the star when outside vision range
+                } else {
+                    pixel.color[3] = 255 // Full brightness within vision range
+                }
+            }
         })
     }
 
@@ -47,9 +66,23 @@ class StarMapBodiesHandler {
             if (!cvs.pixels[pixelIndex]) {
                 cvs.addPixel(asteroid.x, asteroid.y, asteroid.color, asteroid.radius)
             }
+            /** @type {CanvasPixel} */
             const pixel = cvs.pixels[pixelIndex]
             pixel.x = asteroid.x
             pixel.y = asteroid.y
+            
+            // Check if within player's vision range
+            if (gs.fleet && gs.fleet.mapViewDistance) {
+                const distance = calcDistance(asteroid.x, asteroid.y, gs.fleet.x, gs.fleet.y)
+                
+                if (distance > gs.fleet.mapViewDistance) {
+                    //pixel.visible = false // Hide outside vision range
+                    pixel.color[3] = 64
+                } else {
+                    //pixel.visible = true
+                    pixel.color[3] = 255
+                }
+            } 
         })
     }
 
@@ -86,8 +119,8 @@ class StarMapBodiesHandler {
         let circle = cvs.getObject(viewDistanceId)
         
         if (!circle) {
-            // Create the view distance circle
-            circle = cvs.addEmptyCircle(viewDistanceId, gs.fleet.x, gs.fleet.y, gs.fleet.mapViewDistance, 1, COLORS.Cyan, 1.0)
+            // Create the view distance circle with subtle alpha
+            circle = cvs.addEmptyCircle(viewDistanceId, gs.fleet.x, gs.fleet.y, gs.fleet.mapViewDistance, 1, COLORS.Cyan, 0.33)
         }
         
         // Update position and radius
@@ -103,15 +136,36 @@ class StarMapBodiesHandler {
 
         stars.forEach((body) => {
             const id = `star${body.uuid}`
+            const unknownId = `unknown${body.uuid}`
             let cvsObject = cvs.getObject(id)
+            let unknownObj = cvs.getObject(unknownId)
+            
+            // Check if discovered
+            const hasBeenSeen = gs.lastSeenDates.has(body)
+            const isInVisionRange = gs.fleet && gs.fleet.mapViewDistance && 
+                calcDistance(body.x, body.y, gs.fleet.x, gs.fleet.y) <= gs.fleet.mapViewDistance
             
             if (!cvsObject) {
                 const displaySize = Math.sqrt(body.radius/EARTH_RADII_PER_AU) * 3
                 cvsObject = cvs.addFilledCircle(id, body.x, body.y, displaySize, SUN_MIN_SCREEN_SIZE, body.color, () => selectObject.call(this.starMap, body))
             }
             
+            // Create unknown marker circle (no question mark)
+            if (!unknownObj) {
+                unknownObj = cvs.addEmptyCircle(unknownId, body.x, body.y, 0.5, 2, COLORS.White, 1, () => selectObject.call(this.starMap, body))
+                unknownObj.clickPriority = 12
+            }
+            
+            // Show star only if discovered or in vision range
+            const isDiscovered = hasBeenSeen || isInVisionRange
+            cvsObject.visible = isDiscovered
+            unknownObj.visible = isInVisionRange && !hasBeenSeen
+            
             cvsObject.x = body.x
             cvsObject.y = body.y
+            unknownObj.x = body.x
+            unknownObj.y = body.y
+            
             cvsObject.strokeColor = (body == selectedObject) ? COLORS.Green : COLORS.Black
         })
     }
@@ -125,10 +179,17 @@ class StarMapBodiesHandler {
             const planetId = `planet${body.uuid}`
             const labelId = `planetlabel${body.uuid}`
             const nightSideId = `planetnightside${body.uuid}`
+            const unknownId = `unknown${body.uuid}`
             
             let planetObj = cvs.getObject(planetId)
             let labelObj = cvs.getObject(labelId)
             let nightSideObj = cvs.getObject(nightSideId)
+            let unknownObj = cvs.getObject(unknownId)
+            
+            // Check if discovered
+            const hasBeenSeen = gs.lastSeenDates.has(body)
+            const isInVisionRange = gs.fleet && gs.fleet.mapViewDistance && 
+                calcDistance(body.x, body.y, gs.fleet.x, gs.fleet.y) <= gs.fleet.mapViewDistance
             
             // Create objects if they don't exist
             if (!planetObj) {
@@ -161,10 +222,14 @@ class StarMapBodiesHandler {
                 
                 labelObj = cvs.addText(labelId, body.x, body.y, 0, -32, body.name, body.color, DEFAULT_FONT_SIZE, 2, () => selectObject.call(this.starMap, body))
                 labelObj.clickPriority = 10
+                labelObj.visible = false // Start hidden
                 
                 const objs = [planetObj, labelObj]
                 for (const obj of objs) {
                     obj.onHover = () => {
+                        // Show Unknown if not visited
+                        const hasBeenVisited = gs.lastVisitedDates.has(body)
+                        labelObj.text = hasBeenVisited ? body.name : `Unknown ${body.objectType.name}`
                         labelObj.visible = true
                         for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
                     }
@@ -176,13 +241,29 @@ class StarMapBodiesHandler {
                 }
             }
             
-            // Update positions and selection state
+            // Create unknown marker circle (no question mark)
+            if (!unknownObj) {
+                unknownObj = cvs.addEmptyCircle(unknownId, body.x, body.y, 0.3, 2, COLORS.White, 1, () => selectObject.call(this.starMap, body))
+                unknownObj.clickPriority = 12
+            }
+            
+            // Show planet only if discovered or in vision range
+            const isDiscovered = hasBeenSeen || isInVisionRange
+            planetObj.visible = isDiscovered
+            labelObj.visible = false
+            nightSideObj.visible = isDiscovered
+            unknownObj.visible = isInVisionRange && !hasBeenSeen
+            
+            // Update positions
             planetObj.x = body.x
             planetObj.y = body.y
             labelObj.x = body.x
             labelObj.y = body.y
+            unknownObj.x = body.x
+            unknownObj.y = body.y
             
-            if (nightSideObj && body.orbit) {
+            // Update nightside position and angle only when planet is visible
+            if (isDiscovered && nightSideObj && body.orbit) {
                 nightSideObj.x = body.x
                 nightSideObj.y = body.y
                 const angleToSun = calcAngleTowardsPoint(body.x, body.y, body.parent.x, body.parent.y)
@@ -205,9 +286,16 @@ class StarMapBodiesHandler {
         spaceStations.forEach((station) => {
             const stationId = `station${station.uuid}`
             const labelId = `stationlabel${station.uuid}`
+            const unknownId = `unknown${station.uuid}`
             
             let stationObj = cvs.getObject(stationId)
             let labelObj = cvs.getObject(labelId)
+            let unknownObj = cvs.getObject(unknownId)
+            
+            // Check if discovered
+            const hasBeenSeen = gs.lastSeenDates.has(station)
+            const isInVisionRange = gs.fleet && gs.fleet.mapViewDistance && 
+                calcDistance(station.x, station.y, gs.fleet.x, gs.fleet.y) <= gs.fleet.mapViewDistance
              
             if (!stationObj) {
                 stationObj = cvs.addFilledRectangle(stationId, station.x, station.y, station.radius * 16, station.radius * 16, SPACE_STATION_MIN_SCREEN_SIZE, station.color, 0, () => selectObject.call(this.starMap, station))
@@ -217,6 +305,9 @@ class StarMapBodiesHandler {
                 const objs = [stationObj, labelObj]
                 for (const obj of objs) {
                     obj.onHover = () => {
+                        // Show Unknown Station if not visited
+                        const hasBeenVisited = gs.lastVisitedDates.has(station)
+                        labelObj.text = hasBeenVisited ? station.name : 'Unknown Station'
                         labelObj.visible = true
                         for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
                     }
@@ -228,12 +319,28 @@ class StarMapBodiesHandler {
                 }
             }
             
+            // Create unknown marker circle (no question mark)
+            if (!unknownObj) {
+                unknownObj = cvs.addEmptyCircle(unknownId, station.x, station.y, 0.2, 2, COLORS.White, 1, () => selectObject.call(this.starMap, station))
+                unknownObj.clickPriority = 12
+            }
+            
+            // Show station only if discovered or in vision range
+            const isDiscovered = hasBeenSeen || isInVisionRange
+            stationObj.visible = isDiscovered
+            labelObj.visible = false
+            unknownObj.visible = isInVisionRange && !hasBeenSeen
+            
+            // Update positions
             stationObj.x = station.x
             stationObj.y = station.y
             labelObj.x = station.x
             labelObj.y = station.y
+            unknownObj.x = station.x
+            unknownObj.y = station.y
             
-            if (station == selectedObject) {
+            // Update stroke color
+            if (isDiscovered && station == selectedObject) {
                 stationObj.strokeColor = COLORS.Green
                 labelObj.strokeColor = COLORS.Green
             }
@@ -249,7 +356,11 @@ class StarMapBodiesHandler {
         const existingAnomalyIds = new Set()
         
         anomalies.forEach((anomaly) => {
-            const isVisible = anomaly.detectable(gs.fleet)
+            // Check if discovered or in vision range
+            const hasBeenSeen = gs.lastSeenDates.has(anomaly)
+            const isInVisionRange = gs.fleet && gs.fleet.mapViewDistance && 
+                calcDistance(anomaly.x, anomaly.y, gs.fleet.x, gs.fleet.y) <= gs.fleet.mapViewDistance
+            const isVisible = (hasBeenSeen || isInVisionRange) && anomaly.detectable(gs.fleet)
             
             existingAnomalyIds.add(`anomaly${anomaly.uuid}`)
             existingAnomalyIds.add(`anomalylabel${anomaly.uuid}`)
@@ -318,6 +429,14 @@ class StarMapBodiesHandler {
         const existingRuinsIds = new Set()
         
         ruins.forEach((ruin) => {
+            // Check if discovered
+            const hasBeenSeen = gs.lastSeenDates.has(ruin)
+            const isInVisionRange = gs.fleet && gs.fleet.mapViewDistance && 
+                calcDistance(ruin.x, ruin.y, gs.fleet.x, gs.fleet.y) <= gs.fleet.mapViewDistance
+            
+            // Don't show ruins at all if not discovered
+            if (!hasBeenSeen && !isInVisionRange) return
+            
             existingRuinsIds.add(`ruins${ruin.uuid}`)
             existingRuinsIds.add(`ruinslabel${ruin.uuid}`)
             const ruinsId = `ruins${ruin.uuid}`
@@ -348,16 +467,12 @@ class StarMapBodiesHandler {
             ruinsObj.y = ruin.y
             labelObj.x = ruin.x
             labelObj.y = ruin.y
-            
             ruinsObj.visible = true
             
             if (ruin == selectedObject) {
                 ruinsObj.strokeColor = COLORS.Green
                 labelObj.strokeColor = COLORS.Green
                 labelObj.visible = true
-            } else if (!labelObj.visible) {
-                ruinsObj.strokeColor = undefined
-                labelObj.strokeColor = undefined
             }
         })
         

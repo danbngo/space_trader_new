@@ -16,6 +16,13 @@ class StarMap extends BaseMap {
         this.starSystem = starSystem
 
         this.gameYearsPerMs = STAR_MAP_YEARS_PER_MS
+        this.tickCounter = 0 // Track ticks for periodic updates
+        this.frameCounter = 0 // Track frames for optimizing recoloring
+        this.lastPlayerX = gs.fleet ? gs.fleet.x : 0
+        this.lastPlayerY = gs.fleet ? gs.fleet.y : 0
+        this.lastCameraX = 0
+        this.lastCameraY = 0
+        this.lastZoom = 1
 
         this.initializeDOM(this.starSystem.radius*4, this.starSystem.radius*0.4, this.starSystem.radius*40, this.starSystem.radius*1)
 
@@ -40,11 +47,53 @@ class StarMap extends BaseMap {
         // Start continuous waypoint animation loop (runs even when paused)
         this.fleetsHandler.animateWaypoint()
         
+        // Start continuous background star update loop (runs even when paused)
+        this.animateBackgroundStars()
+        
         // Set starMap reference for all fleet AIs
         this.fleetsHandler.updateFleetAIReferences()
     }
 
     static lastZoom = 1
+
+    animateBackgroundStars() {
+        this.frameCounter++
+        
+        // Check if player is in motion
+        const playerInMotion = gs.fleet && (gs.fleet.x !== this.lastPlayerX || gs.fleet.y !== this.lastPlayerY)
+        
+        // Check if camera has moved (pan or zoom)
+        const cameraX = this.cvs.cameraX
+        const cameraY = this.cvs.cameraY
+        const zoom = this.cvs.zoom
+        const cameraChanged = cameraX !== this.lastCameraX || cameraY !== this.lastCameraY || zoom !== this.lastZoom
+        
+        if (playerInMotion) {
+            this.lastPlayerX = gs.fleet.x
+            this.lastPlayerY = gs.fleet.y
+        }
+        
+        if (cameraChanged) {
+            this.lastCameraX = cameraX
+            this.lastCameraY = cameraY
+            this.lastZoom = zoom
+        }
+        
+        // Update background stars every 30th frame when player is in motion OR camera changed
+        if ((playerInMotion || cameraChanged) && this.frameCounter % 1 === 0) {
+            this.bodiesHandler.handleBackgroundStars()
+        }
+        
+        // Update asteroids every 600th frame when player is in motion
+        if (playerInMotion && this.frameCounter % 600 === 0) {
+            this.bodiesHandler.handleAsteroids()
+        }
+        
+        this.cvs.redraw(true)
+        
+        // Continue animation loop
+        requestAnimationFrame(() => this.animateBackgroundStars())
+    }
 
     adjustZoom(modifier = 1.0) {
         this.cvs.adjustZoom(modifier)
@@ -148,12 +197,31 @@ class StarMap extends BaseMap {
         const isDockedHere = obj == gs.location
         const cantTravelHere = (obj == gs.location) || gs.fleet.stranded
         const container = ce({parent:this.objectPane, classNames:['starmap-object-panel']})
-        const displayName = (obj === gs.fleet) ? 'You' : coloredName(obj)
+        
+        // Check if object has been discovered
+        const hasBeenSeen = gs.lastSeenDates.has(obj)
+        const isInVisionRange = gs.fleet && gs.fleet.mapViewDistance && obj.x !== undefined && obj.y !== undefined &&
+            calcDistance(obj.x, obj.y, gs.fleet.x, gs.fleet.y) <= gs.fleet.mapViewDistance
+        const isDiscovered = hasBeenSeen || isInVisionRange
+        const hasBeenVisited = gs.lastVisitedDates.has(obj)
+        
+        let displayName
+        if (obj === gs.fleet) {
+            displayName = 'You'
+        } else if (obj instanceof Planet && !hasBeenVisited) {
+            // Planets and stations show as unknown until visited, even if seen
+            displayName = obj instanceof SpaceStation ? 'Unknown Station' : `Unknown ${obj.objectType.name}`
+        } else if (!isDiscovered && obj.objectType) {
+            displayName = `Undiscovered ${obj.objectType.name}`
+        } else {
+            displayName = coloredName(obj)
+        }
         ce({parent:container, tag:'h3', innerHTML: displayName, onClick: ()=>this.selectObject(obj),
             style: {filter: `drop-shadow(1px 0 0 ${colorArrToRgbaString(COLORS.Green)}) drop-shadow(0 1px 0 ${colorArrToRgbaString(COLORS.Green)})  drop-shadow(0 -0.5px 0 ${colorArrToRgbaString(COLORS.Green)})  drop-shadow(-0.5px 0 0 ${colorArrToRgbaString(COLORS.Green)})`}
         })
         //const allPlanets = [...this.starSystem.planets, ...this.starSystem.dwarfPlanets]
-        const cvsId = obj instanceof Planet ? `planet${obj.uuid}`
+        const cvsId = obj instanceof SpaceStation ? `station${obj.uuid}`
+            : obj instanceof Planet ? `planet${obj.uuid}`
             : obj instanceof Star ? `star${obj.uuid}` 
             : obj instanceof Fleet ? `fleet${obj.uuid}`
             : ''
@@ -174,8 +242,17 @@ class StarMap extends BaseMap {
                 }, 0) / totalShips
             }
             
-            ce({parent:container, innerHTML:`Ships: ${activeShips}/${totalShips} active`})
-            ce({parent:container, innerHTML:`Hull: ${roundToPlaces(totalHullPercent, 1)}%`})
+            // Display ship status in different formats
+            let shipStatusText
+            if (disabledShips === 0) {
+                shipStatusText = `Ships: ${totalShips}`
+            } else if (disabledShips === totalShips) {
+                shipStatusText = `Ships: ${totalShips} disabled`
+            } else {
+                shipStatusText = `Ships: ${activeShips}/${totalShips} active`
+            }
+            ce({parent:container, innerHTML: shipStatusText})
+            ce({parent:container, innerHTML:`Hull: ${statColorSpan(roundToPlaces(totalHullPercent, 1) + '%', totalHullPercent / 100)}`})
             
             // Add Travel button for non-player fleets
             if (obj !== gs.fleet) {
@@ -183,10 +260,12 @@ class StarMap extends BaseMap {
                 ce({parent:container, innerHTML:`Distance: ${distance} AU`})
                 
                 // Create test route to check if interception is possible
-                const testRoute = new Route(gs.fleet, obj, gs.year)
+                // Use InterceptionRoute for moving fleets, regular Route for destroyed/abandoned
+                const testRoute = obj.destroyed ? new Route(gs.fleet, obj, gs.year) : new InterceptionRoute(gs.fleet, obj, gs.year)
                 if (testRoute.valid) {
                     const travelTime = testRoute.travelTime
-                    ce({parent:container, innerHTML:`ETA: ${describeTimespan(travelTime)}`})
+                    const etaYears = travelTime
+                    ce({parent:container, innerHTML:`ETA: ${statColorSpan(describeTimespan(travelTime), 1/(1+etaYears*12))}`})
                     // Abandoned (destroyed) fleets use "Travel" instead of "Intercept"
                     const buttonText = obj.destroyed ? 'Travel' : 'Intercept'
                     ce({parent:container, tag:'button', innerHTML:buttonText, onClick:()=>this.setDestination(obj, true), disabled: gs.fleet.stranded})
@@ -207,9 +286,13 @@ class StarMap extends BaseMap {
         if (obj instanceof Planet) {
             const distance = roundToPlaces(calcDistance(gs.fleet.x, gs.fleet.y, obj.x, obj.y), 2)
             const travelTime = distance / gs.fleet.speed
+            const etaYears = travelTime
             ce({parent:container, innerHTML:`Distance: ${distance} AU`})
-            ce({parent:container, innerHTML:`ETA: ${describeTimespan(travelTime)}`})
-            ce({parent:container, tag:'button', innerHTML:isDockedHere ? 'Dock' : 'Scan', onClick:()=>this.explore(obj)})
+            ce({parent:container, innerHTML:`ETA: ${statColorSpan(describeTimespan(travelTime), 1/(1+etaYears*12))}`})
+            // Only show scan/dock button if planet is discovered
+            if (isDiscovered) {
+                ce({parent:container, tag:'button', innerHTML:isDockedHere ? 'Dock' : 'Scan', onClick:()=>this.explore(obj)})
+            }
             ce({parent:container, tag:'button', innerHTML:'Travel', onClick:()=>this.setDestination(obj, true), disabled: cantTravelHere})
             if (gs.fleet.route) ce({parent:container, tag:'button', innerHTML:'Stop', onClick:()=>this.stopPlayerFleet()})
         }
@@ -324,6 +407,13 @@ class StarMap extends BaseMap {
         gs.year += elapsedYears
         gs.system.updateRoutes(gs.year)
         gs.system.updatePositions()
+        
+        // Update discoveries every 30 ticks
+        this.tickCounter++
+        if (this.tickCounter >= 30) {
+            gs.system.updateDiscoveries()
+            this.tickCounter = 0
+        }
 
         this.refreshInfoBar()
         this.handleCanvasObjects()

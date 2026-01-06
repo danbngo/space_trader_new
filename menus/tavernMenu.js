@@ -104,8 +104,6 @@ function showTavernMenu(tavern, showGossip = false) {
         const officersTable = createHireOfficerMenu(tavern.officers, tavern, onSelectOfficer)
         
         content = ce({children: [
-            ce({tag: 'p', innerHTML: 'Welcome to the tavern. Available mercenaries for hire:'}),
-            ce({tag: 'br'}),
             officersTable,
         ]})
     }

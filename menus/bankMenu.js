@@ -113,7 +113,7 @@ function showBankMenu(bank = new Bank()) {
     }
 
     function showBorrowSlider() {
-        const maxAmt = bank.calcLoanMaxAmount()
+        const maxAmt = bank.calcLoanMaxAmount(gs.captain)
         showSliderModal(
             1, maxAmt, `Borrow - Amount`,
             `How many credits would you like to borrow?`,

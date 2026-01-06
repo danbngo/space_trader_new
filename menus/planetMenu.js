@@ -26,10 +26,12 @@ function showPlanetMenu(planet = new Planet()) {
     console.log('opening planet menu for:',planet)
     const isDocked = gs.location == planet
     const settlement = getDisplaySettlement(planet)
+    const hasVisited = gs.lastVisitedDates.has(planet)
 
     let msg = isDocked ?
         `You have arrived at ${coloredName(planet)}.<br/>`
-        : ''+colorSpan(`You are scanning ${coloredName(planet)}.<br/>`, COLORS.Yellow)
+        : hasVisited ? ''+colorSpan(`You are scanning ${coloredName(planet)}.<br/>`, COLORS.Yellow)
+        : ''+colorSpan(`You are scanning an unknown ${planet.objectType.name.toLowerCase()}.<br/>`, COLORS.Yellow)
     
     // Add scanning mode message with last visit date
     msg += getScanningModeMessage(planet)
@@ -111,13 +113,20 @@ function showPlanetMenu(planet = new Planet()) {
     
     options.push(ce({tag:'br'}));
     //options.push(["News", () => showNewsTimelineMenu(planet, () => showPlanetMenu(planet))]);
-    options.push([`Info`, () => planet.civilization ? showPlanetSocietyMenu(planet) : showPlanetClimateMenu(planet)]);
+    
+    // Check if player has visited this planet
+    const notVisitedMessage = "You must visit this location first to gain detailed information"
+    
+    options.push([`Info`, () => planet.civilization ? showPlanetSocietyMenu(planet) : showPlanetClimateMenu(planet), !hasVisited, notVisitedMessage]);
     if (planet.children && planet.children.length > 0) {
         const firstChild = planet.children[0];
-        if (firstChild && firstChild instanceof Moon) options.push(["Moons", () => showPlanetMenu(firstChild)]);
+        if (firstChild && firstChild instanceof Moon) options.push(["Moons", () => showPlanetMenu(firstChild), !hasVisited, notVisitedMessage]);
     }
     options.push([isDocked ? "Depart" : "Stop Scanning", () => closeModal()]);
-    showPlanetModal(planet, `${coloredName(planet)}`, msg, options, 'planet_menu', (nextPlanet) => showPlanetMenu(nextPlanet));
+    
+    // Use appropriate title based on visit status
+    const menuTitle = hasVisited ? coloredName(planet) : `Scanning Unknown ${planet.objectType.name}`
+    showPlanetModal(planet, menuTitle, msg, options, 'planet_menu', (nextPlanet) => showPlanetMenu(nextPlanet));
 }
 
 /**
@@ -142,14 +151,23 @@ function showMoonsMenu(planet = new Planet()) {
  * @param {Planet} planet - The planet to display information for.
  */
 function showPlanetSocietyMenu(planet = new Planet()) {
+    console.log('showPlanetSocietyMenu called with planet:', planet)
     const {civilization, settlement} = planet
+    console.log('Civilization:', civilization, 'Settlement:', settlement)
     
     let content
     
+    // Check if player has visited this planet
+    if (!gs.lastVisitedDates.has(planet)) {
+        console.log('Planet not visited yet, showing placeholder')
+        content = ce({children: [colorSpan('No data available yet. Visit this location to gather detailed information.', COLORS.Gray)]})
+    }
     // Check if civilization exists
-    if (!civilization) {
+    else if (!civilization) {
+        console.log('No civilization on planet')
         content = ce({children: ['No civilization detected on this planet.']})
     } else {
+        console.log('Displaying civilization data')
         const {governmentType, policies} = civilization
         
         // Build overview section
@@ -262,8 +280,30 @@ function scoreEarthlikeValue(planetValue = 1, earthValue = 1) {
  * @param {Planet} planet - The planet to display climate information for.
  */
 function showPlanetClimateMenu(planet = new Planet()) {
+    console.log('showPlanetClimateMenu called with planet:', planet)
+    // Check if player has visited this planet
+    if (!gs.lastVisitedDates.has(planet)) {
+        console.log('Planet not visited yet, showing placeholder')
+        const content = ce({children: [colorSpan('No data available yet. Visit this location to gather detailed information.', COLORS.Gray)]})
+        showPlanetModal(planet, `${coloredName(planet)} - Climate`, content, [
+            ["Back", () => showPlanetMenu(planet)]
+        ], 'planet_climate', (nextPlanet) => showPlanetClimateMenu(nextPlanet));
+        return
+    }
+    
+    console.log('Planet visited, showing climate data')
     const {climate} = planet
+    console.log('Climate object:', climate)
+    if (!climate) {
+        console.error('Climate is null or undefined!')
+        const content = ce({children: [colorSpan('Error: Climate data missing', COLORS.Red)]})
+        showPlanetModal(planet, `${coloredName(planet)} - Climate`, content, [
+            ["Back", () => showPlanetMenu(planet)]
+        ], 'planet_climate', (nextPlanet) => showPlanetClimateMenu(nextPlanet));
+        return
+    }
     const {temperature, atmosphericPressure, gravity, oceanCoverage, geologicalActivity, magnetosphere, radiationLevel, asteroidImpact} = climate
+    console.log('Climate properties extracted:', {temperature, atmosphericPressure, gravity, oceanCoverage, geologicalActivity, magnetosphere, radiationLevel, asteroidImpact})
     
     // Build left column: Physical Properties and Composition
     let leftContent = `<u>Physical Properties</u><br/>`

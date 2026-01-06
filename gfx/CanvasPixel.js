@@ -9,5 +9,6 @@ class CanvasPixel {
         this.screenOffsetX = screenOffsetX;
         this.screenOffsetY = screenOffsetY;
         this.parallax = parallax;
+        this.visible = true;
     }
 }

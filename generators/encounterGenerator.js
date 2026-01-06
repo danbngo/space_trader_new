@@ -24,11 +24,11 @@ function generateRandomEncounter(encounterType = rndMember(ENCOUNTER_TYPES_ALL),
  */
 function generateEncounterForFleet(fleet) {
     const encounterType = EncounterType.getEncounterTypeForFaction(fleet.factionType)
-    for (const s of fleet.ships) s.aiType = encounterType.aiType
     if (!encounterType) {
         console.warn('Could not determine encounter type for fleet:', fleet)
         return null
     }
+    for (const s of fleet.ships) s.aiType = encounterType.aiType
     const effectTypes = rollEncounterEffectTypes()
     const effects = effectTypes && effectTypes.length > 0 ? generateEffects(encounterType, effectTypes) : []
     

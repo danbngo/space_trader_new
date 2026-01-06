@@ -54,7 +54,7 @@ class StarMapFleetsHandler {
                 distanceToPlayer = calcDistance(fleet.x, fleet.y, gs.fleet.x, gs.fleet.y)
                 const viewDistance = gs.fleet.mapViewDistance
                 
-                if (distanceToPlayer > viewDistance * 2) {
+                if (distanceToPlayer > viewDistance * 1.25) {
                     visibilityState = 'hidden'
                 } else if (distanceToPlayer > viewDistance) {
                     visibilityState = 'unknown'
@@ -150,12 +150,14 @@ class StarMapFleetsHandler {
                 unknownObj.x = fleet.x
                 unknownObj.y = fleet.y
                 
-                // Interpolate color from white (at 1x distance) to gray (64,64,64) at 2x distance
+                // Interpolate color from white (at 1x distance) to gray (64,64,64) at 1.25x distance
                 const viewDistance = gs.fleet.mapViewDistance
-                // t = 0 at 1x distance (inner edge), t = 1 at 2x distance (outer edge)
-                const t = (distanceToPlayer - viewDistance) / viewDistance
+                // t = 0 at 1x distance (inner edge), t = 1 at 1.25x distance (outer edge)
+                const t = (distanceToPlayer - viewDistance) / (viewDistance * 0.25)
                 const gray = Math.round(255 - (255 - 64) * t)
-                unknownObj.fillColor = [gray, gray, gray, 1]
+                // Apply cloakLevel to alpha (higher cloak = more transparent)
+                const alpha = 1 - (fleet.cloakLevel * 0.9)
+                unknownObj.fillColor = [gray, gray, gray, alpha]
                 
                 // Skip remaining updates
                 return
@@ -271,7 +273,7 @@ class StarMapFleetsHandler {
                 distanceToPlayer = calcDistance(fleet.x, fleet.y, gs.fleet.x, gs.fleet.y)
                 const viewDistance = gs.fleet.mapViewDistance
                 
-                if (distanceToPlayer > viewDistance * 2) {
+                if (distanceToPlayer > viewDistance * 1.25) {
                     visibilityState = 'hidden'
                 } else if (distanceToPlayer > viewDistance) {
                     visibilityState = 'unknown'
@@ -318,7 +320,10 @@ class StarMapFleetsHandler {
                 fleetObj.clickPriority = 5 // Fleets have medium priority (lower than planets, higher than default)
                 
                 pathObj = cvs.addLine(pathId, 0, 0, 0, 0, fillColor, 1)
-                labelObj = cvs.addText(labelId, fleet.x, fleet.y, 0, -32, fleet.name + ' (Abandoned)', fillColor, DEFAULT_FONT_SIZE, 2, () => selectObject.call(this.starMap, fleet))
+                
+                // Don't add "(Abandoned)" suffix if the name already contains "Abandoned"
+                const labelText = fleet.name.toLowerCase().includes('abandoned') ? fleet.name : fleet.name + ' (Abandoned)'
+                labelObj = cvs.addText(labelId, fleet.x, fleet.y, 0, -32, labelText, fillColor, DEFAULT_FONT_SIZE, 2, () => selectObject.call(this.starMap, fleet))
                 labelObj.clickPriority = 5 // Fleet labels also have medium priority
                 
                 // Create unknown marker (question mark) for fog-of-war
@@ -358,10 +363,10 @@ class StarMapFleetsHandler {
                 unknownObj.x = fleet.x
                 unknownObj.y = fleet.y
                 
-                // Interpolate color from white (at 1x distance) to gray (64,64,64) at 2x distance
+                // Interpolate color from white (at 1x distance) to gray (64,64,64) at 1.25x distance
                 const viewDistance = gs.fleet.mapViewDistance
-                // t = 0 at 1x distance (inner edge), t = 1 at 2x distance (outer edge)
-                const t = (distanceToPlayer - viewDistance) / viewDistance
+                // t = 0 at 1x distance (inner edge), t = 1 at 1.25x distance (outer edge)
+                const t = (distanceToPlayer - viewDistance) / (viewDistance * 0.25)
                 const gray = Math.round(255 - (255 - 64) * t)
                 unknownObj.fillColor = [gray, gray, gray, 1]
                 
@@ -434,6 +439,9 @@ class StarMapFleetsHandler {
             
             waypointMarker.fillColor = [0, greenValue, 0, 1]
         }
+        
+        // Continue animation loop (runs even when paused)
+        requestAnimationFrame(() => this.animateWaypoint())
     }
 
     /**

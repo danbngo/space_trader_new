@@ -67,10 +67,60 @@ function showPlanetModal(planet = new Planet(), title = '', msg = '', options = 
         planetList = planet.parent.children.filter(c=>(c instanceof Moon));
     }
     
+    // Filter to only include visited planets
+    planetList = planetList.filter(p => gs.lastVisitedDates.has(p));
+    
     const currentIndex = planetList.indexOf(planet);
     const prevPlanet = planetList[currentIndex - 1] || planetList[planetList.length - 1] || planet;
     const nextPlanet = planetList[currentIndex + 1] || planetList[0] || planet;
-    console.log('showing planet modal:',{planet, planetList, currentIndex, prevPlanet, nextPlanet});
+    
+    // Check if there are other planets to navigate to
+    const hasOtherTargets = planetList.length > 1;
+    const noTargetsMessage = "No other discovered objects of this type yet";
+    
+    console.log('showing planet modal:',{planet, planetList, currentIndex, prevPlanet, nextPlanet, hasOtherTargets});
+    
+    const leftButton = ce({
+        tag: 'button',
+        innerHTML: '◀',
+        onClick: hasOtherTargets ? () => onNavigate(prevPlanet) : null,
+        classNames: ['planet-nav-button'],
+        style: {
+            marginLeft: '0px', 
+            marginRight: '0px', 
+            marginTop: '0px',
+            background: 'none',
+            border: 'none',
+            color: hasOtherTargets ? 'black' : '#ccc',
+            cursor: hasOtherTargets ? 'pointer' : 'not-allowed',
+            fontSize: '16px',
+            padding: '5px 10px'
+        }
+    });
+    
+    const rightButton = ce({
+        tag: 'button',
+        innerHTML: '▶',
+        onClick: hasOtherTargets ? () => onNavigate(nextPlanet) : null,
+        classNames: ['planet-nav-button'],
+        style: {
+            marginLeft: '0px', 
+            marginRight: '0px', 
+            marginTop: '0px',
+            background: 'none',
+            border: 'none',
+            color: hasOtherTargets ? 'black' : '#ccc',
+            cursor: hasOtherTargets ? 'pointer' : 'not-allowed',
+            fontSize: '16px',
+            padding: '5px 10px'
+        }
+    });
+    
+    // Add popover tooltips if navigation is disabled
+    if (!hasOtherTargets) {
+        createPopoverElement(leftButton, noTargetsMessage);
+        createPopoverElement(rightButton, noTargetsMessage);
+    }
     
     const titleEl = ce({
         style: {
@@ -80,45 +130,13 @@ function showPlanetModal(planet = new Planet(), title = '', msg = '', options = 
             justifyContent: 'center',
         },
         children: [
-            ce({
-                tag: 'button',
-                innerHTML: '◀',
-                onClick: () => onNavigate(prevPlanet),
-                classNames: ['planet-nav-button'],
-                style: {
-                    marginLeft: '0px', 
-                    marginRight: '0px', 
-                    marginTop: '0px',
-                    background: 'none',
-                    border: 'none',
-                    color: 'black',
-                    cursor: 'pointer',
-                    fontSize: '16px',
-                    padding: '5px 10px'
-                }
-            }),
+            leftButton,
             ce({
                 tag: 'div',
                 style: {minWidth: '300px', textAlign: 'center', color: 'black important!', marginTop: '8px'},
                 children: [title]
             }),
-            ce({
-                tag: 'button',
-                innerHTML: '▶',
-                onClick: () => onNavigate(nextPlanet),
-                classNames: ['planet-nav-button'],
-                style: {
-                    marginLeft: '0px', 
-                    marginRight: '0px', 
-                    marginTop: '0px',
-                    background: 'none',
-                    border: 'none',
-                    color: 'black',
-                    cursor: 'pointer',
-                    fontSize: '16px',
-                    padding: '5px 10px'
-                }
-            })
+            rightButton
         ]
     });
 

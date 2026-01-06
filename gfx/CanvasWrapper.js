@@ -446,6 +446,7 @@ class CanvasWrapper {
         }
         
         for (const pixel of pixels) {
+            if (!pixel.visible) continue;
             let sx = 0//pixel.offsetY;
             let sy = 0//pixel.offsetY;
             if (!pixel.parallax) [sx, sy] = this.worldToScreen(pixel.x, pixel.y);

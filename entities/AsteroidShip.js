@@ -50,6 +50,7 @@ class AsteroidShip extends Ship {
         // Start with 8-12 points around a circle (octagon-ish base)
         const numPoints = rng(12, 8);
         const angleStep = (Math.PI * 2) / numPoints;
+        /** @type {Array<[number, number]>} */
         const vertices = [];
         
         for (let i = 0; i < numPoints; i++) {
