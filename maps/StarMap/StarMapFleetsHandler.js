@@ -27,10 +27,13 @@ class StarMapFleetsHandler {
     setFleetStrokeStyle(fleet, fleetObj, isSelected, isHovered = false) {
         if (isSelected) {
             fleetObj.strokeColor = COLORS.Green
+            fleetObj.lineWidth = 3
         } else if (isHovered) {
             fleetObj.strokeColor = COLORS.Cyan
+            fleetObj.lineWidth = 2
         } else {
             fleetObj.strokeColor = fleet.planet ? fleet.planet.color : COLORS.White
+            fleetObj.lineWidth = 2
         }
     }
 

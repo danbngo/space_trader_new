@@ -25,7 +25,7 @@ const RUINS_TYPES = Object.freeze({
     DEAD_SHIP: new RuinsType("Derelict Vessel", COLORS.DarkGray, "An ancient ship drifting in the void, its crew long gone"),
     SLEEPER_ARK: new RuinsType("Sleeper Ark", COLORS.DarkCyan, "A generation ship in cryogenic suspension, destination unknown"),
     ALIEN_SATELLITE: new RuinsType("Alien Satellite", COLORS.DarkGreen, "A mysterious satellite of unknown origin, still transmitting"),
-    PROBE: new RuinsType("Ancient Probe", COLORS.DarkBlue, "A deteriorating probe from a forgotten civilization"),
+    OBSERVER: new RuinsType("Ancient Probe", COLORS.DarkBlue, "A deteriorating probe from a forgotten civilization"),
     NANITE_BLOB: new RuinsType("Nanite Cloud", COLORS.DarkMagenta, "A mass of dormant self-replicating nanomachines"),
     DEFENSE_PLATFORM: new RuinsType("Defense Platform", COLORS.DarkRed, "A deactivated military installation from a long-dead empire"),
     RESEARCH_STATION: new RuinsType("Research Station", COLORS.DarkYellow, "An abandoned scientific outpost on the edge of civilization"),

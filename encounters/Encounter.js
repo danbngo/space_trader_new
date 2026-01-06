@@ -723,8 +723,9 @@ class Encounter {
         if (playerUndetected) msg += `The ${fleetName} are caught with their shields down!<br/>`
         if (reputation) {
             if (planet) msg += gs.captain.grantReputation(planet, reputation)
-            if (faction) msg += gs.captain.grantReputation(faction, reputation)
         }
+        // Faction ALWAYS loses respect when you attack them
+        if (faction) msg += gs.captain.grantReputation(faction, ATTACK_FACTION_NEGATIVE_REP)
         if (bounty > 0 && planet) {
             msg += gs.captain.grantBounty(planet, bounty)
         }
@@ -774,8 +775,9 @@ class Encounter {
         if (playerUndetected) msg += `The ${fleetName} are caught with their shields down!<br/>`
         if (reputation) {
             if (planet) msg += gs.captain.grantReputation(planet, reputation)
-            if (faction) msg += gs.captain.grantReputation(faction, reputation)
         }
+        // Faction ALWAYS loses respect when you attack them
+        if (faction) msg += gs.captain.grantReputation(faction, ATTACK_FACTION_NEGATIVE_REP)
         if (bounty > 0 && planet) {
             msg += gs.captain.grantBounty(planet, bounty)
         }

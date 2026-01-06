@@ -327,6 +327,9 @@ class StarMap extends BaseMap {
 
         this.refreshInfoBar()
         this.handleCanvasObjects()
+        
+        // Animate waypoint marker (runs every frame)
+        this.fleetsHandler.animateWaypoint()
 
         //pause if player reached his destination
         if (!playerWasDocked && gs.location) {

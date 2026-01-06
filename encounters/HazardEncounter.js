@@ -3,8 +3,8 @@ class HazardEncounter extends Encounter {
         console.log('showPlayerEscapedFromHazardsModal');
         const {enemyFleet, disabledPlayerShips, escapedPlayerShips, playerShips} = this
         
-        // Award experience points for successfully escaping
-        const expGained = Math.round(AVERAGE_EXP_FROM_ESCAPING * 0.5 * (enemyFleet.combatRating / this.playerFleet.combatRating)) // Half XP since hazards are easier to escape
+        // Award experience points for successfully escaping (scales only with enemy strength)
+        const expGained = Math.round(AVERAGE_EXP_FROM_ESCAPING * 0.5 * enemyFleet.combatRating) // Half XP since hazards are easier to escape
         
         let msg = `You escaped from the ${coloredName(enemyFleet)}!<br/>`
         msg += gs.captain.grantExperience(expGained)

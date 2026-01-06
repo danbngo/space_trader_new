@@ -38,7 +38,7 @@ class Path {
     positionAtProgress(progressRatio = 0.0) {
         if (progressRatio <= 0) return [this.startX, this.startY]
         if (progressRatio >= 1) return [this.toX, this.toY]
-        const effectiveProgress = this.normalize ? normalCurve(progressRatio) : progressRatio
+        const effectiveProgress = progressRatio// this.normalize ? normalCurve(progressRatio) : progressRatio
         return [this.startX + this.dx*effectiveProgress, this.startY + this.dy*effectiveProgress]
     }
 

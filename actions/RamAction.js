@@ -10,8 +10,12 @@ class RamAction extends ShipAction {
         this.actor.statusEffects.setAmount(STATUS_EFFECTS.CLOAKED, 0)
         const {actor, target} = this
         const pseudoActions = []
+        
+        // TARGETED ships cannot evade - always hit
+        const isTargeted = target.statusEffects.has(STATUS_EFFECTS.TARGETED)
+        
         //player has a 50% chance to miss at min range and 25% at max range
-        const didMiss = this.path.distance > 0 ? (Math.random() < (0.50 - (0.25 * (this.path.distance / actor.maxMoveDistance)))) : false
+        const didMiss = !isTargeted && this.path.distance > 0 ? (Math.random() < (0.50 - (0.25 * (this.path.distance / actor.maxMoveDistance)))) : false
         if (didMiss) {
             // Move past the target instead of landing on it
             const overshoot = actor.radius + target.radius + 1

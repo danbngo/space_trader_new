@@ -1,7 +1,7 @@
 /** @typedef {'Victory'|'Defeat'|'Surrendered'|'Escaped'} EncounterResultType */
 /** @typedef {'Attack'|'Escape'|'Asteroid'} CombatStrategyType */
 /** @typedef {'FilledCircle'|'EmptyCircle'|'FilledTriangle'|'EmptyTriangle'|'Text'|'Line'|'FilledOval'|'EmptyOval'|'FilledRectangle'} ShapeType */
-/** @typedef {'Move'|'Laser'|'Ram'|'Recharge'|'Wait'|'Blink'|'Booster'|'Cloak'|'Warhead'|'EMPPulse'|'Magnetize'|'SmokeBomb'|'Drill'|'PlasmaSpray'|'NaniteBeam'} MoveType */
+/** @typedef {'Move'|'Laser'|'Ram'|'Recharge'|'Wait'|'Blink'|'Booster'|'Cloak'|'Warhead'|'EMPPulse'|'Magnetize'|'SmokeBomb'|'Drill'|'PlasmaSpray'|'NaniteBeam'|'Scanner'} MoveType */
 /** @typedef {'Default'|'Storm'|'PlayerEncircle'|'PlayerEncircled'} FormationType */
 /** @typedef {'Ship'|'Asteroid'} AIType */
 /** @typedef {'Rocky'|'Icy'|'Plasma'} AsteroidBeltType */
@@ -88,7 +88,8 @@ const MOVE_TYPES = Object.freeze({
     SmokeBomb: 'SmokeBomb',
     Drill: 'Drill',
     NaniteBeam: 'NaniteBeam',
-    PlasmaSpray: 'PlasmaSpray'
+    PlasmaSpray: 'PlasmaSpray',
+    Scanner: 'Scanner'
 })
 const MOVE_TYPES_ALL = Object.values(MOVE_TYPES)
 

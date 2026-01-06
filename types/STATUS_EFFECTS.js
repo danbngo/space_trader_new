@@ -24,6 +24,7 @@ const STATUS_EFFECTS = Object.freeze({
     IONIZED: new StatusEffect('Ionized', 'Inflicts shield damage over time and prevents recharging', COLORS.Yellow),
     OVERHEATED: new StatusEffect('Overheated', 'Inflicts damage over time and blocks use of modules', COLORS.Orange),
     CLOAKED: new StatusEffect('Cloaked', 'Prevents ship from being seen or targeted by enemies', COLORS.Gray),
+    TARGETED: new StatusEffect('Targeted', 'Cannot evade attacks, lasers and rams always hit, cloak disabled', COLORS.LightCyan),
 })
 
 const STATUS_EFFECTS_ALL = Object.values(STATUS_EFFECTS)

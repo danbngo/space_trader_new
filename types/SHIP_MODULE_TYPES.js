@@ -47,6 +47,7 @@ class ShipModule {
 
 
 const SHIP_MODULE_TYPES = {
+    SCANNER: new ShipModuleType('Scanner', COLORS.LightCyan, MOVE_TYPES.Scanner, 'Makes enemy ships un-missable for a time and reveals cloaked ships.', 1000, 4),
     CLOAK: new ShipModuleType('Cloak', COLORS.DarkGray, MOVE_TYPES.Cloak, 'Become invisible and un-targetable by enemy ships. Dispelled if you attack or are attacked.', 1500, 4),
     MAGNETIZE: new ShipModuleType('Magnetize', COLORS.Purple, MOVE_TYPES.Magnetize, 'Pulls your ship and an enemy ship towards each other', 1500, 2),
     WARHEAD: new ShipModuleType('Warhead', COLORS.Red, MOVE_TYPES.Warhead, 'Deals damage and knockback in a large area', 3000, 4),

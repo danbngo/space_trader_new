@@ -88,8 +88,8 @@ class StarSystem extends SpaceObject {
             const interceptionRoute = fleet.route
             const targetFleet = interceptionRoute.targetFleet
             
-            // Skip if target fleet no longer exists
-            if (!targetFleet || !this.fleets.includes(targetFleet)) {
+            // Skip if target fleet no longer exists or is destroyed/abandoned
+            if (!targetFleet || !this.fleets.includes(targetFleet) || targetFleet.destroyed) {
                 fleet.route = null
                 continue
             }
@@ -102,7 +102,7 @@ class StarSystem extends SpaceObject {
                     }
                 }
                 console.log(`🎯 ${fleet.name}'s target ${targetFleet.name} changed route - recalculating interception`)
-                // Create new InterceptionRoute to continue the chase
+                // Create new InterceptionRoute to continue the chase (only for active fleets)
                 fleet.route = new InterceptionRoute(fleet, targetFleet, year)
             }
         }

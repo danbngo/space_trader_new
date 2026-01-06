@@ -118,6 +118,7 @@ const ENCOUNTER_BASE_REPUTATION_EFFECT_ON_VICTORY = -5 //winning a battle grants
 const ENCOUNTER_BASE_REPUTATION_SHRINK_ON_SURRENDER = 5 //surrendering moves your reputation closer to 0
 const ENCOUNTER_BASE_REPUTATION_EFFECT_ON_NO_SURRENDER = 5 //this is applied as an inverse amount, ie, your rep shrinks by base/reputationMultiplier. surrendering to powerful foes is less shameful.
 const ENCOUNTER_BASE_REPUTATION_EFFECT_ON_ATTACK = -5 //attacking a fleet gains you notoriety if they're good and fame if they're bad
+const ATTACK_FACTION_NEGATIVE_REP = -5 //attacking any faction always causes this much reputation loss with that faction (regardless of their alignment)
 const ENCOUNTER_MAX_TAX_RATIO = 0.2 //if tax collectors catch you, they'll take up to this much of your credits (min 100)
 const ENCOUNTER_MAX_EXTORT_RATIO = 0.5 //if syndicates catch you, they'll take up to this much of your credits (min 100)
 

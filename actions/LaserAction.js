@@ -7,22 +7,29 @@ class LaserAction extends ShipAction {
         console.log('LaserAction.execute', { attacker: this.actor, target: this.target });
         // Clear cloak status when attacking
         this.actor.statusEffects.setAmount(STATUS_EFFECTS.CLOAKED, 0)
-        //flat 25% miss chance (75% hit chance) regardless of distance
-        const baseMissChance = 0.25
         
-        // Apply Gunner skill (reduces miss chance, 0.5x at 50 skill)
-        const gunnerSkill = this.actor.fleet.totalSkills.getAmount(SKILLS.Gunner)
-        const gunnerModifier = 1 - (gunnerSkill / 100)
+        // TARGETED ships cannot evade - always hit
+        const isTargeted = this.target.statusEffects.has(STATUS_EFFECTS.TARGETED)
         
-        // Apply Stealth skill (increases enemy miss chance, 2x at 50 skill)
-        const stealthSkill = this.target.fleet.totalSkills.getAmount(SKILLS.Stealth)
-        const stealthModifier = 1 + (stealthSkill / 100)
-        
-        // Apply DUSTY status effect (halves hit chance by doubling miss chance)
-        const dustyModifier = this.actor.statusEffects.has(STATUS_EFFECTS.DUSTY) ? 2 : 1
-        
-        const adjustedMissChance = baseMissChance * gunnerModifier * stealthModifier * dustyModifier
-        const didMiss = Math.random() < adjustedMissChance
+        let didMiss = false
+        if (!isTargeted) {
+            //flat 25% miss chance (75% hit chance) regardless of distance
+            const baseMissChance = 0.25
+            
+            // Apply Gunner skill (reduces miss chance, 0.5x at 50 skill)
+            const gunnerSkill = this.actor.fleet.totalSkills.getAmount(SKILLS.Gunner)
+            const gunnerModifier = 1 - (gunnerSkill / 100)
+            
+            // Apply Stealth skill (increases enemy miss chance, 2x at 50 skill)
+            const stealthSkill = this.target.fleet.totalSkills.getAmount(SKILLS.Stealth)
+            const stealthModifier = 1 + (stealthSkill / 100)
+            
+            // Apply DUSTY status effect (halves hit chance by doubling miss chance)
+            const dustyModifier = this.actor.statusEffects.has(STATUS_EFFECTS.DUSTY) ? 2 : 1
+            
+            const adjustedMissChance = baseMissChance * gunnerModifier * stealthModifier * dustyModifier
+            didMiss = Math.random() < adjustedMissChance
+        }
         if (didMiss) {
             Object.assign(this, {targetBadMessage: 'Missed!'})
         } 

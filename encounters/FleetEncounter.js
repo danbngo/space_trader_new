@@ -3,8 +3,8 @@ class FleetEncounter extends Encounter {
         console.log('showPlayerEscapedFromEnemyModal');
         const {enemyFleet, disabledPlayerShips, escapedPlayerShips, playerShips} = this
         
-        // Award experience points for successfully escaping
-        const expGained = Math.round(AVERAGE_EXP_FROM_ESCAPING * (enemyFleet.combatRating / this.playerFleet.combatRating))
+        // Award experience points for successfully escaping (scales only with enemy strength)
+        const expGained = Math.round(AVERAGE_EXP_FROM_ESCAPING * enemyFleet.combatRating)
         
         let msg = `You escaped from the ${coloredName(enemyFleet)}!<br/>`
         msg += gs.captain.grantExperience(expGained)

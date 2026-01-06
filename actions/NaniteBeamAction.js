@@ -26,6 +26,13 @@ class NaniteBeamAction extends ShipAction {
             this.targetGoodMessage = 'Full hull'
         }
         
+        // Remove all negative status effects (DUSTY, FROZEN, IONIZED, OVERHEATED, TARGETED)
+        this.target.statusEffects.setAmount(STATUS_EFFECTS.DUSTY, 0)
+        this.target.statusEffects.setAmount(STATUS_EFFECTS.FROZEN, 0)
+        this.target.statusEffects.setAmount(STATUS_EFFECTS.IONIZED, 0)
+        this.target.statusEffects.setAmount(STATUS_EFFECTS.OVERHEATED, 0)
+        this.target.statusEffects.setAmount(STATUS_EFFECTS.TARGETED, 0)
+        
         const pseudoActions = this.encounter.handleShipActionComplete(this.actor)
         
         this.actor.moduleCooldowns.setAmount(SHIP_MODULE_TYPES.NANITE_BEAM, SHIP_MODULE_TYPES.NANITE_BEAM.cooldown)

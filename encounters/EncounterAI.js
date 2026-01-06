@@ -266,6 +266,20 @@ class EncounterAI {
                         return new EMPPulseAction(encounter, ship)
                     }
                 }
+                else if (moduleType === SHIP_MODULE_TYPES.SCANNER) {
+                    // Scanner: marks enemies for guaranteed hits
+                    const scannerArea = ship.calcPulseArea()
+                    const scannerRadius = scannerArea.radius * 1.5
+                    const targetsInRange = targets.filter(t => {
+                        if (t.disabled || t.escaped || t.statusEffects.has(STATUS_EFFECTS.TARGETED)) return false
+                        const distance = calcDistance(ship.x, ship.y, t.x, t.y)
+                        return distance <= scannerRadius
+                    })
+                    // Use scanner if we can hit 2+ untargeted enemies
+                    if (targetsInRange.length >= 2) {
+                        return new ScannerAction(encounter, ship)
+                    }
+                }
                 else if (moduleType === SHIP_MODULE_TYPES.MAGNETIZE) {
                     // Magnetize: needs target in beam area
                     const beamTargets = encounter.calcBeamTargets(ship)

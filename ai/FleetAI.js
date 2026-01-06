@@ -40,7 +40,7 @@ class FleetAI {
         if (!gs.system.stars || gs.system.stars.length === 0) return false
         
         const sun = gs.system.stars[0]
-        const sunCircle = new Circle(sun.x, sun.y, sun.radius/SOLAR_RADII_PER_AU)
+        const sunCircle = new Circle(sun.x, sun.y, sun.radius/SOLAR_RADII_PER_AU * 1.25)
         
         // If the ship is already inside the sun, allow it to escape
         const startInsideSun = sunCircle.containsPoint(route.path.startX, route.path.startY)
@@ -200,7 +200,8 @@ class FleetAI {
     }
 
     setTarget(target) {
-        const route = target instanceof Fleet ? new InterceptionRoute(this.fleet, target) : new Route(this.fleet, target)
+        // Use regular Route for destroyed/abandoned fleets, InterceptionRoute for active fleets
+        const route = (target instanceof Fleet && !target.destroyed) ? new InterceptionRoute(this.fleet, target) : new Route(this.fleet, target)
         if (route.valid) {
             // Check if route path intersects with the sun
             if (FleetAI.checkRouteIntersectsSun(route)) {

@@ -224,6 +224,22 @@ const SHIP_SHAPES = {
     ]),
 
     /**
+     * Observer - Scientific vessel with sensor pods
+     * @returns {Polygon}
+     */
+    OBSERVER: () => new Polygon([
+        [0.8, 0],      // Front nose (rotated 90° CCW)
+        [0.3, -0.5],   // Right front sensor
+        [0, -0.7],     // Right sensor pod
+        [-0.4, -0.6],  // Right side
+        [-0.8, -0.3],  // Right rear
+        [-0.8, 0.3],   // Left rear
+        [-0.4, 0.6],   // Left side
+        [0, 0.7],      // Left sensor pod
+        [0.3, 0.5]     // Left front sensor
+    ]),
+
+    /**
      * Starting Ship - Basic balanced triangle
      * @returns {Polygon}
      */

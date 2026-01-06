@@ -114,7 +114,7 @@ class StarMapBodiesHandler {
                 // Create night side overlay as a crescent/gibbous shape
                 const crescentVertices = []
                 const numPoints = 25
-                const terminatorOffset = 0.85
+                const terminatorOffset = 0.25
                 
                 for (let i = 0; i <= numPoints; i++) {
                     const angle = Math.PI * i / numPoints - Math.PI / 2
