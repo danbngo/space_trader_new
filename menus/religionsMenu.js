@@ -48,12 +48,12 @@ function showReligionsMenu(backFunction = () => closeModal()) {
     
     // Populate left column
     for (const religion of leftReligions) {
-        leftColumn.appendChild(createReligionSection(religion, religionFollowers, totalSystemPopulation))
+        leftColumn.appendChild(createReligionSection(religion, religionFollowers, totalPopulation))
     }
     
     // Populate right column
     for (const religion of rightReligions) {
-        rightColumn.appendChild(createReligionSection(religion, religionFollowers, totalSystemPopulation))
+        rightColumn.appendChild(createReligionSection(religion, religionFollowers, totalPopulation))
     }
 
     const columnLayout = createColumnLayout([leftColumn, rightColumn])

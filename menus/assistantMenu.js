@@ -21,7 +21,7 @@ function showAssistantMenu() {
         ['Ships', ()=>showShipsMenu()],
         ['Cargo', ()=>showCargoMenu(), gs.fleet.cargo.totalQuantity === 0],
         ['Officers', ()=>showOfficersMenu(), gs.fleet.subordinates.length === 0],
-        ['Contracts', ()=>showContractsMenu(), gs.fleet.contracts.length === 0],
+        ['Contracts', ()=>showContractsMenu(), gs.contracts.length === 0],
         ['Captain', ()=>showCaptainSkillsMenu(), false, hasSkillPoints || hasPerkPoints ? 'highlighted' : null],
         ['Cyberware', ()=>showCyberwareMenu(), gs.captain.implants.length === 0],
         ce({tag:'br'}),

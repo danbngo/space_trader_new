@@ -137,8 +137,8 @@ function showPlanetsMenu(backFunction = () => closeModal(), dwarfOnly = false, s
     contentContainer.appendChild(table)
     
     function updateButtons() {
-        
-        const buttons = [["Back", backFunction]]
+        /** @type {ButtonData[]} */
+        const buttons = [["Back", backFunction, false]]
         
         if (selectedPlanet) {
             buttons.unshift(["View", () => {
@@ -146,7 +146,7 @@ function showPlanetsMenu(backFunction = () => closeModal(), dwarfOnly = false, s
                 if (currentMap && currentMap.selectObject) {
                     currentMap.selectObject(selectedPlanet)
                 }
-            }])
+            }, false])
         }
         console.log('2')
         

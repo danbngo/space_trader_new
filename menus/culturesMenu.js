@@ -49,12 +49,12 @@ function showCulturesMenu(backFunction = () => closeModal()) {
     
     // Populate left column
     for (const culturePlanet of leftCultures) {
-        leftColumn.appendChild(createCultureSection(culturePlanet, culturePopulation, totalSystemPopulation))
+        leftColumn.appendChild(createCultureSection(culturePlanet, culturePopulation, totalPopulation))
     }
     
     // Populate right column
     for (const culturePlanet of rightCultures) {
-        rightColumn.appendChild(createCultureSection(culturePlanet, culturePopulation, totalSystemPopulation))
+        rightColumn.appendChild(createCultureSection(culturePlanet, culturePopulation, totalPopulation))
     }
 
     const columnLayout = createColumnLayout([leftColumn, rightColumn])

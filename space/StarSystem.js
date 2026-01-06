@@ -172,7 +172,7 @@ class StarSystem extends SpaceObject {
                     }
                     
                     // If using InterceptionRoute and target is still far away and not destroyed, create new route
-                    if (fleet.route.isInterception && fleet.route.targetFleet) {
+                    if (fleet.route instanceof InterceptionRoute && fleet.route.targetFleet) {
                         const targetFleet = fleet.route.targetFleet
                         const distanceToTarget = calcDistance(fleet.x, fleet.y, targetFleet.x, targetFleet.y)
                         
