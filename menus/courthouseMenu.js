@@ -73,14 +73,17 @@ function showCourthouseMenu(courthouse = new Courthouse()) {
         )
     }
 
-    const canPayBounty = gs.credits > 0 && planetBounty > 0
+    const canPayBounty = gs.credits > 0 && planetBounty > 0 && planetReputation >= 0
     const upgradePrice = courthouse.calcUpgradeRankPrice(gs.captain)
-    const canUpgradeRank = upgradePrice !== null && planetReputation > 0 && planetBounty === 0 && gs.credits >= upgradePrice
+    const nextRank = RANK_TYPES_ALL.find(r => r.level === currentRank.level + 1)
+    const requiredReputation = nextRank ? nextRank.upgradeReputation : 0
+    const canUpgradeRank = upgradePrice !== null && planetReputation >= requiredReputation && planetBounty === 0 && gs.credits >= upgradePrice
     
     // Helper functions to get disabled reasons
     function getPayBountyDisabledReason() {
         if (!isDocked) return "Must be docked to pay bounty";
         if (planetBounty <= 0) return "No bounty to pay";
+        if (planetReputation < 0) return "Requires non-negative reputation";
         if (gs.credits <= 0) return "Insufficient credits";
         return null;
     }
@@ -95,7 +98,7 @@ function showCourthouseMenu(courthouse = new Courthouse()) {
         if (!isDocked) return "Must be docked to upgrade rank";
         if (upgradePrice === null) return "Already at maximum rank";
         if (planetBounty > 0) return "Must clear bounty first";
-        if (planetReputation <= 0) return "Requires positive reputation";
+        if (planetReputation < requiredReputation) return `Requires ${requiredReputation} reputation (you have ${planetReputation})`;
         if (gs.credits < upgradePrice) return `Insufficient credits (need ${upgradePrice} CR)`;
         return null;
     }
@@ -106,8 +109,6 @@ function showCourthouseMenu(courthouse = new Courthouse()) {
         ['Serve Jail Time', ()=>showServeJailTimeModal(Math.ceil(planetBounty*JAIL_DAYS_PER_1000CR_FINE/1000)), !isDocked || planetBounty <= 0, getServeJailTimeDisabledReason()],
         ['Upgrade Rank', ()=>showUpgradeRankModal(), !isDocked || !canUpgradeRank, getUpgradeRankDisabledReason()],
     ]
-
-    const nextRank = RANK_TYPES_ALL.find(r => r.level === currentRank.level + 1)
     
     // Create current rank display with popover
     const currentRankSpan = ce({tag: 'span', innerHTML: colorSpan(currentRank.name, currentRank.color)});

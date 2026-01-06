@@ -15,7 +15,8 @@ class StarMapBodiesHandler {
         this.handleBackgroundStars()
         this.handleAsteroids()
         this.handleOrbits()
-        this.handleViewDistanceCircle()
+        // Vision circle removed - too jarring
+        // this.handleViewDistanceCircle()
         this.handleStars()
         this.handlePlanets()
         this.handleSpaceStations()
@@ -48,9 +49,9 @@ class StarMapBodiesHandler {
                 const screenDistance = calcDistance(pixel.screenOffsetX, pixel.screenOffsetY, fleetScreenPos[0], fleetScreenPos[1])
                 
                 if (screenDistance > visionRadiusScreen) {
-                    pixel.color[3] = 64 // Dim the star when outside vision range
+                    pixel.color[3] = bgStar.color[3]*0.25// Dim the star when outside vision range
                 } else {
-                    pixel.color[3] = 255 // Full brightness within vision range
+                    pixel.color[3] = bgStar.color[3]*1 // Full brightness within vision range
                 }
             }
         })
@@ -201,7 +202,7 @@ class StarMapBodiesHandler {
                 // Create night side overlay as a crescent/gibbous shape
                 const crescentVertices = []
                 const numPoints = 25
-                const terminatorOffset = 0.25
+                const terminatorOffset = 0.15 // Reduced from 0.25 for less shadow overlap
                 
                 for (let i = 0; i <= numPoints; i++) {
                     const angle = Math.PI * i / numPoints - Math.PI / 2
@@ -229,7 +230,7 @@ class StarMapBodiesHandler {
                     obj.onHover = () => {
                         // Show Unknown if not visited
                         const hasBeenVisited = gs.lastVisitedDates.has(body)
-                        labelObj.text = hasBeenVisited ? body.name : `Unknown ${body.objectType.name}`
+                        labelObj.textContent = hasBeenVisited ? body.name : `Unknown ${body.objectType.name}`
                         labelObj.visible = true
                         for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
                     }
@@ -253,6 +254,15 @@ class StarMapBodiesHandler {
             labelObj.visible = false
             nightSideObj.visible = isDiscovered
             unknownObj.visible = !hasBeenSeen // Show unknown circle for all unseen planets
+            
+            // Dim planet when outside vision range (like asteroids)
+            if (isDiscovered) {
+                if (isInVisionRange) {
+                    planetObj.fillColor[3] = 1.0 // Full brightness
+                } else {
+                    planetObj.fillColor[3] = 0.25 // Dimmed (64/255 = 0.25)
+                }
+            }
             
             // Update positions
             planetObj.x = body.x
@@ -307,7 +317,7 @@ class StarMapBodiesHandler {
                     obj.onHover = () => {
                         // Show Unknown Station if not visited
                         const hasBeenVisited = gs.lastVisitedDates.has(station)
-                        labelObj.text = hasBeenVisited ? station.name : 'Unknown Station'
+                        labelObj.textContent = hasBeenVisited ? station.name : 'Unknown Station'
                         labelObj.visible = true
                         for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
                     }

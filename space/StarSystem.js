@@ -142,6 +142,19 @@ class StarSystem extends SpaceObject {
                             encounter.startEncounter()
                         }
                     }
+                    
+                    // If using InterceptionRoute and target is still far away and not destroyed, create new route
+                    if (fleet.route.isInterception && fleet.route.targetFleet) {
+                        const targetFleet = fleet.route.targetFleet
+                        const distanceToTarget = calcDistance(fleet.x, fleet.y, targetFleet.x, targetFleet.y)
+                        
+                        // If target is still far away and not destroyed/abandoned, continue chase
+                        if (distanceToTarget > FLEET_COLLISION_DISTANCE && !targetFleet.destroyed) {
+                            console.log(`Target still ${distanceToTarget.toFixed(4)} AU away, generating new interception route...`)
+                            fleet.route = new InterceptionRoute(fleet, targetFleet, year)
+                            continue // Skip setting route to undefined
+                        }
+                    }
                 }
                 //only dock if player fleet near the destination, otherwise its handled by ai
                 if (fleet.route.destination instanceof Planet) fleet.dock(fleet.route.destination)

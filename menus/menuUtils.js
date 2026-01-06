@@ -33,8 +33,8 @@ function getScanningModeMessage(planet) {
     
     const lastVisitYear = gs.lastVisitedDates.get(planet)
     if (lastVisitYear !== undefined) {
-        const yearsSinceVisit = Math.round((gs.year - lastVisitYear) * 100) / 100
-        return colorSpan(`📡 Scanning Mode - Information from last visit (${lastVisitYear.toFixed(2)}, ${yearsSinceVisit.toFixed(2)} years ago)<br/>`, COLORS.Yellow)
+        const yearsSinceVisit = gs.year - lastVisitYear
+        return colorSpan(`📡 Scanning Mode - Information from last visit (${describeDate(lastVisitYear)}, ${describeTimespan(yearsSinceVisit)} ago)<br/>`, COLORS.Yellow)
     } else {
         return colorSpan(`📡 Scanning Mode - No previous visit data available<br/>`, COLORS.Orange)
     }

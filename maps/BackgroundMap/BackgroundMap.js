@@ -86,7 +86,7 @@ class BackgroundMap extends BaseMap {
 
     tick() {
         const currentTime = Date.now()
-        this.renderer.refreshBackground(currentTime / 200000)
+        this.renderer.refreshBackground(gs.year)
         this.renderer.rebuildCanvas()
         this.refreshCanvas()
 

@@ -79,8 +79,8 @@ class StarMap extends BaseMap {
             this.lastZoom = zoom
         }
         
-        // Update background stars every 30th frame when player is in motion OR camera changed
-        if ((playerInMotion || cameraChanged) && this.frameCounter % 1 === 0) {
+        // Update background stars immediately when camera changes, or every 30th frame when only player moves
+        if (cameraChanged || (playerInMotion && this.frameCounter % 30 === 0)) {
             this.bodiesHandler.handleBackgroundStars()
         }
         
@@ -341,7 +341,7 @@ class StarMap extends BaseMap {
     }
 
     /** @param {Planet | Waypoint | Fleet} obj */
-    setDestination(obj, unpause = false, bypassSunWarning = false) {
+    setDestination(obj, unpause = false, bypassSunWarning = false, bypassInterceptWarning = false) {
         let route = null
         
         if (obj instanceof Planet) {
@@ -353,7 +353,28 @@ class StarMap extends BaseMap {
                 console.log('!!!! Cannot intercept fleet - target is too fast or too far')
                 return
             }
-            if (obj instanceof Fleet && !obj.destroyed) unpause = false //these routes can be wonky, so player needs to confirm
+            // Check if interception will take a long time - if so, require confirmation
+            if (obj instanceof Fleet && !obj.destroyed && route.travelTime > WARN_INTERCEPT_DURATION_YEARS && !bypassInterceptWarning) {
+                const targetName = obj.name || 'fleet'
+                const eta = describeTimespan(route.travelTime)
+                showModal(
+                    '⚠️ Long Interception Route',
+                    ce({
+                        children: [
+                            ce({ innerHTML: `Intercepting ${targetName} will take ${eta}.` }),
+                            ce({ innerHTML: 'This is a long journey. Do you want to proceed?' })
+                        ]
+                    }),
+                    [
+                        ['Cancel', () => closeModal()],
+                        ['Proceed', () => {
+                            closeModal()
+                            this.setDestination(obj, true, bypassSunWarning, true)
+                        }]
+                    ]
+                )
+                return
+            }
         } else if (obj.isWaypoint) {
             // Create a route to arbitrary coordinates
             route = new Route(gs.fleet, obj)

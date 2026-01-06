@@ -307,6 +307,9 @@ async function startNewGame() {
 
     // Add player's fleet to system
     gs.system.fleets.push(gs.fleet);
+    
+    // Mark initial objects around player as seen
+    gs.system.updateDiscoveries();
 
     console.log("New game started.");
     createCharacter()
