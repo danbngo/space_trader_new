@@ -156,7 +156,9 @@ class EncounterMap extends BaseMap {
             }
             // Use custom polygon shape if ship type has a shape generator
             else if (ship.shipType.shapeGenerator) {
-                const vertices = ship.shipType.shapeGenerator();
+                const polygonObj = ship.shipType.shapeGenerator();
+                // Extract vertices array from Polygon object
+                const vertices = polygonObj.vertices || polygonObj;
                 shipObj = cvs.addPolygon(shipId, ship.x, ship.y, vertices, ship.radius, 12, ship.color, COLORS.White, ship.angle, ()=>this.selectObject(ship));
             }
             // Fallback to legacy shapes
@@ -460,26 +462,25 @@ class EncounterMap extends BaseMap {
         console.log('autoFleeShip', { ship })
         if (!this.calcCanBeControlled(ship)) return
         
-        // Temporarily force the ship to use Escape strategy
-        // We'll do this by temporarily modifying the ship's hull to appear damaged
-        const originalHull = ship.hull[0]
-        const originalAiType = ship.aiType
-        
-        ship.aiType = AI_TYPES.Ship
-        // Make it think it's badly damaged to trigger escape behavior
-        ship.hull[0] = ship.hull[1] * 0.3
-        
-        // Use the encounter AI to determine the best move
-        const action = this.encounter.ai.calcMoveForShip(ship)
-        
-        // Restore original values
-        ship.hull[0] = originalHull
-        ship.aiType = originalAiType
-        
-        if (action) {
-            console.log('Auto-Flee executing action:', action)
-            this.moveHandlerMap.get(action.actionType).execute(action)
+        // Directly create an escape move action - move towards edge of map
+        if (ship.engine > 0) {
+            const angleFromCenter = calcAngleTowardsPoint(0, 0, ship.x, ship.y)
+            const [toX, toY] = rotatePoint(this.encounter.mapRadius * 2, 0, 0, 0, angleFromCenter)
+            const ai = this.encounter.ai
+            const bestMove = ai.calcBestMoveCoords(ship, toX, toY)
+            
+            if (bestMove) {
+                const action = new MoveAction(this.encounter, ship, bestMove[0], bestMove[1])
+                console.log('Auto-Flee executing escape action:', action)
+                this.moveHandlerMap.get(action.actionType).execute(action)
+                return
+            }
         }
+        
+        // Fallback to wait if can't move
+        const action = new WaitAction(this.encounter, ship)
+        console.log('Auto-Flee executing wait action (no movement possible):', action)
+        this.moveHandlerMap.get(action.actionType).execute(action)
     }
 
     handleEnemyActions() {

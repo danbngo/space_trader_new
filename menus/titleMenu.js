@@ -193,6 +193,12 @@ async function startNewGame() {
     }
     const numToGenerate = Math.min(rng(12, 6), ALL_LAGRANGE_POINTS.length)
     gs.system.spaceStations = generateSpaceStations(numToGenerate, ALL_LAGRANGE_POINTS, ASTEROID_BELTS_ALL)
+    
+    // Set parent property for all space stations and add them to SOL as children
+    for (const station of gs.system.spaceStations) {
+        station.parent = SOL;
+    }
+    SOL.addChildren(gs.system.spaceStations);
 
     // Generate civilizations and settlements for space stations
     //presumed to be neutral, we'll dig into this more later

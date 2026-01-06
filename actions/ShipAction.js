@@ -123,7 +123,7 @@ class ShipAction {
 
     handleCollisions() {
         const pseudoActions = []
-        const COLLISION_BUFFER = 0.1 // Small additional amount for collision detection
+        const COLLISION_BUFFER = 0.01 // Small additional amount for collision detection
         const PUSH_DISTANCE_MULTIPLIER = 1.2 // How far to push ships away
         const MAX_COLLISION_DAMAGE = 6 // Base damage dealt on collision
         
@@ -131,6 +131,9 @@ class ShipAction {
         for (const otherShip of this.encounter.ships) {
             // Skip self, disabled ships, and escaped ships
             if (otherShip === this.actor || otherShip.disabled || otherShip.escaped) continue
+            
+            // Skip asteroid-on-asteroid collisions
+            if (this.actor.aiType === AI_TYPES.Asteroid && otherShip.aiType === AI_TYPES.Asteroid) continue
             
             // Try polygon collision detection first (more accurate)
             let isColliding = false;

@@ -125,7 +125,9 @@ function generateSettlement(planet) {
     console.log('generating settlement for planet:',planet)
     // Determine settlement type based on planet characteristics
     const settlementType = 
-        planet.objectType == OBJECT_TYPES.PLANET || planet.objectType == OBJECT_TYPES.DWARF_PLANET ? determinePlanetSettlementType(planet) :
+        (planet.objectType == OBJECT_TYPES.PLANET || 
+         planet.objectType == OBJECT_TYPES.DWARF_PLANET || 
+         planet.objectType == OBJECT_TYPES.MOON) ? determinePlanetSettlementType(planet) :
         determineSpaceStationSettlementType(planet)
 
     console.log('generating buildings...')
@@ -158,8 +160,13 @@ function generateSettlement(planet) {
 
     console.log('disabling some buildings...')
 
-    // Dwarf planets have much lower chance of having buildings (95% disabled vs 80% for others)
-    const disableChance = planet.objectType == OBJECT_TYPES.PLANET ? 0 : planet.objectType == OBJECT_TYPES.DWARF_PLANET || planet.objectType == OBJECT_TYPES.MOON ? 0.4 : 0.8
+    // Different body types have different chances of having buildings
+    // Planets: 0% disabled (all buildings available)
+    // Moons/Dwarf planets: 40% disabled
+    // Space stations: 80% disabled
+    const disableChance = planet.objectType == OBJECT_TYPES.PLANET ? 0 :
+                          planet.objectType == OBJECT_TYPES.MOON || planet.objectType == OBJECT_TYPES.DWARF_PLANET ? 0.4 :
+                          0.8
     const buildings = [shipyard, market, blackMarket, guild, bank, courthouse, academy, tavern, cyberSurgeon, geneticist, palace, temple, casino]
     for (const building of buildings) {
         if (Math.random() < disableChance) building.exists = false

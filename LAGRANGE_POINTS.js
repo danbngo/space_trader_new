@@ -196,4 +196,12 @@ const ALL_LAGRANGE_POINTS = [
     NEPTUNE_L3, NEPTUNE_L4, NEPTUNE_L5
 ];
 
+// Set parent property for all Lagrange points so they're part of the orbital hierarchy
+for (const lagrangePoint of ALL_LAGRANGE_POINTS) {
+    lagrangePoint.parent = SOL;
+}
+
+// Add Lagrange points to SOL as children
+SOL.addChildren(ALL_LAGRANGE_POINTS);
+
 console.log("Generated Lagrange points:", ALL_LAGRANGE_POINTS.length);

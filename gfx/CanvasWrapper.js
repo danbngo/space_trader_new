@@ -237,7 +237,29 @@ class CanvasWrapper {
             const textHeight = obj.size
             if (!isPointInRect(mouseX, mouseY, ox-textWidth/2, oy-textHeight/2, textWidth, textHeight)) return false
         }
-        if (obj.shape == SHAPES.FilledOval || obj.shape == SHAPES.EmptyOval) {
+        else if (obj.shape == SHAPES.Polygon) {
+            // Proper point-in-polygon detection
+            if (!obj.vertices || !Array.isArray(obj.vertices) || obj.vertices.length < 3) return false;
+            
+            // Transform mouse coordinates to object's local coordinate system
+            const dx = mouseX - ox;
+            const dy = mouseY - oy;
+            
+            // Apply inverse rotation
+            const cos = Math.cos(-obj.angle);
+            const sin = Math.sin(-obj.angle);
+            const localX = dx * cos - dy * sin;
+            const localY = dx * sin + dy * cos;
+            
+            // Scale vertices by size (matching the render logic)
+            const size = Math.max(obj.minScreenSize, obj.size * this.zoom)/this.pixelRatio;
+            const scaledVertices = obj.vertices.map(([vx, vy]) => [vx * size, vy * size]);
+            
+            // Create polygon and check containment
+            const polygon = new Polygon(scaledVertices);
+            if (!polygon.containsPoint(localX, localY)) return false;
+        }
+        else if (obj.shape == SHAPES.FilledOval || obj.shape == SHAPES.EmptyOval) {
             const ellipse = new Ellipse(ox, oy, Math.max(obj.size * this.zoom, obj.minScreenSize)/this.pixelRatio, Math.max((obj.minorSize || obj.size) * this.zoom, obj.minScreenSize)/this.pixelRatio, obj.angle);
             if (!ellipse.containsPoint(mouseX, mouseY)) return false
         }
@@ -246,7 +268,7 @@ class CanvasWrapper {
             if (!rect.containsPoint(mouseX, mouseY)) return false
         }
         else {
-            // basic circular hitbox for all shapes for now
+            // basic circular hitbox for all other shapes
             const dist = Math.hypot(ox - mouseX, oy - mouseY);
             const hitRadius = Math.max(obj.minScreenSize, obj.size * this.zoom)/this.pixelRatio
             if (dist > hitRadius) return false

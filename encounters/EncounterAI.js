@@ -396,14 +396,8 @@ class EncounterAI {
                 //attack targets if any available
                 return new LaserAction(encounter, ship, rndMember(attackableTargets))
             }
-            const inTheWayTargets = rammableTargets/* rammableTargets.filter(t => {
-                return this.calcIsFacing(ship, t)
-            })*/
-            if (inTheWayTargets.length > 0 && ship.canRam) {
-                //ram targets that are in the way
-                const targetToRam = rndMember(inTheWayTargets)
-                return new RamAction(encounter, ship, targetToRam)
-            }
+            // Asteroids no longer intentionally ram - they just drift around
+            // Removed ramming behavior to reduce asteroid damage since they're now huge
             //if no targets in the way, move semi randomly, mostly in the same dir we're already facing
             const [toX, toY] = rotatePoint(encounter.mapRadius*2, 0, 0, 0, ship.angle + rng(-Math.PI/4, Math.PI/4, false))
             const bestMove = this.calcBestMoveCoords(ship, toX, toY, false)
