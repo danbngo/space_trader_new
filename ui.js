@@ -458,7 +458,6 @@ function createTable(rows = [[ce()]], onSelectRow = null, firstSelectedIndex = o
         });
         th.style.cursor = 'pointer';
         th.style.userSelect = 'none';
-        th.title = 'Click to sort';
     }
     
     // Render data rows
@@ -612,6 +611,9 @@ function createPopoverElement(element, popoverContent) {
             })
         ]
     })
+    
+    // Prevent popover from blocking clicks on underlying elements
+    popover.style.pointerEvents = 'none'
     
     document.body.appendChild(popover);
     

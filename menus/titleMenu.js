@@ -277,7 +277,9 @@ async function startNewGame() {
             new ShipModule(SHIP_MODULE_TYPES.BLINK, 1),
             new ShipModule(SHIP_MODULE_TYPES.BOOSTER, 1),
             new ShipModule(SHIP_MODULE_TYPES.SMOKE_BOMB, 1),
-            new ShipModule(SHIP_MODULE_TYPES.SPEED_MODULE, 1)
+            new ShipModule(SHIP_MODULE_TYPES.SPEED_MODULE, 1),
+            new ShipModule(SHIP_MODULE_TYPES.DRILL, 1),
+            new ShipModule(SHIP_MODULE_TYPES.PLASMA_SPRAY, 1),
         ]
     }
 

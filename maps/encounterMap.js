@@ -43,6 +43,9 @@ class EncounterMap extends BaseMap {
         ])
         
         this.animatingAction = null
+        
+        // Track fade-out progress for escaped ships (shipId -> progress from 1.0 to 0.0)
+        this.fadeOutProgress = new Map()
 
         this.rebuildCanvas()
         this.refresh()
@@ -218,11 +221,27 @@ class EncounterMap extends BaseMap {
 
         //draw objects
         ships.forEach( (ship, index) => {
-            let invisible = ship.escaped
+            const shipId = `ship${ship.uuid}`
+            
+            // Handle fade-out for escaped ships
+            if (ship.escaped) {
+                if (!this.fadeOutProgress.has(shipId)) {
+                    this.fadeOutProgress.set(shipId, 1.0) // Start at full opacity
+                }
+                // Decrease fade progress (fade out over ~1 second at 60fps)
+                let fadeProgress = this.fadeOutProgress.get(shipId)
+                fadeProgress -= 0.016 // Decrease by ~1/60 per frame
+                this.fadeOutProgress.set(shipId, Math.max(0, fadeProgress))
+            } else {
+                // Ship is not escaped, ensure it's not in fade-out map
+                this.fadeOutProgress.delete(shipId)
+            }
+            
+            const fadeProgress = this.fadeOutProgress.get(shipId) ?? 1.0
+            let invisible = fadeProgress <= 0 // Only invisible when fade completes
             if (ship.aiType == AI_TYPES.Asteroid && ship.disabled) invisible = true
 
             //if (obj.location) return //dont display docked fleets
-            const shipId = `ship${ship.uuid}`
             existingShipIds.add(shipId)
             existingShipIds.add(shipId+'shield')
             existingShipIds.add(shipId+'label')
@@ -346,15 +365,15 @@ class EncounterMap extends BaseMap {
             
             // Display cloaked ships as white with low alpha
             if (cloaked) {
-                cvsShipObject.fillColor[3] = 0.1
+                cvsShipObject.fillColor[3] = 0.1 * fadeProgress
             } else {
-                cvsShipObject.fillColor[3] = hullRatio
+                cvsShipObject.fillColor[3] = hullRatio * fadeProgress
             }
             
             cvsShieldObject.x = cvsShipObject.x
             cvsShieldObject.y = cvsShipObject.y
-            cvsShieldObject.strokeColor[3] = shieldsRatio
-            cvsShieldObject.fillColor[3] = shieldsRatio
+            cvsShieldObject.strokeColor[3] = shieldsRatio * fadeProgress
+            cvsShieldObject.fillColor[3] = shieldsRatio * fadeProgress
 
             cvsLabelObject.x = cvsShipObject.x
             cvsLabelObject.y = cvsShipObject.y
@@ -371,24 +390,34 @@ class EncounterMap extends BaseMap {
             }
             else cvsThrusterObject.visible = false
             
-            // Oscillate thruster alpha based on engine speed
+            // Oscillate thruster alpha and size based on engine speed
             const currentMs = Date.now()
             const engineSpeed = ship.engine / AVERAGE_SHIP_ENGINE // Normalize engine value
             const oscillationFreq = 0.005 * (0.005 + engineSpeed) // Faster engines = faster oscillation
             const alpha = 0.9 + 0.1 * Math.sin(currentMs * oscillationFreq)
-            cvsThrusterObject.fillColor[3] = alpha
+            cvsThrusterObject.fillColor[3] = alpha * fadeProgress
+            
+            // Oscillate thruster size
+            const baseThrusterSize = ship.radius * 0.5
+            const sizeOscillation = 1 + 0.2 * Math.sin(currentMs * 0.004)
+            cvsThrusterObject.size = baseThrusterSize * sizeOscillation
+            cvsThrusterObject.minorSize = baseThrusterSize * sizeOscillation
             
             //Object.assign(animThruster, {x: newX, screenOffsetX: engineXOffset, y: newY, screenOffsetY: engineYOffset, angle: action.path.angle-Math.PI})
 
             let fontModifier = null
             if (ship.disabled) {
                 fontModifier = 'italic'
-                cvsLabelObject.fillColor[3] = 0.5
+                cvsLabelObject.fillColor[3] = 0.5 * fadeProgress
             }
-            else if (ship.fleet != activeTurnFleet) fontModifier = 'italic'
+            else if (ship.fleet != activeTurnFleet) {
+                fontModifier = 'italic'
+                cvsLabelObject.fillColor[3] = 1.0 * fadeProgress
+            }
             else {
                 if (ship.actionsRemaining == 0) fontModifier = null
                 else fontModifier = 'bold'
+                cvsLabelObject.fillColor[3] = 1.0 * fadeProgress
             }
             cvsLabelObject.fontModifier = fontModifier
         })
@@ -511,7 +540,7 @@ class EncounterMap extends BaseMap {
             ce({parent:container, innerHTML: obj.disabled ? `(Disabled)` : obj.escaped ? '(Escaped)' : ''})
             if (showActions) {
                 // Create scrollable buttons container
-                const buttonsContainer = ce({parent:container, style: {maxHeight: '300px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px'}})
+                const buttonsContainer = ce({parent:container, style: {maxHeight: '600px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px'}})
                 
                 ce({parent:buttonsContainer, tag:'button', innerHTML:'Shoot', disabled: !canAct || !obj.canShoot, onClick: ()=>this.moveHandlerMap.get(MOVE_TYPES.Laser).startTargeting(obj)})
                 ce({parent:buttonsContainer, tag:'button', innerHTML:'Move', disabled: !canAct, onClick: ()=>this.moveHandlerMap.get(MOVE_TYPES.Move).startTargeting(obj)})

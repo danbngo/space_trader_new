@@ -20,21 +20,65 @@ class MoveActionHandler extends ActionHandler {
 
     target(x = 0, y = 0, ellipse = new Ellipse()) {
         console.log('MoveActionHandler.target', { x, y });
+        
+        // If outside ellipse, clamp to the edge
+        let targetX = x
+        let targetY = y
         if (!ellipse.containsPoint(x, y)) {
-            return
+            // Calculate angle from ellipse center to mouse position
+            const dx = x - ellipse.x
+            const dy = y - ellipse.y
+            const angleToMouse = Math.atan2(dy, dx)
+            
+            // Rotate to ellipse's local coordinate system
+            const localAngle = angleToMouse - ellipse.angle
+            
+            // Calculate point on ellipse edge at this angle
+            const cos = Math.cos(localAngle)
+            const sin = Math.sin(localAngle)
+            const scale = Math.sqrt(1 / (cos*cos/(ellipse.radiusX*ellipse.radiusX) + sin*sin/(ellipse.radiusY*ellipse.radiusY)))
+            
+            // Rotate back to world coordinates
+            const localX = cos * scale
+            const localY = sin * scale
+            targetX = ellipse.x + localX * Math.cos(ellipse.angle) - localY * Math.sin(ellipse.angle)
+            targetY = ellipse.y + localX * Math.sin(ellipse.angle) + localY * Math.cos(ellipse.angle)
         }
+        
         const targetingCvsCircle = this.cvs.getObject('targetingcircle')
-        Object.assign(targetingCvsCircle, {visible: true, x, y})
+        Object.assign(targetingCvsCircle, {visible: true, x: targetX, y: targetY})
         this.encounterMap.refreshCanvas()
     }
 
     attempt(x = 0, y = 0, ellipse = new Ellipse(), mover = new Ship()) {
         console.log('MoveActionHandler.attempt', { x, y, mover });
+        
+        // If outside ellipse, clamp to the edge
+        let targetX = x
+        let targetY = y
         if (!ellipse.containsPoint(x, y)) {
-            return
+            // Calculate angle from ellipse center to mouse position
+            const dx = x - ellipse.x
+            const dy = y - ellipse.y
+            const angleToMouse = Math.atan2(dy, dx)
+            
+            // Rotate to ellipse's local coordinate system
+            const localAngle = angleToMouse - ellipse.angle
+            
+            // Calculate point on ellipse edge at this angle
+            const cos = Math.cos(localAngle)
+            const sin = Math.sin(localAngle)
+            const scale = Math.sqrt(1 / (cos*cos/(ellipse.radiusX*ellipse.radiusX) + sin*sin/(ellipse.radiusY*ellipse.radiusY)))
+            
+            // Rotate back to world coordinates
+            const localX = cos * scale
+            const localY = sin * scale
+            targetX = ellipse.x + localX * Math.cos(ellipse.angle) - localY * Math.sin(ellipse.angle)
+            targetY = ellipse.y + localX * Math.sin(ellipse.angle) + localY * Math.cos(ellipse.angle)
         }
+        
         this.encounterMap.cvs.objClickEnabled = true
-        this.execute(new MoveAction(this.encounter, mover, x, y))
+        this.execute(new MoveAction(this.encounter, mover, targetX, targetY))
     }
 
     execute(action =  new MoveAction()) {

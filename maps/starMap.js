@@ -33,6 +33,9 @@ class StarMap extends BaseMap {
         this.selectObject(autoSelectObject || gs.fleet)
         if (StarMap.lastZoom) this.adjustZoom(StarMap.lastZoom/this.cvs.zoom)
         
+        // Start continuous waypoint animation loop (runs even when paused)
+        this.animateWaypoint()
+        
         // Set starMap reference for all fleet AIs
         this.updateFleetAIReferences()
     }
@@ -243,7 +246,7 @@ class StarMap extends BaseMap {
                 // This creates a curved terminator by using two circular arcs
                 const crescentVertices = []
                 const numPoints = 25
-                const terminatorOffset = 0.3 // How much the terminator curves (0 = straight line, 1 = full circle)
+                const terminatorOffset = 0.15 // How much the terminator curves (0 = straight line, 1 = full circle)
                 
                 // First arc: outer edge of planet (right half)
                 for (let i = 0; i <= numPoints; i++) {
@@ -312,13 +315,26 @@ class StarMap extends BaseMap {
         spaceStations.forEach((station) => {
             const stationId = `station${station.uuid}`
             const labelId = `stationlabel${station.uuid}`
+            const shadowId = `stationshadow${station.uuid}`
             
             let stationObj = cvs.getObject(stationId)
             let labelObj = cvs.getObject(labelId)
+            let shadowObj = cvs.getObject(shadowId)
              
             // Create objects if they don't exist
             if (!stationObj) {
                 stationObj = cvs.addFilledRectangle(stationId, station.x, station.y, station.radius * 16, station.radius * 16, 12, station.color, 0, () => this.selectObject(station))
+                
+                // Create shadow as a simple vertical half-rectangle
+                const shadowVertices = [
+                    [0, -0.5],    // top center
+                    [0.5, -0.5],  // top right
+                    [0.5, 0.5],   // bottom right
+                    [0, 0.5]      // bottom center
+                ]
+                const shadowColor = [0, 0, 0, 0.7]
+                shadowObj = cvs.addPolygon(shadowId, station.x, station.y, shadowVertices, station.radius * 16, 8, shadowColor, null, 0, null, 13)
+                
                 labelObj = cvs.addText(labelId, station.x, station.y, 0, -24, station.name, station.color, DEFAULT_FONT_SIZE, 2, () => this.selectObject(station))
                 
                 const objs = [stationObj, labelObj]
@@ -338,8 +354,14 @@ class StarMap extends BaseMap {
             // Update positions and selection state
             stationObj.x = station.x
             stationObj.y = station.y
+            shadowObj.x = station.x
+            shadowObj.y = station.y
             labelObj.x = station.x
             labelObj.y = station.y
+            
+            // Rotate shadow based on angle to sun (assuming sun is at 0,0)
+            const angleToSun = Math.atan2(station.y - 0, station.x - 0)
+            shadowObj.angle = angleToSun + Math.PI / 2 // Rotate shadow perpendicular to sun direction
             
             if (station == this.selectedObject) {
                 stationObj.strokeColor = COLORS.Green
@@ -501,7 +523,7 @@ class StarMap extends BaseMap {
         // Track existing fleet UUIDs
         const existingFleetIds = new Set()
         
-        fleets.forEach((fleet) => {
+        fleets.forEach((fleet, fleetIndex) => {
             existingFleetIds.add(`fleet${fleet.uuid}`)
             existingFleetIds.add(`fleetlabel${fleet.uuid}`)
             existingFleetIds.add(`fleetpath${fleet.uuid}`)
@@ -576,7 +598,13 @@ class StarMap extends BaseMap {
             }
             
             fleetObj.strokeColor = (fleet == this.selectedObject) ? COLORS.Green : COLORS.Black
-            fleetObj.fillColor[3] = 1-(fleet.cloakLevel*0.95)
+            
+            // Oscillate brightness slightly using alpha channel
+            const currentMs = Date.now()
+            const brightnessOscillation = 0.05 * Math.sin(currentMs * 0.002 + fleetIndex) // Slight brightness variation
+            const baseAlpha = 1-(fleet.cloakLevel*0.95)
+            fleetObj.fillColor[3] = Math.max(0.5, Math.min(1, baseAlpha + brightnessOscillation))
+            
             // Update onClick handler - docked fleets should not be clickable
             fleetObj.onClick = fleet.location ? null : () => this.selectObject(fleet)
             
@@ -616,12 +644,18 @@ class StarMap extends BaseMap {
                 thrusterObj.screenOffsetX = screenOffsetX
                 thrusterObj.screenOffsetY = screenOffsetY
                 
-                // Oscillate thruster transparency
+                // Oscillate thruster transparency and size
                 const currentMs = Date.now()
                 const oscillationFreq = 0.003 // Slower oscillation for fleet thrusters
                 const baseAlpha = 1 - (fleet.cloakLevel * 0.95)
-                const oscillation = 0.1 * Math.sin(currentMs * oscillationFreq)
-                thrusterObj.fillColor[3] = Math.min(1, baseAlpha + oscillation)
+                const alphaOscillation = 0.1 * Math.sin(currentMs * oscillationFreq)
+                thrusterObj.fillColor[3] = Math.min(1, baseAlpha + alphaOscillation)
+                
+                // Oscillate size slightly
+                const fleetSize = Math.pow(fleet.radius/EARTH_RADII_PER_AU, 0.4) * 2.5 * 100
+                const sizeOscillation = 1 + 0.15 * Math.sin(currentMs * 0.004)
+                thrusterObj.size = fleetSize * 0.5 * sizeOscillation
+                thrusterObj.minorSize = fleetSize * 0.5 * sizeOscillation
             }
         })
         
@@ -726,7 +760,17 @@ class StarMap extends BaseMap {
             waypointMarker.visible = true
             waypointMarker.x = this.selectedObject.x
             waypointMarker.y = this.selectedObject.y
-            
+        } else {
+            waypointMarker.visible = false
+        }
+    }
+    
+    // Continuous animation loop for waypoint (runs even when paused)
+    animateWaypoint() {
+        const {cvs} = this
+        const waypointMarker = cvs.getObject('waypointMarker')
+        
+        if (waypointMarker && waypointMarker.visible) {
             // Oscillate the green color component over time
             const currentMs = Date.now()
             const oscillationFreq = 0.003
@@ -734,9 +778,11 @@ class StarMap extends BaseMap {
             const maxGreen = 255
             const greenValue = minGreen + (maxGreen - minGreen) * (0.5 + 0.5 * Math.sin(currentMs * oscillationFreq))
             waypointMarker.fillColor[1] = greenValue
-        } else {
-            waypointMarker.visible = false
+            cvs.redraw(false) // Redraw only if needed
         }
+        
+        // Continue animation loop forever
+        requestAnimationFrame(() => this.animateWaypoint())
     }
 
     refreshObjectPane() {

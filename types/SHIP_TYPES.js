@@ -171,21 +171,29 @@ function spawnSmallerAsteroids(died, encounter) {
         const angle = Math.random() * Math.PI * 2
         const newHull = Math.floor(died.hull[1] * 0.5)
         const offsetDist = rng(died.radius, died.radius/4, false)
-        const newX = died.x + Math.cos(angle) * offsetDist
-        const newY = died.y + Math.sin(angle) * offsetDist
         const newEngine = died.engine * 2
         
         const smallAsteroid = new AsteroidShip(died.name, died.shipType, died.color, [newHull,newHull], [0,0], died.lasers, newEngine, 0, died.radars, died.maxActionsPerTurn)
         smallAsteroid.hull = [newHull, newHull]
-        smallAsteroid.x = newX
-        smallAsteroid.y = newY
-        smallAsteroid.angle = angle
+        smallAsteroid.x = died.x//newX
+        smallAsteroid.y = died.y//newY
+        smallAsteroid.angle = Math.random() * Math.PI * 2
         smallAsteroid.radiusModifier = died.radiusModifier / 2
         smallAsteroid.fleet = died.fleet
         smallAsteroid.aiType = died.aiType
         died.fleet.ships.push(smallAsteroid)
         died.fleet.addShip(smallAsteroid)
         console.log('spawned small asteroid:',smallAsteroid,smallAsteroid.radius)
+
+        //asteroids "fly out" to their new location
+        setTimeout(() => {
+            const newX = died.x + Math.cos(angle) * offsetDist
+            const newY = died.y + Math.sin(angle) * offsetDist
+            smallAsteroid.x = newX
+            smallAsteroid.y = newY
+            smallAsteroid.angle = Math.random() * Math.PI * 2
+        }, 1)
+
     }
     if (currentMap && currentMap.refreshCanvas) {
         currentMap.refreshCanvas()
