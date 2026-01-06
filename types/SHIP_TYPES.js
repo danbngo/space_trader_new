@@ -117,7 +117,7 @@ ASTEROID_SHIP_TYPES.ASTEROID.onDisabled = (died = new Ship(), encounter) => {
     console.log('Asteroid.onDisabled', { died, encounter });
     if (Math.random()*died.radiusModifier < 0.5) {
         const effect = new DebrisCloudEffect(died.x, died.y, Math.random() * Math.PI * 4)
-        effect.radius *= Math.sqrt(died.radiusModifier)
+        effect.radius *= Math.sqrt(died.radiusModifier)/2
         encounter.addEffect(effect)
     } else {
         spawnSmallerAsteroids(died, encounter)
@@ -128,7 +128,7 @@ ASTEROID_SHIP_TYPES.CRYOID.onDisabled = (died = new Ship(), encounter) => {
     console.log('Cryoid.onDisabled', { died, encounter });
     if (Math.random()*died.radiusModifier < 0.5) {
         const effect = new IceCloudEffect(died.x, died.y, Math.random() * Math.PI * 4)
-        effect.radius *= died.radiusModifier
+        effect.radius *= Math.sqrt(died.radiusModifier)/2
         encounter.addEffect(effect)
     } else {
         spawnSmallerAsteroids(died, encounter)
@@ -139,7 +139,7 @@ ASTEROID_SHIP_TYPES.PLASMOID.onDisabled = (died = new Ship(), encounter) => {
     console.log('Plasmoid.onDisabled', { died, encounter });
     if (Math.random()*died.radiusModifier < 0.5) {
         const effect = new IonCloudEffect(died.x, died.y, Math.random() * Math.PI * 4)
-        effect.radius *= died.radiusModifier
+        effect.radius *= Math.sqrt(died.radiusModifier)/2
         encounter.addEffect(effect)
     } else {
         spawnSmallerAsteroids(died, encounter)
@@ -150,7 +150,7 @@ ASTEROID_SHIP_TYPES.MAGNETOID.onDisabled = (died = new Ship(), encounter) => {
     console.log('Magnetoid.onDisabled', { died, encounter });
     if (Math.random()*died.radiusModifier < 0.5) {
         const effect = new IonCloudEffect(died.x, died.y, Math.random() * Math.PI * 4)
-        effect.radius *= died.radiusModifier
+        effect.radius *= Math.sqrt(died.radiusModifier)/2
         encounter.addEffect(effect)
     } else {
         spawnSmallerAsteroids(died, encounter)
@@ -171,7 +171,7 @@ function spawnSmallerAsteroids(died, encounter) {
         const angle = Math.random() * Math.PI * 2
         const newHull = Math.floor(died.hull[1] * 0.5)
         const offsetDist = rng(died.radius, died.radius/4, false)
-        const newEngine = died.engine * 2
+        const newEngine = died.engine * 4
         
         const smallAsteroid = new AsteroidShip(died.name, died.shipType, died.color, [newHull,newHull], [0,0], died.lasers, newEngine, 0, died.radars, died.maxActionsPerTurn)
         smallAsteroid.hull = [newHull, newHull]

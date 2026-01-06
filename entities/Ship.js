@@ -107,8 +107,22 @@ class Ship {
         return BASE_SHIP_RADIUS_IN_MILES * (1+Math.sqrt(this.mass)) * this.radiusModifier
     }
 
+    /**
+     * Gets the transformed polygon shape for this ship at its current position and angle.
+     * @returns {Polygon} The ship's polygon shape transformed to world coordinates.
+     */
+    getPolygonShape() {
+        if (this.shipType.shapeGenerator) {
+            const baseShape = this.shipType.shapeGenerator();
+            // Transform the polygon to ship's current position, scale, and rotation
+            return baseShape.transform(this.radius, this.angle, this.x, this.y);
+        }
+        // Fallback: return null if no shape generator
+        return null;
+    }
+
     get mass() {
-        return AVERAGE_SHIP_MASS * (this.hull[1]/AVERAGE_SHIP_HULL
+        return this.radiusModifier * AVERAGE_SHIP_MASS * (this.hull[1]/AVERAGE_SHIP_HULL
         + this.shields[1]/AVERAGE_SHIP_SHIELDS 
         + this.lasers/AVERAGE_SHIP_LASERS
         + this.cargoSpace/AVERAGE_SHIP_CARGO_SPACE

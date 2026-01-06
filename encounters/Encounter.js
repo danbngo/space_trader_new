@@ -207,8 +207,8 @@ class Encounter {
 
     calcOpposingFleet(fleet = new Fleet()) {
         console.log('EncounterAI.calcOpposingFleet', { fleet });
-        if (fleet == gs.fleet) return this.fleet
-        else return gs.fleet
+        if (fleet == this.playerFleet || fleet == gs.fleet) return this.fleet
+        else return this.playerFleet
     }
 
     calcHarmableTargets(attacker = new Ship()) {
@@ -261,12 +261,15 @@ class Encounter {
         const validTargets = []
         const a1 = attacker.calcMoveArea()
         for (const target of this.calcHarmableTargets(attacker)) {
+            // Account for both ship radii - ships can ram when their edges touch
             // Check if target center is in range OR if closest edge of target is in range
             const inRange = a1.containsPoint(target.x, target.y)
             if (!inRange) {
                 // Check if the edge of the target ship closest to attacker is within ram range
+                // Use sum of both radii since collision happens when edges touch
                 const angleToTarget = calcAngleTowardsPoint(attacker.x, attacker.y, target.x, target.y)
-                const [edgeX, edgeY] = rotatePoint(target.radius, 0, target.x, target.y, angleToTarget + Math.PI)
+                const combinedRadius = target.radius + attacker.radius
+                const [edgeX, edgeY] = rotatePoint(combinedRadius, 0, target.x, target.y, angleToTarget + Math.PI)
                 if (!a1.containsPoint(edgeX, edgeY)) continue
             }
             validTargets.push(target)
@@ -478,6 +481,12 @@ class Encounter {
 
         for (const ship of enemyShips) {
             Object.assign(ship, {color: this.encounterType.enemyColor})
+        }
+        
+        // Regenerate effects now that ships are positioned to avoid overlaps
+        const effectTypes = rollEncounterEffectTypes()
+        if (effectTypes && effectTypes.length > 0) {
+            this.effects = generateEffects(this.encounterType, effectTypes, this.ships)
         }
     }
 

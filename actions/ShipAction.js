@@ -132,13 +132,38 @@ class ShipAction {
             // Skip self, disabled ships, and escaped ships
             if (otherShip === this.actor || otherShip.disabled || otherShip.escaped) continue
             
-            // Calculate distance between ships
-            const distance = calcDistance(this.actor.x, this.actor.y, otherShip.x, otherShip.y)
-            const collisionRadius = this.actor.radius + otherShip.radius + COLLISION_BUFFER
+            // Try polygon collision detection first (more accurate)
+            let isColliding = false;
+            const actorPolygon = this.actor.getPolygonShape();
+            const otherPolygon = otherShip.getPolygonShape();
+            
+            if (actorPolygon && otherPolygon) {
+                // Use polygon-circle collision detection
+                // Check if actor polygon intersects with other ship's circular approximation
+                isColliding = actorPolygon.circleIntersectsWithPolygon(
+                    otherShip.x, 
+                    otherShip.y, 
+                    otherShip.radius + COLLISION_BUFFER
+                );
+                
+                // Double-check with other ship's polygon if first check passes
+                if (isColliding || otherPolygon.circleIntersectsWithPolygon(
+                    this.actor.x,
+                    this.actor.y,
+                    this.actor.radius + COLLISION_BUFFER
+                )) {
+                    isColliding = true;
+                }
+            } else {
+                // Fallback to circle-circle collision detection if no polygon shape
+                const distance = calcDistance(this.actor.x, this.actor.y, otherShip.x, otherShip.y);
+                const collisionRadius = this.actor.radius + otherShip.radius + COLLISION_BUFFER;
+                isColliding = distance < collisionRadius;
+            }
             
             // Check if ships are overlapping
-            if (distance < collisionRadius) {
-                console.log('Ship collision detected:', this.actor.name, otherShip.name, distance, collisionRadius)
+            if (isColliding) {
+                console.log('Ship collision detected:', this.actor.name, otherShip.name)
                 
                 // Calculate mass ratio for physics
                 const actorMass = this.actor.mass
@@ -155,8 +180,8 @@ class ShipAction {
                 const dy = otherShip.y - this.actor.y
                 const angle = Math.atan2(dy, dx)
                 
-                // Calculate base push distance (enough to separate them)
-                const basePushDistance = (collisionRadius - distance) * PUSH_DISTANCE_MULTIPLIER
+                // Calculate base push distance (use radii as approximation for separation)
+                const basePushDistance = (this.actor.radius + otherShip.radius + COLLISION_BUFFER) * PUSH_DISTANCE_MULTIPLIER
                 
                 // Push the other ship away (proportional to its mass ratio)
                 const otherShipPushDistance = basePushDistance * otherShipMassRatio

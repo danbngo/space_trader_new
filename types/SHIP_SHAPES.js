@@ -1,109 +1,109 @@
 /**
  * @fileoverview Shape generators for different ship types.
- * Each function returns normalized vertices for polygon rendering.
+ * Each function returns a Polygon instance with normalized vertices.
  */
 
 const SHIP_SHAPES = {
     /**
      * Scout - Long, skinny triangle for speed
-     * @returns {Array<[number, number]>}
+     * @returns {Polygon}
      */
-    SCOUT: () => [
+    SCOUT: () => new Polygon([
         [1.2, 0],      // Sharp nose (rotated 90° CCW)
         [-1, 0.3],     // Left rear
         [-0.8, 0],     // Center rear notch
         [-1, -0.3]     // Right rear
-    ],
+    ]),
 
     /**
      * Tanker - Rectangular with snub nose (top half of hexagon)
-     * @returns {Array<[number, number]>}
+     * @returns {Polygon}
      */
-    TANKER: () => [
+    TANKER: () => new Polygon([
         [0.8, 0.3],    // Left front (rotated 90° CCW)
         [0.8, -0.3],   // Right front
         [0, -0.6],     // Right middle
         [-0.8, -0.6],  // Right rear
         [-0.8, 0.6],   // Left rear
         [0, 0.6]       // Left middle
-    ],
+    ]),
 
     /**
      * Fighter - Compact triangle with wide wings
-     * @returns {Array<[number, number]>}
+     * @returns {Polygon}
      */
-    FIGHTER: () => [
+    FIGHTER: () => new Polygon([
         [0.9, 0],      // Nose (rotated 90° CCW)
         [-0.3, 0.8],   // Left wing
         [-0.8, 0.3],   // Left rear
         [-0.8, -0.3],  // Right rear
         [-0.3, -0.8]   // Right wing
-    ],
+    ]),
 
     /**
      * Battleship - Large hexagonal shape
-     * @returns {Array<[number, number]>}
+     * @returns {Polygon}
      */
-    BATTLESHIP: () => [
+    BATTLESHIP: () => new Polygon([
         [1, 0],        // Front (rotated 90° CCW)
         [0.5, -0.7],   // Right front
         [-0.5, -0.7],  // Right rear
         [-1, 0],       // Rear
         [-0.5, 0.7],   // Left rear
         [0.5, 0.7]     // Left front
-    ],
+    ]),
 
     /**
      * Frigate - Balanced military triangle
-     * @returns {Array<[number, number]>}
+     * @returns {Polygon}
      */
-    FRIGATE: () => [
+    FRIGATE: () => new Polygon([
         [1, 0],        // Nose (rotated 90° CCW)
         [-0.7, 0.5],   // Left rear
         [-0.5, 0],     // Center rear indent
         [-0.7, -0.5]   // Right rear
-    ],
+    ]),
 
     /**
      * Destroyer - Elongated pentagon with weapon pods
-     * @returns {Array<[number, number]>}
+     * @returns {Polygon}
      */
-    DESTROYER: () => [
+    DESTROYER: () => new Polygon([
         [1.1, 0],      // Front point (rotated 90° CCW)
         [0.2, -0.6],   // Right weapon pod
         [-0.9, -0.4],  // Right rear
         [-0.9, 0.4],   // Left rear
         [0.2, 0.6]     // Left weapon pod
-    ],
+    ]),
 
     /**
      * Courier Ship - Sleek, aerodynamic delta
-     * @returns {Array<[number, number]>}
+     * @returns {Polygon}
      */
-    COURIER_SHIP: () => [
+    COURIER_SHIP: () => new Polygon([
         [1.3, 0],      // Long nose (rotated 90° CCW)
         [-0.9, 0.4],   // Left
         [-0.9, -0.4]   // Right
-    ],
+    ]),
 
     /**
      * Passenger Ship - Wide oval/ellipse shape
-     * @returns {Array<[number, number]>}
+     * @returns {Polygon}
      */
-    PASSENGER_SHIP: () => [
+    PASSENGER_SHIP: () => new Polygon([
         [0.9, 0],      // Front (rotated 90° CCW)
         [0.3, -0.6],   // Right front
         [-0.3, -0.6],  // Right rear
         [-0.9, 0],     // Rear
         [-0.3, 0.6],   // Left rear
         [0.3, 0.6]     // Left front
-    ],
+    ]),
 
     /**
      * Supply Ship - Box-like with rounded corners
-     * @returns {Array<[number, number]>}
+     * @returns {Polygon}
      */
-    SUPPLY_SHIP: () => [
+    SUPPLY_SHIP: () => new Polygon([
         [0.7, 0.5],    // Left front (rotated 90° CCW)
         [0.7, -0.5],   // Right front
         [0.5, -0.7],   // Right front corner
@@ -112,36 +112,36 @@ const SHIP_SHAPES = {
         [-0.7, 0.5],   // Left rear
         [-0.5, 0.7],   // Left rear corner
         [0.5, 0.7]     // Left front corner
-    ],
+    ]),
 
     /**
      * Blockade Runner - Sleek, narrow wedge
-     * @returns {Array<[number, number]>}
+     * @returns {Polygon}
      */
-    BLOCKADE_RUNNER: () => [
+    BLOCKADE_RUNNER: () => new Polygon([
         [1.1, 0],      // Sharp nose (rotated 90° CCW)
         [-1, 0.25],    // Left rear (narrow)
         [-1, -0.25]    // Right rear (narrow)
-    ],
+    ]),
 
     /**
      * Interceptor - Angular aggressive shape
-     * @returns {Array<[number, number]>}
+     * @returns {Polygon}
      */
-    INTERCEPTOR: () => [
+    INTERCEPTOR: () => new Polygon([
         [0.9, 0],      // Front (rotated 90° CCW)
         [0.2, -0.7],   // Right wing
         [-0.8, -0.5],  // Right rear
         [-0.6, 0],     // Center notch
         [-0.8, 0.5],   // Left rear
         [0.2, 0.7]     // Left wing
-    ],
+    ]),
 
     /**
      * Jammer - Dish-like shape with protrusions
-     * @returns {Array<[number, number]>}
+     * @returns {Polygon}
      */
-    JAMMER: () => [
+    JAMMER: () => new Polygon([
         [0.7, 0],      // Front (rotated 90° CCW)
         [0.5, -0.5],   // Right front antenna
         [0, -0.7],     // Right side
@@ -150,13 +150,13 @@ const SHIP_SHAPES = {
         [-0.5, 0.5],   // Left rear antenna
         [0, 0.7],      // Left side
         [0.5, 0.5]     // Left front antenna
-    ],
+    ]),
 
     /**
      * Fire Ship - Flame-like irregular triangle
-     * @returns {Array<[number, number]>}
+     * @returns {Polygon}
      */
-    FIRE_SHIP: () => [
+    FIRE_SHIP: () => new Polygon([
         [1, 0],        // Front point (rotated 90° CCW)
         [0.3, -0.4],   // Right flame
         [-0.5, -0.7],  // Right wing
@@ -164,13 +164,13 @@ const SHIP_SHAPES = {
         [-0.9, 0.2],   // Left rear
         [-0.5, 0.7],   // Left wing
         [0.3, 0.4]     // Left flame
-    ],
+    ]),
 
     /**
      * Tug Ship - Compact rectangular with arms
-     * @returns {Array<[number, number]>}
+     * @returns {Polygon}
      */
-    TUG_SHIP: () => [
+    TUG_SHIP: () => new Polygon([
         [0.6, 0.4],    // Left arm front (rotated 90° CCW)
         [0.3, 0.8],    // Left arm
         [-0.3, 0.8],   // Left arm rear
@@ -179,13 +179,13 @@ const SHIP_SHAPES = {
         [-0.3, -0.8],  // Right arm rear
         [0.3, -0.8],   // Right arm
         [0.6, -0.4]    // Right arm front
-    ],
+    ]),
 
     /**
      * Drilling Rig - Industrial box with drill point
-     * @returns {Array<[number, number]>}
+     * @returns {Polygon}
      */
-    DRILLING_RIG: () => [
+    DRILLING_RIG: () => new Polygon([
         [1.2, 0],      // Drill point (rotated 90° CCW)
         [0.8, -0.3],   // Right drill side
         [0.5, -0.6],   // Right body
@@ -193,13 +193,13 @@ const SHIP_SHAPES = {
         [-0.8, 0.6],   // Left rear
         [0.5, 0.6],    // Left body
         [0.8, 0.3]     // Left drill side
-    ],
+    ]),
 
     /**
      * Escort Ship - Shield-like protective shape
-     * @returns {Array<[number, number]>}
+     * @returns {Polygon}
      */
-    ESCORT_SHIP: () => [
+    ESCORT_SHIP: () => new Polygon([
         [0.8, 0],      // Front (rotated 90° CCW)
         [0.4, -0.7],   // Right front
         [-0.2, -0.8],  // Right side
@@ -207,13 +207,13 @@ const SHIP_SHAPES = {
         [-0.8, 0.5],   // Left rear
         [-0.2, 0.8],   // Left side
         [0.4, 0.7]     // Left front
-    ],
+    ]),
 
     /**
      * Utility Ship - Multi-purpose hexagon with tools
-     * @returns {Array<[number, number]>}
+     * @returns {Polygon}
      */
-    UTILITY_SHIP: () => [
+    UTILITY_SHIP: () => new Polygon([
         [0.9, 0],      // Front (rotated 90° CCW)
         [0.4, -0.6],   // Right front
         [-0.2, -0.7],  // Right tool
@@ -221,15 +221,15 @@ const SHIP_SHAPES = {
         [-0.9, 0.4],   // Left rear
         [-0.2, 0.7],   // Left tool
         [0.4, 0.6]     // Left front
-    ],
+    ]),
 
     /**
      * Starting Ship - Basic balanced triangle
-     * @returns {Array<[number, number]>}
+     * @returns {Polygon}
      */
-    STARTING_SHIP: () => [
+    STARTING_SHIP: () => new Polygon([
         [0.9, 0],      // Nose (rotated 90° CCW)
         [-0.8, 0.5],   // Left
         [-0.8, -0.5]   // Right
-    ]
+    ])
 }

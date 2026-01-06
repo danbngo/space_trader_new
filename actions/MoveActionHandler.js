@@ -11,14 +11,33 @@ class MoveActionHandler extends ActionHandler {
         const targetingCvsObject = this.cvs.addEmptyOval('targetingarea', ellipse.x, ellipse.y, ellipse.radiusX, ellipse.radiusY, 4, COLORS.Targeting, ellipse.angle, 2)
         const targetingCvsCircle = this.cvs.addEmptyCircle('targetingcircle', ellipse.x, ellipse.y, mover.radius, 4, COLORS.TargetingConfirm, 2)
         
-        this.cvs.onClickWorldXY = (x, y) => this.attempt(x, y, ellipse, mover)
-        this.cvs.onMouseMoveWorldXY = (x, y) => this.target(x, y, ellipse)
+        // Calculate valid ram targets (enemies within move range)
+        const validRamTargets = this.encounter.calcRamTargets(mover)
         
-        this.encounterMap.cvs.objClickEnabled = false
-        this.encounterMap.startTargeting('Move', [targetingCvsObject, targetingCvsCircle])
+        this.cvs.onClickWorldXY = (x, y) => this.attempt(x, y, ellipse, mover)
+        this.cvs.onMouseMoveWorldXY = (x, y) => this.target(x, y, ellipse, mover)
+        
+        // Allow clicking on ships for ramming
+        this.encounterMap.onSelectObject = (selectedObj) => {
+            if (selectedObj instanceof Ship && validRamTargets.includes(selectedObj)) {
+                this.attemptRam(mover, selectedObj)
+            }
+        }
+        this.encounterMap.onHoverObject = (hoveredObj) => {
+            if (hoveredObj instanceof Ship && validRamTargets.includes(hoveredObj)) {
+                this.targetRam(hoveredObj)
+            } else {
+                // Reset to move targeting visual when not hovering ram target
+                const targetingCvsCircle = this.cvs.getObject('targetingcircle')
+                Object.assign(targetingCvsCircle, {visible: true, x: ellipse.x, y: ellipse.y, radius: mover.radius})
+                this.encounterMap.refreshCanvas()
+            }
+        }
+        
+        this.encounterMap.startTargeting('Move (click enemy to ram)', [targetingCvsObject, targetingCvsCircle], validRamTargets)
     }
 
-    target(x = 0, y = 0, ellipse = new Ellipse()) {
+    target(x = 0, y = 0, ellipse = new Ellipse(), mover = new Ship()) {
         console.log('MoveActionHandler.target', { x, y });
         
         // If outside ellipse, clamp to the edge
@@ -46,8 +65,41 @@ class MoveActionHandler extends ActionHandler {
         }
         
         const targetingCvsCircle = this.cvs.getObject('targetingcircle')
-        Object.assign(targetingCvsCircle, {visible: true, x: targetX, y: targetY})
+        Object.assign(targetingCvsCircle, {visible: true, x: targetX, y: targetY, radius: mover.radius})
         this.encounterMap.refreshCanvas()
+    }
+    
+    targetRam(target = new Ship()) {
+        console.log('MoveActionHandler.targetRam', { target });
+        const targetingCvsCircle = this.cvs.getObject('targetingcircle')
+        Object.assign(targetingCvsCircle, {visible: true, x: target.x, y: target.y, radius: target.radius})
+        this.encounterMap.refreshCanvas()
+    }
+    
+    attemptRam(attacker = new Ship(), target = new Ship()) {
+        console.log('MoveActionHandler.attemptRam', { attacker, target });
+        const action = new RamAction(this.encounter, attacker, target)
+        this.executeRam(action)
+    }
+    
+    executeRam(action = new RamAction()) {
+        console.log('MoveActionHandler.executeRam', { action });
+        const path = action.path
+        const attacker = action.actor
+        
+        const popupId = `ram_${Date.now()}_${Math.random()}`
+        const animLine = this.cvs.addLine(popupId, action.path.startX, action.path.startY, action.path.toX, action.path.toY, attacker.color, 2)
+        const ramDuration = 500
+
+        const animation = new Loop(ramDuration, (progressRatio)=>{
+            const [newX, newY] = path.positionAtProgress(progressRatio)
+            Object.assign(attacker, {x: newX, y: newY, angle: path.angle})
+        }, ()=>{
+            this.cvs.deleteObject(animLine)
+            this.completeAction(action)
+        })
+        
+        this.startAnimating(action, animation)
     }
 
     attempt(x = 0, y = 0, ellipse = new Ellipse(), mover = new Ship()) {

@@ -20,11 +20,17 @@ class BoosterAction extends ShipAction {
         this.actor.statusEffects.setAmount(STATUS_EFFECTS.CLOAKED, 0)
         const ship = this.actor
         
-        // Create plasma trail from start to near end (90% of the way to avoid burning self)
-        const trailEndProgress = 1 //hehe, hurt the player a bit when he uses it
+        // Create plasma trail from start to end (uses full boost distance with quality)
+        // Trail should match the actual distance traveled
+        const quality = this.actor.getModuleQuality(SHIP_MODULE_TYPES.BOOSTER)
+        const boostMultiplier = 4 * quality
+        const boostDistance = this.actor.maxMoveDistance * boostMultiplier
+        
+        // Trail extends to the full boost endpoint
+        const trailEndProgress = 1.0
         const trailEndX = this.startX + (this.toX - this.startX) * trailEndProgress
         const trailEndY = this.startY + (this.toY - this.startY) * trailEndProgress
-        console.log('BoosterAction.execute creating plasma trail to', trailEndX, trailEndY, 'from:', this.startX, this.startY,'progress:', trailEndProgress)
+        console.log('BoosterAction.execute creating plasma trail to', trailEndX, trailEndY, 'from:', this.startX, this.startY, 'distance:', boostDistance, 'quality:', quality)
         const plasmaTrail = new PlasmaTrailEffect(this.startX, this.startY, trailEndX, trailEndY)
         const pseudoActions = this.encounter.addEffect(plasmaTrail)
         

@@ -9,8 +9,10 @@ class BoosterActionHandler extends ActionHandler {
 
         this.encounterMap.targetingAreas = []
         
-        // Calculate where the ship will boost to
-        const boostDistance = attacker.maxMoveDistance * 4
+        // Calculate where the ship will boost to (with quality multiplier)
+        const quality = attacker.getModuleQuality(SHIP_MODULE_TYPES.BOOSTER)
+        const boostMultiplier = 4 * quality
+        const boostDistance = attacker.maxMoveDistance * boostMultiplier
         const [dx, dy] = rotatePoint(boostDistance, 0, 0, 0, attacker.angle)
         const toX = attacker.x + dx
         const toY = attacker.y + dy
@@ -43,9 +45,9 @@ class BoosterActionHandler extends ActionHandler {
         const path = action.path
         const attacker = action.actor
         
-        // Trail effect
+        // Trail effect - extends to the full boost endpoint
         const popupId = `boosttrail_${Date.now()}_${Math.random()}`
-        const trailLine = this.cvs.addLine(popupId, action.path.startX, action.path.startY, action.path.toX, action.path.toY, COLORS.Orange, 4)
+        const trailLine = this.cvs.addLine(popupId, action.path.startX, action.path.startY, action.path.toX, action.path.toY, COLORS.Orange, 6)
         
         const animation = new Loop(boostDuration, (progressRatio) => {
             const [newX, newY] = path.positionAtProgress(progressRatio)

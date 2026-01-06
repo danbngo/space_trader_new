@@ -54,6 +54,10 @@ class EncounterAI {
         else if (aiType == AI_TYPES.Asteroid) {
             strategy = COMBAT_STRATEGIES.Asteroid
         }
+        else {
+            // Default to Attack strategy if aiType is not set (e.g., player ships)
+            strategy = COMBAT_STRATEGIES.Attack
+        }
 
         console.log('combat balances:', { fleetCombatBalance, shipState, strategy });
         return strategy
@@ -234,6 +238,22 @@ class EncounterAI {
                         return new WarheadAction(encounter, ship, null, closest.x, closest.y)
                     }
                 }
+                else if (moduleType === SHIP_MODULE_TYPES.DRILL) {
+                    // Drill: ram-like attack with heavy hull damage
+                    const drillTargets = encounter.calcRamTargets(ship)
+                    if (drillTargets.length > 0) {
+                        return new DrillAction(encounter, ship, drillTargets[0])
+                    }
+                }
+                else if (moduleType === SHIP_MODULE_TYPES.PLASMA_SPRAY) {
+                    // Plasma Spray: triangular area attack that overheats targets
+                    const quality = ship.getModuleQuality(SHIP_MODULE_TYPES.PLASMA_SPRAY)
+                    const plasmaTargets = encounter.calcPlasmaSprayTargets(ship, quality)
+                    if (plasmaTargets.length > 0) {
+                        // PlasmaSprayAction doesn't need a target parameter, it hits all in area
+                        return new PlasmaSprayAction(encounter, ship)
+                    }
+                }
                 else if (moduleType === SHIP_MODULE_TYPES.EMP_PULSE) {
                     // EMP Pulse: affects all ships in pulse radius
                     const pulseArea = ship.calcPulseArea()
@@ -276,7 +296,19 @@ class EncounterAI {
                 }
             }
             if (strategy == COMBAT_STRATEGIES.Escape || strategy == COMBAT_STRATEGIES.Asteroid) {
-                if (moduleType === SHIP_MODULE_TYPES.SMOKE_BOMB) {
+                if (moduleType === SHIP_MODULE_TYPES.NANITE_BEAM) {
+                    // Nanite Beam: heal allied ships in beam range
+                    const allBeamTargets = encounter.calcBeamTargets(ship)
+                    const alliedTargets = allBeamTargets.filter(t => 
+                        t.fleet === ship.fleet && !t.disabled && t.hull[0] < t.hull[1]
+                    )
+                    if (alliedTargets.length > 0) {
+                        // Prioritize healing the most damaged ally
+                        alliedTargets.sort((a, b) => (a.hull[0] / a.hull[1]) - (b.hull[0] / b.hull[1]))
+                        return new NaniteBeamAction(encounter, ship, alliedTargets[0])
+                    }
+                }
+                else if (moduleType === SHIP_MODULE_TYPES.SMOKE_BOMB) {
                 // Smoke Bomb: place near nearest target or self
                     if (nearestTarget) {
                         const pulseArea = ship.calcPulseArea()

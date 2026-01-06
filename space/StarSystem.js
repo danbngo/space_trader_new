@@ -96,8 +96,12 @@ class StarSystem extends SpaceObject {
             
             // Check if target's route has changed (including both becoming null or non-null)
             if (targetFleet.route !== interceptionRoute.targetRouteAtCreation) {
+                if (targetFleet.route && interceptionRoute.targetRouteAtCreation) {
+                    if (targetFleet.route.destination !== interceptionRoute.targetRouteAtCreation.destination) {
+                        continue
+                    }
+                }
                 console.log(`🎯 ${fleet.name}'s target ${targetFleet.name} changed route - recalculating interception`)
-                
                 // Create new InterceptionRoute to continue the chase
                 fleet.route = new InterceptionRoute(fleet, targetFleet, year)
             }

@@ -2,9 +2,10 @@
  * Generates environmental effects for an encounter map.
  * @param {EncounterType} encounterType - The type of encounter.
  * @param {EffectType[]} effectTypes - Array of effect types to generate from.
+ * @param {Ship[]} ships - Array of ships to avoid overlapping (optional).
  * @returns {Effect[]} Array of generated effects.
  */
-function generateEffects(encounterType, effectTypes = EFFECT_TYPES_ALL) {
+function generateEffects(encounterType, effectTypes = EFFECT_TYPES_ALL, ships = []) {
     const mapRadius = encounterType.mapRadius
     const effects = []
     //now that effectTypes is an array and not a list, we want to generate only a few per effect
@@ -17,6 +18,14 @@ function generateEffects(encounterType, effectTypes = EFFECT_TYPES_ALL) {
         }
         return false
     }
+    
+    function isTooCloseToShips(effect, ships, minDistance = 5) {
+        for (const ship of ships) {
+            const dist = calcDistance(effect.x, effect.y, ship.x, ship.y)
+            if (dist < effect.radius + ship.radius + minDistance) return true
+        }
+        return false
+    }
 
     for (let i = 0; i < numToGenerate; i++) {
         const effectType = rndMember(effectTypes)
@@ -24,13 +33,33 @@ function generateEffects(encounterType, effectTypes = EFFECT_TYPES_ALL) {
         let effect;
 
         if (effectType.shape === SHAPES.FilledOval) {
-            let [x,y] = rotatePoint(dist, 0, 0, 0, rng(Math.PI*2, -Math.PI*2, false))
-            const dist2 = mapRadius * (0.5 + rng(0.5, 0, false)) //bias away from center
-            let [toX,toY] = rotatePoint(dist2, 0, 0, 0, rng(Math.PI*2, -Math.PI*2, false))
-            //beams are cooler when they go REALLY far
-            //if effect would overlap with existing, skip it
-            effect = generateEffect(effectType, x, y, toX, toY)
-            if (isTooCloseToExistingEffect(effect)) continue
+            // Try multiple times to find a position that doesn't overlap ships
+            const maxAttempts = 5
+            let attempts = 0
+            let validPosition = false
+            
+            while (attempts < maxAttempts && !validPosition) {
+                let [x,y] = rotatePoint(dist, 0, 0, 0, rng(Math.PI*2, -Math.PI*2, false))
+                const dist2 = mapRadius * (0.5 + rng(0.5, 0, false)) //bias away from center
+                let [toX,toY] = rotatePoint(dist2, 0, 0, 0, rng(Math.PI*2, -Math.PI*2, false))
+                
+                effect = generateEffect(effectType, x, y, toX, toY)
+                
+                // Check if too close to existing effects or ships
+                if (!isTooCloseToExistingEffect(effect) && !isTooCloseToShips(effect, ships)) {
+                    validPosition = true
+                } else {
+                    attempts++
+                }
+            }
+            
+            // If we couldn't find a valid position after max attempts, place it anyway
+            if (!validPosition) {
+                let [x,y] = rotatePoint(dist, 0, 0, 0, rng(Math.PI*2, -Math.PI*2, false))
+                const dist2 = mapRadius * (0.5 + rng(0.5, 0, false))
+                let [toX,toY] = rotatePoint(dist2, 0, 0, 0, rng(Math.PI*2, -Math.PI*2, false))
+                effect = generateEffect(effectType, x, y, toX, toY)
+            }
         }
         else if (effectType.shape == SHAPES.FilledRectangle) {
             //make beams very long - extend 4x map radius in both directions from center point

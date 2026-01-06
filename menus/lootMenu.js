@@ -48,7 +48,7 @@ function showLootMenu(loot = new CountsMap()) {
                 `
             },
             'Take', 'Cancel', (amt = 0)=>takeCargo(ct, amt), ()=>reloadMenu(),
-            [['Take All', ()=>takeCargo(ct, takeableAmount)]]
+            [['Take All', ()=>takeCargo(ct, takeableAmount), takeableAmount == 0]]
         )
     }
 
@@ -80,7 +80,9 @@ function showLootMenu(loot = new CountsMap()) {
 
     function takeAllLoot() {
         let availableSpace = fleet.availableCargoSpace
-        for (const ct of CARGO_TYPES_ALL) {
+        // Sort cargo types by value (highest first) to prioritize valuable cargo
+        const sortedCargoTypes = [...CARGO_TYPES_ALL].sort((a, b) => b.value - a.value)
+        for (const ct of sortedCargoTypes) {
             const lootAmount = loot.getAmount(ct)
             if (lootAmount > 0 && availableSpace > 0) {
                 const amountToTake = Math.min(lootAmount, availableSpace)
