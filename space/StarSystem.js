@@ -41,6 +41,8 @@ class StarSystem extends SpaceObject {
         this.fleets = fleets
         /** @type {Fleet[]} - Destroyed fleets that can be salvaged or resurrected */
         this.abandonedFleets = []
+        /** @type {number} - Frame counter for orbital decay timing */
+        this.updatePositionsFrameCount = 0
         /** @type {AsteroidBelt[]} */
         this.asteroidBelts = asteroidBelts
         /** @type {Asteroid[]} */
@@ -203,6 +205,45 @@ class StarSystem extends SpaceObject {
                 if (anomaly.discoveredYear === null && anomaly.detectable(gs.fleet)) {
                     anomaly.discoveredYear = year
                     console.log(`🔍 Discovered anomaly: ${anomaly.name} at ${Math.round(year * 10) / 10}`)
+                }
+            }
+        }
+
+        // Update abandoned fleet positions based on their orbits
+        this.updatePositionsFrameCount++
+        const shouldDecayOrbits = this.updatePositionsFrameCount % 600 === 0
+        
+        // Get primary star (assumes first star is the sun)
+        const star = this.stars[0]
+        if (!star) return // No star, can't process orbits
+        
+        // Convert star radius from solar radii to AU (1 solar radius ≈ 0.00465047 AU)
+        const sunRadiusAU = star.radius * 0.00465047
+        
+        for (let i = this.abandonedFleets.length - 1; i >= 0; i--) {
+            const fleet = this.abandonedFleets[i]
+            
+            // Ensure fleet has an orbit
+            if (!fleet.orbit) {
+                // Generate orbit from current position
+                fleet.orbit = star.getOrbitAtXY(fleet.x - star.x, fleet.y - star.y)
+                console.log(`🌀 Generated orbit for abandoned fleet ${fleet.name} at radius ${fleet.orbit.radius.toFixed(4)} AU`)
+            }
+            
+            // Update position based on orbital mechanics
+            const [offsetX, offsetY] = fleet.orbit.calcRelativePosition(year)
+            fleet.x = star.x + offsetX
+            fleet.y = star.y + offsetY
+            
+            // Apply orbital decay every 600 frames
+            if (shouldDecayOrbits) {
+                // Decay rate: 0.001 AU per iteration (tune this for desired spiral speed)
+                fleet.orbit.radius -= 0.001
+                
+                // Check if fleet has fallen into the sun
+                if (fleet.orbit.radius < sunRadiusAU) {
+                    console.log(`☀️ Abandoned fleet ${fleet.name} has fallen into the sun (radius ${fleet.orbit.radius.toFixed(6)} AU < sun radius ${sunRadiusAU.toFixed(6)} AU)`)
+                    this.removeAbandonedFleet(fleet)
                 }
             }
         }

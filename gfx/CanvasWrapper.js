@@ -51,6 +51,7 @@ class CanvasWrapper {
         
         this.maxFrameRate = MAX_FRAMES_PER_SECOND; //do not refresh more than 30 times per second
         this.lastRedrawAt = 0;
+        this.fillColor = null
         
         this.autoResize()
     }
@@ -122,6 +123,12 @@ class CanvasWrapper {
     
     addFilledRectangle(id = "", x = 0, y = 0, width = 0, height = 0, minScreenSize = 0, fillColor = COLORS.LightGray, angle = 0, onClick = null) {
         const obj = new CanvasObject({ id, shape: SHAPES.FilledRectangle, x, y, size: width, minorSize: height, minScreenSize, angle, fillColor, onClick });
+        return this.addObject(obj)
+    }
+    
+    addClearCircle(id = "", x = 0, y = 0, radius = 100) {
+        const obj = new CanvasObject({ id, shape: SHAPES.ClearCircle, x, y, size: radius});
+        obj.zIndex = -1000
         return this.addObject(obj)
     }
     
@@ -430,11 +437,17 @@ class CanvasWrapper {
         
         const {ctx, canvas, pixels, zoom, pixelRatio} = this
         const {width, height} = canvas
-        //ctx.clearRect(0, 0, width, height);
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         
+        ctx.clearRect(0, 0, width/pixelRatio, height/pixelRatio);
+        // Always clear canvas first
+        if (this.fillColor) {
+            ctx.fillStyle = this.fillColor;
+            ctx.fillRect(0, 0, width/pixelRatio, height/pixelRatio);
+        }
 
+        // Draw pixels (asteroids, etc)
         if (this.pixels.length > 0) {
             const pixelImgData = ctx.createImageData(width, height);
             const pixelData = pixelImgData.data;
@@ -468,9 +481,6 @@ class CanvasWrapper {
                 }
             }
             ctx.putImageData(pixelImgData, 0, 0);
-        }
-        else {
-            ctx.clearRect(0, 0, width/pixelRatio, height/pixelRatio);
         }
         
         const drawOrder = this.drawOrder

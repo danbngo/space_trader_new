@@ -54,6 +54,8 @@ class Fleet extends SpaceObject {
         this.abandonedYear = null; // Year when fleet was destroyed
         /** @type {string|null} */
         this.originalName = null; // Original name before being abandoned
+        /** @type {Orbit|null} */
+        this.orbit = null; // Orbital path for abandoned fleets (spiraling into sun)
         
         // Temporary properties used during deserialization (SaveManager)
         /** @type {string} */

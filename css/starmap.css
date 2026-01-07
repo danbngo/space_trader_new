@@ -5,9 +5,17 @@
 .starmap-root {
     width: 100%;
     height: 100%;
-    display: flex;
-    flex-direction: column;
+    position: relative;
     overflow: hidden;
+}
+
+/* Canvas layers - positioned absolutely to overlap */
+.starmap-root > .canvas-root {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }
 
 /* === INFO BAR AT TOP === */

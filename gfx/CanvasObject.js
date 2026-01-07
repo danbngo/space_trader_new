@@ -25,6 +25,9 @@ class CanvasObject {
     * @param {number | null} [params.durationMs]
     * @param {number} [params.zIndex] - Draw order priority (higher values draw on top)
     * @param {Array<[number, number]>} [params.vertices] - Array of [x, y] coordinates for polygon shape
+    * @property {number} centerOpacity - For radial gradient
+    * @property {number} centerOpacity - For radial gradient
+    * @property {number} edgeOpacity - For radial gradient
     */
     constructor({
         id = '',
@@ -93,6 +96,10 @@ class CanvasObject {
         this.endMs = durationMs ? this.startMs + durationMs : null;
         this.initialScreenOffsetY = screenOffsetY;
         this.expired = false
+
+        this.centerRadius = 0
+        this.centerOpacity = 0
+        this.edgeOpacity = 0
     }
 
     setDurationMs(durationMs = 1000) {
@@ -216,12 +223,6 @@ class CanvasObject {
             
             case SHAPES.FilledTriangle:
             if (this.angle) ctx.rotate(this.angle);
-            /*if (this.gradient) {
-            const gradient = ctx.createLinearGradient(0, 0, 0, size)
-            gradient.addColorStop(1, '#000000');
-            gradient.addColorStop(0, ctx.fillStyle); 
-            ctx.fillStyle = gradient;
-            }*/
             ctx.beginPath();
             // tip (pointing right)
             ctx.moveTo(minorSize / 2, 0);
@@ -279,6 +280,56 @@ class CanvasObject {
                 ctx.closePath();
                 if (this.fillColor) ctx.fill();
                 if (this.strokeColor) ctx.stroke();
+            }
+            break;
+            
+            case SHAPES.RadialGradient:
+            const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, size);
+            const centerOpacity = this.centerOpacity !== undefined ? this.centerOpacity : 0;
+            const edgeOpacity = this.edgeOpacity !== undefined ? this.edgeOpacity : 1;
+            const [r, g, b] = this.fillColor || COLORS.Black;
+            gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${centerOpacity})`);
+            gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, ${edgeOpacity})`);
+            ctx.fillStyle = gradient;
+            ctx.fillRect(-size, -size, size * 2, size * 2);
+            break;
+            
+            case SHAPES.ClearCircle:
+            // Draw magenta rectangle covering entire viewport
+            // Note: ctx is already translated to (sx, sy), so we need to draw relative to that
+            
+            // Clear a roughly circular area using ~30 rectangular passes
+            // Using clearRect to reveal background stars underneath
+            const clearRadius = size; // Radius in screen pixels (already converted from world coords)
+            const numPasses = 30;
+
+            for (let i = 0; i < numPasses; i++) {
+                const angle = (i / numPasses) * Math.PI * 2;
+                const nextAngle = ((i + 1) / numPasses) * Math.PI * 2;
+                
+                // Calculate multiple rectangles arranged in a circle
+                // Each rectangle clears a segment, creating rough circular shape
+                const x1 = Math.cos(angle) * clearRadius;
+                const y1 = Math.sin(angle) * clearRadius;
+                const x2 = Math.cos(nextAngle) * clearRadius;
+                const y2 = Math.sin(nextAngle) * clearRadius;
+                
+                // Calculate rectangle dimensions to approximate circle segment
+                const rectWidth = Math.abs(x2 - x1) + clearRadius * 0.3;
+                const rectHeight = Math.abs(y2 - y1) + clearRadius * 0.3;
+                const rectX = (x1 + x2) / 2 - rectWidth / 2;
+                const rectY = (y1 + y2) / 2 - rectHeight / 2;
+                
+                ctx.clearRect(rectX, rectY, rectWidth, rectHeight);
+            }
+            
+            // Clear center circle to ensure it's fully transparent
+            const centerSize = clearRadius * 0.7;
+            for (let pass = 0; pass < 8; pass++) {
+                const angle = (pass / 8) * Math.PI * 2;
+                const offsetX = Math.cos(angle) * centerSize * 0.3;
+                const offsetY = Math.sin(angle) * centerSize * 0.3;
+                ctx.clearRect(offsetX - centerSize, offsetY - centerSize, centerSize * 2, centerSize * 2);
             }
             break;
         }

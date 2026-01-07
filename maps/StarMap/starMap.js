@@ -25,6 +25,7 @@ class StarMap extends BaseMap {
         this.currentFPS = 0
 
         this.initializeDOM(this.starSystem.radius*4, this.starSystem.radius*0.4, this.starSystem.radius*40, this.starSystem.radius*1)
+        this.renderBackgroundStars()
         
         // Create debug panel
         this.debugPanel = ce({parent: this.root, style:{position:'absolute', bottom: 0, right: 0}})
@@ -45,6 +46,9 @@ class StarMap extends BaseMap {
         this.selectObject(autoSelectObject || gs.fleet)
         if (StarMap.lastZoom) this.adjustZoom(StarMap.lastZoom/this.cvs.zoom)
         
+        // Add spotlight overlay to darken stars outside view range
+        this.createSpotlight()
+        
         // Start continuous waypoint animation loop (runs even when paused)
         this.fleetsHandler.animateWaypoint()
         
@@ -53,6 +57,116 @@ class StarMap extends BaseMap {
         
         // Set starMap reference for all fleet AIs
         this.fleetsHandler.updateFleetAIReferences()
+    }
+    
+    createSpotlight() {
+        if (!gs.fleet || !gs.fleet.mapViewDistance) {
+            console.warn('⚠️ Cannot create spotlight: no fleet or mapViewDistance');
+            return;
+        }
+        
+        const spotlightId = 'spotlight'
+        const x = gs.fleet.x
+        const y = gs.fleet.y
+        const radius = gs.fleet.mapViewDistance
+        
+        console.log('🔦 Creating spotlight with fleet data:');
+        console.log('  - Fleet position:', { x, y });
+        console.log('  - Fleet totalRadar:', gs.fleet.totalRadar);
+        console.log('  - Fleet mapViewDistance:', radius, 'AU');
+        console.log('  - STAR_MAP_AVERAGE_VIEW_DISTANCE:', STAR_MAP_AVERAGE_VIEW_DISTANCE);
+        console.log('  - AVERAGE_SHIP_RADARS:', AVERAGE_SHIP_RADARS);
+        console.log('  - Calculation: 0.5 +', STAR_MAP_AVERAGE_VIEW_DISTANCE, '*', gs.fleet.totalRadar, '/', AVERAGE_SHIP_RADARS, '=', radius);
+        
+        this.spotlight = this.overlayCvs.addClearCircle(spotlightId, x, y, radius)
+        
+        console.log('🔦 Spotlight created:', this.spotlight);
+    }
+    
+    updateSpotlight() {
+        if (!this.spotlight || !gs.fleet || !gs.fleet.mapViewDistance) return
+        
+        console.log('updating spotlight')
+        // Update spotlight position to follow player
+        this.spotlight.x = gs.fleet.x
+        this.spotlight.y = gs.fleet.y
+        this.spotlight.size = gs.fleet.mapViewDistance
+        this.overlayCvs.cameraX = this.cvs.cameraX
+        this.overlayCvs.cameraY = this.cvs.cameraY
+        this.overlayCvs.zoom = this.cvs.zoom
+    }
+
+    /**
+     * Initialize DOM with background canvas layer under main canvas
+     */
+    initializeDOM(baseZoom, minZoom, maxZoom, cameraPanLimit) {
+        // Create background canvas for parallax stars (static, never moves)
+        this.bgCvs = new CanvasWrapper(baseZoom, minZoom, maxZoom, cameraPanLimit)
+        this.bgCvs.canvas.style.pointerEvents = 'none' // Don't capture mouse events
+        
+        // Create main canvas
+        this.cvs = new CanvasWrapper(baseZoom, minZoom, maxZoom, cameraPanLimit)
+        
+        // Create overlay canvas for spotlight (on top of everything)
+        this.overlayCvs = new CanvasWrapper(baseZoom, minZoom, maxZoom, cameraPanLimit)
+        this.overlayCvs.fillColor = 'rgba(255, 0, 255, 0.5)' // Semi-transparent magenta
+        this.overlayCvs.root.style.pointerEvents = 'none' // Don't capture mouse events on container
+        this.overlayCvs.canvas.style.pointerEvents = 'none' // Don't capture mouse events on canvas
+        
+        // Build DOM structure with three layers: bg -> main -> overlay
+        this.root = ce({classNames: ['starmap-root'], children: [
+            this.bgCvs.root,      // Background layer (rendered first/below)
+            this.cvs.root,        // Main layer (game objects)
+            this.overlayCvs.root  // Overlay layer (spotlight on top)
+        ]})
+        this.controls = ce({parent: this.root, style: {position: 'absolute', top: 0, left: 0}})
+        this.infoBar = ce({parent: this.root, style:{position:'absolute', bottom: 0, left: 0}})
+        this.objectPane = ce({parent: this.root, style: {position: 'absolute', top: 0, right: 0, height: '100%', pointerEvents: 'none'}})
+        
+        window.addEventListener("resize", () => {
+            this.cvs.autoResize()
+            this.bgCvs.autoResize()
+            this.overlayCvs.autoResize()
+            // Re-render background stars when canvas size changes
+            this.renderBackgroundStars()
+        })
+        
+        // Deferred initialization
+        requestAnimationFrame(()=> requestAnimationFrame(()=>{
+            this.cvs.autoResize()
+            this.bgCvs.autoResize()
+            this.overlayCvs.autoResize()
+            this.onDeferredInit()
+        }))
+    }
+    
+    /**
+     * Render background stars to background canvas (called once on init and on resize)
+     */
+    renderBackgroundStars() {
+        const {backgroundStars} = this.starSystem
+        const {width, height} = this.bgCvs.canvas
+        //const pixelRatio = this.bgCvs.pixelRatio
+        
+        // Clear existing pixels
+        this.bgCvs.pixels = []
+        
+        // Calculate offset for parallax positioning
+        const sizeOffset = Math.max(width, height) / SOLAR_SYSTEM_RADIUS_IN_AU * 4
+        
+        backgroundStars.forEach((bgStar) => {
+            // Background stars use parallax (static screen positions)
+            let sx = bgStar.x * sizeOffset
+            let sy = bgStar.y * sizeOffset
+            
+            // Add pixel with screen offset (parallax = true means it won't move with camera)
+            this.bgCvs.addPixel(0, 0, bgStar.color, bgStar.radius, sx, sy, true)
+        })
+        
+        // Redraw background canvas once
+        this.bgCvs.redraw(true)
+        
+        console.log(`Rendered ${backgroundStars.length} background stars to static canvas`)
     }
 
     static lastZoom = 1
@@ -90,11 +204,6 @@ class StarMap extends BaseMap {
             this.lastZoom = zoom
         }
         
-        // Update background stars immediately when camera changes, or every 30th frame when only player moves
-        if (cameraChanged || (playerInMotion && this.frameCounter % 30 === 0)) {
-            if (STARMAP_DEBUG_CONFIG.displayBackgroundStars) this.bodiesHandler.handleBackgroundStars()
-        }
-        
         // Update asteroids every 600th frame when player is in motion
         if (playerInMotion && this.frameCounter % 600 === 0) {
             if (STARMAP_DEBUG_CONFIG.displayAsteroids) this.bodiesHandler.handleAsteroids()
@@ -105,7 +214,15 @@ class StarMap extends BaseMap {
             this.updateETADisplays()
         }
         
+        // Update spotlight position every frame to follow player
+        this.updateSpotlight()
+        
+        // Redraw main canvas (background canvas is static and doesn't need redraw)
         this.cvs.redraw(true)
+        
+        // Redraw overlay canvas with spotlight
+
+        this.overlayCvs.redraw(true)
         
         // Continue animation loop
         requestAnimationFrame(() => this.animate())

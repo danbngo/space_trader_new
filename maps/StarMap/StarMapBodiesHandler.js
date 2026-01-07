@@ -14,7 +14,7 @@ class StarMapBodiesHandler {
     handleAll() {
         const perfStart = STARMAP_DEBUG_CONFIG.logPerformance ? performance.now() : 0;
         
-        if (STARMAP_DEBUG_CONFIG.displayBackgroundStars) this.handleBackgroundStars();
+        // Background stars are handled by separate bgCvs canvas in starMap.js
         if (STARMAP_DEBUG_CONFIG.displayAsteroids) this.handleAsteroids();
         if (STARMAP_DEBUG_CONFIG.displayOrbits) this.handleOrbits();
         // Vision circle removed - too jarring
@@ -31,45 +31,12 @@ class StarMapBodiesHandler {
         }
     }
 
-    handleBackgroundStars() {
-        const {starSystem, cvs} = this.starMap
-        const {backgroundStars} = starSystem
-        
-        const sizeOffset = Math.max(cvs.canvas.width, cvs.canvas.height)/SOLAR_SYSTEM_RADIUS_IN_AU * 4
-        backgroundStars.forEach((bgStar, index) => {
-            if (!cvs.pixels[index]) {
-                cvs.addPixel(0, 0, bgStar.color, bgStar.radius, bgStar.x * sizeOffset, bgStar.y * sizeOffset, true)
-            }
-            
-            /** @type {CanvasPixel} */
-            const pixel = cvs.pixels[index]
-            
-            // Check if background star is within player's vision circle on screen
-            if (gs.fleet && gs.fleet.mapViewDistance) {
-                // Get player's screen position
-                const fleetScreenPos = cvs.worldToScreen(gs.fleet.x, gs.fleet.y)
-                
-                // Calculate vision radius in screen pixels
-                const visionRadiusScreen = gs.fleet.mapViewDistance * cvs.zoom / cvs.pixelRatio
-                
-                const screenDistance = calcDistance(pixel.screenOffsetX, pixel.screenOffsetY, fleetScreenPos[0], fleetScreenPos[1])
-                
-                if (screenDistance > visionRadiusScreen) {
-                    pixel.color[3] = Math.round(bgStar.color[3]*255*0.5)// Dim the star when outside vision range
-                } else {
-                    pixel.color[3] = bgStar.color[3]*255 // Full brightness within vision range
-                }
-            }
-        })
-    }
-
     handleAsteroids() {
         const {starSystem, cvs} = this.starMap
-        const {backgroundStars, asteroids} = starSystem
-        const numBackgroundStars = backgroundStars.length
+        const { asteroids} = starSystem
         
         asteroids.forEach((asteroid, index) => {
-            const pixelIndex = numBackgroundStars + index
+            const pixelIndex = index
             if (!cvs.pixels[pixelIndex]) {
                 cvs.addPixel(asteroid.x, asteroid.y, asteroid.color, asteroid.radius)
             }

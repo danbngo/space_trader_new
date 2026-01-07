@@ -142,12 +142,14 @@
             <label>Hover Position:</label>
             <span id="hover-coords" style="color: #ff0; font-weight: bold;">—</span>
         </div>
-        <button id="shift-left-btn">◀ Shift Image Left</button>
-        <button id="shift-right-btn">Shift Image Right ▶</button>
-        <button id="undo-btn" disabled>Undo Last Point</button>
-        <button id="mirror-btn" disabled>Mirror Left → Right</button>
-        <button id="clear-btn" disabled>Clear All</button>
-        <button id="finish-btn" disabled>Finish & Output</button>
+        <button id="shift-left-btn">< shift</button>
+        <button id="shift-right-btn">shift ></button>
+        <button id="rotate-btn">rotate</button>
+        <button id="undo-btn" disabled>undo</button>
+        <button id="mirror-btn" disabled>mirror L->R</button>
+        <button id="clear-btn" disabled>clear</button>
+        <button id="close-btn" disabled>close</button>
+        <button id="finish-btn" disabled>finish</button>
     </div>
     
     <div id="output" style="display: none;"></div>
@@ -161,10 +163,12 @@
         const clearBtn = document.getElementById('clear-btn');
         const finishBtn = document.getElementById('finish-btn');
         const mirrorBtn = document.getElementById('mirror-btn');
+        const closeBtn = document.getElementById('close-btn');
         const snapInput = document.getElementById('snap-input');
         const hoverCoordsDisplay = document.getElementById('hover-coords');
         const shiftLeftBtn = document.getElementById('shift-left-btn');
         const shiftRightBtn = document.getElementById('shift-right-btn');
+        const rotateBtn = document.getElementById('rotate-btn');
         
         let vertices = [];
         let image = null;
@@ -304,6 +308,7 @@
             undoBtn.disabled = !hasVertices;
             clearBtn.disabled = !hasVertices;
             mirrorBtn.disabled = !hasVertices;
+            closeBtn.disabled = vertices.length < 2;
             finishBtn.disabled = vertices.length < 3;
         }
         
@@ -360,6 +365,50 @@
             drawCanvas();
         });
         
+        // Rotate image 90 degrees clockwise
+        rotateBtn.addEventListener('click', () => {
+            if (!image) return;
+            
+            // Create temporary canvas for rotation
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            
+            // Swap dimensions for 90 degree rotation
+            tempCanvas.width = imageHeight;
+            tempCanvas.height = imageWidth;
+            
+            // Rotate around center
+            tempCtx.translate(imageHeight / 2, imageWidth / 2);
+            tempCtx.rotate(Math.PI / 2);
+            tempCtx.drawImage(image, -imageWidth / 2, -imageHeight / 2);
+            
+            // Create new image from rotated canvas
+            const newImg = new Image();
+            newImg.onload = () => {
+                image = newImg;
+                imageWidth = newImg.width;
+                imageHeight = newImg.height;
+                canvas.width = imageWidth;
+                canvas.height = imageHeight;
+                imageOffsetX = 0; // Reset offset
+                
+                // Rotate vertices to match (x,y) -> (-y,x) for 90° clockwise
+                const centerX = imageWidth / 2;
+                const centerY = imageHeight / 2;
+                vertices = vertices.map(v => {
+                    const relX = v.x - (imageHeight / 2); // Old center
+                    const relY = v.y - (imageWidth / 2);
+                    return {
+                        x: centerX + relY,
+                        y: centerY - relX
+                    };
+                });
+                
+                drawCanvas();
+            };
+            newImg.src = tempCanvas.toDataURL();
+        });
+        
         // Undo button
         undoBtn.addEventListener('click', () => {
             if (vertices.length > 0) {
@@ -398,6 +447,21 @@
             outputDiv.style.display = 'none';
         });
         
+        // Close button - connects last vertex to first vertex
+        closeBtn.addEventListener('click', () => {
+            if (vertices.length < 2) {
+                alert('Need at least 2 vertices to close the shape!');
+                return;
+            }
+            
+            // Add the first vertex again to close the loop
+            const firstVertex = vertices[0];
+            vertices.push({ x: firstVertex.x, y: firstVertex.y });
+            
+            drawCanvas();
+            outputDiv.style.display = 'none';
+        });
+        
         // Clear button
         clearBtn.addEventListener('click', () => {
             if (confirm('Clear all vertices?')) {
@@ -424,6 +488,23 @@
                 y: v.y - centerY
             }));
             
+            // Find bounding box to normalize to -1,1 range
+            const maxAbsX = Math.max(...normalizedVertices.map(v => Math.abs(v.x)));
+            const maxAbsY = Math.max(...normalizedVertices.map(v => Math.abs(v.y)));
+            const maxAbsValue = Math.max(maxAbsX, maxAbsY);
+            
+            // Scale to fit within -1,1 range
+            const scaledVertices = normalizedVertices.map(v => ({
+                x: v.x / maxAbsValue,
+                y: v.y / maxAbsValue
+            }));
+            
+            // Rotate 270 degrees clockwise: (x, y) -> (-y, x)
+            const rotatedVertices = scaledVertices.map(v => ({
+                x: -v.y,
+                y: v.x
+            }));
+            
             // Output raw pixel coordinates
             console.log('=== RAW PIXEL COORDINATES ===');
             console.log('Image dimensions:', imageWidth, 'x', imageHeight);
@@ -434,14 +515,23 @@
             console.log('\n=== NORMALIZED COORDINATES (center = 0,0) ===');
             console.log('Vertices:', JSON.stringify(normalizedVertices, null, 2));
             
-            // Output as array format
-            console.log('\n=== ARRAY FORMAT ===');
-            const arrayFormat = normalizedVertices.map(v => `[${v.x}, ${v.y}]`).join(',\n    ');
+            // Output scaled coordinates (-1,1 range)
+            console.log('\n=== SCALED COORDINATES (fit within -1,-1,1,1) ===');
+            console.log('Scale factor:', maxAbsValue);
+            console.log('Vertices:', JSON.stringify(scaledVertices, null, 2));
+            
+            // Output rotated coordinates (270 degrees clockwise)
+            console.log('\n=== ROTATED COORDINATES (270° clockwise) ===');
+            console.log('Vertices:', JSON.stringify(rotatedVertices, null, 2));
+            
+            // Output as array format (using rotated vertices)
+            console.log('\n=== ARRAY FORMAT (rotated 90° clockwise, scaled to -1,1) ===');
+            const arrayFormat = rotatedVertices.map(v => `[${v.x.toFixed(3)}, ${v.y.toFixed(3)}]`).join(',\n    ');
             console.log('[\n    ' + arrayFormat + '\n]');
             
             // Display in UI
             outputDiv.style.display = 'block';
-            outputDiv.textContent = `Vertices created! Check the console for output.\n\nVertex count: ${vertices.length}\nImage size: ${imageWidth}x${imageHeight}\n\nCopy the console output and give it to me to convert to your ship format.`;
+            outputDiv.textContent = `Vertices created! Check the console for output.\n\nVertex count: ${vertices.length}\nImage size: ${imageWidth}x${imageHeight}\nScale factor: ${maxAbsValue.toFixed(2)}\n\nCopy the console output and give it to me to convert to your ship format.`;
             
             alert('Output sent to console! Press F12 to view.');
         });

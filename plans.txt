@@ -12,6 +12,7 @@ DONE:
 
 TODO:
 
+-abandoned fleets need to have an orbit .. think about it :(
 
 -add an escort fleet system to the game - will be very useful later for quests
 -cyber modules, geneticist and perks all need to be tested
