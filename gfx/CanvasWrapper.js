@@ -434,40 +434,44 @@ class CanvasWrapper {
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         
-        const pixelImgData = ctx.createImageData(width, height);
-        const pixelData = pixelImgData.data;
-        
-        function putPixelAt(sx, sy, r, g, b, a) {
-            const i = (sy * width + sx) * 4;
-            pixelData[i] = r
-            pixelData[i + 1] = g
-            pixelData[i + 2] = b
-            pixelData[i + 3] = a
-        }
-        
-        for (const pixel of pixels) {
-            if (!pixel.visible) continue;
-            let sx = 0//pixel.offsetY;
-            let sy = 0//pixel.offsetY;
-            if (!pixel.parallax) [sx, sy] = this.worldToScreen(pixel.x, pixel.y);
-            sx += pixel.screenOffsetX;
-            sy += pixel.screenOffsetY;
-            sx = Math.round(sx*pixelRatio)
-            sy = Math.round(sy*pixelRatio)
-            if (sx < 0 || sx >= width || sy < 0 || sy >= height) continue;
-            const size = pixel.size;
-            const intSize = Math.ceil(size)
-            for (let offsetX = -intSize; offsetX <= intSize; offsetX++) {
-                for (let offsetY = -intSize; offsetY <= intSize; offsetY++) {
-                    if (sx + offsetX < 0 || sx + offsetX >= width || sy + offsetY < 0 || sy + offsetY >= height) continue;
-                    if (calcDistance(0, 0, offsetX, offsetY) > size) continue;
-                    putPixelAt(sx + offsetX, sy + offsetY, pixel.color[0], pixel.color[1], pixel.color[2], pixel.color[3])
+
+        if (this.pixels.length > 0) {
+            const pixelImgData = ctx.createImageData(width, height);
+            const pixelData = pixelImgData.data;
+            
+            function putPixelAt(sx, sy, r, g, b, a) {
+                const i = (sy * width + sx) * 4;
+                pixelData[i] = r
+                pixelData[i + 1] = g
+                pixelData[i + 2] = b
+                pixelData[i + 3] = a
+            }
+            
+            for (const pixel of pixels) {
+                if (!pixel.visible) continue;
+                let sx = 0//pixel.offsetY;
+                let sy = 0//pixel.offsetY;
+                if (!pixel.parallax) [sx, sy] = this.worldToScreen(pixel.x, pixel.y);
+                sx += pixel.screenOffsetX;
+                sy += pixel.screenOffsetY;
+                sx = Math.round(sx*pixelRatio)
+                sy = Math.round(sy*pixelRatio)
+                if (sx < 0 || sx >= width || sy < 0 || sy >= height) continue;
+                const size = pixel.size;
+                const intSize = Math.ceil(size)
+                for (let offsetX = -intSize; offsetX <= intSize; offsetX++) {
+                    for (let offsetY = -intSize; offsetY <= intSize; offsetY++) {
+                        if (sx + offsetX < 0 || sx + offsetX >= width || sy + offsetY < 0 || sy + offsetY >= height) continue;
+                        if (calcDistance(0, 0, offsetX, offsetY) > size) continue;
+                        putPixelAt(sx + offsetX, sy + offsetY, pixel.color[0], pixel.color[1], pixel.color[2], pixel.color[3])
+                    }
                 }
             }
-            //putPixelAt(sx, sy, pixel.r, pixel.g, pixel.b, pixel.a)
+            ctx.putImageData(pixelImgData, 0, 0);
         }
-        
-        ctx.putImageData(pixelImgData, 0, 0);
+        else {
+            ctx.clearRect(0, 0, width/pixelRatio, height/pixelRatio);
+        }
         
         const drawOrder = this.drawOrder
         for (const obj of drawOrder) {

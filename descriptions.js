@@ -1,5 +1,5 @@
 
-function describeTimespan(years = 0) {
+function describeTimespan(years = 0, roundToPlaces = 2) {
     if (years <= 0) return "0 hours";
     
     // Convert
@@ -9,7 +9,7 @@ function describeTimespan(years = 0) {
     const hours = days * 24;
     
     const format = (value, unit) =>
-        `${parseFloat(value.toFixed(2))} ${unit}${value === 1 ? "" : "s"}`;
+        `${parseFloat(value.toFixed(unit == 'day' ? 0 : roundToPlaces))} ${unit}${value === 1 ? "" : "s"}`;
     
     // Choose only the LARGEST meaningful unit
     if (years >= 1) return format(years, "year");

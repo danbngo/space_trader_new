@@ -37,7 +37,6 @@ class StarMapBodiesHandler {
         
         const sizeOffset = Math.max(cvs.canvas.width, cvs.canvas.height)/SOLAR_SYSTEM_RADIUS_IN_AU * 4
         backgroundStars.forEach((bgStar, index) => {
-            bgStar.twinkle(gs.year)
             if (!cvs.pixels[index]) {
                 cvs.addPixel(0, 0, bgStar.color, bgStar.radius, bgStar.x * sizeOffset, bgStar.y * sizeOffset, true)
             }
@@ -56,9 +55,9 @@ class StarMapBodiesHandler {
                 const screenDistance = calcDistance(pixel.screenOffsetX, pixel.screenOffsetY, fleetScreenPos[0], fleetScreenPos[1])
                 
                 if (screenDistance > visionRadiusScreen) {
-                    pixel.color[3] = bgStar.color[3]*0.25// Dim the star when outside vision range
+                    pixel.color[3] = Math.round(bgStar.color[3]*255*0.5)// Dim the star when outside vision range
                 } else {
-                    pixel.color[3] = bgStar.color[3]*1 // Full brightness within vision range
+                    pixel.color[3] = bgStar.color[3]*255 // Full brightness within vision range
                 }
             }
         })

@@ -1,33 +1,3 @@
-/*
-StarMap
-ticket speed: 1 hour per real life second
-default zoom distances: 1200px = half the size of the solar system
-*/
-
-/**
- * Debug configuration for StarMap rendering performance
- * Set any value to false to skip that element's computation and rendering entirely
- */
-const STARMAP_DEBUG_CONFIG = {
-    //displayBackgroundStars: true,    // Background parallax stars (5000+ pixels updated every frame)
-    //displayAsteroids: true,           // Floating asteroids
-    //displayOrbits: true,              // Orbital path circles
-    //displayStars: true,               // Sun/stars
-    //displayPlanets: true,             // Planets and dwarf planets (with shadows)
-    //displayPlanetLabels: true,        // Planet name labels
-    //displaySpaceStations: true,       // Space stations
-    //displayAnomalies: true,           // Anomalies
-    //displayRuins: true,               // Ancient ruins
-    //displayFleets: true,              // All fleets (player + NPC)
-    //displayFleetLabels: true,         // Fleet name labels
-    //displayFleetPaths: true,          // Fleet route lines
-    //displayFleetThrusters: true,      // Fleet thruster effects
-    //displayAbandonedFleets: true,     // Abandoned/destroyed fleets
-    //displayWaypoint: true,            // Player waypoint marker
-    
-    // Performance monitoring
-    logPerformance: false,            // Log render times to console
-};
 
 /**
  * @param {StarSystem} starSystem
@@ -59,8 +29,6 @@ class StarMap extends BaseMap {
         // Create debug panel
         this.debugPanel = ce({parent: this.root, style:{position:'absolute', bottom: 0, right: 0}})
 
-        for (const bgStar of starSystem.backgroundStars) bgStar.reset()
-
         // Initialize handlers
         this.bodiesHandler = new StarMapBodiesHandler(this)
         this.fleetsHandler = new StarMapFleetsHandler(this)
@@ -81,7 +49,7 @@ class StarMap extends BaseMap {
         this.fleetsHandler.animateWaypoint()
         
         // Start continuous background star update loop (runs even when paused)
-        this.animateBackgroundStars()
+        this.animate()
         
         // Set starMap reference for all fleet AIs
         this.fleetsHandler.updateFleetAIReferences()
@@ -89,7 +57,7 @@ class StarMap extends BaseMap {
 
     static lastZoom = 1
 
-    animateBackgroundStars() {
+    animate() {
         this.frameCounter++
         
         // Track FPS
@@ -132,10 +100,15 @@ class StarMap extends BaseMap {
             if (STARMAP_DEBUG_CONFIG.displayAsteroids) this.bodiesHandler.handleAsteroids()
         }
         
+        // Update ETA displays every 60 frames
+        if (this.frameCounter % 30 === 0) {
+            this.updateETADisplays()
+        }
+        
         this.cvs.redraw(true)
         
         // Continue animation loop
-        requestAnimationFrame(() => this.animateBackgroundStars())
+        requestAnimationFrame(() => this.animate())
     }
 
     adjustZoom(modifier = 1.0) {
@@ -191,12 +164,15 @@ class StarMap extends BaseMap {
     }
 
     refreshInfoBar() {
+        console.log('1')
         const {fleet, year} = gs
         const {location, route} = fleet
         const destination = route?.destination
-        const distance = roundToPlaces(route?.path.distance, 2)
+        const distance = roundToPlaces(route?.path.distance, 1)
         const endYear = route?.endYear
-        const yearsRemaining = describeTimespan(endYear-year)
+        const yearsRemaining = describeTimespan(endYear-year, 1)
+
+        console.log(yearsRemaining,endYear,year)
 
         /** @param {SpaceObject|Waypoint} destination */
         const destinationLink = (destination)=> {
@@ -216,13 +192,22 @@ class StarMap extends BaseMap {
                     children: [
                         `→`,
                         destinationLink(destination),
-                        ` | Distance: ${distance} AU | ETA: ${yearsRemaining}`
+                        ` | Distance: `,
+                        this.infoBarDistanceEl = ce({id: 'star_map_distance_info_bar', innerHTML: `${distance} AU`}),
+                        ` | ETA: `,
+                        this.infoBarETAEl = ce({id: 'star_map_eta_info_bar', innerHTML: yearsRemaining})
                     ]
                 })
                 : location ? destinationLink(location)
                 : '(Space)',
             ]
         })
+        
+        // Clear references if no destination
+        if (!destination) {
+            this.infoBarDistanceEl = null
+            this.infoBarETAEl = null
+        }
     }
     
     refreshDebugPanel() {
@@ -234,6 +219,44 @@ class StarMap extends BaseMap {
                 `FPS: ${this.currentFPS}`
             ]
         })
+    }
+    
+    updateETADisplays() {
+        const {fleet, year} = gs
+        const {route} = fleet
+        
+        // Update info bar distance and ETA using stored references
+        if (route && this.infoBarDistanceEl && this.infoBarETAEl) {
+            const distance = roundToPlaces(route.path.distance, 1)
+            const endYear = route.endYear
+            const yearsRemaining = describeTimespan(endYear - year, 1)
+            
+            this.infoBarDistanceEl.textContent = `${distance} AU`
+            this.infoBarETAEl.textContent = yearsRemaining
+        }
+        
+        // Update object pane distance and ETA using stored references
+        const obj = this.selectedObject
+        if (obj && obj !== gs.fleet && this.objPaneDistanceEl && this.objPaneETAEl) {
+            if (obj.x !== undefined && obj.y !== undefined) {
+                const distance = calcDistance(gs.fleet.x, gs.fleet.y, obj.x, obj.y)
+                const travelTime = distance / gs.fleet.speed
+                const etaYears = travelTime
+                
+                // Update distance
+                this.objPaneDistanceEl.textContent = `${roundToPlaces(distance, 1)} AU`
+                
+                // Update ETA
+                if (obj instanceof Planet || obj.isWaypoint) {
+                    const timespan = describeTimespan(travelTime, 1)
+                    if (obj instanceof Planet) {
+                        this.objPaneETAEl.innerHTML = statColorSpan(timespan, 1/(1+etaYears*12))
+                    } else {
+                        this.objPaneETAEl.textContent = timespan
+                    }
+                }
+            }
+        }
     }
     
     handleCanvasObjects() {
@@ -324,7 +347,7 @@ class StarMap extends BaseMap {
             
             // Add Travel button for non-player fleets
             if (obj !== gs.fleet) {
-                const distance = roundToPlaces(calcDistance(gs.fleet.x, gs.fleet.y, obj.x, obj.y), 2)
+                const distance = roundToPlaces(calcDistance(gs.fleet.x, gs.fleet.y, obj.x, obj.y), 1)
                 ce({parent:container, innerHTML:`Distance: ${distance} AU`})
                 
                 // Create test route to check if interception is possible
@@ -333,7 +356,7 @@ class StarMap extends BaseMap {
                 if (testRoute.valid) {
                     const travelTime = testRoute.travelTime
                     const etaYears = travelTime
-                    ce({parent:container, innerHTML:`ETA: ${statColorSpan(describeTimespan(travelTime), 1/(1+etaYears*12))}`})
+                    ce({parent:container, innerHTML:`ETA: ${statColorSpan(describeTimespan(travelTime, 1), 1/(1+etaYears*12))}`})
                     // Abandoned (destroyed) fleets use "Travel" instead of "Intercept"
                     const buttonText = obj.destroyed ? 'Travel' : 'Intercept'
                     ce({parent:container, tag:'button', innerHTML:buttonText, onClick:()=>this.setDestination(obj, true), disabled: gs.fleet.stranded})
@@ -352,11 +375,17 @@ class StarMap extends BaseMap {
             }
         }
         if (obj instanceof Planet) {
-            const distance = roundToPlaces(calcDistance(gs.fleet.x, gs.fleet.y, obj.x, obj.y), 2)
+            const distance = roundToPlaces(calcDistance(gs.fleet.x, gs.fleet.y, obj.x, obj.y), 1)
             const travelTime = distance / gs.fleet.speed
             const etaYears = travelTime
-            ce({parent:container, innerHTML:`Distance: ${distance} AU`})
-            ce({parent:container, innerHTML:`ETA: ${statColorSpan(describeTimespan(travelTime), 1/(1+etaYears*12))}`})
+            ce({parent:container, children: [
+                'Distance: ',
+                this.objPaneDistanceEl = ce({id: 'star_map_distance_object_pane', innerHTML: `${distance} AU`})
+            ]})
+            ce({parent:container, children: [
+                'ETA: ',
+                this.objPaneETAEl = ce({id: 'star_map_eta_object_pane', innerHTML: statColorSpan(describeTimespan(travelTime, 1), 1/(1+etaYears*12))})
+            ]})
             // Only show scan/dock button if planet is discovered
             if (isDiscovered) {
                 ce({parent:container, tag:'button', innerHTML:isDockedHere ? 'Dock' : 'Scan', onClick:()=>this.explore(obj)})
@@ -369,10 +398,16 @@ class StarMap extends BaseMap {
         }
         // Handle waypoint (arbitrary coordinates)
         if (obj.isWaypoint) {
-            const distance = roundToPlaces(calcDistance(gs.fleet.x, gs.fleet.y, obj.x, obj.y), 2)
+            const distance = roundToPlaces(calcDistance(gs.fleet.x, gs.fleet.y, obj.x, obj.y), 1)
             const travelTime = distance / gs.fleet.speed
-            ce({parent:container, innerHTML:`Distance: ${distance} AU`})
-            ce({parent:container, innerHTML:`ETA: ${describeTimespan(travelTime)}`})
+            ce({parent:container, children: [
+                'Distance: ',
+                this.objPaneDistanceEl = ce({id: 'star_map_distance_object_pane', innerHTML: `${distance} AU`})
+            ]})
+            ce({parent:container, children: [
+                'ETA: ',
+                this.objPaneETAEl = ce({id: 'star_map_eta_object_pane', innerHTML: describeTimespan(travelTime, 1)})
+            ]})
             ce({parent:container, tag:'button', innerHTML:'Travel', onClick:()=>this.setDestination(obj, true), disabled: gs.fleet.stranded})
             if (gs.fleet.route) ce({parent:container, tag:'button', innerHTML:'Stop', onClick:()=>this.stopPlayerFleet()})
         }
@@ -424,7 +459,7 @@ class StarMap extends BaseMap {
             // Check if interception will take a long time - if so, require confirmation
             if (obj instanceof Fleet && !obj.destroyed && route.travelTime > WARN_INTERCEPT_DURATION_YEARS && !bypassInterceptWarning) {
                 const targetName = obj.name || 'fleet'
-                const eta = describeTimespan(route.travelTime)
+                const eta = describeTimespan(route.travelTime, 1)
                 showModal(
                     '⚠️ Long Interception Route',
                     ce({
@@ -520,7 +555,6 @@ class StarMap extends BaseMap {
             this.tickCounter = 0
         }
 
-        this.refreshInfoBar()
         this.handleCanvasObjects()
         // Note: Canvas redraw is handled by animateBackgroundStars() which runs continuously
 

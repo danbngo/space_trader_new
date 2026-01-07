@@ -17,11 +17,9 @@ function generateBackgroundStars(radius = 1, numStars = 1) {
         const g = Math.min(255, baseBrightness + rng(colorVariance, -colorVariance))
         const b = Math.min(255, baseBrightness + rng(colorVariance, -colorVariance))
         const color = [r, g, b, 1]
-        //minutes
-        const twinkleDurationYear = 1/365/24 * rng(5*1000,5,false)
         const size = 1// Math.min(rng(1.0, 1.0, false), rng(0.9, 1.0, false))
         //const color = `rgba(${r},${g},${b})`
-        const bgStar = new BackgroundStar(x, y, color, size, twinkleDurationYear)
+        const bgStar = new BackgroundStar(x, y, color, size)
         backgroundStars.push(bgStar)
     }
     return backgroundStars

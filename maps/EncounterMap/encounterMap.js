@@ -220,15 +220,6 @@ class EncounterMap extends BaseMap {
         this.renderer.refreshCanvas(forceRedraw)
     }
 
-    refreshBackground(year = 0) {
-        const {starSystem, cvs} = this
-        const {backgroundStars} = starSystem
-        backgroundStars.forEach( (bgStar, index) => {
-            bgStar.twinkle(year)
-            cvs.pixels[index].a = bgStar.color[3];
-        });
-    }
-
     refreshObjectPane() {
         //const playerShips = gs.fleet.ships
         const {selectedObject, encounter} = this
@@ -471,7 +462,6 @@ class EncounterMap extends BaseMap {
         const currentTime = Date.now()
         this.lastTickMs = currentTime
 
-        this.refreshBackground(currentTime/200000) //hack to make stars twinkle at a reasonable speed
         this.refreshCanvas()
 
         // Only continue animation loop if not paused

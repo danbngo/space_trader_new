@@ -26,7 +26,6 @@ class BackgroundMapRenderer {
         
         // Draw background stars with parallax - only add if not already present
         bgStars.forEach((bgStar, index) => {
-            bgStar.twinkle(Date.now() / 500000)
             // Only add pixel if it doesn't already exist
             if (cvs.pixels[index] == undefined) {
                 // Initialize with random position within screen bounds
@@ -153,7 +152,6 @@ class BackgroundMapRenderer {
                 // Reset to random position within screen bounds
                 pixel.screenOffsetX = Math.random() * screenWidth
                 pixel.screenOffsetY = Math.random() * screenHeight
-                bgStar.reset() // Reset twinkle
             }
         })
         

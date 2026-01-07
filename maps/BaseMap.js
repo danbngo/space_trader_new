@@ -105,19 +105,6 @@ class BaseMap {
     }
     
     /**
-     * Update background stars (twinkling effect)
-     * @param {number} year 
-     */
-    refreshBackground(year = 0) {
-        const {starSystem, cvs} = this
-        const {backgroundStars} = starSystem
-        backgroundStars.forEach((bgStar, index) => {
-            bgStar.twinkle(year)
-            cvs.pixels[index].a = bgStar.color[3]
-        })
-    }
-    
-    /**
      * Override in subclass to update object details pane
      */
     refreshObjectPane() {

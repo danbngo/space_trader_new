@@ -12,10 +12,7 @@ class BackgroundMap extends BaseMap {
         this.innerRadius = 0.1
 
         // Generate background stars for parallax effect
-        this.bgStars = generateBackgroundStars(this.outerRadius * 2, 5000)
-        for (const bgStar of this.bgStars) {
-            bgStar.reset()
-        }
+        this.bgStars = []//generateBackgroundStars(this.outerRadius * 2, 5000)
 
         // Generate 3D asteroids instead of flat stars
         this.asteroids = []

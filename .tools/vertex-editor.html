@@ -187,10 +187,20 @@
         }
         
         // Snap a coordinate to the grid
+        // Grid is centered so (0,0) - the image center - always falls on a grid intersection
         function snapToGrid(value) {
             const snapSize = parseInt(snapInput.value) || 0;
             if (snapSize === 0) return value;
-            return Math.round(value / snapSize) * snapSize;
+            
+            // Calculate center point (this is coordinate (0,0) in normalized space)
+            const center = (value < imageWidth ? imageWidth : imageHeight) / 2;
+            
+            // Calculate offset from center
+            const offset = value - center;
+            
+            // Snap the offset, then add back to center
+            const snappedOffset = Math.round(offset / snapSize) * snapSize;
+            return center + snappedOffset;
         }
         
         // Load image
