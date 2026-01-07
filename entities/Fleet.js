@@ -46,6 +46,10 @@ class Fleet extends SpaceObject {
         this.angle = 0
         /** @type {number} */
         this.cloakLevel = 0; // 0 = visible, 1.0 = fully cloaked
+        /** @type {number} */
+        this.currentFuel = 0; // Current fuel amount for the fleet
+        /** @type {Fleet|null} */
+        this.escortTarget = null; // Fleet that this fleet is escorting/following
         /** @type {Fleet|Asteroid|Anomaly|string|null} */
         this.destroyedBy = null; // Track what destroyed this fleet
         /** @type {boolean} */
@@ -153,6 +157,10 @@ class Fleet extends SpaceObject {
 
     get totalHull() {
         return this.ships.reduce((total, ship) => total + ship.hull[0], 0);
+    }
+
+    get totalFuelCapacity() {
+        return this.ships.reduce((total, ship) => total + ship.fuelCapacity, 0);
     }
 
     get totalSkills() {

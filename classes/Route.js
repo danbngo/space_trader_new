@@ -5,8 +5,9 @@ class Route {
      * @param {Fleet} fleet
      * @param {SpaceObject|Waypoint} destination
      * @param {number} startYear
+     * @param {boolean} [isInterception=false] - Whether this is an interception route (gets speed boost and reduced margin)
      */
-    constructor(fleet = new Fleet(), destination = new Planet(), startYear = gs.year) {
+    constructor(fleet = new Fleet(), destination = new Planet(), startYear = gs.year, isInterception = false) {
         //run simu
         /** @type {string} */
         this.uuid = generateUUID('route_')
@@ -25,10 +26,12 @@ class Route {
         }
 
         const naiveDistance = calcDistance(fleet.x, fleet.y, destination.x, destination.y)
-        const naiveTravelTime = naiveDistance/fleet.speed
-        //add one extra day
-        const travelMargin = 1/365 //small buffer to routes, dont want fleets zipping around too jerkily
-        const route = Route.estimateTravelTimeToOrbitingBody(startYear, fleet, destination, 100, naiveTravelTime*10+travelMargin)
+        // Apply 1.1x speed bonus for interceptions
+        const effectiveSpeed = isInterception ? fleet.speed * 1.1 : fleet.speed
+        const naiveTravelTime = naiveDistance/effectiveSpeed
+        // Interceptions get half the travel margin for tighter pursuit
+        const travelMargin = isInterception ? 1/730 : 1/365
+        const route = Route.estimateTravelTimeToOrbitingBody(startYear, fleet, destination, 100, naiveTravelTime*10+travelMargin, effectiveSpeed)
         if (route) {
             const {toX, toY, endYear} = route
             this.endYear = endYear + travelMargin//add a small buffer to arrival time
@@ -54,6 +57,7 @@ class Route {
      * @param {SpaceObject|Waypoint} planet 
      * @param {number} [samples] 
      * @param {number} [maxYears] 
+     * @param {number} [effectiveSpeed] - Override fleet speed (used for interception speed bonus)
      * @returns {{bestYearOffset: number, endPosition: [number, number], toX: number, toY: number, endYear: number, debug: Array}}  
      */
     static estimateTravelTimeToOrbitingBody(
@@ -61,10 +65,11 @@ class Route {
         fleet = new Fleet(),
         planet = new Planet(),
         samples = 100,
-        maxYears = 10
+        maxYears = 10,
+        effectiveSpeed = undefined
     ) {
         const results = [];
-        const speed = fleet.speed
+        const speed = effectiveSpeed !== undefined ? effectiveSpeed : fleet.speed
         let bestYearOffset = Infinity;
         /** @type {[number, number] | undefined} */
         let endPosition;

@@ -54,6 +54,9 @@ class FleetAI {
      * Updates AI behavior each game tick.
      */
     tick(elapsedYears = 1) {
+        // Skip AI if this fleet is escorting another fleet
+        if (this.fleet.escortTarget) return
+        
         this.voyageYearsRemaining -= elapsedYears;
         if (this.isNearOrigin(elapsedYears)) {
             this.onNearOrigin()

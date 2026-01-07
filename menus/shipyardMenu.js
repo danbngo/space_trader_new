@@ -9,7 +9,7 @@ function createBuyShipMenu(ships = [new Ship()], shipyard = new Shipyard(), onSe
     if (ships.length == 0) return `(None)`
     /** @type {any[]} */
     const rows = [
-        ['Ship Name', 'Quality', 'Hull', 'Shields', 'Lasers', 'Engine', 'Cargo Space', 'Buy Price']
+        ['Ship Name', 'Quality', 'Hull', 'Shields', 'Fuel', 'Lasers', 'Engine', 'Cargo Space', 'Buy Price']
     ]
     for (const ship of ships) {
         const buyPrice = shipyard.calcBuyPrice(ship)
@@ -18,6 +18,7 @@ function createBuyShipMenu(ships = [new Ship()], shipyard = new Shipyard(), onSe
             statColorSpan(roundToPlaces(ship.quality * 100, 1) + '%', ship.quality),
             statColorSpan(ship.hull[1], ship.hull[1]/10),
             statColorSpan(ship.shields[1], ship.shields[1]/10),
+            statColorSpan(ship.fuelCapacity, ship.fuelCapacity/10),
             statColorSpan(ship.lasers, ship.lasers/10),
             statColorSpan(ship.engine, ship.engine/10),
             statColorSpan(ship.cargoSpace, ship.cargoSpace/10),
@@ -229,9 +230,16 @@ function showShipyardBuyMenu(shipyard = new Shipyard()) {
 
     function showBuyShipModal(ship = new Ship()) {
         const buyPrice = shipyard.calcBuyPrice(ship)
+        
+        // Create ship visual using Ship.asImage() with player's fleet color
+        const shipImage = ship.asImage(80, gs.fleet.color)
+        
         showModal(
             `Buy ${coloredName(ship)}?`,
-            `Buy the ${coloredName(ship)} for ${buyPrice} credits?`,
+            ce({children: [
+                shipImage,
+                `Buy the ${coloredName(ship)} for ${buyPrice} credits?`
+            ]}),
             [
                 ['Buy', () => buyShip(ship), !isDocked],
                 ['Cancel', () => rebuildMenu()],
@@ -241,10 +249,20 @@ function showShipyardBuyMenu(shipyard = new Shipyard()) {
     
     function onSelectShipyardShip(ship = new Ship()) {
         const buyPrice = shipyard.calcBuyPrice(ship)
-        const canBuy = gs.credits >= buyPrice && fleet.ships.length < fleet.numPilots
+        const canAfford = gs.credits >= buyPrice
+        const hasRoomForShip = fleet.ships.length < fleet.numPilots
+        const canBuy = canAfford && hasRoomForShip
+        
         /** @type {ButtonData[]} */
         const buttons = []
-        if (canBuy) buttons.push([`Buy`, ()=>showBuyShipModal(ship)])
+        
+        // Always show Buy button, but disable with reason if can't buy
+        let disabledReason = ''
+        if (!canAfford) disabledReason = `Not enough credits (need ${buyPrice}, have ${gs.credits})`
+        else if (!hasRoomForShip) disabledReason = `No room for more ships (${fleet.ships.length}/${fleet.numPilots} pilots)`
+        
+        buttons.push([`Buy`, ()=>showBuyShipModal(ship), !canBuy, disabledReason])
+        
         buttons.push(
             ["Buy Modules", ()=>showShipyardBuyModulesMenu(shipyard)],
             ["Your Ships", ()=>showShipyardSellMenu(shipyard)],

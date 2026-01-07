@@ -57,6 +57,19 @@ const DWARF_PLANETS = [CERES, PLUTO, ERIS, HAUMEA, MAKEMAKE] //getting rid of fa
 
 SOL.addChildren([...PLANETS, ...DWARF_PLANETS])
 
+// Add craters to Mars
+const marsNumberOfCraters = 10 + Math.floor(Math.random() * 11) // 10-20 craters
+const marsCraters = []
+for (let i = 0; i < marsNumberOfCraters; i++) {
+    marsCraters.push({
+        x: (Math.random() - 0.5) * 1.6, // Random x position from -0.8 to 0.8 (ratio of planet radius)
+        y: (Math.random() - 0.5) * 1.6, // Random y position from -0.8 to 0.8
+        radius: 0.05 + Math.random() * 0.15 // Random radius from 0.05 to 0.20
+    })
+}
+MARS.decorators.push(new PlanetDecorator({ craters: marsCraters }))
+
+
 
 const CORONA = new AsteroidBelt("Corona", ASTEROID_BELT_TYPES.Plasma, hexToRgba('#ffaa0022'), 0.1, new Orbit(0.2), [ENCOUNTER_TYPES.PLASMOIDS_CALM], [ENCOUNTER_TYPES.PLASMOIDS_STORM], [EFFECT_TYPES.ION_CLOUD, EFFECT_TYPES.PLASMA_TRAIL])
 const ASTEROID_BELT = new AsteroidBelt("Asteroid Belt", ASTEROID_BELT_TYPES.Rocky, hexToRgba('#bb8844'), 0.2*2.8, new Orbit(2.8), [ENCOUNTER_TYPES.ASTEROIDS_CALM], [ENCOUNTER_TYPES.ASTEROIDS_STORM], [EFFECT_TYPES.DEBRIS_CLOUD])

@@ -1183,7 +1183,7 @@ const SaveManager = {
         if (!name) return null;
         return Object.values(SHIP_TYPES).find(t => t.name === name) ||
                Object.values(ASTEROID_SHIP_TYPES).find(t => t.name === name) ||
-               (name === 'Starting Ship' ? STARTING_SHIP_TYPE : null);
+               (name === 'Starting Ship' ? SHIP_TYPES.FRIGATE : null);
     },
 
     findShipModuleType(name) {

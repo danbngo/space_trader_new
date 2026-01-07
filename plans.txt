@@ -7,12 +7,11 @@ DONE:
  -do have them spawn their own fleets,
 -asteroids change shape when i miss them!!?? but less than the OG planets
 -make spinning or being rammed animated - use new shipactions and/or anim handlers (not just pseudo)
-
 -saving/loading (this is a big milestone, if you're ready for this means game is almost ready for release)
+-add the fuel concept to the game. will make it so he cant explore as hard. will also make it so we can implement a lunar landing minigame
+-abandoned fleets need to have an orbit .. think about it :(
 
 TODO:
-
--abandoned fleets need to have an orbit .. think about it :(
 
 -add an escort fleet system to the game - will be very useful later for quests
 -cyber modules, geneticist and perks all need to be tested

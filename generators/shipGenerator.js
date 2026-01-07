@@ -13,6 +13,7 @@ function generateShip(planet = new Planet(), shipType = rndMember(SHIP_TYPES_ALL
     let radars =     Math.ceil(AVERAGE_SHIP_RADARS*rng(2, 0.5, false)*shipType.radars*technology)
     let engine =  Math.ceil(AVERAGE_SHIP_ENGINE*rng(2, 0.5, false)*shipType.engine*technology)
     let cargoSpace = Math.ceil(AVERAGE_SHIP_CARGO_SPACE*rng(2, 0.5, false)*shipType.cargoSpace*technology)
+    let fuelCapacity = Math.ceil(AVERAGE_SHIP_FUEL_CAPACITY*rng(2, 0.5, false)*shipType.fuelCapacity*technology)
     const shields = [maxShields, maxShields]
     const hull = [maxHull, maxHull]
     const maxActionsPerTurn = shipType.maxActionsPerTurn || SHIP_NUM_MOVES_PER_TURN
@@ -23,8 +24,8 @@ function generateShip(planet = new Planet(), shipType = rndMember(SHIP_TYPES_ALL
     const isAsteroid = ASTEROID_SHIP_TYPES_ALL.includes(shipType);
     
     if (isAsteroid) {
-        return new AsteroidShip(name, shipType, COLORS.LightGray, hull, shields, lasers, engine, cargoSpace, radars, maxActionsPerTurn);
+        return new AsteroidShip(name, shipType, COLORS.LightGray, hull, shields, lasers, engine, cargoSpace, radars, fuelCapacity, maxActionsPerTurn);
     } else {
-        return new Ship(name, shipType, COLORS.LightGray, hull, shields, lasers, engine, cargoSpace, radars, maxActionsPerTurn);
+        return new Ship(name, shipType, COLORS.LightGray, hull, shields, lasers, engine, cargoSpace, radars, fuelCapacity, maxActionsPerTurn);
     }
 }

@@ -34,6 +34,11 @@ function showReligionsMenu(backFunction = () => closeModal()) {
         }
         religionFollowers.set(religion, followers)
     }
+    
+    // Calculate visited civilized planets population for percentage calculations
+    const visitedCivilizedPopulation = visitedPlanets
+        .filter(p => p.c && p.c.population)
+        .reduce((sum, p) => sum + p.c.population, 0)
 
     // Split religions into two columns
     const midpoint = Math.ceil(religions.length / 2)
@@ -48,12 +53,12 @@ function showReligionsMenu(backFunction = () => closeModal()) {
     
     // Populate left column
     for (const religion of leftReligions) {
-        leftColumn.appendChild(createReligionSection(religion, religionFollowers, totalPopulation))
+        leftColumn.appendChild(createReligionSection(religion, religionFollowers, visitedCivilizedPopulation))
     }
     
     // Populate right column
     for (const religion of rightReligions) {
-        rightColumn.appendChild(createReligionSection(religion, religionFollowers, totalPopulation))
+        rightColumn.appendChild(createReligionSection(religion, religionFollowers, visitedCivilizedPopulation))
     }
 
     const columnLayout = createColumnLayout([leftColumn, rightColumn])
@@ -115,16 +120,21 @@ function createReligionSection(religion, religionFollowers, totalSystemPopulatio
         religionSection.appendChild(noTraits)
     }
 
-    // Add state religion adoption info
-    const planetsWithStateReligion = gs.system.planets.filter(p => p.c && p.c.stateReligion === religion)
-    const stateReligionCount = planetsWithStateReligion.length
-    const totalPlanets = gs.system.planets.filter(p => p.c).length
+    // Add state religion adoption info (only count discovered planets)
+    const discoveredPlanets = gs.system.planets.filter(p => p.c && gs.lastVisitedDates.has(p))
+    const discoveredPlanetsWithStateReligion = discoveredPlanets.filter(p => p.c.stateReligion === religion)
+    const stateReligionCount = discoveredPlanetsWithStateReligion.length
     
-    if (totalPlanets > 0) {
-        const planetSymbols = planetsWithStateReligion.map(p => p.symbol).join(' ')
+    // Check if player has discovered all civilized planets
+    const allCivilizedPlanets = gs.system.planets.filter(p => p.c)
+    const allDiscovered = discoveredPlanets.length >= allCivilizedPlanets.length
+    
+    if (discoveredPlanets.length > 0) {
+        const planetSymbols = allDiscovered ? discoveredPlanetsWithStateReligion.map(p => p.symbol).join(' ') : ''
+        const totalText = allDiscovered ? `${allCivilizedPlanets.length}` : '?'
         const stateReligionEl = ce({
             style: 'margin-bottom: 8px;',
-            children: [`State Religion: ${stateReligionCount} of ${totalPlanets} planets ${planetSymbols ? '— ' + planetSymbols : ''}`]
+            children: [`State Religion: ${stateReligionCount} of ${totalText} planets ${planetSymbols ? '— ' + planetSymbols : ''}`]
         })
         religionSection.appendChild(stateReligionEl)
     }

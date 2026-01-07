@@ -125,7 +125,7 @@ class StarSystem extends SpaceObject {
             }
             
             // Check if target's route has changed (including both becoming null or non-null)
-            if (targetFleet.route !== interceptionRoute.targetRouteAtCreation) {
+            if (Math.random() > .95 && targetFleet.route !== interceptionRoute.targetRouteAtCreation) {
                 if (targetFleet.route && interceptionRoute.targetRouteAtCreation) {
                     if (targetFleet.route.destination !== interceptionRoute.targetRouteAtCreation.destination) {
                         continue
@@ -135,6 +135,42 @@ class StarSystem extends SpaceObject {
                 // Create new InterceptionRoute to continue the chase (only for active fleets)
                 fleet.route = new InterceptionRoute(fleet, targetFleet, year)
             }
+        }
+    }
+
+    deductFuel(fleet, distanceTraveled) {
+        if (!fleet || fleet.destroyed) return
+        const fuelCost = distanceTraveled * FUEL_COST_PER_1_AU
+        fleet.currentFuel = Math.max(0, fleet.currentFuel - fuelCost)
+    }
+
+    updateEscortPositions() {
+        // Update positions of all escorting fleets
+        const fleets = this.fleets
+        for (const fleet of fleets) {
+            // Skip if no escort target or if destroyed
+            if (!fleet.escortTarget || fleet.destroyed) continue
+            
+            // Check if escort target is no longer in the game (removed or abandoned)
+            if (!this.fleets.includes(fleet.escortTarget)) {
+                fleet.escortTarget = null
+                continue
+            }
+            
+            // Skip if escort target is destroyed
+            if (fleet.escortTarget.destroyed) {
+                fleet.escortTarget = null
+                continue
+            }
+            
+            // Calculate angle toward escort target
+            const dx = fleet.escortTarget.x - fleet.x
+            const dy = fleet.escortTarget.y - fleet.y
+            fleet.angle = Math.atan2(dy, dx)
+            
+            // Move toward escort target using weighted average (95% current position, 5% target position)
+            fleet.x = fleet.x * 0.95 + fleet.escortTarget.x * 0.05
+            fleet.y = fleet.y * 0.95 + fleet.escortTarget.y * 0.05
         }
     }
 
@@ -193,10 +229,18 @@ class StarSystem extends SpaceObject {
             }
             //otherwise, make progress along journey
             fleet.location = undefined
+            const oldX = fleet.x
+            const oldY = fleet.y
             const [fx,fy] = fleet.route.positionAtYear(year)
             fleet.x = fx
             fleet.y = fy
             fleet.angle = fleet.route.path ? fleet.route.path.angle : 0
+            
+            // Deduct fuel for player fleet only
+            if (fleet === gs.fleet) {
+                const distanceTraveled = calcDistance(oldX, oldY, fx, fy)
+                this.deductFuel(fleet, distanceTraveled)
+            }
         }
         
         // Check if player fleet has discovered any anomalies

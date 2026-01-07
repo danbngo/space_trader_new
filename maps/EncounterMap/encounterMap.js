@@ -146,20 +146,24 @@ class EncounterMap extends BaseMap {
             if (shipObj) return
             console.log('rebuilding ship:',shipId,shipObj,ship)
             
+            // Determine stroke color based on fleet's cloakLevel
+            const strokeColor = (ship.fleet && ship.fleet.cloakLevel > 0) ? null : COLORS.White
+            const asteroidStrokeColor = (ship.fleet && ship.fleet.cloakLevel > 0) ? null : COLORS.Gray
+            
             // Special handling for asteroids - use polygon shape
             if (ship instanceof AsteroidShip) {
                 // Generate asteroid shape if not already generated
                 if (!ship.asteroidVertices) {
                     ship.asteroidVertices = AsteroidShip.generateShape();
                 }
-                shipObj = cvs.addPolygon(shipId, ship.x, ship.y, ship.asteroidVertices, ship.radius, 12, ship.color, COLORS.Gray, ship.angle, ()=>this.selectObject(ship));
+                shipObj = cvs.addPolygon(shipId, ship.x, ship.y, ship.asteroidVertices, ship.radius, 12, ship.color, asteroidStrokeColor, ship.angle, ()=>this.selectObject(ship));
             }
             // Use custom polygon shape if ship type has a shape generator
             else if (ship.shipType.shapeGenerator) {
                 const polygonObj = ship.shipType.shapeGenerator();
                 // Extract vertices array from Polygon object
                 const vertices = polygonObj.vertices || polygonObj;
-                shipObj = cvs.addPolygon(shipId, ship.x, ship.y, vertices, ship.radius, 12, ship.color, COLORS.White, ship.angle, ()=>this.selectObject(ship));
+                shipObj = cvs.addPolygon(shipId, ship.x, ship.y, vertices, ship.radius, 12, ship.color, strokeColor, ship.angle, ()=>this.selectObject(ship));
             }
             // Fallback to legacy shapes
             else if (ship.shipType.shape == SHAPES.FilledTriangle) {

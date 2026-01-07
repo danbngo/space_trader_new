@@ -86,25 +86,29 @@ class EncounterMapRenderer {
             if (!cvsShipObject) {
                 console.log('dynamically adding new ship to canvas:', shipId, ship)
                 
+                // Determine stroke color based on fleet's cloakLevel
+                const strokeColor = (ship.fleet && ship.fleet.cloakLevel > 0) ? null : COLORS.White
+                const asteroidStrokeColor = (ship.fleet && ship.fleet.cloakLevel > 0) ? null : COLORS.Gray
+                
                 // Special handling for asteroids - use polygon shape
                 if (ship instanceof AsteroidShip) {
                     if (!ship.asteroidVertices) {
                         ship.asteroidVertices = AsteroidShip.generateShape()
                     }
-                    cvsShipObject = cvs.addPolygon(shipId, ship.x, ship.y, ship.asteroidVertices, ship.radius, 12, ship.color, COLORS.Gray, ship.angle, () => this.encounterMap.selectObject(ship))
+                    cvsShipObject = cvs.addPolygon(shipId, ship.x, ship.y, ship.asteroidVertices, ship.radius, 12, ship.color, asteroidStrokeColor, ship.angle, () => this.encounterMap.selectObject(ship))
                 }
                 // Use custom polygon shape if ship type has a shape generator
                 else if (ship.shipType.shapeGenerator) {
                     const shapePolygon = ship.shipType.shapeGenerator()
                     const vertices = shapePolygon.vertices
-                    cvsShipObject = cvs.addPolygon(shipId, ship.x, ship.y, vertices, ship.radius, 12, ship.color, COLORS.White, ship.angle, () => this.encounterMap.selectObject(ship))
+                    cvsShipObject = cvs.addPolygon(shipId, ship.x, ship.y, vertices, ship.radius, 12, ship.color, strokeColor, ship.angle, () => this.encounterMap.selectObject(ship))
                 }
                 // Fallback to legacy shapes
                 else if (ship.shipType.shape == SHAPES.FilledTriangle) {
                     cvsShipObject = cvs.addFilledTriangle(shipId, ship.x, ship.y, ship.radius, ship.radius, 12, ship.color, ship.angle, () => this.encounterMap.selectObject(ship))
                 }
                 else if (ship.shipType.shape == SHAPES.FilledOval) {
-                    cvsShipObject = cvs.addFilledOval(shipId, ship.x, ship.y, ship.radius, ship.radius * ship.widthModifier, 0.5, ship.color, ship.angle, () => this.encounterMap.selectObject(ship))
+                    cvsShipObject = cvs.addFilledOval(shipId, ship.x, ship.y, ship.radius, ship.radius * (ship instanceof AsteroidShip ? ship.widthModifier : 1), 0.5, ship.color, ship.angle, () => this.encounterMap.selectObject(ship))
                 }
                 else if (ship.shipType.shape == SHAPES.FilledCircle) {
                     cvsShipObject = cvs.addFilledCircle(shipId, ship.x, ship.y, ship.radius, 12, ship.color, () => this.encounterMap.selectObject(ship))

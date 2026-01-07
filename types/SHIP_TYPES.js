@@ -67,17 +67,14 @@ const SHIP_TYPES = {
     DESTROYER: new ShipType('Destroyer', 'Heavy weapons platform equipped with warheads, trading speed for devastating firepower.', null, 2, 1, 4, 1, 0.5, 3, [SHIP_MODULE_TYPES.WARHEAD], 2),
     JAMMER: new ShipType('Jammer', 'Electronic warfare vessel designed to disrupt enemy sensors and communications.', null, 2, 2, 1, 1, 0.1, 2, [SHIP_MODULE_TYPES.EMP_PULSE], 2),
     BATTLESHIP: new ShipType('Battleship', 'Massive capital ship with warhead launchers, heavy armor, and shields for fleet engagements.', null, 4, 4, 3, 1, 2, 1.5, [SHIP_MODULE_TYPES.WARHEAD], 1),
-    TUG_SHIP: new ShipType('Tug Ship', 'Heavy-duty vessel designed for towing and maneuvering larger ships or objects in space.', null, 2, 0.5, 0.5, 2, 1, 1, [SHIP_MODULE_TYPES.MAGNETIZE], 1),
     DRILLING_RIG: new ShipType('Drilling Rig', 'Industrial vessel with a heavy drill for asteroid mining and resource extraction.', null, 3, 0.1, 2, 1, 3, 0.5, [SHIP_MODULE_TYPES.DRILL], 2),
     ESCORT_SHIP: new ShipType('Escort Ship', 'Defensive support vessel with smoke bombs and strong shields to protect allied ships.', null, 1, 1.5, 1.5, 0.5, 0.25, 1.5, [SHIP_MODULE_TYPES.SMOKE_BOMB], 2),
     INTERCEPTOR: new ShipType('Interceptor', 'Fast pursuit craft with magnetic grapples for capturing or disabling enemy vessels.', null, 1.5, 1.5, 1.5, 2, 0.25, 2, [SHIP_MODULE_TYPES.MAGNETIZE], 2),
-    UTILITY_SHIP: new ShipType('Utility Ship', 'Support vessel equipped with nanite repair systems to fix damaged ships in the field.', null, 1, 2, 0.5, 1, 0.5, 2, [SHIP_MODULE_TYPES.NANITE_BEAM], 3),
+    UTILITY_SHIP: new ShipType('Utility Ship', 'Support vessel equipped with nanite repair systems to fix damaged ships in the field.', null, 1, 2, 0.5, 1, 0.5, 2, [SHIP_MODULE_TYPES.NANITE_BEAM, SHIP_MODULE_TYPES.MAGNETIZE], 1),
     OBSERVER: new ShipType('Observer', 'Scientific vessel equipped with advanced sensors for gathering data.', null, 0.5, 0.5, 0.5, 2, 0.5, 4, [SHIP_MODULE_TYPES.SCANNER], 2),
 }
 
 const SHIP_TYPES_ALL = Object.values(SHIP_TYPES)
-
-const STARTING_SHIP_TYPE = new ShipType('Starting Ship', 'A basic ship with balanced capabilities suitable for beginning your journey.', null, 1, 1, 1, 1, 1, 1, [], 1, 1)
 
 // Assign shape generators to ship types
 SHIP_TYPES.COURIER_SHIP.shapeGenerator = SHIP_SHAPES.COURIER_SHIP
@@ -92,13 +89,11 @@ SHIP_TYPES.FRIGATE.shapeGenerator = SHIP_SHAPES.FRIGATE
 SHIP_TYPES.DESTROYER.shapeGenerator = SHIP_SHAPES.DESTROYER
 SHIP_TYPES.JAMMER.shapeGenerator = SHIP_SHAPES.JAMMER
 SHIP_TYPES.BATTLESHIP.shapeGenerator = SHIP_SHAPES.BATTLESHIP
-SHIP_TYPES.TUG_SHIP.shapeGenerator = SHIP_SHAPES.TUG_SHIP
 SHIP_TYPES.DRILLING_RIG.shapeGenerator = SHIP_SHAPES.DRILLING_RIG
 SHIP_TYPES.ESCORT_SHIP.shapeGenerator = SHIP_SHAPES.ESCORT_SHIP
 SHIP_TYPES.INTERCEPTOR.shapeGenerator = SHIP_SHAPES.INTERCEPTOR
 SHIP_TYPES.UTILITY_SHIP.shapeGenerator = SHIP_SHAPES.UTILITY_SHIP
 SHIP_TYPES.OBSERVER.shapeGenerator = SHIP_SHAPES.OBSERVER
-STARTING_SHIP_TYPE.shapeGenerator = SHIP_SHAPES.STARTING_SHIP
 
 const ASTEROID_SHIP_TYPES = {
     ASTEROID: new ShipType('Asteroid', 'Rocky space debris drifting through the void, can be mined for valuable minerals.', null, 0.2, 0, 0, 0.25, 0.5, 1, [], 0, 1),

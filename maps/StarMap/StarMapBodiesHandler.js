@@ -135,7 +135,8 @@ class StarMapBodiesHandler {
             
             // Create unknown marker circle (no question mark)
             if (!unknownObj) {
-                unknownObj = cvs.addEmptyCircle(unknownId, body.x, body.y, 0.5, 2, COLORS.White, 1, () => selectObject.call(this.starMap, body))
+                const displaySize = Math.sqrt(body.radius/EARTH_RADII_PER_AU) * 3
+                unknownObj = cvs.addEmptyCircle(unknownId, body.x, body.y, displaySize, SUN_MIN_SCREEN_SIZE, COLORS.White, 1, () => selectObject.call(this.starMap, body))
                 unknownObj.clickPriority = 12
             }
             
@@ -180,6 +181,14 @@ class StarMapBodiesHandler {
                 const displaySize = Math.pow(body.radius/EARTH_RADII_PER_AU, 0.4) * 3.5
                 planetObj = cvs.addFilledCircle(planetId, body.x, body.y, displaySize, minScreenSize, body.color, () => selectObject.call(this.starMap, body))
                 planetObj.clickPriority = 10
+                
+                // Associate and create decorators
+                if (body.decorators && body.decorators.length > 0) {
+                    body.decorators.forEach(decorator => {
+                        decorator.associate(planetObj)
+                        decorator.decorate(cvs, planetId)
+                    })
+                }
                 
                 // Create night side overlay as a crescent/gibbous shape
                 const crescentVertices = []
@@ -237,7 +246,9 @@ class StarMapBodiesHandler {
             
             // Create unknown marker circle (no question mark)
             if (!unknownObj) {
-                unknownObj = cvs.addEmptyCircle(unknownId, body.x, body.y, 0.3, 2, COLORS.White, 1, () => selectObject.call(this.starMap, body))
+                const minScreenSize = body.objectType == OBJECT_TYPES.DWARF_PLANET ? DWARF_PLANET_MIN_SCREEN_SIZE : PLANET_MIN_SCREEN_SIZE
+                const displaySize = Math.pow(body.radius/EARTH_RADII_PER_AU, 0.4) * 3.5
+                unknownObj = cvs.addEmptyCircle(unknownId, body.x, body.y, displaySize, minScreenSize, COLORS.White, 1, () => selectObject.call(this.starMap, body))
                 unknownObj.clickPriority = 12
             }
             
@@ -247,6 +258,15 @@ class StarMapBodiesHandler {
             if (labelObj) labelObj.visible = false
             nightSideObj.visible = isDiscovered
             unknownObj.visible = !hasBeenSeen // Show unknown circle for all unseen planets
+            
+            // Update decorator visibility
+            if (body.decorators && body.decorators.length > 0) {
+                body.decorators.forEach(decorator => {
+                    decorator.canvasObjects.forEach(obj => {
+                        obj.visible = isDiscovered
+                    })
+                })
+            }
             
             // Dim planet when outside vision range (like asteroids)
             if (isDiscovered) {
@@ -264,6 +284,13 @@ class StarMapBodiesHandler {
             labelObj.y = body.y
             unknownObj.x = body.x
             unknownObj.y = body.y
+            
+            // Update decorators
+            if (body.decorators && body.decorators.length > 0) {
+                body.decorators.forEach(decorator => {
+                    decorator.update()
+                })
+            }
             
             // Update nightside position and angle only when planet is visible
             if (isDiscovered && nightSideObj && body.orbit) {

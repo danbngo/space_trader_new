@@ -85,8 +85,6 @@ class StarMap extends BaseMap {
     
     updateSpotlight() {
         if (!this.spotlight || !gs.fleet || !gs.fleet.mapViewDistance) return
-        
-        console.log('updating spotlight')
         // Update spotlight position to follow player
         this.spotlight.x = gs.fleet.x
         this.spotlight.y = gs.fleet.y
@@ -107,20 +105,37 @@ class StarMap extends BaseMap {
         // Create main canvas
         this.cvs = new CanvasWrapper(baseZoom, minZoom, maxZoom, cameraPanLimit)
         
-        // Create overlay canvas for spotlight (on top of everything)
+        // Create overlay canvas for spotlight (between background and main)
         this.overlayCvs = new CanvasWrapper(baseZoom, minZoom, maxZoom, cameraPanLimit)
-        this.overlayCvs.fillColor = 'rgba(255, 0, 255, 0.5)' // Semi-transparent magenta
+        this.overlayCvs.fillColor = 'rgba(0, 0, 0, 0.5)' // Semi-transparent black
         this.overlayCvs.root.style.pointerEvents = 'none' // Don't capture mouse events on container
         this.overlayCvs.canvas.style.pointerEvents = 'none' // Don't capture mouse events on canvas
         
-        // Build DOM structure with three layers: bg -> main -> overlay
+        // Build DOM structure with three layers: bg -> overlay -> main
         this.root = ce({classNames: ['starmap-root'], children: [
-            this.bgCvs.root,      // Background layer (rendered first/below)
-            this.cvs.root,        // Main layer (game objects)
-            this.overlayCvs.root  // Overlay layer (spotlight on top)
+            this.bgCvs.root,      // Background layer (stars - rendered first/below)
+            this.overlayCvs.root, // Overlay layer (fog of war - dims stars only)
+            this.cvs.root         // Main layer (game objects - on top, not dimmed)
         ]})
         this.controls = ce({parent: this.root, style: {position: 'absolute', top: 0, left: 0}})
         this.infoBar = ce({parent: this.root, style:{position:'absolute', bottom: 0, left: 0}})
+        this.fuelBar = ce({parent: this.root, style:{position:'absolute', bottom: '30px', left: '50%', transform: 'translateX(-50%)'}})
+        this.pausedIndicator = ce({
+            parent: this.root,
+            innerHTML: 'PAUSED',
+            style: {
+                position: 'absolute',
+                top: '25%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                color: 'white',
+                fontSize: '24px',
+                fontWeight: 'bold',
+                pointerEvents: 'none',
+                opacity: '0.7',
+                display: 'none'
+            }
+        })
         this.objectPane = ce({parent: this.root, style: {position: 'absolute', top: 0, right: 0, height: '100%', pointerEvents: 'none'}})
         
         window.addEventListener("resize", () => {
@@ -312,7 +327,9 @@ class StarMap extends BaseMap {
                         ` | Distance: `,
                         this.infoBarDistanceEl = ce({id: 'star_map_distance_info_bar', innerHTML: `${distance} AU`}),
                         ` | ETA: `,
-                        this.infoBarETAEl = ce({id: 'star_map_eta_info_bar', innerHTML: yearsRemaining})
+                        this.infoBarETAEl = ce({id: 'star_map_eta_info_bar', innerHTML: yearsRemaining}),
+                        ` | Fuel: `,
+                        this.infoBarFuelCostEl = ce({id: 'star_map_fuel_cost_info_bar', innerHTML: `${roundToPlaces(distance * FUEL_COST_PER_1_AU, 1)}`})
                     ]
                 })
                 : location ? destinationLink(location)
@@ -324,7 +341,32 @@ class StarMap extends BaseMap {
         if (!destination) {
             this.infoBarDistanceEl = null
             this.infoBarETAEl = null
+            this.infoBarFuelCostEl = null
         }
+        
+        // Update fuel bar
+        this.refreshFuelBar()
+    }
+    
+    refreshFuelBar() {
+        const {fleet} = gs
+        const fuelPercentage = (fleet.currentFuel / fleet.totalFuelCapacity) * 100
+        
+        this.fuelBar.innerHTML = ''
+        ce({
+            parent: this.fuelBar,
+            style: {display: 'flex', gap: '6px', alignItems: 'center'},
+            children: [
+                'Fuel',
+                new ProgressBar({
+                    value: fuelPercentage,
+                    fillColor: '#ffaa00',
+                    overrideLabel: '',
+                    width: 25
+                }).container,
+                `${Math.round(fleet.currentFuel)}/${Math.round(fleet.totalFuelCapacity)}`
+            ]
+        })
     }
     
     refreshDebugPanel() {
@@ -473,7 +515,9 @@ class StarMap extends BaseMap {
                 if (testRoute.valid) {
                     const travelTime = testRoute.travelTime
                     const etaYears = travelTime
+                    const fuelCost = roundToPlaces(testRoute.path.distance * FUEL_COST_PER_1_AU, 1)
                     ce({parent:container, innerHTML:`ETA: ${statColorSpan(describeTimespan(travelTime, 1), 1/(1+etaYears*12))}`})
+                    ce({parent:container, innerHTML:`Fuel: ${fuelCost}`})
                     // Abandoned (destroyed) fleets use "Travel" instead of "Intercept"
                     const buttonText = obj.destroyed ? 'Travel' : 'Intercept'
                     ce({parent:container, tag:'button', innerHTML:buttonText, onClick:()=>this.setDestination(obj, true), disabled: gs.fleet.stranded})
@@ -503,11 +547,19 @@ class StarMap extends BaseMap {
                 'ETA: ',
                 this.objPaneETAEl = ce({id: 'star_map_eta_object_pane', innerHTML: statColorSpan(describeTimespan(travelTime, 1), 1/(1+etaYears*12))})
             ]})
+            ce({parent:container, children: [
+                'Fuel: ',
+                this.objPaneFuelCostEl = ce({id: 'star_map_fuel_cost_object_pane', innerHTML: `${roundToPlaces(distance * FUEL_COST_PER_1_AU, 1)}`})
+            ]})
             // Only show scan/dock button if planet is discovered
             if (isDiscovered) {
                 ce({parent:container, tag:'button', innerHTML:isDockedHere ? 'Dock' : 'Scan', onClick:()=>this.explore(obj)})
             }
-            ce({parent:container, tag:'button', innerHTML:'Travel', onClick:()=>this.setDestination(obj, true), disabled: cantTravelHere})
+            // Hide travel button if this planet is already the destination of the current route
+            const isCurrentDestination = gs.fleet.route && gs.fleet.route.destination === obj
+            if (!isCurrentDestination) {
+                ce({parent:container, tag:'button', innerHTML:'Travel', onClick:()=>this.setDestination(obj, true), disabled: cantTravelHere})
+            }
             if (gs.fleet.route) ce({parent:container, tag:'button', innerHTML:'Stop', onClick:()=>this.stopPlayerFleet()})
         }
         if (obj instanceof Star) {
@@ -524,6 +576,10 @@ class StarMap extends BaseMap {
             ce({parent:container, children: [
                 'ETA: ',
                 this.objPaneETAEl = ce({id: 'star_map_eta_object_pane', innerHTML: describeTimespan(travelTime, 1)})
+            ]})
+            ce({parent:container, children: [
+                'Fuel: ',
+                this.objPaneFuelCostEl = ce({id: 'star_map_fuel_cost_object_pane', innerHTML: `${roundToPlaces(distance * FUEL_COST_PER_1_AU, 1)}`})
             ]})
             ce({parent:container, tag:'button', innerHTML:'Travel', onClick:()=>this.setDestination(obj, true), disabled: gs.fleet.stranded})
             if (gs.fleet.route) ce({parent:container, tag:'button', innerHTML:'Stop', onClick:()=>this.stopPlayerFleet()})
@@ -601,6 +657,28 @@ class StarMap extends BaseMap {
             route = new Route(gs.fleet, obj)
         }
         
+        // Check if player has enough fuel for the route
+        if (route && gs.fleet) {
+            const fuelRequired = route.path.distance * FUEL_COST_PER_1_AU
+            if (gs.fleet.currentFuel < fuelRequired) {
+                const targetName = obj.name || 'waypoint'
+                showModal(
+                    '⚠️ Insufficient Fuel',
+                    ce({
+                        children: [
+                            ce({ innerHTML: `Your route to ${targetName} requires ${roundToPlaces(fuelRequired, 1)} fuel, but you only have ${roundToPlaces(gs.fleet.currentFuel, 1)}.` }),
+                            ce({ innerHTML: 'You need to refuel at a shipyard before making this journey.' })
+                        ]
+                    }),
+                    [
+                        ['OK', () => closeModal()]
+                    ]
+                )
+                this._creatingRoute = false
+                return
+            }
+        }
+        
         // Check if route intersects the sun
         if (route && FleetAI.checkRouteIntersectsSun(route)) {
             if (!bypassSunWarning) {
@@ -643,6 +721,12 @@ class StarMap extends BaseMap {
         console.log('setting paused to:',newPausedState)
         const wasAlreadyUnpaused = !this.paused
         this.paused = newPausedState
+        
+        // Update paused indicator visibility
+        if (this.pausedIndicator) {
+            this.pausedIndicator.style.display = this.paused ? 'block' : 'none'
+        }
+        
         // Only start tick loop if transitioning from paused to unpaused
         // This prevents multiple simultaneous tick loops from rapid clicking
         if (!this.paused && !wasAlreadyUnpaused) {
@@ -664,6 +748,7 @@ class StarMap extends BaseMap {
         gs.year += elapsedYears
         gs.system.updateRoutes(gs.year)
         gs.system.updatePositions()
+        gs.system.updateEscortPositions()
         
         // Update discoveries every 90 ticks
         this.tickCounter++

@@ -10,13 +10,14 @@ class Ship {
      * @param {number[]} color - The RGB color of the ship.
      * @param {number[]} hull - The current and maximum hull integrity [current, max].
      * @param {number[]} shields - The current and maximum shield strength [current, max].
+     * @param {number} fuelCapacity - The fuel capacity of the ship.
      * @param {number} lasers - The laser power of the ship.
      * @param {number} engine - The engine power of the ship.
      * @param {number} cargoSpace - The cargo space available on the ship.
      * @param {number} radars - The radar capability of the ship.
      * @param {number} maxActionsPerTurn - The maximum number of actions the ship can take per turn.
      */
-    constructor(name = "Unnamed", shipType = SHIP_TYPES[0], color = COLORS.White, hull = [0, 0], shields = [0, 0], lasers = 0, engine = 0, cargoSpace = 0, radars = 0, maxActionsPerTurn = SHIP_NUM_MOVES_PER_TURN) {
+    constructor(name = "Unnamed", shipType = SHIP_TYPES[0], color = COLORS.White, hull = [0, 0], shields = [0, 0], fuelCapacity = 0, lasers = 0, engine = 0, cargoSpace = 0, radars = 0, maxActionsPerTurn = SHIP_NUM_MOVES_PER_TURN) {
         /** @type {string} */
         this.name = name;
         /** @type {ShipType} */
@@ -27,6 +28,8 @@ class Ship {
         this.hull = hull; //sustain more damage before being disabled
         /** @type {number[]} */
         this.shields = shields; //take less damage from lasers
+        /** @type {number} */
+        this.fuelCapacity = fuelCapacity; //maximum fuel capacity
         /** @type {number} */
         this.lasers = lasers; //do more damage in combat, and vs. asteroids
         /** @type {number} */
@@ -437,5 +440,35 @@ class Ship {
     get unusedModuleSlots() {
         const [used, available] = this.moduleSlots
         return available-used
+    }
+
+    /**
+     * Creates an HTML image element showing this ship's graphical representation.
+     * @param {number} size - The size in pixels for the ship image.
+     * @param {number[]} [color] - Optional color override (defaults to ship's fleet color or ship color).
+     * @returns {HTMLCanvasElement} Canvas element showing the ship.
+     */
+    asImage(size = 80, color = undefined) {
+        const shipShape = this.shipType.shape()
+        const shipColor = color || (this.fleet ? this.fleet.color : this.color)
+        
+        const shipObj = new CanvasObject({
+            id: 'preview-ship',
+            shape: SHAPES.Polygon,
+            x: 0,
+            y: 0,
+            size: size,
+            fillColor: shipColor,
+            strokeColor: COLORS.White,
+            vertices: shipShape.vertices
+        })
+        
+        // Convert to image
+        const shipImage = shipObj.asImage(size)
+        shipImage.style.backgroundColor = '#000'
+        shipImage.style.display = 'block'
+        shipImage.style.margin = '10px auto'
+        
+        return shipImage
     }
 }

@@ -12,8 +12,15 @@ function createTradeInfoBuyTable(ct = CARGO_TYPES_ALL[0], onSelectPlanet = (p = 
         ['Planet', 'Buy Price', 'Market Amt.', 'Distance', 'ETA']
     ]
     
+    // Filter to only visited locations that have markets
+    const visitedLocationsWithMarkets = planets.filter(p => {
+        if (!gs.lastVisitedDates.has(p)) return false
+        const market = illegal ? p.settlement?.blackMarket : p.settlement?.market
+        return market != null
+    })
+    
     // Sort planets by buy price (lowest first)
-    const sortedPlanets = [...planets].sort((a, b) => {
+    const sortedPlanets = [...visitedLocationsWithMarkets].sort((a, b) => {
         const marketA = illegal ? a.settlement?.blackMarket : a.settlement?.market
         const marketB = illegal ? b.settlement?.blackMarket : b.settlement?.market
         const priceA = marketA ? marketA.calcCargoBuyPrices().getAmount(ct) : Infinity
@@ -52,8 +59,15 @@ function createTradeInfoSellTable(ct = CARGO_TYPES_ALL[0], onSelectPlanet = (p =
         ['Planet', 'Sell Price', 'Market CR', 'Distance', 'ETA']
     ]
     
+    // Filter to only visited locations that have markets
+    const visitedLocationsWithMarkets = planets.filter(p => {
+        if (!gs.lastVisitedDates.has(p)) return false
+        const market = illegal ? p.settlement?.blackMarket : p.settlement?.market
+        return market != null
+    })
+    
     // Sort planets by sell price (highest first)
-    const sortedPlanets = [...planets].sort((a, b) => {
+    const sortedPlanets = [...visitedLocationsWithMarkets].sort((a, b) => {
         const marketA = illegal ? a.settlement?.blackMarket : a.settlement?.market
         const marketB = illegal ? b.settlement?.blackMarket : b.settlement?.market
         const priceA = marketA ? marketA.calcCargoSellPrices().getAmount(ct) : -Infinity

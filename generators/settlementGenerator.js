@@ -162,16 +162,35 @@ function generateSettlement(planet) {
 
     // Different body types have different chances of having buildings
     // Planets: 0% disabled (all buildings available)
-    // Moons/Dwarf planets: 40% disabled
-    // Space stations: 80% disabled
+    // Moons/Dwarf planets: 40% disabled (minimum 2 for dwarf planets)
+    // Space stations: 80% disabled (minimum 1)
     const disableChance = planet.objectType == OBJECT_TYPES.PLANET ? 0 :
                           planet.objectType == OBJECT_TYPES.MOON || planet.objectType == OBJECT_TYPES.DWARF_PLANET ? 0.4 :
                           0.8
     const buildings = [shipyard, market, blackMarket, guild, bank, courthouse, academy, tavern, cyberSurgeon, geneticist, palace, temple, casino]
+    
+    // First pass: randomly disable buildings
     for (const building of buildings) {
         if (Math.random() < disableChance) building.exists = false
         // Randomize building level from 1-3
         building.level = Math.floor(Math.random() * 3) + 1
+    }
+    
+    // Enforce minimum buildings for dwarf planets and space stations
+    const enabledCount = buildings.filter(b => b.exists).length
+    const minBuildings = planet.objectType == OBJECT_TYPES.DWARF_PLANET ? DWARF_PLANET_MIN_BUILDINGS :
+                        planet.objectType == OBJECT_TYPES.SPACE_STATION ? SPACE_STATION_MIN_BUILDINGS :
+                        0
+    
+    if (minBuildings > 0 && enabledCount < minBuildings) {
+        // Re-enable random disabled buildings until we meet minimum
+        const disabledBuildings = buildings.filter(b => !b.exists)
+        const needToEnable = minBuildings - enabledCount
+        for (let i = 0; i < needToEnable && disabledBuildings.length > 0; i++) {
+            const randomIndex = Math.floor(Math.random() * disabledBuildings.length)
+            disabledBuildings[randomIndex].exists = true
+            disabledBuildings.splice(randomIndex, 1)
+        }
     }
 
     return new Settlement({planet, settlementType, shipyard, market, blackMarket, guild, bank, courthouse, academy, tavern, cyberSurgeon, geneticist, palace, temple, casino})

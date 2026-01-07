@@ -144,7 +144,6 @@
         </div>
         <button id="shift-left-btn">< shift</button>
         <button id="shift-right-btn">shift ></button>
-        <button id="rotate-btn">rotate</button>
         <button id="undo-btn" disabled>undo</button>
         <button id="mirror-btn" disabled>mirror L->R</button>
         <button id="clear-btn" disabled>clear</button>
@@ -168,7 +167,6 @@
         const hoverCoordsDisplay = document.getElementById('hover-coords');
         const shiftLeftBtn = document.getElementById('shift-left-btn');
         const shiftRightBtn = document.getElementById('shift-right-btn');
-        const rotateBtn = document.getElementById('rotate-btn');
         
         let vertices = [];
         let image = null;
@@ -214,8 +212,15 @@
             imageWidth = img.width;
             imageHeight = img.height;
             
-            canvas.width = imageWidth;
-            canvas.height = imageHeight;
+            // Scale canvas to be 40% of window width while maintaining aspect ratio
+            const targetWidth = window.innerWidth * 0.4;
+            const scale = targetWidth / imageWidth;
+            
+            canvas.width = imageWidth * scale;
+            canvas.height = imageHeight * scale;
+            
+            // Store scale for coordinate conversion
+            canvas.dataset.scale = scale;
             
             drawCanvas();
         };
@@ -228,9 +233,11 @@
             // Clear canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Draw image with offset
+            const scale = parseFloat(canvas.dataset.scale) || 1;
+            
+            // Draw image scaled with offset
             if (image) {
-                ctx.drawImage(image, imageOffsetX, 0);
+                ctx.drawImage(image, imageOffsetX * scale, 0, imageWidth * scale, imageHeight * scale);
             }
             
             // Draw crosshair at center (fixed position)
@@ -238,10 +245,10 @@
             ctx.lineWidth = 1;
             ctx.setLineDash([5, 5]);
             ctx.beginPath();
-            ctx.moveTo(imageWidth / 2, 0);
-            ctx.lineTo(imageWidth / 2, imageHeight);
-            ctx.moveTo(0, imageHeight / 2);
-            ctx.lineTo(imageWidth, imageHeight / 2);
+            ctx.moveTo((imageWidth / 2) * scale, 0);
+            ctx.lineTo((imageWidth / 2) * scale, canvas.height);
+            ctx.moveTo(0, (imageHeight / 2) * scale);
+            ctx.lineTo(canvas.width, (imageHeight / 2) * scale);
             ctx.stroke();
             ctx.setLineDash([]);
             
@@ -251,9 +258,9 @@
                 ctx.strokeStyle = '#0ff';
                 ctx.lineWidth = 2;
                 ctx.beginPath();
-                ctx.moveTo(vertices[0].x, vertices[0].y);
+                ctx.moveTo(vertices[0].x * scale, vertices[0].y * scale);
                 for (let i = 1; i < vertices.length; i++) {
-                    ctx.lineTo(vertices[i].x, vertices[i].y);
+                    ctx.lineTo(vertices[i].x * scale, vertices[i].y * scale);
                 }
                 ctx.stroke();
                 
@@ -261,13 +268,13 @@
                 vertices.forEach((v, i) => {
                     ctx.fillStyle = '#0ff';
                     ctx.beginPath();
-                    ctx.arc(v.x, v.y, 5, 0, Math.PI * 2);
+                    ctx.arc(v.x * scale, v.y * scale, 5, 0, Math.PI * 2);
                     ctx.fill();
                     
                     // Draw vertex number
                     ctx.fillStyle = '#fff';
                     ctx.font = '12px monospace';
-                    ctx.fillText(i + 1, v.x + 8, v.y - 8);
+                    ctx.fillText(i + 1, v.x * scale + 8, v.y * scale - 8);
                 });
                 
                 // Draw preview line and vertex if hovering
@@ -279,8 +286,8 @@
                     ctx.lineWidth = 1;
                     ctx.setLineDash([3, 3]);
                     ctx.beginPath();
-                    ctx.moveTo(lastVertex.x, lastVertex.y);
-                    ctx.lineTo(hoverPos.x, hoverPos.y);
+                    ctx.moveTo(lastVertex.x * scale, lastVertex.y * scale);
+                    ctx.lineTo(hoverPos.x * scale, hoverPos.y * scale);
                     ctx.stroke();
                     ctx.setLineDash([]);
                     
@@ -289,14 +296,14 @@
                     ctx.strokeStyle = '#ff0';
                     ctx.lineWidth = 1;
                     ctx.beginPath();
-                    ctx.arc(hoverPos.x, hoverPos.y, 4, 0, Math.PI * 2);
+                    ctx.arc(hoverPos.x * scale, hoverPos.y * scale, 4, 0, Math.PI * 2);
                     ctx.fill();
                 }
             } else if (hoverPos) {
                 // If no vertices yet, just show the preview point
                 ctx.fillStyle = '#ff0';
                 ctx.beginPath();
-                ctx.arc(hoverPos.x, hoverPos.y, 4, 0, Math.PI * 2);
+                ctx.arc(hoverPos.x * scale, hoverPos.y * scale, 4, 0, Math.PI * 2);
                 ctx.fill();
             }
             
@@ -315,8 +322,10 @@
         // Handle canvas clicks
         canvas.addEventListener('click', (e) => {
             const rect = canvas.getBoundingClientRect();
-            let x = e.clientX - rect.left;
-            let y = e.clientY - rect.top;
+            const scale = parseFloat(canvas.dataset.scale) || 1;
+            // Convert canvas coordinates to image coordinates
+            let x = (e.clientX - rect.left) / scale;
+            let y = (e.clientY - rect.top) / scale;
             
             // Apply snapping
             x = snapToGrid(x);
@@ -329,8 +338,10 @@
         // Handle mouse movement for preview
         canvas.addEventListener('mousemove', (e) => {
             const rect = canvas.getBoundingClientRect();
-            let x = e.clientX - rect.left;
-            let y = e.clientY - rect.top;
+            const scale = parseFloat(canvas.dataset.scale) || 1;
+            // Convert canvas coordinates to image coordinates
+            let x = (e.clientX - rect.left) / scale;
+            let y = (e.clientY - rect.top) / scale;
             
             // Apply snapping
             x = snapToGrid(x);
@@ -365,50 +376,6 @@
             drawCanvas();
         });
         
-        // Rotate image 90 degrees clockwise
-        rotateBtn.addEventListener('click', () => {
-            if (!image) return;
-            
-            // Create temporary canvas for rotation
-            const tempCanvas = document.createElement('canvas');
-            const tempCtx = tempCanvas.getContext('2d');
-            
-            // Swap dimensions for 90 degree rotation
-            tempCanvas.width = imageHeight;
-            tempCanvas.height = imageWidth;
-            
-            // Rotate around center
-            tempCtx.translate(imageHeight / 2, imageWidth / 2);
-            tempCtx.rotate(Math.PI / 2);
-            tempCtx.drawImage(image, -imageWidth / 2, -imageHeight / 2);
-            
-            // Create new image from rotated canvas
-            const newImg = new Image();
-            newImg.onload = () => {
-                image = newImg;
-                imageWidth = newImg.width;
-                imageHeight = newImg.height;
-                canvas.width = imageWidth;
-                canvas.height = imageHeight;
-                imageOffsetX = 0; // Reset offset
-                
-                // Rotate vertices to match (x,y) -> (-y,x) for 90° clockwise
-                const centerX = imageWidth / 2;
-                const centerY = imageHeight / 2;
-                vertices = vertices.map(v => {
-                    const relX = v.x - (imageHeight / 2); // Old center
-                    const relY = v.y - (imageWidth / 2);
-                    return {
-                        x: centerX + relY,
-                        y: centerY - relX
-                    };
-                });
-                
-                drawCanvas();
-            };
-            newImg.src = tempCanvas.toDataURL();
-        });
-        
         // Undo button
         undoBtn.addEventListener('click', () => {
             if (vertices.length > 0) {
@@ -423,13 +390,16 @@
             const centerX = imageWidth / 2;
             const tolerance = 2; // Pixels of tolerance for "center" vertices
             
-            // Find all left-side vertices (x < centerX, excluding center)
-            const leftVertices = vertices.filter(v => v.x < centerX - tolerance);
+            // Find all left-side vertices (x <= centerX, excluding strictly center)
+            const leftVertices = vertices.filter(v => v.x <= centerX - tolerance);
             
             if (leftVertices.length === 0) {
                 alert('No left-side vertices found to mirror!\n\nMake sure you have vertices with x < center.');
                 return;
             }
+            
+            console.log(`Mirroring ${leftVertices.length} vertices from left side`);
+            console.log('Left vertices:', leftVertices);
             
             // Create mirrored versions (flip x coordinate around center)
             const mirroredVertices = leftVertices.map(v => ({
@@ -439,6 +409,8 @@
             
             // Reverse the mirrored vertices so the polygon flows correctly
             mirroredVertices.reverse();
+            
+            console.log('Mirrored vertices (reversed):', mirroredVertices);
             
             // Append mirrored vertices to the end
             vertices.push(...mirroredVertices);
@@ -454,9 +426,14 @@
                 return;
             }
             
-            // Add the first vertex again to close the loop
+            // Check if last vertex is already the same as first vertex
             const firstVertex = vertices[0];
-            vertices.push({ x: firstVertex.x, y: firstVertex.y });
+            const lastVertex = vertices[vertices.length - 1];
+            
+            // Only add first vertex if it's not already the last vertex
+            if (firstVertex.x !== lastVertex.x || firstVertex.y !== lastVertex.y) {
+                vertices.push({ x: firstVertex.x, y: firstVertex.y });
+            }
             
             drawCanvas();
             outputDiv.style.display = 'none';
@@ -529,11 +506,54 @@
             const arrayFormat = rotatedVertices.map(v => `[${v.x.toFixed(3)}, ${v.y.toFixed(3)}]`).join(',\n    ');
             console.log('[\n    ' + arrayFormat + '\n]');
             
-            // Display in UI
-            outputDiv.style.display = 'block';
-            outputDiv.textContent = `Vertices created! Check the console for output.\n\nVertex count: ${vertices.length}\nImage size: ${imageWidth}x${imageHeight}\nScale factor: ${maxAbsValue.toFixed(2)}\n\nCopy the console output and give it to me to convert to your ship format.`;
+            // Build full output text
+            const fullOutput = `=== RAW PIXEL COORDINATES ===
+Image dimensions: ${imageWidth} x ${imageHeight}
+Center point: ${centerX}, ${centerY}
+Vertices (pixel coords):
+${JSON.stringify(vertices, null, 2)}
+
+=== NORMALIZED COORDINATES (center = 0,0) ===
+Vertices:
+${JSON.stringify(normalizedVertices, null, 2)}
+
+=== SCALED COORDINATES (fit within -1,-1,1,1) ===
+Scale factor: ${maxAbsValue}
+Vertices:
+${JSON.stringify(scaledVertices, null, 2)}
+
+=== ROTATED COORDINATES (270° clockwise) ===
+Vertices:
+${JSON.stringify(rotatedVertices, null, 2)}
+
+=== ARRAY FORMAT (rotated 90° clockwise, scaled to -1,1) ===
+[
+    ${arrayFormat}
+]`;
             
-            alert('Output sent to console! Press F12 to view.');
+            // Display in UI with textarea
+            outputDiv.style.display = 'block';
+            outputDiv.innerHTML = `
+                <h3>Vertices Complete!</h3>
+                <p><strong>Vertex count:</strong> ${vertices.length}</p>
+                <p><strong>Image size:</strong> ${imageWidth}x${imageHeight}</p>
+                <p><strong>Scale factor:</strong> ${maxAbsValue.toFixed(2)}</p>
+                <p>Copy the array format below:</p>
+                <textarea id="output-textarea" style="width: 100%; height: 400px; font-family: monospace; font-size: 12px;">${fullOutput}</textarea>
+                <button id="copy-btn" style="margin-top: 10px; padding: 8px 16px;">Copy to Clipboard</button>
+            `;
+            
+            // Add copy button functionality
+            const copyBtn = document.getElementById('copy-btn');
+            const textarea = document.getElementById('output-textarea');
+            copyBtn.addEventListener('click', () => {
+                textarea.select();
+                document.execCommand('copy');
+                copyBtn.textContent = 'Copied!';
+                setTimeout(() => {
+                    copyBtn.textContent = 'Copy to Clipboard';
+                }, 2000);
+            });
         });
     </script>
 </body>

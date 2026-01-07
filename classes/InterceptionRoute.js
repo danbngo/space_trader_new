@@ -44,7 +44,7 @@ class InterceptionRoute extends Route {
         }
         
         // Now call super with the interception waypoint
-        super(fleet, interceptionWaypoint, startYear)
+        super(fleet, interceptionWaypoint, startYear, true) // Pass true for isInterception flag
         
         // Override with specific interception route UUID
         /** @type {string} */

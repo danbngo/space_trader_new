@@ -123,6 +123,7 @@ function showShipsMenu(ships = [...gs.fleet.ships], selectedShip = null) {
         return ce({
             style: {display: 'flex', flexDirection: 'column', gap: '12px'},
             children: [
+                selectedShip.asImage(80),
                 `<u>Pilot:</b>`,
                 pilotDropdown.container,
                 `<u>Installed Modules:</u>`,

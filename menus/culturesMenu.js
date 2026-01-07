@@ -35,6 +35,11 @@ function showCulturesMenu(backFunction = () => closeModal()) {
         }
         culturePopulation.set(culturePlanet, population)
     }
+    
+    // Calculate visited civilized planets population for percentage calculations
+    const visitedCivilizedPopulation = visitedPlanets
+        .filter(p => p.c && p.c.population)
+        .reduce((sum, p) => sum + p.c.population, 0)
 
     // Split cultures into two columns
     const midpoint = Math.ceil(visitedCultures.length / 2)
@@ -49,12 +54,12 @@ function showCulturesMenu(backFunction = () => closeModal()) {
     
     // Populate left column
     for (const culturePlanet of leftCultures) {
-        leftColumn.appendChild(createCultureSection(culturePlanet, culturePopulation, totalPopulation))
+        leftColumn.appendChild(createCultureSection(culturePlanet, culturePopulation, visitedCivilizedPopulation))
     }
     
     // Populate right column
     for (const culturePlanet of rightCultures) {
-        rightColumn.appendChild(createCultureSection(culturePlanet, culturePopulation, totalPopulation))
+        rightColumn.appendChild(createCultureSection(culturePlanet, culturePopulation, visitedCivilizedPopulation))
     }
 
     const columnLayout = createColumnLayout([leftColumn, rightColumn])
@@ -100,16 +105,21 @@ function createCultureSection(culturePlanet, culturePopulation, totalSystemPopul
         ]
     })
 
-    // Add culture prevalence info
-    const planetsWithCulture = gs.system.planets.filter(p => p.c && p.c.cultures && p.c.cultures.getAmount(culturePlanet) > 0.05)
-    const prevalenceCount = planetsWithCulture.length
-    const totalPlanets = gs.system.planets.filter(p => p.c).length
+    // Add culture prevalence info (only count discovered planets)
+    const discoveredPlanets = gs.system.planets.filter(p => p.c && gs.lastVisitedDates.has(p))
+    const discoveredPlanetsWithCulture = discoveredPlanets.filter(p => p.c.cultures && p.c.cultures.getAmount(culturePlanet) > 0.05)
+    const prevalenceCount = discoveredPlanetsWithCulture.length
     
-    if (totalPlanets > 0) {
-        const planetSymbols = planetsWithCulture.map(p => p.symbol).join(' ')
+    // Check if player has discovered all civilized planets
+    const allCivilizedPlanets = gs.system.planets.filter(p => p.c)
+    const allDiscovered = discoveredPlanets.length >= allCivilizedPlanets.length
+    
+    if (discoveredPlanets.length > 0) {
+        const planetSymbols = allDiscovered ? discoveredPlanetsWithCulture.map(p => p.symbol).join(' ') : ''
+        const totalText = allDiscovered ? `${allCivilizedPlanets.length}` : '?'
         const prevalenceEl = ce({
             style: 'margin-bottom: 8px;',
-            children: [`Present on: ${prevalenceCount} of ${totalPlanets} planets ${planetSymbols ? '— ' + planetSymbols : ''}`]
+            children: [`Present on: ${prevalenceCount} of ${totalText} planets ${planetSymbols ? '— ' + planetSymbols : ''}`]
         })
         cultureSection.appendChild(prevalenceEl)
     }
