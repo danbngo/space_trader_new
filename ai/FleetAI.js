@@ -240,7 +240,7 @@ class FleetAI {
     isNearby(object, elapsedYears = 1) {
         // @ts-ignore
         if (object.location) return false
-        const distMod = elapsedYears/MAX_FRAMES_PER_SECOND/STAR_MAP_YEARS_PER_MS //during simus make ships able to collide easier
+        const distMod = elapsedYears //during simus make ships able to collide easier
         return calcDistance(this.fleet.x, this.fleet.y, object.x, object.y) < (FLEET_COLLISION_DISTANCE*distMod) // Within 0.01 AU
     }
 

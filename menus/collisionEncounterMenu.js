@@ -42,7 +42,7 @@ function checkForFleetCollision(collisionDistance) {
     })
     
     // Debug logging
-    if (gs.system.fleets.length > 1) {
+    /*if (gs.system.fleets.length > 1) {
         const closestFleet = gs.system.fleets
             .filter(f => f !== playerFleet)
             .reduce((closest, fleet) => {
@@ -55,7 +55,7 @@ function checkForFleetCollision(collisionDistance) {
             const closestDist = calcDistance(playerFleet.x, playerFleet.y, closestFleet.x, closestFleet.y)
             console.log(`Closest fleet: ${closestFleet.name} at distance ${closestDist.toFixed(4)} AU (collision at ${collisionDistance.toFixed(4)} AU)`)
         }
-    }
+    }*/
     
     if (nearbyFleets.length === 0) return false
     

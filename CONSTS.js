@@ -15,8 +15,7 @@ const FLEET_RADIUS = 1/1000 * 1/EARTH_RADII_PER_AU
 const RUINS_RADIUS = 1/100 * 1/EARTH_RADII_PER_AU
 const ANOMALY_RADIUS = 1/10 * 1/EARTH_RADII_PER_AU
 
-const FLEET_COLLISION_DISTANCE = FLEET_RADIUS * 1000*1000
-const ASTEROID_MINING_DISTANCE = FLEET_RADIUS * 2000*1000 // 2x easier to mine than fleet collision range
+
 const ASTEROID_MIN_SCREEN_RADIUS = 1 // Hide asteroids when they would appear smaller than 1px radius
 const MINING_HAZARD_CHANCE = 0.1 // 10% chance of encountering a hazard when mining
 const REPAIR_COST_PER_1_HULL = 10 // Base cost to repair 1 hull point at shipyard
@@ -105,7 +104,7 @@ const AMBIENT_EFFECT_MIN_RADIUS_MODIFIER = 2
 const AMBIENT_EFFECT_MAX_RADIUS_MODIFIER = 2
 
 const STAR_MAP_YEARS_PER_MS = 1/365/24/60 * 2
-const MAX_FRAMES_PER_SECOND = 30
+const MAX_FRAMES_PER_SECOND = 60
 
 const NEWS_MAX_AGE = 60
 
@@ -140,3 +139,6 @@ const SUN_MIN_SCREEN_SIZE = 18
 const PLANET_MIN_SCREEN_SIZE = 14
 const DWARF_PLANET_MIN_SCREEN_SIZE = 12
 const SPACE_STATION_MIN_SCREEN_SIZE = 10
+
+const FLEET_COLLISION_DISTANCE = FLEET_RADIUS * 1000
+const ASTEROID_MINING_DISTANCE = FLEET_RADIUS * 2000 // 2x easier to mine than fleet collision range

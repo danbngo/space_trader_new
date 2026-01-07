@@ -9,21 +9,21 @@ default zoom distances: 1200px = half the size of the solar system
  * Set any value to false to skip that element's computation and rendering entirely
  */
 const STARMAP_DEBUG_CONFIG = {
-    displayBackgroundStars: true,    // Background parallax stars (5000+ pixels updated every frame)
-    displayAsteroids: true,           // Floating asteroids
-    displayOrbits: true,              // Orbital path circles
-    displayStars: true,               // Sun/stars
-    displayPlanets: true,             // Planets and dwarf planets (with shadows)
-    displayPlanetLabels: true,        // Planet name labels
-    displaySpaceStations: true,       // Space stations
-    displayAnomalies: true,           // Anomalies
-    displayRuins: true,               // Ancient ruins
-    displayFleets: true,              // All fleets (player + NPC)
-    displayFleetLabels: true,         // Fleet name labels
-    displayFleetPaths: true,          // Fleet route lines
-    displayFleetThrusters: true,      // Fleet thruster effects
-    displayAbandonedFleets: true,     // Abandoned/destroyed fleets
-    displayWaypoint: true,            // Player waypoint marker
+    //displayBackgroundStars: true,    // Background parallax stars (5000+ pixels updated every frame)
+    //displayAsteroids: true,           // Floating asteroids
+    //displayOrbits: true,              // Orbital path circles
+    //displayStars: true,               // Sun/stars
+    //displayPlanets: true,             // Planets and dwarf planets (with shadows)
+    //displayPlanetLabels: true,        // Planet name labels
+    //displaySpaceStations: true,       // Space stations
+    //displayAnomalies: true,           // Anomalies
+    //displayRuins: true,               // Ancient ruins
+    //displayFleets: true,              // All fleets (player + NPC)
+    //displayFleetLabels: true,         // Fleet name labels
+    //displayFleetPaths: true,          // Fleet route lines
+    //displayFleetThrusters: true,      // Fleet thruster effects
+    //displayAbandonedFleets: true,     // Abandoned/destroyed fleets
+    //displayWaypoint: true,            // Player waypoint marker
     
     // Performance monitoring
     logPerformance: false,            // Log render times to console
@@ -124,12 +124,12 @@ class StarMap extends BaseMap {
         
         // Update background stars immediately when camera changes, or every 30th frame when only player moves
         if (cameraChanged || (playerInMotion && this.frameCounter % 30 === 0)) {
-            this.bodiesHandler.handleBackgroundStars()
+            if (STARMAP_DEBUG_CONFIG.displayBackgroundStars) this.bodiesHandler.handleBackgroundStars()
         }
         
         // Update asteroids every 600th frame when player is in motion
         if (playerInMotion && this.frameCounter % 600 === 0) {
-            this.bodiesHandler.handleAsteroids()
+            if (STARMAP_DEBUG_CONFIG.displayAsteroids) this.bodiesHandler.handleAsteroids()
         }
         
         this.cvs.redraw(true)
@@ -239,7 +239,8 @@ class StarMap extends BaseMap {
     handleCanvasObjects() {
         this.bodiesHandler.handleAll()
         this.fleetsHandler.handleAll()
-        this.cvs.redraw(true)
+        // Note: cvs.redraw() is called by the animation loops (animateBackgroundStars/tick)
+        // Don't redraw here or we'll redraw twice per frame
     }
 
     refreshObjectPane() {
@@ -401,6 +402,13 @@ class StarMap extends BaseMap {
 
     /** @param {Planet | Waypoint | Fleet} obj */
     setDestination(obj, unpause = false, bypassSunWarning = false, bypassInterceptWarning = false) {
+        // Prevent rapid-clicking from creating multiple expensive route calculations
+        if (this._creatingRoute) {
+            console.log('Route creation already in progress, ignoring duplicate click')
+            return
+        }
+        this._creatingRoute = true
+        
         let route = null
         
         if (obj instanceof Planet) {
@@ -410,6 +418,7 @@ class StarMap extends BaseMap {
             route = obj.destroyed ? new Route(gs.fleet, obj) : new InterceptionRoute(gs.fleet, obj)
             if (!route.valid) {
                 console.log('!!!! Cannot intercept fleet - target is too fast or too far')
+                this._creatingRoute = false
                 return
             }
             // Check if interception will take a long time - if so, require confirmation
@@ -432,6 +441,7 @@ class StarMap extends BaseMap {
                         }]
                     ]
                 )
+                this._creatingRoute = false
                 return
             }
         } else if (obj.isWaypoint) {
@@ -460,6 +470,7 @@ class StarMap extends BaseMap {
                         }]
                     ]
                 )
+                this._creatingRoute = false
                 return
             }
         }
@@ -471,12 +482,18 @@ class StarMap extends BaseMap {
         
         if (unpause) this.togglePause(false)
         this.refresh()
+        
+        // Release route creation lock
+        this._creatingRoute = false
     }
 
     togglePause(newPausedState = !this.paused) {
         console.log('setting paused to:',newPausedState)
+        const wasAlreadyUnpaused = !this.paused
         this.paused = newPausedState
-        if (!this.paused) {
+        // Only start tick loop if transitioning from paused to unpaused
+        // This prevents multiple simultaneous tick loops from rapid clicking
+        if (!this.paused && !wasAlreadyUnpaused) {
             this.lastTickMs = Date.now()
             this.tick()
         }
@@ -496,18 +513,16 @@ class StarMap extends BaseMap {
         gs.system.updateRoutes(gs.year)
         gs.system.updatePositions()
         
-        // Update discoveries every 30 ticks
+        // Update discoveries every 90 ticks
         this.tickCounter++
-        if (this.tickCounter >= 30) {
+        if (this.tickCounter >= 90) {
             gs.system.updateDiscoveries()
             this.tickCounter = 0
         }
 
         this.refreshInfoBar()
         this.handleCanvasObjects()
-        
-        // Animate waypoint marker (runs every frame)
-        this.fleetsHandler.animateWaypoint()
+        // Note: Canvas redraw is handled by animateBackgroundStars() which runs continuously
 
         //pause if player reached his destination
         if (!playerWasDocked && gs.location) {
