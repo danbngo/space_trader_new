@@ -12,6 +12,8 @@ class Religion {
      */
     constructor(name = 'Unnamed Faith', traits = [], color = COLORS.White, symbol = '✦') {
         /** @type {string} */
+        this.uuid = generateUUID('religion_')
+        /** @type {string} */
         this.name = name;
         /** @type {ReligionTrait[]} */
         this.traits = traits;

@@ -12,16 +12,23 @@ class StarMapBodiesHandler {
     }
 
     handleAll() {
-        this.handleBackgroundStars()
-        this.handleAsteroids()
-        this.handleOrbits()
+        const perfStart = STARMAP_DEBUG_CONFIG.logPerformance ? performance.now() : 0;
+        
+        if (STARMAP_DEBUG_CONFIG.displayBackgroundStars) this.handleBackgroundStars();
+        if (STARMAP_DEBUG_CONFIG.displayAsteroids) this.handleAsteroids();
+        if (STARMAP_DEBUG_CONFIG.displayOrbits) this.handleOrbits();
         // Vision circle removed - too jarring
         // this.handleViewDistanceCircle()
-        this.handleStars()
-        this.handlePlanets()
-        this.handleSpaceStations()
-        this.handleAnomalies()
-        this.handleRuins()
+        if (STARMAP_DEBUG_CONFIG.displayStars) this.handleStars();
+        if (STARMAP_DEBUG_CONFIG.displayPlanets) this.handlePlanets();
+        if (STARMAP_DEBUG_CONFIG.displaySpaceStations) this.handleSpaceStations();
+        if (STARMAP_DEBUG_CONFIG.displayAnomalies) this.handleAnomalies();
+        if (STARMAP_DEBUG_CONFIG.displayRuins) this.handleRuins();
+        
+        if (STARMAP_DEBUG_CONFIG.logPerformance) {
+            const perfEnd = performance.now();
+            console.log(`StarMapBodiesHandler.handleAll: ${(perfEnd - perfStart).toFixed(2)}ms`);
+        }
     }
 
     handleBackgroundStars() {
@@ -210,19 +217,20 @@ class StarMapBodiesHandler {
                 
                 // Create night side overlay as a crescent/gibbous shape
                 const crescentVertices = []
-                const numPoints = 25
-                const terminatorOffset = 0.15 // Reduced from 0.25 for less shadow overlap
+                const numPoints = 10 // Reduced from 25 for better performance
+                const terminatorOffset = 0.75 // Controls the curvature of the terminator line
+                const shadowPositionOffset = 0.33 // Shifts shadow toward sun-facing side (0.25 = 25% of radius)
                 
                 for (let i = 0; i <= numPoints; i++) {
                     const angle = Math.PI * i / numPoints - Math.PI / 2
-                    const x = Math.cos(angle)
+                    const x = Math.cos(angle) + shadowPositionOffset
                     const y = Math.sin(angle)
                     crescentVertices.push([x, y])
                 }
                 
                 for (let i = numPoints; i >= 0; i--) {
                     const angle = Math.PI * i / numPoints - Math.PI / 2
-                    const x = Math.cos(angle) * terminatorOffset - terminatorOffset
+                    const x = Math.cos(angle) * terminatorOffset - terminatorOffset + shadowPositionOffset
                     const y = Math.sin(angle)
                     crescentVertices.push([x, y])
                 }
@@ -230,23 +238,34 @@ class StarMapBodiesHandler {
                 const nightColor = [0, 0, 0, 0.7]
                 nightSideObj = cvs.addPolygon(nightSideId, body.x, body.y, crescentVertices, displaySize, minScreenSize, nightColor, null, 0, null, 11)
                 
-                labelObj = cvs.addText(labelId, body.x, body.y, 0, -32, body.name, body.color, DEFAULT_FONT_SIZE, 2, () => selectObject.call(this.starMap, body))
-                labelObj.clickPriority = 10
-                labelObj.visible = false // Start hidden
-                
-                const objs = [planetObj, labelObj]
-                for (const obj of objs) {
-                    obj.onHover = () => {
-                        // Use descriptor property
-                        labelObj.textContent = body.descriptor
-                        labelObj.visible = true
-                        for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
+                if (STARMAP_DEBUG_CONFIG.displayPlanetLabels) {
+                    labelObj = cvs.addText(labelId, body.x, body.y, 0, -32, body.name, body.color, DEFAULT_FONT_SIZE, 2, () => selectObject.call(this.starMap, body))
+                    labelObj.clickPriority = 10
+                    labelObj.visible = false // Start hidden
+                    
+                    const objs = [planetObj, labelObj]
+                    for (const obj of objs) {
+                        obj.onHover = () => {
+                            // Use descriptor property
+                            labelObj.textContent = body.descriptor
+                            labelObj.visible = true
+                            for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
+                        }
+                        obj.onHoverEnd = () => {
+                            labelObj.visible = false
+                            for (const obj3 of objs) obj3.strokeColor = (body == selectedObject) ? COLORS.Green : COLORS.Black
+                        }
+                        obj.onHoverEnd()
                     }
-                    obj.onHoverEnd = () => {
-                        labelObj.visible = false
-                        for (const obj3 of objs) obj3.strokeColor = (body == selectedObject) ? COLORS.Green : COLORS.Black
+                } else {
+                    // No labels - just handle hover on planet
+                    planetObj.onHover = () => {
+                        planetObj.strokeColor = COLORS.Cyan
                     }
-                    obj.onHoverEnd()
+                    planetObj.onHoverEnd = () => {
+                        planetObj.strokeColor = (body == selectedObject) ? COLORS.Green : COLORS.Black
+                    }
+                    planetObj.onHoverEnd()
                 }
             }
             
@@ -259,7 +278,7 @@ class StarMapBodiesHandler {
             // Show planet only if discovered or in vision range
             const isDiscovered = hasBeenSeen || isInVisionRange
             planetObj.visible = isDiscovered
-            labelObj.visible = false
+            if (labelObj) labelObj.visible = false
             nightSideObj.visible = isDiscovered
             unknownObj.visible = !hasBeenSeen // Show unknown circle for all unseen planets
             

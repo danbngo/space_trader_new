@@ -13,6 +13,8 @@ class News {
     constructor(startedName = '', endedName = '', failedName = '', cancelledName = '', newsType = NT_ALL[0], planet = new Planet(), targetPlanet = null) {
         //console.log('instantiating News with:',{startedName, endedName, newsType, planet, targetPlanet});
         /** @type {string} */
+        this.uuid = generateUUID('news_')
+        /** @type {string} */
         this.startedName = String(colorSpan(newsType.newsFlavor.symbol + ' ' + startedName, newsType.newsFlavor.color));
         /** @type {string} */
         this.endedName = String(colorSpan(newsType.newsFlavor.symbol + ' ' + endedName, newsType.newsFlavor.color));
@@ -54,6 +56,8 @@ class News {
         /** @type {number|null} */
         this.endedYear = null;
         this.onTick = (elapsedYears = 1)=>{}
+        
+        gameRegistry.registerNews(this)
     }
 
     /** 

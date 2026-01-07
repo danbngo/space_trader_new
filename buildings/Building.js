@@ -8,6 +8,8 @@ class Building {
      * @param {BuildingType} buildingType - The type of building.
      */
     constructor(planet = new Planet(), buildingType = BUILDING_TYPES_ALL[0]) {
+        /** @type {string} */
+        this.uuid = generateUUID('building_')
         /** @type {Planet} */
         this.planet = planet
         /** @type {BuildingType} */
@@ -17,6 +19,8 @@ class Building {
         this.level = 1
         this.exists = true;
         //this.normalize() //danmod this causes errors because the extending child class tries to use ITS normalize function instead of the one below
+        
+        gameRegistry.registerBuilding(this)
     }
     normalize() {
         const multiplier = this.planet?.objectType?.powerMultiplier ?? 1

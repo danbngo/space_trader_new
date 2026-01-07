@@ -53,6 +53,8 @@ class NewsEffect extends Civilization {
         religions = new CountsMap()
 
     }) {
+        /** @type {string} */
+        //this.uuid = generateUUID('effect_') //wont need, we dont serialize these
         super({
             planet,
             cargoPriceMultipliers,

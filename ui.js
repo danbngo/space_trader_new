@@ -475,9 +475,10 @@ let currentModal = ce()
  * @param {(ButtonData|HTMLElement)[]} buttons - Array of button data or HTML elements
  * @param {string} id - The ID to assign to the modal
  * @param {Function|null} onClosePanel - Optional callback when close button is clicked
+ * @param {number} dimBackgroundRatio - Alpha value for background dimming (0-1), default 0.55
  * @returns {HTMLElement} The created modal element
  */
-function showModal(title = '', text = '', buttons = [['Continue', ()=>{}, false]], id = '', onClosePanel = null) {
+function showModal(title = '', text = '', buttons = [['Continue', ()=>{}, false]], id = '', onClosePanel = null, dimBackgroundRatio = 0.55) {
     onClosePanel = null //danmod - this was ugly
     if (currentMap) {
         currentMap.refresh()
@@ -485,8 +486,8 @@ function showModal(title = '', text = '', buttons = [['Continue', ()=>{}, false]
     }
     // Close existing modal if open
     if (currentModal) closeModal();
-    // Create overlay
-    currentModal = ce({parent:UI_CONTAINER, classNames:['modal-overlay'], children:[
+    // Create overlay with custom background transparency
+    currentModal = ce({parent:UI_CONTAINER, classNames:['modal-overlay'], style: {background: `rgba(0, 0, 0, ${dimBackgroundRatio})`}, children:[
         createPanel(title, text, buttons, id, onClosePanel)
     ]})
     return currentModal

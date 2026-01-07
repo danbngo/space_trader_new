@@ -3,18 +3,36 @@
  */
 function showTitleScreen() {
     showBackgroundMap()
+    
+    // Check if save exists
+    const hasSave = SaveManager.hasSave();
+    
+    /** @type {ButtonData[]} */
+    const buttons = [
+        ["New Game", () => startNewGame()],
+    ];
+    
+    if (hasSave) {
+        buttons.push(["Load Game", () => loadSavedGame()]);
+    } else {
+        buttons.push(["Continue", () => continueGame()]);
+    }
+    
+    buttons.push(
+        ["Debug Mode", () => {
+            DEBUG_MODE = true
+            startNewGame()
+        }],
+        ["About", () => showAbout()]
+    );
+    
     showModal(
         "Space Game",
         "A text‑based space adventure.",
-        [
-            ["New Game", () => startNewGame()],
-            ["Continue", () => continueGame()],
-            ["Debug Mode", () => {
-                DEBUG_MODE = true
-                startNewGame()
-            }],
-            ["About", () => showAbout()]
-        ]
+        buttons,
+        '',
+        null,
+        0.25  // Lighter background for title screen
     );
 }
 
@@ -328,6 +346,14 @@ function continueGame() {
     //gs.load()
     console.log("Game continued:", gs);
     showStarMap()
+}
+
+/**
+ * Load a saved game from localStorage
+ */
+function loadSavedGame() {
+    // Show the load menu instead of loading a single save
+    showLoadMenu();
 }
 
 function showAbout() {

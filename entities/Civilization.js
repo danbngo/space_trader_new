@@ -43,6 +43,8 @@ class Civilization {
         navy = 1, army = 1, corruption = 1, crime = 1, wealth = 1, reserves = 1, taxes = 1,
         religions = new CountsMap(), races = new CountsMap(), stateReligion = null
     } = {}) {
+        /** @type {string} */
+        this.uuid = generateUUID('civ_')
         /** @type {Planet} */
         this.planet = planet;
         /** @type {GovernmentType} */
@@ -95,6 +97,8 @@ class Civilization {
         this.reserves = reserves; //more goods in markets
         /** @type {number} */
         this.taxes = taxes; //tax rate applied to most transactions (0 to MAX_TAX_RATE)
+        
+        gameRegistry.registerCivilization(this)
     }
 
     /**

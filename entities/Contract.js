@@ -23,6 +23,8 @@ class Contract {
         reward = 0,
         description = ''
     ) {
+        /** @type {string} */
+        this.uuid = generateUUID('contract_')
         /** @type {ContractType} */
         this.contractType = contractType;
         /** @type {Planet} */
@@ -39,6 +41,8 @@ class Contract {
         this.reward = reward;
         /** @type {string} */
         this.description = description;
+        
+        gameRegistry.registerContract(this)
     }
 
     get isExpired() {

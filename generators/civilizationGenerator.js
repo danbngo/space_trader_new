@@ -26,7 +26,7 @@ function generateCivilization(planet) {
 
     const cargoPriceMultipliers = new CountsMap()
     for (const ct of CARGO_TYPES_ALL) {
-        cargoPriceMultipliers.setAmount(ct, rng(MARKET_MAX_CARGO_PRICE_MODIFIER, MARKET_MIN_CARGO_PRICE_MODIFIER, false))
+        cargoPriceMultipliers.setAmount(ct, 1) //used to randomize this but news and climate covers that pretty well
     }
 
     const skillPriceMultipliers = new CountsMap()

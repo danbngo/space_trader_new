@@ -8,6 +8,8 @@ class Route {
      */
     constructor(fleet = new Fleet(), destination = new Planet(), startYear = gs.year) {
         //run simu
+        /** @type {string} */
+        this.uuid = generateUUID('route_')
         this.fleet = fleet
         this.destination = destination
         this.startYear = startYear
@@ -34,6 +36,8 @@ class Route {
             this.path = new Path(this.fleet.x, this.fleet.y, toX, toY)
             this.valid = true
         }
+        
+        gameRegistry.registerRoute(this)
     }
 
     positionAtYear(year = 0) {

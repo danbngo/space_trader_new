@@ -241,7 +241,15 @@ async function addHistory(startYear = 3000, endYear = 3000, progress = {complete
     const YEARS_PER_WEEK = 1 / WEEKS_PER_YEAR
     
     for (let y = startYear; y < endYear; y += YEARS_PER_WEEK) {
-        gs.year = y
+        const previousYear = Math.floor(gs.year);
+        gs.year = y;
+        
+        // Reset savedThisTick flag when year changes
+        const currentYear = Math.floor(gs.year);
+        if (currentYear !== previousYear) {
+            gs.savedThisTick = false;
+        }
+        
         weeksSinceYield++
         
         // Process news 7 times per week (once per day equivalent)

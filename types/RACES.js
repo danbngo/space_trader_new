@@ -13,6 +13,8 @@ class Race {
      */
     constructor(name = '', color = COLORS.White, symbol = '👤', description = '', weight = 1, automaticPerks = []) {
         /** @type {string} */
+        this.uuid = generateUUID('race_')
+        /** @type {string} */
         this.name = name
         /** @type {number[]} */
         this.color = color

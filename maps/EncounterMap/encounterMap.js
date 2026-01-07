@@ -166,7 +166,7 @@ class EncounterMap extends BaseMap {
                 shipObj = cvs.addFilledTriangle(shipId, ship.x, ship.y, ship.radius, ship.radius, 12, ship.color, ship.angle, ()=>this.selectObject(ship))
             }
             else if (ship.shipType.shape == SHAPES.FilledOval) {
-                shipObj = cvs.addFilledOval(shipId, ship.x, ship.y, ship.radius, ship.radius * ship.widthModifier, 0.5, ship.color, ship.angle, ()=>this.selectObject(ship))
+                shipObj = cvs.addFilledOval(shipId, ship.x, ship.y, ship.radius, ship.radius * (ship instanceof AsteroidShip ? ship.widthModifier : 1), 0.5, ship.color, ship.angle, ()=>this.selectObject(ship))
                 console.log('ship obj:', shipObj)
             }
             else if (ship.shipType.shape == SHAPES.FilledCircle) {

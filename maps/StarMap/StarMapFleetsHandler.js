@@ -12,9 +12,16 @@ class StarMapFleetsHandler {
     }
 
     handleAll() {
-        this.handleFleets()
-        this.handleAbandonedFleets()
-        this.handleWaypoint()
+        const perfStart = STARMAP_DEBUG_CONFIG.logPerformance ? performance.now() : 0;
+        
+        if (STARMAP_DEBUG_CONFIG.displayFleets) this.handleFleets();
+        if (STARMAP_DEBUG_CONFIG.displayAbandonedFleets) this.handleAbandonedFleets();
+        if (STARMAP_DEBUG_CONFIG.displayWaypoint) this.handleWaypoint();
+        
+        if (STARMAP_DEBUG_CONFIG.logPerformance) {
+            const perfEnd = performance.now();
+            console.log(`StarMapFleetsHandler.handleAll: ${(perfEnd - perfStart).toFixed(2)}ms`);
+        }
     }
 
     /**
@@ -103,30 +110,45 @@ class StarMapFleetsHandler {
                 
                 fleetObj.clickPriority = 5 // Fleets have medium priority (lower than planets, higher than default)
                 
-                pathObj = cvs.addLine(pathId, 0, 0, 0, 0, fillColor, 1)
-                thrusterObj = cvs.addFilledTriangle(thrusterId, fleet.x, fleet.y, fleetSize*0.5, fleetSize*0.5, 6, COLORS.Orange)
-                labelObj = cvs.addText(labelId, fleet.x, fleet.y, 0, -32, fleet.name, fillColor, DEFAULT_FONT_SIZE, 2, () => selectObject.call(this.starMap, fleet))
-                labelObj.clickPriority = 5 // Fleet labels also have medium priority
-                
-                // Create unknown marker (question mark) for fog-of-war
-                unknownObj = cvs.addText(unknownId, fleet.x, fleet.y, 0, 0, '?', COLORS.White, DEFAULT_FONT_SIZE * 1.5, 2)
-                unknownObj.visible = false
-                
-                labelObj.visible = isPlayerFleet
-                
-                const objs = [fleetObj, labelObj]
-                for (const obj of objs) {
-                    obj.onHover = () => {
-                        labelObj.visible = true
+                if (STARMAP_DEBUG_CONFIG.displayFleetPaths) {
+                    pathObj = cvs.addLine(pathId, 0, 0, 0, 0, fillColor, 1)
+                }
+                if (STARMAP_DEBUG_CONFIG.displayFleetThrusters) {
+                    thrusterObj = cvs.addFilledTriangle(thrusterId, fleet.x, fleet.y, fleetSize*0.5, fleetSize*0.5, 6, COLORS.Orange)
+                }
+                if (STARMAP_DEBUG_CONFIG.displayFleetLabels) {
+                    labelObj = cvs.addText(labelId, fleet.x, fleet.y, 0, -32, fleet.name, fillColor, DEFAULT_FONT_SIZE, 2, () => selectObject.call(this.starMap, fleet))
+                    labelObj.clickPriority = 5 // Fleet labels also have medium priority
+                    
+                    // Create unknown marker (question mark) for fog-of-war
+                    unknownObj = cvs.addText(unknownId, fleet.x, fleet.y, 0, 0, '?', COLORS.White, DEFAULT_FONT_SIZE * 1.5, 2)
+                    unknownObj.visible = false
+                    
+                    labelObj.visible = isPlayerFleet
+                    
+                    const objs = [fleetObj, labelObj]
+                    for (const obj of objs) {
+                        obj.onHover = () => {
+                            labelObj.visible = true
+                            this.setFleetStrokeStyle(fleet, fleetObj, fleet == selectedObject, true)
+                            labelObj.strokeColor = COLORS.Cyan
+                        }
+                        obj.onHoverEnd = () => {
+                            labelObj.visible = isPlayerFleet
+                            this.setFleetStrokeStyle(fleet, fleetObj, fleet == selectedObject, false)
+                            labelObj.strokeColor = fleet == selectedObject ? COLORS.Green : (fleet.planet ? fleet.planet.color : COLORS.White)
+                        }
+                        if (!isPlayerFleet) obj.onHoverEnd()
+                    }
+                } else {
+                    // No labels - just handle hover on fleet
+                    fleetObj.onHover = () => {
                         this.setFleetStrokeStyle(fleet, fleetObj, fleet == selectedObject, true)
-                        labelObj.strokeColor = COLORS.Cyan
                     }
-                    obj.onHoverEnd = () => {
-                        labelObj.visible = isPlayerFleet
+                    fleetObj.onHoverEnd = () => {
                         this.setFleetStrokeStyle(fleet, fleetObj, fleet == selectedObject, false)
-                        labelObj.strokeColor = fleet == selectedObject ? COLORS.Green : (fleet.planet ? fleet.planet.color : COLORS.White)
                     }
-                    if (!isPlayerFleet) obj.onHoverEnd()
+                    if (!isPlayerFleet) fleetObj.onHoverEnd()
                 }
             }
             
@@ -134,37 +156,38 @@ class StarMapFleetsHandler {
             if (visibilityState === 'hidden') {
                 // Completely hidden - hide all objects
                 fleetObj.visible = false
-                labelObj.visible = false
-                pathObj.visible = false
-                thrusterObj.visible = false
-                unknownObj.visible = false
+                if (labelObj) labelObj.visible = false
+                if (pathObj) pathObj.visible = false
+                if (thrusterObj) thrusterObj.visible = false
+                if (unknownObj) unknownObj.visible = false
                 // Skip remaining updates for hidden fleets
                 return
             } else if (visibilityState === 'unknown') {
                 // Show only question mark, hide everything else
                 fleetObj.visible = false
-                labelObj.visible = false
-                pathObj.visible = false
-                thrusterObj.visible = false
-                unknownObj.visible = true
-                unknownObj.x = fleet.x
-                unknownObj.y = fleet.y
-                
-                // Interpolate color from white (at 1x distance) to gray (64,64,64) at 1.25x distance
-                const viewDistance = gs.fleet.mapViewDistance
-                // t = 0 at 1x distance (inner edge), t = 1 at 1.25x distance (outer edge)
-                const t = (distanceToPlayer - viewDistance) / (viewDistance * 0.25)
-                const gray = Math.round(255 - (255 - 64) * t)
-                // Apply cloakLevel to alpha (higher cloak = more transparent)
-                const alpha = 1 - (fleet.cloakLevel * 0.9)
-                unknownObj.fillColor = [gray, gray, gray, alpha]
-                
+                if (labelObj) labelObj.visible = false
+                if (pathObj) pathObj.visible = false
+                if (thrusterObj) thrusterObj.visible = false
+                if (unknownObj) {
+                    unknownObj.visible = STARMAP_DEBUG_CONFIG.displayFleetLabels
+                    unknownObj.x = fleet.x
+                    unknownObj.y = fleet.y
+                    
+                    // Interpolate color from white (at 1x distance) to gray (64,64,64) at 1.25x distance
+                    const viewDistance = gs.fleet.mapViewDistance
+                    // t = 0 at 1x distance (inner edge), t = 1 at 1.25x distance (outer edge)
+                    const t = (distanceToPlayer - viewDistance) / (viewDistance * 0.25)
+                    const gray = Math.round(255 - (255 - 64) * t)
+                    // Apply cloakLevel to alpha (higher cloak = more transparent)
+                    const alpha = 1 - (fleet.cloakLevel * 0.9)
+                    unknownObj.fillColor = [gray, gray, gray, alpha]
+                }
                 // Skip remaining updates
                 return
             } else {
                 // Visible - show fleet normally, hide question mark
                 fleetObj.visible = true
-                unknownObj.visible = false
+                if (unknownObj) unknownObj.visible = false
             }
             
             // Update fleet position and angle
@@ -189,63 +212,63 @@ class StarMapFleetsHandler {
             // Update stroke style based on selection
             this.setFleetStrokeStyle(fleet, fleetObj, fleet == selectedObject)
             
-            // Oscillate brightness dramatically using alpha channel
-            const currentMs = Date.now()
-            const brightnessOscillation = 0.3 * Math.sin(currentMs * 0.002 + fleetIndex) // Dramatic brightness variation
+            // Set fleet alpha (no oscillation for performance)
             const baseAlpha = 1-(fleet.cloakLevel*0.95)
-            fleetObj.fillColor[3] = Math.max(0.3, Math.min(1, baseAlpha + brightnessOscillation))
+            fleetObj.fillColor[3] = baseAlpha
             
             // Update onClick handler - docked fleets should not be clickable
             fleetObj.onClick = fleet.location ? null : () => selectObject.call(this.starMap, fleet)
             
             // Update label
-            if (fleet.location || !fleet.route) {
-                labelObj.visible = false
-            } else {
-                labelObj.visible = isPlayerFleet
-                labelObj.x = fleet.x
-                labelObj.y = fleet.y
+            if (labelObj) {
+                if (fleet.location || !fleet.route) {
+                    labelObj.visible = false
+                } else {
+                    labelObj.visible = isPlayerFleet
+                    labelObj.x = fleet.x
+                    labelObj.y = fleet.y
+                }
             }
             
             // Update path (only show for player fleet or selected fleet)
-            const shouldShowPath = (fleet === gs.fleet || fleet === selectedObject) && fleet.route && fleet.route.path
-            if (!shouldShowPath) {
-                pathObj.visible = false
-            } else {
-                let {startX, startY, toX, toY} = fleet.route.path
-                pathObj.visible = true
-                pathObj.x = startX
-                pathObj.y = startY
-                pathObj.x2 = toX
-                pathObj.y2 = toY
+            if (pathObj) {
+                const shouldShowPath = (fleet === gs.fleet || fleet === selectedObject) && fleet.route && fleet.route.path
+                if (!shouldShowPath) {
+                    pathObj.visible = false
+                } else {
+                    let {startX, startY, toX, toY} = fleet.route.path
+                    pathObj.visible = true
+                    pathObj.x = startX
+                    pathObj.y = startY
+                    pathObj.x2 = toX
+                    pathObj.y2 = toY
+                }
             }
             
             // Update thruster
-            if (fleet.location || !fleet.route || isTurning) {
-                thrusterObj.visible = false
-            } else {
-                // Position thruster behind fleet, offset by fleet size + small gap
-                const thrusterOffset = 15
-                const [screenOffsetX, screenOffsetY] = rotatePoint(thrusterOffset, 0, 0, 0, fleetAngle - Math.PI)
-                if (fleetAngle !== undefined) thrusterObj.angle = fleetAngle - Math.PI
-                thrusterObj.visible = true
-                thrusterObj.x = fleet.x
-                thrusterObj.y = fleet.y
-                thrusterObj.screenOffsetX = screenOffsetX
-                thrusterObj.screenOffsetY = screenOffsetY
-                
-                // Oscillate thruster transparency and size
-                const currentMs = Date.now()
-                const oscillationFreq = 0.003 // Slower oscillation for fleet thrusters
-                const baseAlpha = 1 - (fleet.cloakLevel * 0.95)
-                const alphaOscillation = 0.1 * Math.sin(currentMs * oscillationFreq)
-                thrusterObj.fillColor[3] = Math.min(1, baseAlpha + alphaOscillation)
-                
-                // Oscillate size slightly
-                const fleetSize = Math.pow(fleet.radius/EARTH_RADII_PER_AU, 0.4) * 2.5 * 100
-                const sizeOscillation = 1 + 0.15 * Math.sin(currentMs * 0.004)
-                thrusterObj.size = fleetSize * 0.5 * sizeOscillation
-                thrusterObj.minorSize = fleetSize * 0.5 * sizeOscillation
+            if (thrusterObj) {
+                if (fleet.location || !fleet.route || isTurning) {
+                    thrusterObj.visible = false
+                } else {
+                    // Position thruster behind fleet, offset by fleet size + small gap
+                    const thrusterOffset = 15
+                    const [screenOffsetX, screenOffsetY] = rotatePoint(thrusterOffset, 0, 0, 0, fleetAngle - Math.PI)
+                    if (fleetAngle !== undefined) thrusterObj.angle = fleetAngle - Math.PI
+                    thrusterObj.visible = true
+                    thrusterObj.x = fleet.x
+                    thrusterObj.y = fleet.y
+                    thrusterObj.screenOffsetX = screenOffsetX
+                    thrusterObj.screenOffsetY = screenOffsetY
+                    
+                    // Set thruster alpha (no oscillation for performance)
+                    const baseAlpha = 1 - (fleet.cloakLevel * 0.95)
+                    thrusterObj.fillColor[3] = baseAlpha
+                    
+                    // Set constant thruster size
+                    const fleetSize = Math.pow(fleet.radius/EARTH_RADII_PER_AU, 0.4) * 2.5 * 100
+                    thrusterObj.size = fleetSize * 0.5
+                    thrusterObj.minorSize = fleetSize * 0.5
+                }
             }
         })
         

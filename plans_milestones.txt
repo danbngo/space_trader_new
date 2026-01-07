@@ -1,0 +1,35 @@
+-get the game playable. not perfect or balanced but... playable.
+-get the game hosted on itch.io
+-fill in my itch.io page with some light descriptions
+-get it to where people can download it or play in browser
+
+
+
+goals:
+get the game hosted on itch.io
+
+
+
+COMPREHENSIVE TESTING PLAN WORK OUR WAY UP, THEN OUT
+
+the first priority is get rid of any actual bugs
+-player getting the drop on enemies based on positioning doesnt seem to work right
+
+next priority is to fully flesh out (but not BALANCE, that comes LATER) out every CORE part of the game
+-trading
+-fleet combat
+-avoiding pirates
+-upgrading your ships
+-buying officers
+-leveling up
+-maybe smuggling (that was in space trader OG after all)
+-getting a good score by the end of the game
+
+next priority is to playtest those parts of the game to determine which parts may need major overhauls/changes
+
+next priority is to throw more features in and repeat the process - such as the individual crew members doing things, etc.
+
+THEN near the end comes balance, because balance involves every single aspect of the game together 
+caveat - you do want to aim for SOME reasonableness in trading, etc. the player cant just pull money out of thin air.
+but if some things are OP or not quite balanced properly, thats ok for now.
+you'll get a sense for this when the game itself is playable

@@ -15,6 +15,8 @@ class Officer {
      */
     constructor(name = "Unnamed", planet = new Planet(), factionType = FACTION_TYPES_ALL[0], race = RACES_ALL[0], religion = RELIGION_AGNOSTICISM, age = 25, credits = 0) {
         /** @type {string} */
+        this.uuid = generateUUID('officer_')
+        /** @type {string} */
         this.name = name;
         /** @type {Planet} */
         this.planet = planet;
@@ -56,6 +58,14 @@ class Officer {
         this.ranks = new Map();
         /** @type {PerkType[]} */
         this.perks = [];
+        
+        // Temporary properties used during deserialization (SaveManager)
+        /** @type {string} */
+        this._planetUUID = undefined;
+        /** @type {string} */
+        this._fleetUUID = undefined;
+        
+        gameRegistry.registerOfficer(this)
     }
 
     get bonusSkills() {

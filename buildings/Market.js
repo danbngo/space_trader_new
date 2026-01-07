@@ -152,6 +152,23 @@ class Market extends Building {
         // Invert availability: low availability (0.5x) = high price (2x)
         calc.addFactor('availability', 1.0 / Math.max(0.1, availabilityMultiplier));
         
+        // Add news event effects on cargo prices
+        const activeNews = gs.system.news.filter(news => 
+            news.started && !news.ended && (news.planet === this.planet || news.targetPlanet === this.planet)
+        );
+        
+        for (const news of activeNews) {
+            // Check start effects
+            if (news.startEffects) {
+                for (const effect of news.startEffects) {
+                    const modifier = effect.cargoPriceMultipliers.getAmount(ct);
+                    if (modifier && modifier !== 1.0) {
+                        calc.addFactor(news.newsType.name.toLowerCase(), modifier);
+                    }
+                }
+            }
+        }
+        
         // Cargo-specific demand factors
         if (ct === CARGO_TYPES.FOOD) {
             calc.addFactor('population demand', 0.8 + civ.population * 1.2);

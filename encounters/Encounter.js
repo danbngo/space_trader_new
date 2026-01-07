@@ -14,6 +14,8 @@ class Encounter {
      */
     constructor(encounterType = ENCOUNTER_TYPES_ALL[0], planet = new Planet(), fleet = new Fleet(), effects = [], undetectedFleet) {
         console.log('Encounter.constructor', { encounterType, planet, fleet });
+        /** @type {string} */
+        this.uuid = generateUUID('encounter_')
         /** @type {EncounterType} */
         this.encounterType = encounterType;
         /** @type {Planet} */
@@ -61,6 +63,8 @@ class Encounter {
         for (const ship of this.playerShips) {
             this.playerShipHullsAtStart.set(ship, ship.hull[0])
         }
+        
+        gameRegistry.registerEncounter(this)
     }
 
     get ships() {

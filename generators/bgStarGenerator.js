@@ -11,7 +11,7 @@ function generateBackgroundStars(radius = 1, numStars = 1) {
         let [x,y] = rotatePoint(distance, 0, 0, 0, Math.PI*4*Math.random())
         //y *= Math.random()
         // Make stars mostly white with slight color variance and brightness variance
-        const baseBrightness = rng(128, 32)
+        const baseBrightness = rng(192, 64)
         const colorVariance = rng(20, 0) // Small color variance
         const r = Math.min(255, baseBrightness + rng(colorVariance, -colorVariance))
         const g = Math.min(255, baseBrightness + rng(colorVariance, -colorVariance))

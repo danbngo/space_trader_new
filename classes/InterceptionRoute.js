@@ -46,12 +46,19 @@ class InterceptionRoute extends Route {
         // Now call super with the interception waypoint
         super(fleet, interceptionWaypoint, startYear)
         
+        // Override with specific interception route UUID
+        /** @type {string} */
+        this.uuid = generateUUID('interception_')
+        
         // Store additional information about the interception
         this.isInterception = true
         this.targetFleet = target
         this.targetRouteAtCreation = target.route // Store target's route at time of creation
         this.interceptionPoint = interceptionResult
         this.iterations = interceptionResult.iterations
+        
+        // Register this route in the gameRegistry
+        gameRegistry.registerRoute(this)
     }
     
     /**

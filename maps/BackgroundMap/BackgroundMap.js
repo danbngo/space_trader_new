@@ -21,7 +21,7 @@ class BackgroundMap extends BaseMap {
         this.asteroids = []
         const numAsteroids = 50
         for (let i = 0; i < numAsteroids; i++) {
-            this.asteroids.push(this.createAsteroid())
+            this.asteroids.push(this.createAsteroid(true)) // Pass true for initial random z
         }
 
         // Track which asteroid UUIDs are currently on canvas
@@ -43,17 +43,21 @@ class BackgroundMap extends BaseMap {
         this.tick()
     }
 
-    createAsteroid() {
+    createAsteroid(isInitial = false) {
         // Start at random position across the entire field, avoiding center
         const angle = Math.random() * Math.PI * 2
         const minDistance = 1.5 // Avoid spawning too close to center
         const distance = minDistance + Math.random() * (this.outerRadius * 0.8 - minDistance)
-        const z = 2.5 + Math.random() * 2.5 // Random depth from close (2.5) to far (5.0) - spawn farther away
+        // On initial load, spawn at random depths; after that, spawn at max distance
+        const z = isInitial ? (0.3 + Math.random() * 7.7) : 8.0
         
         // Brown-ish colors with variation
         const baseR = 160
         const baseG = 120
         const baseB = 80
+        const baseR2 = 120
+        const baseG2 = 120
+        const baseB2 = 120
         
         return {
             uuid: generateUUID(), // Unique ID for tracking
@@ -64,12 +68,18 @@ class BackgroundMap extends BaseMap {
             rotation: Math.random() * Math.PI * 2, // Current rotation
             rotationSpeed: (Math.random() - 0.5) * 0.05, // Rotation per frame
             vertices: AsteroidShip.generateShape(1.0, 0.4, 0.5),
-            color: [
-                baseR + rng(40, -40),
-                baseG + rng(40, -40),
-                baseB + rng(40, -40),
+            color: Math.random() > 0.5 ? [
+                baseR + rng(3, -3),
+                baseG + rng(3, -3),
+                baseB + rng(3, -3),
                 255
-            ]
+            ] : [
+                baseR2 + rng(3, -3),
+                baseG2 + rng(3, -3),
+                baseB2 + rng(3, -3),
+                255
+            ],
+            radius: rng(1,0.1,false)
         }
     }
 

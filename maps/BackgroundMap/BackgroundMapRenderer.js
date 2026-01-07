@@ -55,18 +55,17 @@ class BackgroundMapRenderer {
             const projectedY = asteroid.y * scale
             
             // Size increases as asteroid gets closer (smaller z)
-            const baseSize = 0.2
-            const size = baseSize * scale
+            const size = asteroid.radius * scale
             
             // Brightness increases more dramatically as asteroid gets closer (smaller z)
-            const maxZ = 5.0
+            const maxZ = 8.0 // Match the maximum spawn z value
             const distanceRatio = (maxZ - asteroid.z) / maxZ // 0 when far, 1 when close
-            const brightness = Math.min(1, Math.pow(distanceRatio, 0.5) + 0.3) // Square root for stronger effect, +0.3 min brightness
+            const brightness = distanceRatio // Square root for stronger effect, +0.3 min brightness
             const color = [
                 Math.round(asteroid.color[0] * brightness),
                 Math.round(asteroid.color[1] * brightness),
                 Math.round(asteroid.color[2] * brightness),
-                Math.round(255 * brightness)
+                Math.round(255)
             ]
             
             const asteroidId = `asteroid_${asteroid.uuid}`
@@ -75,31 +74,30 @@ class BackgroundMapRenderer {
             const zIndex = Math.round(1000 / asteroid.z)
             
             // Only add if it doesn't exist, otherwise update existing
-            const existingObj = cvs.drawOrder.find(obj => obj.id === asteroidId)
+            let existingObj = cvs.drawOrder.find(obj => obj.id === asteroidId)
             if (!existingObj) {
-                cvs.addPolygon(
+                existingObj = cvs.addPolygon(
                     asteroidId,
                     projectedX,
                     projectedY,
                     asteroid.vertices,
                     size,
-                    2, // min screen size
-                    color,
-                    COLORS.White, // white stroke
+                    0, // min screen size
+                    [...asteroid.color],
+                    null, // white stroke
                     asteroid.rotation,
                     null, // no click handler
                     zIndex // closer asteroids (smaller z) have higher zIndex
                 )
                 activeAsteroidIds.add(asteroid.uuid)
-            } else {
-                // Update existing asteroid position, size, brightness, rotation, and zIndex
-                existingObj.x = projectedX
-                existingObj.y = projectedY
-                existingObj.size = size
-                existingObj.color = [...color]
-                existingObj.rotation = asteroid.rotation
-                existingObj.zIndex = zIndex
-            }
+            } 
+            // Update existing asteroid position, size, brightness, rotation, and zIndex
+            existingObj.x = projectedX
+            existingObj.y = projectedY
+            existingObj.size = size
+            existingObj.fillColor = [...color]
+            existingObj.rotation = asteroid.rotation
+            existingObj.zIndex = zIndex
         })
         
         // Remove canvas objects for asteroids that no longer exist
@@ -180,22 +178,11 @@ class BackgroundMapRenderer {
                 const distance = minDistance + Math.random() * (this.backgroundMap.outerRadius * 0.8 - minDistance)
                 asteroid.x = Math.cos(newAngle) * distance
                 asteroid.y = Math.sin(newAngle) * distance
-                asteroid.z = 3.0 + Math.random() * 2.0 // Reset to far distance (high z)
+                asteroid.z = 8.0 // Reset to max distance to simulate discovering new asteroids
                 asteroid.angle = newAngle
                 asteroid.rotation = Math.random() * Math.PI * 2
                 asteroid.rotationSpeed = (Math.random() - 0.5) * 0.05
                 asteroid.vertices = AsteroidShip.generateShape(1.0, 0.4, 0.5)
-                
-                // Brown-ish colors with variation
-                const baseR = 160
-                const baseG = 120
-                const baseB = 80
-                asteroid.color = [
-                    baseR + rng(40, -40),
-                    baseG + rng(40, -40),
-                    baseB + rng(40, -40),
-                    255
-                ]
             }
         })
     }

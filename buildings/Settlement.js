@@ -22,6 +22,8 @@ class Settlement {
      * @param {Casino} params.casino - The casino building.
      */
     constructor({planet = new Planet(), settlementType = null, shipyard = null, market = null, blackMarket = null, guild = null, bank = null, courthouse = null, academy = null, tavern = null, cyberSurgeon = null, geneticist = null, palace = null, temple = null, casino = null}) {
+        /** @type {string} */
+        this.uuid = generateUUID('settlement_')
         /** @type {Planet} */
         this.planet = planet;
         /** @type {SettlementType} */
@@ -52,6 +54,8 @@ class Settlement {
         this.temple = temple;
         /** @type {Casino} */
         this.casino = casino;
+        
+        gameRegistry.registerSettlement(this)
     }
     get buildings() {
         return [this.academy, this.bank, this.blackMarket, this.casino, this.courthouse, this.cyberSurgeon, this.geneticist, this.guild, this.market, this.palace, this.shipyard, this.tavern, this.temple]

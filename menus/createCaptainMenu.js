@@ -100,6 +100,22 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
     const leftColumn = ce({
         style: {display: 'flex', flexDirection: 'column', gap: '12px'},
         children: [
+            // Name input field
+            ce({
+                style: {display: 'flex', flexDirection: 'column', gap: '4px'},
+                children: [
+                    ce({children: ['Name:']}),
+                    (() => {
+                        const input = createTextInput('Enter captain name', captain.name || '')
+                        input.style.width = '240px'
+                        input.addEventListener('input', () => {
+                            captain.name = input.value
+                        })
+                        return input
+                    })()
+                ]
+            }),
+            
             ce({children: ['<u>Character Background</u>']}),
 
                         // Faction dropdown

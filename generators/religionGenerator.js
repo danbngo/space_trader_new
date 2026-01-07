@@ -33,16 +33,6 @@ function getUnusedReligionSymbol() {
  * @returns {string} The generated religion name.
  */
 function generateReligionName() {
-    const prefixes = [
-        'Order of', 'Path of', 'Way of', 'Cult of', 'Seekers of'
-    ];
-    
-    const shortConcepts = [
-        'the Void', 'the Nexus', 'Light', 'Unity', 'the Flame', 
-        'the Stars', 'Balance', 'the Cycle', 'Reason', 'Truth',
-        'the Singularity', 'the Architects', 'Harmony', 'Ascension'
-    ];
-    
     const oneWordNames = [
         'Voidism', 'Cosmism', 'Nexism', 'Lumism', 'Stellarism',
         'Unitarians', 'Singularians', 'Cyclists', 'Harmonics', 'Transcendents',
@@ -54,18 +44,12 @@ function generateReligionName() {
     
     const roll = Math.random();
     
-    if (roll < 0.4) {
-        // 40% single word
+    if (roll < 0.5) {
+        // 50% single word
         return rndMember(oneWordNames);
-    } else if (roll < 0.7) {
-        // 30% mashup word
-        return rndMember(mashupPrefixes) + rndMember(mashupSuffixes);
-    } else if (roll < 0.9) {
-        // 20% prefix + short concept
-        return `${rndMember(prefixes)} ${rndMember(shortConcepts)}`;
     } else {
-        // 10% just short concept
-        return rndMember(shortConcepts);
+        // 50% mashup word
+        return rndMember(mashupPrefixes) + rndMember(mashupSuffixes);
     }
 }
 

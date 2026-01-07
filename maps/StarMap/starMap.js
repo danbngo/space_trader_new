@@ -5,6 +5,31 @@ default zoom distances: 1200px = half the size of the solar system
 */
 
 /**
+ * Debug configuration for StarMap rendering performance
+ * Set any value to false to skip that element's computation and rendering entirely
+ */
+const STARMAP_DEBUG_CONFIG = {
+    displayBackgroundStars: true,    // Background parallax stars (5000+ pixels updated every frame)
+    displayAsteroids: true,           // Floating asteroids
+    displayOrbits: true,              // Orbital path circles
+    displayStars: true,               // Sun/stars
+    displayPlanets: true,             // Planets and dwarf planets (with shadows)
+    displayPlanetLabels: true,        // Planet name labels
+    displaySpaceStations: true,       // Space stations
+    displayAnomalies: true,           // Anomalies
+    displayRuins: true,               // Ancient ruins
+    displayFleets: true,              // All fleets (player + NPC)
+    displayFleetLabels: true,         // Fleet name labels
+    displayFleetPaths: true,          // Fleet route lines
+    displayFleetThrusters: true,      // Fleet thruster effects
+    displayAbandonedFleets: true,     // Abandoned/destroyed fleets
+    displayWaypoint: true,            // Player waypoint marker
+    
+    // Performance monitoring
+    logPerformance: false,            // Log render times to console
+};
+
+/**
  * @param {StarSystem} starSystem
  * @param {Fleet|Planet} autoSelectObject
  * 
@@ -23,8 +48,16 @@ class StarMap extends BaseMap {
         this.lastCameraX = 0
         this.lastCameraY = 0
         this.lastZoom = 1
+        
+        // FPS tracking
+        this.fpsFrames = 0
+        this.fpsLastTime = performance.now()
+        this.currentFPS = 0
 
         this.initializeDOM(this.starSystem.radius*4, this.starSystem.radius*0.4, this.starSystem.radius*40, this.starSystem.radius*1)
+        
+        // Create debug panel
+        this.debugPanel = ce({parent: this.root, style:{position:'absolute', bottom: 0, right: 0}})
 
         for (const bgStar of starSystem.backgroundStars) bgStar.reset()
 
@@ -58,6 +91,16 @@ class StarMap extends BaseMap {
 
     animateBackgroundStars() {
         this.frameCounter++
+        
+        // Track FPS
+        this.fpsFrames++
+        const currentTime = performance.now()
+        if (currentTime - this.fpsLastTime >= 1000) {
+            this.currentFPS = Math.round(this.fpsFrames * 1000 / (currentTime - this.fpsLastTime))
+            this.fpsFrames = 0
+            this.fpsLastTime = currentTime
+            this.refreshDebugPanel()
+        }
         
         // Check if player is in motion
         const playerInMotion = gs.fleet && (gs.fleet.x !== this.lastPlayerX || gs.fleet.y !== this.lastPlayerY)
@@ -141,7 +184,8 @@ class StarMap extends BaseMap {
                 ce({tag:'button', classNames: [(this.paused && !gs.fleet.route) || (!this.paused && gs.location) ? 'highlighted' : null] , innerHTML:this.paused ? '▶' : '⏸', onClick: () => this.togglePause()}),
                 ce({tag:'button', innerHTML:'+', onClick: () => this.adjustZoom(1.33)}),
                 ce({tag:'button', innerHTML:'-', onClick: () => this.adjustZoom(0.66)}),
-                ce({tag:'button', classNames: [gs.captain.skillPoints > 0 ? 'highlighted' : null], innerHTML:'?', onClick: () => showAssistantMenu()}),
+                ce({tag:'button', classNames: [gs.captain.skillPoints > 0 ? 'highlighted' : null], innerHTML:'🖳', onClick: () => showAssistantMenu()}),
+                ce({tag:'button', innerHTML:'☰', onClick: () => this.handleSaveGame()}),
             ]
         })
     }
@@ -177,6 +221,17 @@ class StarMap extends BaseMap {
                 })
                 : location ? destinationLink(location)
                 : '(Space)',
+            ]
+        })
+    }
+    
+    refreshDebugPanel() {
+        this.debugPanel.innerHTML = ""
+        ce({
+            parent: this.debugPanel,
+            classNames: ['starmap-info-bar'],
+            children: [
+                `FPS: ${this.currentFPS}`
             ]
         })
     }
@@ -470,6 +525,23 @@ class StarMap extends BaseMap {
         if (!this.paused) {
             requestAnimationFrame(()=>this.tick())
         }
+    }
+
+    /**
+     * Handle saving the game
+     */
+    handleSaveGame() {
+        // Pause the game while in menu
+        const wasPaused = this.paused;
+        if (!wasPaused) {
+            this.togglePause(true);
+        }
+        
+        // Show save/load menu
+        showSaveLoadMenu();
+        
+        // When modal closes, resume if needed
+        // Note: Individual menu functions handle their own resume logic
     }
 }
 

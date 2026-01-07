@@ -115,7 +115,7 @@ for (const st of ASTEROID_SHIP_TYPES_ALL) {
 }
 
 
-ASTEROID_SHIP_TYPES.ASTEROID.onDisabled = (died = new Ship(), encounter) => {
+ASTEROID_SHIP_TYPES.ASTEROID.onDisabled = (died = new AsteroidShip(), encounter) => {
     console.log('Asteroid.onDisabled', { died, encounter });
     if (Math.random()*died.radiusModifier < 0.5) {
         const effect = new DebrisCloudEffect(died.x, died.y, Math.random() * Math.PI * 4)
@@ -126,7 +126,7 @@ ASTEROID_SHIP_TYPES.ASTEROID.onDisabled = (died = new Ship(), encounter) => {
     }
 }
 
-ASTEROID_SHIP_TYPES.CRYOID.onDisabled = (died = new Ship(), encounter) => {
+ASTEROID_SHIP_TYPES.CRYOID.onDisabled = (died = new AsteroidShip(), encounter) => {
     console.log('Cryoid.onDisabled', { died, encounter });
     if (Math.random()*died.radiusModifier < 0.5) {
         const effect = new IceCloudEffect(died.x, died.y, Math.random() * Math.PI * 4)
@@ -137,7 +137,7 @@ ASTEROID_SHIP_TYPES.CRYOID.onDisabled = (died = new Ship(), encounter) => {
     }
 }
 
-ASTEROID_SHIP_TYPES.PLASMOID.onDisabled = (died = new Ship(), encounter) => {
+ASTEROID_SHIP_TYPES.PLASMOID.onDisabled = (died = new AsteroidShip(), encounter) => {
     console.log('Plasmoid.onDisabled', { died, encounter });
     if (Math.random()*died.radiusModifier < 0.5) {
         const effect = new IonCloudEffect(died.x, died.y, Math.random() * Math.PI * 4)
@@ -148,7 +148,7 @@ ASTEROID_SHIP_TYPES.PLASMOID.onDisabled = (died = new Ship(), encounter) => {
     }
 }
 
-ASTEROID_SHIP_TYPES.MAGNETOID.onDisabled = (died = new Ship(), encounter) => {
+ASTEROID_SHIP_TYPES.MAGNETOID.onDisabled = (died = new AsteroidShip(), encounter) => {
     console.log('Magnetoid.onDisabled', { died, encounter });
     if (Math.random()*died.radiusModifier < 0.5) {
         const effect = new IonCloudEffect(died.x, died.y, Math.random() * Math.PI * 4)
@@ -162,7 +162,7 @@ ASTEROID_SHIP_TYPES.MAGNETOID.onDisabled = (died = new Ship(), encounter) => {
 
 /**
  * Utility function to spawn smaller asteroids when a large asteroid is destroyed
- * @param {Ship} died - The destroyed asteroid
+ * @param {AsteroidShip} died - The destroyed asteroid
  * @param {Encounter} encounter - The current encounter
  */
 function spawnSmallerAsteroids(died, encounter) {

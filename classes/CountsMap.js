@@ -206,11 +206,19 @@ class CountsMap {
      */
     toJSON() {
         // Custom serialization for JSON.stringify
-        // Convert Map to object, handling Planet keys specially
+        // Convert Map to object, preferring UUID, then falling back to name
         const obj = {}
         for (const [key, amount] of this.counts) {
-            // If key has a .name property (like Planet), use the name as the key
-            const jsonKey = key?.name || String(key)
+            if (!key) {
+                console.warn('CountsMap.toJSON: Encountered null/undefined key, skipping');
+                continue;
+            }
+            // Prefer UUID if available, otherwise fall back to name, or String conversion
+            const jsonKey = key?.uuid || key?.name || String(key);
+            if (!jsonKey || jsonKey === '[object Object]') {
+                console.warn('CountsMap.toJSON: Unable to serialize key:', key);
+                continue;
+            }
             obj[jsonKey] = amount
         }
         return { counts: obj }

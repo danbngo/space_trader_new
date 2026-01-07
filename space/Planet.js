@@ -35,6 +35,8 @@ class Planet extends OrbitingObject {
         this.magnetosphereRadius = magnetosphereRadius
         /** @type {string} - Symbol: first letter of planet name in its color */
         this.symbol = colorSpan(this.name.charAt(0), this.color)
+        
+        gameRegistry.registerPlanet(this)
     }
     get c() {
         return this.civilization

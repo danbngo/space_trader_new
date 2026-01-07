@@ -54,6 +54,28 @@ class Fleet extends SpaceObject {
         this.abandonedYear = null; // Year when fleet was destroyed
         /** @type {string|null} */
         this.originalName = null; // Original name before being abandoned
+        
+        // Temporary properties used during deserialization (SaveManager)
+        /** @type {string} */
+        this._planetUUID = undefined;
+        /** @type {string} */
+        this._locationUUID = undefined;
+        /** @type {string} */
+        this._fleetTypeName = undefined;
+        /** @type {string} */
+        this._factionTypeName = undefined;
+        /** @type {string} */
+        this._flagshipUUID = undefined;
+        /** @type {string} */
+        this._captainUUID = undefined;
+        /** @type {string} */
+        this._destroyedBy = undefined;
+        /** @type {Object} */
+        this._routeData = undefined;
+        /** @type {Object} */
+        this._fleetAIData = undefined;
+        
+        gameRegistry.registerFleet(this)
     }
 
     /**

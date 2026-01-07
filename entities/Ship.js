@@ -66,10 +66,18 @@ class Ship {
 
         /** @type {string} */
         this.uuid = generateUUID('ship_');
-        /** @type {number} */
-        this.radiusModifier = 1;
-        /** @type {number} */
-        this.widthModifier = 1;
+        
+        // Temporary properties used during deserialization (SaveManager)
+        /** @type {string} */
+        this._fleetUUID = undefined;
+        /** @type {string} */
+        this._pilotUUID = undefined;
+        /** @type {string} */
+        this._disabledByShipUUID = undefined;
+        /** @type {string} */
+        this._aiTypeName = undefined;
+        
+        gameRegistry.registerShip(this)
     }
 
     get quality() {
@@ -104,7 +112,8 @@ class Ship {
 
     get radius() {
         //use formula based on mass and radius of a sphere
-        return BASE_SHIP_RADIUS_IN_MILES * (1+Math.sqrt(this.mass)) * this.radiusModifier
+        const modifier = this instanceof AsteroidShip && this.radiusModifier !== undefined ? this.radiusModifier : 1;
+        return BASE_SHIP_RADIUS_IN_MILES * (1+Math.sqrt(this.mass)) * modifier;
     }
 
     /**
@@ -122,7 +131,8 @@ class Ship {
     }
 
     get mass() {
-        return this.radiusModifier * AVERAGE_SHIP_MASS * (this.hull[1]/AVERAGE_SHIP_HULL
+        return (this instanceof AsteroidShip ? this.radiusModifier : 1) * AVERAGE_SHIP_MASS
+        * (this.hull[1]/AVERAGE_SHIP_HULL
         + this.shields[1]/AVERAGE_SHIP_SHIELDS 
         + this.lasers/AVERAGE_SHIP_LASERS
         + this.cargoSpace/AVERAGE_SHIP_CARGO_SPACE

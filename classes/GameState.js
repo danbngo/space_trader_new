@@ -27,6 +27,8 @@ class GameState {
         this.lastVisitedDates = new Map();
         /** @type {Map<SpaceObject, number>} - Last seen dates (year) for each space object */
         this.lastSeenDates = new Map();
+        /** @type {boolean} - Whether the game was saved this tick */
+        this.savedThisTick = false;
     }
 
     get captain() {

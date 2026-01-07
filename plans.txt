@@ -1,50 +1,20 @@
-HOW WE'RE GONNA 'FIX' SATTELITES AND DWARF PLANETS
 
-satelites WILL NOT SEND OUT fleets, they are basically just outposts of the home planet and can only be run by major planets.
-they have less services etc.
-they can ONLY be effected by disasters, 
-
-COMPREHENSIVE TESTING PLAN WORK OUR WAY UP, THEN OUT
-
-the first priority is get rid of any actual bugs
--player getting the drop on enemies based on positioning doesnt seem to work right
-
-next priority is to fully flesh out (but not BALANCE, that comes LATER) out every CORE part of the game
--trading
--fleet combat
--avoiding pirates
--upgrading your ships
--buying officers
--leveling up
--maybe smuggling (that was in space trader OG after all)
--getting a good score by the end of the game
-
-next priority is to playtest those parts of the game to determine which parts may need major overhauls/changes
-
-next priority is to throw more features in and repeat the process - such as the individual crew members doing things, etc.
-
-THEN near the end comes balance, because balance involves every single aspect of the game together 
-caveat - you do want to aim for SOME reasonableness in trading, etc. the player cant just pull money out of thin air.
-but if some things are OP or not quite balanced properly, thats ok for now.
-you'll get a sense for this when the game itself is playable
-
-
-TODO:
--i think its actually time to slow down - there is way, way too much going on in the system, on screen and cognitively in the game
-with half baked/half finished ideas. we need to iron out what we have and make sure that's fun, bug free and understandable.
+DONE:
 
 -dwarf planets, space stations should be under the influence of different major planets
  -incorporate them into the existing news system but tweak their interactions to represent being "jr partners"
  -downshift their numbers on the planet stats tab
- -do have them spawn their own fleets, but less than the OG planets
+ -do have them spawn their own fleets,
+-asteroids change shape when i miss them!!?? but less than the OG planets
+-make spinning or being rammed animated - use new shipactions and/or anim handlers (not just pseudo)
 
--i think to do this we need to wipe the slate clean WITHIN THE GAME ITSELF, by implementing the roguelike and incremental aspects. 
+-saving/loading (this is a big milestone, if you're ready for this means game is almost ready for release)
+
+TODO:
+
 
 -add an escort fleet system to the game - will be very useful later for quests
 -cyber modules, geneticist and perks all need to be tested
--should officers + captain be able to do stuff other than just fly around? ie actually get out of their ship and use their skills
-and equipment?
--asteroids change shape when i miss them!!??
 
 -make ruins and anomalies interactive
 
@@ -53,10 +23,8 @@ verify: -make sure anomalies and scientists actually work
 -planetMap! shows the moons, where each building is and causes the player ship to move around to use buildings
 
 verify: -make the AI for calcBestLaserCoords better - simulate up to 10 moves in advance and if any lead to a situation where we can shoot the enemy, favor them.
--make spinning or being rammed animated - use new shipactions and/or anim handlers (not just pseudo)
--in general, add some modules that do things other than grant new moves-regen, etc.
 
--saving/loading (this is a big milestone, if you're ready for this means game is almost ready for release)
+-in general, add some modules that do things other than grant new moves-regen, etc.
 
 take on bounty missions ?? letter of marque??
 -make the officer's bounties, infamy, fame etc have an effect on the players encounters
@@ -74,3 +42,5 @@ unique ships
 -what happens if player reaches the end of the map? we dont really need to do anything but might be cool.
 - tutorial?
 -asteroids, cannot shoot through them, they can be purposely shot and broken to create debris
+-should officers + captain be able to do stuff other than just fly around? ie actually get out of their ship and use their skills
+and equipment?
