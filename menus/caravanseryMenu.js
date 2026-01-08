@@ -10,6 +10,7 @@ function showCaravanseryMenu(caravansery) {
     msg += `<br/>`
     msg += colorSpan(`(Escort missions coming soon!)`, COLORS.Gray)
     
+    /** @type {ButtonData[]} */
     const buttons = [
         ['Back', () => showPlanetMenu(planet)]
     ]

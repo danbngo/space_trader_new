@@ -32,6 +32,12 @@ class StarMapFleetsHandler {
      * @param {boolean} isHovered - Whether the fleet is currently hovered
      */
     setFleetStrokeStyle(fleet, fleetObj, isSelected, isHovered = false) {
+        // Cloaked fleets have no stroke
+        if (fleet.cloakLevel > 0) {
+            fleetObj.strokeColor = null
+            return
+        }
+        
         if (isSelected) {
             fleetObj.strokeColor = COLORS.Green
             fleetObj.lineWidth = 3
@@ -39,7 +45,9 @@ class StarMapFleetsHandler {
             fleetObj.strokeColor = COLORS.Cyan
             fleetObj.lineWidth = 2
         } else {
-            fleetObj.strokeColor = fleet.planet ? fleet.planet.color : COLORS.White
+            // Use black stroke for abandoned fleets, planet color for active fleets
+            const isAbandoned = this.starSystem.abandonedFleets.includes(fleet)
+            fleetObj.strokeColor = isAbandoned ? COLORS.Black : (fleet.planet ? fleet.planet.color : COLORS.White)
             fleetObj.lineWidth = 2
         }
     }
@@ -121,8 +129,9 @@ class StarMapFleetsHandler {
                     labelObj.clickPriority = 5 // Fleet labels also have medium priority
                     
                     // Create unknown marker (question mark) for fog-of-war
-                    unknownObj = cvs.addText(unknownId, fleet.x, fleet.y, 0, 0, '?', COLORS.White, DEFAULT_FONT_SIZE * 1.5, 2)
+                    unknownObj = cvs.addText(unknownId, fleet.x, fleet.y, 0, 0, '?', COLORS.White, DEFAULT_FONT_SIZE * 1.5, 2, () => selectObject.call(this.starMap, fleet))
                     unknownObj.visible = false
+                    unknownObj.clickPriority = 5
                     
                     labelObj.visible = isPlayerFleet
                     
@@ -350,8 +359,9 @@ class StarMapFleetsHandler {
                 labelObj.clickPriority = 5 // Fleet labels also have medium priority
                 
                 // Create unknown marker (question mark) for fog-of-war
-                unknownObj = cvs.addText(unknownId, fleet.x, fleet.y, 0, 0, '?', COLORS.White, DEFAULT_FONT_SIZE * 1.5, 2)
+                unknownObj = cvs.addText(unknownId, fleet.x, fleet.y, 0, 0, '?', COLORS.White, DEFAULT_FONT_SIZE * 1.5, 2, () => selectObject.call(this.starMap, fleet))
                 unknownObj.visible = false
+                unknownObj.clickPriority = 5
                 
                 const objs = [fleetObj, labelObj]
                 for (const obj of objs) {
@@ -363,7 +373,7 @@ class StarMapFleetsHandler {
                     obj.onHoverEnd = () => {
                         labelObj.visible = false
                         this.setFleetStrokeStyle(fleet, fleetObj, fleet == selectedObject, false)
-                        labelObj.strokeColor = fleet == selectedObject ? COLORS.Green : (fleet.planet ? fleet.planet.color : COLORS.White)
+                        labelObj.strokeColor = fleet == selectedObject ? COLORS.Green : COLORS.Black
                     }
                     obj.onHoverEnd()
                 }

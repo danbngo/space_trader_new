@@ -58,8 +58,9 @@ function createTextInput(placeholder = '', defaultValue = '') {
 
 /**
  * Shows the save menu with list of existing saves
+ * @param {Function} [returnCallback] - Function to call when going back (defaults to showSaveLoadMenu)
  */
-function showSaveMenu() {
+function showSaveMenu(returnCallback = showSaveLoadMenu) {
     const saveList = SaveManager.getSaveList();
     
     // Sort by most recent timestamp first
@@ -121,22 +122,23 @@ function showSaveMenu() {
                     `A save named "${saveName}" already exists. Overwrite it?`,
                     [
                         ['Overwrite', () => performSave(saveName)],
-                        ['Cancel', () => showSaveMenu()]
+                        ['Cancel', () => showSaveMenu(returnCallback)]
                     ]
                 );
             } else {
                 performSave(saveName);
             }
         }],
-        ['Cancel', () => showSaveLoadMenu()]
+        ['Cancel', () => returnCallback()]
     ]);
 }
 
 /**
- * Performs the actual save operation
+ * Shows the load menu with list of existing saves
  * @param {string} saveName
+ * @param {Function} [returnCallback] - Function to call when going back (defaults to showSaveLoadMenu)
  */
-function performSave(saveName) {
+function performSave(saveName, returnCallback = showSaveLoadMenu) {
     showModal('Saving...', 'Saving your game...', []);
     
     setTimeout(() => {
@@ -152,7 +154,7 @@ function performSave(saveName) {
             showModal(
                 'Save Failed',
                 `Failed to save game: ${result.error}<br/>Please try again.`,
-                [['OK', () => showSaveMenu()]]
+                [['OK', () => showSaveMenu(returnCallback)]]
             );
         }
     }, 100);
@@ -160,12 +162,13 @@ function performSave(saveName) {
 
 /**
  * Shows the load menu with list of existing saves
+ * @param {Function} [returnCallback] - Function to call when going back (defaults to showSaveLoadMenu)
  */
-function showLoadMenu() {
+function showLoadMenu(returnCallback = showSaveLoadMenu) {
     const saveList = SaveManager.getSaveList();
     
     if (saveList.length === 0) {
-        showModal('No Saves', 'No saved games found.', [['OK', () => showSaveLoadMenu()]]);
+        showModal('No Saves', 'No saved games found.', [['OK', () => returnCallback()]]);
         return;
     }
     
@@ -211,7 +214,7 @@ function showLoadMenu() {
     showModal('Load Game', content, [
         ['Load', () => {
             if (selectedIndex === null) {
-                showModal('Error', 'Please select a save to load.', [['OK', () => showLoadMenu()]]);
+                showModal('Error', 'Please select a save to load.', [['OK', () => showLoadMenu(returnCallback)]]);
                 return;
             }
             
@@ -224,7 +227,7 @@ function showLoadMenu() {
                     'Loading will discard any unsaved progress. Continue?',
                     [
                         ['Load Anyway', () => performLoad(save.name)],
-                        ['Cancel', () => showLoadMenu()]
+                        ['Cancel', () => showLoadMenu(returnCallback)]
                     ]
                 );
             } else {
@@ -233,7 +236,7 @@ function showLoadMenu() {
         }],
         ['Delete', () => {
             if (selectedIndex === null) {
-                showModal('Error', 'Please select a save to delete.', [['OK', () => showLoadMenu()]]);
+                showModal('Error', 'Please select a save to delete.', [['OK', () => showLoadMenu(returnCallback)]]);
                 return;
             }
             
@@ -244,13 +247,13 @@ function showLoadMenu() {
                 [
                     ['Delete', () => {
                         SaveManager.deleteSave(save.name);
-                        showModal('Deleted', `Save "${save.name}" has been deleted.`, [['OK', () => showLoadMenu()]]);
+                        showModal('Deleted', `Save "${save.name}" has been deleted.`, [['OK', () => showLoadMenu(returnCallback)]]);
                     }],
-                    ['Cancel', () => showLoadMenu()]
+                    ['Cancel', () => showLoadMenu(returnCallback)]
                 ]
             );
         }],
-        ['Cancel', () => showSaveLoadMenu()]
+        ['Cancel', () => returnCallback()]
     ]);
 }
 

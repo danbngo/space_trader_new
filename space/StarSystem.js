@@ -125,7 +125,7 @@ class StarSystem extends SpaceObject {
             }
             
             // Check if target's route has changed (including both becoming null or non-null)
-            if (Math.random() > .95 && targetFleet.route !== interceptionRoute.targetRouteAtCreation) {
+            if (targetFleet.route !== interceptionRoute.targetRouteAtCreation) {
                 if (targetFleet.route && interceptionRoute.targetRouteAtCreation) {
                     if (targetFleet.route.destination !== interceptionRoute.targetRouteAtCreation.destination) {
                         continue
@@ -163,14 +163,44 @@ class StarSystem extends SpaceObject {
                 continue
             }
             
-            // Calculate angle toward escort target
-            const dx = fleet.escortTarget.x - fleet.x
-            const dy = fleet.escortTarget.y - fleet.y
-            fleet.angle = Math.atan2(dy, dx)
+            // Match the escort target's angle (face same direction as the target)
+            fleet.angle = fleet.escortTarget.angle
             
             // Move toward escort target using weighted average (95% current position, 5% target position)
             fleet.x = fleet.x * 0.95 + fleet.escortTarget.x * 0.05
             fleet.y = fleet.y * 0.95 + fleet.escortTarget.y * 0.05
+        }
+    }
+
+    updateAITargetPositions() {
+        // Update positions of fleets with AI targets that are close enough to "magnet onto" them
+        const fleets = this.fleets
+        const MAGNET_DISTANCE = 0.25 // AU - distance within which fleets will magnet onto their target
+        
+        for (const fleet of fleets) {
+            // Skip if no fleet AI, no target, destroyed, or is the player fleet
+            if (!fleet.fleetAI || !fleet.fleetAI.target || fleet.destroyed || fleet === gs.fleet) continue
+            
+            const target = fleet.fleetAI.target
+            
+            // Skip if target doesn't have valid coordinates
+            if (typeof target.x !== 'number' || typeof target.y !== 'number') continue
+            
+            // Calculate distance to target
+            const dx = target.x - fleet.x
+            const dy = target.y - fleet.y
+            const distance = Math.sqrt(dx * dx + dy * dy)
+            
+            // If within magnet distance, pull fleet toward target
+            if (distance <= MAGNET_DISTANCE && distance > 0.001) {
+                // Calculate angle toward target
+                fleet.angle = Math.atan2(dy, dx)
+                
+                // Move toward target using weighted average (90% current position, 10% target position)
+                // More aggressive than escorts since they're actively pursuing
+                fleet.x = fleet.x * 0.9 + target.x * 0.1
+                fleet.y = fleet.y * 0.9 + target.y * 0.1
+            }
         }
     }
 

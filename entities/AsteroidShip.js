@@ -15,10 +15,11 @@ class AsteroidShip extends Ship {
      * @param {number} engine - The engine power of the asteroid.
      * @param {number} cargoSpace - The cargo space available on the asteroid.
      * @param {number} radars - The radar capability of the asteroid.
+     * @param {number} fuelCapacity - The fuel capacity of the asteroid.
      * @param {number} maxActionsPerTurn - The maximum number of actions per turn.
      */
-    constructor(name = "Unnamed", shipType = ASTEROID_SHIP_TYPES.ASTEROID, color = COLORS.White, hull = [0, 0], shields = [0, 0], lasers = 0, engine = 0, cargoSpace = 0, radars = 0, maxActionsPerTurn = SHIP_NUM_MOVES_PER_TURN) {
-        super(name, shipType, color, hull, shields, lasers, engine, cargoSpace, radars, maxActionsPerTurn);
+    constructor(name = "Unnamed", shipType = ASTEROID_SHIP_TYPES.ASTEROID, color = COLORS.White, hull = [0, 0], shields = [0, 0], lasers = 0, engine = 0, cargoSpace = 0, radars = 0, fuelCapacity = 0, maxActionsPerTurn = SHIP_NUM_MOVES_PER_TURN) {
+        super(name, shipType, color, hull, shields, lasers, engine, cargoSpace, radars, fuelCapacity, maxActionsPerTurn);
         
         // Override radiusModifier for asteroid-specific range
         /** @type {number} */

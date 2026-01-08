@@ -134,6 +134,8 @@ function generateSettlement(planet) {
     
     const shipyard = new Shipyard(planet)
     
+    const caravansery = new Caravansery(planet)
+    
     const market =  new Market(planet, false)
     
     const blackMarket =  new Market(planet, true) 
@@ -167,7 +169,7 @@ function generateSettlement(planet) {
     const disableChance = planet.objectType == OBJECT_TYPES.PLANET ? 0 :
                           planet.objectType == OBJECT_TYPES.MOON || planet.objectType == OBJECT_TYPES.DWARF_PLANET ? 0.4 :
                           0.8
-    const buildings = [shipyard, market, blackMarket, guild, bank, courthouse, academy, tavern, cyberSurgeon, geneticist, palace, temple, casino]
+    const buildings = [shipyard, caravansery, market, blackMarket, guild, bank, courthouse, academy, tavern, cyberSurgeon, geneticist, palace, temple, casino]
     
     // First pass: randomly disable buildings
     for (const building of buildings) {
@@ -193,5 +195,5 @@ function generateSettlement(planet) {
         }
     }
 
-    return new Settlement({planet, settlementType, shipyard, market, blackMarket, guild, bank, courthouse, academy, tavern, cyberSurgeon, geneticist, palace, temple, casino})
+    return new Settlement({planet, settlementType, shipyard, caravansery, market, blackMarket, guild, bank, courthouse, academy, tavern, cyberSurgeon, geneticist, palace, temple, casino})
 }

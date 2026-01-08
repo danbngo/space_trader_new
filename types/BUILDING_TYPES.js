@@ -67,7 +67,8 @@ const BUILDING_TYPES = {
     BLACK_MARKET: new BuildingType('Black Market', COLORS.Red, RANK_TYPES.VISA, 10*1000, true),
     
     SHIPYARD: new BuildingType('Shipyard', COLORS.LightGray, RANK_TYPES.NO_RANK, 20*1000),
-    
+    CARAVANSERY: new BuildingType('Caravansery', COLORS.Brown, RANK_TYPES.NO_RANK, 15*1000),
+
     MARKET: new BuildingType('Market', COLORS.LightBlue, RANK_TYPES.VISA, 30*1000),
     TAVERN: new BuildingType('Tavern', COLORS.Orange, RANK_TYPES.VISA, 5*1000),
     

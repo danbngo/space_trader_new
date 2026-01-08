@@ -350,9 +350,21 @@ class StarMap extends BaseMap {
     
     refreshFuelBar() {
         const {fleet} = gs
-        const fuelPercentage = (fleet.currentFuel / fleet.totalFuelCapacity) * 100
         
         this.fuelBar.innerHTML = ''
+        
+        // If no ships, show warning instead of fuel bar
+        if (fleet.ships.length === 0) {
+            ce({
+                parent: this.fuelBar,
+                style: {color: '#ffdd00', fontWeight: 'bold'},
+                innerHTML: '(NO SHIPS)'
+            })
+            return
+        }
+        
+        const fuelPercentage = (fleet.currentFuel / fleet.totalFuelCapacity) * 100
+        
         ce({
             parent: this.fuelBar,
             style: {display: 'flex', gap: '6px', alignItems: 'center'},
@@ -458,6 +470,15 @@ class StarMap extends BaseMap {
         } else {
             displayName = coloredName(obj)
         }
+        
+        // Override display name for out-of-range fleets
+        if (obj instanceof Fleet && obj !== gs.fleet && gs.fleet && gs.fleet.mapViewDistance) {
+            const distanceToPlayer = calcDistance(obj.x, obj.y, gs.fleet.x, gs.fleet.y)
+            if (distanceToPlayer > gs.fleet.mapViewDistance) {
+                displayName = '<span style="color: ' + colorArrToRgbaString(COLORS.Yellow) + '">Unknown Fleet</span>'
+            }
+        }
+        
         ce({parent:container, tag:'h3', innerHTML: displayName, onClick: ()=>this.selectObject(obj),
             style: {filter: `drop-shadow(1px 0 0 ${colorArrToRgbaString(COLORS.Green)}) drop-shadow(0 1px 0 ${colorArrToRgbaString(COLORS.Green)})  drop-shadow(0 -0.5px 0 ${colorArrToRgbaString(COLORS.Green)})  drop-shadow(-0.5px 0 0 ${colorArrToRgbaString(COLORS.Green)})`}
         })
@@ -475,54 +496,73 @@ class StarMap extends BaseMap {
             imageObject = this.cvs.getObject(`fleet${obj.uuid}`)
         }
         
-        ce({parent:container, style: {margin: 'auto'}, onClick: ()=>this.selectObject(obj), children:[
-            imageObject?.asImage(25, COLORS.LightGreen) || null
-        ]})
+        // Check if fleet is out of radar range
+        let isFleetOutOfRange = false
+        if (obj instanceof Fleet && obj !== gs.fleet && gs.fleet && gs.fleet.mapViewDistance) {
+            const distanceToPlayer = calcDistance(obj.x, obj.y, gs.fleet.x, gs.fleet.y)
+            isFleetOutOfRange = distanceToPlayer > gs.fleet.mapViewDistance
+        }
+        
+        // Don't show image for out-of-range fleets
+        if (!isFleetOutOfRange) {
+            ce({parent:container, style: {margin: 'auto'}, onClick: ()=>this.selectObject(obj), children:[
+                imageObject?.asImage(25, COLORS.LightGreen) || null
+            ]})
+        }
+        
         if (obj instanceof Fleet) {
-            const totalShips = obj.ships.length
-            const disabledShips = obj.ships.filter(ship => ship.disabled).length
-            const activeShips = totalShips - disabledShips
-            
-            // Calculate average hull percentage
-            let totalHullPercent = 0
-            if (totalShips > 0) {
-                totalHullPercent = obj.ships.reduce((sum, ship) => {
-                    const hullPercent = ship.hull[1] > 0 ? (ship.hull[0] / ship.hull[1]) * 100 : 0
-                    return sum + hullPercent
-                }, 0) / totalShips
-            }
-            
-            // Display ship status in different formats
-            let shipStatusText
-            if (disabledShips === 0) {
-                shipStatusText = `Ships: ${totalShips}`
-            } else if (disabledShips === totalShips) {
-                shipStatusText = `Ships: ${totalShips} disabled`
-            } else {
-                shipStatusText = `Ships: ${activeShips}/${totalShips} active`
-            }
-            ce({parent:container, innerHTML: shipStatusText})
-            ce({parent:container, innerHTML:`Hull: ${statColorSpan(roundToPlaces(totalHullPercent, 1) + '%', totalHullPercent / 100)}`})
-            
-            // Add Travel button for non-player fleets
-            if (obj !== gs.fleet) {
+            // For out-of-range fleets, only show distance and don't show detailed stats or actions
+            if (isFleetOutOfRange) {
                 const distance = roundToPlaces(calcDistance(gs.fleet.x, gs.fleet.y, obj.x, obj.y), 1)
                 ce({parent:container, innerHTML:`Distance: ${distance} AU`})
+                ce({parent:container, innerHTML:`<span style="color: ${colorArrToRgbaString(COLORS.Gray)}">Out of radar range</span>`})
+            } else {
+                // Show normal fleet details for in-range fleets
+                const totalShips = obj.ships.length
+                const disabledShips = obj.ships.filter(ship => ship.disabled).length
+                const activeShips = totalShips - disabledShips
                 
-                // Create test route to check if interception is possible
-                // Use InterceptionRoute for moving fleets, regular Route for destroyed/abandoned
-                const testRoute = obj.destroyed ? new Route(gs.fleet, obj, gs.year) : new InterceptionRoute(gs.fleet, obj, gs.year)
-                if (testRoute.valid) {
-                    const travelTime = testRoute.travelTime
-                    const etaYears = travelTime
-                    const fuelCost = roundToPlaces(testRoute.path.distance * FUEL_COST_PER_1_AU, 1)
-                    ce({parent:container, innerHTML:`ETA: ${statColorSpan(describeTimespan(travelTime, 1), 1/(1+etaYears*12))}`})
-                    ce({parent:container, innerHTML:`Fuel: ${fuelCost}`})
-                    // Abandoned (destroyed) fleets use "Travel" instead of "Intercept"
-                    const buttonText = obj.destroyed ? 'Travel' : 'Intercept'
-                    ce({parent:container, tag:'button', innerHTML:buttonText, onClick:()=>this.setDestination(obj, true), disabled: gs.fleet.stranded})
+                // Calculate average hull percentage
+                let totalHullPercent = 0
+                if (totalShips > 0) {
+                    totalHullPercent = obj.ships.reduce((sum, ship) => {
+                        const hullPercent = ship.hull[1] > 0 ? (ship.hull[0] / ship.hull[1]) * 100 : 0
+                        return sum + hullPercent
+                    }, 0) / totalShips
+                }
+                
+                // Display ship status in different formats
+                let shipStatusText
+                if (disabledShips === 0) {
+                    shipStatusText = `Ships: ${totalShips}`
+                } else if (disabledShips === totalShips) {
+                    shipStatusText = `Ships: ${totalShips} disabled`
                 } else {
-                    ce({parent:container, innerHTML:`Cannot intercept (too fast)`})
+                    shipStatusText = `Ships: ${activeShips}/${totalShips} active`
+                }
+                ce({parent:container, innerHTML: shipStatusText})
+                ce({parent:container, innerHTML:`Hull: ${statColorSpan(roundToPlaces(totalHullPercent, 1) + '%', totalHullPercent / 100)}`})
+                
+                // Add Travel button for non-player fleets
+                if (obj !== gs.fleet) {
+                    const distance = roundToPlaces(calcDistance(gs.fleet.x, gs.fleet.y, obj.x, obj.y), 1)
+                    ce({parent:container, innerHTML:`Distance: ${distance} AU`})
+                    
+                    // Create test route to check if interception is possible
+                    // Use InterceptionRoute for moving fleets, regular Route for destroyed/abandoned
+                    const testRoute = obj.destroyed ? new Route(gs.fleet, obj, gs.year) : new InterceptionRoute(gs.fleet, obj, gs.year)
+                    if (testRoute.valid) {
+                        const travelTime = testRoute.travelTime
+                        const etaYears = travelTime
+                        const fuelCost = roundToPlaces(testRoute.path.distance * FUEL_COST_PER_1_AU, 1)
+                        ce({parent:container, innerHTML:`ETA: ${statColorSpan(describeTimespan(travelTime, 1), 1/(1+etaYears*12))}`})
+                        ce({parent:container, innerHTML:`Fuel: ${fuelCost}`})
+                        // Abandoned (destroyed) fleets use "Travel" instead of "Intercept"
+                        const buttonText = obj.destroyed ? 'Travel' : 'Intercept'
+                        ce({parent:container, tag:'button', innerHTML:buttonText, onClick:()=>this.setDestination(obj, true), disabled: gs.fleet.stranded})
+                    } else {
+                        ce({parent:container, innerHTML:`Cannot intercept (too fast)`})
+                    }
                 }
             }
         }
@@ -749,6 +789,7 @@ class StarMap extends BaseMap {
         gs.system.updateRoutes(gs.year)
         gs.system.updatePositions()
         gs.system.updateEscortPositions()
+        gs.system.updateAITargetPositions()
         
         // Update discoveries every 90 ticks
         this.tickCounter++

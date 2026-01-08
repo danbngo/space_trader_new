@@ -8,6 +8,7 @@ class Settlement {
      * @param {Planet} params.planet - The planet this settlement is on.
      * @param {SettlementType} params.settlementType - The type of settlement.
      * @param {Shipyard} params.shipyard - The shipyard building.
+     * @param {Caravansery} params.caravansery - The caravansery building.
      * @param {Market} params.market - The market building.
      * @param {Market} params.blackMarket - The black market building.
      * @param {Guild} params.guild - The guild building.
@@ -21,7 +22,7 @@ class Settlement {
      * @param {Temple} params.temple - The temple building.
      * @param {Casino} params.casino - The casino building.
      */
-    constructor({planet = new Planet(), settlementType = null, shipyard = null, market = null, blackMarket = null, guild = null, bank = null, courthouse = null, academy = null, tavern = null, cyberSurgeon = null, geneticist = null, palace = null, temple = null, casino = null}) {
+    constructor({planet = new Planet(), settlementType = null, shipyard = null, caravansery = null, market = null, blackMarket = null, guild = null, bank = null, courthouse = null, academy = null, tavern = null, cyberSurgeon = null, geneticist = null, palace = null, temple = null, casino = null}) {
         /** @type {string} */
         this.uuid = generateUUID('settlement_')
         /** @type {Planet} */
@@ -30,6 +31,8 @@ class Settlement {
         this.settlementType = settlementType;
         /** @type {Shipyard} */
         this.shipyard = shipyard;
+        /** @type {Caravansery} */
+        this.caravansery = caravansery;
         /** @type {Market} */
         this.market = market;
         /** @type {Market} */

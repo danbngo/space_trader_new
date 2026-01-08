@@ -279,7 +279,7 @@ class Fleet extends SpaceObject {
     }
     
     get stranded() {
-        return this.ships.filter(s=>(!s.disabled)).length <= 0
+        return this.ships.filter(s=>(!s.disabled)).length <= 0 || this.currentFuel <= 0
     }
 
     get numPilots() {
