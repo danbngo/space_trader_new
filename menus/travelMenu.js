@@ -110,15 +110,33 @@ function showLongInterceptionWarningModal(targetFleet, route, onProceed) {
 function  checkPlayerStranded() {
     if (!gs.fleet.stranded) return
     console.log('checkPlayerStranded');
-    const [nearestPlanet, nearestDistance] = gs.system.calcNearestPlanet(gs.fleet)
-    const creditCost = 100 + rng(500*Math.sqrt(nearestDistance), 250*Math.sqrt(nearestDistance), true)
+    
+    // Find the last visited planet (most recent year in lastVisitedDates)
+    let towDestination = null
+    let mostRecentYear = -Infinity
+    for (const [planet, visitYear] of gs.lastVisitedDates.entries()) {
+        if (visitYear > mostRecentYear) {
+            mostRecentYear = visitYear
+            towDestination = planet
+        }
+    }
+    
+    // If no visited planets, fall back to nearest planet
+    if (!towDestination) {
+        console.log('No visited planets found, using nearest planet as fallback')
+        const [nearestPlanet] = gs.system.calcNearestPlanet(gs.fleet)
+        towDestination = nearestPlanet
+    }
+    
+    const towDistance = calcDistance(gs.fleet.x, gs.fleet.y, towDestination.x, towDestination.y)
+    const creditCost = 100 + rng(500*Math.sqrt(towDistance), 250*Math.sqrt(towDistance), true)
     const canAfford = gs.credits >= creditCost
     const noCredits = gs.credits <= 0
-    const dayCost = 1 + rng(1.5*nearestDistance, 0.75*nearestDistance, false)
+    const dayCost = 1 + rng(1.5*towDistance, 0.75*towDistance, false)
     gs.credits = Math.max(0, gs.credits - creditCost)
     gs.year += dayCost/365
 
-    console.log('player is stranded:',nearestPlanet,nearestDistance,creditCost,dayCost)
+    console.log('player is stranded - towing to:',towDestination.name,towDistance,creditCost,dayCost)
 
     const outOfFuel = gs.fleet.fuel <= 0
     const noWorkingShips = gs.fleet.ships.filter(s=>(!s.disabled)).length <= 0
@@ -134,5 +152,5 @@ function  checkPlayerStranded() {
     msg += `You spend ${describeTimespan(dayCost/365)} being dragged through space.<br/>`
     currentMap.refresh()
 
-    showModal(`Stranded`, msg, [['Continue', ()=>showPlanetMenu(nearestPlanet)]])
+    showModal(`Stranded`, msg, [['Continue', ()=>showPlanetMenu(towDestination)]])
 }

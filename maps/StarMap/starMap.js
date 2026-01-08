@@ -365,6 +365,10 @@ class StarMap extends BaseMap {
         
         const fuelPercentage = (fleet.fuel / fleet.totalFuelCapacity) * 100
         
+        // Calculate color ratio: 4.0 at 100% fuel, 1.0 at 50% fuel, 0.0 at 0% fuel
+        const colorRatio = fuelPercentage / 25
+        const fuelBarColor = calcStatColor(colorRatio)
+        
         ce({
             parent: this.fuelBar,
             style: {display: 'flex', gap: '6px', alignItems: 'center'},
@@ -372,7 +376,7 @@ class StarMap extends BaseMap {
                 'Fuel: ',
                 new ProgressBar({
                     value: fuelPercentage,
-                    fillColor: '#ffaa00',
+                    fillColor: fuelBarColor,
                     overrideLabel: '',
                     width: 25
                 }).container,

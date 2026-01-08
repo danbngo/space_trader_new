@@ -316,7 +316,6 @@ class StarSystem extends SpaceObject {
 
         // Update abandoned fleet positions based on their orbits
         this.updatePositionsFrameCount++
-        const shouldDecayOrbits = this.updatePositionsFrameCount % 600 === 0
         
         // Get primary star (assumes first star is the sun)
         const star = this.stars[0]
@@ -340,16 +339,13 @@ class StarSystem extends SpaceObject {
             fleet.x = star.x + offsetX
             fleet.y = star.y + offsetY
             
-            // Apply orbital decay every 600 frames
-            if (shouldDecayOrbits) {
-                // Decay rate: 0.001 AU per iteration (tune this for desired spiral speed)
-                fleet.orbit.radius -= 0.001
-                
-                // Check if fleet has fallen into the sun
-                if (fleet.orbit.radius < sunRadiusAU) {
-                    console.log(`☀️ Abandoned fleet ${fleet.name} has fallen into the sun (radius ${fleet.orbit.radius.toFixed(6)} AU < sun radius ${sunRadiusAU.toFixed(6)} AU)`)
-                    this.removeAbandonedFleet(fleet)
-                }
+            // Decay rate: 0.001 AU per iteration (tune this for desired spiral speed)
+            fleet.orbit.radius -= 0.0001
+            
+            // Check if fleet has fallen into the sun
+            if (fleet.orbit.radius < sunRadiusAU) {
+                console.log(`☀️ Abandoned fleet ${fleet.name} has fallen into the sun (radius ${fleet.orbit.radius.toFixed(6)} AU < sun radius ${sunRadiusAU.toFixed(6)} AU)`)
+                this.removeAbandonedFleet(fleet)
             }
         }
     }

@@ -208,13 +208,7 @@ function showMap(map) {
     showElement(map.root)
 }
 
-/**
- * Creates a colored span with text based on a ratio (stat coloring).
- * @param {string|number} text - The text to display
- * @param {number} ratio - The ratio used for color interpolation (0-4+)
- * @returns {string} HTML string with colored span
- */
-function statColorSpan(text = '', ratio = 1.0) {
+function calcStatColor(ratio = 1.0) {
     // clamp ratio so interpolation works cleanly
     const r = Math.max(0, Math.min(ratio, 4.0));
     // helper: linear interpolation between two hex colors
@@ -246,6 +240,17 @@ function statColorSpan(text = '', ratio = 1.0) {
             break;
         }
     }
+    return color;
+}
+
+/**
+ * Creates a colored span with text based on a ratio (stat coloring).
+ * @param {string|number} text - The text to display
+ * @param {number} ratio - The ratio used for color interpolation (0-4+)
+ * @returns {string} HTML string with colored span
+ */
+function statColorSpan(text = '', ratio = 1.0) {
+    const color = calcStatColor(ratio)
     return colorSpan(text, color)
 }
 
