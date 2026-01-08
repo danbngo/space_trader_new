@@ -24,7 +24,7 @@ class Building {
     }
     normalize() {
         const multiplier = this.planet?.objectType?.powerMultiplier ?? 1
-        this.credits = Math.round(this.buildingType.baseCredits * this.planet.c.wealth * this.planet.c.inflationRate * multiplier)
+        this.credits = Math.round(this.buildingType.baseCredits * this.planet.c.wealth * (1+this.planet.c.inflationRate) * multiplier)
     }
     get rake() {
         const corruption = this.planet.c.corruption

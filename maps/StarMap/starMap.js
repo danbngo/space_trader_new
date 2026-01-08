@@ -123,16 +123,16 @@ class StarMap extends BaseMap {
         this.pausedIndicator = ce({
             parent: this.root,
             innerHTML: 'PAUSED',
+            classNames: ['paused-indicator'],
             style: {
                 position: 'absolute',
                 top: '25%',
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
-                color: 'white',
+                color: 'cyan',
                 fontSize: '24px',
                 fontWeight: 'bold',
                 pointerEvents: 'none',
-                opacity: '0.7',
                 display: 'none'
             }
         })

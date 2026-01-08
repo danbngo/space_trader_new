@@ -57,18 +57,49 @@ const DWARF_PLANETS = [CERES, PLUTO, ERIS, HAUMEA, MAKEMAKE] //getting rid of fa
 
 SOL.addChildren([...PLANETS, ...DWARF_PLANETS])
 
+// Helper function to check if two craters overlap
+function cratersOverlap(crater1, crater2) {
+    const dx = crater1.x - crater2.x
+    const dy = crater1.y - crater2.y
+    const distance = Math.sqrt(dx * dx + dy * dy)
+    const minDistance = crater1.radius + crater2.radius
+    return distance < minDistance
+}
+
 // Add craters to Mars
 const marsNumberOfCraters = 10 + Math.floor(Math.random() * 11) // 10-20 craters
 const marsCraters = []
 for (let i = 0; i < marsNumberOfCraters; i++) {
-    marsCraters.push({
-        x: (Math.random() - 0.5) * 1.6, // Random x position from -0.8 to 0.8 (ratio of planet radius)
-        y: (Math.random() - 0.5) * 1.6, // Random y position from -0.8 to 0.8
-        radius: 0.05 + Math.random() * 0.15 // Random radius from 0.05 to 0.20
-    })
+    let placed = false
+    let attempts = 0
+    const maxAttempts = 10
+    
+    while (!placed && attempts < maxAttempts) {
+        const newCrater = {
+            x: (Math.random() - 0.5) * 1.6, // Random x position from -0.8 to 0.8 (ratio of planet radius)
+            y: (Math.random() - 0.5) * 1.6, // Random y position from -0.8 to 0.8
+            radius: 0.03 + Math.random() * 0.08 // Smaller: random radius from 0.03 to 0.11 (reduced from 0.05-0.20)
+        }
+        
+        // Check if this crater overlaps with any existing crater
+        let overlaps = false
+        for (const existingCrater of marsCraters) {
+            if (cratersOverlap(newCrater, existingCrater)) {
+                overlaps = true
+                break
+            }
+        }
+        
+        if (!overlaps) {
+            marsCraters.push(newCrater)
+            placed = true
+        }
+        
+        attempts++
+    }
+    // If all 10 attempts failed, skip this crater and continue with the next one
 }
 MARS.decorators.push(new PlanetDecorator({ craters: marsCraters }))
-
 
 
 const CORONA = new AsteroidBelt("Corona", ASTEROID_BELT_TYPES.Plasma, hexToRgba('#ffaa0022'), 0.1, new Orbit(0.2), [ENCOUNTER_TYPES.PLASMOIDS_CALM], [ENCOUNTER_TYPES.PLASMOIDS_STORM], [EFFECT_TYPES.ION_CLOUD, EFFECT_TYPES.PLASMA_TRAIL])

@@ -353,7 +353,7 @@ function continueGame() {
  */
 function loadSavedGame() {
     // Show the load menu instead of loading a single save
-    showLoadMenu();
+    showLoadMenu(showTitleScreen);
 }
 
 function showAbout() {

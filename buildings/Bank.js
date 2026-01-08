@@ -11,6 +11,7 @@ class Bank extends Building {
         super(planet, BUILDING_TYPES.BANK)
         /** @type {number} */
         this.playerBalance = 0
+        this.normalize()
     }
     calcDepositPenalty(depositAmount = 0) {
         return Math.ceil( depositAmount * Math.pow(0.01, 1/(1+this.planet.c.corruption)) )

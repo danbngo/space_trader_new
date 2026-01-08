@@ -18,6 +18,21 @@
     height: 100%;
 }
 
+/* === PAUSED INDICATOR === */
+
+.paused-indicator {
+    animation: pulse-brightness 2s ease-in-out infinite;
+}
+
+@keyframes pulse-brightness {
+    0%, 100% {
+        opacity: 0.5;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
 /* === INFO BAR AT TOP === */
 
 .starmap-info-bar {

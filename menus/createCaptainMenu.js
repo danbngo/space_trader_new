@@ -242,6 +242,7 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
             ["Upgrade", () => improveSkill(selectedSkill), !canAfford || !selectedSkill],
             ["Randomize", ()=>randomizeCaptain()],
             ["Reset", ()=>resetCaptain()],
+            ["Cancel", () => { closeModal(); onClose(); }],
             ["Finish", () => {
                 console.log('finishing captain creation',captain)
                 

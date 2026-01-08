@@ -9,6 +9,7 @@ class Academy extends Building {
      */
     constructor(planet = new Planet()) {
         super(planet, BUILDING_TYPES.ACADEMY)
+        this.normalize()
     }
     calcSkillUpgradeCost(officer, skill = SKILLS_ALL[0]) {
         // Base cost scales exponentially with current skill level

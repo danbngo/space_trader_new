@@ -316,7 +316,7 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
         const canSell = isDocked && shipyardCanAfford && !isLastShip;
         const damageAmount = ship.hull[1] - ship.hull[0];
         const canRepair = isDocked && damageAmount > 0;
-        const repairCost = canRepair ? shipyard.calculateRepairCost(ship, damageAmount) : 0;
+        //const repairCost = canRepair ? shipyard.calculateRepairCost(ship, damageAmount) : 0;
         
         let disabledReason = null;
         if (!isDocked) disabledReason = 'Must be docked to sell ships';
@@ -327,15 +327,114 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
         if (!isDocked) repairDisabledReason = 'Must be docked to repair ships';
         else if (damageAmount <= 0) repairDisabledReason = 'Ship is not damaged';
         
+        // For last ship, change Sell button to show Trade modal
+        const sellButtonAction = isLastShip ? ()=>showTradeLastShipModal(ship) : ()=>showSellShipModal(ship);
+        
         /** @type {ButtonData[]} */
         const buttons = [
-            [`Sell`, ()=>showSellShipModal(ship), !canSell, disabledReason],
+            [`Sell`, sellButtonAction, !canSell && !isLastShip, disabledReason],
             [`Repair`, ()=>showRepairShipModal(ship), !canRepair, repairDisabledReason],
             ["Buy Modules", ()=>showShipyardBuyModulesMenu(shipyard)],
             ["Buy Ships", ()=>showShipyardBuyMenu(shipyard)],
             ["Back", () => leave()],
         ]
-        refreshPanelButtons('shipyard_buy_panel', buttons)
+        refreshPanelButtons('shipyard_sell_panel', buttons)
+    }
+
+    function showTradeLastShipModal(currentShip = new Ship()) {
+        const sellPrice = shipyard.calcSellPrice(currentShip);
+        
+        // Create table similar to buy menu but with trade cost
+        function createTradeTable(ships, onSelectShip) {
+            if (ships.length == 0) return `(None)`;
+            
+            const rows = [
+                ['Ship Name', 'Quality', 'Hull', 'Shields', 'Fuel', 'Lasers', 'Engine', 'Cargo Space', 'Trade Cost']
+            ];
+            
+            for (const ship of ships) {
+                const buyPrice = shipyard.calcBuyPrice(ship);
+                const tradeCost = buyPrice - sellPrice;
+                const tradeCostDisplay = tradeCost >= 0 ? `+${tradeCost}` : `${tradeCost}`;
+                const tradeCostColor = tradeCost <= 0 ? COLORS.Green : (gs.credits >= tradeCost ? COLORS.White : COLORS.Red);
+                
+                rows.push([
+                    ship.name,
+                    statColorSpan(roundToPlaces(ship.quality * 100, 1) + '%', ship.quality),
+                    statColorSpan(ship.hull[1], ship.hull[1]/10),
+                    statColorSpan(ship.shields[1], ship.shields[1]/10),
+                    statColorSpan(ship.fuelCapacity, ship.fuelCapacity/10),
+                    statColorSpan(ship.lasers, ship.lasers/10),
+                    statColorSpan(ship.engine, ship.engine/10),
+                    statColorSpan(ship.cargoSpace, ship.cargoSpace/10),
+                    colorSpan(tradeCostDisplay, tradeCostColor)
+                ]);
+            }
+            
+            return createTable(rows, (rowIndex) => onSelectShip(ships[rowIndex]));
+        }
+        
+        let selectedTradeShip = null;
+        
+        function showTradeModal() {
+            const content = ce({children: [
+                colorSpan("You cannot sell your last ship or you'd no longer be a captain! However, you can trade it for another.", COLORS.Yellow),
+                ce({tag: 'br'}),
+                createTradeTable(shipyard.ships, (ship) => {
+                    selectedTradeShip = ship;
+                    showTradeModal(); // Recreate modal with updated buttons
+                }),
+                ce({tag: 'br'}),
+                `Your Credits: ${gs.credits}CR`
+            ]});
+            /** @type {ButtonData[]} */
+            let buttons = []
+            if (!selectedTradeShip) {
+                buttons = [
+                    ['Trade', null, true, 'Select a ship to trade'],
+                    ['Cancel', () => closeModal()]
+                ];
+            } else {
+                const buyPrice = shipyard.calcBuyPrice(selectedTradeShip);
+                const tradeCost = buyPrice - sellPrice;
+                const canAfford = gs.credits >= tradeCost;
+                
+                let disabledReason = null;
+                if (!canAfford) disabledReason = `Not enough credits (need ${tradeCost}, have ${gs.credits})`;
+                
+                buttons = [
+                    ['Trade', () => performTrade(currentShip, selectedTradeShip, tradeCost), !canAfford, disabledReason],
+                    ['Cancel', () => closeModal()]
+                ];
+            }
+            
+            showModal(
+                'Trade Ship',
+                content,
+                buttons
+            );
+        }
+        
+        function performTrade(oldShip, newShip, tradeCost) {
+            Shipyard.recordState(shipyard);
+            
+            // Remove old ship from player, add to shipyard
+            safeRemove(fleet.ships, oldShip);
+            safeAdd(shipyard.ships, oldShip);
+            
+            // Remove new ship from shipyard, add to player
+            safeRemove(shipyard.ships, newShip);
+            safeAdd(fleet.ships, newShip);
+            
+            // Handle credits
+            gs.credits -= tradeCost;
+            shipyard.credits += tradeCost;
+            
+            closeModal();
+            rebuildMenu();
+        }
+        
+        showTradeModal();
     }
 
     function showRepairShipModal(ship = new Ship()) {
@@ -419,6 +518,11 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
         `shipyard_sell_panel`,
         (nextPlanet) => nextPlanet.settlement?.shipyard ? showShipyardSellMenu(nextPlanet.settlement.shipyard) : showPlanetMenu(nextPlanet)
     );
+    
+    // Auto-select first ship
+    if (fleet.ships.length > 0) {
+        onSelectPlayerShip(fleet.ships[0])
+    }
 }
 
 function showShipyardBuyModulesMenu(shipyard = new Shipyard()) {

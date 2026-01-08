@@ -191,15 +191,33 @@ class StarSystem extends SpaceObject {
             const dy = target.y - fleet.y
             const distance = Math.sqrt(dx * dx + dy * dy)
             
-            // If within magnet distance, pull fleet toward target
+            // If within magnet distance, speed up progress toward target
             if (distance <= MAGNET_DISTANCE && distance > 0.001) {
                 // Calculate angle toward target
                 fleet.angle = Math.atan2(dy, dx)
                 
-                // Move toward target using weighted average (90% current position, 10% target position)
-                // More aggressive than escorts since they're actively pursuing
-                fleet.x = fleet.x * 0.9 + target.x * 0.1
-                fleet.y = fleet.y * 0.9 + target.y * 0.1
+                // If fleet has a route, accelerate its progress instead of modifying x,y
+                if (fleet.route && fleet.route.valid && fleet.route.path) {
+                    const duration = fleet.route.endYear - fleet.route.startYear
+                    const elapsedTime = gs.year - fleet.route.startYear
+                    const currentProgress = elapsedTime / duration
+                    
+                    // Accelerate by 1% (but don't exceed 100% progress)
+                    const acceleratedProgress = Math.min(currentProgress * 1.01, 1.0)
+                    
+                    // Calculate what year would give us this accelerated progress
+                    const acceleratedElapsedTime = acceleratedProgress * duration
+                    const acceleratedYear = fleet.route.startYear + acceleratedElapsedTime
+                    
+                    // Update fleet position based on accelerated progress
+                    const [newX, newY] = fleet.route.positionAtYear(acceleratedYear)
+                    fleet.x = newX
+                    fleet.y = newY
+                } else {
+                    // No route - use direct position interpolation (fallback behavior)
+                    fleet.x = fleet.x * 0.9 + target.x * 0.1
+                    fleet.y = fleet.y * 0.9 + target.y * 0.1
+                }
             }
         }
     }

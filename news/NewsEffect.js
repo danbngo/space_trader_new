@@ -142,7 +142,7 @@ class NewsEffect extends Civilization {
                 building.level = Math.max(0, building.level-1)
             }
             for (const building of buildingsImproved) {
-                building.level = building.level+1
+                building.level = Math.min(1,building.level+1) //removing ability to upgrade buildings for now, cognitively complicated
             }
         }
 
