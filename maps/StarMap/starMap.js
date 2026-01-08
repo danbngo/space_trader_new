@@ -806,10 +806,10 @@ class StarMap extends BaseMap {
             this.tickCounter = 0
         }
         
-        // Update fuel bar every 15 frames
+        // Update fuel bar every 10 frames
         if (!this.fuelBarCounter) this.fuelBarCounter = 0
         this.fuelBarCounter++
-        if (this.fuelBarCounter >= 15) {
+        if (this.fuelBarCounter >= 10) {
             this.refreshFuelBar()
             this.fuelBarCounter = 0
         }

@@ -146,5 +146,5 @@ const SPACE_STATION_MIN_SCREEN_SIZE = 10
 const DWARF_PLANET_MIN_BUILDINGS = 2
 const SPACE_STATION_MIN_BUILDINGS = 1
 
-const FLEET_COLLISION_DISTANCE = 0.5
-const ASTEROID_MINING_DISTANCE = 0.5 // 2x easier to mine than fleet collision range
+const FLEET_COLLISION_DISTANCE = 0.1
+const ASTEROID_MINING_DISTANCE = 0.2 // 2x easier to mine than fleet collision range

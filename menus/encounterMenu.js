@@ -10,7 +10,6 @@ function checkForEncounter(elapsedDays = 1) {
     if (gs.location || gs.encounter) return
     // Check encounter immunity
     if (gs.year < gs.encounterImmunityUntilYear) return
-    //return checkForPlanetEncounters(elapsedDays) || 
     checkForAsteroidBeltEncounters(elapsedDays)
 }
 

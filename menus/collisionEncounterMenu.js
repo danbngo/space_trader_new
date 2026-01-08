@@ -1,16 +1,21 @@
 
 function checkForCollisionEncounter() {
+    console.log('1a')
     // Don't trigger while docked, in encounter, or during immunity/denial periods
     if (gs.location || gs.encounter) return false
+    console.log('2a')
     if (gs.year < gs.encounterImmunityUntilYear) return false
+    console.log('3a')
 
     // Check for fleet collisions first
     const fleetCollision = checkForFleetCollision(FLEET_COLLISION_DISTANCE)
     if (fleetCollision) return true
+    console.log('4a')
     
     // Check for abandoned fleet collisions
     const abandonedFleetCollision = checkForAbandonedFleetCollision(FLEET_COLLISION_DISTANCE)
     if (abandonedFleetCollision) return true
+    console.log('5a')
     
     return false
 }
@@ -41,7 +46,7 @@ function checkForFleetCollision(collisionDistance) {
     })
     
     // Debug logging
-    /*if (gs.system.fleets.length > 1) {
+    if (gs.system.fleets.length > 1) {
         const closestFleet = gs.system.fleets
             .filter(f => f !== playerFleet)
             .reduce((closest, fleet) => {
@@ -54,7 +59,7 @@ function checkForFleetCollision(collisionDistance) {
             const closestDist = calcDistance(playerFleet.x, playerFleet.y, closestFleet.x, closestFleet.y)
             console.log(`Closest fleet: ${closestFleet.name} at distance ${closestDist.toFixed(4)} AU (collision at ${collisionDistance.toFixed(4)} AU)`)
         }
-    }*/
+    }
     
     if (nearbyFleets.length === 0) return false
     

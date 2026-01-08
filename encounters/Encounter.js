@@ -699,7 +699,6 @@ class Encounter {
         console.log('startEncounter:',this)
         if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
         gs.encounter = this
-        // Set encounter immunity for after this encounter ends
         gs.encounterImmunityUntilYear = gs.year + (ENCOUNTER_IMMUNITY_DAYS / 365)
         
         // Add player fleet to enemy AI's visited list so they don't actively target player again

@@ -111,10 +111,6 @@ class Fleet extends SpaceObject {
         console.log(`🚢 ${this.name} ${this.uuid} is starting route to ${route.destination.name}`)
         this.location = null
         this.route = route
-        // Grant encounter immunity when player LEAVES the dock
-        if (this === gs.fleet) {
-            gs.encounterImmunityUntilYear = gs.year + (ENCOUNTER_IMMUNITY_DAYS / 365)
-        }
     };
 
     get subordinates() {
