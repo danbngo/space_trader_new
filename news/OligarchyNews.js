@@ -14,6 +14,10 @@ class OligarchyNews extends News {
                 economy: CL.SLIGHTLY_LOW,
                 wealth: CL.SLIGHTLY_LOW,
                 taxes: CL.LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.FOOD, CL.SLIGHTLY_HIGH],
+                    [CARGO_TYPES.MEDICINE, CL.SLIGHTLY_HIGH]
+                ]))
             },
             {
                 corruption: CL.LOW,

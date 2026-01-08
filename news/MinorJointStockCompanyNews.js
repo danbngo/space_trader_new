@@ -15,6 +15,10 @@ class MinorJointStockCompanyNews extends News {
                 territory: CL.SLIGHTLY_HIGH,
                 taxes: CL.LOW,
                 reserves: CL.HIGH,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.FOOD, CL.SLIGHTLY_LOW],
+                    [CARGO_TYPES.METAL, CL.SLIGHTLY_LOW]
+                ]))
             },
             {
                 economy: CL.HIGH, // Reduced from VERY_HIGH

@@ -20,6 +20,10 @@ class WarSurrenderNews extends News {
         this.addTargetPlanetEffect(
             {
                 prestige: CL.LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.WEAPONS, CL.SLIGHTLY_LOW],
+                    [CARGO_TYPES.FOOD, CL.SLIGHTLY_HIGH]
+                ]))
             },
             {
                 territory: CL.LOW,

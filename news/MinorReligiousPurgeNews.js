@@ -12,6 +12,9 @@ class MinorReligiousPurgeNews extends News {
             {
                 security: CL.SLIGHTLY_LOW,
                 prestige: CL.SLIGHTLY_HIGH,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.HOLOCUBES, CL.SLIGHTLY_HIGH]
+                ]))
             },
             {
                 prestige: CL.HIGH,

@@ -21,7 +21,7 @@ class StarSystem extends SpaceObject {
      */
     constructor(name = "Unnamed", color = COLORS.White, radius = 0, barycenter = null, stars = [], planets = [], dwarfPlanets = [], 
         moons = [], spaceStations = [], asteroidBelts = [], asteroids = [], backgroundStars = []) {
-        console.log('instantiating star system w name:', name, 'stars:', stars, 'planets:', planets, 'dwarf planets:', dwarfPlanets, 'moons:', moons, 'space stations:', spaceStations, 'fleets:', fleets);
+        console.log('instantiating star system w name:', name, 'stars:', stars, 'planets:', planets, 'dwarf planets:', dwarfPlanets, 'moons:', moons, 'space stations:', spaceStations);
         super(name, OBJECT_TYPES.ABSTRACT, color, radius, 0, 0);
         /** @type {SpaceObject} */
         this.barycenter = barycenter

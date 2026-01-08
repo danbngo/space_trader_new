@@ -12,7 +12,10 @@ class PropagandaCampaignNews extends News {
             {
                 wealth: CL.SLIGHTLY_LOW,
                 culture: CL.SLIGHTLY_LOW,
-                corruption: CL.SLIGHTLY_LOW
+                corruption: CL.SLIGHTLY_LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.HOLOCUBES, CL.SLIGHTLY_HIGH]
+                ]))
             },
             {
                 prestige: CL.SLIGHTLY_LOW

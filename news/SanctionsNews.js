@@ -31,7 +31,12 @@ class SanctionsNews extends News {
             {
                 reserves: CL.SLIGHTLY_LOW,
                 economy: CL.SLIGHTLY_LOW,
-                wealth: CL.SLIGHTLY_LOW
+                wealth: CL.SLIGHTLY_LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.FOOD, CL.SLIGHTLY_HIGH],
+                    [CARGO_TYPES.ELECTRONICS, CL.HIGH],
+                    [CARGO_TYPES.MEDICINE, CL.SLIGHTLY_HIGH]
+                ]))
             },
             {
                 reserves: CL.LOW,

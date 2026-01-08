@@ -13,7 +13,10 @@ class WarInternmentNews extends News {
                 economy: CL.SLIGHTLY_LOW,
                 prestige: CL.SLIGHTLY_LOW,
                 security: CL.SLIGHTLY_HIGH,
-                population: CL.SLIGHTLY_LOW
+                population: CL.SLIGHTLY_LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.FOOD, CL.SLIGHTLY_HIGH]
+                ]))
             },
             {
                 security: CL.SLIGHTLY_HIGH,

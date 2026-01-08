@@ -26,7 +26,12 @@ class RefugeesNews extends News {
         this.addTargetPlanetEffect(
             {
                 population: CL.SLIGHTLY_HIGH,
-                culture: CL.SLIGHTLY_LOW
+                culture: CL.SLIGHTLY_LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.FOOD, CL.SLIGHTLY_HIGH],
+                    [CARGO_TYPES.MEDICINE, CL.SLIGHTLY_HIGH],
+                    [CARGO_TYPES.CONSTRUCTION, CL.SLIGHTLY_HIGH]
+                ]))
             },
             {
                 population: CL.SLIGHTLY_HIGH,

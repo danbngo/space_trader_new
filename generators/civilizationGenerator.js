@@ -34,43 +34,6 @@ function generateCivilization(planet) {
         skillPriceMultipliers.setAmount(sk, rng(ACADEMY_MAX_SKILL_PRICE_MODIFIER, ACADEMY_MIN_SKILL_PRICE_MODIFIER, false))
     }
 
-    // Generate random race demographics
-    const races = new CountsMap()
-    
-    // Ensure normalized
-    races.normalize()
-
-    // Generate random religion demographics from star system religions
-    const religions = new CountsMap()
-    let stateReligion = null
-    const systemReligions = gs && gs.system ? gs.system.religions : []
-    if (systemReligions && systemReligions.length > 0) {
-        const numReligions = Math.min(rng(systemReligions.length, 1), systemReligions.length)
-        const selectedReligions = rndMembers(systemReligions, numReligions, true)
-        
-        stateReligion = rndMember(selectedReligions)
-        
-        // Generate random weights for religions
-        const religionWeights = []
-        for (let i = 0; i < selectedReligions.length; i++) {
-            // If this is the state religion, give it a much higher weight
-            if (selectedReligions[i] === stateReligion) {
-                religionWeights.push(Math.random() * 15 + 10) // 10-25 weight
-            } else {
-                religionWeights.push(Math.random() * 5 + 1) // 1-6 weight
-            }
-        }
-        
-        // Add agnostic/non-religious population to the mix (no RELIGION_AGNOSTICISM or RELIGION_ATHEISM constants)
-        // Just leave some percentage as non-religious by not adding up to 100%
-        
-        // Normalize to ratios (0-1, not percentages)
-        const totalReligionWeight = religionWeights.reduce((sum, w) => sum + w, 0)
-        for (let i = 0; i < selectedReligions.length; i++) {
-            religions.setAmount(selectedReligions[i], religionWeights[i] / totalReligionWeight)
-        }
-    }
-
     // Generate culture demographics
     const cultures = new CountsMap()
     const majorPlanets = gs && gs.system ? gs.system.planets.filter(p => p !== planet) : []
@@ -102,7 +65,7 @@ function generateCivilization(planet) {
     }
 
     return new Civilization({
-        planet, governmentType, cargoPriceMultipliers, skillPriceMultipliers, technology, education, territory, population,
+        planet, governmentType, cargoPriceMultipliers, technology, education, territory, population,
          army, navy, industry, economy, security, culture, prestige, corruption, crime,
          wealth, reserves, taxes
     })

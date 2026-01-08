@@ -15,7 +15,11 @@ class PirateHavenNews extends News {
                 commerce: CL.MEDIUM,
                 taxes: CL.MEDIUM,
                 prestige: CL.SLIGHTLY_LOW,
-                culture: CL.SLIGHTLY_LOW
+                culture: CL.SLIGHTLY_LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.WEAPONS, CL.HIGH],
+                    [CARGO_TYPES.DRUGS, CL.SLIGHTLY_LOW]
+                ]))
             },
             {
                 security: CL.HIGH,

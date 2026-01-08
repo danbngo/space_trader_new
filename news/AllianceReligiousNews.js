@@ -14,7 +14,10 @@ class AllianceReligiousNews extends News {
             culture: CL.SLIGHTLY_HIGH,
             prestige: CL.SLIGHTLY_HIGH,
             army: CL.SLIGHTLY_HIGH,
-            navy: CL.SLIGHTLY_HIGH
+            navy: CL.SLIGHTLY_HIGH,
+            cargoPriceMultipliers: new CountsMap(new Map([
+                [CARGO_TYPES.HOLOCUBES, CL.SLIGHTLY_LOW]
+            ]))
         })
 
         this.addTargetPlanetEffect({

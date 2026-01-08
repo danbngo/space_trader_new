@@ -14,7 +14,11 @@ class WarConvertIndustryNews extends News {
                 economy: CL.MEDIUM,
                 culture: CL.SLIGHTLY_LOW,
                 navy: CL.SLIGHTLY_HIGH,
-                army: CL.SLIGHTLY_HIGH
+                army: CL.SLIGHTLY_HIGH,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.METAL, CL.HIGH],
+                    [CARGO_TYPES.WEAPONS, CL.SLIGHTLY_LOW]
+                ]))
             },
             {},
             {}

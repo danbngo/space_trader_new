@@ -29,6 +29,9 @@ class MinorForcedDemilitarizationNews extends News {
                 navy: CL.VERY_LOW,
                 prestige: CL.LOW,
                 culture: CL.SLIGHTLY_HIGH,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.WEAPONS, CL.SLIGHTLY_LOW]
+                ]))
             },
             {
                 army: CL.LOW,

@@ -12,7 +12,10 @@ class IndoctrinationProgramNews extends News {
             {
                 education: CL.SLIGHTLY_LOW,
                 technology: CL.SLIGHTLY_LOW,
-                prestige: CL.SLIGHTLY_LOW
+                prestige: CL.SLIGHTLY_LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.HOLOCUBES, CL.SLIGHTLY_HIGH]
+                ]))
             },
             {
                 culture: CL.SLIGHTLY_HIGH,

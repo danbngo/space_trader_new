@@ -13,6 +13,9 @@ class MinorCulturalIntegrationProgramNews extends News {
                 culture: CL.SLIGHTLY_HIGH,
                 security: CL.SLIGHTLY_HIGH,
                 taxes: CL.HIGH,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.HOLOCUBES, CL.SLIGHTLY_HIGH]
+                ]))
             },
             {
                 culture: CL.HIGH,

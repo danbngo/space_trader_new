@@ -166,10 +166,9 @@ const SOLAR_SYSTEM = new StarSystem(
     DWARF_PLANETS,
     [], //moons added in MOONS.js
     [],
-    [],
-    [ASTEROID_BELT, TROJANS, GREEKS, KUIPER_BELT, OORT_CLOUD], [...ASTEROIDS_ALL],
+    [ASTEROID_BELT, TROJANS, GREEKS, KUIPER_BELT, OORT_CLOUD],
+    [...ASTEROIDS_ALL],
     BACKGROUND_STARS,
-    []
 );
 
 console.log("Generated solar system:", SOLAR_SYSTEM)

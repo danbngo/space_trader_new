@@ -11,6 +11,9 @@ class LegallyAssistedDeathNews extends News {
         this.addPlanetEffect(
             {
                 culture: CL.SLIGHTLY_LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.MEDICINE, CL.SLIGHTLY_LOW]
+                ]))
             },
             {
                 population: CL.SLIGHTLY_LOW,

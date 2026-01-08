@@ -26,7 +26,11 @@ class RuinsDiscoveredNews extends News {
         this.addPlanetEffect(
             {
                 taxes: CL.VERY_HIGH,
-                wealth: CL.VERY_HIGH
+                wealth: CL.VERY_HIGH,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.NANITES, CL.SLIGHTLY_HIGH],
+                    [CARGO_TYPES.ELECTRONICS, CL.SLIGHTLY_HIGH]
+                ]))
             },
             successEffects,
             failureEffects

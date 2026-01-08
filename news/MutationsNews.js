@@ -12,7 +12,11 @@ class MutationsNews extends News {
             {
                 culture: CL.MEDIUM,
                 corruption: CL.SLIGHTLY_HIGH,
-                crime: CL.SLIGHTLY_HIGH
+                crime: CL.SLIGHTLY_HIGH,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.MEDICINE, CL.HIGH],
+                    [CARGO_TYPES.NANITES, CL.SLIGHTLY_HIGH]
+                ]))
             },
             {
                 education: CL.SLIGHTLY_HIGH,

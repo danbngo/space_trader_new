@@ -13,6 +13,10 @@ class DisasterAsteroidNews extends News {
         this.addPlanetEffect(
             {
                 taxes: CL.VERY_HIGH,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.CONSTRUCTION, CL.HIGH],
+                    [CARGO_TYPES.METAL, CL.SLIGHTLY_HIGH]
+                ]))
             },
             {
                 technology: CL.HIGH,

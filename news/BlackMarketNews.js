@@ -12,7 +12,11 @@ class BlackMarketNews extends News {
             {
                 economy: CL.SLIGHTLY_LOW,
                 corruption: CL.SLIGHTLY_LOW,
-                crime: CL.SLIGHTLY_LOW
+                crime: CL.SLIGHTLY_LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.DRUGS, CL.SLIGHTLY_LOW],
+                    [CARGO_TYPES.WEAPONS, CL.SLIGHTLY_LOW]
+                ]))
             },
             {
                 economy: CL.SLIGHTLY_HIGH,

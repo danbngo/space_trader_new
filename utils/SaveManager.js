@@ -283,18 +283,9 @@ const SaveManager = {
             spaceStations: this.serializeArray(system.spaceStations),
             asteroidBelts: this.serializeArray(system.asteroidBelts),
             asteroids: this.serializeArray(system.asteroids),
-            ruins: this.serializeArray(system.ruins),
-            anomalies: this.serializeArray(system.anomalies),
             
             // Planet dynamic data
             planetData: planetData,
-            
-            // Fleets
-            fleets: (system.fleets || []).map(fleet => this.serializeFleet(fleet)),
-            abandonedFleets: (system.abandonedFleets || []).map(fleet => this.serializeFleet(fleet)),
-            
-            // Religions
-            religions: (system.religions || []).map(religion => this.serializeReligion(religion)),
             
             // News
             news: (system.news || []).map(news => this.serializeNews(news)),
@@ -316,17 +307,11 @@ const SaveManager = {
             color: fleet.color,
             x: fleet.x,
             y: fleet.y,
-            angle: fleet.angle,
-            cloakLevel: fleet.cloakLevel,
-            destroyed: fleet.destroyed,
-            abandonedYear: fleet.abandonedYear,
-            originalName: fleet.originalName,
             
             planetUUID: this.objectToUUID(fleet.planet),
             locationUUID: this.objectToUUID(fleet.location),
             fleetTypeName: fleet.fleetType ? fleet.fleetType.name : null,
             flagshipUUID: this.objectToUUID(fleet.flagship),
-            destroyedBy: typeof fleet.destroyedBy === 'string' ? fleet.destroyedBy : this.objectToUUID(fleet.destroyedBy),
             
             ships: fleet.ships.map(ship => this.serializeShip(ship)),
             officers: fleet.officers.map(officer => this.serializeOfficer(officer)),
@@ -577,13 +562,6 @@ const SaveManager = {
             }
         }
         
-        // Religions
-        system.religions = (systemData.religions || []).map(r => this.deserializeReligion(r));
-        
-        // Fleets
-        system.fleets = (systemData.fleets || []).map(f => this.deserializeFleet(f));
-        system.abandonedFleets = (systemData.abandonedFleets || []).map(f => this.deserializeFleet(f));
-        
         // News
         system.news = (systemData.news || []).map(n => this.deserializeNews(n));
         system.history = (systemData.history || []).map(n => this.deserializeNews(n));
@@ -611,13 +589,6 @@ const SaveManager = {
         fleet.uuid = data.uuid;
         gameRegistry.registerFleet(fleet);
         
-        // Restore properties
-        fleet.angle = data.angle;
-        fleet.cloakLevel = data.cloakLevel || 0;
-        fleet.destroyed = data.destroyed || false;
-        fleet.abandonedYear = data.abandonedYear || null;
-        fleet.originalName = data.originalName || null;
-        
         fleet.fuel = data.fuel || 0;
         
         // Deserialize ships first
@@ -634,7 +605,6 @@ const SaveManager = {
         fleet._locationUUID = data.locationUUID;
         fleet._fleetTypeName = data.fleetTypeName;
         fleet._captainUUID = data.captainUUID;
-        fleet._destroyedBy = data.destroyedBy;
         
         return fleet;
     },
@@ -823,44 +793,6 @@ const SaveManager = {
         
         gameRegistry.registerNews(news);
         return news;
-    },
-
-    /**
-     * Restore all cross-references after all entities are created
-     * @param {GameState} gs
-     * @param {Object} saveData
-     */
-    restoreCrossReferences(gs, saveData) {
-        console.log('SaveManager: Restoring cross-references...');
-        
-        // Restore fleet references
-        for (const fleet of gs.system.fleets.concat(gs.system.abandonedFleets || [])) {
-            fleet.planet = this.uuidToObject(fleet._planetUUID, 'planet');
-            fleet.location = this.uuidToObject(fleet._locationUUID, 'planet');
-            fleet.fleetType = this.findFleetType(fleet._fleetTypeName);
-            fleet.captain = this.uuidToObject(fleet._captainUUID, 'officer');
-            
-            // Handle destroyedBy (can be string or UUID)
-            if (typeof fleet._destroyedBy === 'string' && !fleet._destroyedBy.includes('_')) {
-                fleet.destroyedBy = fleet._destroyedBy;
-            } else {
-                fleet.destroyedBy = this.uuidToObject(fleet._destroyedBy, 'fleet');
-            }
-            
-            // Restore ship->fleet references
-            for (const ship of fleet.ships) {
-                ship.fleet = fleet;
-                ship.pilot = this.uuidToObject(ship._pilotUUID, 'officer');
-                ship.disabledByShip = this.uuidToObject(ship._disabledByShipUUID, 'ship');
-                ship.aiType = this.findAIType(ship._aiTypeName);
-            }
-            
-            // Restore officer->fleet and officer->planet references
-            for (const officer of fleet.officers) {
-                officer.fleet = fleet;
-                officer.planet = this.uuidToObject(officer._planetUUID, 'planet');
-            }
-        }
     },
 
     // === Type Finder Helper Methods ===

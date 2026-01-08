@@ -20,7 +20,11 @@ class AlienLifeDiscoveredNews extends News {
         this.addPlanetEffect(
             {
                 taxes: CL.VERY_HIGH,
-                wealth: CL.HIGH
+                wealth: CL.HIGH,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.MEDICINE, CL.HIGH],
+                    [CARGO_TYPES.NANITES, CL.SLIGHTLY_HIGH]
+                ]))
             },
             {
                 prestige: CL.VERY_HIGH,

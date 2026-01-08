@@ -11,6 +11,10 @@ class VirtualRealityChambersNews extends News {
         this.addPlanetEffect(
             {
                 technology: CL.SLIGHTLY_HIGH,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.HOLOCUBES, CL.HIGH],
+                    [CARGO_TYPES.ELECTRONICS, CL.SLIGHTLY_HIGH]
+                ]))
             },
             {
                 population: CL.SLIGHTLY_LOW,

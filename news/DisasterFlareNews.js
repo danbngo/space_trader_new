@@ -12,7 +12,10 @@ class DisasterFlareNews extends News {
             {
                 economy: CL.SLIGHTLY_LOW,
                 industry: CL.SLIGHTLY_LOW,
-                technology: CL.SLIGHTLY_LOW
+                technology: CL.SLIGHTLY_LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.ELECTRONICS, CL.HIGH]
+                ]))
             },
             {
                 technology: CL.SLIGHTLY_LOW

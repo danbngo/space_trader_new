@@ -15,6 +15,11 @@ class ForeignAidNews extends News {
                 reserves: CL.HIGH,
                 wealth: CL.HIGH,
                 prestige: CL.SLIGHTLY_LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.CONSTRUCTION, CL.HIGH],
+                    [CARGO_TYPES.FOOD, CL.SLIGHTLY_HIGH],
+                    [CARGO_TYPES.MEDICINE, CL.SLIGHTLY_HIGH]
+                ]))
             },
             {
                 buildingsImproved,

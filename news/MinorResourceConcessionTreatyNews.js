@@ -14,6 +14,10 @@ class MinorResourceConcessionTreatyNews extends News {
                 economy: CL.SLIGHTLY_HIGH,
                 reserves: CL.SLIGHTLY_HIGH,
                 taxes: CL.LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.METAL, CL.SLIGHTLY_LOW],
+                    [CARGO_TYPES.ISOTOPES, CL.SLIGHTLY_LOW]
+                ]))
             },
             {
                 wealth: CL.HIGH,

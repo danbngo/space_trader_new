@@ -13,7 +13,12 @@ class LaborStrikesNews extends News {
                 industry: CL.VERY_HIGH,
                 culture: CL.SLIGHTLY_HIGH,
                 economy: CL.SLIGHTLY_HIGH,
-                wealth: CL.SLIGHTLY_HIGH
+                wealth: CL.SLIGHTLY_HIGH,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.METAL, CL.HIGH],
+                    [CARGO_TYPES.CONSTRUCTION, CL.HIGH],
+                    [CARGO_TYPES.ELECTRONICS, CL.SLIGHTLY_HIGH]
+                ]))
             },
             {
                 culture: CL.SLIGHTLY_HIGH,

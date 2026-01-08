@@ -8,7 +8,11 @@ class WarAllyNews extends News {
             NT.WAR_ALLY, planet, targetPlanet
         )
         
-        this.addPlanetEffect({},
+        this.addPlanetEffect({
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.WEAPONS, CL.SLIGHTLY_HIGH]
+                ]))
+            },
             {
                 wealth: CL.LOW,
                 prestige: CL.LOW,

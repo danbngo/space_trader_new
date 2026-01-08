@@ -11,7 +11,11 @@ class WarOffensiveNews extends News {
         this.addPlanetEffect(
             {
                 military: CL.SLIGHTLY_LOW,
-                navy: CL.LOW
+                navy: CL.LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.WEAPONS, CL.HIGH],
+                    [CARGO_TYPES.ISOTOPES, CL.SLIGHTLY_HIGH]
+                ]))
             },
             {
                 navy: CL.SLIGHTLY_LOW,

@@ -11,6 +11,10 @@ class PirateArmadaNews extends News {
         this.addPlanetEffect(
             {
                 economy: CL.LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.WEAPONS, CL.HIGH],
+                    [CARGO_TYPES.FOOD, CL.SLIGHTLY_HIGH]
+                ]))
             },
             {
                 navy: CL.SLIGHTLY_HIGH,

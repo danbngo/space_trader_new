@@ -33,6 +33,10 @@ class MinorDebtTrapRestructuringNews extends News {
                 wealth: CL.HIGH,
                 reserves: CL.VERY_HIGH,
                 taxes: CL.VERY_LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.CONSTRUCTION, CL.HIGH],
+                    [CARGO_TYPES.METAL, CL.SLIGHTLY_HIGH]
+                ]))
             },
             {
                 territory: CL.LOW,

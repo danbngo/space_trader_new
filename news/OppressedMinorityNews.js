@@ -9,7 +9,11 @@ class OppressedMinorityNews extends News {
         )
 
         this.addPlanetEffect(
-            {},
+            {
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.MEDICINE, CL.SLIGHTLY_HIGH]
+                ]))
+            },
             {
                 prestige: CL.SLIGHTLY_HIGH,
                 culture: CL.SLIGHTLY_LOW

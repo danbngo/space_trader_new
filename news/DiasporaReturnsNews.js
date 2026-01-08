@@ -13,7 +13,11 @@ class DiasporaReturnsNews extends News {
                 population: CL.HIGH,
                 culture: CL.SLIGHTLY_HIGH,
                 education: CL.SLIGHTLY_HIGH,
-                wealth: CL.SLIGHTLY_HIGH
+                wealth: CL.SLIGHTLY_HIGH,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.FOOD, CL.SLIGHTLY_HIGH],
+                    [CARGO_TYPES.CONSTRUCTION, CL.SLIGHTLY_HIGH]
+                ]))
             },
             {
                 population: CL.HIGH,

@@ -14,6 +14,11 @@ class BankruptcyNews extends News {
                 economy: CL.SLIGHTLY_LOW,
                 reserves: CL.SLIGHTLY_LOW,
                 taxes: CL.SLIGHTLY_HIGH,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.FOOD, CL.SLIGHTLY_HIGH],
+                    [CARGO_TYPES.WATER, CL.SLIGHTLY_HIGH],
+                    [CARGO_TYPES.MEDICINE, CL.HIGH]
+                ]))
             },
             {
                 wealth: CL.HIGH,

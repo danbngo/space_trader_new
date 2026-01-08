@@ -14,7 +14,10 @@ class AllianceNews extends News {
             technology: CL.SLIGHTLY_HIGH,
             prestige: CL.SLIGHTLY_HIGH,
             army: CL.SLIGHTLY_HIGH,
-            navy: CL.SLIGHTLY_HIGH
+            navy: CL.SLIGHTLY_HIGH,
+            cargoPriceMultipliers: new CountsMap(new Map([
+                [CARGO_TYPES.WEAPONS, CL.SLIGHTLY_LOW]
+            ]))
         })
 
         this.addTargetPlanetEffect({

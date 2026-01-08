@@ -34,7 +34,11 @@ class WarSabotageNews extends News {
                 economy: CL.SLIGHTLY_LOW,
                 security: CL.SLIGHTLY_LOW,
                 crime: CL.SLIGHTLY_HIGH,
-                technology: CL.SLIGHTLY_LOW
+                technology: CL.SLIGHTLY_LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.CONSTRUCTION, CL.SLIGHTLY_HIGH],
+                    [CARGO_TYPES.ELECTRONICS, CL.SLIGHTLY_HIGH]
+                ]))
             },
             {
                 buildingsDamaged,

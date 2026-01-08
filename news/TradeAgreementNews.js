@@ -12,7 +12,11 @@ class TradeAgreementNews extends News {
             {
                 reserves: CL.HIGH,
                 economy: CL.SLIGHTLY_HIGH,
-                wealth: CL.HIGH
+                wealth: CL.HIGH,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.FOOD, CL.SLIGHTLY_LOW],
+                    [CARGO_TYPES.ELECTRONICS, CL.SLIGHTLY_LOW]
+                ]))
             },
             {
                 economy: CL.SLIGHTLY_HIGH,

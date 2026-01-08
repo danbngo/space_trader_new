@@ -23,7 +23,11 @@ class GunboatDiplomacyNews extends News {
         )
 
         this.addTargetPlanetEffect(
-            {},
+            {
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.WEAPONS, CL.SLIGHTLY_HIGH]
+                ]))
+            },
             {
                 economy: CL.SLIGHTLY_HIGH,
                 wealth: CL.SLIGHTLY_LOW,

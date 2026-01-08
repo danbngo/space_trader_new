@@ -12,6 +12,9 @@ class HoloCultureNews extends News {
             {
                 culture: CL.HIGH,
                 wealth: CL.HIGH,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.HOLOCUBES, CL.SLIGHTLY_LOW]
+                ]))
             },
             {
                 culture: CL.VERY_HIGH,

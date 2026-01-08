@@ -11,7 +11,10 @@ class PhilosophicalDebatesNews extends News {
         this.addPlanetEffect(
             {
                 education: CL.SLIGHTLY_HIGH,
-                culture: CL.SLIGHTLY_HIGH
+                culture: CL.SLIGHTLY_HIGH,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.HOLOCUBES, CL.SLIGHTLY_LOW]
+                ]))
             },
             {
                 education: CL.SLIGHTLY_HIGH,

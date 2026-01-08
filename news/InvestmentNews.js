@@ -32,7 +32,11 @@ class InvestmentNews extends News {
                 wealth: CL.HIGH,
                 reserves: CL.LOW,
                 industry: CL.SLIGHTLY_HIGH,
-                econommy: CL.SLIGHTLY_HIGH
+                econommy: CL.SLIGHTLY_HIGH,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.CONSTRUCTION, CL.HIGH],
+                    [CARGO_TYPES.METAL, CL.SLIGHTLY_HIGH]
+                ]))
             },
             {
                 buildingsImproved,

@@ -11,7 +11,6 @@ class StarMap extends BaseMap {
         this.starSystem = starSystem
 
         this.gameYearsPerMs = STAR_MAP_YEARS_PER_MS
-        this.tickCounter = 0 // Track ticks for periodic updates
         this.frameCounter = 0 // Track frames for optimizing recoloring
         this.lastPlayerX = gs.fleet ? gs.fleet.x : 0
         this.lastPlayerY = gs.fleet ? gs.fleet.y : 0
@@ -611,8 +610,8 @@ class StarMap extends BaseMap {
             // Hide travel button if this planet is already the destination of the current route
             const isCurrentDestination = gs.fleet.route && gs.fleet.route.destination === obj
             if (!isCurrentDestination) {
-                const outOfFuel = gs.fleet.fuel <= 0
-                ce({parent:container, tag:'button', innerHTML:'Travel', onClick:()=>this.setDestination(obj, true), disabled: cantTravelHere || outOfFuel})
+                const stranded = gs.fleet.stranded
+                //ce({parent:container, tag:'button', innerHTML:'Travel', onClick:()=>this.setDestination(obj, true), disabled: cantTravelHere || outOfFuel})
             }
             if (gs.fleet.route) ce({parent:container, tag:'button', innerHTML:'Stop', onClick:()=>this.stopPlayerFleet()})
         }
@@ -636,7 +635,7 @@ class StarMap extends BaseMap {
                 this.objPaneFuelCostEl = ce({id: 'star_map_fuel_cost_object_pane', innerHTML: `${roundToPlaces(distance * FUEL_COST_PER_1_AU, 1)}`})
             ]})
             const outOfFuel = gs.fleet.fuel <= 0
-            ce({parent:container, tag:'button', innerHTML:'Travel', onClick:()=>this.setDestination(obj, true), disabled: gs.fleet.stranded || outOfFuel})
+            //ce({parent:container, tag:'button', innerHTML:'Travel', onClick:()=>this.setDestination(obj, true), disabled: gs.fleet.stranded || outOfFuel})
             if (gs.fleet.route) ce({parent:container, tag:'button', innerHTML:'Stop', onClick:()=>this.stopPlayerFleet()})
         }
     }
@@ -661,134 +660,6 @@ class StarMap extends BaseMap {
     explore(obj) {
         if (obj instanceof Planet) showPlanetMenu(obj)
         if (obj instanceof Star) showStarMenu(obj)
-    }
-
-    /** @param {Planet | Waypoint | Fleet} obj */
-    setDestination(obj, unpause = false, bypassSunWarning = false, bypassInterceptWarning = false, bypassEscortWarning = false) {
-        // Prevent rapid-clicking from creating multiple expensive route calculations
-        if (this._creatingRoute) {
-            console.log('Route creation already in progress, ignoring duplicate click')
-            return
-        }
-        this._creatingRoute = true
-        
-        // Warn if player has an active escort mission
-        if (gs.fleet.escortTarget && !bypassEscortWarning) {
-            showModal(
-                'Abandon Escort?',
-                'You are currently escorting a fleet. Setting a new destination will abandon them and fail the escort mission. Continue?',
-                [
-                    ['Abandon', () => {
-                        // Fail escort missions
-                        for (const mission of gs.missions) {
-                            if (mission.missionType === MISSION_TYPES.ESCORT_CONVOY) {
-                                mission.onPlayerDropEscort()
-                            }
-                        }
-                        gs.fleet.escortTarget = null
-                        this.setDestination(obj, unpause, bypassSunWarning, bypassInterceptWarning, true)
-                    }],
-                    ['Cancel', () => {
-                        this._creatingRoute = false
-                    }]
-                ]
-            )
-            return
-        }
-        
-        // REMOVED: Route system - travel disabled
-        /*
-        let route = null
-        
-        if (obj instanceof Planet) {
-            route = new Route(gs.fleet, obj)
-        } else if (obj instanceof Fleet) {
-            // Abandoned (destroyed) fleets use normal Route, active fleets use InterceptionRoute
-            route = obj.destroyed ? new Route(gs.fleet, obj) : new InterceptionRoute(gs.fleet, obj)
-            if (!route.valid) {
-                console.log('!!!! Cannot intercept fleet - target is too fast or too far')
-                this._creatingRoute = false
-                return
-            }
-            // Check if interception will take a long time - if so, require confirmation
-            if (obj instanceof Fleet && !obj.destroyed && route.travelTime > WARN_INTERCEPT_DURATION_YEARS && !bypassInterceptWarning) {
-                showLongInterceptionWarningModal(obj, route, () => {
-                    this.setDestination(obj, true, bypassSunWarning, true)
-                })
-                this._creatingRoute = false
-                return
-            }
-        } else if (obj.isWaypoint) {
-            // Create a route to arbitrary coordinates
-            route = new Route(gs.fleet, obj)
-        }
-        
-        // Check if player has enough fuel for the route
-        if (route && gs.fleet) {
-            const fuelRequired = route.path.distance * FUEL_COST_PER_1_AU
-            if (gs.fleet.fuel < fuelRequired) {
-                showInsufficientFuelModal(route, obj, () => this._proceedWithRoute(route, obj, unpause, bypassSunWarning))
-                this._creatingRoute = false
-                return
-            }
-            
-            // Check if destination is too far from any refueling station
-            const destinationX = route.path.toX
-            const destinationY = route.path.toY
-            const fuelAfterArrival = gs.fleet.fuel - fuelRequired
-            
-            // Find nearest valid refueling station from destination
-            const validStations = [...gs.system.planets, ...gs.system.dwarfPlanets, ...gs.system.spaceStations]
-                .filter(p => p.isValidRefuelingStation && p.isValidRefuelingStation())
-            
-            let nearestStationDistance = Infinity
-            for (const station of validStations) {
-                const distance = calcDistance(destinationX, destinationY, station.x, station.y)
-                if (distance < nearestStationDistance) {
-                    nearestStationDistance = distance
-                }
-            }
-            
-            // Warn if remaining fuel wouldn't be enough to reach nearest station
-            const fuelToNearestStation = nearestStationDistance * FUEL_COST_PER_1_AU
-            if (validStations.length > 0 && fuelAfterArrival < fuelToNearestStation) {
-                showFuelWarningModal(route, obj, fuelAfterArrival, nearestStationDistance, () => this._proceedWithRoute(route, obj, unpause, bypassSunWarning))
-                this._creatingRoute = false
-                return
-            }
-        }
-        
-        // Continue with route validation and setting
-        this._proceedWithRoute(route, obj, unpause, bypassSunWarning)
-        */
-        
-        // Simplified: Just release the lock since routes are disabled
-        this._creatingRoute = false
-    }
-    
-    _proceedWithRoute(route, obj, unpause, bypassSunWarning) {
-        // REMOVED: Route validation and setting
-        /*
-        // Check if route intersects the sun
-        if (route && FleetAI.checkRouteIntersectsSun(route)) {
-            if (!bypassSunWarning) {
-                showSunWarningModal(obj, () => this.setDestination(obj, unpause, true))
-                this._creatingRoute = false
-                return
-            }
-        }
-        
-        // Set the route
-        if (route) {
-            gs.fleet.startRoute(route)
-        }
-        */
-        
-        if (unpause) this.togglePause(false)
-        this.refresh()
-        
-        // Release route creation lock
-        this._creatingRoute = false
     }
 
     togglePause(newPausedState = !this.paused) {
@@ -825,17 +696,7 @@ class StarMap extends BaseMap {
         checkExpiredMissions()
         checkCompletedMissions()
         
-        gs.system.updateRoutes(gs.year)
         gs.system.updatePositions()
-        gs.system.updateEscortPositions()
-        gs.system.updateAITargetPositions()
-        
-        // Update discoveries every 90 ticks
-        this.tickCounter++
-        if (this.tickCounter >= 90) {
-            gs.system.updateDiscoveries()
-            this.tickCounter = 0
-        }
         
         // Update fuel bar every 10 frames
         if (!this.fuelBarCounter) this.fuelBarCounter = 0

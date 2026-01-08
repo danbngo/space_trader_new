@@ -9,7 +9,11 @@ class WarCodeBreakNews extends News {
         )
 
         this.addPlanetEffect(
-            {},
+            {
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.ELECTRONICS, CL.SLIGHTLY_HIGH]
+                ]))
+            },
             {
                 security: CL.HIGH,
                 army: CL.HIGH,

@@ -156,15 +156,8 @@ class Mission {
             /** @type {any} */
             const fleet = escortFleet
             fleet.missionUuid = this.uuid
-            
-            // REMOVED: FleetAI destination setting
-            // Set destination via fleetAI
-            // if (escortFleet.fleetAI && this.targetPlanet) {
-            //     escortFleet.fleetAI.destination = this.targetPlanet
-            // }
-            
-            gs.fleet.escortTarget = escortFleet
-            gs.system.fleets.push(escortFleet)
+
+            //TODO ADD SHIP TO PLAYER FLEET
         }
 
         // For cargo delivery, ensure player has cargo space

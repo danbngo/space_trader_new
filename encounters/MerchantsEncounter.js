@@ -98,8 +98,6 @@ class MerchantsEncounter extends Encounter {
             msg += `They offer to sell you ${buyAmount} ${ct.symbol} ${coloredName(ct)} for ${pricePerUnit}CR each (total: ${totalPrice}CR).<br/>`
 
             if (gs.credits < totalPrice) {
-                const brokeDialogue = this.getPlayerBrokeDialogue()
-                msg += brokeDialogue ? `"${brokeDialogue}"<br/>` : ''
                 msg += `You don't have enough credits for their offer.<br/>`
             }
             else {

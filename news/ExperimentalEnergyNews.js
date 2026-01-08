@@ -11,7 +11,11 @@ class ExperimentalEnergyNews extends News {
         this.addPlanetEffect(
             {
                 taxes: CL.VERY_HIGH,
-                wealth: CL.HIGH
+                wealth: CL.HIGH,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.ANTIMATTER, CL.HIGH],
+                    [CARGO_TYPES.ISOTOPES, CL.SLIGHTLY_HIGH]
+                ]))
             },
             {
                 technology: CL.HIGH,

@@ -14,6 +14,10 @@ class ImmigrationNews extends News {
                 economy: CL.SLIGHTLY_HIGH,
                 industry: CL.HIGH,
                 security: CL.SLIGHTLY_LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.FOOD, CL.SLIGHTLY_HIGH],
+                    [CARGO_TYPES.CONSTRUCTION, CL.HIGH]
+                ]))
             },
             {
                 population: CL.HIGH,

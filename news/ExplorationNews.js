@@ -14,6 +14,10 @@ class ExplorationNews extends News {
                 reserves: CL.LOW,
                 army: CL.SLIGHTLY_LOW,
                 navy: CL.LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.FOOD, CL.SLIGHTLY_HIGH],
+                    [CARGO_TYPES.ISOTOPES, CL.SLIGHTLY_HIGH]
+                ]))
             },
             {
                 taxes: CL.SLIGHTLY_HIGH,

@@ -4,7 +4,6 @@
  * @property {Planet} [planet] - The planet this civilization belongs to.
  * @property {GovernmentType} [governmentType] - The type of government of the civilization.
  * @property {CountsMap} [cargoPriceMultipliers] - Multipliers for cargo prices specific to this civilization.
- * @property {CountsMap} [skillPriceMultipliers] - Multipliers for cargo prices specific to this civilization.
  * @property {number} [technology] - Quality rating of ships produced by this civilization.
  * @property {number} [education] - Quality rating of officers from this civilization.
  * @property {number} [territory] - The territorial reach of the civilization in Astronomical Units (AUs).
@@ -128,16 +127,12 @@ class Civilization {
      */
     multiply(civMultipliers) {
         for (const cr of CIVILIZATION_RATINGS_ALL) {
-            //if (cr.id === 'cargoPriceMultipliers' || cr.id === 'skillPriceMultipliers') continue;
             const modifier = civMultipliers[cr.id];
             if (modifier == null || modifier == undefined || isNaN(modifier) || modifier == 1) continue;
             this[cr.id] *= civMultipliers[cr.id];
         }
         if (civMultipliers.cargoPriceMultipliers) for (const [ct, mod] of civMultipliers.cargoPriceMultipliers.counts) {
             this.cargoPriceMultipliers.multiply(ct, mod)
-        }
-        if (civMultipliers.skillPriceMultipliers) for (const [st, mod] of civMultipliers.skillPriceMultipliers.counts) {
-            this.skillPriceMultipliers.multiply(st, mod)
         }
     }
     
@@ -149,7 +144,6 @@ class Civilization {
         const inverseEffect = new Civilization({
             planet: this.planet,
             cargoPriceMultipliers: this.cargoPriceMultipliers ? this.cargoPriceMultipliers.calcInvertedMultipliers() : undefined,
-            skillPriceMultipliers: this.skillPriceMultipliers ? this.skillPriceMultipliers.calcInvertedMultipliers() : undefined,
         });
         for (const cr of CIVILIZATION_RATINGS_ALL) {
             inverseEffect[cr.id] = 1 / this[cr.id];
@@ -176,19 +170,12 @@ class Civilization {
                 this.cargoPriceMultipliers.counts.set(ct, mod)
             }
         }
-        if (withCiv.skillPriceMultipliers) {
-            if (!this.skillPriceMultipliers) this.skillPriceMultipliers = new CountsMap()
-            for (const [st, mod] of withCiv.skillPriceMultipliers.counts) {
-                this.skillPriceMultipliers.counts.set(st, mod)
-            }
-        }
     }
 
     clone() {
         const clone = new Civilization({
             planet: this.planet,
             cargoPriceMultipliers: this.cargoPriceMultipliers.clone(),
-            skillPriceMultipliers: this.skillPriceMultipliers.clone(),
             governmentType: this.governmentType,
         })
         for (const cr of CIVILIZATION_RATINGS_ALL) {

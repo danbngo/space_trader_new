@@ -12,6 +12,10 @@ class ArtificialLifeNews extends News {
             {
                 technology: CL.SLIGHTLY_HIGH,
                 education: CL.SLIGHTLY_HIGH,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.NANITES, CL.HIGH],
+                    [CARGO_TYPES.MEDICINE, CL.SLIGHTLY_HIGH]
+                ]))
             },
             {
                 wealth: CL.SLIGHTLY_HIGH,

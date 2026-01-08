@@ -12,7 +12,11 @@ class AutomationCrisisNews extends News {
             {
                 industry: CL.HIGH,
                 wealth: CL.SLIGHTLY_HIGH,
-                culture: CL.SLIGHTLY_HIGH
+                culture: CL.SLIGHTLY_HIGH,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.ELECTRONICS, CL.HIGH],
+                    [CARGO_TYPES.NANITES, CL.SLIGHTLY_HIGH]
+                ]))
             },
             {
                 economy: CL.SLIGHTLY_HIGH,

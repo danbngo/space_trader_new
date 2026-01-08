@@ -13,6 +13,10 @@ class ArtificialWombsNews extends News {
                 taxes: CL.HIGH,
                 wealth: CL.SLIGHTLY_LOW,
                 technology: CL.SLIGHTLY_HIGH,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.MEDICINE, CL.HIGH],
+                    [CARGO_TYPES.FOOD, CL.SLIGHTLY_HIGH]
+                ]))
             },
             {
                 population: CL.HIGH,

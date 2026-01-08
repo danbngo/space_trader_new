@@ -12,6 +12,9 @@ class DiplomaticRecognitionCrisisNews extends News {
             {
                 prestige: CL.LOW,
                 territory: CL.SLIGHTLY_LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.WEAPONS, CL.SLIGHTLY_HIGH]
+                ]))
             },
             {
                 prestige: CL.HIGH,

@@ -33,7 +33,12 @@ class WarInvasionNews extends News {
                 population: CL.SLIGHTLY_LOW,
                 economy: CL.SLIGHTLY_LOW,
                 industry: CL.SLIGHTLY_LOW,
-                territory: CL.SLIGHTLY_LOW
+                territory: CL.SLIGHTLY_LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.MEDICINE, CL.HIGH],
+                    [CARGO_TYPES.FOOD, CL.HIGH],
+                    [CARGO_TYPES.WEAPONS, CL.SLIGHTLY_HIGH]
+                ]))
             },
             {
                 buildingsDamaged,

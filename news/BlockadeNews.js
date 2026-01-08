@@ -26,6 +26,11 @@ class BlockadeNews extends News {
                 prestige: CL.SLIGHTLY_LOW,
                 economy: CL.SLIGHTLY_LOW,
                 reserves: CL.VERY_LOW,
+                cargoPriceMultipliers: new CountsMap(new Map([
+                    [CARGO_TYPES.FOOD, CL.HIGH],
+                    [CARGO_TYPES.MEDICINE, CL.HIGH],
+                    [CARGO_TYPES.WATER, CL.SLIGHTLY_HIGH]
+                ]))
             },
             {
                 prestige: CL.SLIGHTLY_LOW,
