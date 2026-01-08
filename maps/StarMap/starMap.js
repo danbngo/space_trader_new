@@ -363,20 +363,19 @@ class StarMap extends BaseMap {
             return
         }
         
-        const fuelPercentage = (fleet.currentFuel / fleet.totalFuelCapacity) * 100
+        const fuelPercentage = (fleet.fuel / fleet.totalFuelCapacity) * 100
         
         ce({
             parent: this.fuelBar,
             style: {display: 'flex', gap: '6px', alignItems: 'center'},
             children: [
-                'Fuel',
+                'Fuel: ',
                 new ProgressBar({
                     value: fuelPercentage,
                     fillColor: '#ffaa00',
                     overrideLabel: '',
                     width: 25
                 }).container,
-                `${Math.round(fleet.currentFuel)}/${Math.round(fleet.totalFuelCapacity)}`
             ]
         })
     }
@@ -700,13 +699,13 @@ class StarMap extends BaseMap {
         // Check if player has enough fuel for the route
         if (route && gs.fleet) {
             const fuelRequired = route.path.distance * FUEL_COST_PER_1_AU
-            if (gs.fleet.currentFuel < fuelRequired) {
+            if (gs.fleet.fuel < fuelRequired) {
                 const targetName = obj.name || 'waypoint'
                 showModal(
                     '⚠️ Insufficient Fuel',
                     ce({
                         children: [
-                            ce({ innerHTML: `Your route to ${targetName} requires ${roundToPlaces(fuelRequired, 1)} fuel, but you only have ${roundToPlaces(gs.fleet.currentFuel, 1)}.` }),
+                            ce({ innerHTML: `Your route to ${targetName} requires ${roundToPlaces(fuelRequired, 1)} fuel, but you only have ${roundToPlaces(gs.fleet.fuel, 1)}.` }),
                             ce({ innerHTML: 'You need to refuel at a shipyard before making this journey.' })
                         ]
                     }),

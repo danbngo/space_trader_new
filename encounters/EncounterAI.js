@@ -13,7 +13,8 @@ class EncounterAI {
         this.encounter = encounter
     }
 
-    calcShipsWithActions(fleet = new Fleet()) {
+    /** @param {Fleet} fleet */
+    calcShipsWithActions(fleet) {
         console.log('EncounterAI.calcShipsWithActions', { fleet });
         return fleet.activeShips.filter(s => s.actionsRemaining > 0)
     }

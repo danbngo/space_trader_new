@@ -7,7 +7,7 @@ class Route {
      * @param {number} startYear
      * @param {boolean} [isInterception=false] - Whether this is an interception route (gets speed boost and reduced margin)
      */
-    constructor(fleet = new Fleet(), destination = new Planet(), startYear = gs.year, isInterception = false) {
+    constructor(fleet, destination, startYear = gs.year, isInterception = false) {
         //run simu
         /** @type {string} */
         this.uuid = generateUUID('route_')

@@ -46,8 +46,6 @@ class Fleet extends SpaceObject {
         this.angle = 0
         /** @type {number} */
         this.cloakLevel = 0; // 0 = visible, 1.0 = fully cloaked
-        /** @type {number} */
-        this.currentFuel = 0; // Current fuel amount for the fleet
         /** @type {Fleet|null} */
         this.escortTarget = null; // Fleet that this fleet is escorting/following
         /** @type {Fleet|Asteroid|Anomaly|string|null} */
@@ -82,6 +80,10 @@ class Fleet extends SpaceObject {
         this._fleetAIData = undefined;
         
         gameRegistry.registerFleet(this)
+
+        /** @type {number} */
+        this.fuel = 0;
+        console.log('set fleet fuel to:',this.fuel,'for fleet:',this.name)
     }
 
     /**
@@ -279,7 +281,7 @@ class Fleet extends SpaceObject {
     }
     
     get stranded() {
-        return this.ships.filter(s=>(!s.disabled)).length <= 0 || this.currentFuel <= 0
+        return this.ships.filter(s=>(!s.disabled)).length <= 0 || this.fuel <= 0
     }
 
     get numPilots() {

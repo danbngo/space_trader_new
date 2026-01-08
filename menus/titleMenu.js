@@ -319,6 +319,8 @@ async function startNewGame() {
 
     gs.fleet.addShip(playerShip)
     gs.fleet.addOfficer(captain)
+    gs.fleet.fuel = gs.fleet.totalFuelCapacity // Start with full fuel tank
+
     
     // Auto-assign captain to starting ship
     gs.fleet.autoAssignPilots()

@@ -346,6 +346,8 @@ const SaveManager = {
             
             route: fleet.route ? this.serializeRoute(fleet.route) : null,
             fleetAI: fleet.fleetAI ? this.serializeFleetAI(fleet.fleetAI) : null,
+
+            fuel: fleet.fuel || 0,
         };
     },
 
@@ -739,6 +741,8 @@ const SaveManager = {
         fleet.destroyed = data.destroyed || false;
         fleet.abandonedYear = data.abandonedYear || null;
         fleet.originalName = data.originalName || null;
+        
+        fleet.fuel = data.fuel || 0;
         
         // Deserialize ships first
         fleet.ships = (data.ships || []).map(s => this.deserializeShip(s));

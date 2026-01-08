@@ -16,14 +16,14 @@ const STARMAP_DEBUG_CONFIG = {
     displayPlanets: true,             // Planets and dwarf planets (with shadows)
     displayPlanetLabels: true,        // Planet name labels
     displaySpaceStations: true,       // Space stations
-    //displayAnomalies: true,           // Anomalies
-    //displayRuins: true,               // Ancient ruins
+    displayAnomalies: true,           // Anomalies
+    displayRuins: true,               // Ancient ruins
     displayFleets: true,              // All fleets (player + NPC)
-    //displayFleetLabels: true,         // Fleet name labels
-    //displayFleetPaths: true,          // Fleet route lines
-    //displayFleetThrusters: true,      // Fleet thruster effects
-    //displayAbandonedFleets: true,     // Abandoned/destroyed fleets
-    //displayWaypoint: true,            // Player waypoint marker
+    displayFleetLabels: true,         // Fleet name labels
+    displayFleetPaths: true,          // Fleet route lines
+    displayFleetThrusters: true,      // Fleet thruster effects
+    displayAbandonedFleets: true,     // Abandoned/destroyed fleets
+    displayWaypoint: true,            // Player waypoint marker
     
     // Performance monitoring
     logPerformance: false,            // Log render times to console

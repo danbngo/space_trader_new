@@ -141,7 +141,7 @@ class StarSystem extends SpaceObject {
     deductFuel(fleet, distanceTraveled) {
         if (!fleet || fleet.destroyed) return
         const fuelCost = distanceTraveled * FUEL_COST_PER_1_AU
-        fleet.currentFuel = Math.max(0, fleet.currentFuel - fuelCost)
+        fleet.fuel = Math.max(0, fleet.fuel - fuelCost)
     }
 
     updateEscortPositions() {

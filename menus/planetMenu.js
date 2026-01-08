@@ -59,10 +59,10 @@ function showPlanetMenu(planet = new Planet()) {
         }
                 
         // Refuel up to 5 units when docking
-        const fuelNeeded = gs.fleet.totalFuelCapacity - gs.fleet.currentFuel
+        const fuelNeeded = gs.fleet.totalFuelCapacity - gs.fleet.fuel
         if (fuelNeeded > 0) {
             const fuelToGive = Math.min(5, fuelNeeded)
-            gs.fleet.currentFuel += fuelToGive
+            gs.fleet.fuel += fuelToGive
             msg += colorSpan(`The dock provides ${roundToPlaces(fuelToGive, 1)} units of complimentary fuel.<br/>`, COLORS.LightGreen)
         }
         

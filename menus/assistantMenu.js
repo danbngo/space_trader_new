@@ -19,15 +19,15 @@ function showAssistantMenu() {
     
     const menuItems = [
         ['Ships', ()=>showShipsMenu()],
-        ['Cargo', ()=>showCargoMenu(), gs.fleet.cargo.totalQuantity === 0],
-        ['Officers', ()=>showOfficersMenu(), gs.fleet.subordinates.length === 0],
-        ['Contracts', ()=>showContractsMenu(), gs.contracts.length === 0],
+        ['Cargo', ()=>showCargoMenu(), gs.fleet.cargo.totalQuantity === 0, 'No cargo in hold'],
+        ['Officers', ()=>showOfficersMenu(), gs.fleet.subordinates.length === 0, 'No officers hired'],
+        ['Contracts', ()=>showContractsMenu(), gs.contracts.length === 0, 'No active contracts'],
         ['Captain', ()=>showCaptainSkillsMenu(), false, hasSkillPoints || hasPerkPoints ? 'highlighted' : null],
-        ['Cyberware', ()=>showCyberwareMenu(), gs.captain.implants.length === 0],
+        ['Cyberware', ()=>showCyberwareMenu(), gs.captain.implants.length === 0, 'No cyberware installed'],
         ce({tag:'br'}),
-        ['Planets', ()=>showPlanetsMenu(()=>showAssistantMenu()), !hasSeenPlanets],
-        ['Dwarf Planets', ()=>showDwarfPlanetsMenu(()=>showAssistantMenu()), !hasSeenDwarfs],
-        ['Space Stations', ()=>showSpaceStationsMenu(()=>showAssistantMenu()), !hasSeenStations],
+        ['Planets', ()=>showPlanetsMenu(()=>showAssistantMenu()), !hasSeenPlanets, 'No planets discovered yet'],
+        ['Dwarf Planets', ()=>showDwarfPlanetsMenu(()=>showAssistantMenu()), !hasSeenDwarfs, 'No dwarf planets discovered yet'],
+        ['Space Stations', ()=>showSpaceStationsMenu(()=>showAssistantMenu()), !hasSeenStations, 'No space stations discovered yet'],
     ]
     
     // Only show Fleets and Abandoned Fleets in debug mode
@@ -39,15 +39,15 @@ function showAssistantMenu() {
     }
     
     menuItems.push(
-        ['Anomalies', ()=>showAnomaliesMenu(()=>showAssistantMenu()), !hasSeenAnomalies],
-        ['Ruins', ()=>showRuinsDatabaseMenu(()=>showAssistantMenu()), !hasSeenRuins],
+        ['Anomalies', ()=>showAnomaliesMenu(()=>showAssistantMenu()), !hasSeenAnomalies, 'No anomalies discovered yet'],
+        ['Ruins', ()=>showRuinsDatabaseMenu(()=>showAssistantMenu()), !hasSeenRuins, 'No ruins discovered yet'],
         ce({tag:'br'}),
         ['Trade', ()=>showTradeInfoSellMenu()],
-        ['News', ()=>showNewsTimelineMenu(null, ()=>showAssistantMenu()), !hasVisitedMajorBodies],
-        ['Religions', ()=>showReligionsMenu(()=>showAssistantMenu()), !hasVisitedMajorBodies],
-        ['Cultures', ()=>showCulturesMenu(()=>showAssistantMenu()), !hasVisitedMajorBodies],
-        ['Governments', ()=>showGovernmentsMenu(()=>showAssistantMenu()), !hasVisitedMajorBodies],
-        ['Politics', ()=>showPoliticsMenu(()=>showAssistantMenu()), !hasVisitedMajorBodies],
+        ['News', ()=>showNewsTimelineMenu(null, ()=>showAssistantMenu()), !hasVisitedMajorBodies, 'Visit a planet or station to access news'],
+        ['Religions', ()=>showReligionsMenu(()=>showAssistantMenu()), !hasVisitedMajorBodies, 'Visit a planet or station to learn about religions'],
+        ['Cultures', ()=>showCulturesMenu(()=>showAssistantMenu()), !hasVisitedMajorBodies, 'Visit a planet or station to learn about cultures'],
+        ['Governments', ()=>showGovernmentsMenu(()=>showAssistantMenu()), !hasVisitedMajorBodies, 'Visit a planet or station to learn about governments'],
+        ['Politics', ()=>showPoliticsMenu(()=>showAssistantMenu()), !hasVisitedMajorBodies, 'Visit a planet or station to access political information'],
         ce({tag:'br'}),
         ['Cancel', ()=>{
             closeModal()

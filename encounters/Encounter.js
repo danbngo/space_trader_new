@@ -12,7 +12,7 @@ class Encounter {
      * @param {Effect[]} effects - Environmental effects active in the encounter.
      * @param {Fleet|null} undetectedFleet
      */
-    constructor(encounterType = ENCOUNTER_TYPES_ALL[0], planet = new Planet(), fleet = new Fleet(), effects = [], undetectedFleet) {
+    constructor(encounterType = ENCOUNTER_TYPES_ALL[0], planet, fleet, effects = [], undetectedFleet) {
         console.log('Encounter.constructor', { encounterType, planet, fleet });
         /** @type {string} */
         this.uuid = generateUUID('encounter_')
@@ -702,7 +702,7 @@ class Encounter {
 
         console.log('player is stranded:',nearestPlanet,nearestDistance,creditCost,dayCost)
 
-        const outOfFuel = gs.fleet.currentFuel <= 0
+        const outOfFuel = gs.fleet.fuel <= 0
         const noWorkingShips = gs.fleet.ships.filter(s=>(!s.disabled)).length <= 0
         
         let msg = outOfFuel && noWorkingShips ? 

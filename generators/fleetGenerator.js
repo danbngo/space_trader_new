@@ -4,7 +4,7 @@
  * @param {FleetType} fleetType - The type of fleet determining cargo types.
  * @returns {CountsMap} The generated cargo inventory.
  */
-function generateFleetCargo(fleet = new Fleet(), fleetType = FLEET_TYPES_ALL[0]) {
+function generateFleetCargo(fleet, fleetType) {
     const cargo = new CountsMap()
     const maxCargo = fleet.totalCargoSpace
     //non-repeating is set to false to allow weighted cargo types
@@ -80,6 +80,8 @@ function generateFleet(fleetType = FLEET_TYPES_ALL[0], factionType = null, plane
     if (factionType && factionType.cloaked) {
         fleet.cloakLevel = 1.0
     }
+
+    fleet.fuel = fleet.totalFuelCapacity // Start with full fuel tank
 
     return fleet
 }

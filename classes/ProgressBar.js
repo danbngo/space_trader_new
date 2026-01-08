@@ -56,7 +56,7 @@ class ProgressBar {
 
         this.percentageElement = ce({
             classNames: ['progressBar-percentage'],
-            children: this.overrideLabel ? [this.overrideLabel] : [`${Math.round(0)}$%`]
+            children: this.overrideLabel ? [this.overrideLabel] : [`${Math.round(0)}%`]
         })
 
         this.container = ce({
