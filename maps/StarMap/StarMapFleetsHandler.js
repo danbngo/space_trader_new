@@ -203,17 +203,19 @@ class StarMapFleetsHandler {
             fleetObj.x = fleet.x
             fleetObj.y = fleet.y
             
-            // Smoothly rotate towards target angle instead of snapping
+            // Smoothly rotate towards target angle using weighted averaging
             let isTurning = false
             if (fleetAngle !== undefined) {
                 const currentAngle = fleetObj.angle || fleetAngle
                 const angleDiff = normalizeAngle(fleetAngle - currentAngle)
-                const rotationSpeed = Math.PI / 60 // Rotate up to ~3 degrees per frame (2x slower)
+                const angleThreshold = Math.PI / 180 // ~1 degree threshold
                 
-                if (Math.abs(angleDiff) < rotationSpeed) {
+                if (Math.abs(angleDiff) < angleThreshold) {
                     fleetObj.angle = fleetAngle // Close enough, snap to target
                 } else {
-                    fleetObj.angle = currentAngle + Math.sign(angleDiff) * rotationSpeed
+                    // Use weighted averaging: faster turn at start, slower at end
+                    const lerpFactor = 0.3
+                    fleetObj.angle = currentAngle + angleDiff * lerpFactor
                     isTurning = true
                 }
             }

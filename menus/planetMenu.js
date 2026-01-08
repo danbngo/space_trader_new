@@ -15,6 +15,7 @@ const buildingHandlerMapping = [
     {type: BUILDING_TYPES.CYBER_SURGEON, prop: 'cyberSurgeon', menu: (b) => showCyberSurgeonBuyMenu(b)},
     {type: BUILDING_TYPES.GENETICIST, prop: 'geneticist', menu: (b) => showGeneticistBuyMenu(b)},
     {type: BUILDING_TYPES.PALACE, prop: 'palace', menu: (b) => showPalaceMenu(b)},
+    {type: BUILDING_TYPES.CARAVANSERY, prop: 'caravansery', menu: (b) => showCaravanseryMenu(b)},
 ]
 
 
@@ -58,12 +59,12 @@ function showPlanetMenu(planet = new Planet()) {
             }
         }
                 
-        // Refuel up to 5 units when docking
-        const fuelNeeded = gs.fleet.totalFuelCapacity - gs.fleet.fuel
+        // Refuel up to 50% of total capacity when docking
+        const halfCapacity = gs.fleet.totalFuelCapacity * 0.5
+        const fuelNeeded = halfCapacity - gs.fleet.fuel
         if (fuelNeeded > 0) {
-            const fuelToGive = Math.min(5, fuelNeeded)
-            gs.fleet.fuel += fuelToGive
-            msg += colorSpan(`The dock provides ${roundToPlaces(fuelToGive, 1)} units of complimentary fuel.<br/>`, COLORS.LightGreen)
+            gs.fleet.fuel += fuelNeeded
+            msg += colorSpan(`The dock provides ${roundToPlaces(fuelNeeded, 1)} units of complimentary fuel (50% capacity).<br/>`, COLORS.LightGreen)
         }
         
         // Check for damaged buildings

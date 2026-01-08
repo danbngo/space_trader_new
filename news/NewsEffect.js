@@ -213,6 +213,7 @@ class NewsEffect extends Civilization {
             }
 
             if (cargoPriceMultipliers) for (const [cargoType, modifier] of cargoPriceMultipliers.counts) {
+                console.log('test:', cargoType, modifier, cargoPriceMultipliers)
                 msg += `- Demand for ${cargoType.name}: ${civilization.cargoPriceMultipliers.getAmount(cargoType)}x ➜ ${civilization.cargoPriceMultipliers.getAmount(cargoType)*modifier}x.<br/>`
             }
 

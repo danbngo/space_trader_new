@@ -5,9 +5,60 @@
  * @returns {HTMLTableElement} The cargo table element.
  */
 function createCargoTable(cargo = new CountsMap(), onSelectCargoType = (ct = CARGO_TYPES_ALL[0])=>{}) {
-    /** @type {Array<[string, string, string|HTMLElement]>} */
+    // Calculate best prices from memorized settlements
+    const bestSellPrices = new CountsMap()
+    const bestBuyPrices = new CountsMap()
+    
+    for (const [planet, settlement] of gs.memorizedSettlements.entries()) {
+        const market = settlement.market
+        const blackMarket = settlement.blackMarket
+        
+        if (market && market.exists && !market.damaged) {
+            const sellPrices = market.calcCargoSellPrices()
+            const buyPrices = market.calcCargoBuyPrices()
+            
+            for (const ct of CARGO_TYPES_ALL) {
+                const sellPrice = sellPrices.getAmount(ct)
+                const buyPrice = buyPrices.getAmount(ct)
+                
+                // Track best sell price (highest)
+                if (sellPrice > bestSellPrices.getAmount(ct)) {
+                    bestSellPrices.setAmount(ct, sellPrice)
+                }
+                
+                // Track best buy price (lowest)
+                const currentBest = bestBuyPrices.getAmount(ct)
+                if (currentBest === 0 || buyPrice < currentBest) {
+                    bestBuyPrices.setAmount(ct, buyPrice)
+                }
+            }
+        }
+        
+        if (blackMarket && blackMarket.exists && !blackMarket.damaged) {
+            const sellPrices = blackMarket.calcCargoSellPrices()
+            const buyPrices = blackMarket.calcCargoBuyPrices()
+            
+            for (const ct of CARGO_TYPES_ALL) {
+                const sellPrice = sellPrices.getAmount(ct)
+                const buyPrice = buyPrices.getAmount(ct)
+                
+                // Track best sell price (highest)
+                if (sellPrice > bestSellPrices.getAmount(ct)) {
+                    bestSellPrices.setAmount(ct, sellPrice)
+                }
+                
+                // Track best buy price (lowest)
+                const currentBest = bestBuyPrices.getAmount(ct)
+                if (currentBest === 0 || buyPrice < currentBest) {
+                    bestBuyPrices.setAmount(ct, buyPrice)
+                }
+            }
+        }
+    }
+    
+    /** @type {Array<[string, string, string|HTMLElement, string, string]>} */
     const rows = [
-        ['Cargo Type', 'Amount', 'Cargo Space %']
+        ['Cargo Type', 'Amount', 'Cargo Space %', 'Best Sell', 'Best Buy']
     ]
     for (const ct of CARGO_TYPES_ALL) {
         const amount = cargo.getAmount(ct)
@@ -21,10 +72,17 @@ function createCargoTable(cargo = new CountsMap(), onSelectCargoType = (ct = CAR
         
         const bar = progressBar.container
         
+        const bestSell = bestSellPrices.getAmount(ct)
+        const bestBuy = bestBuyPrices.getAmount(ct)
+        const sellDisplay = bestSell > 0 ? `${bestSell} CR` : '-'
+        const buyDisplay = bestBuy > 0 ? `${bestBuy} CR` : '-'
+        
         rows.push([
             coloredName(ct),
             ''+cargo.getAmount(ct),
             bar,
+            sellDisplay,
+            buyDisplay
         ])
     }
     const totalBar = new ProgressBar({
@@ -34,7 +92,9 @@ function createCargoTable(cargo = new CountsMap(), onSelectCargoType = (ct = CAR
     rows.push([
         'All',
         ''+cargo.total,
-        totalBar.container
+        totalBar.container,
+        '-',
+        '-'
     ])
     return createTable(rows, (rowIndex = 0)=>onSelectCargoType(CARGO_TYPES_ALL[rowIndex]))
 }
@@ -74,7 +134,11 @@ function showCargoMenu(cargo = gs.fleet.cargo) {
     showModal(
         `Cargo Manifest`,
         ce({children:[
+            colorSpan('Prices are based on last visit to planet(s)', COLORS.Yellow),
+            ce({tag: 'br'}),
+            ce({tag: 'br'}),
             createCargoTable(cargo, onSelectCargoType),
+            ce({tag: 'br'}),
             `Your Cargo Space: ${gs.fleet.cargo.total}/${gs.fleet.totalCargoSpace}`,
         ]}),
         [

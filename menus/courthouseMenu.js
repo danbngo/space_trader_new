@@ -119,7 +119,7 @@ function showCourthouseMenu(courthouse = new Courthouse()) {
     if (upgradePrice !== null && nextRank) {
         const nextRankSpan = ce({tag: 'span', innerHTML: colorSpan(nextRank.name, nextRank.color)});
         createPopoverElement(nextRankSpan, nextRank.description);
-        nextRankDisplay = ce({children: [' | Next Rank: ', nextRankSpan, ` (${upgradePrice} CR)`]});
+        nextRankDisplay = ce({children: [' | Next Rank: ', nextRankSpan, ` | Upgrade Cost: ${upgradePrice} CR`]});
     } else {
         nextRankDisplay = ce({tag: 'span', innerHTML: ' (Max Rank)'});
     }
