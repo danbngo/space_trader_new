@@ -9,11 +9,10 @@ class Encounter {
      * @param {EncounterType} encounterType - The type of encounter.
      * @param {Planet} planet - The planet where the encounter occurs.
      * @param {Fleet} fleet - The enemy fleet.
-     * @param {Effect[]} effects - Environmental effects active in the encounter.
      * @param {Fleet|null} undetectedFleet
      */
-    constructor(encounterType = ENCOUNTER_TYPES_ALL[0], planet, fleet, effects = [], undetectedFleet) {
-        console.log('Encounter.constructor', { encounterType, planet, fleet });
+    constructor(encounterType = ENCOUNTER_TYPES_ALL[0], planet, fleet, undetectedFleet) {
+        console.log('Encounter.constructor', { encounterType, planet, fleet, undetectedFleet });
         /** @type {string} */
         this.uuid = generateUUID('encounter_')
         /** @type {EncounterType} */
@@ -22,6 +21,8 @@ class Encounter {
         this.planet = planet;
         /** @type {Fleet} */
         this.fleet = fleet;
+        /** @type {Fleet|null} */
+        this.undetectedFleet = undetectedFleet;
         /** @type {boolean} */
         this.combatEnabled = false;
         /** @type {Fleet} */
@@ -34,33 +35,14 @@ class Encounter {
         this.enemyShips = this.enemyFleet.ships
         /** @type {Ship[]} */
         //this.ships = [...this.playerShips, ...this.enemyShips]
-        /** @type {EncounterAI} */
-        this.ai = new EncounterAI(this)
         /** @type {ENCOUNTER_RESULTS|null} */
         this.result = null //playerVictory, playerDefeat, playerSurrendered,
         /** @type {Fleet} */
         this.activeTurnFleet = this.playerFleet
-        /** @type {Effect[]} */
-        this.effects = effects
-        /** @type {Fleet|null} */
-        this.undetectedFleet = undetectedFleet
-        this.playerUndetected = undetectedFleet == this.playerFleet
-        this.enemyUndetected = undetectedFleet == this.fleet
-        this.formationType =
-            this.encounterType.aiType == AI_TYPES.Asteroid ? FORMATION_TYPES.Storm
-            : this.playerUndetected ? FORMATION_TYPES.PlayerEncircle
-            : this.enemyUndetected ? FORMATION_TYPES.PlayerEncircled
-            : FORMATION_TYPES.Default
-
-        /** @type {Map<Ship, number>} */
         this.playerShipHullsAtStart = new Map()
         for (const ship of this.playerShips) {
             this.playerShipHullsAtStart.set(ship, ship.hull[0])
         }
-    }
-
-    get npcIsTargetingPlayer() {
-        return this.fleet.fleetAI.target == gs.fleet
     }
 
     get ships() {
@@ -121,73 +103,18 @@ class Encounter {
     handleTurnComplete() {
         console.log('Encounter.handleTurnComplete', { activeTurnFleet: this.activeTurnFleet });
         if (!this.isTurnComplete()) return
-        this.onEndTurn?.()
-        for (const ship of this.activeTurnFleet.ships) {
-            ship.actionsRemaining = 0
-            // Decrement module cooldowns
-            for (const moduleType of Object.values(SHIP_MODULE_TYPES)) {
-                const currentCooldown = ship.moduleCooldowns.getAmount(moduleType)
-                if (currentCooldown <= 0) continue
-                let cooldownToRecover = 1
-                while (Math.random()*(1+ship.fleet.totalSkills.getAmount(SKILLS.Engineer)/50) > 0.5 && cooldownToRecover < currentCooldown) {
-                    cooldownToRecover += 1
-                }
-                ship.moduleCooldowns.setAmount(moduleType, currentCooldown - cooldownToRecover)
-            }
-        }
-        
-        // Handle effect expiration and decay
-        for (const effect of this.effects) {
-            effect.onTurnEnd()
-        }
-        // Remove expired effects
-        this.effects = this.effects.filter(effect => (effect.remainingTurns > 0 || effect.remainingTurns === null))
-        
         if (this.activeTurnFleet === this.playerFleet) {
             this.activeTurnFleet = this.enemyFleet
         }
         else if (this.activeTurnFleet === this.enemyFleet) {
             this.activeTurnFleet = this.playerFleet
         }
-        for (const ship of this.activeTurnFleet.activeShips) {
-            ship.resetActions()
-        }
         this.updateEncounterResult()
     }
 
-    handleShipActionComplete(ship ) {
-        const pseudoActions = ship.spendAction()
-        // Apply effects that the ship is starting its turn inside
-        for (const key of ship.statusEffects.keys) {
-            if (ship.statusEffects.has(key)) {
-                ship.statusEffects.increment(key, -1)
-            }
-        }
-        for (const effect of this.effects) {
-            if (effect.containsPoint(ship.x, ship.y)) {
-                pseudoActions.push(...effect.hitShip(this, ship))
-            }
-        }
-        return pseudoActions
-    }
-
-    addEffect(effect = new Effect()) {
-        console.log('Encounter.addEffect', { effect });
-        const pseudoActions = []
-        this.effects.push(effect)
-        // Trigger hitShip for all ships currently within the effect's area
-        for (const ship of this.ships) {
-            if (effect.containsPoint(ship.x, ship.y)) {
-                /** @ts-ignore */
-                pseudoActions.push(...effect.hitShip(this, ship))
-            }
-        }
-        return pseudoActions
-    }
-
     updateEncounterResult() {
-        console.log('Encounter.updateEncounterResult:',this.activeEnemyShips,this.activePlayerShips,this.playerFlagship);
-        const {activeEnemyShips, playerFlagship} = this
+        console.log('Encounter.updateEncounterResult:',this.activeEnemyShips,this.activePlayerShips);
+        const {activeEnemyShips, activePlayerShips, escapedPlayerShips, playerShips} = this
         
         // Track disabled enemy ships for missions (initialize tracking set if needed)
         if (!this._missionTrackedShips) this._missionTrackedShips = new Set()
@@ -201,20 +128,29 @@ class Encounter {
             }
         }
         
-        if (activeEnemyShips.length == 0) {
+        // Victory: No active enemy ships remain
+        if (activeEnemyShips.length === 0) {
             this.result = ENCOUNTER_RESULTS.Victory
             this.combatEnabled = false
             return
         }
-        else if (playerFlagship.escaped) {
+        
+        // Escaped: All player ships have escaped
+        if (activePlayerShips.length === 0 && escapedPlayerShips.length === playerShips.length) {
             this.result = ENCOUNTER_RESULTS.Escaped
             this.combatEnabled = false
             return
         }
-        else if (playerFlagship.disabled) {
+        
+        // Defeat: No player ships escaped (all disabled)
+        if (activePlayerShips.length === 0 && escapedPlayerShips.length === 0) {
             this.result = ENCOUNTER_RESULTS.Defeat
             this.combatEnabled = false
+            return
         }
+
+        throw new Error('partial escapes not implemented yet')
+        
         console.log('Encounter result:',this.result);
     }
 
@@ -223,122 +159,6 @@ class Encounter {
         if (fleet == this.playerFleet || fleet == gs.fleet) return this.fleet
         else return this.playerFleet
     }
-
-    calcHarmableTargets(attacker ) {
-        console.log('Encounter.calcHarmableTargets', { attacker });
-
-        //asteroids can target each other
-        //const ships = (attacker.aiType == AI_TYPES.Asteroid) ? this.ships : this.calcOpposingFleet(attacker.fleet).ships;
-        const ships = this.calcOpposingFleet(attacker.fleet).ships;
-
-        return ships.filter(target => {
-            if (target.statusEffects.has(STATUS_EFFECTS.CLOAKED)) return false
-            if (target.disabled || target.escaped) return false
-            return true
-        })
-    }
-
-    calcLaserTargets(attacker ) {
-        console.log('Encounter.calcLaserTargets', { attacker });
-        const validTargets = []
-        const [t1, t2] = attacker.calcLaserAreas()
-        for (const target of this.calcHarmableTargets(attacker)) {
-            if (target.statusEffects.has(STATUS_EFFECTS.DUSTY)) continue
-            
-            // Check if target center is in range OR if closest edge of target is in range
-            const inRange = t1.containsPoint(target.x, target.y) || t2.containsPoint(target.x, target.y)
-            if (!inRange) {
-                // Check if the edge of the target ship closest to attacker is within laser range
-                const angleToTarget = calcAngleTowardsPoint(attacker.x, attacker.y, target.x, target.y)
-                const [edgeX, edgeY] = rotatePoint(target.radius, 0, target.x, target.y, angleToTarget + Math.PI)
-                if (!t1.containsPoint(edgeX, edgeY) && !t2.containsPoint(edgeX, edgeY)) continue
-            }
-            validTargets.push(target)
-        }
-        return validTargets
-    }
-
-    calcPlasmaSprayTargets(attacker, areaMultiplier = 1.0) {
-        console.log('Encounter.calcPlasmaSprayTargets', { attacker, areaMultiplier });
-        const validTargets = []
-        const [t1, t2] = attacker.calcLaserAreas(areaMultiplier)
-        for (const target of this.calcHarmableTargets(attacker)) {
-            if (!t1.containsPoint(target.x, target.y) && !t2.containsPoint(target.x, target.y)) continue
-            validTargets.push(target)
-        }
-        return validTargets
-    }
-
-    calcRamTargets(attacker ) {
-        console.log('Encounter.calcRamTargets', { attacker });
-        const validTargets = []
-        const a1 = attacker.calcMoveArea()
-        for (const target of this.calcHarmableTargets(attacker)) {
-            // Account for both ship radii - ships can ram when their edges touch
-            // Check if target center is in range OR if closest edge of target is in range
-            const inRange = a1.containsPoint(target.x, target.y)
-            if (!inRange) {
-                // Check if the edge of the target ship closest to attacker is within ram range
-                // Use sum of both radii since collision happens when edges touch
-                const angleToTarget = calcAngleTowardsPoint(attacker.x, attacker.y, target.x, target.y)
-                const combinedRadius = target.radius + attacker.radius
-                const [edgeX, edgeY] = rotatePoint(combinedRadius, 0, target.x, target.y, angleToTarget + Math.PI)
-                if (!a1.containsPoint(edgeX, edgeY)) continue
-            }
-            validTargets.push(target)
-        }
-        return validTargets
-    }
-
-    calcBeamTargets(attacker, targetArea = null) {
-        console.log('Encounter.calcBeamTargets', { attacker });
-        const validTargets = []
-        const targetingArea = targetArea || attacker.calcBeamArea()
-        for (const target of this.calcHarmableTargets(attacker)) {
-            if (targetingArea.containsPoint(target.x, target.y)) validTargets.push(target)
-        }
-        return validTargets
-    }
-
-    calcPulseTargets(attacker ) {
-        console.log('Encounter.calcPulseTargets', { attacker });
-        const validTargets = []
-        const targetingArea = attacker.calcPulseArea()
-        for (const target of this.calcHarmableTargets(attacker)) {
-            if (targetingArea.containsPoint(target.x, target.y)) validTargets.push(target)
-        }
-        return validTargets
-    }
-
-    checkShipMovementEffects(ship ) {
-        const pseudoActions = []
-        console.log('Encounter.checkShipMovementEffects', { ship, effects:this.effects });
-        // Check if ship entered any effects
-        for (const effect of this.effects) {
-            if (effect.containsPoint(ship.x, ship.y)) {
-                pseudoActions.push(...effect.hitShip(this, ship))
-            }
-        }
-        
-        // Check if ship escaped map
-        const distanceFromCenter = calcDistance(0, 0, ship.x, ship.y)
-
-        //fooroids only escape if they reached the left side of the screen
-        if (distanceFromCenter > this.mapRadius) {
-            pseudoActions.push(ShipAction.getDamageAction(this, ship, 0, 0, false, true))
-            ship.escaped = true
-        }
-        return pseudoActions
-    }
-
-    /**
-     * Checks if this fleet has already visited the player before.
-     * @returns {boolean} True if the fleet has already visited the player.
-     */
-    hasAlreadyVisitedPlayer() {
-        return this.fleet && this.fleet.fleetAI && this.fleet.fleetAI.visited.includes(gs.fleet)
-    }
-
     /**
      * Shows a message indicating the fleet doesn't want to interact again.
      * Use this to prevent player abuse of resource-granting encounters.
@@ -359,11 +179,6 @@ class Encounter {
      * Called when the encounter starts. Override in subclasses.
      */
     onStart() {
-        // Mark player as visited so AI won't immediately re-encounter them
-        if (this.fleet && this.fleet.fleetAI && !this.fleet.fleetAI.visited.includes(gs.fleet)) {
-            this.fleet.fleetAI.visited.push(gs.fleet)
-        }
-        // Override in subclass
     }
 
     /**
@@ -392,211 +207,6 @@ class Encounter {
      */
     onSurrender() {
         // Override in subclass
-    }
-
-    /**
-     * Called at the end of each turn. Override in subclasses if needed.
-     */
-    onEndTurn() {
-        // Override in subclass if needed
-    }
-
-    /**
-     * Initializes and positions ships for the encounter based on formation type.
-     */
-    positionShips() {
-        console.log('Encounter.positionShips')
-        const {playerShips, enemyShips, ships, playerFleet, enemyFleet, formationType} = this
-        const maxSpawnDistance = this.mapRadius * ENCOUNTER_SHIP_MAX_SPAWN_DISTANCE_RATIO
-        const minSpawnDistance = this.mapRadius * ENCOUNTER_SHIP_MIN_SPAWN_DISTANCE_RATIO
-
-        for (const ship of ships) {
-            ship.resetCombatVars()
-        }
-
-        const anglePlayerFleetToEnemy = calcAngleTowardsPoint(playerFleet.x, playerFleet.y, enemyFleet.x, enemyFleet.y)
-        const angleEnemyFleetToPlayer = calcAngleTowardsPoint(enemyFleet.x, enemyFleet.y, playerFleet.x, playerFleet.y)
-        const enemyFacingAngle = enemyFleet.angle
-        const playerFacingAngle = playerFleet.angle
-        const distMargin = maxSpawnDistance-minSpawnDistance
-        const avgDist = distMargin/2 + minSpawnDistance
-
-        // For Storm formation (asteroids), position player ships near center first
-        if (formationType == FORMATION_TYPES.Storm) {
-            // Position player ships closer to center (0,0) for storm encounters
-            const stormPlayerMaxDist = this.mapRadius * 0.15 // 15% of map radius from center
-            playerShips.forEach((ship, i) => {
-                const distFromCenter = rng(stormPlayerMaxDist, 0)
-                const angle = rng(Math.PI * 2, 0, false)
-                const [x, y] = rotatePoint(distFromCenter, 0, 0, 0, angle)
-                const angleDiff = rng(Math.PI / 8)
-                Object.assign(ship, { x, y, angle: playerFacingAngle + angleDiff })
-            })
-            
-            // Now place asteroids, avoiding player ship positions
-            const buffer = 2.5
-            for (const asteroid of enemyShips) {
-                let validPosition = false
-                let attempts = 0
-                let x, y, angle
-                
-                // Try up to 20 times to find a non-overlapping position
-                while (!validPosition && attempts < 20) {
-                    const dist = rng(this.mapRadius * 0.3, this.mapRadius) // Start asteroids at least 30% away from center
-                    angle = rng(Math.PI * 2, 0, false)
-                    ;[x, y] = rotatePoint(dist, 0, 0, 0, angle)
-                    
-                    // Check if this position overlaps with any player ship
-                    validPosition = true
-                    for (const playerShip of playerShips) {
-                        const distance = calcDistance(x, y, playerShip.x, playerShip.y)
-                        const minDistance = asteroid.radius + playerShip.radius + buffer
-                        if (distance < minDistance) {
-                            validPosition = false
-                            break
-                        }
-                    }
-                    
-                    // Also check against other already-placed asteroids
-                    if (validPosition) {
-                        for (const otherAsteroid of enemyShips) {
-                            if (otherAsteroid === asteroid) break // Only check already-placed ones
-                            if (otherAsteroid.x === undefined) break
-                            const distance = calcDistance(x, y, otherAsteroid.x, otherAsteroid.y)
-                            const minDistance = asteroid.radius + otherAsteroid.radius + 1
-                            if (distance < minDistance) {
-                                validPosition = false
-                                break
-                            }
-                        }
-                    }
-                    
-                    attempts++
-                }
-                
-                // If we found a valid position, assign it; otherwise skip this asteroid
-                if (validPosition) {
-                    Object.assign(asteroid, { x, y, angle: rng(Math.PI * 2, 0, false) })
-                } else {
-                    console.log(`Warning: Could not find valid position for asteroid after ${attempts} attempts, removing it`)
-                    asteroid.x = undefined // Mark for removal
-                }
-            }
-            
-            // Remove asteroids that couldn't be placed
-            const asteroidsToRemove = enemyShips.filter(a => a.x === undefined)
-            for (const asteroid of asteroidsToRemove) {
-                safeRemove(enemyShips, asteroid)
-                safeRemove(enemyFleet.ships, asteroid)
-            }
-            
-            if (asteroidsToRemove.length > 0) {
-                console.log(`Removed ${asteroidsToRemove.length} asteroids that could not be placed without overlapping`)
-            }
-        }
-        else if (formationType == FORMATION_TYPES.PlayerEncircled) {
-            //enemy ships should be in a half circle around the players fleet
-            const angleStep = (Math.PI * 2)/enemyShips.length
-            const buffer = 1.5 // Buffer space between ships
-            enemyShips.forEach((ship, i) => {
-                let validPosition = false
-                let attempts = 0
-                let x, y, angle, dist
-                
-                // Try up to 10 times to find a non-overlapping position
-                while (!validPosition && attempts < 10) {
-                    angle = angleStep * i + (enemyFleet.angle || 0) + (attempts > 0 ? rng(Math.PI/4, -Math.PI/4, false) : 0)
-                    dist = rng(maxSpawnDistance, minSpawnDistance)
-                    ;[x, y] = rotatePoint(dist, 0, 0, 0, angle)
-                    
-                    // Check if this position overlaps with any player ship
-                    validPosition = true
-                    for (const playerShip of playerShips) {
-                        const distance = calcDistance(x, y, playerShip.x, playerShip.y)
-                        const minDistance = ship.radius + playerShip.radius + buffer
-                        if (distance < minDistance) {
-                            validPosition = false
-                            break
-                        }
-                    }
-                    attempts++
-                }
-                
-                // If we couldn't find a valid position after 10 attempts, use the last attempted position anyway
-                if (!validPosition) {
-                    console.log(`Warning: Could not find non-overlapping position for enemy ship ${ship.shipType.name} after 10 attempts`)
-                }
-                
-                Object.assign(ship, {x, y})
-            })
-        }
-        else {
-            const [cx, cy] = rotatePoint(avgDist, 0, 0, 0, angleEnemyFleetToPlayer+Math.PI)
-            enemyFleet.ships.forEach((ship,i)=>{
-                const distFromCenter = rng(distMargin, distMargin/8)
-                const buffer = 1.5 // Buffer space between ships
-                let validPosition = false
-                let attempts = 0
-                let x, y, dx, dy
-                
-                // Try up to 10 times to find a non-overlapping position
-                while (!validPosition && attempts < 10) {
-                    [dx, dy] = rotatePoint(distFromCenter, 0, 0, 0, rng(Math.PI*2, 0, false))
-                    x = cx + dx
-                    y = cy + dy
-                    
-                    // Check if this position overlaps with any player ship
-                    validPosition = true
-                    for (const playerShip of playerShips) {
-                        const distance = calcDistance(x, y, playerShip.x, playerShip.y)
-                        const minDistance = ship.radius + playerShip.radius + buffer
-                        if (distance < minDistance) {
-                            validPosition = false
-                            break
-                        }
-                    }
-                    attempts++
-                }
-                
-                // If we couldn't find a valid position after 10 attempts, use the last attempted position anyway
-                if (!validPosition) {
-                    console.log(`Warning: Could not find non-overlapping position for enemy ship ${ship.shipType.name} after 10 attempts`)
-                }
-                
-                const angleDiff = rng(Math.PI/8)
-                Object.assign(ship, {x, y, angle: enemyFacingAngle + angleDiff})
-            })
-        }
-        if (formationType == FORMATION_TYPES.PlayerEncircle) {
-            const angleStep = (Math.PI * 2) / playerShips.length
-            playerShips.forEach((ship, i) => {
-                const angle = angleStep * i + (playerFleet.angle || 0)
-                const dist = rng(maxSpawnDistance,minSpawnDistance)
-                const [x, y] = rotatePoint(dist, 0, 0, 0, angle)
-                Object.assign(ship, {x, y})
-            })
-        }
-        else if (formationType != FORMATION_TYPES.Storm) {
-            // For non-Storm, non-PlayerEncircle formations, position player ships normally
-            const [cx,cy] = rotatePoint(avgDist, 0, 0, 0, anglePlayerFleetToEnemy+Math.PI)
-            playerFleet.ships.forEach((ship,i)=>{
-                const distFromCenter = rng(distMargin, distMargin/8)
-                const [dx,dy] = rotatePoint(distFromCenter, 0, 0, 0, rng(Math.PI*2, 0, false))
-                const angleDiff = rng(Math.PI/8)
-                Object.assign(ship, {x: cx+dx, y: cy+dy, angle: playerFacingAngle + angleDiff})
-            })
-        }
-        // Note: Storm formation player ships are already positioned near center above
-
-        for (const ship of enemyShips) {
-            Object.assign(ship, {color: this.encounterType.enemyColor})
-        }
-        
-        // Regenerate effects now that ships are positioned to avoid overlaps
-        const effectTypes = rollEncounterEffectTypes()
-        if (effectTypes && effectTypes.length > 0) {
-            this.effects = generateEffects(this.encounterType, effectTypes, this.ships)
-        }
     }
 
     /**
@@ -710,19 +320,6 @@ class Encounter {
         console.log('startEncounter:',this)
         if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
         gs.encounter = this
-        gs.encounterImmunityUntilYear = gs.year + (ENCOUNTER_IMMUNITY_DAYS / 365)
-        
-        // Add player fleet to enemy AI's visited list so they don't actively target player again
-        if (this.fleet.fleetAI && this.fleet.fleetAI.visited && !this.fleet.fleetAI.visited.includes(gs.fleet)) {
-            this.fleet.fleetAI.visited.push(gs.fleet)
-        }
-        
-        this.positionShips()
-
-        showModal(coloredName(this.fleet), this.encounterType.description, [['Ok', ()=>{
-            showEncounterMap()
-            if (this.encounterType.aiType == AI_TYPES.Asteroid) this.onStart()
-        }]])
     }
     /**
      * Ends the current encounter and returns to the star map.
@@ -734,15 +331,14 @@ class Encounter {
         //restore all shields
         for (const s of gs.fleet.ships) s.restoreShields()
         //pause and show modal if player has no working ships, cant move
-        checkPlayerStranded()
+        //checkPlayerStranded()
     }
 
     showPlayerRefuseSurrenderModal() {
         console.log('showPlayerRefuseSurrenderModal');
         const fleetName = coloredName(this.fleet)
         const planet = this.planet
-        const faction = this.fleet.factionType
-        const reputationMultiplier = faction.reputationMultiplier
+        const reputationMultiplier = this.encounterType.reputationMultiplier
         const reputation = Math.ceil(ENCOUNTER_BASE_REPUTATION_EFFECT_ON_NO_SURRENDER * reputationMultiplier)
         const bounty = reputationMultiplier > 0 ? ENCOUNTER_BASE_FINE_ON_ATTACK * reputationMultiplier : 0
         

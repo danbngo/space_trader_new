@@ -8,8 +8,6 @@ function checkForEncounter(elapsedDays = 1) {
     //console.log('checkForEncounter', { elapsedDays, location: gs.location, encounter: gs.encounter });
     //dont have encounters while docked or already in an encounter
     if (gs.location || gs.encounter) return
-    // Check encounter immunity
-    if (gs.year < gs.encounterImmunityUntilYear) return
     checkForAsteroidBeltEncounters(elapsedDays)
 }
 

@@ -165,33 +165,6 @@ class Ship {
         return Math.pow(hpRating * atkRating, 0.5)
     }
 
-    get maxMoveDistance() {
-        const baseDistance = (1 + AVERAGE_SHIP_MOVE_DISTANCE * Math.pow( (this.engine/AVERAGE_SHIP_ENGINE) / (this.mass/AVERAGE_SHIP_MASS), 0.5));
-        
-        // Apply Pilot skill (2x movement at 50 skill)
-        const pilotSkill = this.fleet.totalSkills.getAmount(SKILLS.Pilot)
-        const pilotModifier = 1 + (pilotSkill / 50)
-        
-        // Apply movement penalty if ship is frozen
-        // REMOVED: STATUS_EFFECTS
-        if (this.statusEffects.has('FROZEN')) {
-            return baseDistance * pilotModifier * 0.5;
-        }
-        return baseDistance * pilotModifier;
-    }
-
-    get maxAttackDistance() {
-        return 1 + AVERAGE_SHIP_ATTACK_DISTANCE * Math.pow( (this.radars/AVERAGE_SHIP_RADARS) / (this.mass/AVERAGE_SHIP_MASS), 0.5);
-    }
-
-    get maxLaserDamage() {
-        return 1 + AVERAGE_SHIP_LASER_DMG * (this.lasers/AVERAGE_SHIP_LASERS);
-    }
-
-    get maxRamDamage() {
-        return 1 + AVERAGE_SHIP_RAM_DMG * Math.pow(this.maxMoveDistance/AVERAGE_SHIP_MOVE_DISTANCE * this.mass/AVERAGE_SHIP_MASS, 0.5);
-    }
-
     /**
      * Checks if the ship's hull is damaged.
      * @returns {boolean} True if hull is below maximum.
@@ -240,45 +213,7 @@ class Ship {
      * Resets all combat-related variables to initial state.
      */
     resetCombatVars() {
-        //this.restoreShields() //looks weird visually
-        this.angle = Math.PI*2;
         this.escaped = false;
-        // Set all module cooldowns to max
-        for (const moduleType of Object.values(SHIP_MODULE_TYPES)) {
-            this.moduleCooldowns.setAmount(moduleType, rng(moduleType.cooldown, 0, true))
-        }
-        this.statusEffects.clear()
-        this.resetActions()
-    }
-
-    /**
-     * Resets action points at the start of a new turn.
-     */
-    resetActions() {
-        this.actionsRemaining = this.maxActionsPerTurn;
-        
-        // Check for SpeedModule - grants +1 action per turn
-        const speedModule = this.modules.find(m => m.moduleType === SHIP_MODULE_TYPES.SPEED_MODULE)
-        if (speedModule && Math.random() > .8) {
-            this.actionsRemaining = this.actionsRemaining + 1
-        }
-        // Commented out random slow - kept for reference
-        // if (Math.random() < 0.1) {
-        //     this.actionsRemaining = Math.max(1, this.actionsRemaining - 1)
-        // }
-    }
-
-    /**
-     * Consumes one action point.
-     * @returns {Array} Array of pseudo-actions (currently empty).
-     */
-    spendAction() {
-        const pseudoActions = []
-        this.actionsRemaining = Math.max(0, this.actionsRemaining - 1)
-        
-        //we could later add dot damage here
-
-        return pseudoActions
     }
 
     /**
@@ -286,9 +221,7 @@ class Ship {
      */
     setDisabled() {
         this.hull[0] = 0
-        const recordedAngle = this.angle
         this.resetCombatVars()
-        this.angle = recordedAngle
     }
 
     get disabled() {
@@ -340,112 +273,6 @@ class Ship {
         return this.restoreShields(rechargeAmt)
     }
 
-    /**
-     * Calculates the attack areas for laser weapons (two triangles).
-     * @param {number} overrideX - Override x position (defaults to ship.x).
-     * @param {number} overrideY - Override y position (defaults to ship.y).
-     * @param {number} areaMultiplier - Scale factor for attack range (defaults to 1.0).
-     * @returns {Triangle[]} Array of two targeting triangles.
-     */
-    calcLaserAreas(overrideX = this.x, overrideY = this.y, areaMultiplier = 1.0) {
-        // Base range is 2x the original maxAttackDistance
-        const attackRange = (1+this.maxAttackDistance) * 2 * areaMultiplier
-        const targetingAngle = this.angle+Math.PI/2
-        const targetingAngle2 = this.angle-Math.PI/2
-        const [tx,ty] = rotatePoint(overrideX + attackRange/2, overrideY, overrideX, overrideY, targetingAngle)
-        const [tx2,ty2] = rotatePoint(overrideX + attackRange/2, overrideY, overrideX, overrideY, targetingAngle2)
-        //turn the triangles an additional radian so they are pointing outwards
-        const targetingTriangle1 = new Triangle(tx, ty, attackRange*2, Triangle.calcEquilateralTriangleHeight(attackRange), targetingAngle+Math.PI)
-        const targetingTriangle2 = new Triangle(tx2, ty2, attackRange*2, Triangle.calcEquilateralTriangleHeight(attackRange), targetingAngle2-Math.PI)
-        return [targetingTriangle1, targetingTriangle2]
-    }
-
-    /**
-     * Calculates the movement area for this ship (ellipse).
-     * @param {number} overrideX - Override x position (defaults to ship.x).
-     * @param {number} overrideY - Override y position (defaults to ship.y).
-     * @returns {Ellipse} The movement area.
-     */
-    calcMoveArea(overrideX = this.x, overrideY = this.y) {
-        const targetingAngle = this.angle
-        const moveRange = 1+this.maxMoveDistance
-        //use 0.55, want ship to be forced to move slightly
-        const [tx,ty] = rotatePoint(overrideX + moveRange*1.05, overrideY, overrideX, overrideY, targetingAngle)
-        //if ship was at 0 angle, it would be facing right. we would want the ellipse to be wider horizontally than vertically
-        const ellipse = new Ellipse(tx, ty, moveRange, moveRange*.66, targetingAngle)
-        return ellipse
-    }
-
-    /**
-     * Calculates the bomb/warhead area (circle in front of ship).
-     * @param {number} overrideX - Override x position (defaults to ship.x).
-     * @param {number} overrideY - Override y position (defaults to ship.y).
-     * @returns {Circle} The bomb area.
-     */
-    calcBombArea(overrideX = this.x, overrideY = this.y) {
-        const targetingAngle = this.angle
-        const attackRange = this.maxAttackDistance/2
-        // Position circle slightly in front of ship
-        const [cx, cy] = rotatePoint(overrideX + attackRange * 1.2, overrideY, overrideX, overrideY, targetingAngle)
-        return new Circle(cx, cy, attackRange)
-    }
-
-    /**
-     * Calculates the beam weapon area (triangle in front of ship).
-     * @param {number} overrideX - Override x position (defaults to ship.x).
-     * @param {number} overrideY - Override y position (defaults to ship.y).
-     * @returns {Triangle} The beam area.
-     */
-    calcBeamArea(overrideX = this.x, overrideY = this.y) {
-        const attackRange = 1+this.maxAttackDistance
-        const targetingAngle = this.angle
-        // Position triangle in front of ship
-        const [tx, ty] = rotatePoint(overrideX + attackRange/2, overrideY, overrideX, overrideY, targetingAngle)
-        const targetingTriangle = new Triangle(tx, ty, attackRange*2, Triangle.calcEquilateralTriangleHeight(attackRange), targetingAngle+Math.PI)
-        return targetingTriangle
-    }
-
-    /**
-     * Calculates the EMP pulse area (circle centered on ship).
-     * @param {number} overrideX - Override x position (defaults to ship.x).
-     * @param {number} overrideY - Override y position (defaults to ship.y).
-     * @returns {Circle} The pulse area.
-     */
-    calcPulseArea(overrideX = this.x, overrideY = this.y) {
-        // EMP pulse is centered on the ship and has radius = maxAttackDistance * 2
-        const pulseRadius = this.maxAttackDistance/2
-        return new Circle(overrideX, overrideY, pulseRadius)
-    }
-
-    get canShoot() {
-        return this.lasers > 0 && !this.disabled && !this.escaped
-    }
-
-    get canUseModules() {
-        // REMOVED: STATUS_EFFECTS
-        return !this.disabled && !this.escaped && !this.statusEffects.has('OVERHEATED')
-    }
-
-    get canRam() {
-        // REMOVED: STATUS_EFFECTS
-        return this.engine > 0 && !this.disabled && !this.escaped && !this.statusEffects.has('FROZEN')
-    }
-
-    get canRecharge() {
-        // REMOVED: STATUS_EFFECTS
-        return !this.disabled && !this.escaped && !this.statusEffects.has('IONIZED') && (this.shields[0] < this.shields[1])
-    }
-
-    get moduleSlots() {
-        const available = this.shipType.moduleSlots
-        const used = this.localModules.length
-        return [used, available]
-    }
-
-    get unusedModuleSlots() {
-        const [used, available] = this.moduleSlots
-        return available-used
-    }
 
     /**
      * Creates an HTML image element showing this ship's graphical representation.

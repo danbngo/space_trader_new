@@ -193,20 +193,14 @@ const SaveManager = {
                 }
             }
             
-            // Try to resolve as a UUID from gameRegistry (for Planet, Race, Religion, FactionType keys)
+            // Try to resolve as a UUID from gameRegistry (for Planet, Religion keys)
             if (typeof keyId === 'string' && keyId.includes('_')) {
                 // Check various object types by UUID prefix
                 if (keyId.startsWith('planet_')) {
                     const obj = gameRegistry.get('planet', keyId);
                     if (obj) key = obj;
-                } else if (keyId.startsWith('race_')) {
-                    const obj = RACES_ALL.find(r => r.uuid === keyId);
-                    if (obj) key = obj;
                 } else if (keyId.startsWith('religion_')) {
                     const obj = RELIGIONS.find(r => r.uuid === keyId);
-                    if (obj) key = obj;
-                } else if (keyId.startsWith('faction_')) {
-                    const obj = FACTION_TYPES_ALL.find(f => f.name === keyId);
                     if (obj) key = obj;
                 }
             }
@@ -333,7 +327,6 @@ const SaveManager = {
             planetUUID: this.objectToUUID(fleet.planet),
             locationUUID: this.objectToUUID(fleet.location),
             fleetTypeName: fleet.fleetType ? fleet.fleetType.name : null,
-            factionTypeName: fleet.factionType ? fleet.factionType.name : null,
             flagshipUUID: this.objectToUUID(fleet.flagship),
             destroyedBy: typeof fleet.destroyedBy === 'string' ? fleet.destroyedBy : this.objectToUUID(fleet.destroyedBy),
             
@@ -424,8 +417,6 @@ const SaveManager = {
             expPoints: officer.expPoints,
             
             planetUUID: this.objectToUUID(officer.planet),
-            factionTypeName: officer.factionType ? officer.factionType.name : null,
-            raceName: officer.race ? officer.race.name : null,
             religionName: officer.religion ? officer.religion.name : null,
             fleetUUID: this.objectToUUID(officer.fleet),
             
@@ -724,7 +715,6 @@ const SaveManager = {
             data.name,
             null, // planet will be restored later
             null, // fleetType will be restored later
-            null, // factionType will be restored later
             data.color,
             data.x,
             data.y
@@ -756,7 +746,6 @@ const SaveManager = {
         fleet._planetUUID = data.planetUUID;
         fleet._locationUUID = data.locationUUID;
         fleet._fleetTypeName = data.fleetTypeName;
-        fleet._factionTypeName = data.factionTypeName;
         fleet._flagshipUUID = data.flagshipUUID;
         fleet._captainUUID = data.captainUUID;
         fleet._destroyedBy = data.destroyedBy;
@@ -845,16 +834,14 @@ const SaveManager = {
         if (!data) return null;
         
         // Find types
-        const factionType = this.findFactionType(data.factionTypeName);
-        const race = this.findRace(data.raceName);
         const religion = this.findReligion(data.religionName);
         
         // Create officer
         const officer = new Officer(
             data.name,
             null, // planet restored later
-            factionType,
-            race,
+            null,
+            null,
             religion,
             data.age,
             data.credits
@@ -1040,7 +1027,6 @@ const SaveManager = {
             fleet.planet = this.uuidToObject(fleet._planetUUID, 'planet');
             fleet.location = this.uuidToObject(fleet._locationUUID, 'planet');
             fleet.fleetType = this.findFleetType(fleet._fleetTypeName);
-            fleet.factionType = this.findFactionType(fleet._factionTypeName);
             fleet.flagship = this.uuidToObject(fleet._flagshipUUID, 'ship');
             fleet.captain = this.uuidToObject(fleet._captainUUID, 'officer');
             
@@ -1252,7 +1238,7 @@ const SaveManager = {
 
     /**
      * Get list of all saves
-     * @returns {Array<{name: string, timestamp: number, year: number, captainName: string, captainFaction: string, captainRace: string}>}
+     * @returns {Array<{name: string, timestamp: number, year: number, captainName: string}>}
      */
     getSaveList() {
         const listJson = localStorage.getItem(this.SAVE_LIST_KEY);
@@ -1280,8 +1266,6 @@ const SaveManager = {
             // Add metadata
             saveData.saveName = saveName;
             saveData.captainName = gs.captain?.name || 'Unknown';
-            saveData.captainFaction = gs.captain?.factionType?.name || 'Unknown';
-            saveData.captainRace = gs.captain?.race?.name || 'Unknown';
             
             const jsonString = JSON.stringify(saveData);
             
@@ -1300,9 +1284,7 @@ const SaveManager = {
                 name: saveName,
                 timestamp: saveData.timestamp,
                 year: saveData.year,
-                captainName: saveData.captainName,
-                captainFaction: saveData.captainFaction,
-                captainRace: saveData.captainRace
+                captainName: saveData.captainName
             };
             
             if (existingIndex >= 0) {

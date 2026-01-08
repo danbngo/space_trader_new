@@ -17,10 +17,6 @@ class GameState {
         this.missions = [];
         /** @type {Mission[]} */
         this.oldMissions = [];
-        /** @type {number} */
-        this.encounterImmunityUntilYear = 0;
-        /** @type {number} */
-        this.nextTitheYear = 0;
         /** @type {Map<Planet, Settlement>} - Memorized settlements from player's last visit */
         this.memorizedSettlements = new Map();
         /** @type {Map<Planet, number>} - Last visit dates (year) for each planet */
