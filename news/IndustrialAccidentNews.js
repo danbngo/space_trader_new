@@ -50,7 +50,7 @@ class IndustrialAccidentNews extends News {
         const ratingsValid = p.c.industry > CL.VERY_HIGH && p.c.corruption > CL.MEDIUM
         
         // More likely on heavily polluted worlds with poor environmental controls
-        const pollutionValid = !p.climate.pollution || p.climate.pollution.value >= POLLUTION_LEVELS.HIGH.value
+        const pollutionValid = p.features.includes(PLANET_FEATURE_TYPES.HEAVY_POLLUTION)
         
         return ratingsValid && pollutionValid
     }

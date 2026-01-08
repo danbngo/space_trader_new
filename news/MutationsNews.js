@@ -45,7 +45,7 @@ class MutationsNews extends News {
     isValid() {
         const {planet: p} = this
         // Requires high radiation levels
-        const climateValid = p.climate.radiationLevel && p.climate.radiationLevel.value >= RADIATION_LEVELS.SLIGHTLY_HIGH.value
+        const climateValid = p.features.includes(PLANET_FEATURE_TYPES.HIGH_RADIATION) || p.features.includes(PLANET_FEATURE_TYPES.RADIATION_BELTS)
         
         // Needs settlement to have population
         const settlementValid = p.settlement && p.settlement.settlementType !== null

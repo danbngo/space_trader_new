@@ -22,8 +22,6 @@ class StarMapBodiesHandler {
         if (STARMAP_DEBUG_CONFIG.displayStars) this.handleStars();
         if (STARMAP_DEBUG_CONFIG.displayPlanets) this.handlePlanets();
         if (STARMAP_DEBUG_CONFIG.displaySpaceStations) this.handleSpaceStations();
-        if (STARMAP_DEBUG_CONFIG.displayAnomalies) this.handleAnomalies();
-        if (STARMAP_DEBUG_CONFIG.displayRuins) this.handleRuins();
         
         if (STARMAP_DEBUG_CONFIG.logPerformance) {
             const perfEnd = performance.now();

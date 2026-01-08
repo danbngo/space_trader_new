@@ -23,8 +23,8 @@ class Planet extends OrbitingObject {
         this.settlement = settlement
         /** @type {Civilization|null} */
         this.civilization = civilization
-        /** @type {Climate} */
-        this.climate = climate || new Climate()
+        /** @type {null} Climate system removed */
+        this.climate = null
         /** @type {PlanetFeatureType[]} */
         this.features = features
         /** @type {number} */

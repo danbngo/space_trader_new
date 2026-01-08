@@ -45,7 +45,7 @@ class GravityHealthNews extends News {
     isValid() {
         const {planet: p} = this
         // Requires very low gravity
-        const climateValid = p.climate.gravity && p.climate.gravity.value <= GRAVITIES.VERY_LOW.value
+        const climateValid = p.features.includes(PLANET_FEATURE_TYPES.LOW_GRAVITY)
         
         // Needs population with some technology
         const settlementValid = p.settlement && p.settlement.settlementType !== null && p.c.technology > CL.SLIGHTLY_LOW

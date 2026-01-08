@@ -60,106 +60,12 @@ function generateSpaceStation(name = "Station", lagrangePoint, asteroidBelts = [
  * @param {number} distanceFromSun - Distance from the sun in AU.
  * @param {AsteroidBelt[]} asteroidBelts - Asteroid belts in the system.
  * @param {SettlementType} stationType - The structural type of space station.
- * @returns {Climate}
+ * @returns {null} Climate system has been removed - space stations no longer have climate
  */
 function generateStationClimate(distanceFromSun = 1.0, asteroidBelts = [], stationType) {
-    // Temperature based on distance from sun
-    let temperature
-    if (distanceFromSun < 0.5) {
-        temperature = TEMPERATURES.EXTREMELY_HIGH
-    } else if (distanceFromSun < 1.5) {
-        temperature = TEMPERATURES.HIGH
-    } else if (distanceFromSun < 3.0) {
-        temperature = TEMPERATURES.LOW
-    } else {
-        temperature = TEMPERATURES.EXTREMELY_LOW
-    }
-    
-    // Most stations have controlled atmosphere
-    const atmosphericPressure = ATMOSPHERIC_PRESSURES.MEDIUM
-    
-    // Artificial gravity varies by station type
-    let gravity
-    if (stationType === SETTLEMENT_TYPES.O_NEILL_CYLINDER || 
-        stationType === SETTLEMENT_TYPES.STANFORD_TORUS ||
-        stationType === SETTLEMENT_TYPES.BERNAL_SPHERE) {
-        gravity = GRAVITIES.MEDIUM
-    } else if (stationType === SETTLEMENT_TYPES.ROTATING_DRUM ||
-               stationType === SETTLEMENT_TYPES.SPOKED_WHEEL ||
-               stationType === SETTLEMENT_TYPES.HABITAT_RING) {
-        gravity = GRAVITIES.LOW
-    } else {
-        gravity = GRAVITIES.EXTREMELY_LOW
-    }
-    
-    // Ocean coverage - only certain station types might have artificial water features
-    let oceanCoverage = OCEAN_COVERAGES.NONE
-    let oceanType = null
-    if (stationType === SETTLEMENT_TYPES.O_NEILL_CYLINDER || 
-        stationType === SETTLEMENT_TYPES.BERNAL_SPHERE) {
-        if (Math.random() < 0.3) { // 30% chance of having water features
-            oceanCoverage = OCEAN_COVERAGES.MEDIUM
-            oceanType = PLANET_OCEAN_TYPES.WATER
-        }
-    }
-    
-    // Geological activity - stations don't have natural geology
-    const geologicalActivity = GEOLOGICAL_ACTIVITIES.NONE
-    const geologyType = PLANET_GEOLOGY_TYPES.METALLIC // Stations are built from metal
-    
-    // Magnetosphere depends on station design
-    let magnetosphere = MAGNETOSPHERES.NONE
-    if (stationType === SETTLEMENT_TYPES.BERNAL_SPHERE || 
-        stationType === SETTLEMENT_TYPES.O_NEILL_CYLINDER) {
-        magnetosphere = MAGNETOSPHERES.LOW
-    }
-    
-    // Radiation level based on distance and nearby asteroid belts
-    let radiationLevel = RADIATION_LEVELS.LOW
-    if (distanceFromSun < 0.5) {
-        radiationLevel = RADIATION_LEVELS.HIGH
-    }
-    // Check if near asteroid belt
-    for (const belt of asteroidBelts) {
-        const distanceToBelt = Math.abs(distanceFromSun - belt.orbit.radius)
-        if (distanceToBelt < 0.5) {
-            radiationLevel = RADIATION_LEVELS.MEDIUM
-            break
-        }
-    }
-    
-    // Asteroid impact risk based on proximity to belts
-    let asteroidImpact = ASTEROID_IMPACTS.LOW
-    for (const belt of asteroidBelts) {
-        const distanceToBelt = Math.abs(distanceFromSun - belt.orbit.radius)
-        if (distanceToBelt < 0.2) {
-            asteroidImpact = ASTEROID_IMPACTS.VERY_HIGH
-            break
-        } else if (distanceToBelt < 0.5) {
-            asteroidImpact = ASTEROID_IMPACTS.MEDIUM
-        }
-    }
-    
-    // Pollution - stations generally have low pollution due to advanced life support
-    const pollution = POLLUTION_LEVELS.VERY_LOW
-    
-    // Atmosphere type - stations typically have breathable air
-    const atmosphereType = PLANET_ATMOSPHERE_TYPES.OXYGEN_NITROGEN
-    
-    return new Climate(
-        temperature,
-        atmosphericPressure,
-        gravity,
-        oceanCoverage,
-        geologicalActivity,
-        magnetosphere,
-        radiationLevel,
-        asteroidImpact,
-        pollution,
-        atmosphereType,
-        oceanType,
-        geologyType
-    )
+    // Climate class has been removed from the game
+    // Space stations now work without climate data
+    return null
 }
 
 /**

@@ -115,15 +115,6 @@ async function startNewGame() {
     gs.year = GAME_START_YEAR
     gs.system = SOLAR_SYSTEM
 
-    console.log('Adding religions...')
-    gs.system.religions = []
-    console.log('Adding space stations...')
-    console.log('Adding ruins...')
-    gs.system.ruins = []
-    
-    console.log("Generated religions:", RELIGIONS)
-    console.log("Generated space stations:", SPACE_STATIONS)
-
     // Generate civilizations and settlements for all planets, dwarf planets, and moons
     const allPlanets = [...gs.system.planets, ...gs.system.dwarfPlanets, ...MOONS_ALL]
     for (const planet of allPlanets) {
@@ -144,30 +135,7 @@ async function startNewGame() {
     }
     SOL.addChildren(gs.system.spaceStations);
 
-    // Generate civilizations and settlements for space stations
-    //presumed to be neutral, we'll dig into this more later
-    /*if (gs.system.spaceStations) {
-        for (const station of gs.system.spaceStations) {
-            // Civilizations and settlements are already generated in generateSpaceStation
-            // Just need to set up relationships
-            for (const p of allPlanets) {
-                station.c.relationships.set(p, RELATIONSHIP_TYPES.NEUTRAL)
-                p.c.relationships.set(station, RELATIONSHIP_TYPES.NEUTRAL)
-            }
-            // Set relationships between stations
-            for (const otherStation of gs.system.spaceStations) {
-                if (station !== otherStation) {
-                    station.c.relationships.set(otherStation, RELATIONSHIP_TYPES.NEUTRAL)
-                }
-            }
-        }
-    }*/
-
     gs.system.updatePositions(gs.year)
-
-    // Initialize anomalies before simulation starts
-    console.log('Initializing anomalies...')
-    if (!gs.system.anomalies) gs.system.anomalies = [];
 
     // Simulate history
     try {
@@ -194,16 +162,7 @@ async function startNewGame() {
     // Give player all modules for testing (only in debug mode)
     if (DEBUG_MODE) {
         playerShip.localModules = [
-            new ShipModule(SHIP_MODULE_TYPES.CLOAK, 1),
-            new ShipModule(SHIP_MODULE_TYPES.MAGNETIZE, 1),
-            new ShipModule(SHIP_MODULE_TYPES.WARHEAD, 1),
-            new ShipModule(SHIP_MODULE_TYPES.EMP_PULSE, 1),
-            new ShipModule(SHIP_MODULE_TYPES.BLINK, 1),
-            new ShipModule(SHIP_MODULE_TYPES.BOOSTER, 1),
-            new ShipModule(SHIP_MODULE_TYPES.SMOKE_BOMB, 1),
-            new ShipModule(SHIP_MODULE_TYPES.SPEED_MODULE, 1),
-            new ShipModule(SHIP_MODULE_TYPES.DRILL, 1),
-            new ShipModule(SHIP_MODULE_TYPES.PLASMA_SPRAY, 1),
+  
         ]
     }
 
@@ -212,7 +171,6 @@ async function startNewGame() {
         "Player Fleet",
         null,
         PLAYER_FLEET_TYPE,
-        null,
         COLORS.LightGray,
     )
 
@@ -224,17 +182,10 @@ async function startNewGame() {
     // Auto-assign captain to starting ship
     gs.fleet.autoAssignPilots()
 
-    // Add player's fleet to system
-    gs.system.fleets.push(gs.fleet);
-    
-    // Mark initial objects around player as seen
-    gs.system.updateDiscoveries();
-
     console.log("New game started.");
     createCharacter()
 
     assessPlanets()
-    assessFleets()
 }
 
 function createCharacter() {

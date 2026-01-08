@@ -46,7 +46,7 @@ class PollutionFamineNews extends News {
     isValid() {
         const {planet: p} = this
         // Requires very high pollution
-        const climateValid = p.climate.pollution && p.climate.pollution.value >= POLLUTION_LEVELS.VERY_HIGH.value
+        const climateValid = p.features.includes(PLANET_FEATURE_TYPES.HEAVY_POLLUTION)
         
         // Needs population
         const settlementValid = p.settlement && p.settlement.settlementType !== null && p.c.population > CL.SLIGHTLY_LOW

@@ -45,7 +45,7 @@ class DisasterAsteroidNews extends News {
     isValid() {
         const {planet: p} = this
         // Only affects planets with high asteroid impact frequency
-        const climateValid = p.climate.asteroidImpact && p.climate.asteroidImpact.value >= ASTEROID_IMPACTS.SLIGHTLY_HIGH.value
+        const climateValid = p.features.includes(PLANET_FEATURE_TYPES.ASTEROID_BOMBARDMENT)
         
         // Needs civilization to save
         const settlementValid = p.settlement && p.settlement.settlementType !== null

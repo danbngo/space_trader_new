@@ -69,11 +69,9 @@ class RefugeesNews extends News {
         const sourceValid = hasDangerousEvent && lowScore
         
         // Target planet must be habitable to accept refugees (breathable atmosphere, moderate temp)
-        const targetHabitable = tp.climate.atmosphericPressure && 
-            tp.climate.atmosphericPressure.value >= ATMOSPHERIC_PRESSURES.MEDIUM.value &&
-            (!tp.climate.temperature || 
-                (tp.climate.temperature.value >= TEMPERATURES.LOW.value && 
-                 tp.climate.temperature.value <= TEMPERATURES.HIGH.value))
+        const targetHabitable = tp.features.includes(PLANET_FEATURE_TYPES.THICK_ATMOSPHERE) &&
+            !tp.features.includes(PLANET_FEATURE_TYPES.EXTREMELY_HOT) &&
+            !tp.features.includes(PLANET_FEATURE_TYPES.EXTREMELY_COLD)
         
         // Must not be at war, target must have capacity
         const relationshipsValid = !Civilization.areAtWar(p, tp)

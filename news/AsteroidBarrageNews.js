@@ -47,7 +47,7 @@ class AsteroidBarrageNews extends News {
     isValid() {
         const {planet: p} = this
         // Requires high asteroid impact frequency
-        const climateValid = p.climate.asteroidImpact && p.climate.asteroidImpact.value >= ASTEROID_IMPACTS.HIGH.value
+        const climateValid = p.features.includes(PLANET_FEATURE_TYPES.ASTEROID_BOMBARDMENT)
         
         // Needs civilization
         const settlementValid = p.settlement && p.settlement.settlementType !== null

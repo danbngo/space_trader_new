@@ -43,11 +43,11 @@ class IceCapsMeltNews extends News {
 
     isValid() {
         const {planet: p} = this
-        // Requires high temperature and existing ice (not already max ocean coverage)
-        const climateValid = p.climate.temperature && 
-            p.climate.temperature.value >= TEMPERATURES.HIGH.value &&
-            p.climate.oceanCoverage &&
-            p.climate.oceanCoverage.value < OCEAN_COVERAGES.VERY_HIGH.value
+        // Requires high temperature and existing ice caps
+        const hasIceCaps = p.features.includes(PLANET_FEATURE_TYPES.ICE_CAPS)
+        const isHot = p.features.includes(PLANET_FEATURE_TYPES.EXTREMELY_HOT)
+        const notOceanWorld = !p.features.includes(PLANET_FEATURE_TYPES.OCEAN_WORLD)
+        const climateValid = hasIceCaps && (isHot || notOceanWorld)
         
         // Needs settlement and industry to be affected
         const settlementValid = p.settlement && p.settlement.settlementType !== null && p.c.industry > CL.SLIGHTLY_LOW

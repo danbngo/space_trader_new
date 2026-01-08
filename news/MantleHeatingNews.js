@@ -50,15 +50,12 @@ class MantleHeatingNews extends News {
             && p.c.reserves > CL.HIGH
             && p.c.technology > CL.HIGH
         
-        // Don't do it if geological activity or magnetosphere is already at dangerous levels
-        const geologyValid = p.climate.geologicalActivity && 
-            p.climate.geologicalActivity.value < GEOLOGICAL_ACTIVITIES.HIGH.value
-        const magnetosphereNotDangerous = !p.climate.magnetosphere || 
-            p.climate.magnetosphere.value < MAGNETOSPHERES.VERY_HIGH.value
+        // Don't do it if geological activity is already at dangerous levels
+        const geologyValid = !p.features.includes(PLANET_FEATURE_TYPES.VOLCANIC_ACTIVITY)
+        const magnetosphereNotDangerous = true // No feature for extremely high magnetosphere
         
-        // Only worth doing if geology is low (dead planet)
-        const worthDoing = p.climate.geologicalActivity && 
-            p.climate.geologicalActivity.value <= GEOLOGICAL_ACTIVITIES.SLIGHTLY_LOW.value
+        // Only worth doing if geology is low (dead planet - no volcanic activity)
+        const worthDoing = !p.features.includes(PLANET_FEATURE_TYPES.VOLCANIC_ACTIVITY)
         
         return ratingsValid && geologyValid && magnetosphereNotDangerous && worthDoing
     }

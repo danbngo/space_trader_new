@@ -47,8 +47,7 @@ class PollutionCleanupNews extends News {
             && p.c.taxes > CL.SLIGHTLY_LOW
         
         // Must actually have pollution to clean
-        const pollutionValid = p.climate.pollution && 
-            p.climate.pollution.value >= POLLUTION_LEVELS.SLIGHTLY_HIGH.value
+        const pollutionValid = p.features.includes(PLANET_FEATURE_TYPES.HEAVY_POLLUTION)
         
         return ratingsValid && pollutionValid
     }

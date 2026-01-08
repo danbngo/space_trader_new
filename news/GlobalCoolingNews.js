@@ -49,12 +49,10 @@ class GlobalCoolingNews extends News {
     isValid() {
         const {planet: p} = this
         // Requires high geological activity (volcanic eruptions) or recent disasters
-        const climateValid = p.climate.geologicalActivity && 
-            p.climate.geologicalActivity.value >= GEOLOGICAL_ACTIVITIES.VERY_HIGH.value
+        const climateValid = p.features.includes(PLANET_FEATURE_TYPES.VOLCANIC_ACTIVITY)
         
         // Needs atmosphere and settlement
-        const atmosphereValid = p.climate.atmosphericPressure && 
-            p.climate.atmosphericPressure.value >= ATMOSPHERIC_PRESSURES.MEDIUM.value
+        const atmosphereValid = p.features.includes(PLANET_FEATURE_TYPES.THICK_ATMOSPHERE)
         const settlementValid = p.settlement && p.settlement.settlementType !== null
         
         return climateValid && atmosphereValid && settlementValid

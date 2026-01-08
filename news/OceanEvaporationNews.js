@@ -41,11 +41,9 @@ class OceanEvaporationNews extends News {
 
     isValid() {
         const {planet: p} = this
-        // Requires low atmospheric pressure and existing oceans
-        const climateValid = p.climate.atmosphericPressure && 
-            p.climate.atmosphericPressure.value <= ATMOSPHERIC_PRESSURES.LOW.value &&
-            p.climate.oceanCoverage &&
-            p.climate.oceanCoverage.value > OCEAN_COVERAGES.VERY_LOW.value
+        // Requires thin/no atmosphere and existing oceans (not a dry world)
+        const climateValid = (p.features.includes(PLANET_FEATURE_TYPES.THIN_ATMOSPHERE) || p.features.includes(PLANET_FEATURE_TYPES.NO_ATMOSPHERE)) &&
+            !p.features.includes(PLANET_FEATURE_TYPES.DRY_WORLD)
         
         // Needs settlement
         const settlementValid = p.settlement && p.settlement.settlementType !== null

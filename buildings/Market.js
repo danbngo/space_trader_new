@@ -61,23 +61,8 @@ class Market extends Building {
             calc.addFactor(planetType.name.toLowerCase(), planetType.cargoModifiers.get(ct));
         }
         
-        // Apply atmosphere type modifiers
-        const atmosphereType = this.planet.climate.atmosphereType;
-        if (atmosphereType && atmosphereType.cargoModifiers.has(ct)) {
-            calc.addFactor(atmosphereType.name.toLowerCase(), atmosphereType.cargoModifiers.get(ct));
-        }
-        
-        // Apply geology type modifiers
-        const geologyType = this.planet.climate.geologyType;
-        if (geologyType && geologyType.cargoModifiers.has(ct)) {
-            calc.addFactor(geologyType.name.toLowerCase(), geologyType.cargoModifiers.get(ct));
-        }
-        
-        // Apply ocean type modifiers
-        const oceanType = this.planet.climate.oceanType;
-        if (oceanType && oceanType.cargoModifiers.has(ct)) {
-            calc.addFactor(oceanType.name.toLowerCase(), oceanType.cargoModifiers.get(ct));
-        }
+        // Climate types no longer exist - removed atmosphere, geology, and ocean type modifiers
+        // Planet features now provide environmental context instead
         
         // Each cargo type has different production/availability based on civilization attributes
         if (ct == CARGO_TYPES.FOOD) {

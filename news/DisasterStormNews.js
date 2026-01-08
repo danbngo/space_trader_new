@@ -38,11 +38,11 @@ class DisasterStormNews extends News {
     isValid() {
         const {planet: p} = this
         // Only affects planets with substantial atmosphere
-        const climateValid = p.climate.atmosphericPressure && p.climate.atmosphericPressure.value >= ATMOSPHERIC_PRESSURES.MEDIUM.value
+        const climateValid = p.features.includes(PLANET_FEATURE_TYPES.THICK_ATMOSPHERE)
         
         // More likely with storm features or high geological activity (energy input)
-        const hasStormFeature = p.features && p.features.some(f => f.name.toLowerCase().includes('storm'))
-        const highActivity = p.climate.geologicalActivity && p.climate.geologicalActivity.value >= GEOLOGICAL_ACTIVITIES.SLIGHTLY_HIGH.value
+        const hasStormFeature = p.features && p.features.some(f => f.name && f.name.toLowerCase().includes('storm'))
+        const highActivity = p.features.includes(PLANET_FEATURE_TYPES.VOLCANIC_ACTIVITY)
         
         const featureValid = hasStormFeature || highActivity
         

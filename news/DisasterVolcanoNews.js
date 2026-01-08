@@ -40,7 +40,7 @@ class DisasterVolcanoNews extends News {
     isValid() {
         const {planet: p} = this
         // Only affects planets with high geological activity
-        const climateValid = p.climate.geologicalActivity && p.climate.geologicalActivity.value >= GEOLOGICAL_ACTIVITIES.HIGH.value
+        const climateValid = p.features.includes(PLANET_FEATURE_TYPES.VOLCANIC_ACTIVITY)
         
         // Needs settlement
         const settlementValid = p.settlement && p.settlement.settlementType !== null

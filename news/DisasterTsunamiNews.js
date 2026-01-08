@@ -38,11 +38,11 @@ class DisasterTsunamiNews extends News {
     isValid() {
         const {planet: p} = this
         // Only affects planets with high ocean coverage
-        const climateValid = p.climate.oceanCoverage && p.climate.oceanCoverage.value >= OCEAN_COVERAGES.HIGH.value
+        const climateValid = p.features.includes(PLANET_FEATURE_TYPES.OCEAN_WORLD)
         
         // Can be triggered by geological activity (underwater quakes) or asteroid impacts
-        const hasGeologicalActivity = p.climate.geologicalActivity && p.climate.geologicalActivity.value >= GEOLOGICAL_ACTIVITIES.SLIGHTLY_HIGH.value
-        const hasAsteroidRisk = p.climate.asteroidImpact && p.climate.asteroidImpact.value >= ASTEROID_IMPACTS.MEDIUM.value
+        const hasGeologicalActivity = p.features.includes(PLANET_FEATURE_TYPES.VOLCANIC_ACTIVITY)
+        const hasAsteroidRisk = p.features.includes(PLANET_FEATURE_TYPES.ASTEROID_BOMBARDMENT)
         
         const triggerValid = hasGeologicalActivity || hasAsteroidRisk
         

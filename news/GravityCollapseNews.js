@@ -46,7 +46,7 @@ class GravityCollapseNews extends News {
     isValid() {
         const {planet: p} = this
         // Requires very high gravity
-        const climateValid = p.climate.gravity && p.climate.gravity.value >= GRAVITIES.VERY_HIGH.value
+        const climateValid = p.features.includes(PLANET_FEATURE_TYPES.HIGH_GRAVITY)
         
         // Needs industrial infrastructure
         const settlementValid = p.settlement && p.settlement.settlementType !== null && p.c.industry > CL.SLIGHTLY_LOW

@@ -32,7 +32,8 @@ class DisasterFlareNews extends News {
     determineOutcome() {
         const {planet: p} = this
         // Success depends on magnetosphere (natural protection), technology (shielding), and industry (hardened infrastructure)
-        this.rollOutcome(p.climate.magnetosphere.value * p.c.technology * p.c.industry, CL.MEDIUM)
+        const magnetosphereValue = p.features.includes(PLANET_FEATURE_TYPES.STRONG_MAGNETOSPHERE) ? CL.HIGH : (p.features.includes(PLANET_FEATURE_TYPES.WEAK_MAGNETOSPHERE) || p.features.includes(PLANET_FEATURE_TYPES.NO_MAGNETOSPHERE)) ? CL.LOW : CL.MEDIUM
+        this.rollOutcome(magnetosphereValue * p.c.technology * p.c.industry, CL.MEDIUM)
     }
 
     isValid() {
@@ -40,15 +41,15 @@ class DisasterFlareNews extends News {
         // Only affects planets close to the star (within 10 AU)
         const orbitValid = p.orbit && p.orbit.radius < 10
         
-        // Protected if planet has high magnetosphere
-        const protectedByMagnetosphere = p.climate.magnetosphere && p.climate.magnetosphere.value >= MAGNETOSPHERES.HIGH.value
+        // Protected if planet has strong magnetosphere
+        const protectedByMagnetosphere = p.features.includes(PLANET_FEATURE_TYPES.STRONG_MAGNETOSPHERE)
         if (protectedByMagnetosphere) return false
         
         // More likely on planets with weaker magnetospheres (less natural protection)
-        const weakMagnetosphere = p.climate.magnetosphere && p.climate.magnetosphere.value < MAGNETOSPHERES.MEDIUM.value
+        const weakMagnetosphere = p.features.includes(PLANET_FEATURE_TYPES.WEAK_MAGNETOSPHERE) || p.features.includes(PLANET_FEATURE_TYPES.NO_MAGNETOSPHERE)
         
         // More likely on planets already experiencing high radiation (closer to star, etc.)
-        const highRadiation = p.climate.radiationLevel && p.climate.radiationLevel.value >= RADIATION_LEVELS.SLIGHTLY_HIGH.value
+        const highRadiation = p.features.includes(PLANET_FEATURE_TYPES.HIGH_RADIATION) || p.features.includes(PLANET_FEATURE_TYPES.RADIATION_BELTS)
         
         // Needs settlement
         const settlementValid = p.settlement && p.settlement.settlementType !== null

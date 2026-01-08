@@ -48,11 +48,9 @@ class TourismNews extends News {
         const ratingsValid = (p.c.economy < CL.MEDIUM) || (p.c.culture < CL.MEDIUM)
         
         // Climate must be pleasant for tourism (moderate temp, breathable atmosphere, low pollution)
-        const temperatureValid = !p.climate.temperature || 
-            (p.climate.temperature.value >= TEMPERATURES.MEDIUM.value && p.climate.temperature.value <= TEMPERATURES.SLIGHTLY_HIGH.value)
-        const atmosphereValid = p.climate.atmosphericPressure && 
-            p.climate.atmosphericPressure.value >= ATMOSPHERIC_PRESSURES.MEDIUM.value
-        const pollutionValid = !p.climate.pollution || p.climate.pollution.value < POLLUTION_LEVELS.HIGH.value
+        const temperatureValid = !p.features.includes(PLANET_FEATURE_TYPES.EXTREMELY_HOT) && !p.features.includes(PLANET_FEATURE_TYPES.EXTREMELY_COLD)
+        const atmosphereValid = p.features.includes(PLANET_FEATURE_TYPES.THICK_ATMOSPHERE)
+        const pollutionValid = !p.features.includes(PLANET_FEATURE_TYPES.HEAVY_POLLUTION)
         const climateValid = temperatureValid && atmosphereValid && pollutionValid
         
         const interferingEvent = 

@@ -49,8 +49,7 @@ class PlanetaryDefenseNews extends News {
             && p.c.reserves > CL.SLIGHTLY_LOW
         
         // Orbital platform needs stable space environment (low asteroid impact risk)
-        const orbitalStability = !p.climate.asteroidImpact || 
-            p.climate.asteroidImpact.value < ASTEROID_IMPACTS.HIGH.value
+        const orbitalStability = !p.features.includes(PLANET_FEATURE_TYPES.ASTEROID_BOMBARDMENT)
         
         return ratingsValid && orbitalStability
     }

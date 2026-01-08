@@ -50,8 +50,7 @@ class OrbitalShieldsNews extends News {
             && p.c.reserves > CL.SLIGHTLY_LOW
         
         // Must have radiation problem to solve
-        const radiationValid = p.climate.radiationLevel && 
-            p.climate.radiationLevel.value >= RADIATION_LEVELS.MEDIUM.value
+        const radiationValid = p.features.includes(PLANET_FEATURE_TYPES.HIGH_RADIATION) || p.features.includes(PLANET_FEATURE_TYPES.RADIATION_BELTS)
         
         return ratingsValid && radiationValid
     }

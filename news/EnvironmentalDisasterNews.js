@@ -43,10 +43,10 @@ class EnvironmentalDisasterNews extends News {
         const ratingsValid = p.c.industry >= CL.HIGH
         
         // More likely on planets with atmospheres (greenhouse gases can accumulate)
-        const hasAtmosphere = p.climate.atmosphericPressure && p.climate.atmosphericPressure.value > ATMOSPHERIC_PRESSURES.VERY_LOW.value
+        const hasAtmosphere = !p.features.includes(PLANET_FEATURE_TYPES.NO_ATMOSPHERE)
         
         // More likely on warmer planets (accelerates environmental damage)
-        const warmPlanet = p.climate.temperature && p.climate.temperature.value >= TEMPERATURES.MEDIUM.value
+        const warmPlanet = p.features.includes(PLANET_FEATURE_TYPES.EXTREMELY_HOT)
         
         // Needs settlement
         const settlementValid = p.settlement && p.settlement.settlementType !== null

@@ -21,7 +21,7 @@ function determineSpaceStationSettlementType(station) {
  * @returns {SettlementType} The most appropriate settlement type.
  */
 function determinePlanetSettlementType(planet) {
-    const climate = planet.climate
+    const features = planet.features
     const planetType = planet.planetType
     
     // Gas giants and gas dwarfs -> Cloud cities
@@ -34,87 +34,76 @@ function determinePlanetSettlementType(planet) {
         return SETTLEMENT_TYPES.ICE_CITY
     }
     
-    // Check for tidally locked planets (very long day length suggests tidal locking)
-    if (planet.dayLength > 50) {
+    // Check for tidally locked planets
+    if (features.includes(PLANET_FEATURE_TYPES.TIDALLY_LOCKED)) {
         return SETTLEMENT_TYPES.TWILIGHT_REGION_CITY
     }
     
     // Earthlike planets with ideal conditions -> Planetary megacities
-    // REMOVED: Climate constants (TEMPERATURES, ATMOSPHERIC_PRESSURES, GRAVITIES, etc.) were deleted
-    // Defaulting all settlements to DOMED_CITY for now
-    /*
-    if (planetType === PLANET_TYPES.EARTHLIKE) {
-        const isIdeal = climate.temperature === TEMPERATURES.MEDIUM &&
-                       climate.atmosphericPressure === ATMOSPHERIC_PRESSURES.MEDIUM &&
-                       climate.gravity === GRAVITIES.MEDIUM &&
-                       climate.radiationLevel === RADIATION_LEVELS.VERY_LOW
-        if (isIdeal) {
-            return SETTLEMENT_TYPES.PLANETARY_MEGACITY
-        }
+    const isIdeal = planetType === PLANET_TYPES.EARTHLIKE &&
+                   features.includes(PLANET_FEATURE_TYPES.THICK_ATMOSPHERE) &&
+                   !features.includes(PLANET_FEATURE_TYPES.EXTREMELY_HOT) &&
+                   !features.includes(PLANET_FEATURE_TYPES.EXTREMELY_COLD) &&
+                   !features.includes(PLANET_FEATURE_TYPES.HIGH_RADIATION) &&
+                   !features.includes(PLANET_FEATURE_TYPES.LOW_GRAVITY) &&
+                   !features.includes(PLANET_FEATURE_TYPES.HIGH_GRAVITY)
+    
+    if (isIdeal) {
+        return SETTLEMENT_TYPES.PLANETARY_MEGACITY
     }
     
     // Ocean-covered worlds
-    if (climate.oceanCoverage === OCEAN_COVERAGES.VERY_HIGH || climate.oceanCoverage === OCEAN_COVERAGES.HIGH) {
-        // Deep ocean worlds with subsurface oceans
-        if (climate.oceanType === PLANET_OCEAN_TYPES.SUBSURFACE_WATER) {
+    if (features.includes(PLANET_FEATURE_TYPES.OCEAN_WORLD)) {
+        // Subsurface ocean worlds
+        if (features.includes(PLANET_FEATURE_TYPES.SUBSURFACE_OCEAN)) {
             return SETTLEMENT_TYPES.SUBMERGED_CITY
         }
-        // Extreme pressure -> Ocean trench cities
-        if (climate.atmosphericPressure === ATMOSPHERIC_PRESSURES.CRUSHING || 
-            climate.gravity === GRAVITIES.EXTREMELY_HIGH || 
-            climate.gravity === GRAVITIES.VERY_HIGH) {
+        // High pressure/gravity ocean worlds -> Ocean trench cities
+        if (features.includes(PLANET_FEATURE_TYPES.HIGH_GRAVITY) || 
+            features.includes(PLANET_FEATURE_TYPES.THICK_ATMOSPHERE)) {
             return SETTLEMENT_TYPES.OCEAN_TRENCH_CITY
         }
         // Regular ocean worlds -> Floating cities
         return SETTLEMENT_TYPES.FLOATING_CITY
     }
     
-    // Extreme volcanic/geological activity -> Lava cities
-    if (climate.geologicalActivity === GEOLOGICAL_ACTIVITIES.EXTREMELY_HIGH ||
-        climate.geologicalActivity === GEOLOGICAL_ACTIVITIES.VERY_HIGH) {
+    // Extreme volcanic activity -> Lava cities
+    if (features.includes(PLANET_FEATURE_TYPES.VOLCANIC_ACTIVITY)) {
         return SETTLEMENT_TYPES.LAVA_CITY
     }
     
     // Hostile surface conditions requiring full protection
-    const extremeRadiation = climate.radiationLevel === RADIATION_LEVELS.EXTREMELY_HIGH || 
-                            climate.radiationLevel === RADIATION_LEVELS.VERY_HIGH
-    const extremeTemperature = climate.temperature === TEMPERATURES.EXTREMELY_HIGH || 
-                              climate.temperature === TEMPERATURES.EXTREMELY_LOW ||
-                              climate.temperature === TEMPERATURES.MOLTEN
-    const extremePressure = climate.atmosphericPressure === ATMOSPHERIC_PRESSURES.CRUSHING ||
-                           climate.atmosphericPressure === ATMOSPHERIC_PRESSURES.NONE
+    const extremeRadiation = features.includes(PLANET_FEATURE_TYPES.HIGH_RADIATION) || 
+                            features.includes(PLANET_FEATURE_TYPES.RADIATION_BELTS)
+    const extremeTemperature = features.includes(PLANET_FEATURE_TYPES.EXTREMELY_HOT) || 
+                              features.includes(PLANET_FEATURE_TYPES.EXTREMELY_COLD)
+    const noPressure = features.includes(PLANET_FEATURE_TYPES.NO_ATMOSPHERE)
     
     // Completely inhospitable -> Orbital platforms
     if ((extremeRadiation && extremeTemperature) || 
-        (extremeRadiation && extremePressure && extremeTemperature)) {
+        (extremeRadiation && noPressure && extremeTemperature)) {
         return SETTLEMENT_TYPES.ORBITAL_PLATFORM
     }
     
-    // Very hostile but somewhat survivable -> Underground cities
+    // Very hostile but somewhat survivable -> Underground or canyon cities
     if (extremeRadiation || extremeTemperature) {
-        // Check if planet has canyons or ravines (based on geological activity)
-        if (climate.geologicalActivity === GEOLOGICAL_ACTIVITIES.HIGH ||
-            climate.geologicalActivity === GEOLOGICAL_ACTIVITIES.MEDIUM) {
+        // Check if planet has volcanic activity (likely has canyons/ravines)
+        if (features.includes(PLANET_FEATURE_TYPES.VOLCANIC_ACTIVITY)) {
             return Math.random() < 0.5 ? SETTLEMENT_TYPES.UNDERGROUND_CITY : SETTLEMENT_TYPES.CANYON_CITY
         }
         return SETTLEMENT_TYPES.UNDERGROUND_CITY
     }
     
     // Harsh but manageable surface -> Domed cities
-    if (extremePressure || 
-        climate.temperature === TEMPERATURES.VERY_LOW || 
-        climate.temperature === TEMPERATURES.VERY_HIGH) {
+    if (noPressure || features.includes(PLANET_FEATURE_TYPES.THIN_ATMOSPHERE)) {
         return SETTLEMENT_TYPES.DOMED_CITY
     }
     
-    // Low atmosphere rocky worlds with canyons
-    if ((climate.atmosphericPressure === ATMOSPHERIC_PRESSURES.VERY_LOW ||
-         climate.atmosphericPressure === ATMOSPHERIC_PRESSURES.EXTREMELY_LOW) &&
-        (climate.geologicalActivity === GEOLOGICAL_ACTIVITIES.MEDIUM ||
-         climate.geologicalActivity === GEOLOGICAL_ACTIVITIES.HIGH)) {
+    // Low atmosphere rocky worlds with geological activity -> Canyon cities
+    if (features.includes(PLANET_FEATURE_TYPES.THIN_ATMOSPHERE) &&
+        features.includes(PLANET_FEATURE_TYPES.VOLCANIC_ACTIVITY)) {
         return SETTLEMENT_TYPES.CANYON_CITY
     }
-    */
     
     // Default for terrestrial planets with moderate conditions -> Domed cities
     return SETTLEMENT_TYPES.DOMED_CITY

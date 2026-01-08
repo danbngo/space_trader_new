@@ -48,8 +48,7 @@ class AsteroidSteeringNews extends News {
             && p.c.wealth > CL.SLIGHTLY_LOW
         
         // Must have asteroid impact problem
-        const asteroidValid = p.climate.asteroidImpact && 
-            p.climate.asteroidImpact.value >= ASTEROID_IMPACTS.MEDIUM.value
+        const asteroidValid = p.features.includes(PLANET_FEATURE_TYPES.ASTEROID_BOMBARDMENT)
         
         return ratingsValid && asteroidValid
     }

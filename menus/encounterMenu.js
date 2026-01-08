@@ -41,8 +41,8 @@ function checkForAsteroidBeltEncounters(elapsedDays = 1) {
     console.log(`🚨 ASTEROID ENCOUNTER TRIGGERED`, {selectedAsteroidIndex, selectedAsteroid, selectedBelt, encounterType, proximityFactors, totalProximityFactor});
     
     // Start the encounter
-    const encounter = generateRandomEncounter(encounterType, null)
-    encounter.startEncounter()
+    //const encounter = generateRandomEncounter(encounterType, null)
+    //encounter.startEncounter()
     return true
 }
 
@@ -81,7 +81,16 @@ function checkForPlanetEncounters(elapsedDays = 1) {
         
         // Check for magnetosphere encounters
         if (planet.magnetosphereRadius > 0 && distance < planet.magnetosphereRadius) {
-            const magnetosphereStrength = planet.climate.magnetosphere.value
+            // Determine magnetosphere strength from features
+            let magnetosphereStrength = 1.0 // default
+            if (planet.features.includes(PLANET_FEATURE_TYPES.STRONG_MAGNETOSPHERE)) {
+                magnetosphereStrength = 1.5
+            } else if (planet.features.includes(PLANET_FEATURE_TYPES.WEAK_MAGNETOSPHERE)) {
+                magnetosphereStrength = 0.7
+            } else if (planet.features.includes(PLANET_FEATURE_TYPES.NO_MAGNETOSPHERE)) {
+                magnetosphereStrength = 0.1
+            }
+            
             // Stronger magnetospheres = higher chance of magnetoid encounters
             const magnetosphereChance = ASTEROIDS_ENCOUNTER_CHANCE_PER_DAY * 0.3 * magnetosphereStrength
             if (calcOccurrencesPerTimespan(magnetosphereChance, elapsedDays)) {

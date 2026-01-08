@@ -51,9 +51,8 @@ class OceanRestorationNews extends News {
             && p.c.taxes > CL.HIGH
             && p.c.wealth > CL.SLIGHTLY_LOW
         
-        // Must have below average ocean levels
-        const oceanValid = !p.climate.oceanCoverage || 
-            p.climate.oceanCoverage.value < OCEAN_COVERAGES.MEDIUM.value
+        // Must have below average ocean levels (dry world or no ocean world feature)
+        const oceanValid = p.features.includes(PLANET_FEATURE_TYPES.DRY_WORLD) || !p.features.includes(PLANET_FEATURE_TYPES.OCEAN_WORLD)
         
         return ratingsValid && oceanValid
     }

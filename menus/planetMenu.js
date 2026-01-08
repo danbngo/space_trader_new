@@ -318,16 +318,14 @@ function showPlanetClimateMenu(planet = new Planet()) {
     }
     leftContent += `<br/>`
     
-    // Composition
-    leftContent += `<u>Composition</u><br/>`
-    if (planet.climate.atmosphereType) {
-        leftContent += `Atmosphere: ${colorSpan(planet.climate.atmosphereType.name, planet.climate.atmosphereType.color)}<br/>`
-    }
-    if (planet.climate.oceanType) {
-        leftContent += `Ocean: ${colorSpan(planet.climate.oceanType.name, planet.climate.oceanType.color)}<br/>`
-    }
-    if (planet.climate.geologyType) {
-        leftContent += `Geology: ${colorSpan(planet.climate.geologyType.name, planet.climate.geologyType.color)}<br/>`
+    // Features
+    leftContent += `<u>Planet Features</u><br/>`
+    if (planet.features && planet.features.length > 0) {
+        planet.features.forEach(feature => {
+            leftContent += `${feature.name}<br/>`
+        })
+    } else {
+        leftContent += `None<br/>`
     }
     
     // Build right column: Climate Data

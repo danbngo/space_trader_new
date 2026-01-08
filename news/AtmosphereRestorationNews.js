@@ -50,13 +50,11 @@ class AtmosphereRestorationNews extends News {
             && p.c.wealth > CL.MEDIUM
             && p.c.reserves > CL.SLIGHTLY_LOW
         
-        // Must not already have high atmosphere or unhealthy atmosphere
-        const atmosphereValid = p.climate.atmosphericPressure && 
-            p.climate.atmosphericPressure.value < ATMOSPHERIC_PRESSURES.HIGH.value
+        // Must not already have thick atmosphere
+        const atmosphereValid = !p.features.includes(PLANET_FEATURE_TYPES.THICK_ATMOSPHERE)
         
         // Pollution must be low for algae to work effectively
-        const pollutionValid = !p.climate.pollution || 
-            p.climate.pollution.value < POLLUTION_LEVELS.SLIGHTLY_HIGH.value
+        const pollutionValid = !p.features.includes(PLANET_FEATURE_TYPES.HEAVY_POLLUTION)
         
         return ratingsValid && atmosphereValid && pollutionValid
     }

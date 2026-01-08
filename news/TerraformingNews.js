@@ -48,9 +48,12 @@ class TerraformingNews extends News {
         
         // Terraforming makes sense for worlds with challenging conditions
         const hasChallengingClimate = 
-            (p.climate.temperature && (p.climate.temperature.value < TEMPERATURES.LOW.value || p.climate.temperature.value > TEMPERATURES.HIGH.value)) ||
-            (p.climate.atmosphericPressure && p.climate.atmosphericPressure.value < ATMOSPHERIC_PRESSURES.LOW.value) ||
-            (p.climate.gravity && (p.climate.gravity.value < GRAVITIES.LOW.value || p.climate.gravity.value > GRAVITIES.HIGH.value))
+            p.features.includes(PLANET_FEATURE_TYPES.EXTREMELY_HOT) ||
+            p.features.includes(PLANET_FEATURE_TYPES.EXTREMELY_COLD) ||
+            p.features.includes(PLANET_FEATURE_TYPES.THIN_ATMOSPHERE) ||
+            p.features.includes(PLANET_FEATURE_TYPES.NO_ATMOSPHERE) ||
+            p.features.includes(PLANET_FEATURE_TYPES.LOW_GRAVITY) ||
+            p.features.includes(PLANET_FEATURE_TYPES.HIGH_GRAVITY)
         
         // Planet must not already have this event
         const interferingEvent = News.planetHasAnyNews(p, NT_ECONOMY_PREVENTING)

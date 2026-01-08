@@ -51,10 +51,8 @@ class SpaceElevatorNews extends News {
         const {planet: p} = this
         
         // Space elevator requires stable climate - no extreme seismic activity or extreme weather
-        const seismicStability = !p.climate.geologicalActivity || 
-            p.climate.geologicalActivity.value < GEOLOGICAL_ACTIVITIES.HIGH.value
-        const weatherStability = !p.climate.temperature || 
-            (p.climate.temperature.value > TEMPERATURES.VERY_LOW.value && p.climate.temperature.value < TEMPERATURES.VERY_HIGH.value)
+        const seismicStability = !p.features.includes(PLANET_FEATURE_TYPES.VOLCANIC_ACTIVITY)
+        const weatherStability = !p.features.includes(PLANET_FEATURE_TYPES.EXTREMELY_HOT) && !p.features.includes(PLANET_FEATURE_TYPES.EXTREMELY_COLD)
         const climateStable = seismicStability && weatherStability
         
         if (!climateStable) return false

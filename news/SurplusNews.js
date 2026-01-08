@@ -33,8 +33,7 @@ class SurplusNews extends News {
         const ratingsValid = p.c.reserves < CL.MEDIUM
         
         // More likely to find resources on geologically active worlds
-        const geologyBonus = !p.climate.geologicalActivity || 
-            p.climate.geologicalActivity.value >= GEOLOGICAL_ACTIVITIES.SLIGHTLY_LOW.value
+        const geologyBonus = p.features.includes(PLANET_FEATURE_TYPES.VOLCANIC_ACTIVITY) || true
         
         //more for flavor than anything, irl you could find goodies at any time
         const interferingEvent = News.planetHasAnyNews(p, [NT.SURPLUS, NT.DEPRESSION, NT.SCARCITY])

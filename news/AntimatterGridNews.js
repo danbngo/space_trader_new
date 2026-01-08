@@ -59,8 +59,8 @@ class AntimatterGridNews extends News {
             && p.c.reserves > CL.SLIGHTLY_LOW
         
         // More challenging in extreme climates (extreme temperatures or high seismic activity increase risk)
-        const extremeTemp = p.climate.temperature && (p.climate.temperature.value <= TEMPERATURES.VERY_LOW.value || p.climate.temperature.value >= TEMPERATURES.VERY_HIGH.value)
-        const highSeismicActivity = p.climate.geologicalActivity && p.climate.geologicalActivity.value >= GEOLOGICAL_ACTIVITIES.HIGH.value
+        const extremeTemp = p.features.includes(PLANET_FEATURE_TYPES.EXTREMELY_HOT) || p.features.includes(PLANET_FEATURE_TYPES.EXTREMELY_COLD)
+        const highSeismicActivity = p.features.includes(PLANET_FEATURE_TYPES.VOLCANIC_ACTIVITY)
         
         // Still possible, but make it less likely if climate is hazardous (could fail in determineOutcome)
         // We allow it but note the risk - game designers can decide if we want to block it entirely

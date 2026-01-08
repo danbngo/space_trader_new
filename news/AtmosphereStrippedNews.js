@@ -44,9 +44,9 @@ class AtmosphereStrippedNews extends News {
     isValid() {
         const {planet: p} = this
         // Requires high radiation OR low gravity, and existing atmosphere
-        const highRadiation = p.climate.radiationLevel && p.climate.radiationLevel.value >= RADIATION_LEVELS.HIGH.value
-        const lowGravity = p.climate.gravity && p.climate.gravity.value <= GRAVITIES.LOW.value
-        const hasAtmosphere = p.climate.atmosphericPressure && p.climate.atmosphericPressure.value > ATMOSPHERIC_PRESSURES.VERY_LOW.value
+        const highRadiation = p.features.includes(PLANET_FEATURE_TYPES.HIGH_RADIATION)
+        const lowGravity = p.features.includes(PLANET_FEATURE_TYPES.LOW_GRAVITY)
+        const hasAtmosphere = !p.features.includes(PLANET_FEATURE_TYPES.NO_ATMOSPHERE)
         
         const climateValid = (highRadiation || lowGravity) && hasAtmosphere
         

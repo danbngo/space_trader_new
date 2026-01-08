@@ -41,14 +41,14 @@ class DisasterGreenhouseNews extends News {
     isValid() {
         const {planet: p} = this
         // Only affects planets with very high industry or already warm temperatures
-        const climateValid = (p.c.industry >= CL.HIGH) || (p.climate.temperature && p.climate.temperature.value >= TEMPERATURES.SLIGHTLY_HIGH.value && p.c.industry >= CL.SLIGHTLY_HIGH)
+        const climateValid = (p.c.industry >= CL.HIGH) || (p.features.includes(PLANET_FEATURE_TYPES.EXTREMELY_HOT) && p.c.industry >= CL.SLIGHTLY_HIGH)
         
         // Needs atmosphere and settlement
-        const atmosphereValid = p.climate.atmosphericPressure && p.climate.atmosphericPressure.value > ATMOSPHERIC_PRESSURES.VERY_LOW.value
+        const atmosphereValid = !p.features.includes(PLANET_FEATURE_TYPES.NO_ATMOSPHERE)
         const settlementValid = p.settlement && p.settlement.settlementType !== null
         
         // Requires high pollution levels (greenhouse effect is caused by pollution)
-        const pollutionValid = p.climate.pollution && p.climate.pollution.value >= POLLUTION_LEVELS.HIGH.value
+        const pollutionValid = p.features.includes(PLANET_FEATURE_TYPES.HEAVY_POLLUTION)
         
         return climateValid && atmosphereValid && settlementValid && pollutionValid
     }

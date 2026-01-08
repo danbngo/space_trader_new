@@ -48,7 +48,7 @@ class PlagueNews extends News {
         const hasVaccine = News.planetHasAnyNews(p, [NT.PLAGUE_VACCINE])
         
         // More likely on polluted worlds (weakened population health)
-        const pollutionModifier = p.climate.pollution && p.climate.pollution.value >= POLLUTION_LEVELS.SLIGHTLY_HIGH.value
+        const pollutionModifier = p.features.includes(PLANET_FEATURE_TYPES.HEAVY_POLLUTION)
         
         return ratingsValid && !hasVaccine && pollutionModifier
     }

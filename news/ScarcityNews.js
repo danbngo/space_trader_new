@@ -51,8 +51,7 @@ class ScarcityNews extends News {
         const ratingsValid = p.c.population > CL.VERY_HIGH || p.c.industry >= CL.VERY_HIGH
         
         // More likely on dry worlds with limited agriculture potential
-        const scarcityRisk = !p.climate.oceanCoverage || 
-            p.climate.oceanCoverage.value < OCEAN_COVERAGES.SLIGHTLY_LOW.value
+        const scarcityRisk = p.features.includes(PLANET_FEATURE_TYPES.DRY_WORLD)
         
         const interferingEvent = News.planetHasAnyNews(p, NT_ECONOMY_BOOSTING)
         return ratingsValid && scarcityRisk && !interferingEvent

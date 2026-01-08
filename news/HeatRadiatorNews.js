@@ -49,8 +49,8 @@ class HeatRadiatorNews extends News {
             && p.c.technology > CL.MEDIUM
         
         // Must have high heat/geological activity to vent
-        const heatValid = (p.climate.temperature && p.climate.temperature.value >= TEMPERATURES.HIGH.value) ||
-            (p.climate.geologicalActivity && p.climate.geologicalActivity.value >= GEOLOGICAL_ACTIVITIES.HIGH.value)
+        const heatValid = p.features.includes(PLANET_FEATURE_TYPES.EXTREMELY_HOT) ||
+            p.features.includes(PLANET_FEATURE_TYPES.VOLCANIC_ACTIVITY)
         
         return ratingsValid && heatValid
     }

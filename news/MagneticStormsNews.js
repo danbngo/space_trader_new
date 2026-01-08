@@ -43,8 +43,8 @@ class MagneticStormsNews extends News {
 
     isValid() {
         const {planet: p} = this
-        // Requires high magnetosphere
-        const climateValid = p.climate.magnetosphere && p.climate.magnetosphere.value >= MAGNETOSPHERES.HIGH.value
+        // Requires strong magnetosphere
+        const climateValid = p.features.includes(PLANET_FEATURE_TYPES.STRONG_MAGNETOSPHERE)
         
         // Needs settlement with technology
         const settlementValid = p.settlement && p.settlement.settlementType !== null && p.c.technology > CL.SLIGHTLY_LOW
