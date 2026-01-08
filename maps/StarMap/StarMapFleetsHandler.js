@@ -32,12 +32,6 @@ class StarMapFleetsHandler {
      * @param {boolean} isHovered - Whether the fleet is currently hovered
      */
     setFleetStrokeStyle(fleet, fleetObj, isSelected, isHovered = false) {
-        // Cloaked fleets have no stroke
-        if (fleet.cloakLevel > 0) {
-            fleetObj.strokeColor = null
-            return
-        }
-        
         if (isSelected) {
             fleetObj.strokeColor = COLORS.Green
             fleetObj.lineWidth = 3
@@ -45,9 +39,8 @@ class StarMapFleetsHandler {
             fleetObj.strokeColor = COLORS.Cyan
             fleetObj.lineWidth = 2
         } else {
-            // Use black stroke for abandoned fleets, planet color for active fleets
-            const isAbandoned = this.starSystem.abandonedFleets.includes(fleet)
-            fleetObj.strokeColor = isAbandoned ? COLORS.Black : (fleet.planet ? fleet.planet.color : COLORS.White)
+            // All fleets have black stroke by default
+            fleetObj.strokeColor = COLORS.Black
             fleetObj.lineWidth = 2
         }
     }
@@ -101,9 +94,9 @@ class StarMapFleetsHandler {
                 // Use exponent 0.4 instead of 0.5 (sqrt) to compress larger fleets more (same as planets)
                 const fleetSize = Math.pow(fleet.radius/EARTH_RADII_PER_AU, 0.4) * 2.5 * 100
                 
-                // Use faction color for fill, planet color for stroke
-                const fillColor = fleet.factionType ? fleet.factionType.color : (fleet.planet ? fleet.planet.color : COLORS.White)
-                const strokeColor = fleet.planet ? fleet.planet.color : COLORS.White
+                // Use planet color for fill, black for stroke
+                const fillColor = fleet.planet ? fleet.planet.color : COLORS.White
+                const strokeColor = COLORS.Black
                 
                 // Use custom polygon shape if flagship has a shape generator
                 const flagship = fleet.flagship || (fleet.ships && fleet.ships[0])
@@ -336,9 +329,9 @@ class StarMapFleetsHandler {
                 // Use exponent 0.4 instead of 0.5 (sqrt) to compress larger fleets more (same as planets)
                 const fleetSize = Math.pow(fleet.radius/EARTH_RADII_PER_AU, 0.4) * 2.5
                 
-                // Use faction color for fill, planet color for stroke
-                const fillColor = fleet.factionType ? fleet.factionType.color : (fleet.planet ? fleet.planet.color : COLORS.White)
-                const strokeColor = fleet.planet ? fleet.planet.color : COLORS.White
+                // Use planet color for fill, black for stroke
+                const fillColor = fleet.planet ? fleet.planet.color : COLORS.White
+                const strokeColor = COLORS.Black
                 
                 // Use custom polygon shape if flagship has a shape generator
                 const flagship = fleet.flagship || (fleet.ships && fleet.ships[0])

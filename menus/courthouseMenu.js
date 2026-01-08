@@ -131,10 +131,7 @@ function showCourthouseMenu(courthouse = new Courthouse()) {
     createPopoverElement(bountySpan, penaltyCalc.createPopover(planetBounty, 'bounty payment penalty', true));
 
     let infoContainer = ce({children: [
-        forceOneLine(ce({children: ['Your Rank: ', currentRankSpan, nextRankDisplay]})),
-        ce({tag: 'br'}),
-        forceOneLine(ce({children: [`Your CR: ${gs.credits} | Your Bounty: `, bountySpan]})),
-        ce({tag: 'br'}),
+        forceOneLine(ce({children: ['Your Rank: ', currentRankSpan, nextRankDisplay, `Your CR: ${gs.credits} | Your Bounty: `, bountySpan]})),
         upgradePrice !== null && !canUpgradeRank && isDocked ? colorSpan(`Rank upgrade requires positive reputation, no bounty, and ${upgradePrice} CR.`, COLORS.Orange) + '<br/>' : '',
     ]})
 

@@ -7,7 +7,7 @@
  */
 function createHireOfficerMenu(officers = [], guild = new Guild(), onSelectOfficer = (officer)=>{}) {
     console.log('creating hire officer menu:',officers)
-    if (officers.length == 0) return `(No officers available)`
+    if (officers.length == 0) return colorSpan('(No officers available)', COLORS.Yellow)
     /** @type {any[]} */
     const rows = [
         ['Name', 'Age', 'Level', 'CR Share', ...SKILLS_ALL, 'Hire Price']

@@ -1,5 +1,5 @@
 const buildingHandlerMapping = [
-    {type: BUILDING_TYPES.SHIPYARD, prop: 'shipyard', menu: (b) => showShipyardBuyMenu(b)},
+    {type: BUILDING_TYPES.SHIPYARD, prop: 'shipyard', menu: (b) => showShipyardSellMenu(b)},
     {type: BUILDING_TYPES.COURTHOUSE, prop: 'courthouse', menu: (b) => showCourthouseMenu(b)},
     {type: BUILDING_TYPES.MARKET, prop: 'market', menu: (b) => showMarketMenu(b)},
     {type: BUILDING_TYPES.BLACK_MARKET, prop: 'blackMarket', menu: (b) => showMarketMenu(b)},
@@ -108,7 +108,7 @@ function showPlanetMenu(planet = new Planet()) {
             }
             
             const isDisabled = accessDeniedReason !== null
-            const levelDisplay = building.level ? ` ${toRomanNumeral(building.level)}` : ''
+            const levelDisplay = building.level ? ` ${building.level}` : ''
             const buttonText = type.name + levelDisplay
             
             // Add tooltip for disabled buttons

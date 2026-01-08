@@ -239,8 +239,8 @@ const SaveManager = {
                 // Fleet reference
                 fleetUUID: this.objectToUUID(gs.fleet),
                 
-                // Contracts
-                contracts: (gs.contracts || []).map(contract => this.serializeContract(contract)),
+                // Missions
+                missions: (gs.missions || []).map(mission => this.serializeMission(mission)),
                 
                 // Maps with planet/spaceobject keys
                 memorizedSettlements: this.serializeMapWithObjectKeys(gs.memorizedSettlements),
@@ -442,24 +442,24 @@ const SaveManager = {
     },
 
     /**
-     * Serialize a Contract
-     * @param {Contract} contract
+     * Serialize a Mission
+     * @param {Mission} mission
      * @returns {Object}
      */
-    serializeContract(contract) {
-        if (!contract) return null;
+    serializeMission(mission) {
+        if (!mission) return null;
         
         return {
-            uuid: contract.uuid,
-            description: contract.description,
-            expirationDate: contract.expirationDate,
-            amount: contract.amount,
-            reward: contract.reward,
+            uuid: mission.uuid,
+            description: mission.description,
+            expirationDate: mission.expirationDate,
+            amount: mission.amount,
+            reward: mission.reward,
             
-            contractTypeName: contract.contractType ? contract.contractType.name : null,
-            planetUUID: this.objectToUUID(contract.planet),
-            targetPlanetUUID: this.objectToUUID(contract.targetPlanet),
-            cargoTypeName: contract.cargoType ? contract.cargoType.name : null,
+            missionTypeName: mission.missionType ? mission.missionType.name : null,
+            planetUUID: this.objectToUUID(mission.planet),
+            targetPlanetUUID: this.objectToUUID(mission.targetPlanet),
+            cargoTypeName: mission.cargoType ? mission.cargoType.name : null,
         };
     },
 
@@ -633,7 +633,7 @@ const SaveManager = {
             gs.year = saveData.year || GAME_START_YEAR;
             gs.encounterImmunityUntilYear = saveData.encounterImmunityUntilYear || 0;
             gs.nextTitheYear = saveData.nextTitheYear || 0;
-            gs.contracts = [];
+            gs.missions = [];
             
             // PASS 1: Deserialize StarSystem structure (stars, planets, etc. - already exist globally)
             // We use existing SOLAR_SYSTEM and just update dynamic data
@@ -649,7 +649,7 @@ const SaveManager = {
             
             // PASS 4: Restore GameState-level references
             gs.fleet = this.uuidToObject(saveData.fleetUUID, 'fleet');
-            gs.contracts = (saveData.contracts || []).map(c => this.deserializeContract(c));
+            gs.missions = (saveData.missions || []).map(c => this.deserializeMission(c));
             
             // Restore maps (note: memorizedSettlements values need special handling)
             gs.memorizedSettlements = new Map();
@@ -889,33 +889,32 @@ const SaveManager = {
     },
 
     /**
-     * Deserialize a Contract
+     * Deserialize a Mission
      * @param {Object} data
-     * @returns {Contract}
+     * @returns {Mission}
      */
-    deserializeContract(data) {
+    deserializeMission(data) {
         if (!data) return null;
         
-        const contractType = this.findContractType(data.contractTypeName);
+        const missionType = this.findMissionType(data.missionTypeName);
         const planet = this.uuidToObject(data.planetUUID, 'planet');
         const targetPlanet = this.uuidToObject(data.targetPlanetUUID, 'planet');
         const cargoType = this.findCargoType(data.cargoTypeName);
         
-        const contract = new Contract(
-            contractType,
+        const mission = new Mission(
+            missionType,
             planet,
             targetPlanet,
             data.expirationDate,
             cargoType,
             data.amount,
             data.reward,
-            data.description
         );
         
-        contract.uuid = data.uuid;
+        mission.uuid = data.uuid;
         
-        gameRegistry.registerContract(contract);
-        return contract;
+        gameRegistry.registerMission(mission);
+        return mission;
     },
 
     /**
@@ -1215,9 +1214,9 @@ const SaveManager = {
                (name === 'Agnosticism' ? RELIGION_AGNOSTICISM : null);
     },
 
-    findContractType(name) {
+    findMissionType(name) {
         if (!name) return null;
-        return Object.values(CONTRACT_TYPES).find(t => t.name === name);
+        return Object.values(MISSION_TYPES).find(t => t.name === name);
     },
 
     findCargoType(name) {

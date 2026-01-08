@@ -175,7 +175,7 @@ function generateSettlement(planet) {
     for (const building of buildings) {
         if (Math.random() < disableChance) building.exists = false
         // Randomize building level from 1-3
-        building.level = Math.floor(Math.random() * 3) + 1
+        building.level = 1//Math.floor(Math.random() * 3) + 1
     }
     
     // Enforce minimum buildings for dwarf planets and space stations

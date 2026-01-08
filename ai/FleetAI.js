@@ -106,13 +106,16 @@ class FleetAI {
     checkAsteroidHits() {
         if (!gs.system.asteroids || gs.system.asteroids.length === 0) return
         
+        // Miners are immune to asteroid strikes (they know how to navigate asteroid fields)
+        if (this.fleet.factionType === FACTION_TYPES.MINERS) return
+        
         // Check for nearby asteroids
         for (const asteroid of gs.system.asteroids) {
             const distance = calcDistance(this.fleet.x, this.fleet.y, asteroid.x, asteroid.y)
             
             if (distance < FLEET_COLLISION_DISTANCE) {
-                // Small chance to be hit by asteroid (10% per check)
-                if (Math.random() < 0.1) {
+                // Small chance to be hit by asteroid (5% per check)
+                if (Math.random() < 0.05) {
                     // Apply damage to a random ship in the fleet
                     const activeShips = this.fleet.ships.filter(s => !s.disabled)
                     if (activeShips.length === 0) return

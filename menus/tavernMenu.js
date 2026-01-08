@@ -6,7 +6,7 @@
  * @returns {HTMLTableElement|string} The officers table or "(None)" if no officers.
  */
 function createHireOfficerMenu(officers = [new Officer()], tavern = new Tavern(), onSelectOfficer = (officer = new Officer())=>{}) {
-    if (officers.length == 0) return `(None)`
+    if (officers.length == 0) return colorSpan('(No officers available)', COLORS.Yellow)
     
     /** @type {any[]} */
     const rows = [

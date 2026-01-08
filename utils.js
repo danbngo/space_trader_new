@@ -383,7 +383,7 @@ function rndRound(fraction = 0.5) {
  * @param {boolean} [options.showSellPrice] - Whether to show sell price (default: false).
  * @returns {HTMLElement} The info container element.
  */
-function createBuildingPriceInfo(building = new Building(), buildingName = "Building", options = {showBuyPrice: true, showSellPrice: false}) {
+function createBuildingPriceInfo(building, buildingName = "Building", options = {showBuyPrice: true, showSellPrice: false}) {
     const {showBuyPrice = true, showSellPrice = false} = options;
     const {planet} = building;
     const {corruption, inflationRate, taxRate} = planet.c;

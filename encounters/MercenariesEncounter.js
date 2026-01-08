@@ -12,7 +12,7 @@ class MercenariesEncounter extends FleetEncounter {
         // Mercenaries demand surrender if at war or infamous (50% chance for infamy)
         if (isAtWar || (hasInfamy && Math.random() < 0.5)) {
             const reason = isAtWar 
-                ? `"${coloredName(originPlanet)} vessel detected! Our contract with ${coloredName(this.planet)} is clear - surrender or die!"` 
+                ? `"${coloredName(originPlanet)} vessel detected! Our mission with ${coloredName(this.planet)} is clear - surrender or die!"` 
                 : `"We've been hired to deal with you. You've made too many enemies. Surrender your ships or we open fire!"`;
             
             showModal(coloredName(this.fleet), 
@@ -30,7 +30,7 @@ class MercenariesEncounter extends FleetEncounter {
             // 50% chance to attack if tense
             if (relationship === RELATIONSHIP_TYPES.TENSE && Math.random() < 0.5) {
                 showModal(coloredName(this.fleet), 
-                    `A ${coloredName(this.fleet)} fleet contracted by ${coloredName(this.planet)} intercepts you!<br/>` +
+                    `A ${coloredName(this.fleet)} fleet missioned by ${coloredName(this.planet)} intercepts you!<br/>` +
                     `"We've been authorized to deal with ${coloredName(originPlanet)} ships in this sector. Stand down!"`, [
                     ['Fight', () => this.startCombat(true)],
                     ['Try to Talk', () => this.showNeutralMercenaries()],
@@ -118,7 +118,7 @@ class MercenariesEncounter extends FleetEncounter {
         // Teleport player to this planet
         gs.fleet.dock(this.planet);
         
-        showModal('Impounded', `You surrender to the ${fleetName}. They escort you to ${planetName} where your escort ships and cargo are turned over to their employer.<br/><br/>"Smart choice. Our contract didn't require killing you - just taking your assets. You're free to go... for now."<br/><br/>Your crew is intact, but you've lost everything except your flagship.`, [
+        showModal('Impounded', `You surrender to the ${fleetName}. They escort you to ${planetName} where your escort ships and cargo are turned over to their employer.<br/><br/>"Smart choice. Our mission didn't require killing you - just taking your assets. You're free to go... for now."<br/><br/>Your crew is intact, but you've lost everything except your flagship.`, [
             ['Continue', ()=>showPlanetMenu(this.planet)],
         ])
     }
@@ -151,13 +151,13 @@ class MercenariesEncounter extends FleetEncounter {
             gs.captain.reputation.setAmount(this.planet, halvedInfamy);
         }
         
-        let message = `The ${fleetName} execute their contract with ruthless efficiency, reducing your fleet to scrap metal and debris. Your flagship barely survives, drifting through the wreckage.<br/><br/>`;
+        let message = `The ${fleetName} execute their mission with ruthless efficiency, reducing your fleet to scrap metal and debris. Your flagship barely survives, drifting through the wreckage.<br/><br/>`;
         
         if (casualties.length > 0) {
             message += `<b>Casualties:</b> ${casualties.join(', ')} perished in the battle.<br/><br/>`;
         }
         
-        message += `They've seized all your cargo and destroyed your escort ships. "Contract fulfilled. Nothing personal."<br/><br/>Your infamy with ${planetName} has been somewhat reduced by this defeat.`;
+        message += `They've seized all your cargo and destroyed your escort ships. "Mission fulfilled. Nothing personal."<br/><br/>Your infamy with ${planetName} has been somewhat reduced by this defeat.`;
         
         showModal('Destroyed', message, [
             ['Continue', ()=>this.endEncounter()],

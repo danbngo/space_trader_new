@@ -13,8 +13,8 @@ class GameState {
         this.fleet = null;
         /** @type {Encounter} */
         this.encounter = null;
-        /** @type {Contract[]} */
-        this.contracts = [];
+        /** @type {Mission[]} */
+        this.missions = [];
         /** @type {number} */
         this.encounterImmunityUntilYear = 0;
         /** @type {number} */

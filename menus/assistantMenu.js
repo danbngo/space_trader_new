@@ -21,7 +21,7 @@ function showAssistantMenu() {
         ['Ships', ()=>showShipsMenu()],
         ['Cargo', ()=>showCargoMenu(), gs.fleet.cargo.totalQuantity === 0, 'No cargo in hold'],
         ['Officers', ()=>showOfficersMenu(), gs.fleet.subordinates.length === 0, 'No officers hired'],
-        ['Contracts', ()=>showContractsMenu(), gs.contracts.length === 0, 'No active contracts'],
+        ['Missions', ()=>showMissionsMenu(), gs.missions.length === 0, 'No active missions'],
         ['Captain', ()=>showCaptainSkillsMenu(), false, hasSkillPoints || hasPerkPoints ? 'highlighted' : null],
         ['Cyberware', ()=>showCyberwareMenu(), gs.captain.implants.length === 0, 'No cyberware installed'],
         ce({tag:'br'}),

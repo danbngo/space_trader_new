@@ -13,7 +13,8 @@ DONE:
 
 TODO:
 
-
+-improve the courthouse menu visually
+-canUpgrade in academy might be meh.
 -add an escort fleet system to the game - will be very useful later for quests
 -cyber modules, geneticist and perks all need to be tested
 

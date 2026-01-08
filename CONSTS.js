@@ -20,7 +20,7 @@ const ASTEROID_MIN_SCREEN_RADIUS = 1 // Hide asteroids when they would appear sm
 const MINING_HAZARD_CHANCE = 0.1 // 10% chance of encountering a hazard when mining
 const REPAIR_COST_PER_1_HULL = 10 // Base cost to repair 1 hull point at shipyard
 const BASE_FUEL_COST_PER_UNIT = 5 // Base cost per unit of fuel at shipyard
-const FUEL_COST_PER_1_AU = 1 // Fuel units consumed per AU traveled
+const FUEL_COST_PER_1_AU = 1/5 // Fuel units consumed per AU traveled
 const WARN_INTERCEPT_DURATION_YEARS = 1/30 // Show confirmation modal for intercept routes longer than this (1 day)
 
 const PLANET_ENCOUNTER_CHANCE_PER_DAY = 0//0.01; //chance of random encounter per day when right next to an 'average' planet
@@ -69,8 +69,8 @@ const SHIPYARD_AVERAGE_NUM_MODULES = 2
 const CYBER_SURGEON_AVERAGE_NUM_IMPLANTS = 3
 const GENETICIST_AVERAGE_NUM_MODIFICATIONS = 3
 const GUILD_AVERAGE_NUM_OFFICERS = 3
-const GUILD_AVERAGE_NUM_CONTRACTS = 5
-const PALACE_AVERAGE_NUM_CONTRACTS = 3
+const GUILD_AVERAGE_NUM_MISSIONS = 5
+const PALACE_AVERAGE_NUM_MISSIONS = 3
 
 const AVERAGE_TAX_RATE = 0.05
 const AVERAGE_INFLATION_RATE = 0.05
@@ -148,3 +148,5 @@ const SPACE_STATION_MIN_BUILDINGS = 1
 
 const FLEET_COLLISION_DISTANCE = 0.1
 const ASTEROID_MINING_DISTANCE = 0.2 // 2x easier to mine than fleet collision range
+
+const CRIMINAL_MAX_BOUNTY_PER_LEVEL = 500

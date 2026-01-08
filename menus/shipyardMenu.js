@@ -310,13 +310,25 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
         rebuildMenu()
     }
 
+    function refuelFleet() {
+        const refuelCost = shipyard.calcRefuelCost(fleet)
+        if (gs.credits < refuelCost) return
+        if (fleet.fuel >= fleet.totalFuelCapacity) return
+        
+        gs.credits -= refuelCost
+        fleet.fuel = fleet.totalFuelCapacity
+        rebuildMenu()
+    }
+
     function onSelectPlayerShip(ship ) {
         const isLastShip = fleet.ships.length < 2;
         const shipyardCanAfford = shipyard.credits >= shipyard.calcSellPrice(ship);
         const canSell = isDocked && shipyardCanAfford && !isLastShip;
         const damageAmount = ship.hull[1] - ship.hull[0];
         const canRepair = isDocked && damageAmount > 0;
-        //const repairCost = canRepair ? shipyard.calculateRepairCost(ship, damageAmount) : 0;
+        const fuelNeeded = fleet.totalFuelCapacity - fleet.fuel;
+        const refuelCost = fuelNeeded > 0 ? shipyard.calcRefuelCost(fleet) : 0;
+        const canRefuel = isDocked && fuelNeeded > 0 && gs.credits >= refuelCost;
         
         let disabledReason = null;
         if (!isDocked) disabledReason = 'Must be docked to sell ships';
@@ -327,13 +339,32 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
         if (!isDocked) repairDisabledReason = 'Must be docked to repair ships';
         else if (damageAmount <= 0) repairDisabledReason = 'Ship is not damaged';
         
+        let refuelDisabledReason = null;
+        if (!isDocked) refuelDisabledReason = 'Must be docked to refuel';
+        else if (fuelNeeded <= 0) refuelDisabledReason = 'Fuel tank is full';
+        else if (gs.credits < refuelCost) refuelDisabledReason = `Not enough credits (need ${refuelCost} CR)`;
+        
         // For last ship, change Sell button to show Trade modal
         const sellButtonAction = isLastShip ? ()=>showTradeLastShipModal(ship) : ()=>showSellShipModal(ship);
         
-        /** @type {ButtonData[]} */
+        // Create refuel button with cost breakdown popover
+        const refuelCalc = shipyard.getRefuelCostCalculation(fleet);
+        const refuelButtonText = `Refuel (${refuelCost} CR)`;
+        const refuelButton = ce({innerHTML: refuelButtonText, classNames: ['gameButton']});
+        if (!canRefuel) refuelButton.classList.add('disabled');
+        refuelButton.onclick = () => {
+            if (!canRefuel) return;
+            refuelFleet();
+        };
+        if (fuelNeeded > 0) {
+            createPopoverElement(refuelButton, refuelCalc.createPopover(BASE_FUEL_COST_PER_UNIT, 'refuel cost', true));
+        }
+        
+        /** @type {(ButtonData|HTMLElement)[]} */
         const buttons = [
             [`Sell`, sellButtonAction, !canSell && !isLastShip, disabledReason],
             [`Repair`, ()=>showRepairShipModal(ship), !canRepair, repairDisabledReason],
+            refuelButton,
             ["Buy Modules", ()=>showShipyardBuyModulesMenu(shipyard)],
             ["Buy Ships", ()=>showShipyardBuyMenu(shipyard)],
             ["Back", () => leave()],
@@ -345,7 +376,7 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
         const sellPrice = shipyard.calcSellPrice(currentShip);
         
         // Create table similar to buy menu but with trade cost
-        function createTradeTable(ships, onSelectShip) {
+        function createTradeTable(ships, onSelectShip, selectedShip = null) {
             if (ships.length == 0) return `(None)`;
             
             const rows = [
@@ -356,34 +387,38 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
                 const buyPrice = shipyard.calcBuyPrice(ship);
                 const tradeCost = buyPrice - sellPrice;
                 const tradeCostDisplay = tradeCost >= 0 ? `+${tradeCost}` : `${tradeCost}`;
-                const tradeCostColor = tradeCost <= 0 ? COLORS.Green : (gs.credits >= tradeCost ? COLORS.White : COLORS.Red);
+                const tradeCostColor = tradeCost <= 0 ? COLORS.LightGreen : COLORS.LightRed;
                 
                 rows.push([
                     ship.name,
                     statColorSpan(roundToPlaces(ship.quality * 100, 1) + '%', ship.quality),
-                    statColorSpan(ship.hull[1], ship.hull[1]/10),
-                    statColorSpan(ship.shields[1], ship.shields[1]/10),
-                    statColorSpan(ship.fuelCapacity, ship.fuelCapacity/10),
-                    statColorSpan(ship.lasers, ship.lasers/10),
-                    statColorSpan(ship.engine, ship.engine/10),
-                    statColorSpan(ship.cargoSpace, ship.cargoSpace/10),
+                    statColorSpan(ship.hull[1], ship.hull[1]/AVERAGE_SHIP_HULL),
+                    statColorSpan(ship.shields[1], ship.shields[1]/AVERAGE_SHIP_SHIELDS),
+                    statColorSpan(ship.fuelCapacity, ship.fuelCapacity/AVERAGE_SHIP_FUEL_CAPACITY),
+                    statColorSpan(ship.lasers, ship.lasers/AVERAGE_SHIP_LASERS),
+                    statColorSpan(ship.engine, ship.engine/AVERAGE_SHIP_ENGINE),
+                    statColorSpan(ship.cargoSpace, ship.cargoSpace/AVERAGE_SHIP_CARGO_SPACE),
                     colorSpan(tradeCostDisplay, tradeCostColor)
                 ]);
             }
             
-            return createTable(rows, (rowIndex) => onSelectShip(ships[rowIndex]));
+            // Find the index of the selected ship (add 1 to account for header row)
+            const selectedIndex = selectedShip ? ships.indexOf(selectedShip) + 1 : null;
+            
+            return createTable(rows, (rowIndex) => onSelectShip(ships[rowIndex]), selectedIndex);
         }
         
         let selectedTradeShip = null;
         
         function showTradeModal() {
             const content = ce({children: [
-                colorSpan("You cannot sell your last ship or you'd no longer be a captain! However, you can trade it for another.", COLORS.Yellow),
+                colorSpan(`You cannot sell your last ship or you'd no longer be a captain!`, COLORS.Yellow),
+                `However, you can trade it for another.`,
                 ce({tag: 'br'}),
                 createTradeTable(shipyard.ships, (ship) => {
                     selectedTradeShip = ship;
                     showTradeModal(); // Recreate modal with updated buttons
-                }),
+                }, selectedTradeShip),
                 ce({tag: 'br'}),
                 `Your Credits: ${gs.credits}CR`
             ]});
@@ -502,12 +537,30 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
         )
     }
 
+    // Add fuel progress bar
+    const fuelPercentage = (fleet.fuel / fleet.totalFuelCapacity) * 100
+    const colorRatio = fuelPercentage / 25
+    const fuelBarColor = calcStatColor(colorRatio)
+    const fuelBar = ce({
+        style: {marginTop: '10px', display: 'flex', gap: '6px', alignItems: 'center'},
+        children: [
+            'Fleet Fuel: ',
+            new ProgressBar({
+                value: fuelPercentage,
+                fillColor: fuelBarColor,
+                overrideLabel: '',
+                width: 25
+            }).container,
+        ]
+    })
+    
     showPlanetModal(
         planet,
         `${coloredName(planet)} - Shipyard`,
         ce({children:[
             `<b>Your ships</b>`,
             createSellShipMenu(fleet.ships, shipyard, (ship)=>onSelectPlayerShip(ship)),
+            fuelBar,
             `Shipyard Credits: ${shipyard.credits}`,
         ]}),
         [

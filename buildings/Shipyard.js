@@ -152,6 +152,33 @@ class Shipyard extends Building {
         const calc = this.getRepairCostCalculation(ship, amount);
         return Math.round(calc.calculate(REPAIR_COST_PER_1_HULL));
     }
+
+    /**
+     * Get the full refuel cost calculation breakdown for a fleet.
+     * @param {Fleet} fleet - The fleet to calculate for.
+     * @returns {Calculation} The calculation showing all price factors.
+     */
+    getRefuelCostCalculation(fleet) {
+        const fuelNeeded = fleet.totalFuelCapacity - fleet.fuel;
+        const calc = new Calculation();
+        
+        calc.addFactor('fuel units needed', fuelNeeded);
+        calc.addFactor('merchant markup', 1 + this.planet.c.corruption / 4);
+        calc.addFactor('inflation', 1 + this.planet.c.inflationRate / 4);
+        calc.addFactor('base taxes', 1 + this.planet.c.taxes / 4);
+        
+        return calc;
+    }
+
+    /**
+     * Calculate the cost to refuel a fleet.
+     * @param {Fleet} fleet - The fleet to refuel.
+     * @returns {number} The refuel cost in credits.
+     */
+    calcRefuelCost(fleet) {
+        const calc = this.getRefuelCostCalculation(fleet);
+        return Math.round(calc.calculate(BASE_FUEL_COST_PER_UNIT));
+    }
 }
 
 

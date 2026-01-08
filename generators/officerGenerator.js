@@ -168,7 +168,7 @@ function generateOfficer(planet = new Planet(), factionType = FACTION_TYPES_ALL[
         }
         
         // Add bounty for criminals
-        const bounty = rng(officer.level * 1000, officer.level * 100)
+        const bounty = rng(officer.level * CRIMINAL_MAX_BOUNTY_PER_LEVEL, 0)
         officer.bounty.setAmount(planet, bounty)
     }
     // Otherwise reputation stays at 0

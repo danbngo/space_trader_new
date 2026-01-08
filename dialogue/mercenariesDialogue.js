@@ -41,7 +41,7 @@ const DIALOGUE_MERCENARIES_SURRENDERING = [
 
 const DIALOGUE_MERCENARIES_VICTORIOUS = [
     `Just business. Nothing personal.`,
-    `Contract fulfilled. Nice working with you.`,
+    `Mission fulfilled. Nice working with you.`,
 ]
 
 const DIALOGUE_MERCENARIES_PLAYER_DID_SURRENDER = [
@@ -49,5 +49,5 @@ const DIALOGUE_MERCENARIES_PLAYER_DID_SURRENDER = [
 ]
 
 const DIALOGUE_MERCENARIES_PLAYER_BROKE = [
-    `No payment? That's breach of contract, friend.`,
+    `No payment? That's breach of mission, friend.`,
 ]

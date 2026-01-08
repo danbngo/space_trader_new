@@ -1,34 +1,34 @@
 /**
- * Displays the player's active contracts in a table format.
+ * Displays the player's active missions in a table format.
  */
-function showContractsMenu() {
-    const contracts = gs.contracts || []
+function showMissionsMenu() {
+    const missions = gs.missions || []
     
-    if (contracts.length === 0) {
-        showModal('Contracts', colorSpan('You have no active contracts.', COLORS.Gray), [
+    if (missions.length === 0) {
+        showModal('Missions', colorSpan('You have no active missions.', COLORS.Gray), [
             ['Close', () => closeModal()]
         ])
         return
     }
 
-    // Build contracts table
+    // Build missions table
     const tableRows = [
         ['Type', 'Description', 'Reward', 'Expires'],
-        ...contracts.map(contract => [
-            contract.contractType.name,
-            contract.description || 'No description',
-            colorSpan(`${contract.reward}CR`, COLORS.Yellow),
-            contract.expirationDate ? `${describeDate(contract.expirationDate)}${contract.isExpired ? colorSpan(' (EXPIRED)', COLORS.Red) : ''}` : 'No limit'
+        ...missions.map(mission => [
+            mission.missionType.name,
+            mission.description || 'No description',
+            colorSpan(`${mission.reward}CR`, COLORS.Yellow),
+            mission.expirationDate ? `${describeDate(mission.expirationDate)}${mission.isExpired ? colorSpan(' (EXPIRED)', COLORS.Red) : ''}` : 'No limit'
         ])
     ]
 
-    const contractsTable = createTable(tableRows, null, null)
+    const missionsTable = createTable(tableRows, null, null)
 
     showModal(
-        'Active Contracts',
+        'Active Missions',
         ce({children: [
-            `You have ${contracts.length} active contract${contracts.length !== 1 ? 's' : ''}.`,
-            contractsTable
+            `You have ${missions.length} active mission${missions.length !== 1 ? 's' : ''}.`,
+            missionsTable
         ]}),
         [
             ['Close', () => closeModal()]

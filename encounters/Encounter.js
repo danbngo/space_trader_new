@@ -67,6 +67,10 @@ class Encounter {
         gameRegistry.registerEncounter(this)
     }
 
+    get npcIsTargetingPlayer() {
+        return this.fleet.fleetAI.target == gs.fleet
+    }
+
     get ships() {
         return [...this.playerShips, ...this.enemyShips]
     }

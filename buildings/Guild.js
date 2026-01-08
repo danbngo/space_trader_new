@@ -9,50 +9,28 @@ class Guild extends Building {
      */
     constructor(planet = new Planet()) {
         super(planet, BUILDING_TYPES.GUILD)
-        /** @type {Contract[]} */
-        this.contracts = []; // Contract[]
+        /** @type {Mission[]} */
+        this.missions = []; // Mission[]
         this.normalize(true)
     }
-    calcHirePrice(officer) {
-        const basePrice = Math.round(officer.value * (1+this.planet.c.corruption) * this.planet.c.inflationRate / this.planet.c.army)
-        return Math.round(basePrice * (1 + this.planet.c.taxes))
-    }
-    get baseNumOfficers() {
+    get baseNumMissions() {
         const multiplier = this.planet?.objectType?.powerMultiplier ?? 1
-        return GUILD_AVERAGE_NUM_OFFICERS*this.planet.c.army*this.level*multiplier
-    }
-    get baseNumContracts() {
-        const multiplier = this.planet?.objectType?.powerMultiplier ?? 1
-        return Math.round(GUILD_AVERAGE_NUM_CONTRACTS*this.planet.c.economy*this.level*multiplier)
+        return Math.round(GUILD_AVERAGE_NUM_MISSIONS*this.planet.c.economy*this.level*multiplier)
     }
     normalize(clearExisting = false) {
         super.normalize()
         if (clearExisting) {
             this.officers = []
-            this.contracts = []
+            this.missions = []
         }
         
-        // Normalize officers
-        const officerDiffFromBase = this.officers.length - this.baseNumOfficers
-        if (officerDiffFromBase > 0) {
-            this.officers.splice(0, officerDiffFromBase)
-        } else if (officerDiffFromBase < 0) {
-            // Guilds stock non-criminal, non-religious officers
-            const validFactionTypes = PLAYER_FACTIONS.filter(f => !f.religious && !f.criminal)
-            
-            for (let i = 0; i < -officerDiffFromBase; i++) {
-                const factionType = rndMember(validFactionTypes)
-                this.officers.push(generateOfficer(this.planet, factionType))
-            }
-        }
-        
-        // Normalize contracts
-        const contractDiffFromBase = this.contracts.length - this.baseNumContracts
-        if (contractDiffFromBase > 0) {
-            this.contracts.splice(0, contractDiffFromBase)
-        } else if (contractDiffFromBase < 0) {
-            for (let i = 0; i < -contractDiffFromBase; i++) {
-                this.contracts.push(generateContract(this.planet))
+        // Normalize missions
+        const missionDiffFromBase = this.missions.length - this.baseNumMissions
+        if (missionDiffFromBase > 0) {
+            this.missions.splice(0, missionDiffFromBase)
+        } else if (missionDiffFromBase < 0) {
+            for (let i = 0; i < -missionDiffFromBase; i++) {
+                this.missions.push(generateMission(this.planet))
             }
         }
     }

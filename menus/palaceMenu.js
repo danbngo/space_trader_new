@@ -1,5 +1,5 @@
 /**
- * Displays the palace menu for viewing and accepting government contracts.
+ * Displays the palace menu for viewing and accepting government missions.
  * @param {Palace} palace - The palace building to interact with.
  */
 function showPalaceMenu(palace = new Palace()) {
@@ -20,7 +20,7 @@ function showPalaceMenu(palace = new Palace()) {
     } else if (hasInfamy && !isElite) {
         msg = colorSpan('The palace guards refuse you entry due to your criminal record on this planet.', COLORS.Red) + '<br/>'
     } else {
-        msg = 'Welcome to the palace. The government has contracts available for loyal citizens.<br/>'
+        msg = 'Welcome to the palace. The government has missions available for loyal citizens.<br/>'
         if (isElite && hasInfamy) {
             msg += colorSpan('Your Elite rank grants you access despite your reputation.<br/>', COLORS.Gold)
         }
@@ -32,10 +32,10 @@ function showPalaceMenu(palace = new Palace()) {
         ce({children:[
             msg,
             `<br/>`,
-            `[Contract system coming soon]`
+            `[Mission system coming soon]`
         ]}),
         [
-            ['Contracts', () => showContractsMenu(), !canEnter],
+            ['Missions', () => showMissionsMenu(), !canEnter],
             ['Back', () => showPlanetMenu(planet)]
         ],
         'palace_panel',

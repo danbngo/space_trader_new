@@ -15,7 +15,7 @@ class ObjectRegistry {
         this.anomalies = new Map()
         this.ruins = new Map()
         this.officers = new Map()
-        this.contracts = new Map()
+        this.missions = new Map()
         this.settlements = new Map()
         this.civilizations = new Map()
         this.news = new Map()
@@ -59,7 +59,7 @@ class ObjectRegistry {
     registerAnomaly(anomaly) { this.register('anomaly', anomaly) }
     registerRuin(ruins) { this.register('ruin', ruins) }
     registerOfficer(officer) { this.register('officer', officer) }
-    registerContract(contract) { this.register('contract', contract) }
+    registerMission(mission) { this.register('mission', mission) }
     registerSettlement(settlement) { this.register('settlement', settlement) }
     registerCivilization(civ) { this.register('civilization', civ) }
     registerNews(news) { this.register('news', news) }
