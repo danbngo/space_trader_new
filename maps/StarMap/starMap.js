@@ -395,26 +395,32 @@ class StarMap extends BaseMap {
         const {fleet, year} = gs
         const {route} = fleet
         
-        // Update info bar distance and ETA using stored references
-        if (route && this.infoBarDistanceEl && this.infoBarETAEl) {
+        // Update info bar distance, ETA, and fuel cost using stored references
+        if (route && this.infoBarDistanceEl && this.infoBarETAEl && this.infoBarFuelCostEl) {
             const distance = roundToPlaces(route.path.distance, 1)
             const endYear = route.endYear
             const yearsRemaining = describeTimespan(endYear - year, 1)
+            const fuelCost = roundToPlaces(distance * FUEL_COST_PER_1_AU, 1)
             
             this.infoBarDistanceEl.textContent = `${distance} AU`
             this.infoBarETAEl.textContent = yearsRemaining
+            this.infoBarFuelCostEl.textContent = `${fuelCost}`
         }
         
-        // Update object pane distance and ETA using stored references
+        // Update object pane distance, ETA, and fuel cost using stored references
         const obj = this.selectedObject
-        if (obj && obj !== gs.fleet && this.objPaneDistanceEl && this.objPaneETAEl) {
+        if (obj && obj !== gs.fleet && this.objPaneDistanceEl && this.objPaneETAEl && this.objPaneFuelCostEl) {
             if (obj.x !== undefined && obj.y !== undefined) {
                 const distance = calcDistance(gs.fleet.x, gs.fleet.y, obj.x, obj.y)
                 const travelTime = distance / gs.fleet.speed
                 const etaYears = travelTime
+                const fuelCost = roundToPlaces(distance * FUEL_COST_PER_1_AU, 1)
                 
                 // Update distance
                 this.objPaneDistanceEl.textContent = `${roundToPlaces(distance, 1)} AU`
+                
+                // Update fuel cost
+                this.objPaneFuelCostEl.textContent = `${fuelCost}`
                 
                 // Update ETA
                 if (obj instanceof Planet || obj.isWaypoint) {
@@ -474,7 +480,7 @@ class StarMap extends BaseMap {
         if (obj instanceof Fleet && obj !== gs.fleet && gs.fleet && gs.fleet.mapViewDistance) {
             const distanceToPlayer = calcDistance(obj.x, obj.y, gs.fleet.x, gs.fleet.y)
             if (distanceToPlayer > gs.fleet.mapViewDistance) {
-                displayName = '<span style="color: ' + colorArrToRgbaString(COLORS.Yellow) + '">Unknown Fleet</span>'
+                displayName = '<span style="color: ' + colorArrToRgbaString(COLORS.Yellow) + '">Unknown Object</span>'
             }
         }
         

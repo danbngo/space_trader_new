@@ -3,7 +3,6 @@ function checkForCollisionEncounter() {
     // Don't trigger while docked, in encounter, or during immunity/denial periods
     if (gs.location || gs.encounter) return false
     if (gs.year < gs.encounterImmunityUntilYear) return false
-    if (gs.year < gs.encounterDeniedUntilYear) return false
 
     // Check for fleet collisions first
     const fleetCollision = checkForFleetCollision(FLEET_COLLISION_DISTANCE)

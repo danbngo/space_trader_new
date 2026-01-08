@@ -62,7 +62,7 @@ class Route {
      */
     static estimateTravelTimeToOrbitingBody(
         startYear = 0,
-        fleet = new Fleet(),
+        fleet ,
         planet = new Planet(),
         samples = 100,
         maxYears = 10,

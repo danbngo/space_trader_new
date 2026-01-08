@@ -215,7 +215,7 @@ function rollEncounterEffectTypes() {
     return nearbyEffectTypes
 }
 
-function calcAsteroidProximityFactor(fleet = new Fleet(), asteroid = new Asteroid(), threshold = 0.01) {
+function calcAsteroidProximityFactor(fleet , asteroid = new Asteroid(), threshold = 0.01) {
         const distance = calcDistance(fleet.x, fleet.y, asteroid.x, asteroid.y)
         const asteroidRadius = 0.01*(asteroid.radius || 1) // Apply a modifier, asteroid "radii" are based on screen pixels
         // Calculate proximity factor using 1/(1+d/r) formula

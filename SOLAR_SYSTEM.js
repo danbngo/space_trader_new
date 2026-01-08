@@ -66,40 +66,66 @@ function cratersOverlap(crater1, crater2) {
     return distance < minDistance
 }
 
-// Add craters to Mars
-const marsNumberOfCraters = 10 + Math.floor(Math.random() * 11) // 10-20 craters
-const marsCraters = []
-for (let i = 0; i < marsNumberOfCraters; i++) {
-    let placed = false
-    let attempts = 0
-    const maxAttempts = 10
+// Function to generate craters for a celestial body
+function generateCraters(minCraters, maxCraters, minRadius, maxRadius) {
+    const numberOfCraters = minCraters + Math.floor(Math.random() * (maxCraters - minCraters + 1))
+    const craters = []
     
-    while (!placed && attempts < maxAttempts) {
-        const newCrater = {
-            x: (Math.random() - 0.5) * 1.6, // Random x position from -0.8 to 0.8 (ratio of planet radius)
-            y: (Math.random() - 0.5) * 1.6, // Random y position from -0.8 to 0.8
-            radius: 0.03 + Math.random() * 0.08 // Smaller: random radius from 0.03 to 0.11 (reduced from 0.05-0.20)
-        }
+    for (let i = 0; i < numberOfCraters; i++) {
+        let placed = false
+        let attempts = 0
+        const maxAttempts = 10
         
-        // Check if this crater overlaps with any existing crater
-        let overlaps = false
-        for (const existingCrater of marsCraters) {
-            if (cratersOverlap(newCrater, existingCrater)) {
-                overlaps = true
-                break
+        while (!placed && attempts < maxAttempts) {
+            const newCrater = {
+                x: (Math.random() - 0.5) * 1.6, // Random x position from -0.8 to 0.8 (ratio of planet radius)
+                y: (Math.random() - 0.5) * 1.6, // Random y position from -0.8 to 0.8
+                radius: minRadius + Math.random() * (maxRadius - minRadius)
             }
+            
+            // Check if this crater overlaps with any existing crater
+            let overlaps = false
+            for (const existingCrater of craters) {
+                if (cratersOverlap(newCrater, existingCrater)) {
+                    overlaps = true
+                    break
+                }
+            }
+            
+            if (!overlaps) {
+                craters.push(newCrater)
+                placed = true
+            }
+            
+            attempts++
         }
-        
-        if (!overlaps) {
-            marsCraters.push(newCrater)
-            placed = true
-        }
-        
-        attempts++
+        // If all 10 attempts failed, skip this crater and continue with the next one
     }
-    // If all 10 attempts failed, skip this crater and continue with the next one
+    
+    return craters
 }
-MARS.decorators.push(new PlanetDecorator({ craters: marsCraters }))
+
+// Add craters to cratered bodies
+// Mercury - heavily cratered, no atmosphere
+MERCURY.decorators.push(new PlanetDecorator({ craters: generateCraters(15, 25, 0.03, 0.12) }))
+
+// Mars - moderately cratered, thin atmosphere
+MARS.decorators.push(new PlanetDecorator({ craters: generateCraters(10, 20, 0.03, 0.11) }))
+
+// Ceres - heavily cratered dwarf planet
+CERES.decorators.push(new PlanetDecorator({ craters: generateCraters(12, 22, 0.04, 0.13) }))
+
+// Pluto - some large impact basins on icy surface
+PLUTO.decorators.push(new PlanetDecorator({ craters: generateCraters(5, 12, 0.04, 0.10) }))
+
+// Eris - icy surface with moderate cratering
+ERIS.decorators.push(new PlanetDecorator({ craters: generateCraters(8, 15, 0.03, 0.09) }))
+
+// Haumea - elongated with some cratering
+HAUMEA.decorators.push(new PlanetDecorator({ craters: generateCraters(6, 12, 0.03, 0.08) }))
+
+// Makemake - icy surface with moderate cratering
+MAKEMAKE.decorators.push(new PlanetDecorator({ craters: generateCraters(7, 14, 0.03, 0.09) }))
 
 
 const CORONA = new AsteroidBelt("Corona", ASTEROID_BELT_TYPES.Plasma, hexToRgba('#ffaa0022'), 0.1, new Orbit(0.2), [ENCOUNTER_TYPES.PLASMOIDS_CALM], [ENCOUNTER_TYPES.PLASMOIDS_STORM], [EFFECT_TYPES.ION_CLOUD, EFFECT_TYPES.PLASMA_TRAIL])

@@ -231,7 +231,6 @@ const SaveManager = {
                 timestamp: Date.now(),
                 year: gs.year,
                 encounterImmunityUntilYear: gs.encounterImmunityUntilYear,
-                encounterDeniedUntilYear: gs.encounterDeniedUntilYear,
                 nextTitheYear: gs.nextTitheYear,
                 
                 // System reference
@@ -633,7 +632,6 @@ const SaveManager = {
             // Restore basic properties
             gs.year = saveData.year || GAME_START_YEAR;
             gs.encounterImmunityUntilYear = saveData.encounterImmunityUntilYear || 0;
-            gs.encounterDeniedUntilYear = saveData.encounterDeniedUntilYear || 0;
             gs.nextTitheYear = saveData.nextTitheYear || 0;
             gs.contracts = [];
             

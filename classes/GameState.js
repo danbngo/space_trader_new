@@ -18,8 +18,6 @@ class GameState {
         /** @type {number} */
         this.encounterImmunityUntilYear = 0;
         /** @type {number} */
-        this.encounterDeniedUntilYear = 0;
-        /** @type {number} */
         this.nextTitheYear = 0;
         /** @type {Map<Planet, Settlement>} - Memorized settlements from player's last visit */
         this.memorizedSettlements = new Map();

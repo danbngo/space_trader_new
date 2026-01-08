@@ -412,37 +412,77 @@ class Encounter {
         const distMargin = maxSpawnDistance-minSpawnDistance
         const avgDist = distMargin/2 + minSpawnDistance
 
-        //players ships should be in a half circle around the enemy
+        // For Storm formation (asteroids), position player ships near center first
         if (formationType == FORMATION_TYPES.Storm) {
-            for (const ship of enemyShips) {
-                const dist = rng(0, this.mapRadius)
+            // Position player ships closer to center (0,0) for storm encounters
+            const stormPlayerMaxDist = this.mapRadius * 0.15 // 15% of map radius from center
+            playerShips.forEach((ship, i) => {
+                const distFromCenter = rng(stormPlayerMaxDist, 0)
                 const angle = rng(Math.PI * 2, 0, false)
-                let [x, y] = rotatePoint(dist, 0, 0, 0, angle)
-                Object.assign(ship, {x, y, angle: rng(Math.PI * 2, 0, false)})
-            }
+                const [x, y] = rotatePoint(distFromCenter, 0, 0, 0, angle)
+                const angleDiff = rng(Math.PI / 8)
+                Object.assign(ship, { x, y, angle: playerFacingAngle + angleDiff })
+            })
             
-            // Remove asteroids that are too close to player ships
-            const buffer = 2
-            const asteroidsToRemove = []
+            // Now place asteroids, avoiding player ship positions
+            const buffer = 2.5
             for (const asteroid of enemyShips) {
-                for (const playerShip of playerShips) {
-                    const distance = calcDistance(asteroid.x, asteroid.y, playerShip.x, playerShip.y)
-                    const minDistance = asteroid.radius + playerShip.radius + buffer
-                    if (distance < minDistance) {
-                        asteroidsToRemove.push(asteroid)
-                        break
+                let validPosition = false
+                let attempts = 0
+                let x, y, angle
+                
+                // Try up to 20 times to find a non-overlapping position
+                while (!validPosition && attempts < 20) {
+                    const dist = rng(this.mapRadius * 0.3, this.mapRadius) // Start asteroids at least 30% away from center
+                    angle = rng(Math.PI * 2, 0, false)
+                    ;[x, y] = rotatePoint(dist, 0, 0, 0, angle)
+                    
+                    // Check if this position overlaps with any player ship
+                    validPosition = true
+                    for (const playerShip of playerShips) {
+                        const distance = calcDistance(x, y, playerShip.x, playerShip.y)
+                        const minDistance = asteroid.radius + playerShip.radius + buffer
+                        if (distance < minDistance) {
+                            validPosition = false
+                            break
+                        }
                     }
+                    
+                    // Also check against other already-placed asteroids
+                    if (validPosition) {
+                        for (const otherAsteroid of enemyShips) {
+                            if (otherAsteroid === asteroid) break // Only check already-placed ones
+                            if (otherAsteroid.x === undefined) break
+                            const distance = calcDistance(x, y, otherAsteroid.x, otherAsteroid.y)
+                            const minDistance = asteroid.radius + otherAsteroid.radius + 1
+                            if (distance < minDistance) {
+                                validPosition = false
+                                break
+                            }
+                        }
+                    }
+                    
+                    attempts++
+                }
+                
+                // If we found a valid position, assign it; otherwise skip this asteroid
+                if (validPosition) {
+                    Object.assign(asteroid, { x, y, angle: rng(Math.PI * 2, 0, false) })
+                } else {
+                    console.log(`Warning: Could not find valid position for asteroid after ${attempts} attempts, removing it`)
+                    asteroid.x = undefined // Mark for removal
                 }
             }
             
-            // Remove the asteroids from the fleet
+            // Remove asteroids that couldn't be placed
+            const asteroidsToRemove = enemyShips.filter(a => a.x === undefined)
             for (const asteroid of asteroidsToRemove) {
                 safeRemove(enemyShips, asteroid)
                 safeRemove(enemyFleet.ships, asteroid)
             }
             
             if (asteroidsToRemove.length > 0) {
-                console.log(`Removed ${asteroidsToRemove.length} asteroids that were too close to player ships`)
+                console.log(`Removed ${asteroidsToRemove.length} asteroids that could not be placed without overlapping`)
             }
         }
         else if (formationType == FORMATION_TYPES.PlayerEncircled) {
