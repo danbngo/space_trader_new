@@ -1,0 +1,127 @@
+class MerchantsEncounter extends Encounter {
+    
+    showTradeOfferModal(allowSell = true, buyCargoTypes = null, sellCargoTypes = null) {
+        if (allowSell && Math.random() > .5) this.showTradeOfferPlayerSellModal(sellCargoTypes) 
+        else this.showTradeOfferPlayerBuyModal(buyCargoTypes)
+    }
+
+    showTradeOfferPlayerSellModal(cargoTypesOfInterest = null) {
+        let msg = ''
+        const fleetName = coloredName(this.fleet)
+        
+        // Filter player cargo by types of interest if specified
+        let availableCargo = gs.fleet.cargo.keys;
+        if (cargoTypesOfInterest && cargoTypesOfInterest.length > 0) {
+            availableCargo = availableCargo.filter(ct => cargoTypesOfInterest.includes(ct));
+        }
+        
+        const ct = availableCargo.length > 0 ? availableCargo[Math.floor(Math.random() * availableCargo.length)] : null;
+        let onSell = null;
+
+        msg += `The ${fleetName} examine your cargo.<br/>`
+
+        if (!ct || gs.fleet.cargo.getAmount(ct) <= 0) {
+            msg += `They don't seem interested in what you have.<br/>`
+        }
+        else {
+            // Calculate price based on barter skill
+            const barterMultiplier = gs.fleet.calcBarterPriceMultiplier(this.fleet, false);
+            const pricePerUnit = Math.ceil(ct.value * barterMultiplier)
+            
+            // Check how much they can afford
+            const maxAffordableAmount = Math.floor(this.fleet.captain.credits / pricePerUnit);
+            const maxSellAmount = Math.min(gs.fleet.cargo.getAmount(ct), maxAffordableAmount);
+            
+            if (maxSellAmount <= 0) {
+                msg += `They don't have enough credits to buy from you.<br/>`
+            }
+            else {
+                const sellAmount = rng(maxSellAmount, 1)
+                const totalPrice = pricePerUnit * sellAmount
+                const officersShare = gs.fleet.calcTotalCRShare(totalPrice, true)
+                const finalSale = totalPrice - officersShare
+                
+                onSell = () => {
+                    gs.fleet.cargo.increment(ct, -sellAmount)
+                    gs.credits += finalSale
+                    this.fleet.captain.credits -= totalPrice
+                    showModal(fleetName, 
+                        `You sold ${sellAmount} units of ${ct.symbol} ${coloredName(ct)} for ${totalPrice}CR${officersShare ? ` (-${officersShare}CR for officers)` : ''}.<br/>
+                        Transaction complete.<br/>`, [['Continue', ()=>this.endEncounter()]])
+                }
+
+                msg += `They offer to buy ${sellAmount} ${ct.symbol} ${coloredName(ct)} for ${pricePerUnit}CR each (total: ${totalPrice}CR).<br/>`
+                msg += `Price vs. Market: ${roundToPlaces(100*pricePerUnit/ct.value,2)}%<br/>`
+                msg += `Your amount after sale: ${gs.fleet.cargo.getAmount(ct) - sellAmount}<br/>`
+                msg += `Sale Price: ${finalSale}CR ${officersShare ? `(-${officersShare}CR for officers)` : ''}<br/>`
+                msg += `Your CR after sale: ${gs.credits + finalSale}CR.<br/>`
+            }
+        }
+
+        showModal(fleetName, msg, onSell ? [
+            ['Accept', ()=>onSell()],
+            ['Decline', ()=>this.endEncounter()]
+        ] :
+        [['Continue', ()=>this.endEncounter()]])
+    }
+
+    showTradeOfferPlayerBuyModal(cargoTypesOfInterest = null) {
+        let msg = ''
+        const fleetName = coloredName(this.fleet)
+        
+        // Filter fleet cargo by types of interest if specified
+        let availableCargo = this.fleet.cargo.keys;
+        if (cargoTypesOfInterest && cargoTypesOfInterest.length > 0) {
+            availableCargo = availableCargo.filter(ct => cargoTypesOfInterest.includes(ct));
+        }
+        
+        const ct = availableCargo.length > 0 ? availableCargo[Math.floor(Math.random() * availableCargo.length)] : null;
+        const availableCargoSpace = gs.fleet.availableCargoSpace
+        let onBuy = null;
+
+        msg += `The ${fleetName} show their cargo.<br/>`
+        if (!ct || this.fleet.cargo.getAmount(ct) <= 0) {
+            msg += `They have nothing you're interested in.<br/>`
+        }
+        else if (availableCargoSpace <= 0) {
+            msg += `Your cargo bays are full.<br/>`
+        }
+        else {
+            const maxBuyAmount = Math.min(this.fleet.cargo.getAmount(ct), availableCargoSpace)
+            const buyAmount = rng(maxBuyAmount, 1)
+            
+            // Calculate price based on barter skill
+            const barterMultiplier = gs.fleet.calcBarterPriceMultiplier(this.fleet, true);
+            const pricePerUnit = Math.ceil(ct.value * barterMultiplier)
+            const totalPrice = pricePerUnit * buyAmount
+            
+            msg += `They offer to sell you ${buyAmount} ${ct.symbol} ${coloredName(ct)} for ${pricePerUnit}CR each (total: ${totalPrice}CR).<br/>`
+
+            if (gs.credits < totalPrice) {
+                const brokeDialogue = this.getPlayerBrokeDialogue()
+                msg += brokeDialogue ? `"${brokeDialogue}"<br/>` : ''
+                msg += `You don't have enough credits for their offer.<br/>`
+            }
+            else {
+                msg += `Price vs. Market: ${roundToPlaces(100*pricePerUnit/ct.value,2)}%<br/>`
+                msg += `Your amount after purchase: ${gs.fleet.cargo.getAmount(ct) + buyAmount}<br/>`
+                msg += `Your CR after purchase: ${gs.credits - totalPrice}CR.<br/>`
+
+                onBuy = () => {
+                    this.fleet.cargo.increment(ct, -buyAmount)
+                    gs.fleet.cargo.increment(ct, buyAmount)
+                    gs.credits -= totalPrice
+                    this.fleet.captain.credits += totalPrice
+                    showModal(fleetName, 
+                        `You bought ${buyAmount} units of ${ct.symbol} ${coloredName(ct)} for ${totalPrice}CR.<br/>
+                        Transaction complete.<br/>`, [['Continue', ()=>this.endEncounter()]])
+                }
+            }
+        }
+        showModal(fleetName, msg, onBuy ? [
+            ['Accept', ()=>onBuy()],
+            ['Decline', ()=>this.endEncounter()] 
+        ] :
+        [['Continue', ()=>this.endEncounter()]])
+    }
+}

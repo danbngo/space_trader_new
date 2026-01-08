@@ -7,13 +7,8 @@ function checkForEvents(elapsedYears = 1) {
     const elapsedDays = elapsedYears*365
     if (gs.checkGameOver()) return
     checkForNews()
-    checkForAnomalies(elapsedDays)
-    checkForFleetSpawning(elapsedDays)
-    checkForAbandonedFleetDecay(elapsedDays)
-    tickNPCFleets(elapsedYears)
     tickPlanets(elapsedYears)
     if (checkForEncounter(elapsedDays)) return
-    if (checkDebtCollections(elapsedDays)) return
     if (isNaN(gs.credits)) {
         throw new Error('GameState credits is NaN!')
     }
@@ -47,4 +42,9 @@ function tickPlanets(elapsedYears = 1) {
             }
         }
     }
+}
+
+
+function checkPlayerStranded() {
+    
 }

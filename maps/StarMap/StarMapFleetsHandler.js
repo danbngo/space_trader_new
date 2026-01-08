@@ -472,18 +472,4 @@ class StarMapFleetsHandler {
         requestAnimationFrame(() => this.animateWaypoint())
     }
 
-    /**
-     * Update AI references to the starMap after deserialization
-     * (May be needed if fleet AIs reference starMap methods)
-     */
-    updateFleetAIReferences() {
-        const {starSystem} = this.starMap
-        const {fleets} = starSystem
-        
-        fleets.forEach(fleet => {
-            if (fleet.fleetAI) {
-                fleet.fleetAI.starMap = this.starMap
-            }
-        })
-    }
 }
