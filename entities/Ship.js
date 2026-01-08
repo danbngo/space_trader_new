@@ -17,7 +17,7 @@ class Ship {
      * @param {number} radars - The radar capability of the ship.
      * @param {number} maxActionsPerTurn - The maximum number of actions the ship can take per turn.
      */
-    constructor(name = "Unnamed", shipType = SHIP_TYPES[0], color = COLORS.White, hull = [0, 0], shields = [0, 0], fuelCapacity = 0, lasers = 0, engine = 0, cargoSpace = 0, radars = 0, maxActionsPerTurn = SHIP_NUM_MOVES_PER_TURN) {
+    constructor(name = "Unnamed", shipType = SHIP_TYPES[0], color = COLORS.White, hull = [0, 0], shields = [0, 0], lasers = 0, engine = 0, cargoSpace = 0, radars = 0, fuelCapacity = 0, maxActionsPerTurn = SHIP_NUM_MOVES_PER_TURN) {
         /** @type {string} */
         this.name = name;
         /** @type {ShipType} */

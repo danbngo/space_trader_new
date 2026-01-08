@@ -3,7 +3,7 @@ class NaniteBeamActionHandler extends ActionHandler {
         super(encounterMap)
     }
 
-    startTargeting(attacker = new Ship()) {
+    startTargeting(attacker ) {
         console.log('NaniteBeamActionHandler.startTargeting', { attacker });
         if (!this.calcCanBeControlled(attacker)) return
 
@@ -27,7 +27,7 @@ class NaniteBeamActionHandler extends ActionHandler {
         this.encounterMap.startTargeting('Nanites', [targetingCvsTriangle, targetingCvsCircle], validTargets)
     }
 
-    target(target = new Ship()) {
+    target(target ) {
         console.log('NaniteBeamActionHandler.target', { target });
         if (!this.encounterMap.validTargets.includes(target)) return
         
@@ -36,7 +36,7 @@ class NaniteBeamActionHandler extends ActionHandler {
         this.encounterMap.refreshCanvas()
     }
 
-    attempt(attacker = new Ship(), target = new Ship()) {
+    attempt(attacker, target ) {
         console.log('NaniteBeamActionHandler.attempt', { attacker, target });
         if (!this.encounterMap.validTargets.includes(target)) return
         const action = new NaniteBeamAction(this.encounter, attacker, target)

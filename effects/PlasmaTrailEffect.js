@@ -21,7 +21,7 @@ class PlasmaTrailEffect extends Effect {
      * @param {Ship} ship - The ship entering the plasma trail.
      * @returns {ShipAction[]} Array of actions resulting from the hit.
      */
-    hitShip(encounter, ship = new Ship()) {
+    hitShip(encounter, ship ) {
         // Deal damage and apply overheated status when entering plasma trail
         console.log('Ship entered plasma trail:', ship.name)
         if (ASTEROID_SHIP_TYPES_ALL.includes(ship.shipType)) return []

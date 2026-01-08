@@ -65,7 +65,7 @@ class Shipyard extends Building {
      * @param {Ship} ship - The ship to calculate for.
      * @returns {Calculation} The calculation showing all price factors.
      */
-    getBuyPriceCalculation(ship = new Ship()) {
+    getBuyPriceCalculation(ship ) {
         const calc = new Calculation();
         
         calc.addFactor('merchant markup', 1 + this.planet.c.corruption / 4);
@@ -77,7 +77,7 @@ class Shipyard extends Building {
         return calc;
     }
 
-    calcBuyPrice(ship = new Ship()) {
+    calcBuyPrice(ship ) {
         const calc = this.getBuyPriceCalculation(ship);
         return Math.round(calc.calculate(ship.value));
     }
@@ -86,7 +86,7 @@ class Shipyard extends Building {
      * @param {Ship} ship - The ship to calculate for.
      * @returns {Calculation} The calculation showing all price factors.
      */
-    getSellPriceCalculation(ship = new Ship()) {
+    getSellPriceCalculation(ship ) {
         const calc = new Calculation();
         
         calc.addFactor('merchant discount', 1 / (1 + this.planet.c.corruption / 4));
@@ -98,7 +98,7 @@ class Shipyard extends Building {
         return calc;
     }
 
-    calcSellPrice(ship = new Ship()) {
+    calcSellPrice(ship ) {
         const calc = this.getSellPriceCalculation(ship);
         return Math.round(calc.calculate(ship.value));
     }
@@ -131,7 +131,7 @@ class Shipyard extends Building {
      * @param {number} amount - Amount of hull to repair.
      * @returns {Calculation} The calculation showing all price factors.
      */
-    getRepairCostCalculation(ship = new Ship(), amount = 1) {
+    getRepairCostCalculation(ship, amount = 1) {
         const calc = new Calculation();
         
         calc.addFactor('hull points', amount);
@@ -148,7 +148,7 @@ class Shipyard extends Building {
      * @param {number} amount - Amount of hull to repair.
      * @returns {number} The repair cost in credits.
      */
-    calculateRepairCost(ship = new Ship(), amount = 1) {
+    calculateRepairCost(ship, amount = 1) {
         const calc = this.getRepairCostCalculation(ship, amount);
         return Math.round(calc.calculate(REPAIR_COST_PER_1_HULL));
     }

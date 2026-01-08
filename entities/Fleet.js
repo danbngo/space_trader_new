@@ -292,7 +292,7 @@ class Fleet extends SpaceObject {
      * Adds a ship to the fleet.
      * @param {Ship} ship - The ship to add.
      */
-    addShip(ship = new Ship()) {
+    addShip(ship ) {
         if (!this.flagship) this.flagship = ship
         this.ships.push(ship)
         ship.fleet = this

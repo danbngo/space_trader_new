@@ -3,7 +3,7 @@ class BlinkActionHandler extends ActionHandler {
         super(encounterMap)
     }
 
-    startTargeting(ship = new Ship()) {
+    startTargeting(ship ) {
         console.log('BlinkActionHandler.startTargeting', { ship });
         if (!this.calcCanBeControlled(ship)) return
 
@@ -26,7 +26,7 @@ class BlinkActionHandler extends ActionHandler {
         // No dynamic targeting needed - blink is random within radius
     }
 
-    attempt(ship = new Ship()) {
+    attempt(ship ) {
         console.log('BlinkActionHandler.attempt', { ship });
         const action = new BlinkAction(this.encounter, ship)
         this.encounterMap.cvs.objClickEnabled = true

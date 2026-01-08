@@ -702,23 +702,7 @@ class StarMap extends BaseMap {
         if (route && gs.fleet) {
             const fuelRequired = route.path.distance * FUEL_COST_PER_1_AU
             if (gs.fleet.fuel < fuelRequired) {
-                const targetName = obj.name || 'waypoint'
-                showModal(
-                    '⚠️ Insufficient Fuel',
-                    ce({
-                        children: [
-                            ce({ innerHTML: `Your route to ${targetName} requires ${roundToPlaces(fuelRequired, 1)} fuel, but you only have ${roundToPlaces(gs.fleet.fuel, 1)}.` }),
-                            ce({ innerHTML: 'You need to refuel at a shipyard before making this journey.' })
-                        ]
-                    }),
-                    [
-                        ['Cancel Travel', () => closeModal(), false, 'highlighted'],
-                        ['Travel Anyway', () => {
-                            closeModal()
-                            this._proceedWithRoute(route, obj, unpause, bypassSunWarning)
-                        }]
-                    ]
-                )
+                showInsufficientFuelModal(route, obj, () => this._proceedWithRoute(route, obj, unpause, bypassSunWarning))
                 this._creatingRoute = false
                 return
             }
@@ -743,25 +727,7 @@ class StarMap extends BaseMap {
             // Warn if remaining fuel wouldn't be enough to reach nearest station
             const fuelToNearestStation = nearestStationDistance * FUEL_COST_PER_1_AU
             if (validStations.length > 0 && fuelAfterArrival < fuelToNearestStation) {
-                const targetName = obj.name || 'waypoint'
-                showModal(
-                    '⚠️ Fuel Warning',
-                    ce({
-                        children: [
-                            ce({ innerHTML: `After reaching ${targetName}, you will have ${roundToPlaces(fuelAfterArrival, 1)} fuel remaining.` }),
-                            ce({ innerHTML: `The nearest known refueling station is ${roundToPlaces(nearestStationDistance, 1)} AU away (${roundToPlaces(fuelToNearestStation, 1)} fuel required).` }),
-                            ce({ innerHTML: 'You may become stranded. Do you want to proceed?' })
-                        ]
-                    }),
-                    [
-                        ['Cancel Travel', () => closeModal(), false, 'highlighted'],
-                        ['Travel Anyway', () => {
-                            closeModal()
-                            // Continue with the rest of the setDestination logic
-                            this._proceedWithRoute(route, obj, unpause, bypassSunWarning)
-                        }]
-                    ]
-                )
+                showFuelWarningModal(route, obj, fuelAfterArrival, nearestStationDistance, () => this._proceedWithRoute(route, obj, unpause, bypassSunWarning))
                 this._creatingRoute = false
                 return
             }
@@ -775,24 +741,7 @@ class StarMap extends BaseMap {
         // Check if route intersects the sun
         if (route && FleetAI.checkRouteIntersectsSun(route)) {
             if (!bypassSunWarning) {
-                // Warn player and require confirmation
-                const targetName = obj.name || 'waypoint'
-                showModal(
-                    '⚠️ Dangerous Route',
-                    ce({
-                        children: [
-                            ce({ innerHTML: `Your route to ${targetName} passes dangerously close to the sun's core.` }),
-                            ce({ innerHTML: 'This path is extremely hazardous. Do you want to proceed anyway?' })
-                        ]
-                    }),
-                    [
-                        ['Cancel', () => closeModal()],
-                        ['Proceed', () => {
-                            closeModal()
-                            this.setDestination(obj, unpause, true)
-                        }]
-                    ]
-                )
+                showSunWarningModal(obj, () => this.setDestination(obj, unpause, true))
                 this._creatingRoute = false
                 return
             }

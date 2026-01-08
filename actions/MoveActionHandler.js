@@ -3,7 +3,7 @@ class MoveActionHandler extends ActionHandler {
         super(encounterMap)
     }
 
-    startTargeting(mover = new Ship()) {
+    startTargeting(mover ) {
         console.log('MoveActionHandler.startTargeting', { mover });
         if (!this.calcCanBeControlled(mover)) return
         
@@ -37,7 +37,7 @@ class MoveActionHandler extends ActionHandler {
         this.encounterMap.startTargeting('Move', [targetingCvsObject, targetingCvsCircle], validRamTargets)
     }
 
-    target(x = 0, y = 0, ellipse = new Ellipse(), mover = new Ship()) {
+    target(x = 0, y = 0, ellipse = new Ellipse(), mover ) {
         console.log('MoveActionHandler.target', { x, y });
         
         // If outside ellipse, clamp to the edge
@@ -69,14 +69,14 @@ class MoveActionHandler extends ActionHandler {
         this.encounterMap.refreshCanvas()
     }
     
-    targetRam(target = new Ship()) {
+    targetRam(target ) {
         console.log('MoveActionHandler.targetRam', { target });
         const targetingCvsCircle = this.cvs.getObject('targetingcircle')
         Object.assign(targetingCvsCircle, {visible: true, x: target.x, y: target.y, radius: target.radius})
         this.encounterMap.refreshCanvas()
     }
     
-    attemptRam(attacker = new Ship(), target = new Ship()) {
+    attemptRam(attacker, target ) {
         console.log('MoveActionHandler.attemptRam', { attacker, target });
         const action = new RamAction(this.encounter, attacker, target)
         this.executeRam(action)
@@ -102,7 +102,7 @@ class MoveActionHandler extends ActionHandler {
         this.startAnimating(action, animation)
     }
 
-    attempt(x = 0, y = 0, ellipse = new Ellipse(), mover = new Ship()) {
+    attempt(x = 0, y = 0, ellipse = new Ellipse(), mover ) {
         console.log('MoveActionHandler.attempt', { x, y, mover });
         
         // If outside ellipse, clamp to the edge

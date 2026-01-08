@@ -112,7 +112,7 @@ class ShipAction {
         return result
     }
 
-    static getDamageAction(encounter, target = new Ship(), hullDamage = 0, shieldDamage = 0, disabled = false, escaped = false) {
+    static getDamageAction(encounter, target, hullDamage = 0, shieldDamage = 0, disabled = false, escaped = false) {
         const pseudoShipAction = new ShipAction(encounter, null, null, target)
         pseudoShipAction.targetShieldDamage = shieldDamage
         pseudoShipAction.targetHullDamage = hullDamage

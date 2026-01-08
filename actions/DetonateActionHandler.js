@@ -3,7 +3,7 @@ class DetonateActionHandler extends ActionHandler {
         super(encounterMap)
     }
 
-    startTargeting(attacker = new Ship()) {
+    startTargeting(attacker ) {
         console.log('DetonateActionHandler.startTargeting', { attacker });
         if (!this.calcCanBeControlled(attacker)) return
 
@@ -16,7 +16,7 @@ class DetonateActionHandler extends ActionHandler {
         this.encounterMap.startTargeting('Self-Destruct', [targetingCvsCircle], [explosionCircle])
     }
 
-    attempt(attacker = new Ship()) {
+    attempt(attacker ) {
         console.log('DetonateActionHandler.attempt', { attacker });
         const action = new DetonateAction(this.encounter, attacker)
         this.execute(action)

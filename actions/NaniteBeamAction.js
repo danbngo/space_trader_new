@@ -1,5 +1,5 @@
 class NaniteBeamAction extends ShipAction {
-    constructor(encounter, actor = new Ship(), target = new Ship()) {
+    constructor(encounter, actor, target ) {
         super(encounter, actor, MOVE_TYPES.NaniteBeam, target)
         this.actorInfoMessage = 'Nanite Beam!'
         this.healAmount = 0

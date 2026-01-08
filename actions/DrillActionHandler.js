@@ -3,7 +3,7 @@ class DrillActionHandler extends ActionHandler {
         super(encounterMap)
     }
 
-    startTargeting(attacker = new Ship()) {
+    startTargeting(attacker ) {
         console.log('DrillActionHandler.startTargeting', { attacker });
         if (!this.calcCanBeControlled(attacker)) return
         
@@ -23,7 +23,7 @@ class DrillActionHandler extends ActionHandler {
         this.encounterMap.startTargeting('Drill', [targetingCvsObject, targetingCvsCircle], validTargets)
     }
 
-    target(target = new Ship()) {
+    target(target ) {
         console.log('DrillActionHandler.target', { target });
         if (!this.encounterMap.validTargets.includes(target)) return
         
@@ -32,7 +32,7 @@ class DrillActionHandler extends ActionHandler {
         this.encounterMap.refreshCanvas()
     }
 
-    attempt(attacker = new Ship(), target = new Ship()) {
+    attempt(attacker, target ) {
         console.log('DrillActionHandler.attempt', { attacker, target });
         if (!this.encounterMap.validTargets.includes(target)) {
             return

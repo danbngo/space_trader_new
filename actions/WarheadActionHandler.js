@@ -3,7 +3,7 @@ class WarheadActionHandler extends ActionHandler {
         super(encounterMap)
     }
 
-    startTargeting(attacker = new Ship()) {
+    startTargeting(attacker ) {
         console.log('WarheadActionHandler.startTargeting', { attacker });
         if (!this.calcCanBeControlled(attacker)) return
 
@@ -35,7 +35,7 @@ class WarheadActionHandler extends ActionHandler {
         this.encounterMap.refreshCanvas()
     }
 
-    attempt(attacker = new Ship(), targetArea = new Circle(), x = 0, y = 0) {
+    attempt(attacker, targetArea = new Circle(), x = 0, y = 0) {
         console.log('WarheadActionHandler.attempt', { attacker, x, y });
         if (!targetArea.containsPoint(x, y)) {
             return

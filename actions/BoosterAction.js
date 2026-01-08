@@ -1,5 +1,5 @@
 class BoosterAction extends ShipAction {
-    constructor(encounter, actor = new Ship()) {
+    constructor(encounter, actor ) {
         super(encounter, actor, MOVE_TYPES.Booster)
         
         // Scale boost distance with module quality (1.0 = baseline 4x move distance)

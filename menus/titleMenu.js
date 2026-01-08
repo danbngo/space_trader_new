@@ -289,7 +289,7 @@ async function startNewGame() {
         captain.geneticModifications = GENETIC_MODIFICATION_TYPES_ALL.map(modificationType => new GeneticModification(modificationType, 1.0))
     }
     
-    const playerShip = new Ship("Starting Ship", SHIP_TYPES.FRIGATE, COLORS.LightGray, [30,30], [20,20], 10, 10, 10, 10)
+    const playerShip = new Ship("Starting Ship", SHIP_TYPES.FRIGATE, COLORS.LightGray, [30,30], [20,20], 10, 10, 10, 10, 10)
     
     // Give player all modules for testing (only in debug mode)
     if (DEBUG_MODE) {

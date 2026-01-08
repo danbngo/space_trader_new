@@ -1,5 +1,5 @@
 class RechargeAction extends ShipAction {
-    constructor(encounter, actor = new Ship()) {
+    constructor(encounter, actor ) {
         super(encounter, actor, MOVE_TYPES.Recharge)
         //this.actorInfoMessage = 'Recharging!' //clutter-y
     }

@@ -3,7 +3,7 @@ class EMPPulseActionHandler extends ActionHandler {
         super(encounterMap)
     }
 
-    startTargeting(ship = new Ship()) {
+    startTargeting(ship ) {
         console.log('EMPPulseActionHandler.startTargeting', { ship });
         if (!this.calcCanBeControlled(ship)) return
 
@@ -35,7 +35,7 @@ class EMPPulseActionHandler extends ActionHandler {
         // Pulse is always centered on ship, no dynamic targeting
     }
 
-    attempt(ship = new Ship()) {
+    attempt(ship ) {
         console.log('EMPPulseActionHandler.attempt', { ship });
         this.encounterMap.cvs.objClickEnabled = true
         const action = new EMPPulseAction(this.encounter, ship)

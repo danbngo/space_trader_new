@@ -3,7 +3,7 @@ class WaitActionHandler extends ActionHandler {
         super(encounterMap)
     }
 
-    startTargeting(ship = new Ship()) {
+    startTargeting(ship ) {
         // Wait doesn't need targeting, so this can be skipped
         // Just call attempt directly
         this.attempt(ship)
@@ -13,7 +13,7 @@ class WaitActionHandler extends ActionHandler {
         // No targeting needed for wait
     }
 
-    attempt(ship = new Ship()) {
+    attempt(ship ) {
         console.log('WaitActionHandler.attempt', { ship });
         this.execute(new WaitAction(this.encounter, ship))
     }

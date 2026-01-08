@@ -1,3 +1,85 @@
+/**
+ * Shows modal warning player they don't have enough fuel for the route
+ * @param {Route} route - The route being attempted
+ * @param {*} obj - The destination object
+ * @param {Function} onProceed - Callback to proceed with route anyway
+ */
+function showInsufficientFuelModal(route, obj, onProceed) {
+    const fuelRequired = route.path.distance * FUEL_COST_PER_1_AU
+    const targetName = obj.name || 'waypoint'
+    showModal(
+        '⚠️ Insufficient Fuel',
+        ce({
+            children: [
+                ce({ innerHTML: `Your route to ${targetName} requires ${roundToPlaces(fuelRequired, 1)} fuel, but you only have ${roundToPlaces(gs.fleet.fuel, 1)}.` }),
+                ce({ innerHTML: 'You need to refuel at a shipyard before making this journey.' })
+            ]
+        }),
+        [
+            ['Cancel Travel', () => closeModal(), false, 'highlighted'],
+            ['Travel Anyway', () => {
+                closeModal()
+                onProceed()
+            }]
+        ]
+    )
+}
+
+/**
+ * Shows modal warning player they may become stranded at destination
+ * @param {Route} route - The route being attempted
+ * @param {*} obj - The destination object
+ * @param {number} fuelAfterArrival - Fuel remaining after arrival
+ * @param {number} nearestStationDistance - Distance to nearest refueling station
+ * @param {Function} onProceed - Callback to proceed with route anyway
+ */
+function showFuelWarningModal(route, obj, fuelAfterArrival, nearestStationDistance, onProceed) {
+    const targetName = obj.name || 'waypoint'
+    const fuelToNearestStation = nearestStationDistance * FUEL_COST_PER_1_AU
+    showModal(
+        '⚠️ Fuel Warning',
+        ce({
+            children: [
+                ce({ innerHTML: `After reaching ${targetName}, you will have ${roundToPlaces(fuelAfterArrival, 1)} fuel remaining.` }),
+                ce({ innerHTML: `The nearest known refueling station is ${roundToPlaces(nearestStationDistance, 1)} AU away (${roundToPlaces(fuelToNearestStation, 1)} fuel required).` }),
+                ce({ innerHTML: 'You may become stranded. Do you want to proceed?' })
+            ]
+        }),
+        [
+            ['Cancel Travel', () => closeModal(), false, 'highlighted'],
+            ['Travel Anyway', () => {
+                closeModal()
+                onProceed()
+            }]
+        ]
+    )
+}
+
+/**
+ * Shows modal warning player their route passes too close to the sun
+ * @param {*} obj - The destination object
+ * @param {Function} onProceed - Callback to proceed with route anyway
+ */
+function showSunWarningModal(obj, onProceed) {
+    const targetName = obj.name || 'waypoint'
+    showModal(
+        '⚠️ Dangerous Route',
+        ce({
+            children: [
+                ce({ innerHTML: `Your route to ${targetName} passes dangerously close to the sun's core.` }),
+                ce({ innerHTML: 'This path is extremely hazardous. Do you want to proceed anyway?' })
+            ]
+        }),
+        [
+            ['Cancel', () => closeModal()],
+            ['Proceed', () => {
+                closeModal()
+                onProceed()
+            }]
+        ]
+    )
+}
+
 function  checkPlayerStranded() {
     if (!gs.fleet.stranded) return
     console.log('checkPlayerStranded');

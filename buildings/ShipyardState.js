@@ -9,7 +9,7 @@ class ShipyardState {
      * @param {Ship[]} shipyardShips - The shipyard's ships at transaction start.
      * @param {number} shipyardCredits - The shipyard's credits at transaction start.
      */
-    constructor(playerShips = [new Ship()], playerCredits = 0, shipyardShips = [new Ship()], shipyardCredits = 0) {
+    constructor(playerShips = [], playerCredits = 0, shipyardShips = [], shipyardCredits = 0) {
         /** @type {Ship[]} */
         this.playerShips = playerShips;
         /** @type {number} */

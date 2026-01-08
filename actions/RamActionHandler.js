@@ -3,7 +3,7 @@ class RamActionHandler extends ActionHandler {
         super(encounterMap)
     }
 
-    startTargeting(attacker = new Ship()) {
+    startTargeting(attacker ) {
         console.log('RamActionHandler.startTargeting', { attacker });
         if (!this.calcCanBeControlled(attacker)) return
         
@@ -23,7 +23,7 @@ class RamActionHandler extends ActionHandler {
         this.encounterMap.startTargeting('Ram', [targetingCvsObject, targetingCvsCircle], validTargets)
     }
 
-    target(target = new Ship()) {
+    target(target ) {
         console.log('RamActionHandler.target', { target });
         if (!this.encounterMap.validTargets.includes(target)) return
         
@@ -32,7 +32,7 @@ class RamActionHandler extends ActionHandler {
         this.encounterMap.refreshCanvas()
     }
 
-    attempt(attacker = new Ship(), target = new Ship()) {
+    attempt(attacker, target ) {
         console.log('RamActionHandler.attempt', { attacker, target });
         if (!this.encounterMap.validTargets.includes(target)) {
             return

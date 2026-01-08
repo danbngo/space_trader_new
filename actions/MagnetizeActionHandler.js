@@ -3,7 +3,7 @@ class MagnetizeActionHandler extends ActionHandler {
         super(encounterMap)
     }
 
-    startTargeting(attacker = new Ship()) {
+    startTargeting(attacker ) {
         console.log('MagnetizeActionHandler.startTargeting', { attacker });
         if (!this.calcCanBeControlled(attacker)) return
 
@@ -29,7 +29,7 @@ class MagnetizeActionHandler extends ActionHandler {
         this.encounterMap.startTargeting('Magnetize', [targetingCvsTriangle, targetingCvsCircle], validTargets)
     }
 
-    target(target = new Ship()) {
+    target(target ) {
         console.log('MagnetizeActionHandler.target', { target });
         if (!this.encounterMap.validTargets.includes(target)) return
         
@@ -38,7 +38,7 @@ class MagnetizeActionHandler extends ActionHandler {
         this.encounterMap.refreshCanvas()
     }
 
-    attempt(attacker = new Ship(), target = new Ship()) {
+    attempt(attacker, target ) {
         console.log('MagnetizeActionHandler.attempt', { attacker, target });
         if (!this.encounterMap.validTargets.includes(target)) return
         const action = new MagnetizeAction(this.encounter, attacker, target)

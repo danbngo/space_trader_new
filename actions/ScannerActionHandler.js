@@ -3,7 +3,7 @@ class ScannerActionHandler extends ActionHandler {
         super(encounterMap)
     }
 
-    startTargeting(ship = new Ship()) {
+    startTargeting(ship ) {
         console.log('ScannerActionHandler.startTargeting', { ship });
         if (!this.calcCanBeControlled(ship)) return
 
@@ -34,7 +34,7 @@ class ScannerActionHandler extends ActionHandler {
         // Scanner is always centered on ship, no dynamic targeting
     }
 
-    attempt(ship = new Ship()) {
+    attempt(ship ) {
         console.log('ScannerActionHandler.attempt', { ship });
         this.encounterMap.cvs.objClickEnabled = true
         const action = new ScannerAction(this.encounter, ship)

@@ -1,5 +1,5 @@
 class WarheadAction extends ShipAction {
-    constructor(encounter, actor = new Ship(), target = null, toX = undefined, toY = undefined) {
+    constructor(encounter, actor, target = null, toX = undefined, toY = undefined) {
         super(encounter, actor, MOVE_TYPES.Warhead, target, toX, toY)
         this.actorInfoMessage = 'Warhead!'
     }

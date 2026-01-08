@@ -20,7 +20,7 @@ class IonCloudEffect extends Effect {
      * @param {Ship} ship - The ship entering the ion cloud.
      * @returns {ShipAction[]} Array of actions resulting from the hit.
      */
-    hitShip(encounter, ship = new Ship()) {
+    hitShip(encounter, ship ) {
         // Apply ionized status and damage shields when entering ion cloud
         console.log('Ship entered ion cloud:', ship.name)
         if (ASTEROID_SHIP_TYPES_ALL.includes(ship.shipType)) return []

@@ -3,7 +3,7 @@ class RechargeActionHandler extends ActionHandler {
         super(encounterMap)
     }
 
-    startTargeting(ship = new Ship()) {
+    startTargeting(ship ) {
         // Recharge doesn't need targeting, so this can be skipped
         // Just call attempt directly
         this.attempt(ship)
@@ -13,7 +13,7 @@ class RechargeActionHandler extends ActionHandler {
         // No targeting needed for recharge
     }
 
-    attempt(ship = new Ship()) {
+    attempt(ship ) {
         console.log('RechargeActionHandler.attempt', { ship });
         if (ship.shields[0] >= ship.shields[1]) return
         this.execute(new RechargeAction(this.encounter, ship))

@@ -159,7 +159,7 @@ class Encounter {
         this.updateEncounterResult()
     }
 
-    handleShipActionComplete(ship = new Ship()) {
+    handleShipActionComplete(ship ) {
         const pseudoActions = ship.spendAction()
         // Apply effects that the ship is starting its turn inside
         for (const key of ship.statusEffects.keys) {
@@ -215,7 +215,7 @@ class Encounter {
         else return this.playerFleet
     }
 
-    calcHarmableTargets(attacker = new Ship()) {
+    calcHarmableTargets(attacker ) {
         console.log('Encounter.calcHarmableTargets', { attacker });
 
         //asteroids can target each other
@@ -229,7 +229,7 @@ class Encounter {
         })
     }
 
-    calcLaserTargets(attacker = new Ship()) {
+    calcLaserTargets(attacker ) {
         console.log('Encounter.calcLaserTargets', { attacker });
         const validTargets = []
         const [t1, t2] = attacker.calcLaserAreas()
@@ -249,7 +249,7 @@ class Encounter {
         return validTargets
     }
 
-    calcPlasmaSprayTargets(attacker = new Ship(), areaMultiplier = 1.0) {
+    calcPlasmaSprayTargets(attacker, areaMultiplier = 1.0) {
         console.log('Encounter.calcPlasmaSprayTargets', { attacker, areaMultiplier });
         const validTargets = []
         const [t1, t2] = attacker.calcLaserAreas(areaMultiplier)
@@ -260,7 +260,7 @@ class Encounter {
         return validTargets
     }
 
-    calcRamTargets(attacker = new Ship()) {
+    calcRamTargets(attacker ) {
         console.log('Encounter.calcRamTargets', { attacker });
         const validTargets = []
         const a1 = attacker.calcMoveArea()
@@ -281,7 +281,7 @@ class Encounter {
         return validTargets
     }
 
-    calcBeamTargets(attacker = new Ship(), targetArea = null) {
+    calcBeamTargets(attacker, targetArea = null) {
         console.log('Encounter.calcBeamTargets', { attacker });
         const validTargets = []
         const targetingArea = targetArea || attacker.calcBeamArea()
@@ -291,7 +291,7 @@ class Encounter {
         return validTargets
     }
 
-    calcPulseTargets(attacker = new Ship()) {
+    calcPulseTargets(attacker ) {
         console.log('Encounter.calcPulseTargets', { attacker });
         const validTargets = []
         const targetingArea = attacker.calcPulseArea()
@@ -301,7 +301,7 @@ class Encounter {
         return validTargets
     }
 
-    checkShipMovementEffects(ship = new Ship()) {
+    checkShipMovementEffects(ship ) {
         const pseudoActions = []
         console.log('Encounter.checkShipMovementEffects', { ship, effects:this.effects });
         // Check if ship entered any effects

@@ -5,7 +5,7 @@
  * @param {Ship|null} selectedShip - Currently selected ship to highlight.
  * @returns {HTMLElement} The ships table or "(None)" if no ships.
  */
-function createShipsListMenu(ships = [new Ship()], onSelectShip = (s = new Ship())=>{}, selectedShip = null) {
+function createShipsListMenu(ships = [], onSelectShip = (s )=>{}, selectedShip = null) {
     if (ships.length == 0) return ce({innerHTML: `(None)`})
     /** @type {Array<(string|HTMLElement)[]>} */
     const rows = [
@@ -49,13 +49,13 @@ function showShipsMenu(ships = [...gs.fleet.ships], selectedShip = null) {
 
     const reloadMenu = ()=>showShipsMenu(ships, selectedShip)
 
-    function dumpShip(ship = new Ship()) {
+    function dumpShip(ship ) {
         safeRemove(ships, ship)
         const newSelected = ships.length > 0 ? ships[0] : null
         showShipsMenu(ships, newSelected)
     }
 
-    function showDumpShipModal(ship = new Ship()) {
+    function showDumpShipModal(ship ) {
         showModal(`Dump ${coloredName(ship)}`, 
             `Dump ${coloredName(ship)}?`,
             [
@@ -65,7 +65,7 @@ function showShipsMenu(ships = [...gs.fleet.ships], selectedShip = null) {
         )
     }
 
-    function swapPilots(ship = new Ship(), newPilot = new Officer()) {
+    function swapPilots(ship, newPilot = new Officer()) {
         // Get current pilot of selected ship
         const currentPilot = ship.pilot
         
@@ -81,7 +81,7 @@ function showShipsMenu(ships = [...gs.fleet.ships], selectedShip = null) {
         showShipsMenu(ships, ship)
     }
 
-    function onSelectShip(ship = new Ship()) {
+    function onSelectShip(ship ) {
         showShipsMenu(ships, ship)
     }
 

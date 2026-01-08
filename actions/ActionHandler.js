@@ -5,7 +5,7 @@ class ActionHandler {
         this.cvs = encounterMap.cvs
     }
 
-    startTargeting(actor = new Ship()) {
+    startTargeting(actor ) {
         console.log(`ActionHandler.startTargeting (${this.constructor.name})`, { actor });
         throw new Error('startTargeting must be implemented by subclass')
     }
@@ -25,7 +25,7 @@ class ActionHandler {
         throw new Error('execute must be implemented by subclass')
     }
 
-    calcCanBeControlled(ship = new Ship()) {
+    calcCanBeControlled(ship ) {
         const {activeTurnFleet, playerFleet} = this.encounter
         if (ship.fleet != activeTurnFleet) return false
         if (ship.actionsRemaining <= 0) return false

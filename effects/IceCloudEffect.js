@@ -20,7 +20,7 @@ class IceCloudEffect extends Effect {
      * @param {Ship} ship - The ship entering the ice cloud.
      * @returns {ShipAction[]} Array of actions resulting from the hit (empty for ice clouds).
      */
-    hitShip(encounter, ship = new Ship()) {
+    hitShip(encounter, ship ) {
         // Apply frozen status when entering ice cloud
         if (ASTEROID_SHIP_TYPES_ALL.includes(ship.shipType)) return []
         console.log('Ship entered ice cloud:', ship.name)

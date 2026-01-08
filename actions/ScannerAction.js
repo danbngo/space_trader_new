@@ -1,5 +1,5 @@
 class ScannerAction extends ShipAction {
-    constructor(encounter, actor = new Ship()) {
+    constructor(encounter, actor ) {
         super(encounter, actor, MOVE_TYPES.Scanner)
         this.actorInfoMessage = 'Scanner Pulse!'
     }

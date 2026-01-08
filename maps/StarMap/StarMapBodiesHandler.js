@@ -268,13 +268,9 @@ class StarMapBodiesHandler {
                 })
             }
             
-            // Dim planet when outside vision range (like asteroids)
+            // Keep planets at full brightness regardless of vision range
             if (isDiscovered) {
-                if (isInVisionRange) {
-                    planetObj.fillColor[3] = 1.0 // Full brightness
-                } else {
-                    planetObj.fillColor[3] = 0.25 // Dimmed (64/255 = 0.25)
-                }
+                planetObj.fillColor[3] = 1.0
             }
             
             // Update positions

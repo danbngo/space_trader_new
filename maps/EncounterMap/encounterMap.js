@@ -368,7 +368,7 @@ class EncounterMap extends BaseMap {
     }
 
     /** @param {Ship|Effect} obj */
-    selectObject(obj = new Ship()) {
+    selectObject(obj ) {
         console.log('selected:',obj)
         
         // During targeting mode, only allow selecting valid targets
@@ -393,17 +393,17 @@ class EncounterMap extends BaseMap {
         this.renderer.refreshStrokeColors()
     }
 
-    hoverObject(obj = new Ship()) {
+    hoverObject(obj ) {
         if (this.onHoverObject) this.onHoverObject(obj);
     }
 
-    calcStrokeColorForObj(ship = new Ship()) {
+    calcStrokeColorForObj(ship ) {
         if (ship == this.selectedObject) return COLORS.Green
         else if (this.validTargets.includes(ship)) return COLORS.Yellow
         return COLORS.Black
     }
 
-    calcCanBeControlled(ship = new Ship()) {
+    calcCanBeControlled(ship ) {
         const {activeTurnFleet, playerFleet} = this.encounter
         if (ship.fleet != activeTurnFleet) return false
         if (ship.actionsRemaining <= 0) return false

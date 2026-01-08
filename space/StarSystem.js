@@ -294,6 +294,12 @@ class StarSystem extends SpaceObject {
                     console.log('⚠️ Player fleet ran out of fuel!')
                     fleet.route = null
                     fleet.fuel = 0
+                    // Call stranded check on next tick via currentMap
+                    if (currentMap && currentMap.stopPlayerFleet) {
+                        currentMap.stopPlayerFleet()
+                    }
+                    // Defer checkPlayerStranded to avoid modal during tick
+                    setTimeout(() => checkPlayerStranded(), 100)
                 }
             }
         }

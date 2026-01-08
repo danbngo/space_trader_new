@@ -19,7 +19,7 @@ class EncounterAI {
         return fleet.activeShips.filter(s => s.actionsRemaining > 0)
     }
 
-    calcNearestTarget(ship = new Ship()) {
+    calcNearestTarget(ship ) {
         const targetShips = this.encounter.calcHarmableTargets(ship)
         console.log('EncounterAI.calcNearestTarget', { ship, targetShips });
         let closestDistance = Infinity
@@ -36,7 +36,7 @@ class EncounterAI {
         return closest
     }
 
-    calcCombatStrategy(ship = new Ship()) {
+    calcCombatStrategy(ship ) {
         console.log('EncounterAI.calcCombatStrategy', { ship });
         const {fleet, aiType} = ship
         const opposingFleet = this.encounter.calcOpposingFleet(fleet)
@@ -72,7 +72,7 @@ class EncounterAI {
         return action
     }
 
-    calcBestMover(movableShips = [new Ship()]) {
+    calcBestMover(movableShips = []) {
         console.log('EncounterAI.calcBestMover', { movableShips });
         let bestShip = null
         let bestScore = -Infinity
@@ -88,7 +88,7 @@ class EncounterAI {
     }
 
     //simulates 100 moves. a move is considered good if it gets you closer to dest or improves your angle towards dest
-    calcBestMoveCoords(ship = new Ship(), destX = 0, destY = 0, avoidHazards = true, simulations = 100) {
+    calcBestMoveCoords(ship, destX = 0, destY = 0, avoidHazards = true, simulations = 100) {
         console.log('EncounterAI.calcBestMoveCoords', { ship, destX, destY, simulations });
         const moveArea = ship.calcMoveArea()
         let bestMove = null
@@ -127,7 +127,7 @@ class EncounterAI {
     }
 
     //simulates moves looking ahead up to 5 moves to find a path that allows attacking
-    calcBestLaserCoords(attacker = new Ship(), targets = [new Ship()], avoidHazards = true, simulations = 100) {
+    calcBestLaserCoords(attacker, targets = [], avoidHazards = true, simulations = 100) {
         console.log('EncounterAI.calcBestLaserCoords', { attacker, targets, simulations });
         const maxDepth = 5
         const effects = avoidHazards ? this.encounter.effects : []
@@ -212,7 +212,7 @@ class EncounterAI {
         return bestPath
     }
 
-    calcModuleAction(ship = new Ship(), strategy = null, targets = [new Ship()]) {
+    calcModuleAction(ship, strategy = null, targets = []) {
         console.log('EncounterAI.calcModuleAction', { ship, modules: ship.modules });
         const {encounter} = this
         const nearestTarget = this.calcNearestTarget(ship)
@@ -358,7 +358,7 @@ class EncounterAI {
         return null
     }
 
-    calcIsFacing(ship = new Ship(), target = new Ship()) {
+    calcIsFacing(ship, target ) {
         console.log('EncounterAI.calcIsFacing', { ship, target });
         const path = new Path(ship.x, ship.y, target.x, target.y)
         const angleToTarget = path.angle
@@ -368,7 +368,7 @@ class EncounterAI {
         return isFacing
     }
 
-    calcMoveForShip(ship = new Ship(), basicCombatOnly = false) {
+    calcMoveForShip(ship, basicCombatOnly = false) {
         console.log('EncounterAI.calcMoveForShip', { ship, basicCombatOnly });
         const {encounter} = this
         const strategy = this.calcCombatStrategy(ship)

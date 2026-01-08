@@ -57,7 +57,7 @@ class Effect {
         }
     }
 
-    hitShip(encounter, ship = new Ship()) {
+    hitShip(encounter, ship ) {
         // Override in subclass
         return []
     }

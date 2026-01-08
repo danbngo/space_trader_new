@@ -3,7 +3,7 @@ class PlasmaSprayActionHandler extends ActionHandler {
         super(encounterMap)
     }
 
-    startTargeting(ship = new Ship()) {
+    startTargeting(ship ) {
         console.log('PlasmaSprayActionHandler.startTargeting', { ship });
         if (!this.calcCanBeControlled(ship)) return
         
@@ -28,13 +28,13 @@ class PlasmaSprayActionHandler extends ActionHandler {
         this.encounterMap.startTargeting('Plasma', [targetingArea1, targetingArea2], validTargets)
     }
 
-    target(target = new Ship()) {
+    target(target ) {
         console.log('PlasmaSprayActionHandler.target', { target });
         // Just show that we're hovering over a valid target
         // The targeting areas already show the spray pattern
     }
 
-    attempt(attacker = new Ship(), target = new Ship()) {
+    attempt(attacker, target ) {
         console.log('PlasmaSprayActionHandler.attempt', { attacker, target });
         if (!this.encounterMap.validTargets.includes(target)) {
             return

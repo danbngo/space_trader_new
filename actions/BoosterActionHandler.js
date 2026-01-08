@@ -3,7 +3,7 @@ class BoosterActionHandler extends ActionHandler {
         super(encounterMap)
     }
 
-    startTargeting(attacker = new Ship()) {
+    startTargeting(attacker ) {
         console.log('BoosterActionHandler.startTargeting', { attacker });
         if (!this.calcCanBeControlled(attacker)) return
 
@@ -30,7 +30,7 @@ class BoosterActionHandler extends ActionHandler {
         // No dynamic targeting needed - boost is in the direction ship is facing
     }
 
-    attempt(attacker = new Ship()) {
+    attempt(attacker ) {
         console.log('BoosterActionHandler.attempt', { attacker });
         const action = new BoosterAction(this.encounter, attacker)
         this.encounterMap.cvs.objClickEnabled = true

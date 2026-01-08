@@ -3,7 +3,7 @@ class CloakActionHandler extends ActionHandler {
         super(encounterMap)
     }
 
-    startTargeting(ship = new Ship()) {
+    startTargeting(ship ) {
         // Cloak doesn't need targeting, activate immediately
         this.attempt(ship)
     }
@@ -12,7 +12,7 @@ class CloakActionHandler extends ActionHandler {
         // No targeting needed for cloak
     }
 
-    attempt(ship = new Ship()) {
+    attempt(ship ) {
         console.log('CloakActionHandler.attempt', { ship });
         // TODO: Check if ship can cloak (not already cloaked, etc.)
         const action = new CloakAction(this.encounter, ship)

@@ -5,7 +5,7 @@
  * @param {(ship: Ship) => void} onSelectShip - Callback when a ship is selected.
  * @returns {HTMLTableElement|string} The ships table or "(None)" if no ships.
  */
-function createBuyShipMenu(ships = [new Ship()], shipyard = new Shipyard(), onSelectShip = (ship = new Ship())=>{}) {
+function createBuyShipMenu(ships = [], shipyard = new Shipyard(), onSelectShip = (ship )=>{}) {
     if (ships.length == 0) return `(None)`
     /** @type {any[]} */
     const rows = [
@@ -120,7 +120,7 @@ function createBuyModuleMenu(modules = [new ShipModule()], shipyard = new Shipya
  * @param {(ship: Ship) => void} onSelectShip - Callback when a ship is selected.
  * @returns {HTMLTableElement|string} The ships table or "(None)" if no ships.
  */
-function createSellShipMenu(ships = [new Ship()], shipyard = new Shipyard(), onSelectShip = (ship = new Ship())=>{}) {
+function createSellShipMenu(ships = [], shipyard = new Shipyard(), onSelectShip = (ship )=>{}) {
     if (ships.length == 0) return `(None)`
     /** @type {any[]} */
     const rows = [
@@ -215,7 +215,7 @@ function showShipyardBuyMenu(shipyard = new Shipyard()) {
     const rebuildMenu = ()=>showShipyardBuyMenu(shipyard)
     const leave = ()=>leaveShipyard(shipyard)
 
-    function buyShip(ship = new Ship()) {
+    function buyShip(ship ) {
         const buyPrice = shipyard.calcBuyPrice(ship)
         gs.credits -= buyPrice;
         shipyard.credits += buyPrice;
@@ -228,7 +228,7 @@ function showShipyardBuyMenu(shipyard = new Shipyard()) {
         rebuildMenu()
     }
 
-    function showBuyShipModal(ship = new Ship()) {
+    function showBuyShipModal(ship ) {
         const buyPrice = shipyard.calcBuyPrice(ship)
         
         // Create ship visual using Ship.asImage() with player's fleet color
@@ -247,7 +247,7 @@ function showShipyardBuyMenu(shipyard = new Shipyard()) {
         )
     }
     
-    function onSelectShipyardShip(ship = new Ship()) {
+    function onSelectShipyardShip(ship ) {
         const buyPrice = shipyard.calcBuyPrice(ship)
         const canAfford = gs.credits >= buyPrice
         const hasRoomForShip = fleet.ships.length < fleet.numPilots
@@ -300,7 +300,7 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
     const rebuildMenu = ()=>showShipyardSellMenu(shipyard)
     const leave = ()=>leaveShipyard(shipyard)
 
-    function sellShip(ship = new Ship(), salePrice = 0) {
+    function sellShip(ship, salePrice = 0) {
         Shipyard.recordState(shipyard)
         const officersShare = gs.fleet.calcTotalCRShare(salePrice, true)
         gs.credits += salePrice - officersShare;
@@ -310,7 +310,7 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
         rebuildMenu()
     }
 
-    function onSelectPlayerShip(ship = new Ship()) {
+    function onSelectPlayerShip(ship ) {
         const isLastShip = fleet.ships.length < 2;
         const shipyardCanAfford = shipyard.credits >= shipyard.calcSellPrice(ship);
         const canSell = isDocked && shipyardCanAfford && !isLastShip;
@@ -341,7 +341,7 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
         refreshPanelButtons('shipyard_sell_panel', buttons)
     }
 
-    function showTradeLastShipModal(currentShip = new Ship()) {
+    function showTradeLastShipModal(currentShip ) {
         const sellPrice = shipyard.calcSellPrice(currentShip);
         
         // Create table similar to buy menu but with trade cost
@@ -437,7 +437,7 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
         showTradeModal();
     }
 
-    function showRepairShipModal(ship = new Ship()) {
+    function showRepairShipModal(ship ) {
         const maxDamage = ship.hull[1] - ship.hull[0];
         if (maxDamage <= 0) {
             rebuildMenu();
@@ -482,7 +482,7 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
         );
     }
 
-    function showSellShipModal(ship = new Ship()) {
+    function showSellShipModal(ship ) {
         const salePrice = shipyard.calcSellPrice(ship)
         const shipyardCanAfford = shipyard.credits >= salePrice
         const officersShare = gs.fleet.calcTotalCRShare(salePrice, true)
@@ -582,7 +582,7 @@ function showShipyardInstallModuleMenu(shipyard = new Shipyard(), module = new S
     const {fleet} = gs
     const buyPrice = shipyard.calcBuyModulePrice(module)
 
-    function buyModule(module = new ShipModule(), ship = new Ship()) {
+    function buyModule(module = new ShipModule(), ship ) {
         const buyPrice = shipyard.calcBuyModulePrice(module)
         gs.credits -= buyPrice;
         shipyard.credits += buyPrice;
@@ -611,7 +611,7 @@ function showShipyardInstallModuleMenu(shipyard = new Shipyard(), module = new S
         return createTable(rows, (rowIndex) => onSelectShip(fleet.ships[rowIndex]), selectedShip ? fleet.ships.indexOf(selectedShip) + 1 : null)
     }
 
-    function onSelectShip(ship = new Ship()) {
+    function onSelectShip(ship ) {
         const hasOpenSlot = ship.unusedModuleSlots > 0
         const alreadyHasModule = ship.modules.some(m => m.moduleType === module.moduleType)
         const canInstall = hasOpenSlot && !alreadyHasModule && gs.credits >= buyPrice

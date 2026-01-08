@@ -1,5 +1,5 @@
 class SmokeBombAction extends ShipAction {
-    constructor(encounter, actor = new Ship(), toX = undefined, toY = undefined) {
+    constructor(encounter, actor, toX = undefined, toY = undefined) {
         super(encounter, actor, MOVE_TYPES.SmokeBomb, null, toX, toY)
         this.actorInfoMessage = 'Smoke Bomb!'
     }

@@ -1,5 +1,5 @@
 class BlinkAction extends ShipAction {
-    constructor(encounter, actor = new Ship()) {
+    constructor(encounter, actor ) {
         super(encounter, actor, MOVE_TYPES.Blink)
         this.actorInfoMessage = 'Blink!'
     }

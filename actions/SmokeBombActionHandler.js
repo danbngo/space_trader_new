@@ -3,7 +3,7 @@ class SmokeBombActionHandler extends ActionHandler {
         super(encounterMap)
     }
 
-    startTargeting(attacker = new Ship()) {
+    startTargeting(attacker ) {
         console.log('SmokeBombActionHandler.startTargeting', { attacker });
         if (!this.calcCanBeControlled(attacker)) return
 
@@ -32,7 +32,7 @@ class SmokeBombActionHandler extends ActionHandler {
         this.encounterMap.startTargeting('Smoke', [targetingAreaCircle, targetingCvsEllipse], [])
     }
 
-    target(attacker = new Ship(), x = 0, y = 0, targetArea = new Circle()) {
+    target(attacker, x = 0, y = 0, targetArea = new Circle()) {
         console.log('SmokeBombActionHandler.target', { x, y });
         if (!targetArea.containsPoint(x, y)) {
             return
@@ -45,7 +45,7 @@ class SmokeBombActionHandler extends ActionHandler {
         this.encounterMap.refreshCanvas()
     }
 
-    attempt(attacker = new Ship(), targetArea = new Circle(), x = 0, y = 0) {
+    attempt(attacker, targetArea = new Circle(), x = 0, y = 0) {
         console.log('SmokeBombActionHandler.attempt', { attacker, x, y });
         if (!targetArea.containsPoint(x, y)) {
             return

@@ -20,7 +20,7 @@ class DebrisCloudEffect extends Effect {
      * @param {Ship} ship - The ship entering the debris cloud.
      * @returns {ShipAction[]} Array of actions resulting from the hit.
      */
-    hitShip(encounter, ship = new Ship()) {
+    hitShip(encounter, ship ) {
         // No immediate effect when entering
         if (ASTEROID_SHIP_TYPES_ALL.includes(ship.shipType)) return []
         console.log('Ship entered dust cloud:', ship.name)
