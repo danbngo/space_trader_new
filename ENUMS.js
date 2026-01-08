@@ -76,22 +76,11 @@ const COLORS = Object.freeze({
 
 /** @enum {MoveType} */
 const MOVE_TYPES = Object.freeze({
-    Move: 'Move',
     Laser: 'Laser',
-    Ram: 'Ram',
+    Evade: 'Evade',
     Recharge: 'Recharge',
-    Wait: 'Wait',
-    Blink: 'Blink',
-    Booster: 'Booster',
-    Cloak: 'Cloak',
-    Warhead: 'Warhead',
-    EMPPulse: 'EMPPulse',
-    Magnetize: 'Magnetize',
-    SmokeBomb: 'SmokeBomb',
-    Drill: 'Drill',
-    NaniteBeam: 'NaniteBeam',
-    PlasmaSpray: 'PlasmaSpray',
-    Scanner: 'Scanner'
+    Ram: 'Ram',
+    Flee: 'Flee',
 })
 const MOVE_TYPES_ALL = Object.values(MOVE_TYPES)
 
@@ -113,8 +102,8 @@ const AI_TYPES = Object.freeze({
 /** @enum {AsteroidBeltType} */
 const ASTEROID_BELT_TYPES = Object.freeze({
     Rocky: 'Rocky',
-    Icy: 'Icy',
-    Plasma: 'Plasma',
+    //Icy: 'Icy',
+    //Plasma: 'Plasma',
 })
 
 const CL = Object.freeze({

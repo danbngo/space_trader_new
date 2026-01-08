@@ -18,9 +18,10 @@ class StarSystem extends SpaceObject {
      * @param {AsteroidBelt[]} asteroidBelts - The asteroid belts in the star system.
      * @param {Asteroid[]} asteroids - The asteroids in the star system.
      * @param {BackgroundStar[]} backgroundStars - The background stars for visual effect.
-     * @param {Religion[]} religions - The religions in the star system.
-     * @param {Anomaly[]} anomalies - The anomalies in the star system.
-     * @param {Ruins[]} ruins - The ruins in the star system.
+     * REMOVED: Religion, Anomaly, Ruins
+     * @param {Array} religions - REMOVED
+     * @param {Array} anomalies - REMOVED 
+     * @param {Array} ruins - REMOVED
      */
     constructor(name = "Unnamed", color = COLORS.White, radius = 0, barycenter = null, stars = [], planets = [], dwarfPlanets = [], moons = [], spaceStations = [], fleets = [], asteroidBelts = [], asteroids = [], backgroundStars = [], religions = [], anomalies = [], ruins = []) {
         console.log('instantiating star system w name:', name, 'stars:', stars, 'planets:', planets, 'dwarf planets:', dwarfPlanets, 'moons:', moons, 'space stations:', spaceStations, 'fleets:', fleets);
@@ -57,7 +58,8 @@ class StarSystem extends SpaceObject {
         /** @type {string[]} */
         this.newsFeed = [] //strings that have more detailed data
         this.simpleNews = []
-        /** @type {Religion[]} */
+        // REMOVED: Religion
+        // /** @type {Religion[]} */
         this.religions = religions
         /**
          * Calculate total population across all planets, dwarf planets, and space stations
@@ -87,9 +89,10 @@ class StarSystem extends SpaceObject {
             return (planet.c.population / totalPop) * 100
         }
         
-        /** @type {Anomaly[]} */
+        // REMOVED: Anomaly, Ruins
+        // /** @type {Anomaly[]} */
         this.anomalies = anomalies
-        /** @type {Ruins[]} */
+        // /** @type {Ruins[]} */
         this.ruins = ruins
     }
 
@@ -111,7 +114,9 @@ class StarSystem extends SpaceObject {
     }
 
     updateRoutes(year = gs.year) {
+        // REMOVED: InterceptionRoute tracking
         // Check all fleets with InterceptionRoute to see if target route has changed
+        /*
         for (const fleet of this.fleets) {
             if (!fleet.route || !(fleet.route instanceof InterceptionRoute)) continue
             
@@ -136,6 +141,7 @@ class StarSystem extends SpaceObject {
                 fleet.route = new InterceptionRoute(fleet, targetFleet, year)
             }
         }
+        */
     }
 
     deductFuel(fleet, distanceTraveled) {
@@ -177,49 +183,49 @@ class StarSystem extends SpaceObject {
         const fleets = this.fleets
         const MAGNET_DISTANCE = 0.25 // AU - distance within which fleets will magnet onto their target
         
-        for (const fleet of fleets) {
-            // Skip if no fleet AI, no target, destroyed, or is the player fleet
-            if (!fleet.fleetAI || !fleet.fleetAI.target || fleet.destroyed || fleet === gs.fleet) continue
-            
-            const target = fleet.fleetAI.target
-            
-            // Skip if target doesn't have valid coordinates
-            if (typeof target.x !== 'number' || typeof target.y !== 'number') continue
-            
-            // Calculate distance to target
-            const dx = target.x - fleet.x
-            const dy = target.y - fleet.y
-            const distance = Math.sqrt(dx * dx + dy * dy)
-            
-            // If within magnet distance, speed up progress toward target
-            if (distance <= MAGNET_DISTANCE && distance > 0.001) {
-                // Calculate angle toward target
-                fleet.angle = Math.atan2(dy, dx)
-                
-                // If fleet has a route, accelerate its progress instead of modifying x,y
-                if (fleet.route && fleet.route.valid && fleet.route.path) {
-                    const duration = fleet.route.endYear - fleet.route.startYear
-                    const elapsedTime = gs.year - fleet.route.startYear
-                    const currentProgress = elapsedTime / duration
-                    
-                    // Accelerate by 1% (but don't exceed 100% progress)
-                    const acceleratedProgress = Math.min(currentProgress * 1.01, 1.0)
-                    
-                    // Calculate what year would give us this accelerated progress
-                    const acceleratedElapsedTime = acceleratedProgress * duration
-                    const acceleratedYear = fleet.route.startYear + acceleratedElapsedTime
-                    
-                    // Update fleet position based on accelerated progress
-                    const [newX, newY] = fleet.route.positionAtYear(acceleratedYear)
-                    fleet.x = newX
-                    fleet.y = newY
-                } else {
-                    // No route - use direct position interpolation (fallback behavior)
-                    fleet.x = fleet.x * 0.9 + target.x * 0.1
-                    fleet.y = fleet.y * 0.9 + target.y * 0.1
-                }
-            }
-        }
+        // REMOVED: FleetAI target magnetism - entire loop commented out
+        // for (const fleet of fleets) {
+        //     // Skip if no fleet AI, no target, destroyed, or is the player fleet
+        //     if (!fleet.fleetAI || !fleet.fleetAI.target || fleet.destroyed || fleet === gs.fleet) continue
+        //     const target = fleet.fleetAI.target
+        //     
+        //     // Skip if target doesn't have valid coordinates
+        //     if (typeof target.x !== 'number' || typeof target.y !== 'number') continue
+        //     
+        //     // Calculate distance to target
+        //     const dx = target.x - fleet.x
+        //     const dy = target.y - fleet.y
+        //     const distance = Math.sqrt(dx * dx + dy * dy)
+        //     
+        //     // If within magnet distance, speed up progress toward target
+        //     if (distance <= MAGNET_DISTANCE && distance > 0.001) {
+        //         // Calculate angle toward target
+        //         fleet.angle = Math.atan2(dy, dx)
+        //         
+        //         // If fleet has a route, accelerate its progress instead of modifying x,y
+        //         if (fleet.route && fleet.route.valid && fleet.route.path) {
+        //             const duration = fleet.route.endYear - fleet.route.startYear
+        //             const elapsedTime = gs.year - fleet.route.startYear
+        //             const currentProgress = elapsedTime / duration
+        //             
+        //             // Accelerate by 1% (but don't exceed 100% progress)
+        //             const acceleratedProgress = Math.min(currentProgress * 1.01, 1.0)
+        //             
+        //             // Calculate what year would give us this accelerated progress
+        //             const acceleratedElapsedTime = acceleratedProgress * duration
+        //             const acceleratedYear = fleet.route.startYear + acceleratedElapsedTime
+        //             
+        //             // Update fleet position based on accelerated progress
+        //             const [newX, newY] = fleet.route.positionAtYear(acceleratedYear)
+        //             fleet.x = newX
+        //             fleet.y = newY
+        //         } else {
+        //             // No route - use direct position interpolation (fallback behavior)
+        //             fleet.x = fleet.x * 0.9 + target.x * 0.1
+        //             fleet.y = fleet.y * 0.9 + target.y * 0.1
+        //         }
+        //     }
+        // }
     }
 
     updatePositions(year = gs.year) {
@@ -251,12 +257,16 @@ class StarSystem extends SpaceObject {
                     if (fleet.route.destination instanceof Fleet) {
                         const targetFleet = fleet.route.destination
                         // Trigger encounter with the fleet
-                        const encounter = generateEncounterForFleet(targetFleet)
-                        if (encounter) {
-                            encounter.startEncounter()
-                        }
+                        // REMOVED: Encounter system deleted - will be rewritten
+                        // const encounter = generateEncounterForFleet(targetFleet)
+                        // if (encounter) {
+                        //     encounter.startEncounter()
+                        // }
+                        console.error('Encounter system deleted - fleet interception detected but no encounter created')
                     }
                     
+                    // REMOVED: InterceptionRoute handling
+                    /*
                     // If using InterceptionRoute and target is still far away and not destroyed, create new route
                     if (fleet.route instanceof InterceptionRoute && fleet.route.targetFleet) {
                         const targetFleet = fleet.route.targetFleet
@@ -269,6 +279,7 @@ class StarSystem extends SpaceObject {
                             continue // Skip setting route to undefined
                         }
                     }
+                    */
                 }
                 //only dock if player fleet near the destination, otherwise its handled by ai
                 if (fleet.route.destination instanceof Planet) fleet.dock(fleet.route.destination)
@@ -381,10 +392,13 @@ class StarSystem extends SpaceObject {
                 gs.lastSeenDates.set(obj, gs.year)
                 
                 // Special handling for anomalies - mark as discovered
+                // REMOVED: Anomaly tracking
+                /*
                 if (obj instanceof Anomaly && obj.discoveredYear === null) {
                     obj.discoveredYear = gs.year
                     console.log(`🔍 Discovered anomaly: ${obj.name} at ${Math.round(gs.year * 10) / 10}`)
                 }
+                */
             }
         }
     }
@@ -397,11 +411,12 @@ class StarSystem extends SpaceObject {
         fleet.location = null
         fleet.route = null
         // Clear this fleet as a target/route for any other fleets
-        for (const otherFleet of this.fleets) {
-            if (otherFleet.fleetAI?.target === fleet) {
-                otherFleet.fleetAI.target = null
-            }
-        }
+        // REMOVED: FleetAI
+        // for (const otherFleet of this.fleets) {
+        //     if (otherFleet.fleetAI?.target === fleet) {
+        //         otherFleet.fleetAI.target = null
+        //     }
+        // }
     }
 
     removeAbandonedFleet(abandonedFleet) {
@@ -413,12 +428,13 @@ class StarSystem extends SpaceObject {
         abandonedFleet.x = Infinity
         abandonedFleet.y = Infinity
         // Clear this abandoned fleet as a target for any fleets
-        for (const otherFleet of this.fleets) {
-            if (otherFleet.fleetAI?.target === abandonedFleet) {
-                otherFleet.fleetAI.target = null
-                otherFleet.route = null
-            }
-        }
+        // REMOVED: FleetAI
+        // for (const otherFleet of this.fleets) {
+        //     if (otherFleet.fleetAI?.target === abandonedFleet) {
+        //         otherFleet.fleetAI.target = null
+        //         otherFleet.route = null
+        //     }
+        // }
     }
 
     /**
@@ -472,6 +488,8 @@ class StarSystem extends SpaceObject {
             console.log(`👤 Assigned ${fleet.captain.name} as new captain`);
         }
         
+        // REMOVED: FleetAI resurrection
+        /*
         // Assign appropriate AI based on fleet type (if not already present)
         if (!fleet.fleetAI) {
             const aiType = getFleetAITypeForFleetType(fleet.fleetType);
@@ -482,6 +500,7 @@ class StarSystem extends SpaceObject {
         } else {
             console.log(`🤖 Keeping existing AI for resurrected fleet`);
         }
+        */
         
         console.log(`✅ Successfully resurrected ${fleet.name} with ${fleet.officers.length} officers`);
         return fleet;

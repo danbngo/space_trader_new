@@ -24,20 +24,14 @@ class Encounter {
         this.fleet = fleet;
         /** @type {boolean} */
         this.combatEnabled = false;
-        /** @type {number} */
-        this.mapRadius = encounterType.mapRadius;
         /** @type {Fleet} */
         this.playerFleet = gs.fleet
         /** @type {Ship[]} */
         this.playerShips = this.playerFleet.ships
-        /** @type {Ship} */
-        this.playerFlagship = this.playerFleet.flagship
         /** @type {Fleet} */
         this.enemyFleet = this.fleet
         /** @type {Ship[]} */
         this.enemyShips = this.enemyFleet.ships
-        /** @type {Ship} */
-        this.enemyFlagship = this.enemyFleet.flagship
         /** @type {Ship[]} */
         //this.ships = [...this.playerShips, ...this.enemyShips]
         /** @type {EncounterAI} */
@@ -63,8 +57,6 @@ class Encounter {
         for (const ship of this.playerShips) {
             this.playerShipHullsAtStart.set(ship, ship.hull[0])
         }
-        
-        gameRegistry.registerEncounter(this)
     }
 
     get npcIsTargetingPlayer() {

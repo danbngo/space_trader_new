@@ -40,6 +40,9 @@ function determinePlanetSettlementType(planet) {
     }
     
     // Earthlike planets with ideal conditions -> Planetary megacities
+    // REMOVED: Climate constants (TEMPERATURES, ATMOSPHERIC_PRESSURES, GRAVITIES, etc.) were deleted
+    // Defaulting all settlements to DOMED_CITY for now
+    /*
     if (planetType === PLANET_TYPES.EARTHLIKE) {
         const isIdeal = climate.temperature === TEMPERATURES.MEDIUM &&
                        climate.atmosphericPressure === ATMOSPHERIC_PRESSURES.MEDIUM &&
@@ -111,6 +114,7 @@ function determinePlanetSettlementType(planet) {
          climate.geologicalActivity === GEOLOGICAL_ACTIVITIES.HIGH)) {
         return SETTLEMENT_TYPES.CANYON_CITY
     }
+    */
     
     // Default for terrestrial planets with moderate conditions -> Domed cities
     return SETTLEMENT_TYPES.DOMED_CITY
@@ -134,30 +138,39 @@ function generateSettlement(planet) {
     
     const shipyard = new Shipyard(planet)
     
-    const caravansery = new Caravansery(planet)
+    // REMOVED: Deleted buildings (only kept Shipyard, Market, Guild per user request)
+    // const caravansery = new Caravansery(planet)
+    const caravansery = null
     
     const market =  new Market(planet, false)
     
     const blackMarket =  new Market(planet, true) 
     
     const guild =  new Guild(planet)    
-    const bank =  new Bank(planet) 
+    // const bank =  new Bank(planet) 
+    const bank = null
     
-    const courthouse = new Courthouse(planet)
+    // const courthouse = new Courthouse(planet)
+    const courthouse = null
     
-    const academy = new Academy(planet)
+    // const academy = new Academy(planet)
+    const academy = null
     
-    const tavern = new Tavern(planet, true)
+    // const tavern = new Tavern(planet, true)
+    const tavern = null
     
-    const cyberSurgeon = new CyberSurgeon(planet)
+    // REMOVED: CyberSurgeon, Geneticist
+    // const cyberSurgeon = new CyberSurgeon(planet)
+    // const geneticist = new Geneticist(planet)
     
-    const geneticist = new Geneticist(planet)
+    // const palace = new Palace(planet)
+    const palace = null
     
-    const palace = new Palace(planet)
+    // const temple = new Temple(planet)
+    const temple = null
     
-    const temple = new Temple(planet)
-    
-    const casino = new Casino(planet)
+    // const casino = new Casino(planet)
+    const casino = null
     
 
     console.log('disabling some buildings...')
@@ -169,7 +182,9 @@ function generateSettlement(planet) {
     const disableChance = planet.objectType == OBJECT_TYPES.PLANET ? 0 :
                           planet.objectType == OBJECT_TYPES.MOON || planet.objectType == OBJECT_TYPES.DWARF_PLANET ? 0.4 :
                           0.8
-    const buildings = [shipyard, caravansery, market, blackMarket, guild, bank, courthouse, academy, tavern, cyberSurgeon, geneticist, palace, temple, casino]
+    // REMOVED: cyberSurgeon, geneticist, and other deleted buildings
+    // Only Shipyard, Market, Guild remain functional
+    const buildings = [shipyard, market, blackMarket, guild].filter(b => b !== null)
     
     // First pass: randomly disable buildings
     for (const building of buildings) {
@@ -195,5 +210,22 @@ function generateSettlement(planet) {
         }
     }
 
-    return new Settlement({planet, settlementType, shipyard, caravansery, market, blackMarket, guild, bank, courthouse, academy, tavern, cyberSurgeon, geneticist, palace, temple, casino})
+    return new Settlement({
+        planet, 
+        settlementType, 
+        shipyard, 
+        caravansery: null, 
+        market, 
+        blackMarket, 
+        guild, 
+        bank: null, 
+        courthouse: null, 
+        academy: null, 
+        tavern: null, 
+        cyberSurgeon: null, 
+        geneticist: null, 
+        palace: null, 
+        temple: null, 
+        casino: null
+    })
 }

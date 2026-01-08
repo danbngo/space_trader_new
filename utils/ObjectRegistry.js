@@ -65,7 +65,8 @@ class ObjectRegistry {
     registerNews(news) { this.register('news', news) }
     registerNewsEffect(effect) { this.register('newsEffect', effect) }
     registerRoute(route) { this.register('route', route) }
-    registerEncounter(encounter) { this.register('encounter', encounter) }
+    // REMOVED: Encounter system deleted
+    // registerEncounter(encounter) { this.register('encounter', encounter) }
     registerBuilding(building) { this.register('building', building) }
 }
 

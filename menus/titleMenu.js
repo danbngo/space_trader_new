@@ -190,10 +190,10 @@ async function startNewGame() {
     gs.system = SOLAR_SYSTEM
 
     console.log('Adding religions...')
-    gs.system.religions = generateReligions()
+    gs.system.religions = []
     console.log('Adding space stations...')
     console.log('Adding ruins...')
-    gs.system.ruins = generateRuins(gs.system, rng(8, 4))
+    gs.system.ruins = []
     
     console.log("Generated religions:", RELIGIONS)
     console.log("Generated space stations:", SPACE_STATIONS)
@@ -242,10 +242,6 @@ async function startNewGame() {
     // Initialize anomalies before simulation starts
     console.log('Initializing anomalies...')
     if (!gs.system.anomalies) gs.system.anomalies = [];
-    while (gs.system.anomalies.length < MAX_NUM_ANOMALIES) {
-        const anomaly = generateAnomaly();
-        gs.system.anomalies.push(anomaly);
-    }
 
     // Simulate history
     try {
@@ -275,19 +271,9 @@ async function startNewGame() {
 
     // Ensure maximum anomalies exist at end of simulation
     console.log('Topping up anomalies after simulation...')
-    while (gs.system.anomalies.length < MAX_NUM_ANOMALIES) {
-        const anomaly = generateAnomaly();
-        gs.system.anomalies.push(anomaly);
-    }
 
     // Create captain
-    const captain = new Officer("Captain", rndMember(gs.system.planets), FACTION_TYPES_ALL[0], RACES_ALL[0], RELIGION_AGNOSTICISM, MINIMUM_OFFICER_AGE, STARTING_CREDITS);
-    
-    // Give captain all cyber implants and genetic modifications for testing (only in debug mode)
-    if (DEBUG_MODE) {
-        captain.implants = CYBER_IMPLANT_TYPES_ALL.map(implantType => new CyberImplant(implantType, 1.0))
-        captain.geneticModifications = GENETIC_MODIFICATION_TYPES_ALL.map(modificationType => new GeneticModification(modificationType, 1.0))
-    }
+    const captain = new Officer("Captain", rndMember(gs.system.planets), null, null, null, MINIMUM_OFFICER_AGE, STARTING_CREDITS);
     
     const playerShip = new Ship("Starting Ship", SHIP_TYPES.FRIGATE, COLORS.LightGray, [30,30], [20,20], 10, 10, 10, 10, 10)
     

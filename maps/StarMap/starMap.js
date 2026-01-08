@@ -55,8 +55,9 @@ class StarMap extends BaseMap {
         // Start continuous background star update loop (runs even when paused)
         this.animate()
         
+        // REMOVED: FleetAI references
         // Set starMap reference for all fleet AIs
-        this.fleetsHandler.updateFleetAIReferences()
+        // this.fleetsHandler.updateFleetAIReferences()
     }
     
     createSpotlight() {
@@ -557,6 +558,8 @@ class StarMap extends BaseMap {
                     const distance = roundToPlaces(calcDistance(gs.fleet.x, gs.fleet.y, obj.x, obj.y), 1)
                     ce({parent:container, innerHTML:`Distance: ${distance} AU`})
                     
+                    // REMOVED: Route/InterceptionRoute - travel to fleets disabled
+                    /*
                     // Create test route to check if interception is possible
                     // Use InterceptionRoute for moving fleets, regular Route for destroyed/abandoned
                     const testRoute = obj.destroyed ? new Route(gs.fleet, obj, gs.year) : new InterceptionRoute(gs.fleet, obj, gs.year)
@@ -572,6 +575,7 @@ class StarMap extends BaseMap {
                     } else {
                         ce({parent:container, innerHTML:`Cannot intercept (too fast)`})
                     }
+                    */
                 }
             }
         }
@@ -692,6 +696,8 @@ class StarMap extends BaseMap {
             return
         }
         
+        // REMOVED: Route system - travel disabled
+        /*
         let route = null
         
         if (obj instanceof Planet) {
@@ -754,9 +760,15 @@ class StarMap extends BaseMap {
         
         // Continue with route validation and setting
         this._proceedWithRoute(route, obj, unpause, bypassSunWarning)
+        */
+        
+        // Simplified: Just release the lock since routes are disabled
+        this._creatingRoute = false
     }
     
     _proceedWithRoute(route, obj, unpause, bypassSunWarning) {
+        // REMOVED: Route validation and setting
+        /*
         // Check if route intersects the sun
         if (route && FleetAI.checkRouteIntersectsSun(route)) {
             if (!bypassSunWarning) {
@@ -770,6 +782,7 @@ class StarMap extends BaseMap {
         if (route) {
             gs.fleet.startRoute(route)
         }
+        */
         
         if (unpause) this.togglePause(false)
         this.refresh()

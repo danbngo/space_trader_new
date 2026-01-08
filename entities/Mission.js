@@ -122,11 +122,7 @@ class Mission {
      */
     onPlayerDestroyShip(ship, fleet) {
         if (this.missionType === MISSION_TYPES.SEEK_AND_DESTROY) {
-            // Check if destroyed ship's faction matches mission target
-            if (this.missionType.factionTypes.length === 0 || 
-                this.missionType.factionTypes.includes(fleet.factionType)) {
-                this.amountFulfilled++
-            }
+            this.amountFulfilled++
         }
         this.refreshSuccessState()
     }
@@ -153,25 +149,19 @@ class Mission {
 
         // For escort missions, spawn the escort fleet
         if (this.missionType === MISSION_TYPES.ESCORT_CONVOY) {
-            const escortFactionType = this.missionType.factionTypes.length > 0 
-                ? rndMember(this.missionType.factionTypes)
-                : FACTION_TYPES.MERCHANTS
-            
-            // Get the appropriate fleet type for the faction
-            const fleetType = escortFactionType.fleetTypes && escortFactionType.fleetTypes.length > 0
-                ? rndMember(escortFactionType.fleetTypes)
-                : FLEET_TYPES.MERCHANTS
-            const escortFleet = generateFleet(fleetType, escortFactionType, this.planet, this.planet)
+            const fleetType = FLEET_TYPES.MERCHANTS
+            const escortFleet = generateFleet(fleetType, this.planet, this.planet)
             
             // Store mission UUID on the fleet (dynamic property for mission tracking)
             /** @type {any} */
             const fleet = escortFleet
             fleet.missionUuid = this.uuid
             
+            // REMOVED: FleetAI destination setting
             // Set destination via fleetAI
-            if (escortFleet.fleetAI && this.targetPlanet) {
-                escortFleet.fleetAI.destination = this.targetPlanet
-            }
+            // if (escortFleet.fleetAI && this.targetPlanet) {
+            //     escortFleet.fleetAI.destination = this.targetPlanet
+            // }
             
             gs.fleet.escortTarget = escortFleet
             gs.system.fleets.push(escortFleet)

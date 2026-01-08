@@ -47,11 +47,15 @@ class Shipyard extends Building {
         }
     }
 
-    static state = new ShipyardState();
+    // REMOVED: ShipyardState
+    // static state = new ShipyardState();
+    static state = null;
 
     static recordState(shipyard = new Shipyard()) {
         if (gs.fleet.ships.length == 0) return //dont record if player has no ships left, to allow him to restore
-        this.state = new ShipyardState([...gs.fleet.ships], gs.credits, [...shipyard.ships], shipyard.credits)
+        // REMOVED: ShipyardState
+        // this.state = new ShipyardState([...gs.fleet.ships], gs.credits, [...shipyard.ships], shipyard.credits)
+        this.state = null
     }
     static restoreState() {
         gs.fleet.ships = [...this.state.playerShips]

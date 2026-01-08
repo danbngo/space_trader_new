@@ -1199,23 +1199,6 @@ const SaveManager = {
         return Object.values(FLEET_TYPES).find(t => t.name === name);
     },
 
-    findFactionType(name) {
-        if (!name) return null;
-        return Object.values(FACTION_TYPES).find(t => t.name === name);
-    },
-
-    findRace(name) {
-        if (!name) return null;
-        return RACES_ALL.find(r => r.name === name);
-    },
-
-    findReligion(name) {
-        if (!name) return null;
-        // Check global religions first
-        return RELIGIONS.find(r => r.name === name) || 
-               (name === 'Agnosticism' ? RELIGION_AGNOSTICISM : null);
-    },
-
     findMissionType(name) {
         if (!name) return null;
         return Object.values(MISSION_TYPES).find(t => t.name === name);

@@ -12,12 +12,11 @@ class Fleet extends SpaceObject {
      * @param {string} name - The name of the fleet.
      * @param {Planet} planet - The planet the fleet starts at.
      * @param {FleetType} fleetType - The type of fleet
-     * @param {FactionType|null} factionType - The faction the fleet belongs to.
      * @param {number[]} color - The color of the fleet.
      * @param {number} x - The x-coordinate of the fleet's position.
      * @param {number} y - The y-coordinate of the fleet's position.
      */
-    constructor(name = "Unnamed", planet = null, fleetType = FLEET_TYPES_ALL[0], factionType = null, color = COLORS.White, x = 0, y = 0) {
+    constructor(name = "Unnamed", planet = null, fleetType = FLEET_TYPES_ALL[0], color = COLORS.White, x = 0, y = 0) {
         super(name, OBJECT_TYPES.FLEET, color, FLEET_RADIUS, x, y);
         Fleet.numFleetsEver++; // Increment global fleet counter
         /** @type {Planet} */
@@ -30,25 +29,25 @@ class Fleet extends SpaceObject {
         this.ships = []
         /** @type {CountsMap} */
         this.cargo = new CountsMap();
-        /** @type {CyberImplant[]} */
-        this.cyberModules = [];
+        // REMOVED: CyberImplant
+        // /** @type {CyberImplant[]} */
+        // this.cyberModules = [];
         /** @type {Officer} */
         this.captain = null;
         /** @type {Officer[]} */
         this.officers = []
         /** @type {Planet} */
         this.location = null;
-        /** @type {FactionType|null} */
-        this.factionType = factionType;
-        /** @type {FleetAI} */
-        this.fleetAI = null;
+        // REMOVED: FleetAI
+        // /** @type {FleetAI} */
+        // this.fleetAI = null;
         /** @type {number} */
         this.angle = 0
         /** @type {number} */
         this.cloakLevel = 0; // 0 = visible, 1.0 = fully cloaked
         /** @type {Fleet|null} */
         this.escortTarget = null; // Fleet that this fleet is escorting/following
-        /** @type {Fleet|Asteroid|Anomaly|string|null} */
+        /** @type {Fleet|Asteroid|string|null} */ // REMOVED: Anomaly
         this.destroyedBy = null; // Track what destroyed this fleet
         /** @type {boolean} */
         this.destroyed = false; // Whether this fleet is destroyed/abandoned
@@ -67,17 +66,15 @@ class Fleet extends SpaceObject {
         /** @type {string} */
         this._fleetTypeName = undefined;
         /** @type {string} */
-        this._factionTypeName = undefined;
-        /** @type {string} */
-        this._flagshipUUID = undefined;
-        /** @type {string} */
         this._captainUUID = undefined;
         /** @type {string} */
         this._destroyedBy = undefined;
-        /** @type {Object} */
-        this._routeData = undefined;
-        /** @type {Object} */
-        this._fleetAIData = undefined;
+        // REMOVED: Route
+        // /** @type {Object} */
+        // this._routeData = undefined;
+        // REMOVED: FleetAI
+        // /** @type {Object} */
+        // this._fleetAIData = undefined;
         
         gameRegistry.registerFleet(this)
 
@@ -111,7 +108,8 @@ class Fleet extends SpaceObject {
         }
     }
 
-    /** @param {Route} route */
+    // REMOVED: Route
+    // /** @param {Route} route */
     startRoute(route) {
         console.log(`🚢 ${this.name} ${this.uuid} is starting route to ${route.destination.name}`)
         this.location = null

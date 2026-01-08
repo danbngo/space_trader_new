@@ -99,7 +99,7 @@ class StarMapFleetsHandler {
                 const strokeColor = COLORS.Black
                 
                 // Use custom polygon shape if flagship has a shape generator
-                const flagship = fleet.flagship || (fleet.ships && fleet.ships[0])
+                const flagship = fleet.ships[0]
                 if (flagship && flagship.shipType && flagship.shipType.shapeGenerator) {
                     const shapePolygon = flagship.shipType.shapeGenerator()
                     const vertices = shapePolygon.vertices

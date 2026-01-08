@@ -173,7 +173,8 @@ class Ship {
         const pilotModifier = 1 + (pilotSkill / 50)
         
         // Apply movement penalty if ship is frozen
-        if (this.statusEffects.has(STATUS_EFFECTS.FROZEN)) {
+        // REMOVED: STATUS_EFFECTS
+        if (this.statusEffects.has('FROZEN')) {
             return baseDistance * pilotModifier * 0.5;
         }
         return baseDistance * pilotModifier;
@@ -306,7 +307,8 @@ class Ship {
         if (this.disabled) return [0, 0, false]
         
         // Clear cloak status when taking damage
-        this.statusEffects.setAmount(STATUS_EFFECTS.CLOAKED, 0)
+        // REMOVED: STATUS_EFFECTS
+        this.statusEffects.setAmount('CLOAKED', 0)
         
         let disabled = false
         let shieldDamage = 0
@@ -420,15 +422,18 @@ class Ship {
     }
 
     get canUseModules() {
-        return !this.disabled && !this.escaped && !this.statusEffects.has(STATUS_EFFECTS.OVERHEATED)
+        // REMOVED: STATUS_EFFECTS
+        return !this.disabled && !this.escaped && !this.statusEffects.has('OVERHEATED')
     }
 
     get canRam() {
-        return this.engine > 0 && !this.disabled && !this.escaped && !this.statusEffects.has(STATUS_EFFECTS.FROZEN)
+        // REMOVED: STATUS_EFFECTS
+        return this.engine > 0 && !this.disabled && !this.escaped && !this.statusEffects.has('FROZEN')
     }
 
     get canRecharge() {
-        return !this.disabled && !this.escaped && !this.statusEffects.has(STATUS_EFFECTS.IONIZED) && (this.shields[0] < this.shields[1])
+        // REMOVED: STATUS_EFFECTS
+        return !this.disabled && !this.escaped && !this.statusEffects.has('IONIZED') && (this.shields[0] < this.shields[1])
     }
 
     get moduleSlots() {

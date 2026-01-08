@@ -96,17 +96,17 @@ const MISSION_TYPES = {
         maxAmount: 1
     }),
     //the player must defeat X number of ships of faction type Y within timeframe
-    SEEK_AND_DESTROY: new MissionType({
+    /*SEEK_AND_DESTROY: new MissionType({
         name: 'Seek and Destroy',
         color: COLORS.Red,
         description: 'Hunt down and eliminate hostile vessels in the region.',
-        factionTypes: [FACTION_TYPES.PIRATES, FACTION_TYPES.REBELS, FACTION_TYPES.SMUGGLERS, FACTION_TYPES.SLAVERS],
+        factionTypes: [FACTION_TYPES.PIRATES],
         minDuration: 60/365,
         maxDuration: 120/365,
         baseReward: 8000,
         minAmount: 1,
         maxAmount: 3
-    }),
+    }),*/
     //the player must visit X number of other planets/dwarfs/stations and then return to this planet within timeframe
     PATROL_SECTOR: new MissionType({
         name: 'Patrol Sector',

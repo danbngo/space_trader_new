@@ -59,22 +59,12 @@ class ShipType {
 
 const SHIP_TYPES = {
     COURIER_SHIP: new ShipType('Courier Ship', 'Fast, lightly-armored vessel designed for rapid message and package delivery across star systems.', null, 0.1, 0.1, 0.1, 2, 1, 1, 3, [SHIP_MODULE_TYPES.BOOSTER], 2),
-    FIRE_SHIP: new ShipType('Fire Ship', 'Ship that shoots plasma over an area, overheating all targets hit.', null, 0.1, 0.5, 0.5, 1.5, 0.5, 0.5, 0.5, [SHIP_MODULE_TYPES.PLASMA_SPRAY], 2),
-    PASSENGER_SHIP: new ShipType('Passenger Ship', 'Civilian transport designed to carry passengers in comfort with moderate cargo space.', null, 2, 0.5, 0.1, 1, 2, 0.5, 3, [], 1),
-    SUPPLY_SHIP: new ShipType('Supply Ship', 'Nimble cargo vessel specializing in quick resupply runs with decent cargo capacity.', null, 0.5, 0.1, 0.1, 2, 3, 0.5, 1, [], 1),
     TANKER: new ShipType('Tanker', 'Massive bulk hauler with enormous cargo holds designed to transport liquids and gases.', null, 1.5, 0.25, 0.1, 1.5, 5, 1, 2, [], 2),
-    BLOCKADE_RUNNER: new ShipType('Blockade Runner', 'Sleek smuggler ship equipped with cloaking technology for evading detection and patrols.', null, 1, 1, 0.5, 3, 2, 1, 0.5, [SHIP_MODULE_TYPES.CLOAK], 1),
     SCOUT: new ShipType('Scout', 'Long-range reconnaissance vessel with powerful sensors and high speed for exploration.', null, 0.5, 0.5, 0.5, 3, 0.5, 3, 1.5, [SHIP_MODULE_TYPES.SCANNER], 1),
-    FIGHTER: new ShipType('Fighter', 'Agile combat craft with blink drive, designed for hit-and-run attacks and dogfighting.', null, 0.5, 1, 1.5, 2, 0.1, 1, 0.5, [SHIP_MODULE_TYPES.BLINK], 1),
     FRIGATE: new ShipType('Frigate', 'Well-balanced warship with solid defenses, firepower, and speed for versatile combat.', null, 2, 3, 1.5, 3, 1, 1, 1, [SHIP_MODULE_TYPES.BOOSTER], 2),
-    DESTROYER: new ShipType('Destroyer', 'Heavy weapons platform equipped with warheads, trading speed for devastating firepower.', null, 2, 1, 4, 1, 0.5, 3, 1, [SHIP_MODULE_TYPES.WARHEAD], 2),
-    JAMMER: new ShipType('Jammer', 'Electronic warfare vessel designed to disrupt enemy sensors and communications.', null, 2, 2, 1, 1, 0.1, 2, 1, [SHIP_MODULE_TYPES.EMP_PULSE], 2),
     BATTLESHIP: new ShipType('Battleship', 'Massive capital ship with warhead launchers, heavy armor, and shields for fleet engagements.', null, 4, 4, 3, 1, 2, 1.5, 1.5, [SHIP_MODULE_TYPES.WARHEAD], 1),
-    DRILLING_RIG: new ShipType('Drilling Rig', 'Industrial vessel with a heavy drill for asteroid mining and resource extraction.', null, 3, 0.1, 2, 1, 3, 0.5, 1, [SHIP_MODULE_TYPES.DRILL], 2),
-    ESCORT_SHIP: new ShipType('Escort Ship', 'Defensive support vessel with smoke bombs and strong shields to protect allied ships.', null, 1, 1.5, 1.5, 0.5, 0.25, 1.5, 1.5, [SHIP_MODULE_TYPES.SMOKE_BOMB], 2),
     INTERCEPTOR: new ShipType('Interceptor', 'Fast pursuit craft with magnetic grapples for capturing or disabling enemy vessels.', null, 1.5, 1.5, 1.5, 2, 0.25, 2, 1, [SHIP_MODULE_TYPES.MAGNETIZE], 2),
     UTILITY_SHIP: new ShipType('Utility Ship', 'Support vessel equipped with nanite repair systems to fix damaged ships in the field.', null, 1, 2, 0.5, 1, 0.5, 2, 1.5, [SHIP_MODULE_TYPES.NANITE_BEAM, SHIP_MODULE_TYPES.MAGNETIZE], 1),
-    OBSERVER: new ShipType('Observer', 'Scientific vessel equipped with advanced sensors for gathering data.', null, 0.5, 0.5, 0.5, 2, 0.5, 4, 1.5, [SHIP_MODULE_TYPES.SCANNER], 2),
 }
 
 const SHIP_TYPES_ALL = Object.values(SHIP_TYPES)
@@ -110,92 +100,4 @@ const ASTEROID_SHIP_TYPES_ALL = Object.values(ASTEROID_SHIP_TYPES)
 for (const st of ASTEROID_SHIP_TYPES_ALL) {
     st.minRadiusModifier = 4
     st.maxRadiusModifier = 16
-}
-
-
-ASTEROID_SHIP_TYPES.ASTEROID.onDisabled = (died = new AsteroidShip(), encounter) => {
-    console.log('Asteroid.onDisabled', { died, encounter });
-    if (Math.random()*died.radiusModifier < 0.5) {
-        const effect = new DebrisCloudEffect(died.x, died.y, Math.random() * Math.PI * 4)
-        effect.radius *= Math.sqrt(died.radiusModifier)/2
-        encounter.addEffect(effect)
-    } else {
-        spawnSmallerAsteroids(died, encounter)
-    }
-}
-
-ASTEROID_SHIP_TYPES.CRYOID.onDisabled = (died = new AsteroidShip(), encounter) => {
-    console.log('Cryoid.onDisabled', { died, encounter });
-    if (Math.random()*died.radiusModifier < 0.5) {
-        const effect = new IceCloudEffect(died.x, died.y, Math.random() * Math.PI * 4)
-        effect.radius *= Math.sqrt(died.radiusModifier)/2
-        encounter.addEffect(effect)
-    } else {
-        spawnSmallerAsteroids(died, encounter)
-    }
-}
-
-ASTEROID_SHIP_TYPES.PLASMOID.onDisabled = (died = new AsteroidShip(), encounter) => {
-    console.log('Plasmoid.onDisabled', { died, encounter });
-    if (Math.random()*died.radiusModifier < 0.5) {
-        const effect = new IonCloudEffect(died.x, died.y, Math.random() * Math.PI * 4)
-        effect.radius *= Math.sqrt(died.radiusModifier)/2
-        encounter.addEffect(effect)
-    } else {
-        spawnSmallerAsteroids(died, encounter)
-    }
-}
-
-ASTEROID_SHIP_TYPES.MAGNETOID.onDisabled = (died = new AsteroidShip(), encounter) => {
-    console.log('Magnetoid.onDisabled', { died, encounter });
-    if (Math.random()*died.radiusModifier < 0.5) {
-        const effect = new IonCloudEffect(died.x, died.y, Math.random() * Math.PI * 4)
-        effect.radius *= Math.sqrt(died.radiusModifier)/2
-        encounter.addEffect(effect)
-    } else {
-        spawnSmallerAsteroids(died, encounter)
-    }
-}
-
-
-/**
- * Utility function to spawn smaller asteroids when a large asteroid is destroyed
- * @param {AsteroidShip} died - The destroyed asteroid
- * @param {Encounter} encounter - The current encounter
- */
-function spawnSmallerAsteroids(died, encounter) {
-    if (died.hull[1] < 5 || died.radiusModifier <= .25) return; // Too small to split
-    
-    // Spawn 2 smaller asteroids
-    for (let i = 0; i < 2; i++) {
-        const angle = Math.random() * Math.PI * 2
-        const newHull = Math.floor(died.hull[1] * 0.5)
-        const offsetDist = rng(died.radius, died.radius/4, false)
-        const newEngine = died.engine * 4
-        
-        const smallAsteroid = new AsteroidShip(died.name, died.shipType, died.color, [newHull,newHull], [0,0], died.lasers, newEngine, 0, died.radars, died.maxActionsPerTurn)
-        smallAsteroid.hull = [newHull, newHull]
-        smallAsteroid.x = died.x//newX
-        smallAsteroid.y = died.y//newY
-        smallAsteroid.angle = Math.random() * Math.PI * 2
-        smallAsteroid.radiusModifier = died.radiusModifier / 2
-        smallAsteroid.fleet = died.fleet
-        smallAsteroid.aiType = died.aiType
-        died.fleet.ships.push(smallAsteroid)
-        died.fleet.addShip(smallAsteroid)
-        console.log('spawned small asteroid:',smallAsteroid,smallAsteroid.radius)
-
-        //asteroids "fly out" to their new location
-        setTimeout(() => {
-            const newX = died.x + Math.cos(angle) * offsetDist
-            const newY = died.y + Math.sin(angle) * offsetDist
-            smallAsteroid.x = newX
-            smallAsteroid.y = newY
-            smallAsteroid.angle = angle
-        }, 1)
-
-    }
-    if (currentMap && currentMap.refreshCanvas) {
-        currentMap.refreshCanvas()
-    }
 }

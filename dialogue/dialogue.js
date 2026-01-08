@@ -1,3 +1,0 @@
-/**
- * @typedef {string|(()=>string)} Dialogue
- */

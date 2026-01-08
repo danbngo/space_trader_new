@@ -63,23 +63,8 @@ class BuildingType {
 }
 
 const BUILDING_TYPES = {
-    COURTHOUSE: new BuildingType('Court House', COLORS.Brown, RANK_TYPES.OUTLAW, 10*1000, true),
-    BLACK_MARKET: new BuildingType('Black Market', COLORS.Red, RANK_TYPES.VISA, 10*1000, true),
-    
     SHIPYARD: new BuildingType('Shipyard', COLORS.LightGray, RANK_TYPES.NO_RANK, 20*1000),
-    CARAVANSERY: new BuildingType('Caravansery', COLORS.Brown, RANK_TYPES.NO_RANK, 15*1000),
-
     MARKET: new BuildingType('Market', COLORS.LightBlue, RANK_TYPES.VISA, 30*1000),
-    TAVERN: new BuildingType('Tavern', COLORS.Orange, RANK_TYPES.VISA, 5*1000),
-    
-    BANK: new BuildingType('Bank', COLORS.Yellow, RANK_TYPES.CITIZEN, 50*1000),
     GUILD: new BuildingType('Guild', COLORS.Purple, RANK_TYPES.CITIZEN, 10*1000),
-    ACADEMY: new BuildingType('Academy', COLORS.Green, RANK_TYPES.CITIZEN, 10*1000),
-    TEMPLE: new BuildingType('Temple', COLORS.White, RANK_TYPES.CITIZEN, 5*1000),
-    
-    CASINO: new BuildingType('Casino', COLORS.Magenta, RANK_TYPES.ELITE, 20*1000),
-    CYBER_SURGEON: new BuildingType('Cyber Surgeon', COLORS.DarkCyan, RANK_TYPES.ELITE, 15*1000),
-    GENETICIST: new BuildingType('Geneticist', COLORS.LightGreen, RANK_TYPES.ELITE, 15*1000),
-    PALACE: new BuildingType('Palace', COLORS.Gold, RANK_TYPES.ELITE, 10*1000),
 }
 const BUILDING_TYPES_ALL = Object.values(BUILDING_TYPES)

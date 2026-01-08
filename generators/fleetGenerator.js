@@ -20,14 +20,13 @@ function generateFleetCargo(fleet, fleetType) {
 /**
  * Generates 1-5 crew members (officers) for a fleet.
  * @param {Planet} planet - The planet the crew is from.
- * @param {FactionType} factionType - The faction type of the crew.
  * @returns {Officer[]} Array of generated officers.
  */
-function generateCrew(planet, factionType) {
+function generateCrew(planet) {
     const crew = []
     const numCrew = rng(5, 1) // 1-5 crew members
     for (let i = 0; i < numCrew; i++) {
-        crew.push(generateOfficer(planet, factionType))
+        crew.push(generateOfficer(planet, null))
     }
     return crew
 }
@@ -35,13 +34,12 @@ function generateCrew(planet, factionType) {
 /**
  * Generates a complete fleet with ships and cargo.
  * @param {FleetType} fleetType - The type of fleet to generate.
- * @param {FactionType|null} factionType - The faction the fleet belongs to.
  * @param {Planet|null} planet - The planet the fleet is associated with.
  * @param {SpaceObject|null} startAt - The planet where the fleet starts its journey.
  * @returns {Fleet} The generated fleet.
  */
-function generateFleet(fleetType = FLEET_TYPES_ALL[0], factionType = null, planet = null, startAt = planet) {
-    //console.log('generating a fleet:',fleetType,factionType,planet,startAt)
+function generateFleet(fleetType = FLEET_TYPES_ALL[0], planet = null, startAt = planet) {
+    //console.log('generating a fleet:',fleetType,planet,startAt)
     const ships = []
     const numShips = Math.ceil(0.1 + rng(fleetType.minShips, fleetType.maxShips))
     for (let i = 0; i < numShips; i++) {
@@ -54,7 +52,7 @@ function generateFleet(fleetType = FLEET_TYPES_ALL[0], factionType = null, plane
         throw new Error('generateFleet: No ships generated for fleetType '+fleetType.name)
     }
     const fleet = new Fleet(`${fleetType ? fleetType.name : ''}`, planet,
-        fleetType, factionType, planet ? planet.color : COLORS.DarkGray,
+        fleetType, planet ? planet.color : COLORS.DarkGray,
         startAt ? startAt.x : 0, startAt ? startAt.y : 0)
     ships.forEach(s=>fleet.addShip(s))
     
@@ -62,24 +60,20 @@ function generateFleet(fleetType = FLEET_TYPES_ALL[0], factionType = null, plane
     
     if (planet) {
         // Generate captain
-        fleet.captain = generateOfficer(planet, factionType)
+        fleet.captain = generateOfficer(planet, null)
         fleet.captain.credits = rng(fleetType.maxCredits, 0)
         
         // Generate crew members (non-captain officers)
-        const crew = generateCrew(planet, factionType)
+        const crew = generateCrew(planet)
         fleet.officers = [fleet.captain, ...crew]
     }
     
+    // REMOVED: FleetAI assignment
     // Assign AI to fleet - need to do this after fleet is added to starmap
-    const fleetAIType = getFleetAITypeForFleetType(fleetType)
-    if (fleetAIType) {
-        fleet.fleetAI = new fleetAIType.aiClass(fleet, startAt)
-    }
-
-    // Set cloak level if faction has cloaked flag
-    if (factionType && factionType.cloaked) {
-        fleet.cloakLevel = 1.0
-    }
+    // const fleetAIType = getFleetAITypeForFleetType(fleetType)
+    // if (fleetAIType) {
+    //     fleet.fleetAI = new fleetAIType.aiClass(fleet, startAt)
+    // }
 
     fleet.fuel = fleet.totalFuelCapacity // Start with full fuel tank
 

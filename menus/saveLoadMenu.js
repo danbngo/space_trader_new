@@ -71,24 +71,18 @@ function showSaveMenu(returnCallback = showSaveLoadMenu) {
     
     // Create table of existing saves
     const rows = [
-        ['File Name', 'Saved Date', 'Game Year', 'Captain', 'Faction', 'Race']
+        ['File Name', 'Saved Date', 'Game Year', 'Captain']
     ];
     
     for (const save of saveList) {
         const savedDate = new Date(save.timestamp).toLocaleString();
         const gameYear = describeDate(save.year);
         
-        // Deserialize faction and race strings to their type objects
-        const faction = PLAYER_FACTIONS.find(f => f.name === save.captainFaction)
-        const race = Object.values(RACES).find(r => r.name === save.captainRace)
-        
         rows.push([
             save.name,
             savedDate,
             gameYear,
             save.captainName,
-            coloredName(faction),
-            coloredName(race)
         ]);
     }
     
@@ -177,24 +171,18 @@ function showLoadMenu(returnCallback = showSaveLoadMenu) {
     
     // Create table of existing saves
     const rows = [
-        ['File Name', 'Saved Date', 'Game Year', 'Captain', 'Faction', 'Race']
+        ['File Name', 'Saved Date', 'Game Year', 'Captain']
     ];
     
     for (const save of saveList) {
         const savedDate = new Date(save.timestamp).toLocaleString();
         const gameYear = describeDate(save.year);
         
-        // Deserialize faction and race strings to their type objects
-        const faction = PLAYER_FACTIONS.find(f => f.name === save.captainFaction);
-        const race = Object.values(RACES).find(r => r.name === save.captainRace);
-        
         rows.push([
             save.name,
             savedDate,
             gameYear,
             save.captainName,
-            coloredName(faction),
-            coloredName(race)
         ]);
     }
     
