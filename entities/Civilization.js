@@ -3,7 +3,6 @@
  * @typedef {Object} CivilizationParams
  * @property {Planet} [planet] - The planet this civilization belongs to.
  * @property {GovernmentType} [governmentType] - The type of government of the civilization.
- * @property {Policies} [policies] - The active policies for this civilization.
  * @property {CountsMap} [cargoPriceMultipliers] - Multipliers for cargo prices specific to this civilization.
  * @property {CountsMap} [skillPriceMultipliers] - Multipliers for cargo prices specific to this civilization.
  * @property {number} [technology] - Quality rating of ships produced by this civilization.
@@ -22,10 +21,6 @@
  * @property {number} [wealth] - Overall wealth of the civilization.
  * @property {number} [reserves] - Higher reserves means more goods in markets, but lower prices
  * @property {number} [taxes] - Tax rate applied to most transactions (0 to MAX_TAX_RATE).
- * @property {CountsMap} [religions] - Religious representation on this planet (Religion -> adherent population ratio).
- * @property {CountsMap} [races] - Racial demographics of this civilization (Race -> population proportion).
- * @property {CountsMap} [cultures] - Planetary culture demographics of this civilization (Planet -> population proportion).
- * @property {Religion|null} [stateReligion] - The official state religion of this civilization (if any).
  */
 
 /**
@@ -37,11 +32,10 @@ class Civilization {
      * @param {CivilizationParams} params - The civilization parameters.
      */
     constructor({
-        planet = null, governmentType = null, cargoPriceMultipliers = new CountsMap(), skillPriceMultipliers = new CountsMap(),
-        technology = 1.0, education = 1.0, territory = 1, population = 1, industry = 1, cultures = new CountsMap(),
-        economy = 1, security = 1, culture = 1, prestige = 1, policies = new Policies(),
+        planet = null, governmentType = null, cargoPriceMultipliers = new CountsMap(),
+        technology = 1.0, education = 1.0, territory = 1, population = 1, industry = 1, 
+        economy = 1, security = 1, culture = 1, prestige = 1, 
         navy = 1, army = 1, corruption = 1, crime = 1, wealth = 1, reserves = 1, taxes = 1,
-        religions = new CountsMap(), races = new CountsMap(), stateReligion = null
     } = {}) {
         /** @type {string} */
         this.uuid = generateUUID('civ_')
@@ -49,22 +43,10 @@ class Civilization {
         this.planet = planet;
         /** @type {GovernmentType} */
         this.governmentType = governmentType; //many effects!
-        /** @type {Policies} */
-        this.policies = policies; //many effects!
         /** @type {Map<Planet, RelationshipType>} */
         this.relationships = new Map()
         /** @type {CountsMap} */
         this.cargoPriceMultipliers = cargoPriceMultipliers
-        /** @type {CountsMap} */
-        this.skillPriceMultipliers = skillPriceMultipliers
-        /** @type {CountsMap} */
-        this.religions = religions
-        /** @type {CountsMap} */
-        this.races = races
-        /** @type {CountsMap} */
-        this.cultures = cultures
-        /** @type {Religion|null} */
-        this.stateReligion = stateReligion
         /** @type {number} */
         this.territory = territory; //AUs, recall that neptune is 30. encounters for this civilization can be found further from its planet
         /** @type {number} */
@@ -205,12 +187,8 @@ class Civilization {
     clone() {
         const clone = new Civilization({
             planet: this.planet,
-            policies: this.policies.clone(),
             cargoPriceMultipliers: this.cargoPriceMultipliers.clone(),
             skillPriceMultipliers: this.skillPriceMultipliers.clone(),
-            religions: this.religions.clone(),
-            races: this.races.clone(),
-            stateReligion: this.stateReligion,
             governmentType: this.governmentType,
         })
         for (const cr of CIVILIZATION_RATINGS_ALL) {
@@ -312,38 +290,3 @@ class Civilization {
     }
 }
 
-
-/**
- * Represents the active policies of a civilization.
- * @class Policies
- */
-class Policies {
-    /**
-     * @param {PolicyType} economic - Economic policy.
-     * @param {PolicyType} labor - Labor policy.
-     * @param {PolicyType} social - Social policy.
-     * @param {PolicyType} foreign - Foreign policy.
-     */
-    constructor(economic = ECONOMIC_POLICIES[0], labor = LABOR_POLICIES[0], social = SOCIAL_POLICIES[0], foreign = FOREIGN_POLICIES[0]) {
-        /** @type {PolicyType} */
-        this.economic = economic
-        /** @type {PolicyType} */
-        this.labor = labor
-        /** @type {PolicyType} */
-        this.social = social
-        /** @type {PolicyType} */
-        this.foreign = foreign
-    }
-
-    get all() {
-        return [this.economic, this.labor, this.social, this.foreign]
-    }
-
-    /**
-     * Creates a copy of this Policies object.
-     * @returns {Policies} A cloned Policies object.
-     */
-    clone() {
-        return new Policies(this.economic, this.labor, this.social, this.foreign)
-    }
-}

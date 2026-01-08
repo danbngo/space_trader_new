@@ -747,7 +747,7 @@ const SaveManager = {
         officer.ranks = this.deserializeMapWithObjectKeys(data.ranks, 'planet', RANK_TYPES);
         
         // Restore arrays
-        officer.perks = (data.perks || []).map(perkName => this.findPerkType(perkName)).filter(x => x);
+        officer.perks = []; // PERK_TYPES system removed
         
         // Store UUIDs for later reference restoration
         officer._planetUUID = data.planetUUID;
@@ -895,16 +895,6 @@ const SaveManager = {
     findNewsType(name) {
         if (!name) return null;
         return Object.values(NT).find(t => t.name === name);
-    },
-
-    findPerkType(name) {
-        if (!name) return null;
-        return Object.values(PERK_TYPES).find(t => t.name === name);
-    },
-
-    findReligionTrait(name) {
-        if (!name) return null;
-        return Object.values(RELIGION_TRAITS).find(t => t.name === name);
     },
 
     findAIType(name) {

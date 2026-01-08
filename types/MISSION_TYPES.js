@@ -8,22 +8,19 @@ class MissionType {
      * @param {string} params.name - The name of the mission type
      * @param {number[]} params.color - The color associated with this mission type
      * @param {string} params.description - A description of what the mission entails
-     * @param {FactionType[]} params.factionTypes - Faction types this mission can target (empty for any)
      * @param {number} params.minDuration - Minimum mission duration in years
      * @param {number} params.maxDuration - Maximum mission duration in years
      * @param {number} params.baseReward - Base reward in credits
      * @param {number} params.minAmount - Minimum amount (cargo, ships, etc.)
      * @param {number} params.maxAmount - Maximum amount (cargo, ships, etc.)
      */
-    constructor({name = '', color = COLORS.White, description = '', factionTypes = [], minDuration = 1/365, maxDuration = 30/365, baseReward = 1000, minAmount = 1, maxAmount = 10}) {
+    constructor({name = '', color = COLORS.White, description = '',minDuration = 1/365, maxDuration = 30/365, baseReward = 1000, minAmount = 1, maxAmount = 10}) {
         /** @type {string} */
         this.name = name
         /** @type {number[]} */
         this.color = color
         /** @type {string} */
         this.description = description
-        /** @type {FactionType[]} */
-        this.factionTypes = factionTypes
         /** @type {number} */
         this.minDuration = minDuration
         /** @type {number} */
@@ -62,7 +59,6 @@ const MISSION_TYPES = {
         name: 'Escort Convoy',
         color: COLORS.Blue,
         description: 'Protect civilian ships from hostile encounters.',
-        factionTypes: [FACTION_TYPES.MERCHANTS, FACTION_TYPES.COLONISTS, FACTION_TYPES.PILGRIMS],
         minDuration: 60/365,
         maxDuration: 120/365,
         baseReward: 3000,
@@ -76,7 +72,6 @@ const MISSION_TYPES = {
         name: 'Cargo Delivery',
         color: COLORS.LightBlue,
         description: 'Transport specific cargo to a designated planet.',
-        factionTypes: [],
         minDuration: 60/365,
         maxDuration: 120/365,
         baseReward: 4000,
@@ -88,7 +83,6 @@ const MISSION_TYPES = {
         name: 'Deliver Missive',
         color: COLORS.Yellow,
         description: 'Carry important diplomatic or military messages.',
-        factionTypes: [],
         minDuration: 60/365,
         maxDuration: 120/365,
         baseReward: 1000,
@@ -112,7 +106,6 @@ const MISSION_TYPES = {
         name: 'Patrol Sector',
         color: COLORS.DarkCyan,
         description: 'Maintain security in a designated space sector.',
-        factionTypes: [],
         minDuration: 60/365,
         maxDuration: 120/365,
         baseReward: 6000,

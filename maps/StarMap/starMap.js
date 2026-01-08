@@ -855,9 +855,6 @@ class StarMap extends BaseMap {
             return
         }
 
-        // Check for collision-based encounters
-        if (checkForCollisionEncounter()) return
-
         checkForEvents(elapsedYears)
 
         // Only continue animation loop if not paused

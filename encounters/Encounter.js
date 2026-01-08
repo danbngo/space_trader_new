@@ -161,22 +161,6 @@ class Encounter {
         else return this.playerFleet
     }
     /**
-     * Shows a message indicating the fleet doesn't want to interact again.
-     * Use this to prevent player abuse of resource-granting encounters.
-     */
-    showAlreadyMetMessage() {
-        const greeting = this.getGreetingDialogue?.() || null
-        const message = greeting
-            ? `"${greeting}" The ${coloredName(this.fleet)} seem to recognize you and politely decline further interaction.`
-            : `The ${coloredName(this.fleet)} acknowledge you but seem disinterested in further interaction.`
-        
-        showModal(coloredName(this.fleet), message, [
-            ['Continue', ()=>this.endEncounter()],
-            ['Attack', ()=>this.showPlayerAttackModal()],
-        ])
-    }
-
-    /**
      * Called when the encounter starts. Override in subclasses.
      */
     onStart() {
@@ -356,18 +340,8 @@ class Encounter {
     showPlayerDidSurrenderModal() {
         console.log('showPlayerDidSurrenderModal');
         const fleetName = coloredName(this.fleet)
-        const planet = this.planet
-        const reputationMultiplier = this.encounterType.reputationMultiplier
-        const reputationShrink = Math.ceil(ENCOUNTER_BASE_REPUTATION_SHRINK_ON_SURRENDER / Math.abs(reputationMultiplier || 1))
-
-        const surrenderDialogue = this.getPlayerDidSurrenderDialogue()
-
         let msg = `There's no other choice. You power your ships down and broadcast the universal signal for surrender.<br/>`
-        if (surrenderDialogue) {
-            msg += `"${surrenderDialogue}"<br/>`
-        }
         // No reputation change on surrender
-
         showModal(fleetName, msg, [['Continue', ()=>this.onSurrender()]])
     }
 
