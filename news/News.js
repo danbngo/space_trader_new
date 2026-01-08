@@ -568,7 +568,7 @@ class News {
     }
 
     /**
-     * Changes a planet's government type and randomizes compatible policies.
+     * Changes a planet's government type.
      * @param {Planet} targetPlanet - The planet to change government for.
      * @param {GovernmentType} newGovernmentType - The new government type.
      */
@@ -598,30 +598,6 @@ class News {
                 targetPlanet.civilization.stateReligion = null
             }
         }
-        
-        // Filter policies by what's valid for the new government
-        const validEconomicPolicies = ECONOMIC_POLICIES.filter(p => !p.forbiddenGovs.includes(newGovernmentType))
-        const validLaborPolicies = LABOR_POLICIES.filter(p => !p.forbiddenGovs.includes(newGovernmentType))
-        const validSocialPolicies = SOCIAL_POLICIES.filter(p => !p.forbiddenGovs.includes(newGovernmentType))
-        const validForeignPolicies = FOREIGN_POLICIES.filter(p => !p.forbiddenGovs.includes(newGovernmentType))
-        
-        // Helper to select a policy, weighted towards favorites
-        const selectPolicy = (validPolicies) => {
-            const favoritePolicies = validPolicies.filter(p => p.favoriteGovs.includes(newGovernmentType))
-            // 60% chance to pick a favorite if available, otherwise pick randomly from all valid
-            if (favoritePolicies.length > 0 && Math.random() < 0.6) {
-                return rndMember(favoritePolicies)
-            }
-            return rndMember(validPolicies)
-        }
-        
-        // Randomize new policies compatible with the government
-        targetPlanet.civilization.policies = new Policies(
-            selectPolicy(validEconomicPolicies),
-            selectPolicy(validLaborPolicies),
-            selectPolicy(validSocialPolicies),
-            selectPolicy(validForeignPolicies)
-        )
     }
 }
 

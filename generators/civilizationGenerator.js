@@ -34,29 +34,6 @@ function generateCivilization(planet) {
         skillPriceMultipliers.setAmount(sk, rng(ACADEMY_MAX_SKILL_PRICE_MODIFIER, ACADEMY_MIN_SKILL_PRICE_MODIFIER, false))
     }
 
-    // Generate random policies that are valid for this government type
-    const validEconomicPolicies = ECONOMIC_POLICIES.filter(p => !p.forbiddenGovs.includes(governmentType))
-    const validLaborPolicies = LABOR_POLICIES.filter(p => !p.forbiddenGovs.includes(governmentType))
-    const validSocialPolicies = SOCIAL_POLICIES.filter(p => !p.forbiddenGovs.includes(governmentType))
-    const validForeignPolicies = FOREIGN_POLICIES.filter(p => !p.forbiddenGovs.includes(governmentType))
-
-    // Weight selection towards favorite policies for this government
-    const selectPolicy = (validPolicies) => {
-        const favoritePolicies = validPolicies.filter(p => p.favoriteGovs.includes(governmentType))
-        // 60% chance to pick a favorite if available, otherwise pick randomly from all valid
-        if (favoritePolicies.length > 0 && Math.random() < 0.6) {
-            return rndMember(favoritePolicies)
-        }
-        return rndMember(validPolicies)
-    }
-
-    const policies = new Policies(
-        selectPolicy(validEconomicPolicies),
-        selectPolicy(validLaborPolicies),
-        selectPolicy(validSocialPolicies),
-        selectPolicy(validForeignPolicies)
-    )
-
     // Generate random race demographics
     const races = new CountsMap()
     const numRaces = rng(3, 1) // 1-3 races present
@@ -156,7 +133,7 @@ function generateCivilization(planet) {
 
     return new Civilization({
         planet, governmentType, cargoPriceMultipliers, skillPriceMultipliers, technology, education, territory, population,
-         army, navy, industry, economy, security, culture, prestige, corruption, crime, policies,
+         army, navy, industry, economy, security, culture, prestige, corruption, crime,
          wealth, reserves, taxes, races, religions, stateReligion, cultures
     })
 }

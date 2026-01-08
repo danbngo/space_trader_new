@@ -55,19 +55,6 @@ function showGovernmentsMenu(backFunction = () => closeModal()) {
 
     const columnLayout = createColumnLayout([leftColumn, rightColumn])
 
-    // Create policy adoption table
-    const policyAdoptionSection = ce({
-        style: 'margin-top: 30px; padding-top: 20px; border-top: 1px solid #444;',
-        children: [
-            ce({
-                tag: 'div',
-                style: 'font-weight: bold; margin-bottom: 10px; font-size: 1.1em;',
-                children: ['Policy Adoption']
-            }),
-            createPolicyAdoptionTable(civilizedPlanets)
-        ]
-    })
-
     // Create data completeness indicator
     const completenessText = completeness >= 100 
         ? colorSpan('Data 100% complete!', COLORS.Green)
@@ -76,8 +63,7 @@ function showGovernmentsMenu(backFunction = () => closeModal()) {
     const content = ce({
         children: [
             ce({innerHTML: completenessText, style: 'margin-bottom: 15px; font-style: italic;'}),
-            columnLayout, 
-            policyAdoptionSection
+            columnLayout
         ]
     })
 
@@ -139,100 +125,3 @@ function createGovernmentSection(govType, governmentCounts, totalPlanets) {
     return govSection
 }
 
-/**
- * Creates tables showing policy adoption by category across all governments
- * @param {Planet[]} civilizedPlanets - Array of planets with civilizations
- * @returns {HTMLElement} The policy tables in two-column layout
- */
-function createPolicyAdoptionTable(civilizedPlanets) {
-    // Count how many governments use each policy
-    const policyCounts = new Map()
-    
-    for (const planet of civilizedPlanets) {
-        const policies = planet.c.policies
-        if (policies.economic) {
-            policyCounts.set(policies.economic, (policyCounts.get(policies.economic) || 0) + 1)
-        }
-        if (policies.labor) {
-            policyCounts.set(policies.labor, (policyCounts.get(policies.labor) || 0) + 1)
-        }
-        if (policies.social) {
-            policyCounts.set(policies.social, (policyCounts.get(policies.social) || 0) + 1)
-        }
-        if (policies.foreign) {
-            policyCounts.set(policies.foreign, (policyCounts.get(policies.foreign) || 0) + 1)
-        }
-    }
-
-    // Helper function to create a table for a policy category
-    const createCategoryTable = (categoryName, categoryPolicies) => {
-        const usedPolicies = categoryPolicies.filter(p => policyCounts.get(p) > 0)
-        
-        if (usedPolicies.length === 0) {
-            return ce({
-                style: 'margin-bottom: 20px;',
-                children: [
-                    ce({
-                        tag: 'div',
-                        style: 'font-weight: bold; margin-bottom: 5px;',
-                        children: [categoryName]
-                    }),
-                    colorSpan('(No policies active)', COLORS.Gray)
-                ]
-            })
-        }
-
-        // Sort by count descending
-        usedPolicies.sort((a, b) => policyCounts.get(b) - policyCounts.get(a))
-
-        /** @type {Array<[string, string|HTMLElement]>} */
-        const tableRows = [
-            ['Policy', 'Governments']
-        ]
-
-        for (const policy of usedPolicies) {
-            // Get planet symbols for this policy
-            const planetSymbols = civilizedPlanets
-                .filter(p => p.c.policies.all.includes(policy))
-                .map(p => p.symbol)
-                .join(' ')
-            
-            tableRows.push([
-                coloredName(policy),
-                ce({innerHTML: planetSymbols})
-            ])
-        }
-
-        return ce({
-            style: 'margin-bottom: 20px;',
-            children: [
-                ce({
-                    tag: 'div',
-                    style: 'font-weight: bold; margin-bottom: 5px;',
-                    children: [categoryName]
-                }),
-                createTable(tableRows, null, null)
-            ]
-        })
-    }
-
-    // Left column: Social and Foreign policies
-    const leftColumn = ce({
-        style: 'display: flex; flex-direction: column;',
-        children: [
-            createCategoryTable('Social Policies', SOCIAL_POLICIES),
-            createCategoryTable('Foreign Policies', FOREIGN_POLICIES)
-        ]
-    })
-
-    // Right column: Economic and Labor policies
-    const rightColumn = ce({
-        style: 'display: flex; flex-direction: column;',
-        children: [
-            createCategoryTable('Economic Policies', ECONOMIC_POLICIES),
-            createCategoryTable('Labor Policies', LABOR_POLICIES)
-        ]
-    })
-
-    return createColumnLayout([leftColumn, rightColumn])
-}

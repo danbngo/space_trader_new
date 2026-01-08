@@ -224,8 +224,6 @@ const SaveManager = {
                 version: this.SAVE_VERSION,
                 timestamp: Date.now(),
                 year: gs.year,
-                encounterImmunityUntilYear: gs.encounterImmunityUntilYear,
-                nextTitheYear: gs.nextTitheYear,
                 
                 // System reference
                 systemName: gs.system ? gs.system.name : null,
@@ -335,9 +333,6 @@ const SaveManager = {
             captainUUID: this.objectToUUID(fleet.captain),
             
             cargo: this.serializeCountsMap(fleet.cargo),
-            
-            route: fleet.route ? this.serializeRoute(fleet.route) : null,
-            fleetAI: fleet.fleetAI ? this.serializeFleetAI(fleet.fleetAI) : null,
 
             fuel: fleet.fuel || 0,
         };
@@ -424,9 +419,6 @@ const SaveManager = {
             bounty: this.serializeCountsMap(officer.bounty),
             skills: this.serializeCountsMap(officer.skills),
             
-            loans: (officer.loans || []).map(loan => this.serializeBankLoan(loan)),
-            implants: (officer.implants || []).map(implant => this.serializeCyberImplant(implant)),
-            geneticModifications: (officer.geneticModifications || []).map(mod => this.serializeGeneticModification(mod)),
             ranks: this.serializeMapWithObjectKeys(officer.ranks),
             perks: (officer.perks || []).map(perk => perk ? perk.name : null).filter(x => x),
         };
@@ -456,64 +448,8 @@ const SaveManager = {
     },
 
     /**
-     * Serialize a Route
-     * @param {Route} route
-     * @returns {Object}
-     */
-    serializeRoute(route) {
-        if (!route) return null;
-        
-        const serialized = {
-            uuid: route.uuid,
-            startYear: route.startYear,
-            endYear: route.endYear,
-            travelTime: route.travelTime,
-            valid: route.valid,
-            
-            fleetUUID: this.objectToUUID(route.fleet),
-            destinationUUID: this.objectToUUID(route.destination),
-            
-            path: route.path ? {
-                startX: route.path.startX,
-                startY: route.path.startY,
-                toX: route.path.toX,
-                toY: route.path.toY,
-                normalize: route.path.normalize
-            } : null
-        };
-        
-        // Handle InterceptionRoute special case
-        if (route instanceof InterceptionRoute && route.targetFleet) {
-            serialized.isInterception = true;
-            serialized.targetFleetUUID = this.objectToUUID(route.targetFleet);
-            serialized.interceptionPoint = route.interceptionPoint;
-            serialized.iterations = route.iterations;
-        }
-        
-        return serialized;
-    },
-
-    /**
-     * Serialize FleetAI
-     * @param {FleetAI} fleetAI
-     * @returns {Object}
-     */
-    serializeFleetAI(fleetAI) {
-        if (!fleetAI) return null;
-        
-        return {
-            fleetUUID: this.objectToUUID(fleetAI.fleet),
-            originUUID: this.objectToUUID(fleetAI.origin),
-            destinationUUID: this.objectToUUID(fleetAI.destination),
-            targetUUID: this.objectToUUID(fleetAI.target),
-            voyageYearsRemaining: fleetAI.voyageYearsRemaining,
-            visited: this.serializeArray(fleetAI.visited),
-        };
-    },
-
-    /**
      * Serialize Religion
-     * @param {Religion} religion
+     * @param {any} religion
      * @returns {Object}
      */
     serializeReligion(religion) {
@@ -559,53 +495,6 @@ const SaveManager = {
     },
 
     /**
-     * Serialize BankLoan
-     * @param {BankLoan} loan
-     * @returns {Object}
-     */
-    serializeBankLoan(loan) {
-        if (!loan) return null;
-        
-        return {
-            principal: loan.principal,
-            interest: loan.interest,
-            term: loan.term,
-            startYear: loan.startYear,
-            dueYear: loan.dueYear,
-            outstandingBalance: loan.outstandingBalance,
-            planetUUID: this.objectToUUID(loan.planet),
-        };
-    },
-
-    /**
-     * Serialize CyberImplant
-     * @param {CyberImplant} implant
-     * @returns {Object}
-     */
-    serializeCyberImplant(implant) {
-        if (!implant) return null;
-        
-        return {
-            implantTypeName: implant.implantType ? implant.implantType.name : null,
-            quality: implant.quality || 1.0
-        };
-    },
-
-    /**
-     * Serialize GeneticModification
-     * @param {GeneticModification} mod
-     * @returns {Object}
-     */
-    serializeGeneticModification(mod) {
-        if (!mod) return null;
-        
-        return {
-            modificationTypeName: mod.modificationType ? mod.modificationType.name : null,
-            quality: mod.quality || 1.0
-        };
-    },
-
-    /**
      * Main deserialization function - reconstructs GameState from saved data
      * @param {Object} saveData - The saved data object
      * @returns {GameState} Reconstructed game state
@@ -623,8 +512,6 @@ const SaveManager = {
             
             // Restore basic properties
             gs.year = saveData.year || GAME_START_YEAR;
-            gs.encounterImmunityUntilYear = saveData.encounterImmunityUntilYear || 0;
-            gs.nextTitheYear = saveData.nextTitheYear || 0;
             gs.missions = [];
             
             // PASS 1: Deserialize StarSystem structure (stars, planets, etc. - already exist globally)
@@ -746,11 +633,8 @@ const SaveManager = {
         fleet._planetUUID = data.planetUUID;
         fleet._locationUUID = data.locationUUID;
         fleet._fleetTypeName = data.fleetTypeName;
-        fleet._flagshipUUID = data.flagshipUUID;
         fleet._captainUUID = data.captainUUID;
         fleet._destroyedBy = data.destroyedBy;
-        fleet._routeData = data.route;
-        fleet._fleetAIData = data.fleetAI;
         
         return fleet;
     },
@@ -800,7 +684,6 @@ const SaveManager = {
         // Restore modules
         ship.localModules = (data.localModules || []).map(m => this.deserializeShipModule(m));
         ship.moduleCooldowns = this.deserializeCountsMap(data.moduleCooldowns, SHIP_MODULE_TYPES);
-        ship.statusEffects = this.deserializeCountsMap(data.statusEffects, STATUS_EFFECTS);
         
         // Store UUIDs for later reference restoration
         ship._fleetUUID = data.fleetUUID;
@@ -864,9 +747,6 @@ const SaveManager = {
         officer.ranks = this.deserializeMapWithObjectKeys(data.ranks, 'planet', RANK_TYPES);
         
         // Restore arrays
-        officer.loans = (data.loans || []).map(l => this.deserializeBankLoan(l));
-        officer.implants = (data.implants || []).map(i => this.deserializeCyberImplant(i));
-        officer.geneticModifications = (data.geneticModifications || []).map(m => this.deserializeGeneticModification(m));
         officer.perks = (data.perks || []).map(perkName => this.findPerkType(perkName)).filter(x => x);
         
         // Store UUIDs for later reference restoration
@@ -904,22 +784,6 @@ const SaveManager = {
         
         gameRegistry.registerMission(mission);
         return mission;
-    },
-
-    /**
-     * Deserialize Religion
-     * @param {Object} data
-     * @returns {Religion}
-     */
-    deserializeReligion(data) {
-        if (!data) return null;
-        
-        const traits = (data.traits || []).map(traitName => this.findReligionTrait(traitName)).filter(x => x);
-        const religion = new Religion(data.name, traits, data.color, data.symbol);
-        religion.uuid = data.uuid;
-        
-        gameRegistry.registerCivilization(religion); // Religions use civilization registry
-        return religion;
     },
 
     /**
@@ -962,59 +826,6 @@ const SaveManager = {
     },
 
     /**
-     * Deserialize BankLoan
-     * @param {Object} data
-     * @returns {BankLoan}
-     */
-    deserializeBankLoan(data) {
-        if (!data) return null;
-        
-        const planet = this.uuidToObject(data.planetUUID, 'planet');
-        
-        const loan = new BankLoan(
-            data.principal,
-            data.interest,
-            data.term,
-            data.startYear,
-            planet
-        );
-        
-        // Restore calculated/saved fields
-        loan.dueYear = data.dueYear;
-        loan.outstandingBalance = data.outstandingBalance;
-        
-        return loan;
-    },
-
-    /**
-     * Deserialize CyberImplant
-     * @param {Object} data
-     * @returns {CyberImplant}
-     */
-    deserializeCyberImplant(data) {
-        if (!data) return null;
-        
-        const implantType = this.findCyberImplantType(data.implantTypeName);
-        if (!implantType) return null;
-        
-        return new CyberImplant(implantType, data.quality || 1.0);
-    },
-
-    /**
-     * Deserialize GeneticModification
-     * @param {Object} data
-     * @returns {GeneticModification}
-     */
-    deserializeGeneticModification(data) {
-        if (!data) return null;
-        
-        const modType = this.findGeneticModificationType(data.modificationTypeName);
-        if (!modType) return null;
-        
-        return new GeneticModification(modType, data.quality || 1.0);
-    },
-
-    /**
      * Restore all cross-references after all entities are created
      * @param {GameState} gs
      * @param {Object} saveData
@@ -1027,7 +838,6 @@ const SaveManager = {
             fleet.planet = this.uuidToObject(fleet._planetUUID, 'planet');
             fleet.location = this.uuidToObject(fleet._locationUUID, 'planet');
             fleet.fleetType = this.findFleetType(fleet._fleetTypeName);
-            fleet.flagship = this.uuidToObject(fleet._flagshipUUID, 'ship');
             fleet.captain = this.uuidToObject(fleet._captainUUID, 'officer');
             
             // Handle destroyedBy (can be string or UUID)
@@ -1035,16 +845,6 @@ const SaveManager = {
                 fleet.destroyedBy = fleet._destroyedBy;
             } else {
                 fleet.destroyedBy = this.uuidToObject(fleet._destroyedBy, 'fleet');
-            }
-            
-            // Restore route
-            if (fleet._routeData) {
-                fleet.route = this.deserializeRoute(fleet._routeData);
-            }
-            
-            // Restore fleetAI
-            if (fleet._fleetAIData) {
-                fleet.fleetAI = this.deserializeFleetAI(fleet._fleetAIData);
             }
             
             // Restore ship->fleet references
@@ -1061,109 +861,6 @@ const SaveManager = {
                 officer.planet = this.uuidToObject(officer._planetUUID, 'planet');
             }
         }
-    },
-
-    /**
-     * Deserialize a Route
-     * @param {Object} data
-     * @returns {Route}
-     */
-    deserializeRoute(data) {
-        if (!data) return null;
-        
-        const fleet = this.uuidToObject(data.fleetUUID, 'fleet');
-        const destination = this.uuidToObject(data.destinationUUID, 'planet');
-        
-        if (!fleet || !destination) return null;
-        
-        // Check if this is an InterceptionRoute
-        if (data.isInterception) {
-            const targetFleet = this.uuidToObject(data.targetFleetUUID, 'fleet');
-            if (!targetFleet) {
-                console.warn('SaveManager: InterceptionRoute targetFleet not found, creating regular Route');
-                // Fall through to regular route creation
-            } else {
-                // Create InterceptionRoute manually to restore state
-                const route = Object.create(InterceptionRoute.prototype);
-                route.uuid = data.uuid;
-                route.fleet = fleet;
-                route.destination = destination;
-                route.startYear = data.startYear;
-                route.endYear = data.endYear;
-                route.travelTime = data.travelTime;
-                route.valid = data.valid;
-                route.isInterception = true;
-                route.targetFleet = targetFleet;
-                route.targetRouteAtCreation = targetFleet.route;
-                route.interceptionPoint = data.interceptionPoint;
-                route.iterations = data.iterations;
-                
-                if (data.path) {
-                    route.path = new Path(
-                        data.path.startX,
-                        data.path.startY,
-                        data.path.toX,
-                        data.path.toY,
-                        data.path.normalize
-                    );
-                }
-                
-                gameRegistry.registerRoute(route);
-                return route;
-            }
-        }
-        
-        // Create regular route manually since constructor calculates path
-        const route = Object.create(Route.prototype);
-        route.uuid = data.uuid;
-        route.fleet = fleet;
-        route.destination = destination;
-        route.startYear = data.startYear;
-        route.endYear = data.endYear;
-        route.travelTime = data.travelTime;
-        route.valid = data.valid;
-        
-        if (data.path) {
-            route.path = new Path(
-                data.path.startX,
-                data.path.startY,
-                data.path.toX,
-                data.path.toY,
-                data.path.normalize
-            );
-        }
-        
-        gameRegistry.registerRoute(route);
-        return route;
-    },
-
-    /**
-     * Deserialize FleetAI
-     * @param {Object} data
-     * @returns {FleetAI}
-     */
-    deserializeFleetAI(data) {
-        if (!data) return null;
-        
-        const fleet = this.uuidToObject(data.fleetUUID, 'fleet');
-        const origin = this.uuidToObject(data.originUUID, 'planet');
-        
-        if (!fleet) return null;
-        
-        // Determine AI class from fleet type
-        const fleetAIType = getFleetAITypeForFleetType(fleet.fleetType);
-        const AIClass = fleetAIType ? fleetAIType.aiClass : FleetAI;
-        
-        // Create AI with proper constructor (fleet, origin, starMap)
-        const fleetAI = new AIClass(fleet, origin, null);
-        
-        // Restore additional properties
-        fleetAI.destination = this.uuidToObject(data.destinationUUID, 'planet');
-        fleetAI.target = this.uuidToObject(data.targetUUID, 'planet');
-        fleetAI.voyageYearsRemaining = data.voyageYearsRemaining || 0;
-        fleetAI.visited = this.deserializeArray(data.visited || [], 'planet');
-        
-        return fleetAI;
     },
 
     // === Type Finder Helper Methods ===
@@ -1200,11 +897,6 @@ const SaveManager = {
         return Object.values(NT).find(t => t.name === name);
     },
 
-    findEffectType(name) {
-        if (!name) return null;
-        return Object.values(EFFECT_TYPES).find(t => t.name === name);
-    },
-
     findPerkType(name) {
         if (!name) return null;
         return Object.values(PERK_TYPES).find(t => t.name === name);
@@ -1215,25 +907,8 @@ const SaveManager = {
         return Object.values(RELIGION_TRAITS).find(t => t.name === name);
     },
 
-    findCyberImplantType(name) {
-        if (!name) return null;
-        return CYBER_IMPLANT_TYPES_ALL.find(t => t.name === name);
-    },
-
-    findGeneticModificationType(name) {
-        if (!name) return null;
-        return GENETIC_MODIFICATION_TYPES_ALL.find(t => t.name === name);
-    },
-
-    findFleetAIType(name) {
-        if (!name) return null;
-        return Object.values(FLEET_AI_TYPES).find(t => t.name === name);
-    },
-
     findAIType(name) {
         return name
-        /*if (!name) return null;
-        return Object.values(AI_TYPES).find(t => t.name === name);*/
     },
 
     /**
