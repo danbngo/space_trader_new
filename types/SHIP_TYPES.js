@@ -164,7 +164,7 @@ ASTEROID_SHIP_TYPES.MAGNETOID.onDisabled = (died = new AsteroidShip(), encounter
  * @param {Encounter} encounter - The current encounter
  */
 function spawnSmallerAsteroids(died, encounter) {
-    if (died.hull[1] < 6) return; // Too small to split
+    if (died.hull[1] < 5 || died.radiusModifier <= .25) return; // Too small to split
     
     // Spawn 2 smaller asteroids
     for (let i = 0; i < 2; i++) {

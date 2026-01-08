@@ -32,6 +32,8 @@ class ShipAction {
         this.targetGoodMessage = null
         this.targetBadMessage = null
         this.targetInfoMessage = null
+        this.healAmount = 0
+
     }
     get angle() {
         return this.path.angle

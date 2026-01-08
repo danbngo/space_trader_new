@@ -39,11 +39,11 @@ function generateEncounterForFleet(fleet) {
     let undetectedFleet = null
     if (playerSneakAttack && !enemySneakAttack) {
         console.log('Player is performing a sneak attack on the enemy fleet!')
-        undetectedFleet = fleet
+        undetectedFleet = gs.fleet // Player is undetected
     }
     else if (enemySneakAttack && !playerSneakAttack) {
         console.log('Enemy fleet is performing a sneak attack on the player!')
-        undetectedFleet = gs.fleet
+        undetectedFleet = fleet // Enemy is undetected
     }
 
     const EncounterClass = encounterType.encounterClass || Encounter

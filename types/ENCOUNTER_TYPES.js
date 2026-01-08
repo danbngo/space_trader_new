@@ -98,7 +98,11 @@ for (const et of ASTEROID_ENCOUNTER_TYPES_ALL) {
         for (let i = 0; i < encounter.fleet.ships.length; i++) {
             const ratio = i / encounter.fleet.ships.length
             const ship = encounter.fleet.ships[i]
-            if (ship instanceof AsteroidShip) ship.radiusModifier *= ratio
+            if (ship instanceof AsteroidShip) {
+                ship.radiusModifier *= ratio
+                ship.engine /= ratio
+                ship.engine *= 2
+            }
         }
     }
 }

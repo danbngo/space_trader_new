@@ -567,7 +567,8 @@ class Encounter {
                 Object.assign(ship, {x, y})
             })
         }
-        else {
+        else if (formationType != FORMATION_TYPES.Storm) {
+            // For non-Storm, non-PlayerEncircle formations, position player ships normally
             const [cx,cy] = rotatePoint(avgDist, 0, 0, 0, anglePlayerFleetToEnemy+Math.PI)
             playerFleet.ships.forEach((ship,i)=>{
                 const distFromCenter = rng(distMargin, distMargin/8)
@@ -576,6 +577,7 @@ class Encounter {
                 Object.assign(ship, {x: cx+dx, y: cy+dy, angle: playerFacingAngle + angleDiff})
             })
         }
+        // Note: Storm formation player ships are already positioned near center above
 
         for (const ship of enemyShips) {
             Object.assign(ship, {color: this.encounterType.enemyColor})

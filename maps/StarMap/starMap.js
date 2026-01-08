@@ -678,24 +678,9 @@ class StarMap extends BaseMap {
             }
             // Check if interception will take a long time - if so, require confirmation
             if (obj instanceof Fleet && !obj.destroyed && route.travelTime > WARN_INTERCEPT_DURATION_YEARS && !bypassInterceptWarning) {
-                const targetName = obj.name || 'fleet'
-                const eta = describeTimespan(route.travelTime, 1)
-                showModal(
-                    '⚠️ Long Interception Route',
-                    ce({
-                        children: [
-                            ce({ innerHTML: `Intercepting ${targetName} will take ${eta}.` }),
-                            ce({ innerHTML: 'This is a long journey. Do you want to proceed?' })
-                        ]
-                    }),
-                    [
-                        ['Cancel', () => closeModal()],
-                        ['Proceed', () => {
-                            closeModal()
-                            this.setDestination(obj, true, bypassSunWarning, true)
-                        }]
-                    ]
-                )
+                showLongInterceptionWarningModal(obj, route, () => {
+                    this.setDestination(obj, true, bypassSunWarning, true)
+                })
                 this._creatingRoute = false
                 return
             }

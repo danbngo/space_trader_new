@@ -11,8 +11,8 @@ function showInsufficientFuelModal(route, obj, onProceed) {
         '⚠️ Insufficient Fuel',
         ce({
             children: [
-                ce({ innerHTML: `Your route to ${targetName} requires ${roundToPlaces(fuelRequired, 1)} fuel, but you only have ${roundToPlaces(gs.fleet.fuel, 1)}.` }),
-                ce({ innerHTML: 'You need to refuel at a shipyard before making this journey.' })
+                `Your route to ${targetName} requires ${roundToPlaces(fuelRequired, 1)} fuel, but you only have ${roundToPlaces(gs.fleet.fuel, 1)}.`,
+                `You may become stranded. Do you want to proceed?`,
             ]
         }),
         [
@@ -40,9 +40,9 @@ function showFuelWarningModal(route, obj, fuelAfterArrival, nearestStationDistan
         '⚠️ Fuel Warning',
         ce({
             children: [
-                ce({ innerHTML: `After reaching ${targetName}, you will have ${roundToPlaces(fuelAfterArrival, 1)} fuel remaining.` }),
-                ce({ innerHTML: `The nearest known refueling station is ${roundToPlaces(nearestStationDistance, 1)} AU away (${roundToPlaces(fuelToNearestStation, 1)} fuel required).` }),
-                ce({ innerHTML: 'You may become stranded. Do you want to proceed?' })
+                `After reaching ${targetName}, you will have ${roundToPlaces(fuelAfterArrival, 1)} fuel remaining.`,
+                `The nearest known refueling station is ${roundToPlaces(nearestStationDistance, 1)} AU away (${roundToPlaces(fuelToNearestStation, 1)} fuel required).`,
+                `You may become stranded. Do you want to proceed?`
             ]
         }),
         [
@@ -66,8 +66,35 @@ function showSunWarningModal(obj, onProceed) {
         '⚠️ Dangerous Route',
         ce({
             children: [
-                ce({ innerHTML: `Your route to ${targetName} passes dangerously close to the sun's core.` }),
-                ce({ innerHTML: 'This path is extremely hazardous. Do you want to proceed anyway?' })
+                `Your route to ${targetName} passes dangerously close to the sun's core.`,
+                `This path is extremely hazardous. Do you want to proceed anyway?`
+            ]
+        }),
+        [
+            ['Cancel', () => closeModal()],
+            ['Proceed', () => {
+                closeModal()
+                onProceed()
+            }]
+        ]
+    )
+}
+
+/**
+ * Shows modal warning player that intercepting a fleet will take a long time
+ * @param {Fleet} targetFleet - The fleet being intercepted
+ * @param {Route} route - The interception route
+ * @param {Function} onProceed - Callback to proceed with interception anyway
+ */
+function showLongInterceptionWarningModal(targetFleet, route, onProceed) {
+    const targetName = targetFleet.name || 'fleet'
+    const eta = describeTimespan(route.travelTime, 1)
+    showModal(
+        '⚠️ Long Interception Route',
+        ce({
+            children: [
+                `Intercepting ${targetName} will take ${eta}.`,
+                'This is a long journey. Do you want to proceed?',
             ]
         }),
         [
