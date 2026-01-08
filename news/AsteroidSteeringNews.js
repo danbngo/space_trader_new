@@ -22,11 +22,7 @@ class AsteroidSteeringNews extends News {
                 technology: CL.HIGH,
                 navy: CL.SLIGHTLY_HIGH,
                 industry: CL.SLIGHTLY_HIGH,
-                prestige: CL.SLIGHTLY_HIGH,
-                climateAlterations: () => {
-                    // Successfully reduce asteroid impact frequency
-                    planet.climate.incrementClimateValue(ASTEROID_IMPACTS, -1)
-                }
+                prestige: CL.SLIGHTLY_HIGH
             },
             {
                 wealth: CL.LOW,

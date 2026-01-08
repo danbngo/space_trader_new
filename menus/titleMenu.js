@@ -108,80 +108,6 @@ async function simulateHistory(numYears) {
 }
 
 /**
- * Simulates fleet activity with progress tracking.
- * @param {number} numYears - Number of years of fleet activity to simulate.
- */
-async function simulateFleetActivity(numYears) {
-    const activityProgressBar = new ProgressBar({value: 0, width: 50})
-    const activityElapsedTimeElement = ce({tag: 'div', id: 'fleet_elapsed_time', children: ['Elapsed time: 0.0s']})
-    const activeFleetCountElement = ce({tag: 'div', id: 'active_fleet_count', style: 'text-align: center; margin-top: 5px;', children: ['Active Fleets: 0']})
-    const abandonedFleetCountElement = ce({tag: 'div', id: 'abandoned_fleet_count', style: 'text-align: center; margin-top: 5px;', children: ['Abandoned Fleets: 0']})
-    const totalFleetsEverElement = ce({tag: 'div', id: 'total_fleets_ever', style: 'text-align: center; margin-top: 5px;', children: ['Total Fleets Ever: 0']})
-    const activeAnomalyCountElement = ce({tag: 'div', id: 'active_anomaly_count', style: 'text-align: center; margin-top: 5px;', children: ['Active Anomalies: 0']})
-    
-    const displayYears = numYears < 1 ? `${Math.round(numYears * 12)} months` : `${numYears} years`
-    
-    showModal(
-        'Generating Fleet Activity',
-        ce({children: [
-            `Simulating ${displayYears} of fleet movement...`,
-            ce({tag:'br'}),
-            activityProgressBar.container,
-            ce({tag:'br'}),
-            activityElapsedTimeElement,
-            activeFleetCountElement,
-            abandonedFleetCountElement,
-            totalFleetsEverElement,
-            activeAnomalyCountElement
-        ]}),
-        []
-    )
-    
-    // Wait a frame to ensure modal is displayed
-    await new Promise(resolve => setTimeout(resolve, 10))
-    
-    // Simulate fleet activity with progress tracking
-    console.log('Beginning fleet activity simulation...')
-    const activityProgress = {completePercentage: 0}
-    const activityStartTime = performance.now()
-    
-    const activityProgressInterval = setInterval(() => {
-        const elapsedSeconds = (performance.now() - activityStartTime) / 1000
-        activityProgressBar.update(activityProgress.completePercentage)
-        const elapsedEl = document.getElementById('fleet_elapsed_time')
-        if (elapsedEl) {
-            elapsedEl.textContent = `Elapsed time: ${elapsedSeconds.toFixed(1)}s`
-        }
-        const fleetCountEl = document.getElementById('active_fleet_count')
-        if (fleetCountEl) {
-            const activeFleets = gs.system.fleets.filter(f => !f.destroyed).length
-            fleetCountEl.textContent = `Active Fleets: ${activeFleets}`
-        }
-        const abandonedCountEl = document.getElementById('abandoned_fleet_count')
-        if (abandonedCountEl) {
-            abandonedCountEl.textContent = `Abandoned Fleets: ${gs.system.abandonedFleets ? gs.system.abandonedFleets.length : 0}`
-        }
-        const totalFleetsEl = document.getElementById('total_fleets_ever')
-        if (totalFleetsEl) {
-            totalFleetsEl.textContent = `Total Fleets Ever: ${Fleet.numFleetsEver}`
-        }
-        const anomalyCountEl = document.getElementById('active_anomaly_count')
-        if (anomalyCountEl) {
-            anomalyCountEl.textContent = `Active Anomalies: ${gs.system.anomalies ? gs.system.anomalies.length : 0}`
-        }
-    }, 50)
-    
-    await addFleetActivity(numYears, activityProgress)
-    
-    // Refresh positions one final time to ensure all objects are correctly positioned
-    gs.system.updatePositions(gs.year)
-    
-    console.log('Fleet activity simulation finished')
-    clearInterval(activityProgressInterval)
-    closeModal()
-}
-
-/**
  * Initializes and starts a new game with default settings.
  */
 async function startNewGame() {
@@ -256,18 +182,6 @@ async function startNewGame() {
         return
     }
     
-    // Simulate fleet activity (daily ticks for better efficiency)
-
-    try {
-        await simulateFleetActivity(SIMULATE_FLEET_ACTIVITY_YEARS)
-    }
-    catch (e) {
-        console.error("Error during fleet activity simulation:", e)
-        alert("An error occurred during fleet activity simulation. Please try starting a new game again.")
-        assessFleets()
-        closeModal()
-        return
-    }
 
     // Ensure maximum anomalies exist at end of simulation
     console.log('Topping up anomalies after simulation...')
@@ -300,7 +214,6 @@ async function startNewGame() {
         PLAYER_FLEET_TYPE,
         null,
         COLORS.LightGray,
-        0, 0,
     )
 
     gs.fleet.addShip(playerShip)

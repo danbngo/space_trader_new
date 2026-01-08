@@ -13,9 +13,6 @@ class IceCapsMeltNews extends News {
                 industry: CL.LOW,
                 economy: CL.LOW,
                 wealth: CL.SLIGHTLY_LOW,
-                climateAlterations: () => {
-                    planet.climate.incrementClimateValue(OCEAN_COVERAGES, 1)
-                },
                 cargoPriceMultipliers: new CountsMap(new Map([
                     [CARGO_TYPES.CONSTRUCTION, CL.VERY_HIGH],
                     [CARGO_TYPES.WATER, CL.LOW]
@@ -25,10 +22,7 @@ class IceCapsMeltNews extends News {
                 industry: CL.SLIGHTLY_LOW,
                 economy: CL.SLIGHTLY_LOW,
                 culture: CL.SLIGHTLY_HIGH,
-                prestige: CL.SLIGHTLY_HIGH,
-                climateAlterations: () => {
-                    planet.climate.incrementClimateValue(OCEAN_COVERAGES, 1)
-                }
+                prestige: CL.SLIGHTLY_HIGH
             },
             {
                 population: CL.SLIGHTLY_LOW,
@@ -36,10 +30,7 @@ class IceCapsMeltNews extends News {
                 economy: CL.VERY_LOW,
                 wealth: CL.LOW,
                 reserves: CL.LOW,
-                territory: CL.SLIGHTLY_LOW,
-                climateAlterations: () => {
-                    planet.climate.incrementClimateValue(OCEAN_COVERAGES, 2)
-                }
+                territory: CL.SLIGHTLY_LOW
             }
         )
     }

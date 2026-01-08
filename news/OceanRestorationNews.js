@@ -24,11 +24,7 @@ class OceanRestorationNews extends News {
                 technology: CL.SLIGHTLY_HIGH,
                 territory: CL.SLIGHTLY_HIGH,
                 culture: CL.SLIGHTLY_HIGH,
-                prestige: CL.HIGH,
-                climateAlterations: () => {
-                    // Successfully raise ocean coverage
-                    planet.climate.incrementClimateValue(OCEAN_COVERAGES, 1)
-                }
+                prestige: CL.HIGH
             },
             {
                 population: CL.LOW,

@@ -16,9 +16,6 @@ class GlobalCoolingNews extends News {
                 economy: CL.LOW,
                 wealth: CL.SLIGHTLY_LOW,
                 taxes: CL.HIGH,
-                climateAlterations: () => {
-                    planet.climate.incrementClimateValue(TEMPERATURES, -1)
-                },
                 cargoPriceMultipliers: new CountsMap(new Map([
                     [CARGO_TYPES.FOOD, CL.VERY_HIGH],
                     [CARGO_TYPES.ISOTOPES, CL.HIGH]
@@ -28,10 +25,7 @@ class GlobalCoolingNews extends News {
                 population: CL.SLIGHTLY_LOW,
                 culture: CL.HIGH,
                 prestige: CL.SLIGHTLY_HIGH,
-                technology: CL.SLIGHTLY_HIGH,
-                climateAlterations: () => {
-                    planet.climate.incrementClimateValue(TEMPERATURES, -1)
-                }
+                technology: CL.SLIGHTLY_HIGH
             },
             {
                 buildingsDamaged: buildingsToDisable,
@@ -41,10 +35,7 @@ class GlobalCoolingNews extends News {
                 industry: CL.LOW,
                 wealth: CL.LOW,
                 reserves: CL.LOW,
-                territory: CL.SLIGHTLY_LOW,
-                climateAlterations: () => {
-                    planet.climate.incrementClimateValue(TEMPERATURES, -2)
-                }
+                territory: CL.SLIGHTLY_LOW
             }
         )
     }

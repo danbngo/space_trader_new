@@ -25,32 +25,7 @@ class TerraformingNews extends News {
                 industry: CL.HIGH,
                 territory: CL.SLIGHTLY_HIGH,
                 economy: CL.HIGH,
-                prestige: CL.HIGH,
-                climateAlterations: () => {
-                    // Terraforming makes the planet more Earth-like in one aspect
-                    // Only alter one property toward Earth's composition
-                    const possibilities = []
-                    
-                    // Check if atmosphere can be made more Earth-like
-                    if (planet.climate.atmosphereType !== PLANET_ATMOSPHERE_TYPES.OXYGEN_NITROGEN) {
-                        possibilities.push(() => planet.climate.setClimateValue(PLANET_ATMOSPHERE_TYPES, PLANET_ATMOSPHERE_TYPES.OXYGEN_NITROGEN))
-                    }
-                    
-                    // Check if ocean can be made more Earth-like
-                    if (planet.climate.oceanType !== PLANET_OCEAN_TYPES.WATER) {
-                        possibilities.push(() => planet.climate.setClimateValue(PLANET_OCEAN_TYPES, PLANET_OCEAN_TYPES.WATER))
-                    }
-                    
-                    // Check if geology can be made more Earth-like
-                    if (planet.climate.geologyType !== PLANET_GEOLOGY_TYPES.GRANITE) {
-                        possibilities.push(() => planet.climate.setClimateValue(PLANET_GEOLOGY_TYPES, PLANET_GEOLOGY_TYPES.GRANITE))
-                    }
-                    
-                    // Apply one random improvement
-                    if (possibilities.length > 0) {
-                        rndMember(possibilities)()
-                    }
-                }
+                prestige: CL.HIGH
             },
             {
                 wealth: CL.LOW,

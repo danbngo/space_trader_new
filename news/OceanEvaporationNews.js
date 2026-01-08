@@ -12,9 +12,7 @@ class OceanEvaporationNews extends News {
             {
                 economy: CL.SLIGHTLY_LOW,
                 wealth: CL.SLIGHTLY_LOW,
-                climateAlterations: () => {
-                    planet.climate.incrementClimateValue(OCEAN_COVERAGES, -1)
-                },
+
                 cargoPriceMultipliers: new CountsMap(new Map([
                     [CARGO_TYPES.WATER, CL.ASTRONOMICAL],
                     [CARGO_TYPES.FOOD, CL.HIGH]
@@ -23,20 +21,14 @@ class OceanEvaporationNews extends News {
             {
                 economy: CL.SLIGHTLY_LOW,
                 technology: CL.HIGH,
-                education: CL.SLIGHTLY_HIGH,
-                climateAlterations: () => {
-                    planet.climate.incrementClimateValue(OCEAN_COVERAGES, -1)
-                }
+                education: CL.SLIGHTLY_HIGH
             },
             {
                 population: CL.LOW,
                 economy: CL.LOW,
                 wealth: CL.LOW,
                 reserves: CL.SLIGHTLY_LOW,
-                territory: CL.LOW,
-                climateAlterations: () => {
-                    planet.climate.incrementClimateValue(OCEAN_COVERAGES, -2)
-                }
+                territory: CL.LOW
             }
         )
     }

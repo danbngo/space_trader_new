@@ -23,13 +23,7 @@ class HeatRadiatorNews extends News {
                 technology: CL.SLIGHTLY_HIGH,
                 industry: CL.HIGH,
                 economy: CL.SLIGHTLY_HIGH,
-                prestige: CL.SLIGHTLY_HIGH,
-                climateAlterations: () => {
-                    // Successfully reduce geological activity and temperature
-                    planet.climate.incrementClimateValue(GEOLOGICAL_ACTIVITIES, -1)
-                    planet.climate.incrementClimateValue(TEMPERATURES, -1)
-                    planet.climate.incrementClimateValue(MAGNETOSPHERES, -1)
-                }
+                prestige: CL.SLIGHTLY_HIGH
             },
             {
                 wealth: CL.VERY_LOW,

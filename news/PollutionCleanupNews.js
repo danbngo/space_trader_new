@@ -22,11 +22,7 @@ class PollutionCleanupNews extends News {
                 economy: CL.HIGH,
                 culture: CL.HIGH,
                 prestige: CL.SLIGHTLY_HIGH,
-                education: CL.SLIGHTLY_HIGH,
-                climateAlterations: () => {
-                    // Successfully reduce pollution
-                    planet.climate.incrementClimateValue(POLLUTION_LEVELS, -1)
-                }
+                education: CL.SLIGHTLY_HIGH
             },
             {
                 wealth: CL.LOW,

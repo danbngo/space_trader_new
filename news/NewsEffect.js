@@ -49,7 +49,6 @@ class NewsEffect extends Civilization {
         wealth = 1,
         reserves = 1,
         taxes = 1,
-        religions = new CountsMap()
 
     }) {
         /** @type {string} */
@@ -74,7 +73,6 @@ class NewsEffect extends Civilization {
             wealth,
             reserves,
             taxes,
-            religions
         });
 
         /** @type {Planet|null} */

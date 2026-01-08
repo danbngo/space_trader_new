@@ -23,12 +23,7 @@ class MantleHeatingNews extends News {
             {
                 technology: CL.HIGH,
                 industry: CL.SLIGHTLY_HIGH,
-                prestige: CL.HIGH,
-                climateAlterations: () => {
-                    // Successfully increase geological activity and magnetosphere
-                    planet.climate.incrementClimateValue(GEOLOGICAL_ACTIVITIES, 1)
-                    planet.climate.incrementClimateValue(MAGNETOSPHERES, 1)
-                }
+                prestige: CL.HIGH
             },
             {
                 buildingsDamaged,

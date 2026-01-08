@@ -13,9 +13,6 @@ class AtmosphereStrippedNews extends News {
                 population: CL.SLIGHTLY_LOW,
                 economy: CL.SLIGHTLY_LOW,
                 taxes: CL.HIGH,
-                climateAlterations: () => {
-                    planet.climate.incrementClimateValue(ATMOSPHERIC_PRESSURES, -1)
-                },
                 cargoPriceMultipliers: new CountsMap(new Map([
                     [CARGO_TYPES.ISOTOPES, CL.ASTRONOMICAL],
                     [CARGO_TYPES.WATER, CL.VERY_HIGH]
@@ -25,10 +22,7 @@ class AtmosphereStrippedNews extends News {
                 population: CL.SLIGHTLY_LOW,
                 technology: CL.HIGH,
                 prestige: CL.SLIGHTLY_HIGH,
-                education: CL.SLIGHTLY_HIGH,
-                climateAlterations: () => {
-                    planet.climate.incrementClimateValue(ATMOSPHERIC_PRESSURES, -1)
-                }
+                education: CL.SLIGHTLY_HIGH
             },
             {
                 population: CL.LOW,
@@ -36,10 +30,7 @@ class AtmosphereStrippedNews extends News {
                 economy: CL.LOW,
                 wealth: CL.LOW,
                 reserves: CL.LOW,
-                culture: CL.SLIGHTLY_LOW,
-                climateAlterations: () => {
-                    planet.climate.incrementClimateValue(ATMOSPHERIC_PRESSURES, -2)
-                }
+                culture: CL.SLIGHTLY_LOW
             }
         )
     }

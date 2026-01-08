@@ -77,15 +77,15 @@ function createTradeInfoSellTable(ct = CARGO_TYPES_ALL[0], onSelectPlanet = (p =
     for (const planet of sortedPlanets) {
         const market = illegal ? planet.settlement.blackMarket : planet.settlement.market
         const sellPrice = market ? market.calcCargoSellPrices().getAmount(ct) : -1
-        const route = new Route(fleet, planet)
         const distance = calcDistance(fleet.x, fleet.y, planet.x, planet.y)
+        const eta = distance/fleet.speed
         const distScore = 2*(INNER_SOLAR_SYSTEM_RADIUS_IN_AU-distance)/INNER_SOLAR_SYSTEM_RADIUS_IN_AU
         rows.push([
             coloredName(planet),
             !market ? 'N/A' : ''+statColorSpan(sellPrice, sellPrice/ct.value),
             !market ? 'N/A' : ''+statColorSpan(market.credits, market.credits/MARKET_AVERAGE_CREDITS),
             ''+statColorSpan(roundToPlaces(distance, 2), distScore),
-            ''+statColorSpan(describeTimespan(route.travelTime), distScore),
+            ''+statColorSpan(describeTimespan(eta), distScore),
         ])
     }
     return createTable(rows, (rowIndex = 0)=>onSelectPlanet(sortedPlanets[rowIndex]))
@@ -106,6 +106,7 @@ function showTradeInfoSellMenu(ct = CARGO_TYPES_ALL[0]) {
 
     const dropdown = new Dropdown(dropdownOptions, true, CARGO_TYPES_ALL.indexOf(ct)).container
 
+    /** @type {(ButtonData|HTMLElement)[]} */
     const options = [
         dropdown,
         ["Buy Info", () => showTradeInfoBuyMenu(ct)],
@@ -136,6 +137,7 @@ function showTradeInfoBuyMenu(ct = CARGO_TYPES_ALL[0]) {
 
     const dropdown = new Dropdown(dropdownOptions, true, CARGO_TYPES_ALL.indexOf(ct)).container
 
+    /** @type {(ButtonData|HTMLElement)[]} */
     const options = [
         dropdown,
         ["Sell Info", () => showTradeInfoSellMenu(ct)],

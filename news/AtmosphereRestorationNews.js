@@ -24,11 +24,7 @@ class AtmosphereRestorationNews extends News {
                 technology: CL.HIGH,
                 education: CL.SLIGHTLY_HIGH,
                 culture: CL.SLIGHTLY_HIGH,
-                prestige: CL.HIGH,
-                climateAlterations: () => {
-                    // Successfully raise atmospheric pressure
-                    planet.climate.incrementClimateValue(ATMOSPHERIC_PRESSURES, 1)
-                }
+                prestige: CL.HIGH
             },
             {
                 population: CL.SLIGHTLY_HIGH, // Reduced from SLIGHTLY_LOW

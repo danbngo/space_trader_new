@@ -23,11 +23,7 @@ class OrbitalShieldsNews extends News {
                 technology: CL.VERY_HIGH,
                 education: CL.SLIGHTLY_HIGH,
                 industry: CL.SLIGHTLY_HIGH,
-                prestige: CL.HIGH,
-                climateAlterations: () => {
-                    // Successfully reduce radiation
-                    planet.climate.incrementClimateValue(RADIATION_LEVELS, -2)
-                }
+                prestige: CL.HIGH
             },
             {
                 population: CL.SLIGHTLY_LOW,

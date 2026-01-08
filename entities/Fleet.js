@@ -13,8 +13,6 @@ class Fleet extends SpaceObject {
      * @param {Planet} planet - The planet the fleet starts at.
      * @param {FleetType} fleetType - The type of fleet
      * @param {number[]} color - The color of the fleet.
-     * @param {number} x - The x-coordinate of the fleet's position.
-     * @param {number} y - The y-coordinate of the fleet's position.
      */
     constructor(name = "Unnamed", planet = null, fleetType = FLEET_TYPES_ALL[0], color = COLORS.White, x = 0, y = 0) {
         super(name, OBJECT_TYPES.FLEET, color, FLEET_RADIUS, x, y);
@@ -38,26 +36,7 @@ class Fleet extends SpaceObject {
         this.officers = []
         /** @type {Planet} */
         this.location = null;
-        // REMOVED: FleetAI
-        // /** @type {FleetAI} */
-        // this.fleetAI = null;
-        /** @type {number} */
-        this.angle = 0
-        /** @type {number} */
-        this.cloakLevel = 0; // 0 = visible, 1.0 = fully cloaked
-        /** @type {Fleet|null} */
-        this.escortTarget = null; // Fleet that this fleet is escorting/following
-        /** @type {Fleet|Asteroid|string|null} */ // REMOVED: Anomaly
-        this.destroyedBy = null; // Track what destroyed this fleet
-        /** @type {boolean} */
-        this.destroyed = false; // Whether this fleet is destroyed/abandoned
-        /** @type {number|null} */
-        this.abandonedYear = null; // Year when fleet was destroyed
-        /** @type {string|null} */
-        this.originalName = null; // Original name before being abandoned
-        /** @type {Orbit|null} */
-        this.orbit = null; // Orbital path for abandoned fleets (spiraling into sun)
-        
+       
         // Temporary properties used during deserialization (SaveManager)
         /** @type {string} */
         this._planetUUID = undefined;
@@ -67,14 +46,6 @@ class Fleet extends SpaceObject {
         this._fleetTypeName = undefined;
         /** @type {string} */
         this._captainUUID = undefined;
-        /** @type {string} */
-        this._destroyedBy = undefined;
-        // REMOVED: Route
-        // /** @type {Object} */
-        // this._routeData = undefined;
-        // REMOVED: FleetAI
-        // /** @type {Object} */
-        // this._fleetAIData = undefined;
         
         gameRegistry.registerFleet(this)
 

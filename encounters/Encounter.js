@@ -316,7 +316,7 @@ class Encounter {
         //restore all shields
         for (const s of gs.fleet.ships) s.restoreShields()
         //pause and show modal if player has no working ships, cant move
-        //checkPlayerStranded()
+        checkPlayerStranded()
     }
 
     showPlayerRefuseSurrenderModal() {

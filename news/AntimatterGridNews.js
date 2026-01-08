@@ -39,11 +39,7 @@ class AntimatterGridNews extends News {
                 reserves: CL.VERY_LOW,
                 technology: CL.LOW,
                 taxes: CL.VERY_HIGH,
-                prestige: CL.LOW,
-                climateAlterations: () => {
-                    // Catastrophic failure releases massive radiation
-                    planet.climate.incrementClimateValue(RADIATION_LEVELS, 2)
-                }
+                prestige: CL.LOW
             }
         )
     }
