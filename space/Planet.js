@@ -46,6 +46,25 @@ class Planet extends OrbitingObject {
     get s() {
         return this.settlement
     }
+    
+    /**
+     * Check if this planet is a valid refueling station for the player
+     * @returns {boolean} True if player has visited and there's a working shipyard
+     */
+    isValidRefuelingStation() {
+        // Check if player has visited this planet
+        if (!gs.lastVisitedDates.has(this)) return false
+        
+        // Check memorized settlement for a working shipyard
+        const memorizedSettlement = gs.memorizedSettlements.get(this)
+        if (!memorizedSettlement) return false
+        
+        const shipyard = memorizedSettlement.shipyard
+        if (!shipyard) return false
+        
+        // Shipyard must exist and not be damaged
+        return shipyard.exists && !shipyard.damaged
+    }
     /**
      * Returns a display name based on whether the player has visited this planet
      * @returns {string} - Either the planet name or "Unknown [Type]" descriptor

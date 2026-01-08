@@ -328,7 +328,7 @@ class StarMap extends BaseMap {
                         this.infoBarDistanceEl = ce({id: 'star_map_distance_info_bar', innerHTML: `${distance} AU`}),
                         ` | ETA: `,
                         this.infoBarETAEl = ce({id: 'star_map_eta_info_bar', innerHTML: yearsRemaining}),
-                        ` | Fuel: `,
+                        ` | Fuel Cost: `,
                         this.infoBarFuelCostEl = ce({id: 'star_map_fuel_cost_info_bar', innerHTML: `${roundToPlaces(distance * FUEL_COST_PER_1_AU, 1)}`})
                     ]
                 })
@@ -555,7 +555,7 @@ class StarMap extends BaseMap {
                         const etaYears = travelTime
                         const fuelCost = roundToPlaces(testRoute.path.distance * FUEL_COST_PER_1_AU, 1)
                         ce({parent:container, innerHTML:`ETA: ${statColorSpan(describeTimespan(travelTime, 1), 1/(1+etaYears*12))}`})
-                        ce({parent:container, innerHTML:`Fuel: ${fuelCost}`})
+                        ce({parent:container, innerHTML:`Fuel Cost: ${fuelCost}`})
                         // Abandoned (destroyed) fleets use "Travel" instead of "Intercept"
                         const buttonText = obj.destroyed ? 'Travel' : 'Intercept'
                         ce({parent:container, tag:'button', innerHTML:buttonText, onClick:()=>this.setDestination(obj, true), disabled: gs.fleet.stranded})
@@ -587,7 +587,7 @@ class StarMap extends BaseMap {
                 this.objPaneETAEl = ce({id: 'star_map_eta_object_pane', innerHTML: statColorSpan(describeTimespan(travelTime, 1), 1/(1+etaYears*12))})
             ]})
             ce({parent:container, children: [
-                'Fuel: ',
+                'Fuel Cost: ',
                 this.objPaneFuelCostEl = ce({id: 'star_map_fuel_cost_object_pane', innerHTML: `${roundToPlaces(distance * FUEL_COST_PER_1_AU, 1)}`})
             ]})
             // Only show scan/dock button if planet is discovered
@@ -597,7 +597,8 @@ class StarMap extends BaseMap {
             // Hide travel button if this planet is already the destination of the current route
             const isCurrentDestination = gs.fleet.route && gs.fleet.route.destination === obj
             if (!isCurrentDestination) {
-                ce({parent:container, tag:'button', innerHTML:'Travel', onClick:()=>this.setDestination(obj, true), disabled: cantTravelHere})
+                const outOfFuel = gs.fleet.fuel <= 0
+                ce({parent:container, tag:'button', innerHTML:'Travel', onClick:()=>this.setDestination(obj, true), disabled: cantTravelHere || outOfFuel})
             }
             if (gs.fleet.route) ce({parent:container, tag:'button', innerHTML:'Stop', onClick:()=>this.stopPlayerFleet()})
         }
@@ -617,10 +618,11 @@ class StarMap extends BaseMap {
                 this.objPaneETAEl = ce({id: 'star_map_eta_object_pane', innerHTML: describeTimespan(travelTime, 1)})
             ]})
             ce({parent:container, children: [
-                'Fuel: ',
+                'Fuel Cost: ',
                 this.objPaneFuelCostEl = ce({id: 'star_map_fuel_cost_object_pane', innerHTML: `${roundToPlaces(distance * FUEL_COST_PER_1_AU, 1)}`})
             ]})
-            ce({parent:container, tag:'button', innerHTML:'Travel', onClick:()=>this.setDestination(obj, true), disabled: gs.fleet.stranded})
+            const outOfFuel = gs.fleet.fuel <= 0
+            ce({parent:container, tag:'button', innerHTML:'Travel', onClick:()=>this.setDestination(obj, true), disabled: gs.fleet.stranded || outOfFuel})
             if (gs.fleet.route) ce({parent:container, tag:'button', innerHTML:'Stop', onClick:()=>this.stopPlayerFleet()})
         }
     }
@@ -710,7 +712,54 @@ class StarMap extends BaseMap {
                         ]
                     }),
                     [
-                        ['OK', () => closeModal()]
+                        ['Cancel Travel', () => closeModal(), false, 'highlighted'],
+                        ['Travel Anyway', () => {
+                            closeModal()
+                            this._proceedWithRoute(route, obj, unpause, bypassSunWarning)
+                        }]
+                    ]
+                )
+                this._creatingRoute = false
+                return
+            }
+            
+            // Check if destination is too far from any refueling station
+            const destinationX = route.path.toX
+            const destinationY = route.path.toY
+            const fuelAfterArrival = gs.fleet.fuel - fuelRequired
+            
+            // Find nearest valid refueling station from destination
+            const validStations = [...gs.system.planets, ...gs.system.dwarfPlanets, ...gs.system.spaceStations]
+                .filter(p => p.isValidRefuelingStation && p.isValidRefuelingStation())
+            
+            let nearestStationDistance = Infinity
+            for (const station of validStations) {
+                const distance = calcDistance(destinationX, destinationY, station.x, station.y)
+                if (distance < nearestStationDistance) {
+                    nearestStationDistance = distance
+                }
+            }
+            
+            // Warn if remaining fuel wouldn't be enough to reach nearest station
+            const fuelToNearestStation = nearestStationDistance * FUEL_COST_PER_1_AU
+            if (validStations.length > 0 && fuelAfterArrival < fuelToNearestStation) {
+                const targetName = obj.name || 'waypoint'
+                showModal(
+                    '⚠️ Fuel Warning',
+                    ce({
+                        children: [
+                            ce({ innerHTML: `After reaching ${targetName}, you will have ${roundToPlaces(fuelAfterArrival, 1)} fuel remaining.` }),
+                            ce({ innerHTML: `The nearest known refueling station is ${roundToPlaces(nearestStationDistance, 1)} AU away (${roundToPlaces(fuelToNearestStation, 1)} fuel required).` }),
+                            ce({ innerHTML: 'You may become stranded. Do you want to proceed?' })
+                        ]
+                    }),
+                    [
+                        ['Cancel Travel', () => closeModal(), false, 'highlighted'],
+                        ['Travel Anyway', () => {
+                            closeModal()
+                            // Continue with the rest of the setDestination logic
+                            this._proceedWithRoute(route, obj, unpause, bypassSunWarning)
+                        }]
                     ]
                 )
                 this._creatingRoute = false
@@ -718,6 +767,11 @@ class StarMap extends BaseMap {
             }
         }
         
+        // Continue with route validation and setting
+        this._proceedWithRoute(route, obj, unpause, bypassSunWarning)
+    }
+    
+    _proceedWithRoute(route, obj, unpause, bypassSunWarning) {
         // Check if route intersects the sun
         if (route && FleetAI.checkRouteIntersectsSun(route)) {
             if (!bypassSunWarning) {
@@ -795,6 +849,14 @@ class StarMap extends BaseMap {
         if (this.tickCounter >= 90) {
             gs.system.updateDiscoveries()
             this.tickCounter = 0
+        }
+        
+        // Update fuel bar every 15 frames
+        if (!this.fuelBarCounter) this.fuelBarCounter = 0
+        this.fuelBarCounter++
+        if (this.fuelBarCounter >= 15) {
+            this.refreshFuelBar()
+            this.fuelBarCounter = 0
         }
 
         this.handleCanvasObjects()

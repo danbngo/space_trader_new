@@ -288,6 +288,13 @@ class StarSystem extends SpaceObject {
             if (fleet === gs.fleet) {
                 const distanceTraveled = calcDistance(oldX, oldY, fx, fy)
                 this.deductFuel(fleet, distanceTraveled)
+                
+                // Check if player ran out of fuel
+                if (fleet.fuel <= 0) {
+                    console.log('⚠️ Player fleet ran out of fuel!')
+                    fleet.route = null
+                    fleet.fuel = 0
+                }
             }
         }
         
