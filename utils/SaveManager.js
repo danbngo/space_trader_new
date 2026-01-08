@@ -455,6 +455,7 @@ const SaveManager = {
             expirationDate: mission.expirationDate,
             amount: mission.amount,
             reward: mission.reward,
+            amountFulfilled: mission.amountFulfilled,
             
             missionTypeName: mission.missionType ? mission.missionType.name : null,
             planetUUID: this.objectToUUID(mission.planet),
@@ -912,6 +913,7 @@ const SaveManager = {
         );
         
         mission.uuid = data.uuid;
+        mission.amountFulfilled = data.amountFulfilled || 0;
         
         gameRegistry.registerMission(mission);
         return mission;

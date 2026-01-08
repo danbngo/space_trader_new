@@ -15,6 +15,8 @@ class GameState {
         this.encounter = null;
         /** @type {Mission[]} */
         this.missions = [];
+        /** @type {Mission[]} */
+        this.oldMissions = [];
         /** @type {number} */
         this.encounterImmunityUntilYear = 0;
         /** @type {number} */

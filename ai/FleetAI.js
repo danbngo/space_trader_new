@@ -300,6 +300,15 @@ class FleetAI {
 
     onNearDestination() {
         console.log('🛬', `${this.fleet.name+' '+this.fleet.uuid} has arrived at destination ${this.destination.name}.`)
+        
+        // Track escort mission completion
+        if (this.fleet.missionUuid) {
+            const mission = gs.missions.find(m => m.uuid === this.fleet.missionUuid)
+            if (mission) {
+                mission.onPlayerEscortReachDestination(this.fleet)
+            }
+        }
+        
         this.destination = null
         
         // If we still have voyageYears remaining, find a new destination

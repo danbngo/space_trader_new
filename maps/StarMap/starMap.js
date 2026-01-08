@@ -660,13 +660,37 @@ class StarMap extends BaseMap {
     }
 
     /** @param {Planet | Waypoint | Fleet} obj */
-    setDestination(obj, unpause = false, bypassSunWarning = false, bypassInterceptWarning = false) {
+    setDestination(obj, unpause = false, bypassSunWarning = false, bypassInterceptWarning = false, bypassEscortWarning = false) {
         // Prevent rapid-clicking from creating multiple expensive route calculations
         if (this._creatingRoute) {
             console.log('Route creation already in progress, ignoring duplicate click')
             return
         }
         this._creatingRoute = true
+        
+        // Warn if player has an active escort mission
+        if (gs.fleet.escortTarget && !bypassEscortWarning) {
+            showModal(
+                'Abandon Escort?',
+                'You are currently escorting a fleet. Setting a new destination will abandon them and fail the escort mission. Continue?',
+                [
+                    ['Abandon', () => {
+                        // Fail escort missions
+                        for (const mission of gs.missions) {
+                            if (mission.missionType === MISSION_TYPES.ESCORT_CONVOY) {
+                                mission.onPlayerDropEscort()
+                            }
+                        }
+                        gs.fleet.escortTarget = null
+                        this.setDestination(obj, unpause, bypassSunWarning, bypassInterceptWarning, true)
+                    }],
+                    ['Cancel', () => {
+                        this._creatingRoute = false
+                    }]
+                ]
+            )
+            return
+        }
         
         let route = null
         
@@ -783,6 +807,11 @@ class StarMap extends BaseMap {
         const elapsedYears = elapsedMs * this.gameYearsPerMs;
 
         gs.year += elapsedYears
+        
+        // Check for expired and completed missions
+        checkExpiredMissions()
+        checkCompletedMissions()
+        
         gs.system.updateRoutes(gs.year)
         gs.system.updatePositions()
         gs.system.updateEscortPositions()

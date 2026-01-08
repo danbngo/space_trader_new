@@ -196,6 +196,19 @@ class Encounter {
     updateEncounterResult() {
         console.log('Encounter.updateEncounterResult:',this.activeEnemyShips,this.activePlayerShips,this.playerFlagship);
         const {activeEnemyShips, playerFlagship} = this
+        
+        // Track disabled enemy ships for missions (initialize tracking set if needed)
+        if (!this._missionTrackedShips) this._missionTrackedShips = new Set()
+        
+        for (const ship of this.ships) {
+            if (ship.disabled && !this._missionTrackedShips.has(ship) && !this.playerShips.includes(ship)) {
+                this._missionTrackedShips.add(ship)
+                for (const mission of gs.missions) {
+                    mission.onPlayerDestroyShip(ship, this.fleet)
+                }
+            }
+        }
+        
         if (activeEnemyShips.length == 0) {
             this.result = ENCOUNTER_RESULTS.Victory
             this.combatEnabled = false

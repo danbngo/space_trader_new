@@ -1,0 +1,28 @@
+talking to timmi makes me think...
+
+whats the point of the space map with all the shit going on on it? sure its cool, but what does it really add?
+
+im starting to remember that game design is 50% about cutting away, rather than adding. AI is good for one thing, but the other..
+still requires good old fashioned hard work, foresight, planning, understanding of aesthetic/theme
+
+statue of david wouldnt all of a sudden be cooler if they added things like a cool sword and a wolf at his heel
+
+basically like... what is the EXPERIENCE im envisaging for the player when they're playing my game?
+is he whipping out his phone every 5 minutes to make a decision?
+is he in front of a desktop clicking and typing endlessly and using hotkeys?
+is he calm or is he excited/sweaty?
+etc. etc.
+
+what major existing well-mapped, well-understood class of game does my game strongly resemble?
+
+is it a menu driven game ala seedship or the OG space trader?
+  ^^ for this we need to cut the flying around part, go back to random encounters, have a side <> side combat system
+  the emphasis becomes about planning, decisions and understanding the game world and how the stats interact (econ simulator)
+is it a full spectrum roguelike you have to control every moment you're playing? like dwarf fortress?
+  ^^ for this we need to do what tim said, make a chunky astronaut guy who can land and explore, and go tile based
+  here the emphasis is more on roleplay, experiencing the game world and novel discrete interactions
+is it a twitch game where you control shit on the map and click click click?
+  ^^ nah
+is it a 3d space shooter where the emphasis is on combat and novel physics interactions?
+  ^^ this is mostly just for "cool" factor and to obviate the need to think about certain things because "realism". i dont think
+  its an actua plan.

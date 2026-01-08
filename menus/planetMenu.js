@@ -58,14 +58,6 @@ function showPlanetMenu(planet = new Planet()) {
                 s.hull[0] = 1  // Only restore 1 hull to make ship non-disabled
             }
         }
-                
-        // Refuel up to 50% of total capacity when docking
-        const halfCapacity = gs.fleet.totalFuelCapacity * 0.5
-        const fuelNeeded = halfCapacity - gs.fleet.fuel
-        if (fuelNeeded > 0) {
-            gs.fleet.fuel += fuelNeeded
-            msg += colorSpan(`The dock provides ${roundToPlaces(fuelNeeded, 1)} units of complimentary fuel (50% capacity).<br/>`, COLORS.LightGreen)
-        }
         
         // Check for damaged buildings
         if (settlement) {

@@ -103,6 +103,11 @@ class Fleet extends SpaceObject {
             gs.memorizedSettlements.set(planet, planet.settlement.clone())
             gs.lastVisitedDates.set(planet, gs.year)
             console.log(`📝 Memorized settlement at ${planet.name} (year ${gs.year})`)
+            
+            // Track planet visits for missions
+            for (const mission of gs.missions) {
+                mission.onPlayerVisitLocation(planet)
+            }
         }
     }
 
