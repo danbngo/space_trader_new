@@ -25,7 +25,7 @@ function createBuyShipMenu(ships = [], shipyard = new Shipyard(), onSelectShip =
             statColorSpan(buyPrice, ship.value/buyPrice)
         ])
     }
-    const table = createTable(rows, (rowIndex = 0)=>onSelectShip(ships[rowIndex]))
+    const table = createTable(rows, (rowIndex = 0)=>onSelectShip(ships[rowIndex - 1]))
     
     // Add popovers to stat header cells
     const headerRow = table.rows[0];
@@ -81,7 +81,7 @@ function createBuyModuleMenu(modules = [new ShipModule()], shipyard = new Shipya
             module.moduleType.description
         ])
     }
-    const table = createTable(rows, (rowIndex = 0)=>onSelectModule(modules[rowIndex]))
+    const table = createTable(rows, (rowIndex = 0)=>onSelectModule(modules[rowIndex - 1]))
     
     // Add popovers to header columns
     if (table.rows[0]) {
@@ -142,7 +142,7 @@ function createSellShipMenu(ships = [], shipyard = new Shipyard(), onSelectShip 
             statColorSpan(sellPrice, sellPrice/ship.value)
         ])
     }
-    const table = createTable(rows, (rowIndex = 0)=>onSelectShip(ships[rowIndex]))
+    const table = createTable(rows, (rowIndex = 0)=>onSelectShip(ships[rowIndex - 1]))
     
     // Add popovers to stat header cells
     const headerRow = table.rows[0];
@@ -231,13 +231,13 @@ function showShipyardBuyMenu(shipyard = new Shipyard()) {
     function showBuyShipModal(ship ) {
         const buyPrice = shipyard.calcBuyPrice(ship)
         
-        // Create ship visual using Ship.asImage() with player's fleet color
-        const shipImage = ship.asImage(80, gs.fleet.color)
+        // Create ship visual using Ship.asCanvas() with player's fleet color
+        const shipCanvas = ship.asCanvas(80, gs.fleet.color)
         
         showModal(
             `Buy ${coloredName(ship)}?`,
             ce({children: [
-                shipImage,
+                shipCanvas,
                 `Buy the ${coloredName(ship)} for ${buyPrice} credits?`
             ]}),
             [
@@ -405,7 +405,7 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
             // Find the index of the selected ship (add 1 to account for header row)
             const selectedIndex = selectedShip ? ships.indexOf(selectedShip) + 1 : null;
             
-            return createTable(rows, (rowIndex) => onSelectShip(ships[rowIndex]), selectedIndex);
+            return createTable(rows, (rowIndex) => onSelectShip(ships[rowIndex - 1]), selectedIndex);
         }
         
         let selectedTradeShip = null;
@@ -663,7 +663,7 @@ function showShipyardInstallModuleMenu(shipyard = new Shipyard(), module = new S
             ])
         }
         
-        return createTable(rows, (rowIndex) => onSelectShip(fleet.ships[rowIndex]), selectedShip ? fleet.ships.indexOf(selectedShip) + 1 : null)
+        return createTable(rows, (rowIndex) => onSelectShip(fleet.ships[rowIndex - 1]), selectedShip ? fleet.ships.indexOf(selectedShip) + 1 : null)
     }
 
     function onSelectShip(ship ) {

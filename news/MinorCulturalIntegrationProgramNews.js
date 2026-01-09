@@ -32,19 +32,6 @@ class MinorCulturalIntegrationProgramNews extends News {
                 culture: CL.LOW,
             },
         )
-
-        // Heavy culture transfer through educational and cultural institutions
-        this.startEffects[0].onApply = () => {
-            if (this.planet instanceof Planet && this.targetPlanet instanceof Planet) {
-                this.targetPlanet.addCulture(this.planet, 0.08)
-            }
-        }
-        
-        this.completeEffects[0].onApply = () => {
-            if (this.planet instanceof Planet && this.targetPlanet instanceof Planet) {
-                this.targetPlanet.addCulture(this.planet, 0.12)
-            }
-        }
     }
 
     shouldCancel() {

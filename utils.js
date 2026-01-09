@@ -49,6 +49,21 @@ function calcDistance(x1 = 0, y1 = 0, x2 = 0, y2 = 0) {
 }
 
 /**
+ * Darkens an RGBA color array by reducing the RGB components.
+ * @param {number[]} color - The RGBA color array [r, g, b, a] with values 0-255.
+ * @param {number} factor - The darkening factor (0.0 to 1.0, default 0.3).
+ * @returns {number[]} A new darkened RGBA color array.
+ */
+function darkenColor(color, factor = 0.3) {
+    return [
+        Math.floor(color[0] * factor),
+        Math.floor(color[1] * factor),
+        Math.floor(color[2] * factor),
+        color[3] // Keep alpha unchanged
+    ];
+}
+
+/**
  * Rounds a number to a specified number of decimal places.
  * @param {number} num - The number to round.
  * @param {number} places - The number of decimal places.
@@ -438,7 +453,7 @@ function createBuildingPriceInfo(building, buildingName = "Building", options = 
  * @returns {HTMLElement} The info container element.
  */
 function createMarketCargoPriceInfo(market = new Market(), marketName = "Market", cargoType = CARGO_TYPES_ALL[0]) {
-    const {planet, blackMarket} = market;
+    const {planet} = market;
     const {corruption, inflationRate, taxRate} = planet.c;
     const rake = market.rake;
     
@@ -450,7 +465,7 @@ function createMarketCargoPriceInfo(market = new Market(), marketName = "Market"
     buyCalc.addFactor('merchant greed', 1 + rake);
     buyCalc.addFactor('inflation', 1 + inflationRate);
     buyCalc.addFactor('demand', demandMultiplier);
-    if (!blackMarket) buyCalc.addFactor('taxes', 1 + taxRate);
+    if (!cargoType.illegal) buyCalc.addFactor('taxes', 1 + taxRate);
     const totalBuyMultiplier = buyCalc.getTotalMultiplier();
     
     // Build sell price calculation
@@ -458,7 +473,7 @@ function createMarketCargoPriceInfo(market = new Market(), marketName = "Market"
     sellCalc.addFactor('merchant greed', 1 - rake / (1 + rake));
     sellCalc.addFactor('inflation', 1 + inflationRate);
     sellCalc.addFactor('demand', demandMultiplier);
-    if (!blackMarket) sellCalc.addFactor('taxes', 1 - taxRate);
+    if (!cargoType.illegal) sellCalc.addFactor('taxes', 1 - taxRate);
     const totalSellMultiplier = sellCalc.getTotalMultiplier();
     
     // Create the main info line

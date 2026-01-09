@@ -38,19 +38,6 @@ class MinorIdealogicalSpreadNews extends News {
                 security: CL.SLIGHTLY_HIGH,
             },
         )
-
-        // Heavy culture transfer through ideological infiltration
-        this.startEffects[0].onApply = () => {
-            if (this.planet instanceof Planet && this.targetPlanet instanceof Planet) {
-                this.targetPlanet.addCulture(this.planet, 0.05)
-            }
-        }
-        
-        this.completeEffects[0].onApply = () => {
-            if (this.planet instanceof Planet && this.targetPlanet instanceof Planet) {
-                this.targetPlanet.addCulture(this.planet, 0.09)
-            }
-        }
     }
 
     shouldCancel() {

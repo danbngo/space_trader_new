@@ -179,9 +179,9 @@ class CombatMap extends BaseMap {
                 const shipColor = gs.fleet && gs.fleet.color ? gs.fleet.color : [0, 255, 0, 255]
                 const shipSize = 20
                 
-                if (ship.shipType.shapeGenerator && ship.shipType.shapeGenerator.toPolygons) {
+                if (ship.shipType.shipShape && ship.shipType.shipShape.toPolygons) {
                     // Use ship shape polygons
-                    const polygons = ship.shipType.shapeGenerator.toPolygons(shipColor, shipSize)
+                    const polygons = ship.shipType.shipShape.toPolygons(shipColor, shipSize)
                     polygons.forEach((poly, polyIndex) => {
                         this.routeCvs.addPolygon(
                             `ship-${index}-poly-${poly.id}`,
@@ -319,9 +319,9 @@ class CombatMap extends BaseMap {
                 const shipColor = gs.fleet && gs.fleet.color ? gs.fleet.color : [0, 255, 0, 255]
                 const shipSize = 20
                 
-                if (ship.shipType.shapeGenerator && ship.shipType.shapeGenerator.toPolygons) {
+                if (ship.shipType.shipShape && ship.shipType.shipShape.toPolygons) {
                     // Use ship shape polygons
-                    const polygons = ship.shipType.shapeGenerator.toPolygons(shipColor, shipSize)
+                    const polygons = ship.shipType.shipShape.toPolygons(shipColor, shipSize)
                     polygons.forEach((poly, polyIndex) => {
                         this.routeCvs.addPolygon(
                             `ship-${index}-poly-${poly.id}`,

@@ -40,7 +40,7 @@ class ShipType {
         this.name = name
         this.description = description
         this.shape = shape; // Legacy shape enum (deprecated)
-        this.shapeGenerator = null; // Function that generates polygon vertices
+        this.shipShape = null; // Function that generates polygon vertices
         this.hull = hull
         this.shields = shields
         this.lasers = lasers
@@ -62,20 +62,20 @@ const SHIP_TYPES = {
     HAULER: new ShipType('Hauler', 'Massive bulk hauler with enormous cargo holds designed to transport liquids and gases.', null, 1.5, 0.25, 0.1, 1.5, 5, 1, 2, [], 2),
     TANKER: new ShipType('Tanker', 'Has more space for fuel.', null, 1.5, 0.25, 0.1, 1.5, 5, 1, 2, [], 2),
     SCOUT: new ShipType('Scout', 'Long-range reconnaissance vessel with powerful sensors and high speed for exploration.', null, 0.5, 0.5, 0.5, 3, 0.5, 3, 1.5, [], 1),
-    BATTLESHIP: new ShipType('Battleship', 'Massive capital ship with warhead launchers, heavy armor, and shields for fleet engagements.', null, 4, 4, 3, 1, 2, 1.5, 1.5, [], 1),
+    BATTLESHIP: new ShipType('Battleship', 'Massive capital ship with warhead launchers, heavy armor, and shields for fleet engagements.', null, 2, 2, 2, 1, 2, 1.5, 1.5, [], 1),
     INTERCEPTOR: new ShipType('Interceptor', 'Fast pursuit craft with magnetic grapples for capturing or disabling enemy vessels.', null, 1.5, 1.5, 1.5, 2, 0.25, 2, 1, [], 2),
-    RAIDER: new ShipType('Raider', '', null, 1, 2, 0.5, 1, 0.5, 2, 1.5, [], 1),
+    RAIDER: new ShipType('Raider', `Attack ship that specializes in quick strikes and hit-and-run tactics.`, null, 1, 2, 2, 2, 0.5, 0.5, 1.5, [], 1),
 }
 
 const SHIP_TYPES_ALL = Object.values(SHIP_TYPES)
 
 // Assign shape generators to ship types
-SHIP_TYPES.COURIER.shapeGenerator = SHIP_SHAPES.COURIER
-SHIP_TYPES.TANKER.shapeGenerator = SHIP_SHAPES.COURIER
-SHIP_TYPES.SCOUT.shapeGenerator = SHIP_SHAPES.COURIER
-SHIP_TYPES.BATTLESHIP.shapeGenerator = SHIP_SHAPES.COURIER
-SHIP_TYPES.INTERCEPTOR.shapeGenerator = SHIP_SHAPES.COURIER
-SHIP_TYPES.RAIDER.shapeGenerator = SHIP_SHAPES.COURIER
+SHIP_TYPES.COURIER.shipShape = SHIP_SHAPES.COURIER
+SHIP_TYPES.TANKER.shipShape = SHIP_SHAPES.COURIER
+SHIP_TYPES.SCOUT.shipShape = SHIP_SHAPES.COURIER
+SHIP_TYPES.BATTLESHIP.shipShape = SHIP_SHAPES.COURIER
+SHIP_TYPES.INTERCEPTOR.shipShape = SHIP_SHAPES.COURIER
+SHIP_TYPES.RAIDER.shipShape = SHIP_SHAPES.COURIER
 
 
 const ASTEROID_SHIP_TYPES = {

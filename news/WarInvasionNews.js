@@ -54,13 +54,6 @@ class WarInvasionNews extends News {
                 army: CL.SLIGHTLY_LOW
             }
         )
-        
-        // Invaders spread their culture through occupation
-        this.startEffects[0].onApply = () => {
-            if (this.targetPlanet instanceof Planet) {
-                this.targetPlanet.addCulture(this.planet, 0.01);
-            }
-        }
     }
 
     shouldCancel() {

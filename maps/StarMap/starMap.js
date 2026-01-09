@@ -31,14 +31,6 @@ class StarMap extends BaseMap {
 
         // Initialize handlers
         this.bodiesHandler = new StarMapBodiesHandler(this)
-        this.fleetsHandler = new StarMapFleetsHandler(this)
-
-        // Allow clicking empty space to select arbitrary coordinates
-        this.cvs.onClickWorldXY = (x, y) => {
-            if (calcDistance(x, y, 0 ,0) > starSystem.radius) return
-            const waypoint = new Waypoint(x, y)
-            this.selectObject(waypoint)
-        }
 
         this.handleCanvasObjects()
         this.refresh()
@@ -47,9 +39,6 @@ class StarMap extends BaseMap {
         
         // Add spotlight overlay to darken stars outside view range
         this.createSpotlight()
-        
-        // Start continuous waypoint animation loop (runs even when paused)
-        this.fleetsHandler.animateWaypoint()
         
         // Start continuous background star update loop (runs even when paused)
         this.animate()
@@ -126,9 +115,9 @@ class StarMap extends BaseMap {
             classNames: ['paused-indicator'],
             style: {
                 position: 'absolute',
-                top: '25%',
+                bottom: '25%',
                 left: '50%',
-                transform: 'translate(-50%, -50%)',
+                transform: 'translate(-50%, 50%)',
                 color: 'cyan',
                 fontSize: '24px',
                 fontWeight: 'bold',
@@ -306,7 +295,7 @@ class StarMap extends BaseMap {
 
         console.log(yearsRemaining,endYear,year)
 
-        /** @param {SpaceObject|Waypoint} destination */
+        /** @param {SpaceObject} destination */
         const destinationLink = (destination)=> {
             return ce({innerHTML: coloredName(destination), onClick: ()=>this.selectObject(destination), style: {color: colorArrToRgbaString(destination.color)}, classNames:['clickable-text']})
         }
@@ -427,7 +416,7 @@ class StarMap extends BaseMap {
                 this.objPaneFuelCostEl.textContent = `${fuelCost}`
                 
                 // Update ETA
-                if (obj instanceof Planet || obj.isWaypoint) {
+                if (obj instanceof Planet) {
                     const timespan = describeTimespan(travelTime, 1)
                     if (obj instanceof Planet) {
                         this.objPaneETAEl.innerHTML = statColorSpan(timespan, 1/(1+etaYears*12))
@@ -441,7 +430,6 @@ class StarMap extends BaseMap {
     
     handleCanvasObjects() {
         this.bodiesHandler.handleAll()
-        this.fleetsHandler.handleAll()
         // Note: cvs.redraw() is called by the animation loops (animateBackgroundStars/tick)
         // Don't redraw here or we'll redraw twice per frame
     }
@@ -494,15 +482,15 @@ class StarMap extends BaseMap {
         //const allPlanets = [...this.starSystem.planets, ...this.starSystem.dwarfPlanets]
         
         // Determine which canvas object to show as image
+        // Show real colors/decorators if object has been seen, even if not visited
         let imageObject = null
         if (obj instanceof SpaceStation) {
             imageObject = hasBeenSeen ? this.cvs.getObject(`station${obj.uuid}`) : this.cvs.getObject(`unknown${obj.uuid}`)
         } else if (obj instanceof Planet) {
+            // Show actual planet appearance with colors and decorators if it's been seen
             imageObject = hasBeenSeen ? this.cvs.getObject(`planet${obj.uuid}`) : this.cvs.getObject(`unknown${obj.uuid}`)
         } else if (obj instanceof Star) {
             imageObject = hasBeenSeen ? this.cvs.getObject(`star${obj.uuid}`) : this.cvs.getObject(`unknown${obj.uuid}`)
-        } else if (obj instanceof Fleet) {
-            imageObject = this.cvs.getObject(`fleet${obj.uuid}`)
         }
         
         // Check if fleet is out of radar range
@@ -620,26 +608,7 @@ class StarMap extends BaseMap {
         if (obj instanceof Star) {
             ce({parent:container, tag:'button', innerHTML:'View Star', onClick:()=>this.explore(obj)})
         }
-        // Handle waypoint (arbitrary coordinates)
-        if (obj.isWaypoint) {
-            const distance = roundToPlaces(calcDistance(gs.fleet.x, gs.fleet.y, obj.x, obj.y), 1)
-            const travelTime = distance / gs.fleet.speed
-            ce({parent:container, children: [
-                'Distance: ',
-                this.objPaneDistanceEl = ce({id: 'star_map_distance_object_pane', innerHTML: `${distance} AU`})
-            ]})
-            ce({parent:container, children: [
-                'ETA: ',
-                this.objPaneETAEl = ce({id: 'star_map_eta_object_pane', innerHTML: describeTimespan(travelTime, 1)})
-            ]})
-            ce({parent:container, children: [
-                'Fuel Cost: ',
-                this.objPaneFuelCostEl = ce({id: 'star_map_fuel_cost_object_pane', innerHTML: `${roundToPlaces(distance * FUEL_COST_PER_1_AU, 1)}`})
-            ]})
-            const outOfFuel = gs.fleet.fuel <= 0
-            //ce({parent:container, tag:'button', innerHTML:'Travel', onClick:()=>this.setDestination(obj, true), disabled: gs.fleet.stranded || outOfFuel})
-            if (gs.fleet.route) ce({parent:container, tag:'button', innerHTML:'Stop', onClick:()=>this.stopPlayerFleet()})
-        }
+
     }
 
     stopPlayerFleet() {

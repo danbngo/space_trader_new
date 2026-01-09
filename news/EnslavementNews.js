@@ -27,13 +27,6 @@ class EnslavementNews extends News {
             {
                 prestige: CL.SLIGHTLY_LOW,
             }        )
-        
-        // Add culture transfer when enslavement starts
-        this.startEffects[0].onApply = () => {
-            if (this.planet instanceof Planet && this.targetPlanet instanceof Planet) {
-                this.planet.addCulture(this.targetPlanet, 0.05);
-            }
-        }
 
         this.addTargetPlanetEffect(
             {

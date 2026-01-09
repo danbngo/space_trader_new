@@ -58,10 +58,10 @@ class StarMapBodiesHandler {
                 
                 if (distance > gs.fleet.mapViewDistance) {
                     //pixel.visible = false // Hide outside vision range
-                    pixel.color[3] = 64
+                    pixel.color = darkenColor(asteroid.color, 0.25)
                 } else {
                     //pixel.visible = true
-                    pixel.color[3] = 255
+                    pixel.color = asteroid.color
                 }
             } 
         })
@@ -136,6 +136,17 @@ class StarMapBodiesHandler {
                 const displaySize = Math.sqrt(body.radius/EARTH_RADII_PER_AU) * 3
                 unknownObj = cvs.addEmptyCircle(unknownId, body.x, body.y, displaySize, SUN_MIN_SCREEN_SIZE, COLORS.White, 1, () => selectObject.call(this.starMap, body))
                 unknownObj.clickPriority = 12
+                
+                // Add hover handlers to unknown circle
+                unknownObj.onHover = () => {
+                    unknownObj.strokeColor = COLORS.Cyan
+                    unknownObj.lineWidth = 2
+                }
+                unknownObj.onHoverEnd = () => {
+                    unknownObj.strokeColor = COLORS.White
+                    unknownObj.lineWidth = 1
+                }
+                unknownObj.onHoverEnd()
             }
             
             // Show star only if discovered or in vision range
@@ -149,6 +160,7 @@ class StarMapBodiesHandler {
             unknownObj.y = body.y
             
             cvsObject.strokeColor = (body == selectedObject) ? COLORS.Green : COLORS.Black
+            cvsObject.lineWidth = (body == selectedObject) ? 2 : 1
         })
     }
 
@@ -222,11 +234,17 @@ class StarMapBodiesHandler {
                             // Use descriptor property
                             labelObj.textContent = body.descriptor
                             labelObj.visible = true
-                            for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
+                            for (const obj2 of objs) {
+                                obj2.strokeColor = COLORS.Cyan
+                                obj2.lineWidth = 2
+                            }
                         }
                         obj.onHoverEnd = () => {
                             labelObj.visible = false
-                            for (const obj3 of objs) obj3.strokeColor = (body == selectedObject) ? COLORS.Green : COLORS.Black
+                            for (const obj3 of objs) {
+                                obj3.strokeColor = (body == selectedObject) ? COLORS.Green : COLORS.Black
+                                obj3.lineWidth = (body == selectedObject) ? 2 : 1
+                            }
                         }
                         obj.onHoverEnd()
                     }
@@ -234,9 +252,11 @@ class StarMapBodiesHandler {
                     // No labels - just handle hover on planet
                     planetObj.onHover = () => {
                         planetObj.strokeColor = COLORS.Cyan
+                        planetObj.lineWidth = 2
                     }
                     planetObj.onHoverEnd = () => {
                         planetObj.strokeColor = (body == selectedObject) ? COLORS.Green : COLORS.Black
+                        planetObj.lineWidth = (body == selectedObject) ? 2 : 1
                     }
                     planetObj.onHoverEnd()
                 }
@@ -248,6 +268,17 @@ class StarMapBodiesHandler {
                 const displaySize = Math.pow(body.radius/EARTH_RADII_PER_AU, 0.4) * 3.5
                 unknownObj = cvs.addEmptyCircle(unknownId, body.x, body.y, displaySize, minScreenSize, COLORS.White, 1, () => selectObject.call(this.starMap, body))
                 unknownObj.clickPriority = 12
+                
+                // Add hover handlers to unknown circle
+                unknownObj.onHover = () => {
+                    unknownObj.strokeColor = COLORS.Cyan
+                    unknownObj.lineWidth = 2
+                }
+                unknownObj.onHoverEnd = () => {
+                    unknownObj.strokeColor = COLORS.White
+                    unknownObj.lineWidth = 1
+                }
+                unknownObj.onHoverEnd()
             }
             
             // Show planet only if discovered or in vision range
@@ -256,6 +287,15 @@ class StarMapBodiesHandler {
             if (labelObj) labelObj.visible = false
             nightSideObj.visible = isDiscovered
             unknownObj.visible = !hasBeenSeen // Show unknown circle for all unseen planets
+            
+            // Update stroke width for selected planet
+            planetObj.lineWidth = (body == selectedObject) ? 2 : 1
+            
+            // Highlight player's location in green with 2 linewidth
+            if (gs.fleet && gs.fleet.location === body) {
+                planetObj.strokeColor = COLORS.Green
+                planetObj.lineWidth = 2
+            }
             
             // Update decorator visibility
             if (body.decorators && body.decorators.length > 0) {
@@ -332,11 +372,17 @@ class StarMapBodiesHandler {
                         // Use descriptor property
                         labelObj.textContent = station.descriptor
                         labelObj.visible = true
-                        for (const obj2 of objs) obj2.strokeColor = COLORS.Cyan
+                        for (const obj2 of objs) {
+                            obj2.strokeColor = COLORS.Cyan
+                            obj2.lineWidth = 2
+                        }
                     }
                     obj.onHoverEnd = () => {
                         labelObj.visible = false
-                        for (const obj3 of objs) obj3.strokeColor = (station == selectedObject) ? COLORS.Green : COLORS.Black
+                        for (const obj3 of objs) {
+                            obj3.strokeColor = (station == selectedObject) ? COLORS.Green : COLORS.Black
+                            obj3.lineWidth = (station == selectedObject) ? 2 : 1
+                        }
                     }
                     obj.onHoverEnd()
                 }
@@ -346,6 +392,17 @@ class StarMapBodiesHandler {
             if (!unknownObj) {
                 unknownObj = cvs.addEmptyCircle(unknownId, station.x, station.y, 0.2, 2, COLORS.White, 1, () => selectObject.call(this.starMap, station))
                 unknownObj.clickPriority = 12
+                
+                // Add hover handlers to unknown circle
+                unknownObj.onHover = () => {
+                    unknownObj.strokeColor = COLORS.Cyan
+                    unknownObj.lineWidth = 2
+                }
+                unknownObj.onHoverEnd = () => {
+                    unknownObj.strokeColor = COLORS.White
+                    unknownObj.lineWidth = 1
+                }
+                unknownObj.onHoverEnd()
             }
             
             // Show station only if discovered or in vision range
@@ -367,7 +424,61 @@ class StarMapBodiesHandler {
                 stationObj.strokeColor = COLORS.Green
                 labelObj.strokeColor = COLORS.Green
             }
+            
+            // Highlight player's location in green with 2 linewidth
+            if (gs.fleet && gs.fleet.location === station) {
+                stationObj.strokeColor = COLORS.Green
+                stationObj.lineWidth = 2
+            }
         })
+    }
+
+    /**
+     * Handles drawing a white line from player to selected destination if reachable
+     */
+    handleDestinationLine() {
+        const {cvs, selectedObject} = this.starMap
+        const fleet = gs.fleet
+        const lineId = 'destinationLine'
+        
+        if (!fleet) return
+        
+        let lineObj = cvs.getObject(lineId)
+        
+        // Check if we should show the line
+        const shouldShowLine = selectedObject &&
+            selectedObject !== fleet &&
+            selectedObject.x !== undefined &&
+            selectedObject.y !== undefined &&
+            fleet.canReachDestination(selectedObject)
+        
+        if (shouldShowLine) {
+            // Create or update the line
+            if (!lineObj) {
+                lineObj = cvs.addLine(
+                    lineId,
+                    fleet.x,
+                    fleet.y,
+                    selectedObject.x,
+                    selectedObject.y,
+                    COLORS.White,
+                    1 // lineWidth
+                )
+                lineObj.zIndex = -1 // Draw behind everything else
+            } else {
+                // Update line position
+                lineObj.x = fleet.x
+                lineObj.y = fleet.y
+                lineObj.x2 = selectedObject.x
+                lineObj.y2 = selectedObject.y
+                lineObj.visible = true
+            }
+        } else {
+            // Hide the line if it exists
+            if (lineObj) {
+                lineObj.visible = false
+            }
+        }
     }
 
 }

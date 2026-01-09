@@ -98,6 +98,7 @@ class CanvasWrapper {
     adjustZoom(multiplier = 1) {
         this.zoom *= multiplier;
         this.zoom = Math.max(this.minZoom, Math.min(this.maxZoom, this.zoom))
+        console.log('adjusting zoom to', this.zoom, `(multiplier: ${multiplier})`)
         this.redraw();
     }
     
@@ -495,14 +496,18 @@ class CanvasWrapper {
             if (obj.shape === SHAPES.Line && obj.x2 !== undefined && obj.y2 !== undefined) {
                 const [sx2, sy2] = this.worldToScreen(obj.x2, obj.y2);
                 // Check if line intersects with or is within the viewport
-                if (!this.isLineIntersectingRect(sx, sy, sx2, sy2, 0, 0, width, height)) continue;
+                if (!this.isLineIntersectingRect(sx, sy, sx2, sy2, 0, 0, width/pixelRatio, height/pixelRatio)) continue;
             } else {
                 // Standard visibility check for other shapes
-                if (sx + size < 0 || sx - size >= width || sy + size < 0 || sy - size >= height) continue;
+                if (sx + size < 0 || sx - size >= width/pixelRatio || sy + size < 0 || sy - size >= height/pixelRatio) continue;
             }
             
-            sx = Math.round(sx)
-            sy = Math.round(sy)
+            // Don't round coordinates at very low zoom to preserve relative positioning
+            // Rounding only helps performance at higher zooms where sub-pixel precision doesn't matter
+            if (zoom > 5) {
+                sx = Math.round(sx)
+                sy = Math.round(sy)
+            }
             
             let x2Offset = 0;
             let y2Offset = 0;

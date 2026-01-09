@@ -70,6 +70,17 @@ class Fleet extends SpaceObject {
         if (this === gs.fleet && planet.settlement) {
             gs.memorizedSettlements.set(planet, planet.settlement.clone())
             gs.lastVisitedDates.set(planet, gs.year)
+            
+            // Also set visit date for all moons of the planet
+            if (planet.children && planet.children.length > 0) {
+                for (const child of planet.children) {
+                    // Only set for celestial bodies (moons), not fleets
+                    if (child.objectType && child.objectType.name !== 'Fleet' && child instanceof Planet) {
+                        gs.lastVisitedDates.set(child, gs.year)
+                    }
+                }
+            }
+            
             console.log(`📝 Memorized settlement at ${planet.name} (year ${gs.year})`)
             
             // Track planet visits for missions
@@ -301,5 +312,19 @@ class Fleet extends SpaceObject {
 
     get activeShips() {
         return this.ships.filter(s=>!s.disabled && !s.escaped)
+    }
+
+    /**
+     * Check if this fleet can reach a destination based on fuel and distance
+     * @param {SpaceObject} destination - The destination object (Planet, Star, etc.)
+     * @returns {boolean} True if the fleet has enough fuel to reach the destination
+     */
+    canReachDestination(destination) {
+        if (!destination || destination.x === undefined || destination.y === undefined) {
+            return false
+        }
+        const distance = calcDistance(this.x, this.y, destination.x, destination.y)
+        const fuelCost = distance * FUEL_COST_PER_1_AU
+        return this.fuel >= fuelCost
     }
 }

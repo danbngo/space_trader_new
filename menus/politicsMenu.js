@@ -52,15 +52,13 @@ function showPoliticsMenu(backFunction = () => closeModal()) {
         
         return [coloredName(planet),
             coloredName(c.governmentType),
-            c.stateReligion ? coloredName(c.stateReligion) : 'None',
-            c.races?.calcHighestKey() ? coloredName(c.races.calcHighestKey()) : 'Unknown',
             alliances.length > 0 ? alliances.join(' ') : '-',
             tense.length > 0 ? tense.join(' ') : '-',
             atWar.length > 0 ? atWar.join(' ') : '-',
         ]
     })
 
-    tableData.unshift(['Planet Name', 'Government Type', 'State Religion', 'Ethnicity', 'Alliances', 'Tense', 'At War'])
+    tableData.unshift(['Planet Name', 'Government Type', 'Alliances', 'Tense', 'At War'])
     
     // Create table
     const table = createTable(
@@ -69,14 +67,6 @@ function showPoliticsMenu(backFunction = () => closeModal()) {
         null  // selectedRow
     )
     
-    // Create data completeness indicator
-    const completenessText = completeness >= 100 
-        ? colorSpan('Data 100% complete!', COLORS.Green)
-        : `Data ${Math.round(completeness)}% complete, visit more locations to increase accuracy`
-    
-    const completenessDiv = ce({innerHTML: completenessText, style: 'margin-bottom: 15px; font-style: italic;'})
-    
-    contentContainer.insertBefore(completenessDiv, contentContainer.firstChild)
     contentContainer.appendChild(table)
     
     showModal(

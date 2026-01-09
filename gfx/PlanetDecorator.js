@@ -48,6 +48,9 @@ class PlanetDecorator {
         const parent = this.parentCanvasObject
         const parentZIndex = parent.zIndex || 10
         
+        // Store cvs reference for update() method
+        this.cvs = cvs
+        
         // Clear existing canvas objects
         this.canvasObjects.forEach(obj => {
             cvs.deleteObject(obj.id)
@@ -58,10 +61,14 @@ class PlanetDecorator {
         this.craters.forEach((crater, index) => {
             const craterId = `${parentId}-crater-${index}`
             
-            // Calculate absolute position and size based on parent
+            // Calculate position in world space
             const craterX = parent.x + (crater.x * parent.size)
             const craterY = parent.y + (crater.y * parent.size)
             const craterRadius = crater.radius * parent.size
+            
+            // Calculate minScreenSize proportional to parent's minScreenSize
+            // This ensures craters scale with parent when it hits minScreenSize
+            const craterMinScreenSize = parent.minScreenSize * crater.radius
             
             // Create a dark filled circle for the crater
             const craterColor = [0, 0, 0, 0.6] // Semi-transparent black
@@ -70,7 +77,7 @@ class PlanetDecorator {
                 craterX,
                 craterY,
                 craterRadius,
-                1, // minScreenSize
+                craterMinScreenSize,
                 craterColor,
                 null // no click handler
             )
@@ -89,30 +96,26 @@ class PlanetDecorator {
      * Updates decorator positions based on parent movement
      */
     update() {
-        if (!this.parentCanvasObject) {
+        if (!this.parentCanvasObject || !this.cvs) {
             return
         }
         
         const parent = this.parentCanvasObject
-        const deltaX = parent.x - this.lastParentX
-        const deltaY = parent.y - this.lastParentY
         
-        // Only update if there's been movement
-        if (deltaX !== 0 || deltaY !== 0) {
-            // Update crater positions
-            this.craters.forEach((crater, index) => {
-                const craterObj = this.canvasObjects[index]
-                if (craterObj) {
-                    // Recalculate absolute position based on new parent position
-                    craterObj.x = parent.x + (crater.x * parent.size)
-                    craterObj.y = parent.y + (crater.y * parent.size)
-                    craterObj.size = crater.radius * parent.size
-                }
-            })
-            
-            // Update last known position
-            this.lastParentX = parent.x
-            this.lastParentY = parent.y
-        }
+        // Update crater positions using parent's world-space size
+        // CanvasWrapper will handle zoom scaling via: Math.max(minScreenSize, size * zoom / pixelRatio)
+        this.craters.forEach((crater, index) => {
+            const craterObj = this.canvasObjects[index]
+            if (craterObj) {
+                // Use parent.size (world-space) for positioning - zoom is applied by CanvasWrapper
+                craterObj.x = parent.x + (crater.x * parent.size)
+                craterObj.y = parent.y + (crater.y * parent.size)
+                craterObj.size = crater.radius * parent.size
+            }
+        })
+        
+        // Update last known position
+        this.lastParentX = parent.x
+        this.lastParentY = parent.y
     }
 }

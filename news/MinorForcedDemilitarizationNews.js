@@ -40,13 +40,6 @@ class MinorForcedDemilitarizationNews extends News {
                 culture: CL.HIGH,
             },
         )
-
-        // Moderate culture transfer through occupation
-        this.completeEffects[0].onApply = () => {
-            if (this.planet instanceof Planet && this.targetPlanet instanceof Planet) {
-                this.targetPlanet.addCulture(this.planet, 0.06)
-            }
-        }
     }
 
     shouldCancel() {

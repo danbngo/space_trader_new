@@ -58,11 +58,12 @@ function showGovernmentsMenu(backFunction = () => closeModal()) {
     // Create data completeness indicator
     const completenessText = completeness >= 100 
         ? colorSpan('Data 100% complete!', COLORS.Green)
-        : `Data ${Math.round(completeness)}% complete, visit more locations to increase accuracy`
+        : colorSpan(`Data ${Math.round(completeness)}% complete, visit more locations to increase accuracy`, COLORS.LightYellow)
     
     const content = ce({
         children: [
             ce({innerHTML: completenessText, style: 'margin-bottom: 15px; font-style: italic;'}),
+            ce({tag: 'br'}),
             columnLayout
         ]
     })

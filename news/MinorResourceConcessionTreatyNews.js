@@ -43,13 +43,6 @@ class MinorResourceConcessionTreatyNews extends News {
                 taxes: CL.LOW,
             },
         )
-
-        // Slight culture transfer through economic ties
-        this.completeEffects[0].onApply = () => {
-            if (this.planet instanceof Planet && this.targetPlanet instanceof Planet) {
-                this.targetPlanet.addCulture(this.planet, 0.03)
-            }
-        }
     }
 
     shouldCancel() {

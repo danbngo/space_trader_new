@@ -127,20 +127,6 @@ class Ship {
         return BASE_SHIP_RADIUS_IN_MILES * (1+Math.sqrt(this.mass)) * modifier;
     }
 
-    /**
-     * Gets the transformed polygon shape for this ship at its current position and angle.
-     * @returns {Polygon} The ship's polygon shape transformed to world coordinates.
-     */
-    getPolygonShape() {
-        if (this.shipType.shapeGenerator) {
-            const baseShape = this.shipType.shapeGenerator();
-            // Transform the polygon to ship's current position, scale, and rotation
-            return baseShape.transform(this.radius, this.angle, this.x, this.y);
-        }
-        // Fallback: return null if no shape generator
-        return null;
-    }
-
     get mass() {
         return (this instanceof AsteroidShip ? this.radiusModifier : 1) * AVERAGE_SHIP_MASS
         * (this.hull[1]/AVERAGE_SHIP_HULL
@@ -280,57 +266,38 @@ class Ship {
         const rechargeAmt = 1 + rng(this.engine/2)
         return this.restoreShields(rechargeAmt)
     }
-
-
+    
     /**
      * Creates an HTML image element showing this ship's graphical representation.
      * @param {number} size - The size in pixels for the ship image.
      * @param {number[]} [color] - Optional color override (defaults to ship's fleet color or ship color).
      * @returns {HTMLCanvasElement} Canvas element showing the ship.
      */
-    asImage(size = 80, color = undefined) {
-        const shipColor = color || (this.fleet ? this.fleet.color : this.color)
+    asCanvas(size = 80, color = COLORS.White) {
+        console.log('drawing ship as canvas:', this.name, size, color)
+        // Determine the color to use
+        const shipColor = color || (this.fleet ? this.fleet.color : this.color);
         
-        // Use shapeGenerator if available, otherwise fallback to simple circle
-        if (this.shipType.shapeGenerator) {
-            const shipShape = this.shipType.shapeGenerator()
-            
-            const shipObj = new CanvasObject({
-                id: 'preview-ship',
-                shape: SHAPES.Polygon,
-                x: 0,
-                y: 0,
-                size: size,
-                fillColor: shipColor,
-                strokeColor: COLORS.White,
-                vertices: shipShape.vertices
-            })
-            
-            // Convert to image
-            const shipImage = shipObj.asImage(size)
-            shipImage.style.backgroundColor = '#000'
-            shipImage.style.display = 'block'
-            shipImage.style.margin = '10px auto'
-            
-            return shipImage
-        } else {
-            // Fallback to simple circle if no shape generator
-            const shipObj = new CanvasObject({
-                id: 'preview-ship',
-                shape: SHAPES.FilledCircle,
-                x: 0,
-                y: 0,
-                size: size / 2,
-                fillColor: shipColor,
-                strokeColor: COLORS.White
-            })
-            
-            const shipImage = shipObj.asImage(size)
-            shipImage.style.backgroundColor = '#000'
-            shipImage.style.display = 'block'
-            shipImage.style.margin = '10px auto'
-            
-            return shipImage
+        // Get the ship shape from the ship type
+        const shipShape = this.shipType?.shipShape || SHIP_SHAPES.COURIER;
+        
+        // Convert to CanvasObject instances
+        const polygons = shipShape.toPolygons(shipColor, size);
+        
+        // Create a canvas element
+        const canvas = document.createElement('canvas');
+        canvas.width = size * 2;
+        canvas.height = size * 2;
+        const ctx = canvas.getContext('2d');
+        
+        // Sort polygons by zIndex to ensure proper layering (lower zIndex draws first)
+        polygons.sort((a, b) => a.zIndex - b.zIndex);
+        
+        // Use CanvasObject.draw() to render each polygon
+        for (const polygon of polygons) {
+            polygon.draw(Date.now(), ctx, size, size, size, 0, 0);
         }
+        
+        return canvas;
     }
 }

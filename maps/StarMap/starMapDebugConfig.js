@@ -23,7 +23,6 @@ const STARMAP_DEBUG_CONFIG = {
     displayFleetPaths: true,          // Fleet route lines
     displayFleetThrusters: true,      // Fleet thruster effects
     displayAbandonedFleets: true,     // Abandoned/destroyed fleets
-    displayWaypoint: true,            // Player waypoint marker
     
     // Performance monitoring
     logPerformance: false,            // Log render times to console

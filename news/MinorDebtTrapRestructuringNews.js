@@ -47,19 +47,6 @@ class MinorDebtTrapRestructuringNews extends News {
                 taxes: CL.LOW,
             },
         )
-
-        // Moderate culture transfer through economic control
-        this.startEffects[0].onApply = () => {
-            if (this.planet instanceof Planet && this.targetPlanet instanceof Planet) {
-                this.targetPlanet.addCulture(this.planet, 0.04)
-            }
-        }
-        
-        this.completeEffects[0].onApply = () => {
-            if (this.planet instanceof Planet && this.targetPlanet instanceof Planet) {
-                this.targetPlanet.addCulture(this.planet, 0.06)
-            }
-        }
     }
 
     shouldCancel() {

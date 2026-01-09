@@ -47,14 +47,6 @@ class TradeAgreementNews extends News {
                 wealth: CL.SLIGHTLY_HIGH
             }
         )
-        
-        // Exchange culture between trading partners
-        this.startEffects[0].onApply = () => {
-            if (this.planet instanceof Planet && this.targetPlanet instanceof Planet) {
-                this.planet.addCulture(this.targetPlanet, 0.02);
-                this.targetPlanet.addCulture(this.planet, 0.02);
-            }
-        }
     }
 
     shouldCancel() {
