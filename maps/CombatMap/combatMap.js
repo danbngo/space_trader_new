@@ -100,13 +100,194 @@ class CombatMap extends BaseMap {
         
         showElement(this.root)
         
-        // Start animation loop
-        this.animateRouteTravel()
+        // Initialize tick system
+        this.lastTickMs = Date.now()
+        this.paused = false
+        
+        // Start tick loop
+        this.tick()
     }
     
     /**
      * Animates ships during route travel
      */
+    /**
+     * Main game loop tick for travel mode
+     */
+    tick() {
+        if (this.paused) return
+        
+        // Check if travel is still active
+        if (!gs.destination || gs.travelYearsRemaining === null) {
+            console.log('Travel ended')
+            this.cleanup()
+            return
+        }
+        
+        const currentTime = Date.now()
+        const elapsedMs = Math.min(200, currentTime - this.lastTickMs) // Cap at 200ms
+        this.lastTickMs = currentTime
+        const elapsedYears = elapsedMs * STAR_MAP_YEARS_PER_MS * 0.25 // 4x slower travel time
+        
+        // Update game year
+        gs.year += elapsedYears
+        
+        // Update travel progress
+        gs.travelYearsRemaining -= elapsedYears
+        
+        // Update positions
+        gs.system.updatePositions()
+        
+        // Calculate and update progress percentage
+        let progressPercent = 0
+        if (gs.travelStartYear !== null && gs.destination && gs.previousLocation) {
+            const totalDistance = calcDistance(gs.previousLocation.x, gs.previousLocation.y, gs.destination.x, gs.destination.y)
+            const startETA = totalDistance / gs.fleet.speed
+            const remainingETA = Math.max(0, gs.travelYearsRemaining)
+            progressPercent = startETA > 0 ? ((startETA - remainingETA) / startETA) * 100 : 100
+        }
+        
+        // Update progress bar
+        if (this.routeProgressBar) {
+            this.routeProgressBar.update(progressPercent)
+        }
+        
+        // Update ETA display
+        if (this.routeETAEl) {
+            this.routeETAEl.innerHTML = `ETA: ${describeTimespan(Math.max(0, gs.travelYearsRemaining), 1)}`
+        }
+        
+        // Render ships
+        this.renderShips()
+        
+        // Check if travel completed
+        if (gs.travelYearsRemaining <= 0) {
+            console.log('Travel completed - docking at', gs.destination.name)
+            
+            // Dock at destination
+            gs.fleet.dock(gs.destination)
+            
+            // Clear travel state
+            gs.previousLocation = null
+            gs.destination = null
+            gs.travelYearsRemaining = null
+            gs.travelProgress = null
+            gs.travelStartYear = null
+            gs.x = null
+            gs.y = null
+            
+            // Return to star map
+            this.cleanup()
+            showStarMap(gs.location)
+            return
+        }
+        
+        // Continue tick loop
+        requestAnimationFrame(() => this.tick())
+    }
+    
+    /**
+     * Renders ships with thrusters and jitter
+     */
+    renderShips() {
+        // Clear canvas objects
+        this.routeCvs.clear()
+        this.routeCvs.pixels = [] // Keep background stars
+        
+        const centerX = this.routeCvs.canvas.width / 2
+        const centerY = this.routeCvs.canvas.height / 2
+        const shipSpacing = 60
+        
+        // Draw each ship with jitter and thruster
+        this.encounter.playerShips.forEach((ship, index) => {
+            if (this.isShipDestroyed(ship)) return
+            
+            // Get or create jitter offset for this ship
+            if (!this.shipJitterOffsets.has(ship)) {
+                this.shipJitterOffsets.set(ship, {x: 0, y: 0, targetX: 0, targetY: 0})
+            }
+            const jitter = this.shipJitterOffsets.get(ship)
+            
+            // Update jitter target occasionally (every ~30 frames)
+            if (Math.random() < 0.03) {
+                jitter.targetX = (Math.random() - 0.5) * 10 // ±5 pixels x
+                jitter.targetY = (Math.random() - 0.5) * 30 // ±15 pixels y (more y jitter)
+            }
+            
+            // Smooth movement toward target
+            jitter.x += (jitter.targetX - jitter.x) * 0.1
+            jitter.y += (jitter.targetY - jitter.y) * 0.1
+            
+            // Calculate ship position
+            const shipY = centerY + (index - (this.encounter.playerShips.length - 1) / 2) * shipSpacing + jitter.y
+            const shipX = centerX + jitter.x
+            
+            // Draw thruster behind ship (triangle pointing backward)
+            const thrusterSize = 15
+            const thrusterFlicker = 0.7 + Math.random() * 0.3 // Flicker effect
+            const thrusterColor = [255, Math.floor(100 * thrusterFlicker), 0, Math.floor(255 * thrusterFlicker)]
+            this.routeCvs.addFilledTriangle(
+                `thruster-${index}`,
+                shipX - 25, // Behind the ship
+                shipY,
+                thrusterSize,
+                0,
+                2,
+                thrusterColor,
+                null,
+                Math.PI // Point backward
+            )
+            
+            // Draw ship using shape generator if available
+            const shipColor = gs.fleet && gs.fleet.color ? gs.fleet.color : [0, 255, 0, 255]
+            const shipSize = 20
+            
+            if (ship.shipType.shipShape && ship.shipType.shipShape.toPolygons) {
+                // Use ship shape polygons
+                const polygons = ship.shipType.shipShape.toPolygons(shipColor, shipSize)
+                polygons.forEach((poly, polyIndex) => {
+                    this.routeCvs.addPolygon(
+                        `ship-${index}-poly-${poly.id}`,
+                        shipX,
+                        shipY,
+                        poly.vertices,
+                        1, // Size already applied in toPolygons
+                        0,
+                        poly.color,
+                        null,
+                        0, // Angle (facing right by default)
+                        null,
+                        poly.zIndex
+                    )
+                })
+            } else {
+                // Fallback to circle if no shape generator
+                this.routeCvs.addFilledCircle(
+                    `ship-${index}`,
+                    shipX,
+                    shipY,
+                    shipSize,
+                    5,
+                    shipColor
+                )
+            }
+            
+            // Add ship label
+            this.routeCvs.addText(
+                `ship-label-${index}`,
+                shipX,
+                shipY + 30,
+                0,
+                0,
+                ship.shipType.name,
+                [255, 255, 255, 255],
+                12
+            )
+        })
+        
+        this.routeCvs.redraw(true)
+    }
+
     animateRouteTravel() {
         // If we're in travel mode (gs.destination is set), use custom travel animation
         if (gs.destination && gs.travelYearsRemaining !== null) {
@@ -270,9 +451,23 @@ class CombatMap extends BaseMap {
             const elapsedYears = (1 / 60) * STAR_MAP_YEARS_PER_MS / 1000
             gs.updateTravelProgress(elapsedYears)
             
+            // Calculate progress based on start ETA vs remaining ETA
+            let progressPercent = 0
+            if (gs.travelStartYear !== null && gs.destination && gs.previousLocation) {
+                const totalDistance = calcDistance(gs.previousLocation.x, gs.previousLocation.y, gs.destination.x, gs.destination.y)
+                const startETA = totalDistance / gs.fleet.speed
+                const remainingETA = gs.travelYearsRemaining || 0
+                progressPercent = startETA > 0 ? ((startETA - remainingETA) / startETA) * 100 : 0
+            }
+            
             // Update progress bar
-            if (this.routeProgressBar && gs.travelProgress !== null) {
-                this.routeProgressBar.update(gs.travelProgress)
+            if (this.routeProgressBar) {
+                this.routeProgressBar.update(progressPercent)
+            }
+            
+            // Update ETA display
+            if (this.routeETAEl) {
+                this.routeETAEl.innerHTML = `ETA: ${describeTimespan(gs.travelYearsRemaining || 0, 1)}`
             }
             
             // Draw each ship with jitter and thruster
@@ -685,25 +880,102 @@ class CombatMap extends BaseMap {
                 padding: '20px',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '15px',
+                gap: '10px',
                 zIndex: '2',
                 alignItems: 'center',
                 justifyContent: 'center'
             }
         })
         
-        // Progress info
-        const progressInfo = ce({
+        // Calculate travel details
+        const fromName = gs.previousLocation ? gs.previousLocation.name : 'Unknown'
+        const toName = gs.destination ? gs.destination.name : 'Unknown'
+        const distance = gs.destination && gs.previousLocation ? 
+            roundToPlaces(calcDistance(gs.previousLocation.x, gs.previousLocation.y, gs.destination.x, gs.destination.y), 1) : 0
+        const fuelCost = distance * FUEL_COST_PER_1_AU
+        const fuelPercent = gs.fleet.totalFuelCapacity > 0 ? (fuelCost / gs.fleet.totalFuelCapacity) * 100 : 0
+        
+        // Planet images container
+        const planetImagesContainer = ce({
+            style: {
+                display: 'flex',
+                alignItems: 'center',
+                gap: '20px',
+                marginBottom: '10px'
+            }
+        })
+        
+        // From planet image
+        if (gs.previousLocation && gs.previousLocation.asCanvas) {
+            const fromCanvas = gs.previousLocation.asCanvas(80)
+            fromCanvas.style.borderRadius = '50%'
+            fromCanvas.style.border = '2px solid #666'
+            planetImagesContainer.appendChild(fromCanvas)
+        }
+        
+        // Arrow
+        const arrow = ce({
+            innerHTML: '→',
+            style: {
+                color: '#fff',
+                fontSize: '32px',
+                fontWeight: 'bold'
+            }
+        })
+        planetImagesContainer.appendChild(arrow)
+        
+        // To planet image
+        if (gs.destination && gs.destination.asCanvas) {
+            const toCanvas = gs.destination.asCanvas(80)
+            toCanvas.style.borderRadius = '50%'
+            toCanvas.style.border = '2px solid #666'
+            planetImagesContainer.appendChild(toCanvas)
+        }
+        
+        panel.appendChild(planetImagesContainer)
+        
+        // Progress info with route
+        const routeInfo = ce({
             style: {
                 color: '#fff',
                 fontSize: '16px',
-                marginBottom: '10px'
+                fontWeight: 'bold',
+                marginBottom: '5px'
             },
-            children: [
-                'Traveling to destination...'
-            ]
+            innerHTML: `Traveling from ${fromName} to ${toName}`
         })
-        panel.appendChild(progressInfo)
+        panel.appendChild(routeInfo)
+        
+        // Travel stats container
+        const statsContainer = ce({
+            style: {
+                display: 'flex',
+                gap: '20px',
+                color: '#aaa',
+                fontSize: '14px',
+                marginBottom: '10px'
+            }
+        })
+        
+        // Distance
+        this.routeDistanceEl = ce({
+            innerHTML: `Distance: ${distance} AU`
+        })
+        statsContainer.appendChild(this.routeDistanceEl)
+        
+        // Fuel Cost
+        this.routeFuelCostEl = ce({
+            innerHTML: `Fuel Cost: ${roundToPlaces(fuelPercent, 1)}%`
+        })
+        statsContainer.appendChild(this.routeFuelCostEl)
+        
+        // ETA Remaining
+        this.routeETAEl = ce({
+            innerHTML: `ETA: ${describeTimespan(gs.travelYearsRemaining || 0, 1)}`
+        })
+        statsContainer.appendChild(this.routeETAEl)
+        
+        panel.appendChild(statsContainer)
         
         // Create progress bar using ProgressBar class
         this.routeProgressBar = new ProgressBar({
@@ -714,19 +986,6 @@ class CombatMap extends BaseMap {
             overrideLabel: ''
         })
         panel.appendChild(this.routeProgressBar.container)
-        
-        // Progress text
-        const progressText = ce({
-            style: {
-                color: '#aaa',
-                fontSize: '12px',
-                marginTop: '10px'
-            },
-            children: [
-                'Progress until next encounter check'
-            ]
-        })
-        panel.appendChild(progressText)
         
         // Cancel button
         const cancelButton = ce({
@@ -746,16 +1005,18 @@ class CombatMap extends BaseMap {
         })
         
         cancelButton.addEventListener('click', () => {
+            // Pause the map
+            this.paused = true
+            
             // Stop animation
             if (this.routeAnimationFrame) {
                 cancelAnimationFrame(this.routeAnimationFrame)
                 this.routeAnimationFrame = null
             }
             
-            // End encounter and return to star map
-            if (this.encounter) {
-                this.encounter.endEncounter()
-            }
+            // Return to star map without completing travel
+            this.cleanup()
+            showStarMap()
         })
         
         panel.appendChild(cancelButton)

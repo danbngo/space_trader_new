@@ -151,9 +151,6 @@ async function startNewGame() {
     }
     
 
-    // Ensure maximum anomalies exist at end of simulation
-    console.log('Topping up anomalies after simulation...')
-
     // Create captain
     const captain = new Officer("Captain", rndMember(gs.system.planets), MINIMUM_OFFICER_AGE, STARTING_CREDITS);
     
@@ -182,7 +179,7 @@ async function startNewGame() {
     // Auto-assign captain to starting ship
     gs.fleet.autoAssignPilots()
 
-    console.log("New game started.");
+    console.log("New game started.",gs);
     createCharacter()
 
     assessPlanets()

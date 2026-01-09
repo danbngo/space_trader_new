@@ -31,12 +31,16 @@ class GameState {
         this.x = null;
         /** @type {number|null} - Y coordinate during travel */
         this.y = null;
+        /** @type {Planet|SpaceStation|null} - Previous location before travel */
+        this.previousLocation = null;
         /** @type {Planet|null} - Destination planet */
         this.destination = null;
         /** @type {number|null} - Remaining years of travel */
         this.travelYearsRemaining = null;
         /** @type {number|null} - Travel progress (0-100) */
         this.travelProgress = null;
+        /** @type {number|null} - Year when travel started */
+        this.travelStartYear = null;
     }
 
     get captain() {
@@ -152,9 +156,11 @@ class GameState {
             this.fleet.dock(this.destination);
             
             // Clear travel state
+            this.previousLocation = null;
             this.destination = null;
             this.travelYearsRemaining = null;
             this.travelProgress = null;
+            this.travelStartYear = null;
             this.x = null;
             this.y = null;
         }

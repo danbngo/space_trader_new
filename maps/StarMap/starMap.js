@@ -221,6 +221,9 @@ class StarMap extends BaseMap {
         // Update spotlight position every frame to follow player
         this.updateSpotlight()
         
+        // Update player location indicator animation (runs even when paused)
+        this.bodiesHandler.handlePlayerLocationIndicator()
+        
         // Redraw main canvas (background canvas is static and doesn't need redraw)
         this.cvs.redraw(true)
         
@@ -406,23 +409,24 @@ class StarMap extends BaseMap {
             if (obj.x !== undefined && obj.y !== undefined) {
                 const distance = roundToPlaces(calcDistance(gs.fleet.x, gs.fleet.y, obj.x, obj.y), 1)
                 const travelTime = distance / gs.fleet.speed
-                const etaYears = travelTime
-                const fuelCost = roundToPlaces(distance * FUEL_COST_PER_1_AU, 1)
+                const fuelCost = distance * FUEL_COST_PER_1_AU
+                const fuelPercent = gs.fleet.totalFuelCapacity > 0 ? (fuelCost / gs.fleet.totalFuelCapacity) * 100 : 0
+                
+                // Calculate max distance based on available fuel
+                const maxDistance = gs.fleet.totalFuelCapacity / FUEL_COST_PER_1_AU
+                // Ratio: 0.0 at 0 distance, 4.0 at max distance
+                const ratio = maxDistance > 0 ? ((maxDistance-distance) / maxDistance) : 0
                 
                 // Update distance
-                this.objPaneDistanceEl.textContent = `${roundToPlaces(distance, 1)} AU`
+                this.objPaneDistanceEl.innerHTML = statColorSpan(`${roundToPlaces(distance, 1)} AU`, ratio)
                 
                 // Update fuel cost
-                this.objPaneFuelCostEl.textContent = `${fuelCost}`
+                this.objPaneFuelCostEl.innerHTML = statColorSpan(`${roundToPlaces(fuelPercent, 1)}%`, ratio)
                 
                 // Update ETA
                 if (obj instanceof Planet) {
                     const timespan = describeTimespan(travelTime, 1)
-                    if (obj instanceof Planet) {
-                        this.objPaneETAEl.innerHTML = statColorSpan(timespan, 1/(1+etaYears*12))
-                    } else {
-                        this.objPaneETAEl.textContent = timespan
-                    }
+                    this.objPaneETAEl.innerHTML = statColorSpan(timespan, ratio)
                 }
             }
         }
@@ -485,12 +489,18 @@ class StarMap extends BaseMap {
         // Show real colors/decorators if object has been seen, even if not visited
         let imageObject = null
         if (obj instanceof SpaceStation) {
-            imageObject = hasBeenSeen ? this.cvs.getObject(`station${obj.uuid}`) : this.cvs.getObject(`unknown${obj.uuid}`)
+            const mainObj = this.cvs.getObject(`station${obj.uuid}`)
+            const unknownObj = this.cvs.getObject(`unknown${obj.uuid}`)
+            imageObject = (hasBeenSeen && mainObj?.visible) ? mainObj : unknownObj
         } else if (obj instanceof Planet) {
             // Show actual planet appearance with colors and decorators if it's been seen
-            imageObject = hasBeenSeen ? this.cvs.getObject(`planet${obj.uuid}`) : this.cvs.getObject(`unknown${obj.uuid}`)
+            const mainObj = this.cvs.getObject(`planet${obj.uuid}`)
+            const unknownObj = this.cvs.getObject(`unknown${obj.uuid}`)
+            imageObject = (hasBeenSeen && mainObj?.visible) ? mainObj : unknownObj
         } else if (obj instanceof Star) {
-            imageObject = hasBeenSeen ? this.cvs.getObject(`star${obj.uuid}`) : this.cvs.getObject(`unknown${obj.uuid}`)
+            const mainObj = this.cvs.getObject(`star${obj.uuid}`)
+            const unknownObj = this.cvs.getObject(`unknown${obj.uuid}`)
+            imageObject = (hasBeenSeen && mainObj?.visible) ? mainObj : unknownObj
         }
         
         // Check if fleet is out of radar range
@@ -544,25 +554,6 @@ class StarMap extends BaseMap {
                 if (obj !== gs.fleet) {
                     const distance = roundToPlaces(calcDistance(gs.fleet.x, gs.fleet.y, obj.x, obj.y), 1)
                     ce({parent:container, innerHTML:`Distance: ${distance} AU`})
-                    
-                    // REMOVED: Route/InterceptionRoute - travel to fleets disabled
-                    /*
-                    // Create test route to check if interception is possible
-                    // Use InterceptionRoute for moving fleets, regular Route for destroyed/abandoned
-                    const testRoute = obj.destroyed ? new Route(gs.fleet, obj, gs.year) : new InterceptionRoute(gs.fleet, obj, gs.year)
-                    if (testRoute.valid) {
-                        const travelTime = testRoute.travelTime
-                        const etaYears = travelTime
-                        const fuelCost = roundToPlaces(testRoute.path.distance * FUEL_COST_PER_1_AU, 1)
-                        ce({parent:container, innerHTML:`ETA: ${statColorSpan(describeTimespan(travelTime, 1), 1/(1+etaYears*12))}`})
-                        ce({parent:container, innerHTML:`Fuel Cost: ${fuelCost}`})
-                        // Abandoned (destroyed) fleets use "Travel" instead of "Intercept"
-                        const buttonText = obj.destroyed ? 'Travel' : 'Intercept'
-                        ce({parent:container, tag:'button', innerHTML:buttonText, onClick:()=>this.setDestination(obj, true), disabled: gs.fleet.stranded})
-                    } else {
-                        ce({parent:container, innerHTML:`Cannot intercept (too fast)`})
-                    }
-                    */
                 }
             }
         }
@@ -578,19 +569,34 @@ class StarMap extends BaseMap {
         if (obj instanceof Planet) {
             const distance = roundToPlaces(calcDistance(gs.fleet.x, gs.fleet.y, obj.x, obj.y), 1)
             const travelTime = distance / gs.fleet.speed
-            const etaYears = travelTime
+            const fuelCost = distance * FUEL_COST_PER_1_AU
+            const fuelPercent = gs.fleet.totalFuelCapacity > 0 ? (fuelCost / gs.fleet.totalFuelCapacity) * 100 : 0
+            
+            // Calculate max distance based on available fuel
+            const maxDistance = gs.fleet.totalFuelCapacity / FUEL_COST_PER_1_AU
+            // Ratio: 0.0 at 0 distance, 4.0 at max distance
+            const ratio = maxDistance > 0 ? ((maxDistance-distance) / maxDistance) : 0
+            
+            const canReach = gs.fleet.canReachDestination(obj)
+            
+            // Check if route passes too close to sun
+            const fliesIntoSun = this.checkFlyIntoSun(obj)
+            
             ce({parent:container, children: [
                 'Distance: ',
-                this.objPaneDistanceEl = ce({id: 'star_map_distance_object_pane', innerHTML: `${distance} AU`})
+                this.objPaneDistanceEl = ce({id: 'star_map_distance_object_pane', innerHTML: statColorSpan(`${distance} AU`, ratio)})
             ]})
             ce({parent:container, children: [
                 'ETA: ',
-                this.objPaneETAEl = ce({id: 'star_map_eta_object_pane', innerHTML: statColorSpan(describeTimespan(travelTime, 1), 1/(1+etaYears*12))})
+                this.objPaneETAEl = ce({id: 'star_map_eta_object_pane', innerHTML: statColorSpan(describeTimespan(travelTime, 1), ratio)})
             ]})
-            ce({parent:container, children: [
+            ce({parent:container, style: {display: 'flex'}, children: [
                 'Fuel Cost: ',
-                this.objPaneFuelCostEl = ce({id: 'star_map_fuel_cost_object_pane', innerHTML: `${roundToPlaces(distance * FUEL_COST_PER_1_AU, 1)}`})
+                fliesIntoSun ? ce({innerHTML: colorSpan('(Can\'t fly into sun)', COLORS.Orange)}) :
+                    !canReach ? ce({innerHTML: colorSpan('(Too far)', COLORS.Red)}) : 
+                        (this.objPaneFuelCostEl = ce({id: 'star_map_fuel_cost_object_pane', innerHTML: statColorSpan(`${roundToPlaces(fuelPercent, 1)}%`, ratio)}))
             ]})
+            
             // Only show scan/dock button if planet is discovered
             if (isDiscovered) {
                 ce({parent:container, tag:'button', innerHTML:isDockedHere ? 'Dock' : 'Scan', onClick:()=>this.explore(obj)})
@@ -600,7 +606,7 @@ class StarMap extends BaseMap {
             if (!isCurrentDestination) {
                 const stranded = gs.fleet.stranded
                 const hasEnoughFuel = gs.fleet.fuel >= distance * FUEL_COST_PER_1_AU
-                const canTravel = !stranded && hasEnoughFuel
+                const canTravel = !stranded && hasEnoughFuel && !fliesIntoSun
                 ce({parent:container, tag:'button', innerHTML:'Travel', onClick:()=>this.startTravel(obj), disabled: !canTravel})
             }
             if (gs.fleet.route) ce({parent:container, tag:'button', innerHTML:'Stop', onClick:()=>this.stopPlayerFleet()})
@@ -614,6 +620,30 @@ class StarMap extends BaseMap {
     stopPlayerFleet() {
         gs.fleet.route = null
         this.refresh()
+    }
+    
+    /**
+     * Checks if a route from current location to destination passes too close to the sun
+     * @param {Planet} destination - The destination planet
+     * @returns {boolean} True if route passes through dangerous solar proximity
+     */
+    checkFlyIntoSun(destination) {
+        if (!destination || !gs.fleet) return false
+        
+        // Get the sun (first star in the system)
+        const sun = gs.system.stars[0]
+        if (!sun) return false
+        
+        // Use half of Mercury's orbital radius as the danger zone (0.39 AU / 2 = 0.195 AU)
+        const dangerRadius = 0.39 / 2
+        
+        // Create a circle around the sun
+        const sunCircle = new Circle(sun.x, sun.y, dangerRadius)
+        
+        // Check if the line from current position to destination intersects the sun's danger zone
+        const intersects = sunCircle.intersectsLine(gs.fleet.x, gs.fleet.y, destination.x, destination.y)
+        
+        return intersects
     }
 
     startTravel(destination) {
@@ -635,9 +665,11 @@ class StarMap extends BaseMap {
         const travelTime = distance / gs.fleet.speed
         
         // Set travel state
+        gs.previousLocation = gs.fleet.location
         gs.destination = destination
         gs.travelYearsRemaining = travelTime
         gs.travelProgress = 0
+        gs.travelStartYear = gs.year
         gs.x = gs.fleet.x
         gs.y = gs.fleet.y
 

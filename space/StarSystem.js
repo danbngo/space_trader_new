@@ -103,5 +103,11 @@ class StarSystem extends SpaceObject {
         // Get primary star (assumes first star is the sun)
         const star = this.stars[0]
         if (!star) return // No star, can't process orbits
+        
+        // Update docked fleet positions to match their location
+        if (gs.fleet && gs.fleet.location) {
+            gs.fleet.x = gs.fleet.location.x
+            gs.fleet.y = gs.fleet.location.y
+        }
     }
 }

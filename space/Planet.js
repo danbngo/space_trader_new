@@ -95,4 +95,46 @@ class Planet extends OrbitingObject {
         if (baseName.endsWith('sian')) baseName = baseName.replace('sian', 'tian') //mars
         return baseName
     }
+    
+    /**
+     * Renders the planet to a canvas element
+     * @param {number} size - The size of the canvas in pixels
+     * @returns {HTMLCanvasElement} - Canvas element with the rendered planet
+     */
+    asCanvas(size = 80) {
+        // Create a canvas element
+        const canvas = document.createElement('canvas')
+        canvas.width = size
+        canvas.height = size
+        const ctx = canvas.getContext('2d')
+        
+        // Draw the planet as a filled circle
+        ctx.fillStyle = `rgba(${this.color[0]}, ${this.color[1]}, ${this.color[2]}, ${this.color[3] / 255})`
+        ctx.beginPath()
+        ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2)
+        ctx.fill()
+        
+        // Draw decorators if they exist
+        if (this.decorators && this.decorators.length > 0) {
+            this.decorators.forEach(decorator => {
+                if (decorator.canvasObjects && decorator.canvasObjects.length > 0) {
+                    decorator.canvasObjects.forEach(obj => {
+                        // Simple rendering of craters as dark circles
+                        if (obj.shape === SHAPES.FilledCircle) {
+                            const relX = (obj.x / this.radius) * (size / 2) + size / 2
+                            const relY = (obj.y / this.radius) * (size / 2) + size / 2
+                            const relRadius = (obj.size / this.radius) * (size / 2)
+                            
+                            ctx.fillStyle = `rgba(${obj.fillColor[0]}, ${obj.fillColor[1]}, ${obj.fillColor[2]}, ${obj.fillColor[3] / 255})`
+                            ctx.beginPath()
+                            ctx.arc(relX, relY, relRadius, 0, Math.PI * 2)
+                            ctx.fill()
+                        }
+                    })
+                }
+            })
+        }
+        
+        return canvas
+    }
 }

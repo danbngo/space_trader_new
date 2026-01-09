@@ -23,6 +23,7 @@ class StarMapBodiesHandler {
         if (STARMAP_DEBUG_CONFIG.displayPlanets) this.handlePlanets();
         if (STARMAP_DEBUG_CONFIG.displaySpaceStations) this.handleSpaceStations();
         this.handleDestinationLine();
+        this.handlePlayerLocationIndicator();
         
         if (STARMAP_DEBUG_CONFIG.logPerformance) {
             const perfEnd = performance.now();
@@ -289,10 +290,17 @@ class StarMapBodiesHandler {
             nightSideObj.visible = isDiscovered
             unknownObj.visible = !hasBeenSeen // Show unknown circle for all unseen planets
             
-            // Update stroke width for selected planet
-            planetObj.lineWidth = (body == selectedObject) ? 2 : 1
+            // Set default stroke
+            planetObj.strokeColor = COLORS.Black
+            planetObj.lineWidth = 1
             
-            // Highlight player's location in green with 2 linewidth
+            // Update stroke for selected planet
+            if (body == selectedObject) {
+                planetObj.strokeColor = COLORS.Green
+                planetObj.lineWidth = 2
+            }
+            
+            // Highlight player's location in green with 2 linewidth (overrides selection if both)
             if (gs.fleet && gs.fleet.location === body) {
                 planetObj.strokeColor = COLORS.Green
                 planetObj.lineWidth = 2
@@ -335,8 +343,8 @@ class StarMapBodiesHandler {
                 nightSideObj.angle = angleToSun + Math.PI
             }
             
-            if (body == selectedObject) {
-                planetObj.strokeColor = COLORS.Green
+            // Update label stroke color to match planet
+            if (labelObj && body == selectedObject) {
                 labelObj.strokeColor = COLORS.Green
             }
         })
@@ -435,7 +443,7 @@ class StarMapBodiesHandler {
     }
 
     /**
-     * Handles drawing a white line from player to selected destination if reachable
+     * Handles drawing a line from player to selected destination (cyan if reachable, dark red if too far)
      */
     handleDestinationLine() {
         const {cvs, selectedObject} = this.starMap
@@ -470,11 +478,14 @@ class StarMapBodiesHandler {
             selectedObjectName: selectedObject?.name || 'none'
         })
         
-        const shouldShowLine = hasSelectedObject && notSelectingFleet && hasXCoord && hasYCoord && canReach
+        const shouldShowLine = hasSelectedObject && notSelectingFleet && hasXCoord && hasYCoord
         console.log('[DestinationLine] shouldShowLine:', shouldShowLine)
         
         if (shouldShowLine) {
-            console.log('[DestinationLine] Showing line from', {x: fleet.x, y: fleet.y}, 'to', {x: selectedObject.x, y: selectedObject.y})
+            // Determine line color based on whether destination is reachable
+            const lineColor = canReach ? COLORS.Cyan : COLORS.DarkRed
+            
+            console.log('[DestinationLine] Showing line from', {x: fleet.x, y: fleet.y}, 'to', {x: selectedObject.x, y: selectedObject.y}, 'color:', lineColor)
             // Create or update the line
             if (!lineObj) {
                 console.log('[DestinationLine] Creating new line object')
@@ -484,18 +495,19 @@ class StarMapBodiesHandler {
                     fleet.y,
                     selectedObject.x,
                     selectedObject.y,
-                    COLORS.Cyan,
+                    lineColor,
                     2 // lineWidth
                 )
                 lineObj.zIndex = -1 // Draw behind everything else
                 console.log('[DestinationLine] Line created:', lineObj)
             } else {
                 console.log('[DestinationLine] Updating existing line')
-                // Update line position
+                // Update line position and color
                 lineObj.x = fleet.x
                 lineObj.y = fleet.y
                 lineObj.x2 = selectedObject.x
                 lineObj.y2 = selectedObject.y
+                lineObj.strokeColor = lineColor
                 lineObj.visible = true
             }
         } else {
@@ -505,6 +517,72 @@ class StarMapBodiesHandler {
                 lineObj.visible = false
             }
         }
+    }
+
+    /**
+     * Handles drawing an animated triangle indicator at the player's current location
+     */
+    handlePlayerLocationIndicator() {
+        const {cvs} = this.starMap
+        const fleet = gs.fleet
+        const indicatorId = 'playerLocationIndicator'
+        
+        if (!fleet || !fleet.location) {
+            // Hide indicator if no location
+            const indicator = cvs.getObject(indicatorId)
+            if (indicator) indicator.visible = false
+            return
+        }
+        
+        let indicator = cvs.getObject(indicatorId)
+        
+        // Create indicator if it doesn't exist
+        if (!indicator) {
+            // Upward pointing triangle (rotated 180 degrees from downward)
+            const triangleVertices = [
+                [0, 1],        // Bottom point (was top)
+                [-0.866, -0.5], // Top left (was bottom left)
+                [0.866, -0.5]   // Top right (was bottom right)
+            ]
+            
+            indicator = cvs.addPolygon(
+                indicatorId,
+                fleet.location.x,
+                fleet.location.y,
+                triangleVertices,
+                0,    // size in AU (0 = fixed screen size only)
+                8,    // minScreenSize (pixels - stays constant at all zoom levels)
+                COLORS.Green,
+                null, // no strokeColor
+                0,    // angle
+                null, // no click handler
+                100   // high zIndex to draw on top
+            )
+        }
+        
+        // Update position and animation
+        indicator.x = fleet.location.x
+        indicator.y = fleet.location.y
+        indicator.visible = true
+        
+        // Animate bobbing and color throb
+        const now = Date.now()
+        const bobSpeed = 0.004 // Speed of bobbing (4x faster)
+        const throbSpeed = 0.003 // Speed of color throb (2x faster)
+        
+        // Bob up and down (offset in screen space)
+        const bobOffset = Math.sin(now * bobSpeed) * 4 // 4 pixels up/down (50% of 8)
+        indicator.screenOffsetY = -30 + bobOffset // Base offset above planet + bobbing
+        
+        // Throb color between normal green and darker green
+        const throbValue = 0.5 + 0.5 * Math.sin(now * throbSpeed) // 0.0 to 1.0
+        const darkFactor = 0.4 + 0.6 * throbValue // 0.4 to 1.0
+        indicator.fillColor = [
+            Math.floor(COLORS.Green[0] * darkFactor),
+            Math.floor(COLORS.Green[1] * darkFactor),
+            Math.floor(COLORS.Green[2] * darkFactor),
+            COLORS.Green[3]
+        ]
     }
 
 }
