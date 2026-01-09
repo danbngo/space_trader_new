@@ -8,7 +8,6 @@ const NEWS_TYPE_CLASSES = [
     [NT.ADDICTION, AddictionNews],
     [NT.ALLIANCE, AllianceNews],
     [NT.ALLIANCE_GOVERNMENT, AllianceGovernmentNews],
-    [NT.ALLIANCE_CULTURAL, AllianceCulturalNews],
     [NT.ARMS_DEAL, ArmsDealNews],
     [NT.BLOCKADE, BlockadeNews],
     [NT.CIVIL_STRIFE, CivilStrifeNews],

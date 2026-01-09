@@ -26,13 +26,6 @@ class IndoctrinationProgramNews extends News {
                 prestige: CL.SLIGHTLY_LOW
             }
         )
-        
-        // Indoctrination strengthens native culture and identity
-        this.startEffects[0].onApply = () => {
-            if (this.planet instanceof Planet && this.planet.c.cultures) {
-                this.planet.addCulture(this.planet, 0.02);
-            }
-        }
     }
 
     determineOutcome() {

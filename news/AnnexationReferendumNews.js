@@ -45,8 +45,6 @@ class AnnexationReferendumNews extends News {
         // Culture transfer on success
         this.completeEffects[0].onApply = () => {
             if (this.planet instanceof Planet && this.targetPlanet instanceof Planet) {
-                this.targetPlanet.addCulture(this.planet, 0.1)
-                
                 // Change relationships - targetPlanet becomes subject of planet
                 if (this.currentSovereign) {
                     // End old sovereign relationship
@@ -95,15 +93,6 @@ class AnnexationReferendumNews extends News {
         
         // Target must not be planet's subject already
         if (tp.c.relationships.get(p) === RELATIONSHIP_TYPES.SUBJECT) return false
-        
-        // Check culture match - planet's culture must be 1st or 2nd highest on targetPlanet
-        const sortedCultures = [...tp.c.cultures.counts.entries()]
-            .sort((a, b) => b[1] - a[1])
-            .slice(0, 2)
-            .map(entry => entry[0])
-        
-        const cultureMatch = sortedCultures.includes(p)
-        if (!cultureMatch) return false
         
         // Planet must have some cultural strength
         const cultureValid = p.c.culture > CL.MEDIUM

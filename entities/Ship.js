@@ -289,26 +289,48 @@ class Ship {
      * @returns {HTMLCanvasElement} Canvas element showing the ship.
      */
     asImage(size = 80, color = undefined) {
-        const shipShape = this.shipType.shape()
         const shipColor = color || (this.fleet ? this.fleet.color : this.color)
         
-        const shipObj = new CanvasObject({
-            id: 'preview-ship',
-            shape: SHAPES.Polygon,
-            x: 0,
-            y: 0,
-            size: size,
-            fillColor: shipColor,
-            strokeColor: COLORS.White,
-            vertices: shipShape.vertices
-        })
-        
-        // Convert to image
-        const shipImage = shipObj.asImage(size)
-        shipImage.style.backgroundColor = '#000'
-        shipImage.style.display = 'block'
-        shipImage.style.margin = '10px auto'
-        
-        return shipImage
+        // Use shapeGenerator if available, otherwise fallback to simple circle
+        if (this.shipType.shapeGenerator) {
+            const shipShape = this.shipType.shapeGenerator()
+            
+            const shipObj = new CanvasObject({
+                id: 'preview-ship',
+                shape: SHAPES.Polygon,
+                x: 0,
+                y: 0,
+                size: size,
+                fillColor: shipColor,
+                strokeColor: COLORS.White,
+                vertices: shipShape.vertices
+            })
+            
+            // Convert to image
+            const shipImage = shipObj.asImage(size)
+            shipImage.style.backgroundColor = '#000'
+            shipImage.style.display = 'block'
+            shipImage.style.margin = '10px auto'
+            
+            return shipImage
+        } else {
+            // Fallback to simple circle if no shape generator
+            const shipObj = new CanvasObject({
+                id: 'preview-ship',
+                shape: SHAPES.FilledCircle,
+                x: 0,
+                y: 0,
+                size: size / 2,
+                fillColor: shipColor,
+                strokeColor: COLORS.White
+            })
+            
+            const shipImage = shipObj.asImage(size)
+            shipImage.style.backgroundColor = '#000'
+            shipImage.style.display = 'block'
+            shipImage.style.margin = '10px auto'
+            
+            return shipImage
+        }
     }
 }

@@ -34,10 +34,6 @@ class WarInternmentNews extends News {
             },
             {}
         )
-
-        this.startEffects[0].onApply = () => {
-            this.planet.addCulture(this.targetPlanet, -0.05)
-        }
     }
 
     shouldCancel() {
@@ -49,7 +45,6 @@ class WarInternmentNews extends News {
         // Must be at war
         const relationshipValid = Civilization.areAtWar(p, tp)
         // Must have significant population from targetPlanet culture
-        const cultureValid = p.c.cultures.getAmount(tp) > 0.05
-        return relationshipValid && cultureValid
+        return relationshipValid
     }
 }

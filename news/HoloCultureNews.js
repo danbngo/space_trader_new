@@ -34,28 +34,6 @@ class HoloCultureNews extends News {
     }
 
     onSuccess() {
-        // Spread culture to all other planets in the system
-        if (this.planet && this.planet.civilization && this.planet.c.cultures) {
-            const allPlanets = [...gs.system.planets, ...gs.system.dwarfPlanets, ...gs.system.spaceStations]
-            
-            for (const otherPlanet of allPlanets) {
-                if (otherPlanet === this.planet || !otherPlanet.civilization) continue
-                
-                // Transfer culture from this planet to other planets (stronger than normal)
-                this.planet.c.cultures.counts.forEach((amount, culture) => {
-                    if (amount > 0 && otherPlanet.c.cultures) {
-                        // Increase culture transfer - 0.5% instead of typical 0.1%
-                        const transferAmount = amount * 0.005
-                        otherPlanet.c.cultures.increment(culture, transferAmount)
-                    }
-                })
-                
-                // Normalize to keep percentages valid
-                if (otherPlanet.c.cultures) {
-                    otherPlanet.c.cultures.normalize()
-                }
-            }
-        }
     }
 
     determineOutcome() {

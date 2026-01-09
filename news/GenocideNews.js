@@ -32,13 +32,6 @@ class GenocideNews extends News {
                 security: CL.LOW, //people are mad now
             }
         )
-        
-        // Strengthen planet's own culture (ethnic cleansing makes population more homogeneous)
-        this.startEffects[0].onApply = () => {
-            if (this.planet instanceof Planet && this.planet.c.cultures) {
-                this.planet.addCulture(this.planet, 0.05);
-            }
-        }
     }
 
     determineOutcome() {
