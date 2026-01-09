@@ -40,14 +40,11 @@ function showCombatMap(encounter) {
  * @param {Encounter} encounter
  */
 function showCombatMode(encounter) {
-    
-    // Initialize combat state
-    currentEncounter = encounter
-    selectedPlayerShip = getAliveShips(encounter.playerShips)[0] || null
-    selectedEnemyShip = getAliveShips(encounter.enemyShips)[0] || null
-    combatLog = []
-    isPlayerTurn = true
-    
+/**
+ * Shows combat mode with action buttons
+ * @param {Encounter} encounter
+ */
+function showCombatMode(encounter) {
     const container = ce({
         id: 'combat-map-container',
         style: {
@@ -72,6 +69,169 @@ function showCombatMode(encounter) {
     container.appendChild(uiPanel)
     
     showElement(container)
+}
+
+/**
+ * Shows route travel mode with animated ships and progress bar
+ * @param {Encounter} encounter
+ */
+function showRouteTravelMode(encounter) {
+    const container = ce({
+        id: 'combat-map-container',
+        style: {
+            width: '100%',
+            height: '100vh',
+            backgroundColor: '#000',
+            position: 'relative',
+            overflow: 'hidden'
+        }
+    })
+    
+    // Create starfield background
+    const starfield = createStarfield()
+    container.appendChild(starfield)
+    
+    // Create canvas for ships and thrusters
+    const cvs = new CanvasWrapper()
+    cvs.canvas.id = 'route-canvas'
+    cvs.canvas.style.position = 'absolute'
+    cvs.canvas.style.top = '0'
+    cvs.canvas.style.left = '0'
+    cvs.canvas.style.width = '100%'
+    cvs.canvas.style.height = '75%'
+    cvs.canvas.style.zIndex = '1'
+    cvs.canvas.width = window.innerWidth
+    cvs.canvas.height = window.innerHeight * 0.75
+    container.appendChild(cvs.canvas)
+    
+    // Create route UI panel at bottom
+    const routePanel = createRouteTravelUIPanel(encounter, cvs)
+    container.appendChild(routePanel)
+    
+    showElement(container)
+    
+    // Start animation loop
+    animateRouteTravel(encounter, cvs)
+}
+
+/**
+ * Animates ships during route travel
+ * @param {Encounter} encounter
+ * @param {CanvasWrapper} cvs
+ */
+function animateRouteTravel(encounter, cvs) {
+    const centerX = cvs.canvas.width / 2
+    const centerY = cvs.canvas.height / 2
+    const shipSpacing = 60
+    
+    function animate() {
+        // Clear canvas objects
+        cvs.clearObjects()
+        cvs.pixels = [] // Keep background stars
+        
+        // Update progress (chance of encounter per frame)
+        const encounterChancePerFrame = PLANET_ENCOUNTER_CHANCE_PER_DAY / 60 / 60 // Convert from per day to per frame (assuming 60fps)
+        if (Math.random() < encounterChancePerFrame) {
+            routeProgress += 0.5 // Small increment when encounter chance triggers
+        }
+        routeProgress = Math.min(routeProgress, 100)
+        
+        // Update progress bar if it exists
+        const progressBarEl = document.getElementById('route-progress-bar')
+        if (progressBarEl) {
+            const progressFill = progressBarEl.querySelector('.progress-bar-fill')
+            if (progressFill) {
+                progressFill.style.width = `${routeProgress}%`
+            }
+        }
+        
+        // Draw each ship with jitter and thruster
+        encounter.playerShips.forEach((ship, index) => {
+            if (isShipDestroyed(ship)) return
+            
+            // Get or create jitter offset for this ship
+            if (!shipJitterOffsets.has(ship)) {
+                shipJitterOffsets.set(ship, {x: 0, y: 0, targetX: 0, targetY: 0})
+            }
+            const jitter = shipJitterOffsets.get(ship)
+            
+            // Update jitter target occasionally (every ~30 frames)
+            if (Math.random() < 0.03) {
+                jitter.targetX = (Math.random() - 0.5) * 10 // ±5 pixels x
+                jitter.targetY = (Math.random() - 0.5) * 30 // ±15 pixels y (more y jitter)
+            }
+            
+            // Smooth movement toward target
+            jitter.x += (jitter.targetX - jitter.x) * 0.1
+            jitter.y += (jitter.targetY - jitter.y) * 0.1
+            
+            // Calculate ship position
+            const shipY = centerY + (index - (encounter.playerShips.length - 1) / 2) * shipSpacing + jitter.y
+            const shipX = centerX + jitter.x
+            
+            // Draw thruster behind ship (triangle pointing backward)
+            const thrusterSize = 15
+            const thrusterFlicker = 0.7 + Math.random() * 0.3 // Flicker effect
+            const thrusterColor = [255, Math.floor(100 * thrusterFlicker), 0, Math.floor(255 * thrusterFlicker)]
+            cvs.addFilledTriangle(
+                `thruster-${index}`,
+                shipX - 25, // Behind the ship
+                shipY,
+                thrusterSize,
+                0,
+                2,
+                thrusterColor,
+                null,
+                Math.PI // Point backward
+            )
+            
+            // Draw ship as filled circle (simplified)
+            const shipColor = gs.fleet && gs.fleet.color ? gs.fleet.color : [0, 255, 0, 255]
+            cvs.addFilledCircle(
+                `ship-${index}`,
+                shipX,
+                shipY,
+                20,
+                5,
+                shipColor
+            )
+            
+            // Add ship label
+            cvs.addText(
+                `ship-label-${index}`,
+                shipX,
+                shipY + 30,
+                0,
+                0,
+                ship.shipType.name,
+                [255, 255, 255, 255],
+                12
+            )
+        })
+        
+        cvs.redraw(true)
+        
+        // Check if we should trigger an encounter
+        if (routeProgress >= 100) {
+            // Stop animation and trigger encounter
+            if (routeAnimationFrame) {
+                cancelAnimationFrame(routeAnimationFrame)
+                routeAnimationFrame = null
+            }
+            
+            // Trigger next encounter
+            console.log('Route progress complete - triggering encounter')
+            if (currentEncounter) {
+                currentEncounter.endEncounter()
+            }
+            return
+        }
+        
+        // Continue animation
+        routeAnimationFrame = requestAnimationFrame(animate)
+    }
+    
+    animate()
 }
 
 /**
@@ -356,6 +516,123 @@ function createCombatUIPanel(encounter) {
         ]
     })
     panel.appendChild(combatLogPanel)
+    
+    return panel
+}
+
+/**
+ * Creates the route travel UI panel with progress bar
+ * @param {Encounter} encounter
+ * @param {CanvasWrapper} cvs
+ * @returns {HTMLElement}
+ */
+function createRouteTravelUIPanel(encounter, cvs) {
+    const panel = ce({
+        id: 'route-ui-panel',
+        style: {
+            position: 'absolute',
+            bottom: '0',
+            left: '0',
+            width: '100%',
+            height: '25%',
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            borderTop: '2px solid #444',
+            padding: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '15px',
+            zIndex: '2',
+            alignItems: 'center',
+            justifyContent: 'center'
+        }
+    })
+    
+    // Progress info
+    const progressInfo = ce({
+        style: {
+            color: '#fff',
+            fontSize: '16px',
+            marginBottom: '10px'
+        },
+        children: [
+            'Traveling to destination...'
+        ]
+    })
+    panel.appendChild(progressInfo)
+    
+    // Progress bar container
+    const progressBarContainer = ce({
+        id: 'route-progress-bar',
+        style: {
+            width: '60%',
+            height: '30px',
+            backgroundColor: '#222',
+            border: '2px solid #666',
+            borderRadius: '5px',
+            position: 'relative',
+            overflow: 'hidden'
+        }
+    })
+    
+    // Progress bar fill
+    const progressBarFill = ce({
+        classList: ['progress-bar-fill'],
+        style: {
+            width: '0%',
+            height: '100%',
+            backgroundColor: '#4CAF50',
+            transition: 'width 0.3s ease',
+            position: 'relative'
+        }
+    })
+    
+    progressBarContainer.appendChild(progressBarFill)
+    panel.appendChild(progressBarContainer)
+    
+    // Progress text
+    const progressText = ce({
+        style: {
+            color: '#aaa',
+            fontSize: '12px',
+            marginTop: '10px'
+        },
+        children: [
+            'Progress until next encounter check'
+        ]
+    })
+    panel.appendChild(progressText)
+    
+    // Cancel button
+    const cancelButton = ce({
+        tag: 'button',
+        innerHTML: 'Cancel Travel',
+        style: {
+            padding: '10px 20px',
+            backgroundColor: '#660000',
+            color: '#fff',
+            border: '2px solid #aa0000',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            marginTop: '10px'
+        }
+    })
+    
+    cancelButton.addEventListener('click', () => {
+        // Stop animation
+        if (routeAnimationFrame) {
+            cancelAnimationFrame(routeAnimationFrame)
+            routeAnimationFrame = null
+        }
+        
+        // End encounter and return to star map
+        if (currentEncounter) {
+            currentEncounter.endEncounter()
+        }
+    })
+    
+    panel.appendChild(cancelButton)
     
     return panel
 }
@@ -715,5 +992,12 @@ function addToCombatLog(message) {
  */
 function refreshCombatMap() {
     if (!currentEncounter) return
+    
+    // Cleanup any ongoing animation
+    if (routeAnimationFrame) {
+        cancelAnimationFrame(routeAnimationFrame)
+        routeAnimationFrame = null
+    }
+    
     showCombatMap(currentEncounter)
 }
