@@ -113,14 +113,12 @@ function showPlanetsMenu(backFunction = () => closeModal(), dwarfOnly = false, s
             coloredName(planet.planetType),
             `${distanceAU} AU`,
             c ? coloredName(c.governmentType) : '-',
-            c?.races?.calcHighestKey() ? coloredName(c.races.calcHighestKey()) : '-',
-            c?.religions?.calcHighestKey() ? coloredName(c.religions.calcHighestKey()) : '-',
             findExports(planet),
             findImports(planet)
         ]
     })
 
-    tableData.unshift(['Name', 'Type', 'Distance', 'Government', 'Race', 'Religion', 'Exports', 'Imports'])
+    tableData.unshift(['Name', 'Type', 'Distance', 'Government', 'Exports', 'Imports'])
     
     // Create table with selection (row 1 is first data row, after header row 0)
     const table = createTable(

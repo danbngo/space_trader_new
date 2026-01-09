@@ -228,7 +228,6 @@ function showPlanetSocietyMenu(planet = new Planet()) {
     }
     
     showPlanetModal(planet, `${coloredName(planet)} - Society`, content, [
-        ["Demographics", () => showPlanetDemographicsMenu(planet), !civilization],
         ["Climate", () => showPlanetClimateMenu(planet)],
         ["News", () => showPlanetNewsMenu(planet)],
         ["Back", () => showPlanetMenu(planet)]
@@ -310,7 +309,6 @@ function showPlanetClimateMenu(planet = new Planet()) {
     
     showPlanetModal(planet, `${coloredName(planet)} - Climate`, content, [
         ["Society", () => showPlanetSocietyMenu(planet), !planet.civilization],
-        ["Demographics", () => showPlanetDemographicsMenu(planet), !planet.civilization],
         ["News", () => showPlanetNewsMenu(planet)],
         ["Back", () => showPlanetMenu(planet)]
     ], 'planet_climate', (nextPlanet) => showPlanetClimateMenu(nextPlanet));
