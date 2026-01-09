@@ -97,24 +97,55 @@ class PlanetDecorator {
      * Updates decorator positions based on parent movement
      */
     update() {
-        if (!this.parentCanvasObject) {
+        if (!this.parentCanvasObject || !this.cvs) {
             return
         }
         
-
-            //const size = Math.max(obj.minScreenSize, obj.size * zoom / pixelRatio)
-
-            //((x - this.cameraX) * this.zoom + (this.canvas.width / 2)) / this.pixelRatio,
-        // Only update if there's been movement
-        if (true) {
-            // Update crater positions
-            this.craters.forEach((crater, index) => {
-                const craterObj = this.canvasObjects[index]
-                craterObj.x = this.parentCanvasObject.x + (crater.x * this.parentCanvasObject.size)
-                craterObj.y = this.parentCanvasObject.y + (crater.y * this.parentCanvasObject.size)
-                craterObj.size = crater.radius * this.parentCanvasObject.size
-            })
+        const parent = this.parentCanvasObject
+        const zoom = this.cvs.zoom
+        const pixelRatio = this.cvs.pixelRatio
+        
+        // Determine if parent is rendering at minScreenSize or at world-space size
+        // The actual rendered size is: Math.max(minScreenSize, size * zoom) / pixelRatio
+        const worldSpaceSize = parent.size * zoom
+        const isAtMinSize = worldSpaceSize < parent.minScreenSize
+        
+        // Update crater positions
+        this.craters.forEach((crater, index) => {
+            const craterObj = this.canvasObjects[index]
+            if (!craterObj) return
             
-        }
+            if (isAtMinSize) {
+                // Parent is clamped to minScreenSize - use screen-space offsets
+                // Position craters at parent center, then offset in screen space
+                craterObj.x = parent.x
+                craterObj.y = parent.y
+                
+                // Calculate screen-space offsets based on minScreenSize
+                // Crater positions are ratios (-1 to 1), minScreenSize is in screen pixels before pixelRatio
+                craterObj.screenOffsetX = crater.x * parent.minScreenSize
+                craterObj.screenOffsetY = crater.y * parent.minScreenSize
+                
+                // Crater size also needs to be in screen space
+                craterObj.size = 0 // Set world size to 0
+                craterObj.minScreenSize = crater.radius * parent.minScreenSize
+            } else {
+                // Parent is rendering at world-space size - use world coordinates
+                craterObj.x = parent.x + (crater.x * parent.size)
+                craterObj.y = parent.y + (crater.y * parent.size)
+                craterObj.size = crater.radius * parent.size
+                
+                // Clear any screen offsets
+                craterObj.screenOffsetX = 0
+                craterObj.screenOffsetY = 0
+                
+                // Set crater minScreenSize proportional to parent
+                craterObj.minScreenSize = crater.radius * parent.minScreenSize
+            }
+        })
+        
+        // Update last known position
+        this.lastParentX = parent.x
+        this.lastParentY = parent.y
     }
 }
