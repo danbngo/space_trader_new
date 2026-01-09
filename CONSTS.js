@@ -110,5 +110,5 @@ const SPACE_STATION_MIN_BUILDINGS = 1
 
 const CRIMINAL_MAX_BOUNTY_PER_LEVEL = 500
 
-const YEARS_PER_TRAVEL_TICK = 1/365/24 //1 hour per tick
+const YEARS_PER_TRAVEL_TICK = 1/365/24/10 //1 hour per 10 tick
 const BASE_ENCOUNTER_CHANCE_PER_YEAR = 1/365 //1 encounter per day

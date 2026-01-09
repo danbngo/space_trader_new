@@ -30,6 +30,23 @@ class StarMapBodiesHandler {
             console.log(`StarMapBodiesHandler.handleAll: ${(perfEnd - perfStart).toFixed(2)}ms`);
         }
     }
+    
+    /**
+     * Updates all planet decorators (craters, etc.) - called when camera/zoom changes
+     */
+    updateAllDecorators() {
+        const {starSystem} = this.starMap
+        const {planets, dwarfPlanets} = starSystem
+        const allPlanets = [...planets, ...dwarfPlanets]
+        
+        allPlanets.forEach((body) => {
+            if (body.decorators && body.decorators.length > 0) {
+                body.decorators.forEach(decorator => {
+                    decorator.update()
+                })
+            }
+        })
+    }
 
     handleAsteroids() {
         const {starSystem, cvs} = this.starMap
@@ -197,7 +214,7 @@ class StarMapBodiesHandler {
                 // Associate and create decorators
                 if (body.decorators && body.decorators.length > 0) {
                     body.decorators.forEach(decorator => {
-                        decorator.associate(planetObj)
+                        decorator.associate(body, planetObj)
                         decorator.decorate(cvs, planetId)
                     })
                 }
@@ -304,15 +321,6 @@ class StarMapBodiesHandler {
             if (gs.fleet && gs.fleet.location === body) {
                 planetObj.strokeColor = COLORS.Green
                 planetObj.lineWidth = 2
-            }
-            
-            // Update decorator visibility
-            if (body.decorators && body.decorators.length > 0) {
-                body.decorators.forEach(decorator => {
-                    decorator.canvasObjects.forEach(obj => {
-                        obj.visible = isDiscovered
-                    })
-                })
             }
             
             // Keep planets at full brightness regardless of vision range

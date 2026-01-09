@@ -206,6 +206,9 @@ class StarMap extends BaseMap {
             this.lastCameraX = cameraX
             this.lastCameraY = cameraY
             this.lastZoom = zoom
+            
+            // Update decorators when camera changes (especially zoom)
+            this.bodiesHandler.updateAllDecorators()
         }
         
         // Update asteroids every 600th frame when player is in motion
@@ -559,12 +562,6 @@ class StarMap extends BaseMap {
         }
         if (obj == gs.fleet) {
             if (gs.location) ce({parent:container, tag:'button', innerHTML:`Dock (${coloredName(gs.location)})`, onClick:()=>this.explore(gs.location)})
-            
-            // Check if player is near an asteroid for mining
-            const nearbyData = checkNearbyAsteroid()
-            if (nearbyData) {
-                ce({parent:container, tag:'button', innerHTML:'⛏️ Mine', onClick: () => startMining()})
-            }
         }
         if (obj instanceof Planet) {
             const distance = roundToPlaces(calcDistance(gs.fleet.x, gs.fleet.y, obj.x, obj.y), 1)

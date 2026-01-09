@@ -4,11 +4,9 @@
  */
 function checkForEvents(elapsedYears = 1) {
     //console.log('checkForEvents', { elapsedYears });
-    const elapsedDays = elapsedYears*365
     if (gs.checkGameOver()) return
     checkForNews()
     tickPlanets(elapsedYears)
-    if (checkForEncounter(elapsedDays)) return
     if (isNaN(gs.credits)) {
         throw new Error('GameState credits is NaN!')
     }

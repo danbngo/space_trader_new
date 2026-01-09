@@ -83,16 +83,17 @@ class CombatMap extends BaseMap {
         
         // Create canvas for ships and thrusters
         this.routeCvs = new CanvasWrapper()
-        this.routeCvs.canvas.id = 'route-canvas'
-        this.routeCvs.canvas.style.position = 'absolute'
-        this.routeCvs.canvas.style.top = '0'
-        this.routeCvs.canvas.style.left = '0'
-        this.routeCvs.canvas.style.width = '100%'
-        this.routeCvs.canvas.style.height = '75%'
-        this.routeCvs.canvas.style.zIndex = '1'
-        this.routeCvs.canvas.width = window.innerWidth
-        this.routeCvs.canvas.height = window.innerHeight * 0.75
-        this.root.appendChild(this.routeCvs.canvas)
+        this.routeCvs.root.id = 'route-canvas-wrapper'
+        this.routeCvs.root.style.position = 'absolute'
+        this.routeCvs.root.style.top = '0'
+        this.routeCvs.root.style.left = '0'
+        this.routeCvs.root.style.width = '100%'
+        this.routeCvs.root.style.height = '75%'
+        this.routeCvs.root.style.zIndex = '1'
+        this.root.appendChild(this.routeCvs.root)
+        
+        // Auto-resize canvas to fit its container
+        this.routeCvs.autoResize()
         
         // Create route UI panel at bottom
         this.routePanel = this.createRouteTravelUIPanel()
@@ -973,9 +974,7 @@ class CombatMap extends BaseMap {
         
         // From planet image
         if (gs.previousLocation && gs.previousLocation.asCanvas) {
-            const fromCanvas = gs.previousLocation.asCanvas(80)
-            fromCanvas.style.borderRadius = '50%'
-            fromCanvas.style.border = '2px solid #666'
+            const fromCanvas = gs.previousLocation.asCanvas()
             planetImagesContainer.appendChild(fromCanvas)
         }
         
@@ -992,9 +991,7 @@ class CombatMap extends BaseMap {
         
         // To planet image
         if (gs.destination && gs.destination.asCanvas) {
-            const toCanvas = gs.destination.asCanvas(80)
-            toCanvas.style.borderRadius = '50%'
-            toCanvas.style.border = '2px solid #666'
+            const toCanvas = gs.destination.asCanvas()
             planetImagesContainer.appendChild(toCanvas)
         }
         

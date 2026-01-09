@@ -97,44 +97,67 @@ class Planet extends OrbitingObject {
     }
     
     /**
-     * Renders the planet to a canvas element
+     * Renders the planet to a canvas element using CanvasWrapper
      * @param {number} size - The size of the canvas in pixels
-     * @returns {HTMLCanvasElement} - Canvas element with the rendered planet
+     * @returns {HTMLElement} - Container element with the rendered planet canvas
      */
     asCanvas(size = 80) {
-        // Create a canvas element
-        const canvas = document.createElement('canvas')
-        canvas.width = size
-        canvas.height = size
-        const ctx = canvas.getContext('2d')
+        // Create a container element to set bounds
+        const container = ce({
+            style: {
+                width: `${size}px`,
+                height: `${size}px`,
+                display: 'inline-block',
+                position: 'relative'
+            }
+        })
         
-        // Draw the planet as a filled circle
-        ctx.fillStyle = `rgba(${this.color[0]}, ${this.color[1]}, ${this.color[2]}, ${this.color[3] / 255})`
-        ctx.beginPath()
-        ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2)
-        ctx.fill()
+        // Create a CanvasWrapper to properly render the planet
+        const cvs = new CanvasWrapper(1, 1, 1, 0)
+        cvs.canvas.style.display = 'block'
+        cvs.canvas.style.position = 'absolute'
+        cvs.canvas.style.top = '0'
+        cvs.canvas.style.left = '0'
+        setTimeout(() => {
+            cvs.autoResize()
+            cvs.canvas.style.left = `${(container.clientWidth - cvs.canvas.width)/2}px`
+            cvs.canvas.style.top = `${(container.clientHeight - cvs.canvas.height)/2}px`
+        }, 1)
+
+        // Append canvas to container
+        container.appendChild(cvs.root)
         
-        // Draw decorators if they exist
+        // Position camera at center
+        cvs.cameraX = 0
+        cvs.cameraY = 0
+        cvs.zoom = 0 // Scale so planet radius of 1 fills half the canvas
+        
+        // Add the planet as a filled circle at origin
+        const planetObj = cvs.addFilledCircle(
+            `planet-${this.uuid}-canvas`,
+            0, // x at origin
+            0, // y at origin
+            0, // radius (will be scaled by zoom)
+            size/3, // min screen size
+            this.color,
+            null // no click handler
+        )
+        
+        // Add decorators using the decorate method
         if (this.decorators && this.decorators.length > 0) {
             this.decorators.forEach(decorator => {
-                if (decorator.canvasObjects && decorator.canvasObjects.length > 0) {
-                    decorator.canvasObjects.forEach(obj => {
-                        // Simple rendering of craters as dark circles
-                        if (obj.shape === SHAPES.FilledCircle) {
-                            const relX = (obj.x / this.radius) * (size / 2) + size / 2
-                            const relY = (obj.y / this.radius) * (size / 2) + size / 2
-                            const relRadius = (obj.size / this.radius) * (size / 2)
-                            
-                            ctx.fillStyle = `rgba(${obj.fillColor[0]}, ${obj.fillColor[1]}, ${obj.fillColor[2]}, ${obj.fillColor[3] / 255})`
-                            ctx.beginPath()
-                            ctx.arc(relX, relY, relRadius, 0, Math.PI * 2)
-                            ctx.fill()
-                        }
-                    })
-                }
+                decorator.associate(this, planetObj)
+                decorator.decorate(cvs, `planet-${this.uuid}-canvas`)
             })
         }
         
-        return canvas
+        // Auto-resize canvas to fit container
+        cvs.autoResize()
+        
+        // Render the canvas
+        cvs.redraw(true)
+        
+        // Return the container element
+        return container
     }
 }

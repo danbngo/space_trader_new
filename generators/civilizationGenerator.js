@@ -29,11 +29,6 @@ function generateCivilization(planet) {
         cargoPriceMultipliers.setAmount(ct, 1) //used to randomize this but news and climate covers that pretty well
     }
 
-    const skillPriceMultipliers = new CountsMap()
-    for (const sk of SKILLS_ALL) {
-        skillPriceMultipliers.setAmount(sk, rng(ACADEMY_MAX_SKILL_PRICE_MODIFIER, ACADEMY_MIN_SKILL_PRICE_MODIFIER, false))
-    }
-
     return new Civilization({
         planet, governmentType, cargoPriceMultipliers, technology, education, territory, population,
          army, navy, industry, economy, security, culture, prestige, corruption, crime,

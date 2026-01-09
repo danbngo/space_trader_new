@@ -32,11 +32,10 @@
  * @param {number} fuelCapacity - The fuel capacity of the ship
  * @param {Array} modules - The modules equipped on the ship.
  * @param {number} moduleSlots - The maximum number of modules the ship can have.
- * @param {number} maxActionsPerTurn - The maximum number of actions the ship can perform per turn.
  * @returns {ShipType} The created ShipType instance.
  */
 class ShipType {
-    constructor(name = '', description = '', shape, hull = 1, shields = 1, lasers = 1, engine = 1, cargoSpace = 1, radars = 1, fuelCapacity = 1,modules = [], moduleSlots = 0, maxActionsPerTurn = SHIP_NUM_MOVES_PER_TURN) {
+    constructor(name = '', description = '', shape, hull = 1, shields = 1, lasers = 1, engine = 1, cargoSpace = 1, radars = 1, fuelCapacity = 1, modules = [], moduleSlots = 0) {
         this.name = name
         this.description = description
         this.shape = shape; // Legacy shape enum (deprecated)
@@ -50,21 +49,18 @@ class ShipType {
         this.fuelCapacity = fuelCapacity
         this.modules = modules
         this.moduleSlots = moduleSlots
-        this.maxActionsPerTurn = maxActionsPerTurn
         this.onDisabled = null
-        this.minRadiusModifier = 1
-        this.maxRadiusModifier = 1
     }
 }
 
 const SHIP_TYPES = {
-    COURIER: new ShipType('Courier', 'Fast, lightly-armored vessel designed for rapid message and package delivery across star systems.', null, 0.1, 0.1, 0.1, 2, 1, 1, 3, [], 2),
-    HAULER: new ShipType('Hauler', 'Massive bulk hauler with enormous cargo holds designed to transport liquids and gases.', null, 1.5, 0.25, 0.1, 1.5, 5, 1, 2, [], 2),
-    TANKER: new ShipType('Tanker', 'Has more space for fuel.', null, 1.5, 0.25, 0.1, 1.5, 5, 1, 2, [], 2),
-    SCOUT: new ShipType('Scout', 'Long-range reconnaissance vessel with powerful sensors and high speed for exploration.', null, 0.5, 0.5, 0.5, 3, 0.5, 3, 1.5, [], 1),
-    BATTLESHIP: new ShipType('Battleship', 'Massive capital ship with warhead launchers, heavy armor, and shields for fleet engagements.', null, 2, 2, 2, 1, 2, 1.5, 1.5, [], 1),
-    INTERCEPTOR: new ShipType('Interceptor', 'Fast pursuit craft with magnetic grapples for capturing or disabling enemy vessels.', null, 1.5, 1.5, 1.5, 2, 0.25, 2, 1, [], 2),
-    RAIDER: new ShipType('Raider', `Attack ship that specializes in quick strikes and hit-and-run tactics.`, null, 1, 2, 2, 2, 0.5, 0.5, 1.5, [], 1),
+    COURIER: new ShipType('Courier', 'Nimble dispatch vessel built for speed. Light armor, high velocity.', null, 0.25, 0.25, 0.25, 2, 1, 1, 3, [], 2),
+    HAULER: new ShipType('Hauler', 'Industrial freighter with expansive cargo bays. Poor defenses, excellent capacity.', null, 1, 0.25, 0.25, 1.5, 4, 0.5, 2, [], 2),
+    TANKER: new ShipType('Tanker', 'Deep-range transport with extended fuel reserves. Sluggish but tireless.', null, 2, 0.25, 0.5, 0.5, 2, 1, 4, [], 2),
+    SCOUT: new ShipType('Scout', 'Advanced recon platform with long-range sensors. Fast and perceptive.', null, 0.5, 0.5, 0.5, 3, 0.5, 3, 1.5, [], 1),
+    BATTLESHIP: new ShipType('Battleship', 'Heavy warship bristling with weapons and reinforced plating. Slow but devastating.', null, 3, 2, 2, 1, 2, 1.5, 1.5, [], 1),
+    INTERCEPTOR: new ShipType('Interceptor', 'Pursuit specialist equipped with grappling systems. Built to catch and disable.', null, 1.5, 1.5, 1.5, 2, 0.25, 2, 0.5, [], 2),
+    RAIDER: new ShipType('Raider', 'Strike fighter designed for aggressive maneuvers. Fast attack, minimal endurance.', null, 1, 2, 2, 2, 0.5, 0.5, 0.5, [], 1),
 }
 
 const SHIP_TYPES_ALL = Object.values(SHIP_TYPES)
@@ -79,12 +75,7 @@ SHIP_TYPES.RAIDER.shipShape = SHIP_SHAPES.COURIER
 
 
 const ASTEROID_SHIP_TYPES = {
-    ASTEROID: new ShipType('Asteroid', 'Rocky space debris drifting through the void, can be mined for valuable minerals.', null, 0.2, 0, 0, 0.25, 0.5, 1, 1, [], 0, 1),
+    ASTEROID: new ShipType('Asteroid', 'Rocky space debris drifting through the void, can be mined for valuable minerals.', null, 0.2, 0, 0, 0.25, 0.5, 1, 1, [], 0),
 }
 
 const ASTEROID_SHIP_TYPES_ALL = Object.values(ASTEROID_SHIP_TYPES)
-
-for (const st of ASTEROID_SHIP_TYPES_ALL) {
-    st.minRadiusModifier = 4
-    st.maxRadiusModifier = 16
-}

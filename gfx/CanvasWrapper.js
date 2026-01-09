@@ -38,6 +38,8 @@ class CanvasWrapper {
         this.objClickEnabled = true;
         this.isDragging = false;
         this.dragStartTime = 0;
+        this.width = 0
+        this.height = 0
         
         // Setup click detection
         this.canvas.addEventListener('click', (e) => this.handleClick(e));
@@ -79,6 +81,9 @@ class CanvasWrapper {
         this.canvas.width = width
         this.canvas.height = height
         this.ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+
+        this.width = width;
+        this.height = height;
         
         this.redraw()
     }

@@ -5,6 +5,7 @@ class PlanetDecorator {
     /**
      * @param {Object} params
      * @param {Array<{x: number, y: number, radius: number}>} [params.craters] - Array of crater definitions (x,y,radius as ratios 0-1)
+     * @property {CanvasWrapper|null} cvs
      */
     constructor({ craters = [] } = {}) {
         /** @type {Array<{x: number, y: number, radius: number}>} */
@@ -12,7 +13,10 @@ class PlanetDecorator {
         
         /** @type {CanvasObject|null} */
         this.parentCanvasObject = null
-        
+
+        /** @type {Planet|null} */
+        this.parentObject = null
+
         /** @type {number} */
         this.lastParentX = 0
         
@@ -21,13 +25,16 @@ class PlanetDecorator {
         
         /** @type {Array<CanvasObject>} */
         this.canvasObjects = []
+
+        this.cvs = null
     }
     
     /**
      * Associates this decorator with a parent canvas object
      * @param {CanvasObject} canvasObject - The parent planet canvas object
      */
-    associate(canvasObject) {
+    associate(object, canvasObject) {
+        this.parentObject = object
         this.parentCanvasObject = canvasObject
         this.lastParentX = canvasObject.x
         this.lastParentY = canvasObject.y
@@ -44,12 +51,10 @@ class PlanetDecorator {
             console.warn('PlanetDecorator.decorate() called without associated parent canvas object')
             return []
         }
+        this.cvs = cvs
         
         const parent = this.parentCanvasObject
         const parentZIndex = parent.zIndex || 10
-        
-        // Store cvs reference for update() method
-        this.cvs = cvs
         
         // Clear existing canvas objects
         this.canvasObjects.forEach(obj => {
@@ -61,14 +66,10 @@ class PlanetDecorator {
         this.craters.forEach((crater, index) => {
             const craterId = `${parentId}-crater-${index}`
             
-            // Calculate position in world space
+            // Calculate absolute position and size based on parent
             const craterX = parent.x + (crater.x * parent.size)
             const craterY = parent.y + (crater.y * parent.size)
             const craterRadius = crater.radius * parent.size
-            
-            // Calculate minScreenSize proportional to parent's minScreenSize
-            // This ensures craters scale with parent when it hits minScreenSize
-            const craterMinScreenSize = parent.minScreenSize * crater.radius
             
             // Create a dark filled circle for the crater
             const craterColor = [0, 0, 0, 0.6] // Semi-transparent black
@@ -77,7 +78,7 @@ class PlanetDecorator {
                 craterX,
                 craterY,
                 craterRadius,
-                craterMinScreenSize,
+                1, // minScreenSize
                 craterColor,
                 null // no click handler
             )
@@ -96,26 +97,24 @@ class PlanetDecorator {
      * Updates decorator positions based on parent movement
      */
     update() {
-        if (!this.parentCanvasObject || !this.cvs) {
+        if (!this.parentCanvasObject) {
             return
         }
         
-        const parent = this.parentCanvasObject
-        
-        // Update crater positions using parent's world-space size
-        // CanvasWrapper will handle zoom scaling via: Math.max(minScreenSize, size * zoom / pixelRatio)
-        this.craters.forEach((crater, index) => {
-            const craterObj = this.canvasObjects[index]
-            if (craterObj) {
-                // Use parent.size (world-space) for positioning - zoom is applied by CanvasWrapper
-                craterObj.x = parent.x + (crater.x * parent.size)
-                craterObj.y = parent.y + (crater.y * parent.size)
-                craterObj.size = crater.radius * parent.size
-            }
-        })
-        
-        // Update last known position
-        this.lastParentX = parent.x
-        this.lastParentY = parent.y
+
+            //const size = Math.max(obj.minScreenSize, obj.size * zoom / pixelRatio)
+
+            //((x - this.cameraX) * this.zoom + (this.canvas.width / 2)) / this.pixelRatio,
+        // Only update if there's been movement
+        if (true) {
+            // Update crater positions
+            this.craters.forEach((crater, index) => {
+                const craterObj = this.canvasObjects[index]
+                craterObj.x = this.parentCanvasObject.x + (crater.x * this.parentCanvasObject.size)
+                craterObj.y = this.parentCanvasObject.y + (crater.y * this.parentCanvasObject.size)
+                craterObj.size = crater.radius * this.parentCanvasObject.size
+            })
+            
+        }
     }
 }
