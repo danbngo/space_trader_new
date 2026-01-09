@@ -1,32 +1,11 @@
-
 DONE:
 
--dwarf planets, space stations should be under the influence of different major planets
- -incorporate them into the existing news system but tweak their interactions to represent being "jr partners"
- -downshift their numbers on the planet stats tab
- -do have them spawn their own fleets,
--asteroids change shape when i miss them!!?? but less than the OG planets
--make spinning or being rammed animated - use new shipactions and/or anim handlers (not just pseudo)
--saving/loading (this is a big milestone, if you're ready for this means game is almost ready for release)
--add the fuel concept to the game. will make it so he cant explore as hard. will also make it so we can implement a lunar landing minigame
--abandoned fleets need to have an orbit .. think about it :(
 
 TODO:
-
--improve the courthouse menu visually
--canUpgrade in academy might be meh.
--add an escort fleet system to the game - will be very useful later for quests
--cyber modules, geneticist and perks all need to be tested
-
--make ruins and anomalies interactive
-
-verify: -make sure anomalies and scientists actually work
--kuiper belt needs more activities, maybe anomalies ONLY spawn there and maybe gate to other systems goes there
+-test new travel, encounter, combat systems. get em working.
+-fix craters collapsing bug
 -planetMap! shows the moons, where each building is and causes the player ship to move around to use buildings
-
-verify: -make the AI for calcBestLaserCoords better - simulate up to 10 moves in advance and if any lead to a situation where we can shoot the enemy, favor them.
-
--in general, add some modules that do things other than grant new moves-regen, etc.
+-in general, add some modules that do things other than grant new moves-regen, etc. or other ways to upgrade ships.
 
 take on bounty missions ?? letter of marque??
 -make the officer's bounties, infamy, fame etc have an effect on the players encounters
@@ -34,15 +13,4 @@ take on bounty missions ?? letter of marque??
 missions - via the guild, etc.
 -infamy/fame should factor into what missions you can take on
 -escort missions? adds a temporary ship/officer? if they're disabled or die you lose rep?
-give officers and ships perks - not just boring levelups
-
-
-
-PROBABLY NOT ANY TIME SOON
-more interesting dialogue during encounters
-unique ships
--what happens if player reaches the end of the map? we dont really need to do anything but might be cool.
 - tutorial?
--asteroids, cannot shoot through them, they can be purposely shot and broken to create debris
--should officers + captain be able to do stuff other than just fly around? ie actually get out of their ship and use their skills
-and equipment?

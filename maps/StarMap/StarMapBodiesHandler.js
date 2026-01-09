@@ -22,6 +22,7 @@ class StarMapBodiesHandler {
         if (STARMAP_DEBUG_CONFIG.displayStars) this.handleStars();
         if (STARMAP_DEBUG_CONFIG.displayPlanets) this.handlePlanets();
         if (STARMAP_DEBUG_CONFIG.displaySpaceStations) this.handleSpaceStations();
+        this.handleDestinationLine();
         
         if (STARMAP_DEBUG_CONFIG.logPerformance) {
             const perfEnd = performance.now();
@@ -441,31 +442,55 @@ class StarMapBodiesHandler {
         const fleet = gs.fleet
         const lineId = 'destinationLine'
         
-        if (!fleet) return
+        console.log('[DestinationLine] fleet:', fleet)
+        console.log('[DestinationLine] selectedObject:', selectedObject)
+        
+        if (!fleet) {
+            console.log('[DestinationLine] No fleet, returning')
+            return
+        }
         
         let lineObj = cvs.getObject(lineId)
+        console.log('[DestinationLine] lineObj exists:', !!lineObj)
         
         // Check if we should show the line
-        const shouldShowLine = selectedObject &&
-            selectedObject !== fleet &&
-            selectedObject.x !== undefined &&
-            selectedObject.y !== undefined &&
-            fleet.canReachDestination(selectedObject)
+        const hasSelectedObject = !!selectedObject
+        const notSelectingFleet = selectedObject !== fleet
+        const hasXCoord = selectedObject?.x !== undefined
+        const hasYCoord = selectedObject?.y !== undefined
+        const canReach = selectedObject ? fleet.canReachDestination(selectedObject) : false
+        
+        console.log('[DestinationLine] Checks:', {
+            hasSelectedObject,
+            notSelectingFleet,
+            hasXCoord,
+            hasYCoord,
+            canReach,
+            fleetLocation: fleet.location,
+            selectedObjectName: selectedObject?.name || 'none'
+        })
+        
+        const shouldShowLine = hasSelectedObject && notSelectingFleet && hasXCoord && hasYCoord && canReach
+        console.log('[DestinationLine] shouldShowLine:', shouldShowLine)
         
         if (shouldShowLine) {
+            console.log('[DestinationLine] Showing line from', {x: fleet.x, y: fleet.y}, 'to', {x: selectedObject.x, y: selectedObject.y})
             // Create or update the line
             if (!lineObj) {
+                console.log('[DestinationLine] Creating new line object')
                 lineObj = cvs.addLine(
                     lineId,
                     fleet.x,
                     fleet.y,
                     selectedObject.x,
                     selectedObject.y,
-                    COLORS.White,
-                    1 // lineWidth
+                    COLORS.Cyan,
+                    2 // lineWidth
                 )
                 lineObj.zIndex = -1 // Draw behind everything else
+                console.log('[DestinationLine] Line created:', lineObj)
             } else {
+                console.log('[DestinationLine] Updating existing line')
                 // Update line position
                 lineObj.x = fleet.x
                 lineObj.y = fleet.y
@@ -476,6 +501,7 @@ class StarMapBodiesHandler {
         } else {
             // Hide the line if it exists
             if (lineObj) {
+                console.log('[DestinationLine] Hiding line')
                 lineObj.visible = false
             }
         }

@@ -20,7 +20,7 @@ const ASTEROID_MIN_SCREEN_RADIUS = 1 // Hide asteroids when they would appear sm
 const MINING_HAZARD_CHANCE = 0.1 // 10% chance of encountering a hazard when mining
 const REPAIR_COST_PER_1_HULL = 10 // Base cost to repair 1 hull point at shipyard
 const BASE_FUEL_COST_PER_UNIT = 5 // Base cost per unit of fuel at shipyard
-const FUEL_COST_PER_1_AU = 1 // Fuel units consumed per AU traveled
+const FUEL_COST_PER_1_AU = 5 // Fuel units consumed per AU traveled
 const WARN_INTERCEPT_DURATION_YEARS = 1/30 // Show confirmation modal for intercept routes longer than this (1 day)
 
 const PLANET_ENCOUNTER_CHANCE_PER_DAY = 0//0.01; //chance of random encounter per day when right next to an 'average' planet

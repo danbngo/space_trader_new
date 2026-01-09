@@ -404,7 +404,7 @@ class StarMap extends BaseMap {
         const obj = this.selectedObject
         if (obj && obj !== gs.fleet && this.objPaneDistanceEl && this.objPaneETAEl && this.objPaneFuelCostEl) {
             if (obj.x !== undefined && obj.y !== undefined) {
-                const distance = calcDistance(gs.fleet.x, gs.fleet.y, obj.x, obj.y)
+                const distance = roundToPlaces(calcDistance(gs.fleet.x, gs.fleet.y, obj.x, obj.y), 1)
                 const travelTime = distance / gs.fleet.speed
                 const etaYears = travelTime
                 const fuelCost = roundToPlaces(distance * FUEL_COST_PER_1_AU, 1)
