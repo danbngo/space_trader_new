@@ -32,7 +32,6 @@ class NewsEffect extends Civilization {
         forceWithdrawal = false,
         onApply = ()=>{},
         cargoPriceMultipliers = new CountsMap(),
-        skillPriceMultipliers = new CountsMap(),
         technology = 1.0,
         education = 1.0,
         territory = 1,
@@ -56,7 +55,6 @@ class NewsEffect extends Civilization {
         super({
             planet,
             cargoPriceMultipliers,
-            skillPriceMultipliers,
             technology,
             education,
             territory,

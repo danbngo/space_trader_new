@@ -124,7 +124,7 @@ class Fleet extends SpaceObject {
     }
 
     get totalLasers() {
-        return this.ships.reduce((total, ship) => total + ship.lasers, 0);
+        return this.ships.reduce((total, ship) => total + ship.lasers[1], 0);
     }
 
     get totalHull() {

@@ -2,10 +2,6 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
 
     const {name, skills, skillPoints} = captain
 
-    // State tracking for dropdowns - read from current captain/fleet state
-    let selectedRace = captain.race || RACES.HUMAN
-    let selectedFaction = gs.fleet.captain.factionType || PLAYER_FACTIONS[0]
-
     // Helper to set fleet location and position
     function setFleetLocation(planet) {
         gs.fleet.planet = planet
@@ -22,9 +18,7 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
     function resetCaptain() {
         captain.skills = new CountsMap()
         captain.skillPoints = STARTING_SKILL_POINTS;
-        captain.race = RACES.HUMAN
         captain.religion = null
-        gs.fleet.captain.factionType = PLAYER_FACTIONS[0]
         setFleetLocation(EARTH)
         showCaptainCreationMenu(captain, onClose)
     }
@@ -32,10 +26,7 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
     function randomizeCaptain() {
         captain.skills = new CountsMap()
         captain.skillPoints = STARTING_SKILL_POINTS;
-        captain.race = rndMember(Object.values(RACES))
         captain.religion = null
-        gs.fleet.captain.factionType = rndMember(PLAYER_FACTIONS)
-        gs.fleet.factionType = gs.fleet.captain.factionType
         setFleetLocation(EARTH)
         
         // Randomly spend all skill points
@@ -116,100 +107,7 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
                 ]
             }),
             
-            ce({children: ['<u>Character Background</u>']}),
-
-                        // Faction dropdown
-            ce({
-                style: {display: 'flex', flexDirection: 'column', gap: '4px'},
-                children: [
-                    (() => {
-                        const factionDropdown = new Dropdown(
-                            PLAYER_FACTIONS.map(faction => [
-                                `${faction.symbol} ${faction.name}`,
-                                () => {
-                                    selectedFaction = faction
-                                    gs.fleet.captain.factionType = faction
-                                    gs.fleet.factionType = faction
-                                    // Apply faction stat modifiers if needed
-                                    showCaptainCreationMenu(captain, onClose, selectedSkill)
-                                }
-                            ]),
-                            false,
-                            PLAYER_FACTIONS.indexOf(selectedFaction),
-                            250,
-                            2
-                        )
-                        // Add popover to the label showing current selection
-                        setTimeout(() => {
-                            createPopoverElement(factionDropdown.labelElement, selectedFaction.description)
-                            // Add popovers to dropdown items
-                            factionDropdown.dropdownButtons.forEach((btn, index) => {
-                                createPopoverElement(btn, PLAYER_FACTIONS[index].description)
-                            })
-                        }, 10)
-                        return factionDropdown.container
-                    })()
-                ]
-            }),
-            
-            // Race dropdown
-            ce({
-                style: {display: 'flex', flexDirection: 'column', gap: '4px'},
-                children: [
-                    (() => {
-                        const raceDropdown = new Dropdown(
-                            Object.values(RACES).map(race => [
-                                `${race.symbol} ${race.name}`,
-                                () => {
-                                    selectedRace = race
-                                    captain.race = race
-                                    // Apply race stat modifiers if they exist
-                                    showCaptainCreationMenu(captain, onClose, selectedSkill)
-                                }
-                            ]),
-                            false,
-                            Object.values(RACES).indexOf(selectedRace),
-                            250
-                        )
-                        // Add popover to the label showing current selection
-                        setTimeout(() => {
-                            createPopoverElement(raceDropdown.labelElement, selectedRace.description)
-                            // Add popovers to dropdown items
-                            raceDropdown.dropdownButtons.forEach((btn, index) => {
-                                createPopoverElement(btn, Object.values(RACES)[index].description)
-                            })
-                        }, 10)
-                        return raceDropdown.container
-                    })()
-                ]
-            }),
-
-            // Perks section
-            ce({
-                style: {display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '12px'},
-                children: [
-                    ce({tag:'br'}),
-                    ce({children: ['<u>Perks</u>']}),
-                    (() => {
-                        const level1Perks = selectedRace.automaticPerks.filter(perk => perk.minLevel === 1);
-                        if (level1Perks.length === 0) {
-                            return ce({children: [colorSpan('(None)', COLORS.Gray)]});
-                        }
-                        return ce({
-                            tag: 'ul',
-                            style: {marginTop: '4px', marginBottom: '0', paddingLeft: '20px'},
-                            children: level1Perks.map(perk => {
-                                const li = ce({
-                                    tag: 'li',
-                                    children: [colorSpan(perk.name, perk.color)]
-                                });
-                                createPopoverElement(li, perk.description);
-                                return li;
-                            })
-                        });
-                    })()
-                ]
-            }),
+            ce({children: ['<u>Character Background</u>']})
         ]
     })
 
@@ -260,16 +158,6 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
                     captain.reputation.increment(gs.fleet.location, startingReputation);
                     // Grant citizen rank on starting planet (overrides NO_RANK)
                     captain.ranks.set(gs.fleet.location, RANK_TYPES.CITIZEN);
-                }
-                
-                // Reputation with race
-                if (captain.race) {
-                    captain.reputation.increment(captain.race, startingReputation);
-                }
-                
-                // Reputation with faction
-                if (gs.fleet.factionType) {
-                    captain.reputation.increment(gs.fleet.factionType, startingReputation);
                 }
                 
                 closeModal()

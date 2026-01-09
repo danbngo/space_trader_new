@@ -16,12 +16,12 @@ function createBuyShipMenu(ships = [], shipyard = new Shipyard(), onSelectShip =
         rows.push([
             ship.name,
             statColorSpan(roundToPlaces(ship.quality * 100, 1) + '%', ship.quality),
-            statColorSpan(ship.hull[1], ship.hull[1]/10),
-            statColorSpan(ship.shields[1], ship.shields[1]/10),
-            statColorSpan(ship.fuelCapacity, ship.fuelCapacity/10),
-            statColorSpan(ship.lasers, ship.lasers/10),
-            statColorSpan(ship.engine, ship.engine/10),
-            statColorSpan(ship.cargoSpace, ship.cargoSpace/10),
+            statColorSpan(ship.hull[1], ship.hull[1]/AVERAGE_SHIP_HULL),
+            statColorSpan(ship.shields[1], ship.shields[1]/AVERAGE_SHIP_SHIELDS),
+            statColorSpan(ship.lasers[1], ship.lasers[1]/AVERAGE_SHIP_LASERS),
+            statColorSpan(ship.fuelCapacity, ship.fuelCapacity/AVERAGE_SHIP_FUEL_CAPACITY),
+            statColorSpan(ship.engine, ship.engine/AVERAGE_SHIP_ENGINE),
+            statColorSpan(ship.cargoSpace, ship.cargoSpace/AVERAGE_SHIP_CARGO_SPACE),
             statColorSpan(buyPrice, ship.value/buyPrice)
         ])
     }
@@ -135,7 +135,7 @@ function createSellShipMenu(ships = [], shipyard = new Shipyard(), onSelectShip 
             statColorSpan(roundToPlaces(ship.quality * 100, 1) + '%', ship.quality),
             statColorSpan(`${ship.hull[0]}/${ship.hull[1]}`, ship.hull[0]/ship.hull[1]),
             statColorSpan(ship.shields[1], ship.shields[1]/10),
-            statColorSpan(ship.lasers, ship.lasers/10),
+            statColorSpan(ship.lasers[1], ship.lasers[1]/10),
             statColorSpan(ship.engine, ship.engine/10),
             statColorSpan(ship.cargoSpace, ship.cargoSpace/10),
             damageAmount > 0 ? statColorSpan(repairCost, 1/repairCost*100) : colorSpan('—', COLORS.Gray),

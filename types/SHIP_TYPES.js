@@ -58,13 +58,14 @@ class ShipType {
 }
 
 const SHIP_TYPES = {
-    COURIER_SHIP: new ShipType('Courier Ship', 'Fast, lightly-armored vessel designed for rapid message and package delivery across star systems.', null, 0.1, 0.1, 0.1, 2, 1, 1, 3, [SHIP_MODULE_TYPES.BOOSTER], 2),
-    TANKER: new ShipType('Tanker', 'Massive bulk hauler with enormous cargo holds designed to transport liquids and gases.', null, 1.5, 0.25, 0.1, 1.5, 5, 1, 2, [], 2),
+    COURIER: new ShipType('Courier', 'Fast, lightly-armored vessel designed for rapid message and package delivery across star systems.', null, 0.1, 0.1, 0.1, 2, 1, 1, 3, [SHIP_MODULE_TYPES.BOOSTER], 2),
+    HAULER: new ShipType('Hauler', 'Massive bulk hauler with enormous cargo holds designed to transport liquids and gases.', null, 1.5, 0.25, 0.1, 1.5, 5, 1, 2, [], 2),
+    TANKER: new ShipType('Tanker', 'Has more space for fuel.', null, 1.5, 0.25, 0.1, 1.5, 5, 1, 2, [], 2),
     SCOUT: new ShipType('Scout', 'Long-range reconnaissance vessel with powerful sensors and high speed for exploration.', null, 0.5, 0.5, 0.5, 3, 0.5, 3, 1.5, [SHIP_MODULE_TYPES.SCANNER], 1),
-    FRIGATE: new ShipType('Frigate', 'Well-balanced warship with solid defenses, firepower, and speed for versatile combat.', null, 2, 3, 1.5, 3, 1, 1, 1, [SHIP_MODULE_TYPES.BOOSTER], 2),
     BATTLESHIP: new ShipType('Battleship', 'Massive capital ship with warhead launchers, heavy armor, and shields for fleet engagements.', null, 4, 4, 3, 1, 2, 1.5, 1.5, [SHIP_MODULE_TYPES.WARHEAD], 1),
     INTERCEPTOR: new ShipType('Interceptor', 'Fast pursuit craft with magnetic grapples for capturing or disabling enemy vessels.', null, 1.5, 1.5, 1.5, 2, 0.25, 2, 1, [SHIP_MODULE_TYPES.MAGNETIZE], 2),
-    UTILITY_SHIP: new ShipType('Utility Ship', 'Support vessel equipped with nanite repair systems to fix damaged ships in the field.', null, 1, 2, 0.5, 1, 0.5, 2, 1.5, [SHIP_MODULE_TYPES.NANITE_BEAM, SHIP_MODULE_TYPES.MAGNETIZE], 1),
+    CORSAIR: new ShipType('Interceptor', 'Fast pursuit craft with magnetic grapples for capturing or disabling enemy vessels.', null, 1.5, 1.5, 1.5, 2, 0.25, 2, 1, [SHIP_MODULE_TYPES.MAGNETIZE], 2),
+    RAIDER: new ShipType('Raider', '', null, 1, 2, 0.5, 1, 0.5, 2, 1.5, [SHIP_MODULE_TYPES.NANITE_BEAM, SHIP_MODULE_TYPES.MAGNETIZE], 1),
 }
 
 const SHIP_TYPES_ALL = Object.values(SHIP_TYPES)

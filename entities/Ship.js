@@ -11,13 +11,13 @@ class Ship {
      * @param {number[]} hull - The current and maximum hull integrity [current, max].
      * @param {number[]} shields - The current and maximum shield strength [current, max].
      * @param {number} fuelCapacity - The fuel capacity of the ship.
-     * @param {number} lasers - The laser power of the ship.
+     * @param {number[]} lasers - The current and maximum laser charge [current, max].
      * @param {number} engine - The engine power of the ship.
      * @param {number} cargoSpace - The cargo space available on the ship.
      * @param {number} radars - The radar capability of the ship.
      * @param {number} maxActionsPerTurn - The maximum number of actions the ship can take per turn.
      */
-    constructor(name = "Unnamed", shipType = SHIP_TYPES[0], color = COLORS.White, hull = [0, 0], shields = [0, 0], lasers = 0, engine = 0, cargoSpace = 0, radars = 0, fuelCapacity = 0, maxActionsPerTurn = SHIP_NUM_MOVES_PER_TURN) {
+    constructor(name = "Unnamed", shipType = SHIP_TYPES[0], color = COLORS.White, hull = [0, 0], shields = [0, 0], lasers = [0, 0], engine = 0, cargoSpace = 0, radars = 0, fuelCapacity = 0, maxActionsPerTurn = SHIP_NUM_MOVES_PER_TURN) {
         /** @type {string} */
         this.name = name;
         /** @type {ShipType} */
@@ -30,8 +30,8 @@ class Ship {
         this.shields = shields; //take less damage from lasers
         /** @type {number} */
         this.fuelCapacity = fuelCapacity; //maximum fuel capacity
-        /** @type {number} */
-        this.lasers = lasers; //do more damage in combat, and vs. asteroids
+        /** @type {number[]} */
+        this.lasers = lasers; //do more damage in combat, and vs. asteroids [current, max]
         /** @type {number} */
         this.radars = radars; //shoot further, and detect enemies and asteroids at greater distances
         /** @type {number} */
@@ -52,6 +52,8 @@ class Ship {
         this.angle = Math.PI*2; //direction ship is facing in. it can only accelerate/decelerate and shoot in that direction
         /** @type {boolean} */
         this.escaped = false;
+        /** @type {boolean} */
+        this.evading = false;
         /** @type {number} */
         this.maxActionsPerTurn = maxActionsPerTurn;
         /** @type {number} */
@@ -84,7 +86,7 @@ class Ship {
     }
 
     get quality() {
-        let totalStats = this.lasers + this.hull[1] + this.shields[1] + this.engine + this.cargoSpace + this.radars
+        let totalStats = this.lasers[1] + this.hull[1] + this.shields[1] + this.engine + this.cargoSpace + this.radars
         let expectedStats = this.shipType.lasers * AVERAGE_SHIP_LASERS + this.shipType.hull * AVERAGE_SHIP_HULL + this.shipType.shields * AVERAGE_SHIP_SHIELDS + this.shipType.engine * AVERAGE_SHIP_ENGINE + this.shipType.cargoSpace * AVERAGE_SHIP_CARGO_SPACE + this.shipType.radars * AVERAGE_SHIP_RADARS  
         console.log('getting quality:',totalStats, expectedStats, totalStats / expectedStats)
         return totalStats / expectedStats
@@ -96,6 +98,12 @@ class Ship {
 
     get moduleTypes() {
         return this.modules.map(m => m.moduleType)
+    }
+    
+    get unusedModuleSlots() {
+        const totalSlots = this.shipType.moduleSlots || 0
+        const usedSlots = this.localModules.length
+        return Math.max(0, totalSlots - usedSlots)
     }
     
     /**
@@ -137,7 +145,7 @@ class Ship {
         return (this instanceof AsteroidShip ? this.radiusModifier : 1) * AVERAGE_SHIP_MASS
         * (this.hull[1]/AVERAGE_SHIP_HULL
         + this.shields[1]/AVERAGE_SHIP_SHIELDS 
-        + this.lasers/AVERAGE_SHIP_LASERS
+        + this.lasers[1]/AVERAGE_SHIP_LASERS
         + this.cargoSpace/AVERAGE_SHIP_CARGO_SPACE
         + this.engine/AVERAGE_SHIP_ENGINE
         + this.radars/AVERAGE_SHIP_RADARS) / 6
@@ -161,7 +169,7 @@ class Ship {
             this.hull[0] / AVERAGE_SHIP_HULL
             + this.shields[0] / (AVERAGE_SHIP_SHIELDS*2)
             + this.shields[1] / (AVERAGE_SHIP_SHIELDS*2)
-        const atkRating = this.lasers / AVERAGE_SHIP_LASERS * this.radars / AVERAGE_SHIP_RADARS + this.engine / AVERAGE_SHIP_ENGINE
+        const atkRating = this.lasers[1] / AVERAGE_SHIP_LASERS * this.radars / AVERAGE_SHIP_RADARS + this.engine / AVERAGE_SHIP_ENGINE
         return Math.pow(hpRating * atkRating, 0.5)
     }
 
