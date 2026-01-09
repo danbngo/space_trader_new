@@ -126,41 +126,8 @@ function generateSettlement(planet) {
     console.log('generating buildings...')
     
     const shipyard = new Shipyard(planet)
-    
-    // REMOVED: Deleted buildings (only kept Shipyard, Market, Guild per user request)
-    // const caravansery = new Caravansery(planet)
-    const caravansery = null
-    
-    const market =  new Market(planet, false)
-    
-    const blackMarket =  new Market(planet, true) 
-    
+    const market =  new Market(planet)
     const guild =  new Guild(planet)    
-    // const bank =  new Bank(planet) 
-    const bank = null
-    
-    // const courthouse = new Courthouse(planet)
-    const courthouse = null
-    
-    // const academy = new Academy(planet)
-    const academy = null
-    
-    // const tavern = new Tavern(planet, true)
-    const tavern = null
-    
-    // REMOVED: CyberSurgeon, Geneticist
-    // const cyberSurgeon = new CyberSurgeon(planet)
-    // const geneticist = new Geneticist(planet)
-    
-    // const palace = new Palace(planet)
-    const palace = null
-    
-    // const temple = new Temple(planet)
-    const temple = null
-    
-    // const casino = new Casino(planet)
-    const casino = null
-    
 
     console.log('disabling some buildings...')
 
@@ -171,9 +138,8 @@ function generateSettlement(planet) {
     const disableChance = planet.objectType == OBJECT_TYPES.PLANET ? 0 :
                           planet.objectType == OBJECT_TYPES.MOON || planet.objectType == OBJECT_TYPES.DWARF_PLANET ? 0.4 :
                           0.8
-    // REMOVED: cyberSurgeon, geneticist, and other deleted buildings
     // Only Shipyard, Market, Guild remain functional
-    const buildings = [shipyard, market, blackMarket, guild].filter(b => b !== null)
+    const buildings = [shipyard, market, guild].filter(b => b !== null)
     
     // First pass: randomly disable buildings
     for (const building of buildings) {
@@ -203,18 +169,7 @@ function generateSettlement(planet) {
         planet, 
         settlementType, 
         shipyard, 
-        caravansery: null, 
         market, 
-        blackMarket, 
-        guild, 
-        bank: null, 
-        courthouse: null, 
-        academy: null, 
-        tavern: null, 
-        cyberSurgeon: null, 
-        geneticist: null, 
-        palace: null, 
-        temple: null, 
-        casino: null
+        guild
     })
 }

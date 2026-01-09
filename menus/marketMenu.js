@@ -1,7 +1,6 @@
 /**
  * Creates an HTML table displaying market cargo with buy/sell prices.
  * @param {Market} market - The market building.
- * @param {boolean} blackMarket - Whether this is a black market (shows only illegal goods).
  * @param {CountsMap} playerCargo - The player's current cargo.
  * @param {CountsMap} marketCargo - The market's available cargo.
  * @param {CountsMap} buyPrices - The buy prices for each cargo type.
@@ -9,12 +8,12 @@
  * @param {(cargoType: CargoType) => void} onSelectCargoType - Callback when cargo type is selected.
  * @returns {HTMLTableElement} The market cargo table.
  */
-function createMarketCargoTable(market = new Market(), blackMarket = false, playerCargo = new CountsMap(), marketCargo = new CountsMap(), buyPrices = new CountsMap(), sellPrices = new CountsMap(), onSelectCargoType = (ct = CARGO_TYPES_ALL[0])=>{}) {
+function createMarketCargoTable(market = new Market(), playerCargo = new CountsMap(), marketCargo = new CountsMap(), buyPrices = new CountsMap(), sellPrices = new CountsMap(), onSelectCargoType = (ct = CARGO_TYPES_ALL[0])=>{}) {
     /** @type {any[]} */
     const rows = [
         ['Cargo Type', 'Market Amt.', 'Buy Price', 'Your Amt.', 'Sell Price']
     ]
-    const cargoTypes = blackMarket ? CARGO_TYPES_ALL.filter(ct=>ct.illegal) : CARGO_TYPES_ALL.filter(ct=>(!ct.illegal))
+    const cargoTypes = CARGO_TYPES_ALL
     for (const ct of cargoTypes) {
         rows.push([
             `${ct.symbol} ${ct.name}`,
@@ -79,7 +78,7 @@ function createMarketCargoTable(market = new Market(), blackMarket = false, play
  * @param {Market} market - The market building to interact with.
  */
 function showMarketMenu(market = new Market()) {
-    const {blackMarket, planet} = market
+    const {planet} = market
     const {fleet} = gs;
     const isDocked = fleet.location == planet
     const buyPrices = market.calcCargoBuyPrices()
@@ -202,26 +201,25 @@ function showMarketMenu(market = new Market()) {
     let infoContainer = ce({
         children: [
             accessDeniedReason ? colorSpan(accessDeniedReason, COLORS.Orange) + '<br/>' : '',
-            createMarketCargoTable(market, blackMarket, fleet.cargo, market.cargo, buyPrices, sellPrices, onSelectCargoType),
+            createMarketCargoTable(market, fleet.cargo, market.cargo, buyPrices, sellPrices, onSelectCargoType),
             `Market Credits: ${market.credits} | Your Credits: ${gs.credits} | Your Cargo: ${fleet.cargo.total}/${fleet.totalCargoSpace}`,
         ]
     })
 
     showPlanetModal(
         planet,
-        `${coloredName(planet)} - ${blackMarket ? 'Black Market' : 'Market'}`,
+        `${coloredName(planet)} - Market`,
         infoContainer,
         [['Back', ()=>showPlanetMenu(planet)]],
         'market_panel',
         (nextPlanet) => {
-            const nextMarket = blackMarket ? nextPlanet.settlement?.blackMarket : nextPlanet.settlement?.market;
+            const nextMarket = nextPlanet.settlement?.market;
             return nextMarket ? showMarketMenu(nextMarket) : showPlanetMenu(nextPlanet);
         }
     );
     
     // Auto-select first cargo type
-    const cargoTypes = blackMarket ? CARGO_TYPES_ALL.filter(ct=>ct.illegal) : CARGO_TYPES_ALL.filter(ct=>(!ct.illegal))
-    if (cargoTypes.length > 0) {
-        onSelectCargoType(cargoTypes[0])
+    if (CARGO_TYPES_ALL.length > 0) {
+        onSelectCargoType(CARGO_TYPES_ALL[0])
     }
 }

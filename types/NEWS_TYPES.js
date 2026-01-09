@@ -64,9 +64,7 @@ const VASSALS = [OBJECT_TYPES.SPACE_STATION]
 const NT = {
     ADDICTION: new NewsType('Addiction', NF.HEALTH_HAZARD, 3, 8, 1, [], [], [GT.POLICE_STATE]),
     ALLIANCE: new NewsType('Alliance', NF.GEOPOLITICS, 10, 40, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.DEMOCRACY], [], MAJOR_POWERS), //two neutral planets become allies
-    ALLIANCE_RELIGIOUS: new NewsType('Religious Alliance', NF.GEOPOLITICS, 10, 40, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.THEOCRACY, GT.DEMOCRACY], [], MAJOR_POWERS), //two neutral planets with same state religion
     ALLIANCE_GOVERNMENT: new NewsType('Political Alliance', NF.GEOPOLITICS, 10, 40, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.DEMOCRACY, GT.ARISTOCRACY], [], MAJOR_POWERS), //two neutral planets with same government type
-    ALLIANCE_ETHNIC: new NewsType('Ethnic Alliance', NF.GEOPOLITICS, 10, 40, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.DEMOCRACY], [], MAJOR_POWERS), //two neutral planets with same majority ethnicity
     ALLIANCE_CULTURAL: new NewsType('Cultural Alliance', NF.GEOPOLITICS, 10, 40, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.DEMOCRACY], [], MAJOR_POWERS), //two neutral planets with same majority culture
     ARMS_DEAL: new NewsType('Arms Deal', NF.GEOPOLITICS, 2, 5, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.CORPORATISM], [], MAJOR_POWERS), //one planet sends military equipment to another
     CIVIL_STRIFE: new NewsType('Civil Strife', NF.UNREST, 3, 8, 1, [GT.POLICE_STATE], [], []),
@@ -101,7 +99,6 @@ const NT = {
     ASYLUM_POLICY: new NewsType('Asylum Policy', NF.POLITICS, 5, 12, 1, [GT.ANARCHY], [GT.DEMOCRACY], [GT.POLICE_STATE]),
     DIASPORA_RETURNS: new NewsType('Diaspora Returns', NF.CULTURE, 5, 15, 1, [], [GT.DEMOCRACY, GT.CORPORATISM], []),
     INDUSTRIAL_ACCIDENT: new NewsType('Industrial Accident', NF.HEALTH_HAZARD, 2, 5, 1, [], [GT.CORPORATISM], []),
-    RELIGION_INQUISITION: new NewsType('Inquisition', NF.RELIGION, 5, 12, 1, [GT.DEMOCRACY, GT.ANARCHY], [GT.THEOCRACY, GT.POLICE_STATE], [], MAJOR_POWERS),
     BANKRUPTCY: new NewsType('Bankruptcy', NF.ECONOMY, 3, 8, 1, [GT.COMMUNISM], [GT.CORPORATISM, GT.DEMOCRACY], []),
     LAND_GRAB: new NewsType('Imperialism', NF.GEOPOLITICS, 10, 30, 1, [GT.ANARCHY, GT.PUPPET_STATE], [GT.ARISTOCRACY, GT.POLICE_STATE, GT.THEOCRACY], [], MAJOR_POWERS),
     INVESTMENT: new NewsType('Investment', NF.ECONOMY, 5, 10, 1, [], [GT.CORPORATISM], []),
@@ -121,15 +118,6 @@ const NT = {
     POLICY_CHANGE: new NewsType('Policy Change', NF.POLITICS, 3, 8, 1, [GT.ANARCHY, GT.PUPPET_STATE], [], []),
     RAIDING: new NewsType('Raiding', NF.GEOPOLITICS, 15, 30, 1, [GT.DEMOCRACY, GT.PUPPET_STATE], [GT.ANARCHY, GT.ARISTOCRACY, GT.THEOCRACY], [], MAJOR_POWERS),
     RESEARCH_AGREEMENT: new NewsType('Research Agreement', NF.GEOPOLITICS, 2, 8, 1, [], [GT.TECHNOCRACY, GT.DEMOCRACY], [], MAJOR_POWERS),
-    RELIGION_REVIVAL: new NewsType('Religious Revival', NF.RELIGION, 10, 20, 1, [GT.TECHNOCRACY], [GT.THEOCRACY], []),
-    RELIGION_PROSELYTIZE: new NewsType('Religious Proselytization', NF.RELIGION, 5, 15, 1, [GT.TECHNOCRACY], [GT.THEOCRACY, GT.ARISTOCRACY], [], MAJOR_POWERS),
-    RELIGION_HOLY_WAR: new NewsType('Holy War', NF.RELIGION, 10, 30, 100, [GT.TECHNOCRACY, GT.DEMOCRACY, GT.PUPPET_STATE], [GT.THEOCRACY, GT.ARISTOCRACY], [], MAJOR_POWERS),
-    RELIGION_GRAND_COUNCIL: new NewsType('Grand Religious Council', NF.RELIGION, 2, 8, 1, [GT.TECHNOCRACY], [GT.THEOCRACY], [], MAJOR_POWERS),
-    RELIGION_CONQUEST: new NewsType('Religious Conquest', NF.RELIGION, 15, 40, 150, [GT.TECHNOCRACY, GT.DEMOCRACY, GT.PUPPET_STATE, GT.ANARCHY], [GT.THEOCRACY, GT.ARISTOCRACY, GT.POLICE_STATE], [], MAJOR_POWERS),
-    RELIGIOUS_TURMOIL: new NewsType('Religious Turmoil', NF.RELIGION, 5, 15, 1, [GT.TECHNOCRACY, GT.DEMOCRACY], [GT.THEOCRACY, GT.POLICE_STATE], []),
-    RELIGIOUS_CONVERSION: new NewsType('Religious Conversion', NF.RELIGION, 8, 20, 1, [GT.TECHNOCRACY], [GT.THEOCRACY, GT.ARISTOCRACY], [], MAJOR_POWERS),
-    RELIGION_SACRED_SITE: new NewsType('Sacred Site', NF.RELIGION, 10, 30, 1, [GT.ANARCHY], [GT.THEOCRACY], []),
-    RELIGION_SCHISM: new NewsType('Religious Schism', NF.RELIGION, 10, 30, 150, [GT.ANARCHY, GT.PUPPET_STATE], [GT.THEOCRACY], [], MAJOR_POWERS, MAJOR_POWERS),
     REVOLUTION: new NewsType('Revolution', NF.POLITICS, 3, 8, 1, [GT.PUPPET_STATE], [], []),
     SANCTIONS: new NewsType('Sanctions', NF.GEOPOLITICS, 3, 15, 1, [GT.ANARCHY, GT.PUPPET_STATE, GT.CORPORATISM], [GT.DEMOCRACY], [], MAJOR_POWERS),
     SCARCITY: new NewsType('Scarcity', NF.ECONOMY, 3, 8, 1, [], [], []),
@@ -185,8 +173,6 @@ const NT = {
     MUTATIONS: new NewsType('Mutations', NF.HEALTH_HAZARD, 5, 15, 1, [], [], []),
     TERRORISM: new NewsType('Terrorism', NF.CRIME, 5, 15, 1, [GT.DEMOCRACY, GT.PUPPET_STATE], [GT.POLICE_STATE, GT.THEOCRACY, GT.ANARCHY], [GT.POLICE_STATE]),
     TENSIONS: new NewsType('Tensions', NF.GEOPOLITICS, 5, 40, 1, [GT.PUPPET_STATE, GT.ANARCHY], [], [], MAJOR_POWERS), //two neutral planets have relations changed to hostile
-    TENSIONS_RELIGIOUS: new NewsType('Religious Tensions', NF.GEOPOLITICS, 5, 40, 1, [GT.PUPPET_STATE, GT.ANARCHY], [], [], MAJOR_POWERS), //two neutral planets with different state religions and majority religions
-    TENSIONS_ETHNIC: new NewsType('Ethnic Tensions', NF.GEOPOLITICS, 5, 40, 1, [GT.PUPPET_STATE, GT.ANARCHY], [], [], MAJOR_POWERS), //two neutral planets with different majority races
     TENSIONS_ECONOMIC: new NewsType('Economic Tensions', NF.GEOPOLITICS, 5, 40, 1, [GT.PUPPET_STATE, GT.ANARCHY], [], [], MAJOR_POWERS), //the two strongest economies clash
     TENSIONS_BORDERS: new NewsType('Border Tensions', NF.GEOPOLITICS, 5, 40, 1, [GT.PUPPET_STATE, GT.ANARCHY], [], [], MAJOR_POWERS), //two nearby planets with large territories
     TERRAFORMING: new NewsType('Terraforming', NF.ECOLOGY, 5, 40, 1, [], [GT.TECHNOCRACY, GT.CORPORATISM], []), //two neutral planets have relations changed to hostile
@@ -226,15 +212,14 @@ const NT = {
     MINOR_CULTURAL_INTEGRATION_PROGRAM: new NewsType('Cultural Integration Program', NF.HEGEMONY, 10, 30, 1, [GT.ANARCHY, GT.PUPPET_STATE], [], [], MAJOR_POWERS, MINOR_POWERS),
     MINOR_COLOR_REVOLUTION: new NewsType('Color Revolution', NF.HEGEMONY, 5, 20, 150, [GT.ANARCHY, GT.PUPPET_STATE], [], [], MAJOR_POWERS, MINOR_POWERS),
     MINOR_IDEALOGICAL_SPREAD: new NewsType('Ideological Spread', NF.HEGEMONY, 8, 25, 1, [GT.ANARCHY, GT.PUPPET_STATE], [], [], MAJOR_POWERS, MINOR_POWERS),
-    MINOR_RELIGIOUS_PURGE: new NewsType('Religious Purge', NF.HEGEMONY, 10, 30, 150, [GT.ANARCHY, GT.PUPPET_STATE], [], [], MAJOR_POWERS, MINOR_POWERS),
     //more to come later: environmental disasters, terraforming, etc.
 }
 
 const NT_ALL = Object.values(NT)
 //dont include tensions below, not hostile enough
 const NT_WARLIKE = [NT.WAR, NT.WAR_ALLY, NT.WAR_BOMBARDMENT, NT.WAR_HUMAN_WAVE, NT.WAR_INVASION, NT.WAR_OFFENSIVE, NT.WAR_SABOTAGE, NT.WAR_SCORCHED_EARTH, NT.WAR_SUBJUGATION, NT.WAR_SURRENDER]
-const NT_TENSIONS_ALL = [NT.TENSIONS, NT.TENSIONS_RELIGIOUS, NT.TENSIONS_ETHNIC, NT.TENSIONS_ECONOMIC, NT.TENSIONS_BORDERS]
-const NT_ALLIANCE_ALL = [NT.ALLIANCE, NT.ALLIANCE_RELIGIOUS, NT.ALLIANCE_GOVERNMENT, NT.ALLIANCE_ETHNIC, NT.ALLIANCE_CULTURAL]
+const NT_TENSIONS_ALL = [NT.TENSIONS, NT.TENSIONS_ECONOMIC, NT.TENSIONS_BORDERS]
+const NT_ALLIANCE_ALL = [NT.ALLIANCE, NT.ALLIANCE_GOVERNMENT, NT.ALLIANCE_CULTURAL]
 const NT_COOPERATION_PREVENTING = [...NT_WARLIKE, NT.BLOCKADE, ...NT_TENSIONS_ALL, NT.COUP_DETAT, NT.PLAGUE, NT.PLAGUE_SPREAD, NT.DEPORTATION]
 const NT_COOPERATIVE = [...NT_ALLIANCE_ALL, NT.TRADE_AGREEMENT, NT.RESEARCH_AGREEMENT, NT.INVESTMENT, NT.ARMS_DEAL, NT.SPACE_STATION]
 const NT_MARTIAL = [...NT_WARLIKE, NT.MILITARY_BUILDUP, NT.BLOCKADE, NT.CIVIL_WAR, NT.ARMS_DEAL, NT.COUP_DETAT]

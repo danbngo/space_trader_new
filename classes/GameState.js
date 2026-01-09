@@ -25,6 +25,18 @@ class GameState {
         this.lastSeenDates = new Map();
         /** @type {boolean} - Whether the game was saved this tick */
         this.savedThisTick = false;
+        
+        // Travel properties
+        /** @type {number|null} - X coordinate during travel */
+        this.x = null;
+        /** @type {number|null} - Y coordinate during travel */
+        this.y = null;
+        /** @type {Planet|null} - Destination planet */
+        this.destination = null;
+        /** @type {number|null} - Remaining years of travel */
+        this.travelYearsRemaining = null;
+        /** @type {number|null} - Travel progress (0-100) */
+        this.travelProgress = null;
     }
 
     get captain() {
@@ -46,10 +58,6 @@ class GameState {
         this.captain.credits = amt
     }
 
-    get loans() {
-        return this.captain.loans
-    }
-
     get location() {
         return this.fleet.location
     }
@@ -61,12 +69,6 @@ class GameState {
     checkGameOver() {
         // Calculate retirement age based on life extension perks
         let retirementAge = MAXIMUM_RETIREMENT_AGE
-        if (this.captain && this.captain.perks) {
-            const lifeExtensionPerks = this.captain.perks.filter(p => p.name.includes('Long Lived'))
-            // Each life extension tier adds 20% to max retirement age
-            retirementAge = MAXIMUM_RETIREMENT_AGE * (1 + lifeExtensionPerks.length * 0.20)
-        }
-        
         if (this.captain.age < retirementAge) return false
         //game over - reached retirement age
         if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
@@ -114,5 +116,47 @@ class GameState {
 
         const total = shipsScore + creditsScore + officerScore + reputationScore + bountyScore + cargoScore;
         return { total, shipsScore, creditsScore, officerScore, reputationScore, bountyScore, cargoScore };
+    }
+
+    /**
+     * Update travel progress and check if destination reached
+     * @param {number} elapsedYears - Years elapsed since last update
+     */
+    updateTravelProgress(elapsedYears) {
+        if (!this.destination || this.travelYearsRemaining === null) {
+            return; // Not traveling
+        }
+
+        // Reduce remaining travel time
+        this.travelYearsRemaining -= elapsedYears;
+
+        // Calculate progress percentage (0-100)
+        const totalTravelTime = this.travelYearsRemaining + elapsedYears;
+        this.travelProgress = Math.min(100, Math.max(0, ((totalTravelTime - this.travelYearsRemaining) / totalTravelTime) * 100));
+
+        // Update position along the route
+        if (this.fleet && this.destination) {
+            const startX = this.fleet.x || 0;
+            const startY = this.fleet.y || 0;
+            const endX = this.destination.x;
+            const endY = this.destination.y;
+            
+            const progressRatio = this.travelProgress / 100;
+            this.x = startX + (endX - startX) * progressRatio;
+            this.y = startY + (endY - startY) * progressRatio;
+        }
+
+        // Check if arrived
+        if (this.travelYearsRemaining <= 0) {
+            console.log('Travel complete! Arriving at destination:', this.destination.name);
+            this.fleet.dock(this.destination);
+            
+            // Clear travel state
+            this.destination = null;
+            this.travelYearsRemaining = null;
+            this.travelProgress = null;
+            this.x = null;
+            this.y = null;
+        }
     }
 }

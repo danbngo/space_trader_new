@@ -34,36 +34,6 @@ function generateCivilization(planet) {
         skillPriceMultipliers.setAmount(sk, rng(ACADEMY_MAX_SKILL_PRICE_MODIFIER, ACADEMY_MIN_SKILL_PRICE_MODIFIER, false))
     }
 
-    // Generate culture demographics
-    const cultures = new CountsMap()
-    const majorPlanets = gs && gs.system ? gs.system.planets.filter(p => p !== planet) : []
-    
-    if (majorPlanets.length > 0) {
-        // Start with own planet having at least 0.4 (40%) culture
-        let ownCulture = 0.4 + Math.random() * 0.3; // 0.4 to 0.7
-        cultures.setAmount(planet, ownCulture);
-        
-        // Distribute remaining culture among other major planets (up to 0.2 each)
-        const remainingCulture = 1.0 - ownCulture;
-        
-        for (const otherPlanet of majorPlanets) {
-            // Random amount up to 0.2, but also constrained by remaining culture
-            const maxAmount = Math.min(0.2, remainingCulture);
-            if (maxAmount > 0) {
-                const amount = Math.random() * maxAmount;
-                if (amount > 0.01) { // Only add if meaningful
-                    cultures.setAmount(otherPlanet, amount);
-                }
-            }
-        }
-        
-        // Normalize to ensure total is exactly 1.0
-        cultures.normalize();
-    } else {
-        // If no other planets, this planet is 100% its own culture
-        cultures.setAmount(planet, 1.0);
-    }
-
     return new Civilization({
         planet, governmentType, cargoPriceMultipliers, technology, education, territory, population,
          army, navy, industry, economy, security, culture, prestige, corruption, crime,

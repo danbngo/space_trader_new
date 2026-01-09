@@ -18,7 +18,6 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
     function resetCaptain() {
         captain.skills = new CountsMap()
         captain.skillPoints = STARTING_SKILL_POINTS;
-        captain.religion = null
         setFleetLocation(EARTH)
         showCaptainCreationMenu(captain, onClose)
     }
@@ -26,7 +25,6 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
     function randomizeCaptain() {
         captain.skills = new CountsMap()
         captain.skillPoints = STARTING_SKILL_POINTS;
-        captain.religion = null
         setFleetLocation(EARTH)
         
         // Randomly spend all skill points
@@ -87,8 +85,8 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
         }
     })
 
-    // Left Column: Character Background Dropdowns
-    const leftColumn = ce({
+    // Single column layout with name and skills
+    const content = ce({
         style: {display: 'flex', flexDirection: 'column', gap: '12px'},
         children: [
             // Name input field
@@ -98,7 +96,7 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
                     ce({children: ['Name:']}),
                     (() => {
                         const input = createTextInput('Enter captain name', captain.name || '')
-                        input.style.width = '240px'
+                        input.style.width = '300px'
                         input.addEventListener('input', () => {
                             captain.name = input.value
                         })
@@ -107,20 +105,10 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
                 ]
             }),
             
-            ce({children: ['<u>Character Background</u>']})
-        ]
-    })
-
-    // Right Column: Skill Points
-    const rightColumn = ce({
-        style: {display: 'flex', flexDirection: 'column', gap: '12px'},
-        children: [
             skillTable,
             `Skill Points: ${statColorSpan(skillPoints, skillPoints > 0 ? 4 : 1)}`,
         ]
     })
-
-    const columnLayout = createColumnLayout([leftColumn, rightColumn])
 
     // Calculate upgrade button state
     const cost = selectedSkill ? captain.calcSkillPointsToUpgrade(selectedSkill) : 0
@@ -128,12 +116,12 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
     const hasUnspentPoints = skillPoints > 0
 
     showModal(
-        `Create Captain`,
+        `Captain`,
         ce({children:[
-            columnLayout,
+            content,
             ],
             style: {
-                width: '800px'
+                width: '500px'
             }
         }),
         [

@@ -158,7 +158,6 @@ class Civilization {
     overwrite(withCiv = new Civilization()) {
         if (withCiv.planet) this.planet = withCiv.planet
         if (withCiv.governmentType) this.governmentType = withCiv.governmentType
-        if (withCiv.policies) this.policies = withCiv.policies.clone()
         for (const cr of CIVILIZATION_RATINGS_ALL) {
             if (withCiv[cr.id] !== undefined && withCiv[cr.id] !== null && withCiv[cr.id] !== 1.0)
             this[cr.id] = withCiv[cr.id];

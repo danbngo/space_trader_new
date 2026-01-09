@@ -1,23 +1,8 @@
 const buildingHandlerMapping = [
     {type: BUILDING_TYPES.SHIPYARD, prop: 'shipyard', menu: (b) => showShipyardSellMenu(b)},
-    {type: BUILDING_TYPES.COURTHOUSE, prop: 'courthouse', menu: (b) => showCourthouseMenu(b)},
     {type: BUILDING_TYPES.MARKET, prop: 'market', menu: (b) => showMarketMenu(b)},
-    {type: BUILDING_TYPES.BLACK_MARKET, prop: 'blackMarket', menu: (b) => showMarketMenu(b)},
-    {type: BUILDING_TYPES.TAVERN, prop: 'tavern', menu: (b) => showTavernMenu(b)},
     {type: BUILDING_TYPES.GUILD, prop: 'guild', menu: (b) => showGuildMenu(b)},
-    {type: BUILDING_TYPES.ACADEMY, prop: 'academy', menu: (b) => showAcademyMenu(b)},
-    {type: BUILDING_TYPES.BANK, prop: 'bank', menu: (b) => showBankMenu(b)},
-    {type: BUILDING_TYPES.TEMPLE, prop: 'temple', menu: (b) => showTempleMenu(b), getDisabledReason: (b) => {
-        const stateReligion = b.planet.settlement?.government?.stateReligion;
-        return stateReligion ? null : 'No state religion in this settlement';
-    }},
-    {type: BUILDING_TYPES.CASINO, prop: 'casino', menu: (b) => showCasinoMenu(b)},
-    {type: BUILDING_TYPES.CYBER_SURGEON, prop: 'cyberSurgeon', menu: (b) => showCyberSurgeonBuyMenu(b)},
-    {type: BUILDING_TYPES.GENETICIST, prop: 'geneticist', menu: (b) => showGeneticistBuyMenu(b)},
-    {type: BUILDING_TYPES.PALACE, prop: 'palace', menu: (b) => showPalaceMenu(b)},
-    {type: BUILDING_TYPES.CARAVANSERY, prop: 'caravansery', menu: (b) => showCaravanseryMenu(b)},
 ]
-
 
 /**
  * Displays the main planet menu with access to all buildings.
@@ -100,8 +85,8 @@ function showPlanetMenu(planet = new Planet()) {
             }
             
             const isDisabled = accessDeniedReason !== null
-            const levelDisplay = building.level ? ` ${building.level}` : ''
-            const buttonText = type.name + levelDisplay
+            //const levelDisplay = building.level ? ` ${building.level}` : ''
+            const buttonText = type.name// + levelDisplay
             
             // Add tooltip for disabled buttons
             if (isDisabled && accessDeniedReason) {
@@ -169,7 +154,7 @@ function showPlanetSocietyMenu(planet = new Planet()) {
         content = ce({children: ['No civilization detected on this planet.']})
     } else {
         console.log('Displaying civilization data')
-        const {governmentType, policies} = civilization
+        const {governmentType} = civilization
         
         // Build overview section
         let overviewContent = `<u>Overview</u><br/>`
@@ -177,13 +162,6 @@ function showPlanetSocietyMenu(planet = new Planet()) {
         if (settlement && settlement.settlementType) {
             overviewContent += `Settlement: ${colorSpan(settlement.settlementType.name, settlement.settlementType.color)}<br/>`
         }
-    
-    // Build policies section
-    let policiesContent = `<u>Policies</u><br/>`
-    policiesContent += `${policies.economic.flavor.symbol} Economic: ${colorSpan(policies.economic.name, policies.economic.color)}<br/>`
-    policiesContent += `${policies.labor.flavor.symbol} Labor: ${colorSpan(policies.labor.name, policies.labor.color)}<br/>`
-    policiesContent += `${policies.social.flavor.symbol} Social: ${colorSpan(policies.social.name, policies.social.color)}<br/>`
-    policiesContent += `${policies.foreign.flavor.symbol} Foreign: ${colorSpan(policies.foreign.name, policies.foreign.color)}<br/>`
     
     // Build left ratings column
     const leftColumnRatings = ['population', 'territory', 'army', 'navy', 'industry', 'economy', 'security', 'culture', 'technology']
@@ -241,13 +219,11 @@ function showPlanetSocietyMenu(planet = new Planet()) {
     }
     
         // Create layout using createColumnLayout
-        const topSection = createColumnLayout([ce({innerHTML: overviewContent}), ce({innerHTML: policiesContent})])
-        const hr = ce({tag: 'hr', style: {margin: '20px 0', border: `1px solid ${rgbArrayToString(COLORS.Gray)}`}})
         const ratingsHeader = ce({children: ['<u>Ratings</u>']})
         const ratingsSection = createColumnLayout([ce({innerHTML: leftRatingsContent}), ce({innerHTML: rightRatingsContent})])
         
         content = ce({
-            children: [topSection, hr, ratingsHeader, ratingsSection]
+            children: [ratingsHeader, ratingsSection]
         })
     }
     
@@ -293,18 +269,6 @@ function showPlanetClimateMenu(planet = new Planet()) {
     }
     
     console.log('Planet visited, showing climate data')
-    const {climate} = planet
-    console.log('Climate object:', climate)
-    if (!climate) {
-        console.error('Climate is null or undefined!')
-        const content = ce({children: [colorSpan('Error: Climate data missing', COLORS.Red)]})
-        showPlanetModal(planet, `${coloredName(planet)} - Climate`, content, [
-            ["Back", () => showPlanetMenu(planet)]
-        ], 'planet_climate', (nextPlanet) => showPlanetClimateMenu(nextPlanet));
-        return
-    }
-    const {temperature, atmosphericPressure, gravity, oceanCoverage, geologicalActivity, magnetosphere, radiationLevel, asteroidImpact} = climate
-    console.log('Climate properties extracted:', {temperature, atmosphericPressure, gravity, oceanCoverage, geologicalActivity, magnetosphere, radiationLevel, asteroidImpact})
     
     // Build left column: Physical Properties and Composition
     let leftContent = `<u>Physical Properties</u><br/>`
@@ -328,20 +292,6 @@ function showPlanetClimateMenu(planet = new Planet()) {
         leftContent += `None<br/>`
     }
     
-    // Build right column: Climate Data
-    let rightContent = `<u>Climate Data</u><br/>`
-    rightContent += `Temperature: ${temperature.coloredName}<br/>`
-    rightContent += `Atmosphere: ${atmosphericPressure.coloredName}<br/>`
-    rightContent += `Gravity: ${gravity.coloredName}<br/>`
-    rightContent += `Ocean Coverage: ${oceanCoverage.coloredName}<br/>`
-    rightContent += `Geological Activity: ${geologicalActivity.coloredName}<br/>`
-    rightContent += `Magnetosphere: ${magnetosphere.coloredName}<br/>`
-    rightContent += `Radiation Level: ${radiationLevel.coloredName}<br/>`
-    rightContent += `Asteroid Impacts: ${asteroidImpact.coloredName}<br/>`
-    
-    // Create column layout
-    const columnLayout = createColumnLayout([ce({innerHTML: leftContent}), ce({innerHTML: rightContent})])
-    
     // Planet features (outside the columns)
     const features = ce({children: []})
     if (planet.features && planet.features.length > 0) {
@@ -355,7 +305,7 @@ function showPlanetClimateMenu(planet = new Planet()) {
     }
     
     const content = ce({
-        children: [columnLayout, features]
+        children: [features]
     })
     
     showPlanetModal(planet, `${coloredName(planet)} - Climate`, content, [

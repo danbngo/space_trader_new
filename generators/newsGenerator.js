@@ -7,9 +7,7 @@
 const NEWS_TYPE_CLASSES = [
     [NT.ADDICTION, AddictionNews],
     [NT.ALLIANCE, AllianceNews],
-    [NT.ALLIANCE_RELIGIOUS, AllianceReligiousNews],
     [NT.ALLIANCE_GOVERNMENT, AllianceGovernmentNews],
-    [NT.ALLIANCE_ETHNIC, AllianceEthnicNews],
     [NT.ALLIANCE_CULTURAL, AllianceCulturalNews],
     [NT.ARMS_DEAL, ArmsDealNews],
     [NT.BLOCKADE, BlockadeNews],
@@ -44,7 +42,6 @@ const NEWS_TYPE_CLASSES = [
     [NT.ASYLUM_POLICY, AsylumPolicyNews],
     [NT.DIASPORA_RETURNS, DiasporaReturnsNews],
     [NT.INDUSTRIAL_ACCIDENT, IndustrialAccidentNews],
-    [NT.RELIGION_INQUISITION, ReligionInquisitionNews],
     [NT.BANKRUPTCY, BankruptcyNews],
     [NT.LAND_GRAB, LandGrabNews],
     [NT.INVESTMENT, InvestmentNews],
@@ -63,15 +60,6 @@ const NEWS_TYPE_CLASSES = [
     [NT.PLAGUE_VACCINE, PlagueVaccineNews],
     [NT.RAIDING, RaidingNews],
     [NT.RESEARCH_AGREEMENT, ResearchAgreementNews],
-    [NT.RELIGION_REVIVAL, ReligionRevivalNews],
-    [NT.RELIGION_PROSELYTIZE, ReligionProselytizeNews],
-    [NT.RELIGION_HOLY_WAR, ReligionHolyWarNews],
-    [NT.RELIGION_GRAND_COUNCIL, ReligionGrandCouncilNews],
-    [NT.RELIGION_CONQUEST, ReligionConquestNews],
-    [NT.RELIGIOUS_TURMOIL, ReligiousTurmoilNews],
-    [NT.RELIGIOUS_CONVERSION, ReligiousConversionNews],
-    [NT.RELIGION_SACRED_SITE, ReligionSacredSiteNews],
-    [NT.RELIGION_SCHISM, ReligionSchismNews],
     [NT.REVOLUTION, RevolutionNews],
     [NT.SANCTIONS, SanctionsNews],
     [NT.SCARCITY, ScarcityNews],
@@ -118,8 +106,6 @@ const NEWS_TYPE_CLASSES = [
     [NT.MUTATIONS, MutationsNews],
     [NT.TERRORISM, TerrorismNews],
     [NT.TENSIONS, TensionsNews],
-    [NT.TENSIONS_RELIGIOUS, TensionsReligiousNews],
-    [NT.TENSIONS_ETHNIC, TensionsEthnicNews],
     [NT.TENSIONS_ECONOMIC, TensionsEconomicNews],
     [NT.TENSIONS_BORDERS, TensionsBordersNews],
     [NT.TERRAFORMING, TerraformingNews],
@@ -148,7 +134,6 @@ const NEWS_TYPE_CLASSES = [
     [NT.MINOR_CULTURAL_INTEGRATION_PROGRAM, MinorCulturalIntegrationProgramNews],
     [NT.MINOR_COLOR_REVOLUTION, MinorColorRevolutionNews],
     [NT.MINOR_IDEALOGICAL_SPREAD, MinorIdealogicalSpreadNews],
-    [NT.MINOR_RELIGIOUS_PURGE, MinorReligiousPurgeNews],
 ]
 
 const NEWS_TYPE_CLASSES_ARRAY = Object.freeze(NEWS_TYPE_CLASSES.map(pair => pair[1]))
@@ -165,24 +150,13 @@ function generateNews(attemptsRemaining = 100, weights = []) {//only needs to be
     const planet = rndMember(allBodies)
     const targetPlanet = rndMember(allBodies.filter(p=>(p !== planet)))
     
-    // Use weighted selection based on news type weights, with 3x multiplier for favorite govs and policies
+    // Use weighted selection based on news type weights, with 3x multiplier for favorite govs
     if (weights.length == 0) weights = NEWS_TYPE_CLASSES.map(([newsType, cls]) => {
         let weight = newsType.weight || 1
         
         // Triple the weight if this planet's government is a favorite for this news type
         if (newsType.favoriteGovs.includes(planet.c.governmentType)) {
             weight *= 3
-        }
-        
-        // Check if any of the planet's policies favor or forbid this news type
-        const policies = planet.c.policies.all
-        for (const policy of policies) {
-            if (policy.favoriteNewsTypes.includes(newsType)) {
-                weight *= 3
-            }
-            if (policy.forbiddenNewsTypes.includes(newsType)) {
-                weight = 0
-            }
         }
         
         // Check if the planet's settlement type favors or forbids this news type
@@ -245,7 +219,7 @@ async function addHistory(startYear = 3000, endYear = 3000, progress = {complete
         gs.year = y;
         
         // Reset savedThisTick flag when year changes
-        const currentYear = Math.floor(gs.year);
+        currentYear = Math.floor(gs.year);
         if (currentYear !== previousYear) {
             gs.savedThisTick = false;
         }

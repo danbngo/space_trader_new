@@ -58,42 +58,28 @@ class ShipType {
 }
 
 const SHIP_TYPES = {
-    COURIER: new ShipType('Courier', 'Fast, lightly-armored vessel designed for rapid message and package delivery across star systems.', null, 0.1, 0.1, 0.1, 2, 1, 1, 3, [SHIP_MODULE_TYPES.BOOSTER], 2),
+    COURIER: new ShipType('Courier', 'Fast, lightly-armored vessel designed for rapid message and package delivery across star systems.', null, 0.1, 0.1, 0.1, 2, 1, 1, 3, [], 2),
     HAULER: new ShipType('Hauler', 'Massive bulk hauler with enormous cargo holds designed to transport liquids and gases.', null, 1.5, 0.25, 0.1, 1.5, 5, 1, 2, [], 2),
     TANKER: new ShipType('Tanker', 'Has more space for fuel.', null, 1.5, 0.25, 0.1, 1.5, 5, 1, 2, [], 2),
-    SCOUT: new ShipType('Scout', 'Long-range reconnaissance vessel with powerful sensors and high speed for exploration.', null, 0.5, 0.5, 0.5, 3, 0.5, 3, 1.5, [SHIP_MODULE_TYPES.SCANNER], 1),
-    BATTLESHIP: new ShipType('Battleship', 'Massive capital ship with warhead launchers, heavy armor, and shields for fleet engagements.', null, 4, 4, 3, 1, 2, 1.5, 1.5, [SHIP_MODULE_TYPES.WARHEAD], 1),
-    INTERCEPTOR: new ShipType('Interceptor', 'Fast pursuit craft with magnetic grapples for capturing or disabling enemy vessels.', null, 1.5, 1.5, 1.5, 2, 0.25, 2, 1, [SHIP_MODULE_TYPES.MAGNETIZE], 2),
-    CORSAIR: new ShipType('Interceptor', 'Fast pursuit craft with magnetic grapples for capturing or disabling enemy vessels.', null, 1.5, 1.5, 1.5, 2, 0.25, 2, 1, [SHIP_MODULE_TYPES.MAGNETIZE], 2),
-    RAIDER: new ShipType('Raider', '', null, 1, 2, 0.5, 1, 0.5, 2, 1.5, [SHIP_MODULE_TYPES.NANITE_BEAM, SHIP_MODULE_TYPES.MAGNETIZE], 1),
+    SCOUT: new ShipType('Scout', 'Long-range reconnaissance vessel with powerful sensors and high speed for exploration.', null, 0.5, 0.5, 0.5, 3, 0.5, 3, 1.5, [], 1),
+    BATTLESHIP: new ShipType('Battleship', 'Massive capital ship with warhead launchers, heavy armor, and shields for fleet engagements.', null, 4, 4, 3, 1, 2, 1.5, 1.5, [], 1),
+    INTERCEPTOR: new ShipType('Interceptor', 'Fast pursuit craft with magnetic grapples for capturing or disabling enemy vessels.', null, 1.5, 1.5, 1.5, 2, 0.25, 2, 1, [], 2),
+    RAIDER: new ShipType('Raider', '', null, 1, 2, 0.5, 1, 0.5, 2, 1.5, [], 1),
 }
 
 const SHIP_TYPES_ALL = Object.values(SHIP_TYPES)
 
 // Assign shape generators to ship types
-SHIP_TYPES.COURIER_SHIP.shapeGenerator = SHIP_SHAPES.COURIER_SHIP
-SHIP_TYPES.FIRE_SHIP.shapeGenerator = SHIP_SHAPES.FIRE_SHIP
-SHIP_TYPES.PASSENGER_SHIP.shapeGenerator = SHIP_SHAPES.PASSENGER_SHIP
-SHIP_TYPES.SUPPLY_SHIP.shapeGenerator = SHIP_SHAPES.SUPPLY_SHIP
-SHIP_TYPES.TANKER.shapeGenerator = SHIP_SHAPES.TANKER
-SHIP_TYPES.BLOCKADE_RUNNER.shapeGenerator = SHIP_SHAPES.BLOCKADE_RUNNER
-SHIP_TYPES.SCOUT.shapeGenerator = SHIP_SHAPES.SCOUT
-SHIP_TYPES.FIGHTER.shapeGenerator = SHIP_SHAPES.FIGHTER
-SHIP_TYPES.FRIGATE.shapeGenerator = SHIP_SHAPES.FRIGATE
-SHIP_TYPES.DESTROYER.shapeGenerator = SHIP_SHAPES.DESTROYER
-SHIP_TYPES.JAMMER.shapeGenerator = SHIP_SHAPES.JAMMER
-SHIP_TYPES.BATTLESHIP.shapeGenerator = SHIP_SHAPES.BATTLESHIP
-SHIP_TYPES.DRILLING_RIG.shapeGenerator = SHIP_SHAPES.DRILLING_RIG
-SHIP_TYPES.ESCORT_SHIP.shapeGenerator = SHIP_SHAPES.ESCORT_SHIP
-SHIP_TYPES.INTERCEPTOR.shapeGenerator = SHIP_SHAPES.INTERCEPTOR
-SHIP_TYPES.UTILITY_SHIP.shapeGenerator = SHIP_SHAPES.UTILITY_SHIP
-SHIP_TYPES.OBSERVER.shapeGenerator = SHIP_SHAPES.OBSERVER
+SHIP_TYPES.COURIER.shapeGenerator = SHIP_SHAPES.COURIER
+SHIP_TYPES.TANKER.shapeGenerator = SHIP_SHAPES.COURIER
+SHIP_TYPES.SCOUT.shapeGenerator = SHIP_SHAPES.COURIER
+SHIP_TYPES.BATTLESHIP.shapeGenerator = SHIP_SHAPES.COURIER
+SHIP_TYPES.INTERCEPTOR.shapeGenerator = SHIP_SHAPES.COURIER
+SHIP_TYPES.RAIDER.shapeGenerator = SHIP_SHAPES.COURIER
+
 
 const ASTEROID_SHIP_TYPES = {
     ASTEROID: new ShipType('Asteroid', 'Rocky space debris drifting through the void, can be mined for valuable minerals.', null, 0.2, 0, 0, 0.25, 0.5, 1, 1, [], 0, 1),
-    CRYOID: new ShipType('Cryoid', 'Frozen comet fragment containing water ice, leaves a freezing vapor trail when destroyed.', null, 0.2, 0, 0, 0.25, 0.5, 1, 0, [SHIP_MODULE_TYPES.SMOKE_BOMB], 0, 1),
-    PLASMOID: new ShipType('Plasmoid', 'Energetic plasma sphere moving at high velocity, highly volatile and dangerous.', null, 0.2, 0.5, 0, 0.5, 0.5, 1, 0, [SHIP_MODULE_TYPES.BOOSTER], 0, 1),
-    MAGNETOID: new ShipType('Magnetoid', 'Magnetically-charged metallic fragment that can disrupt ship systems and pull objects.', null, 0.2, 0.3, 0, 0.5, 0.5, 1, 0, [SHIP_MODULE_TYPES.MAGNETIZE], 0, 1),
 }
 
 const ASTEROID_SHIP_TYPES_ALL = Object.values(ASTEROID_SHIP_TYPES)

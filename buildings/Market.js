@@ -6,12 +6,9 @@
 class Market extends Building {
     /**
      * @param {Planet} planet - The planet this market is on.
-     * @param {boolean} blackMarket - Whether this is a black market (illegal goods).
      */
-    constructor(planet = new Planet(), blackMarket = false) {
+    constructor(planet = new Planet()) {
         super(planet, BUILDING_TYPES.MARKET)
-        /** @type {boolean} */
-        this.blackMarket = blackMarket;
         /** @type {CountsMap} */
         this.cargo = new CountsMap();
         this.normalize()
@@ -40,9 +37,7 @@ class Market extends Building {
             const baseAmount = Math.round(MARKET_AVERAGE_CARGO_PER_TYPE/this.planet.c.cargoPriceMultipliers.getAmount(cargoType))
             const availabilityCalc = this.calcCargoAvailabilityModifier(cargoType)
             const availabilityModifier = availabilityCalc.getTotalMultiplier()
-            const amount = this.blackMarket 
-                ? baseAmount * this.planet.c.crime * availabilityModifier * this.level * multiplier
-                : baseAmount * this.planet.c.reserves * availabilityModifier * this.level * multiplier
+            const amount = baseAmount * this.planet.c.reserves * availabilityModifier * this.level * multiplier
             baseCargo.setAmount(cargoType, amount)
         }
         return baseCargo
@@ -213,13 +208,8 @@ class Market extends Building {
             // Add market-specific factors
             priceCalc.addFactor('merchant greed', 1 + this.planet.c.corruption);
             priceCalc.addFactor('inflation', 1 + this.planet.c.inflationRate);
-            
-            if (this.blackMarket) {
-                priceCalc.addFactor('black market risk', 1 / this.planet.c.crime);
-            } else {
-                priceCalc.addFactor('reserves', 1 / this.planet.c.reserves);
-                priceCalc.addFactor('taxes', 1 + this.planet.c.taxRate);
-            }
+            priceCalc.addFactor('reserves', 1 / this.planet.c.reserves);
+            priceCalc.addFactor('taxes', 1 + this.planet.c.taxRate);
             
             const price = Math.round(priceCalc.calculate(cargoType.value));
             prices.setAmount(cargoType, price);
@@ -235,13 +225,8 @@ class Market extends Building {
             // Add market-specific factors (sell prices are lower than buy)
             priceCalc.addFactor('merchant greed', 1 / (1 + this.planet.c.corruption));
             priceCalc.addFactor('inflation', 1 + this.planet.c.inflationRate);
-            
-            if (this.blackMarket) {
-                priceCalc.addFactor('black market risk', 1 / this.planet.c.crime);
-            } else {
-                priceCalc.addFactor('reserves', 1 / this.planet.c.reserves);
-                priceCalc.addFactor('taxes', 1 - this.planet.c.taxRate);
-            }
+            priceCalc.addFactor('reserves', 1 / this.planet.c.reserves);
+            priceCalc.addFactor('taxes', 1 - this.planet.c.taxRate);
             
             const price = Math.round(priceCalc.calculate(cargoType.value));
             prices.setAmount(cargoType, price);

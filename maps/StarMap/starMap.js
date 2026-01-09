@@ -611,7 +611,9 @@ class StarMap extends BaseMap {
             const isCurrentDestination = gs.fleet.route && gs.fleet.route.destination === obj
             if (!isCurrentDestination) {
                 const stranded = gs.fleet.stranded
-                //ce({parent:container, tag:'button', innerHTML:'Travel', onClick:()=>this.setDestination(obj, true), disabled: cantTravelHere || outOfFuel})
+                const hasEnoughFuel = gs.fleet.fuel >= distance * FUEL_COST_PER_1_AU
+                const canTravel = !stranded && hasEnoughFuel
+                ce({parent:container, tag:'button', innerHTML:'Travel', onClick:()=>this.startTravel(obj), disabled: !canTravel})
             }
             if (gs.fleet.route) ce({parent:container, tag:'button', innerHTML:'Stop', onClick:()=>this.stopPlayerFleet()})
         }
@@ -643,6 +645,46 @@ class StarMap extends BaseMap {
     stopPlayerFleet() {
         gs.fleet.route = null
         this.refresh()
+    }
+
+    startTravel(destination) {
+        if (!destination || !(destination instanceof Planet)) {
+            console.error('Invalid travel destination:', destination)
+            return
+        }
+
+        const distance = calcDistance(gs.fleet.x, gs.fleet.y, destination.x, destination.y)
+        const fuelCost = distance * FUEL_COST_PER_1_AU
+        
+        // Check if fleet has enough fuel
+        if (gs.fleet.fuel < fuelCost) {
+            console.warn('Not enough fuel to travel to', destination.name)
+            return
+        }
+
+        // Calculate travel time based on fleet speed
+        const travelTime = distance / gs.fleet.speed
+        
+        // Set travel state
+        gs.destination = destination
+        gs.travelYearsRemaining = travelTime
+        gs.travelProgress = 0
+        gs.x = gs.fleet.x
+        gs.y = gs.fleet.y
+
+        // Deduct fuel cost
+        gs.fleet.fuel -= fuelCost
+
+        console.log(`Starting travel to ${destination.name}:`, {
+            distance,
+            fuelCost,
+            travelTime,
+            remainingFuel: gs.fleet.fuel
+        })
+
+        // Close star map and show travel map
+        this.cleanup()
+        showTravelMap()
     }
 
     selectObject(obj) {
@@ -739,6 +781,22 @@ class StarMap extends BaseMap {
         
         // When modal closes, resume if needed
         // Note: Individual menu functions handle their own resume logic
+    }
+
+    /**
+     * Clean up resources when closing the star map
+     */
+    cleanup() {
+        // Pause any running loops
+        this.paused = true;
+        
+        // Cancel any pending animation frames
+        if (this.routeAnimationFrame) {
+            cancelAnimationFrame(this.routeAnimationFrame);
+            this.routeAnimationFrame = null;
+        }
+        
+        console.log('StarMap cleaned up');
     }
 }
 

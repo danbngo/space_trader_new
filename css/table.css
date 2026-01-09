@@ -28,5 +28,6 @@
 }
 
 .ui-table-row.selected {
-    background-color: #033 !important;
+    border: 1px solid cyan;
+    background-color: #011 !important;
 }

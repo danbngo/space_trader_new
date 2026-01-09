@@ -11,11 +11,11 @@ class Planet extends OrbitingObject {
      * @param {PlanetType} planetType - The type of the planet.
      * @param {Settlement|null} settlement - The settlement on the planet.
      * @param {Civilization|null} civilization - The civilization of the planet.
-     * @param {Climate} climate - The climate of the planet.
      * @param {PlanetFeatureType[]} features - Unique features of the planet.
      * @param {number} dayLength - The length of one day in Earth days.
      */
-    constructor(name = "Unnamed", color = COLORS.White, radius = 0, orbit = null, planetType = PLANET_TYPES_ALL[0], settlement = null, civilization = null, climate = null, features = [], dayLength = 1.0, magnetosphereRadius = 0) {
+    constructor(name = "Unnamed", color = COLORS.White, radius = 0, orbit = null, planetType = PLANET_TYPES_ALL[0], settlement = null,
+        civilization = null, features = [], dayLength = 1.0) {
         super(name, OBJECT_TYPES.PLANET, color, radius, orbit);
         /** @type {PlanetType} */
         this.planetType = planetType
@@ -31,8 +31,6 @@ class Planet extends OrbitingObject {
         this.dayLength = dayLength
         /** @type {boolean} */
         this.closed = false
-        /** @type {number} - Radius of magnetosphere in AU */
-        this.magnetosphereRadius = magnetosphereRadius
         /** @type {string} - Symbol: first letter of planet name in its color */
         this.symbol = colorSpan(this.name.charAt(0), this.color)
         /** @type {Array<PlanetDecorator>} - Visual decorators for this planet */
@@ -97,35 +95,4 @@ class Planet extends OrbitingObject {
         if (baseName.endsWith('sian')) baseName = baseName.replace('sian', 'tian') //mars
         return baseName
     }
-    
-    /**
-     * Add cultural influence from another planet to this planet's civilization.
-     * @param {Planet} sourcePlanet - The planet whose culture is being spread
-     * @param {number} weight - The influence weight (1.0 = 100% population addition)
-     */
-    addCulture(sourcePlanet, weight) {
-        if (!this.civilization || !this.civilization.cultures || !sourcePlanet) {
-            return;
-        }
-        
-        const currentAmt = this.c.cultures.getAmount(sourcePlanet)
-        this.c.cultures.setAmount(sourcePlanet, currentAmt * (1 + weight));
-        this.c.cultures.normalize();
-    }
-
-    /**
-     * Add racial influence from another planet to this planet's civilization.
-     * @param {Race} sourceRace - The race being spread
-     * @param {number} weight - The influence weight (1.0 = 100% population addition)
-     */
-    addRace(sourceRace, weight) {
-        if (!this.civilization || !this.civilization.races || !sourceRace) {
-            return;
-        }
-        
-        const currentAmt = this.c.races.getAmount(sourceRace)
-        this.c.races.setAmount(sourceRace, currentAmt * (1 + weight));
-        this.c.races.normalize();
-    }
-
 }

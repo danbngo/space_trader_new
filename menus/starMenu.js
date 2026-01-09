@@ -18,48 +18,9 @@ function showStarMenu(star = new Star()) {
     if (star.temperature) {
         leftContent += `Temperature: ${Math.round(star.temperature).toLocaleString()} K<br/>`
     }
-    if (star.magnetosphereRadius) {
-        leftContent += `Heliosphere: ${roundToPlaces(star.magnetosphereRadius, 1)} AU<br/>`
-    }
     leftContent += `<br/>`
     
-    // Build right column: Stellar Characteristics
-    let rightContent = `<u>Stellar Characteristics</u><br/>`
-    if (star.metallicity) {
-        rightContent += `Metallicity: ${star.metallicity.coloredName}<br/>`
-    }
-    if (star.age) {
-        rightContent += `Age: ${star.age.coloredName}<br/>`
-    }
-    if (star.luminosity) {
-        rightContent += `Luminosity: ${star.luminosity.coloredName}<br/>`
-    }
-    
-    // Add some blank lines if needed to balance columns
-    rightContent += `<br/>`
-    rightContent += `<br/>`
-    rightContent += `<br/>`
-    
-    // Create column layout
-    const columnLayout = createColumnLayout([ce({innerHTML:leftContent}), ce({innerHTML: rightContent})])
-    
-    // Star features (outside the columns)
-    const features = ce({children: []})
-    if (star.features && star.features.length > 0) {
-        features.appendChild(ce({tag: 'br'}))
-        features.appendChild(ce({children: ['<u>Notable Features</u><br/>']}))
-        for (const feature of star.features) {
-            features.appendChild(ce({
-                children: [`${colorSpan('●', feature.color)} ${colorSpan(feature.name, feature.color)}: ${feature.description}<br/>`]
-            }))
-        }
-    }
-    
-    const content = ce({
-        children: [columnLayout, features]
-    })
-    
-    showModal(`${coloredName(star)} - Star Data`, content, [
+    showModal(`${coloredName(star)} - Star Data`, leftContent, [
         ["Close", () => closeModal()]
     ]);
 }

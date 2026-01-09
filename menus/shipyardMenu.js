@@ -560,8 +560,10 @@ function showShipyardSellMenu(shipyard = new Shipyard()) {
         ce({children:[
             `<b>Your ships</b>`,
             createSellShipMenu(fleet.ships, shipyard, (ship)=>onSelectPlayerShip(ship)),
+            ce({tag: 'br'}),
             fuelBar,
-            `Shipyard Credits: ${shipyard.credits}`,
+            ce({tag: 'br'}),
+            `Your Credits: ${gs.credits} | Shipyard Credits: ${shipyard.credits}`,
         ]}),
         [
             ["Buy Modules", ()=>showShipyardBuyModulesMenu(shipyard)],

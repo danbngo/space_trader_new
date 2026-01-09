@@ -359,7 +359,8 @@ function createTable(rows = [[ce()]], onSelectRow = null, firstSelectedIndex = o
     let currentSort = {columnIndex: -1, ascending: true};
     
     // Store original row data with indices for sorting
-    const dataRows = rows.slice(1).map((row, idx) => ({row, originalIndex: idx}));
+    // Add 1 to originalIndex to account for header row
+    const dataRows = rows.slice(1).map((row, idx) => ({row, originalIndex: idx + 1}));
     
     /**
      * Sorts the table by the specified column

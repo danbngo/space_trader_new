@@ -28,7 +28,6 @@ function describeTimespan(years = 0, roundToPlaces = 2) {
 function coloredName(obj = new SpaceObject()) {
     let name = obj.name ? obj.name : ''
     if (obj instanceof Ship) name = obj.shipType.name
-    if (obj instanceof Effect) name = obj.effectType.name
     if (obj instanceof Fleet) return obj.planet ? `${coloredIanName(obj.planet)} ${obj.name}` : obj.name
 
     // @ts-ignore

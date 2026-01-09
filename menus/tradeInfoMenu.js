@@ -15,21 +15,19 @@ function createTradeInfoBuyTable(ct = CARGO_TYPES_ALL[0], onSelectPlanet = (p = 
     // Filter to only visited locations that have markets
     const visitedLocationsWithMarkets = planets.filter(p => {
         if (!gs.lastVisitedDates.has(p)) return false
-        const market = illegal ? p.settlement?.blackMarket : p.settlement?.market
+        const market = p.settlement?.market
         return market != null
     })
     
     // Sort planets by buy price (lowest first)
     const sortedPlanets = [...visitedLocationsWithMarkets].sort((a, b) => {
-        const marketA = illegal ? a.settlement?.blackMarket : a.settlement?.market
-        const marketB = illegal ? b.settlement?.blackMarket : b.settlement?.market
-        const priceA = marketA ? marketA.calcCargoBuyPrices().getAmount(ct) : Infinity
-        const priceB = marketB ? marketB.calcCargoBuyPrices().getAmount(ct) : Infinity
+        const priceA = a.settlement?.market ? a.settlement.market.calcCargoBuyPrices().getAmount(ct) : Infinity
+        const priceB = b.settlement?.market ? b.settlement.market.calcCargoBuyPrices().getAmount(ct) : Infinity
         return priceA - priceB
     })
     
     for (const planet of sortedPlanets) {
-        const market = illegal ? planet.settlement.blackMarket : planet.settlement.market
+        const market = planet.settlement?.market
         const buyPrice = market ? market.calcCargoBuyPrices().getAmount(ct) : -1
         const distance = calcDistance(fleet.x, fleet.y, planet.x, planet.y)
         const eta = distance/gs.fleet.speed
@@ -61,21 +59,21 @@ function createTradeInfoSellTable(ct = CARGO_TYPES_ALL[0], onSelectPlanet = (p =
     // Filter to only visited locations that have markets
     const visitedLocationsWithMarkets = planets.filter(p => {
         if (!gs.lastVisitedDates.has(p)) return false
-        const market = illegal ? p.settlement?.blackMarket : p.settlement?.market
+        const market = p.settlement?.market
         return market != null
     })
     
     // Sort planets by sell price (highest first)
     const sortedPlanets = [...visitedLocationsWithMarkets].sort((a, b) => {
-        const marketA = illegal ? a.settlement?.blackMarket : a.settlement?.market
-        const marketB = illegal ? b.settlement?.blackMarket : b.settlement?.market
+        const marketA = a.settlement?.market
+        const marketB = b.settlement?.market
         const priceA = marketA ? marketA.calcCargoSellPrices().getAmount(ct) : -Infinity
         const priceB = marketB ? marketB.calcCargoSellPrices().getAmount(ct) : -Infinity
         return priceB - priceA  // Descending order
     })
     
     for (const planet of sortedPlanets) {
-        const market = illegal ? planet.settlement.blackMarket : planet.settlement.market
+        const market = planet.settlement?.market
         const sellPrice = market ? market.calcCargoSellPrices().getAmount(ct) : -1
         const distance = calcDistance(fleet.x, fleet.y, planet.x, planet.y)
         const eta = distance/fleet.speed

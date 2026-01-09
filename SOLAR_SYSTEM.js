@@ -154,7 +154,6 @@ SOL.addChildren(ASTEROIDS_ALL)
 const BACKGROUND_STARS = generateBackgroundStars(SOLAR_SYSTEM_RADIUS_IN_AU*2, 5000)
 
 // Religions and space stations will be initialized in titleMenu.js before game start
-const RELIGIONS = []
 const SPACE_STATIONS = []
 
 const SOLAR_SYSTEM = new StarSystem(
@@ -172,7 +171,6 @@ const SOLAR_SYSTEM = new StarSystem(
 );
 
 console.log("Generated solar system:", SOLAR_SYSTEM)
-console.log("Generated religions:", RELIGIONS)
 console.log("Generated space stations:", SPACE_STATIONS)
 
 // Log body counts

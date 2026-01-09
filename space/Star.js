@@ -9,22 +9,11 @@ class Star extends OrbitingObject {
      * @param {number[]} color - The color of the star.
      * @param {number} radius - The radius of the star in AU.
      * @param {Orbit} orbit - The orbit (null for primary star, or orbit for binary systems).
-     * @param {number} magnetosphereRadius - Radius of magnetosphere/heliosphere in AU.
      */
-    constructor(name = "Unnamed", color = COLORS.White, radius = 0, orbit = null, magnetosphereRadius = 0) {
+    constructor(name = "Unnamed", color = COLORS.White, radius = 0, orbit = null) {
         super(name, OBJECT_TYPES.STAR, color, radius, orbit);
-        /** @type {number} - Radius of magnetosphere/heliosphere in AU */
-        this.magnetosphereRadius = magnetosphereRadius
         /** @type {StarType} - The type/classification of the star */
         this.starType = null
-        /** @type {StarFeatureType[]} - Unique features of the star */
-        this.features = []
-        /** @type {StarMetallicity} - Metallicity level of the star */
-        this.metallicity = null
-        /** @type {StarAge} - Age of the star */
-        this.age = null
-        /** @type {StarLuminosity} - Luminosity of the star */
-        this.luminosity = null
         /** @type {number} - Mass in solar masses */
         this.mass = 1.0
         /** @type {number} - Surface temperature in Kelvin */

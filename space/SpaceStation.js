@@ -10,12 +10,12 @@ class SpaceStation extends Planet {
      * @param {PlanetType} planetType - The type of the planet.
      * @param {Settlement|null} settlement - The settlement on the planet.
      * @param {Civilization|null} civilization - The civilization of the planet.
-     * @param {Climate} climate - The climate of the planet.
      * @param {PlanetFeatureType[]} features - Unique features of the planet.
      * @param {number} dayLength - The length of one day in Earth days.
      */
-    constructor(name = "Unnamed", color = COLORS.White, radius = 0, orbit = null, planetType = PLANET_TYPES_ALL[0], settlement = null, civilization = null, climate = null, features = [], dayLength = 1.0, magnetosphereRadius = 0) {
-        super(name, color, radius, orbit, planetType, settlement, civilization, climate, features, dayLength, magnetosphereRadius);
+    constructor(name = "Unnamed", color = COLORS.White, radius = 0, orbit = null, planetType = PLANET_TYPES_ALL[0], settlement = null,
+        civilization = null, features = [], dayLength = 1.0) {
+        super(name, color, radius, orbit, planetType, settlement, civilization, features, dayLength);
         this.objectType = OBJECT_TYPES.SPACE_STATION;
     }
 }

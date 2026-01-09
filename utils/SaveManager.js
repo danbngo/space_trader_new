@@ -199,9 +199,6 @@ const SaveManager = {
                 if (keyId.startsWith('planet_')) {
                     const obj = gameRegistry.get('planet', keyId);
                     if (obj) key = obj;
-                } else if (keyId.startsWith('religion_')) {
-                    const obj = RELIGIONS.find(r => r.uuid === keyId);
-                    if (obj) key = obj;
                 }
             }
             
@@ -238,6 +235,13 @@ const SaveManager = {
                 memorizedSettlements: this.serializeMapWithObjectKeys(gs.memorizedSettlements),
                 lastVisitedDates: this.serializeMapWithObjectKeys(gs.lastVisitedDates),
                 lastSeenDates: this.serializeMapWithObjectKeys(gs.lastSeenDates),
+                
+                // Travel properties
+                x: gs.x,
+                y: gs.y,
+                destinationUUID: this.objectToUUID(gs.destination),
+                travelYearsRemaining: gs.travelYearsRemaining,
+                travelProgress: gs.travelProgress,
                 
                 // StarSystem data
                 system: this.serializeStarSystem(gs.system)
@@ -393,11 +397,9 @@ const SaveManager = {
             credits: officer.credits,
             level: officer.level,
             skillPoints: officer.skillPoints,
-            numPerkPoints: officer.numPerkPoints,
             expPoints: officer.expPoints,
             
             planetUUID: this.objectToUUID(officer.planet),
-            religionName: officer.religion ? officer.religion.name : null,
             fleetUUID: this.objectToUUID(officer.fleet),
             
             reputation: this.serializeCountsMap(officer.reputation),
@@ -405,7 +407,6 @@ const SaveManager = {
             skills: this.serializeCountsMap(officer.skills),
             
             ranks: this.serializeMapWithObjectKeys(officer.ranks),
-            perks: (officer.perks || []).map(perk => perk ? perk.name : null).filter(x => x),
         };
     },
 
@@ -528,6 +529,13 @@ const SaveManager = {
             }
             gs.lastVisitedDates = this.deserializeMapWithObjectKeys(saveData.lastVisitedDates, 'planet');
             gs.lastSeenDates = this.deserializeMapWithObjectKeys(saveData.lastSeenDates, 'planet');
+            
+            // Restore travel properties
+            gs.x = saveData.x !== undefined ? saveData.x : null;
+            gs.y = saveData.y !== undefined ? saveData.y : null;
+            gs.destination = saveData.destinationUUID ? this.uuidToObject(saveData.destinationUUID, 'planet') : null;
+            gs.travelYearsRemaining = saveData.travelYearsRemaining !== undefined ? saveData.travelYearsRemaining : null;
+            gs.travelProgress = saveData.travelProgress !== undefined ? saveData.travelProgress : null;
             
             const elapsed = Date.now() - startTime;
             console.log(`SaveManager: Deserialization complete in ${elapsed}ms`);
@@ -693,9 +701,6 @@ const SaveManager = {
         const officer = new Officer(
             data.name,
             null, // planet restored later
-            null,
-            null,
-            religion,
             data.age,
             data.credits
         );
@@ -707,7 +712,6 @@ const SaveManager = {
         // Restore properties
         officer.level = data.level || 1;
         officer.skillPoints = data.skillPoints || 0;
-        officer.numPerkPoints = data.numPerkPoints || 0;
         officer.expPoints = data.expPoints || 0;
         
         // Restore maps
@@ -715,9 +719,6 @@ const SaveManager = {
         officer.bounty = this.deserializeCountsMap(data.bounty);
         officer.skills = this.deserializeCountsMap(data.skills, SKILLS);
         officer.ranks = this.deserializeMapWithObjectKeys(data.ranks, 'planet', RANK_TYPES);
-        
-        // Restore arrays
-        officer.perks = []; // PERK_TYPES system removed
         
         // Store UUIDs for later reference restoration
         officer._planetUUID = data.planetUUID;
