@@ -27,7 +27,7 @@ class ShipShape {
                 y: 0,
                 size: 1, // Size is already baked into vertices
                 vertices: area, // Use original vertices, CanvasObject will scale them
-                fillColor: color,
+                fillColor: [...color],
                 strokeColor: null,
                 zIndex: 0
             }))

@@ -458,16 +458,11 @@ class StarMapBodiesHandler {
         const fleet = gs.fleet
         const lineId = 'destinationLine'
         
-        console.log('[DestinationLine] fleet:', fleet)
-        console.log('[DestinationLine] selectedObject:', selectedObject)
-        
         if (!fleet) {
-            console.log('[DestinationLine] No fleet, returning')
             return
         }
         
         let lineObj = cvs.getObject(lineId)
-        console.log('[DestinationLine] lineObj exists:', !!lineObj)
         
         // Check if we should show the line
         const hasSelectedObject = !!selectedObject
@@ -487,16 +482,13 @@ class StarMapBodiesHandler {
         })
         
         const shouldShowLine = hasSelectedObject && notSelectingFleet && hasXCoord && hasYCoord
-        console.log('[DestinationLine] shouldShowLine:', shouldShowLine)
         
         if (shouldShowLine) {
             // Determine line color based on whether destination is reachable
             const lineColor = canReach ? COLORS.Cyan : COLORS.DarkRed
             
-            console.log('[DestinationLine] Showing line from', {x: fleet.x, y: fleet.y}, 'to', {x: selectedObject.x, y: selectedObject.y}, 'color:', lineColor)
             // Create or update the line
             if (!lineObj) {
-                console.log('[DestinationLine] Creating new line object')
                 lineObj = cvs.addLine(
                     lineId,
                     fleet.x,
@@ -507,9 +499,7 @@ class StarMapBodiesHandler {
                     2 // lineWidth
                 )
                 lineObj.zIndex = -1 // Draw behind everything else
-                console.log('[DestinationLine] Line created:', lineObj)
             } else {
-                console.log('[DestinationLine] Updating existing line')
                 // Update line position and color
                 lineObj.x = fleet.x
                 lineObj.y = fleet.y
@@ -521,7 +511,6 @@ class StarMapBodiesHandler {
         } else {
             // Hide the line if it exists
             if (lineObj) {
-                console.log('[DestinationLine] Hiding line')
                 lineObj.visible = false
             }
         }

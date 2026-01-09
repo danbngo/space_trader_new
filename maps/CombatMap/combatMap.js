@@ -92,14 +92,27 @@ class CombatMap extends BaseMap {
         this.routeCvs.root.style.zIndex = '1'
         this.root.appendChild(this.routeCvs.root)
         
-        // Auto-resize canvas to fit its container
-        this.routeCvs.autoResize()
-        
         // Create route UI panel at bottom
         this.routePanel = this.createRouteTravelUIPanel()
         this.root.appendChild(this.routePanel)
         
         showElement(this.root)
+        
+        // Defer canvas sizing until after DOM is rendered
+        requestAnimationFrame(() => {
+            // Auto-resize canvas to fit its container
+            this.routeCvs.autoResize()
+            
+            // Set up camera for screen-space rendering (1:1 pixel mapping)
+            this.routeCvs.cameraX = 0
+            this.routeCvs.cameraY = 0
+            this.routeCvs.zoom = 60
+            
+            console.log('Canvas resized - dimensions:', this.routeCvs.canvas.width, 'x', this.routeCvs.canvas.height)
+            
+            // Initial render
+            this.renderShips()
+        })
         
         // Initialize tick system
         this.lastTickMs = Date.now()
@@ -256,105 +269,165 @@ class CombatMap extends BaseMap {
     }
     
     /**
+     * Updates jitter offset for a ship (smooth random movement)
+     * @param {Ship} ship - The ship to update jitter for
+     * @param {number} maxX - Maximum horizontal jitter (±)
+     * @param {number} maxY - Maximum vertical jitter (±)
+     */
+    updateShipJitter(ship, maxX = 2, maxY = 1) {
+        if (!this.shipJitterOffsets.has(ship)) {
+            this.shipJitterOffsets.set(ship, {x: 0, y: 0, targetX: 0, targetY: 0})
+        }
+        const jitter = this.shipJitterOffsets.get(ship)
+        
+        // Update jitter target occasionally (every ~30 frames)
+        if (Math.random() < 0.03) {
+            jitter.targetX = (Math.random() - 0.5) * maxX
+            jitter.targetY = (Math.random() - 0.5) * maxY
+        }
+        
+        // Smooth movement toward target
+        jitter.x += (jitter.targetX - jitter.x) * 0.1
+        jitter.y += (jitter.targetY - jitter.y) * 0.1
+        
+        return jitter
+    }
+    
+    /**
+     * Renders a thruster for a ship
+     * @param {number} index - Ship index for unique ID
+     * @param {number} x - X position
+     * @param {number} y - Y position
+     * @param {number} offsetX - X offset from ship center (negative = behind)
+     */
+    renderThruster(index, x, y, offsetX = -25) {
+        const thrusterSize = 15
+        const thrusterFlicker = 0.7 + Math.random() * 0.3
+        const thrusterColor = [255, Math.floor(100 * thrusterFlicker), 0, Math.floor(255 * thrusterFlicker)]
+        this.routeCvs.addFilledTriangle(
+            `thruster-${index}`,
+            x + offsetX,
+            y,
+            thrusterSize,
+            0,
+            2,
+            thrusterColor,
+            null,
+            Math.PI
+        )
+    }
+    
+    /**
+     * Renders a ship with its shape and label
+     * @param {Ship} ship - The ship to render
+     * @param {number} index - Ship index for unique ID
+     * @param {number} x - X position
+     * @param {number} y - Y position
+     * @param {number} shipSize - Size of the ship
+     * @param {number} labelOffsetY - Y offset for label
+     * @param {boolean} mirror - Whether to mirror the ship horizontally
+     * @param {string} idPrefix - Prefix for object IDs (e.g., 'player' or 'enemy')
+     */
+    renderShip(ship, index, x, y, shipSize = 20, labelOffsetY = 0, mirror = false, idPrefix = 'ship') {
+        const shipColor = gs.fleet && gs.fleet.color ? gs.fleet.color : [0, 255, 0, 255]
+        
+        if (ship.shipType.shipShape && ship.shipType.shipShape.toPolygons) {
+            // Use ship shape polygons
+            const polygons = ship.shipType.shipShape.toPolygons(shipColor, shipSize)
+            polygons.forEach((poly) => {
+                const vertices = mirror ? invertPolygons(poly.vertices) : poly.vertices
+                this.routeCvs.addPolygon(
+                    `${idPrefix}-${index}-poly-${poly.id}`,
+                    x,
+                    y,
+                    vertices,
+                    1,
+                    0,
+                    shipColor,
+                    null,
+                    0,
+                    null,
+                    poly.zIndex
+                )
+            })
+        } else {
+            // Fallback to circle if no shape generator
+            this.routeCvs.addFilledCircle(
+                `${idPrefix}-${index}`,
+                x,
+                y,
+                shipSize,
+                5,
+                shipColor
+            )
+        }
+        
+        // Add ship label
+        this.routeCvs.addText(
+            `${idPrefix}-label-${index}`,
+            x,
+            y-ship.radius,
+            0,
+            labelOffsetY,
+            ship.shipType.name,
+            [255, 255, 255, 255],
+            12
+        )
+    }
+    
+    /**
      * Renders ships with thrusters and jitter
      */
     renderShips() {
+        
+        if (!this.routeCvs) {
+            console.error('❌ renderShips: routeCvs is null!')
+            return
+        }
+        
+        if (!this.encounter || !this.encounter.playerShips) {
+            console.error('❌ renderShips: encounter or playerShips is null!')
+            return
+        }
+        
         // Clear canvas objects
         this.routeCvs.clear()
         this.routeCvs.pixels = [] // Keep background stars
         
-        const centerX = this.routeCvs.canvas.width / 2
-        const centerY = this.routeCvs.canvas.height / 2
         const shipSpacing = 60
+        const leftOffset = -(this.routeCvs.canvas.width / this.routeCvs.zoom) * 0.375 // 75% to left edge
+        const rightOffset = (this.routeCvs.canvas.width / this.routeCvs.zoom) * 0.375 // 75% to right edge
         
-        // Draw each ship with jitter and thruster
+        // Draw player ships with jitter and thruster
         this.encounter.playerShips.forEach((ship, index) => {
             if (this.isShipDestroyed(ship)) return
             
-            // Get or create jitter offset for this ship
-            if (!this.shipJitterOffsets.has(ship)) {
-                this.shipJitterOffsets.set(ship, {x: 0, y: 0, targetX: 0, targetY: 0})
-            }
-            const jitter = this.shipJitterOffsets.get(ship)
+            const jitter = this.updateShipJitter(ship)
+            const shipY = 0 + (index - (this.encounter.playerShips.length - 1) / 2) * shipSpacing + jitter.y
+            const shipX = leftOffset + jitter.x
             
-            // Update jitter target occasionally (every ~30 frames)
-            if (Math.random() < 0.03) {
-                jitter.targetX = (Math.random() - 0.5) * 10 // ±5 pixels x
-                jitter.targetY = (Math.random() - 0.5) * 30 // ±15 pixels y (more y jitter)
-            }
-            
-            // Smooth movement toward target
-            jitter.x += (jitter.targetX - jitter.x) * 0.1
-            jitter.y += (jitter.targetY - jitter.y) * 0.1
-            
-            // Calculate ship position
-            const shipY = centerY + (index - (this.encounter.playerShips.length - 1) / 2) * shipSpacing + jitter.y
-            const shipX = centerX + jitter.x
-            
-            // Draw thruster behind ship (triangle pointing backward)
-            const thrusterSize = 15
-            const thrusterFlicker = 0.7 + Math.random() * 0.3 // Flicker effect
-            const thrusterColor = [255, Math.floor(100 * thrusterFlicker), 0, Math.floor(255 * thrusterFlicker)]
-            this.routeCvs.addFilledTriangle(
-                `thruster-${index}`,
-                shipX - 25, // Behind the ship
-                shipY,
-                thrusterSize,
-                0,
-                2,
-                thrusterColor,
-                null,
-                Math.PI // Point backward
-            )
-            
-            // Draw ship using shape generator if available
-            const shipColor = gs.fleet && gs.fleet.color ? gs.fleet.color : [0, 255, 0, 255]
-            const shipSize = 20
-            
-            if (ship.shipType.shipShape && ship.shipType.shipShape.toPolygons) {
-                // Use ship shape polygons
-                const polygons = ship.shipType.shipShape.toPolygons(shipColor, shipSize)
-                polygons.forEach((poly, polyIndex) => {
-                    this.routeCvs.addPolygon(
-                        `ship-${index}-poly-${poly.id}`,
-                        shipX,
-                        shipY,
-                        poly.vertices,
-                        1, // Size already applied in toPolygons
-                        0,
-                        poly.color,
-                        null,
-                        0, // Angle (facing right by default)
-                        null,
-                        poly.zIndex
-                    )
-                })
-            } else {
-                // Fallback to circle if no shape generator
-                this.routeCvs.addFilledCircle(
-                    `ship-${index}`,
-                    shipX,
-                    shipY,
-                    shipSize,
-                    5,
-                    shipColor
-                )
-            }
-            
-            // Add ship label
-            this.routeCvs.addText(
-                `ship-label-${index}`,
-                shipX,
-                shipY + 30,
-                0,
-                0,
-                ship.shipType.name,
-                [255, 255, 255, 255],
-                12
-            )
+            this.renderThruster(index, shipX, shipY)
+            this.renderShip(ship, index, shipX, shipY, 20, 30, false, 'player')
         })
         
+        // Draw enemy ships if they exist
+        if (this.encounter.enemyShips && this.encounter.enemyShips.length > 0) {
+            this.encounter.enemyShips.forEach((ship, index) => {
+                if (this.isShipDestroyed(ship)) return
+                
+                const jitter = this.updateShipJitter(ship)
+                const shipY = 0 + (index - (this.encounter.enemyShips.length - 1) / 2) * shipSpacing + jitter.y
+                const shipX = rightOffset + jitter.x
+                
+                this.renderThruster(index, shipX, shipY, 25) // Thruster on right side (in front when mirrored)
+                this.renderShip(ship, index, shipX, shipY, 20, 30, true, 'enemy')
+            })
+        }
+        
+        //console.log('About to call routeCvs.redraw()')
+        //console.log('routeCvs.drawOrder length:', this.routeCvs.drawOrder?.length)
         this.routeCvs.redraw(true)
+        //console.log('=== renderShips() complete ===')
     }
 
     animateRouteTravel() {
@@ -385,92 +458,33 @@ class CombatMap extends BaseMap {
                 this.routeProgressBar.update(this.routeProgress)
             }
             
-            // Draw each ship with jitter and thruster
+            // Draw player ships with jitter and thruster
             this.encounter.playerShips.forEach((ship, index) => {
                 if (this.isShipDestroyed(ship)) return
                 
-                // Get or create jitter offset for this ship
-                if (!this.shipJitterOffsets.has(ship)) {
-                    this.shipJitterOffsets.set(ship, {x: 0, y: 0, targetX: 0, targetY: 0})
-                }
-                const jitter = this.shipJitterOffsets.get(ship)
-                
-                // Update jitter target occasionally (every ~30 frames)
-                if (Math.random() < 0.03) {
-                    jitter.targetX = (Math.random() - 0.5) * 10 // ±5 pixels x
-                    jitter.targetY = (Math.random() - 0.5) * 30 // ±15 pixels y (more y jitter)
-                }
-                
-                // Smooth movement toward target
-                jitter.x += (jitter.targetX - jitter.x) * 0.1
-                jitter.y += (jitter.targetY - jitter.y) * 0.1
-                
-                // Calculate ship position
+                const jitter = this.updateShipJitter(ship, 10, 30)
+                const leftOffset = centerX * 0.5 // 75% to left (centerX = 50%, so 0.5 * centerX = 25% from left)
                 const shipY = centerY + (index - (this.encounter.playerShips.length - 1) / 2) * shipSpacing + jitter.y
-                const shipX = centerX + jitter.x
+                const shipX = leftOffset + jitter.x
                 
-                // Draw thruster behind ship (triangle pointing backward)
-                const thrusterSize = 15
-                const thrusterFlicker = 0.7 + Math.random() * 0.3 // Flicker effect
-                const thrusterColor = [255, Math.floor(100 * thrusterFlicker), 0, Math.floor(255 * thrusterFlicker)]
-                this.routeCvs.addFilledTriangle(
-                    `thruster-${index}`,
-                    shipX - 25, // Behind the ship
-                    shipY,
-                    thrusterSize,
-                    0,
-                    2,
-                    thrusterColor,
-                    null,
-                    Math.PI // Point backward
-                )
-                
-                // Draw ship using shape generator if available
-                const shipColor = gs.fleet && gs.fleet.color ? gs.fleet.color : [0, 255, 0, 255]
-                const shipSize = 20
-                
-                if (ship.shipType.shipShape && ship.shipType.shipShape.toPolygons) {
-                    // Use ship shape polygons
-                    const polygons = ship.shipType.shipShape.toPolygons(shipColor, shipSize)
-                    polygons.forEach((poly, polyIndex) => {
-                        this.routeCvs.addPolygon(
-                            `ship-${index}-poly-${poly.id}`,
-                            shipX,
-                            shipY,
-                            poly.vertices,
-                            1, // Size already applied in toPolygons
-                            0,
-                            poly.color,
-                            null,
-                            0, // Angle (facing right by default)
-                            null,
-                            poly.zIndex
-                        )
-                    })
-                } else {
-                    // Fallback to circle if no shape generator
-                    this.routeCvs.addFilledCircle(
-                        `ship-${index}`,
-                        shipX,
-                        shipY,
-                        shipSize,
-                        5,
-                        shipColor
-                    )
-                }
-                
-                // Add ship label
-                this.routeCvs.addText(
-                    `ship-label-${index}`,
-                    shipX,
-                    shipY + 30,
-                    0,
-                    0,
-                    ship.shipType.name,
-                    [255, 255, 255, 255],
-                    12
-                )
+                this.renderThruster(index, shipX, shipY)
+                this.renderShip(ship, index, shipX, shipY, 20, -30, false, 'player')
             })
+            
+            // Draw enemy ships if they exist
+            if (this.encounter.enemyShips && this.encounter.enemyShips.length > 0) {
+                this.encounter.enemyShips.forEach((ship, index) => {
+                    if (this.isShipDestroyed(ship)) return
+                    
+                    const jitter = this.updateShipJitter(ship, 10, 30)
+                    const rightOffset = centerX * 1.5 // 75% to right
+                    const shipY = centerY + (index - (this.encounter.enemyShips.length - 1) / 2) * shipSpacing + jitter.y
+                    const shipX = rightOffset + jitter.x
+                    
+                    this.renderThruster(index, shipX, shipY, 25)
+                    this.renderShip(ship, index, shipX, shipY, 20, -30, true, 'enemy')
+                })
+            }
             
             this.routeCvs.redraw(true)
             
@@ -539,92 +553,33 @@ class CombatMap extends BaseMap {
                 this.routeETAEl.innerHTML = `ETA: ${describeTimespan(gs.travelYearsRemaining || 0, 1)}`
             }
             
-            // Draw each ship with jitter and thruster
+            // Draw player ships with jitter and thruster
             this.encounter.playerShips.forEach((ship, index) => {
                 if (this.isShipDestroyed(ship)) return
                 
-                // Get or create jitter offset for this ship
-                if (!this.shipJitterOffsets.has(ship)) {
-                    this.shipJitterOffsets.set(ship, {x: 0, y: 0, targetX: 0, targetY: 0})
-                }
-                const jitter = this.shipJitterOffsets.get(ship)
-                
-                // Update jitter target occasionally (every ~30 frames)
-                if (Math.random() < 0.03) {
-                    jitter.targetX = (Math.random() - 0.5) * 10 // ±5 pixels x
-                    jitter.targetY = (Math.random() - 0.5) * 30 // ±15 pixels y (more y jitter)
-                }
-                
-                // Smooth movement toward target
-                jitter.x += (jitter.targetX - jitter.x) * 0.1
-                jitter.y += (jitter.targetY - jitter.y) * 0.1
-                
-                // Calculate ship position
+                const jitter = this.updateShipJitter(ship, 10, 30)
+                const leftOffset = centerX * 0.5 // 75% to left (centerX = 50%, so 0.5 * centerX = 25% from left)
                 const shipY = centerY + (index - (this.encounter.playerShips.length - 1) / 2) * shipSpacing + jitter.y
-                const shipX = centerX + jitter.x
+                const shipX = leftOffset + jitter.x
                 
-                // Draw thruster behind ship (triangle pointing backward)
-                const thrusterSize = 15
-                const thrusterFlicker = 0.7 + Math.random() * 0.3 // Flicker effect
-                const thrusterColor = [255, Math.floor(100 * thrusterFlicker), 0, Math.floor(255 * thrusterFlicker)]
-                this.routeCvs.addFilledTriangle(
-                    `thruster-${index}`,
-                    shipX - 25, // Behind the ship
-                    shipY,
-                    thrusterSize,
-                    0,
-                    2,
-                    thrusterColor,
-                    null,
-                    Math.PI // Point backward
-                )
-                
-                // Draw ship using shape generator if available
-                const shipColor = gs.fleet && gs.fleet.color ? gs.fleet.color : [0, 255, 0, 255]
-                const shipSize = 20
-                
-                if (ship.shipType.shipShape && ship.shipType.shipShape.toPolygons) {
-                    // Use ship shape polygons
-                    const polygons = ship.shipType.shipShape.toPolygons(shipColor, shipSize)
-                    polygons.forEach((poly, polyIndex) => {
-                        this.routeCvs.addPolygon(
-                            `ship-${index}-poly-${poly.id}`,
-                            shipX,
-                            shipY,
-                            poly.vertices,
-                            1, // Size already applied in toPolygons
-                            0,
-                            poly.color,
-                            null,
-                            0, // Angle (facing right by default)
-                            null,
-                            poly.zIndex
-                        )
-                    })
-                } else {
-                    // Fallback to circle if no shape generator
-                    this.routeCvs.addFilledCircle(
-                        `ship-${index}`,
-                        shipX,
-                        shipY,
-                        shipSize,
-                        5,
-                        shipColor
-                    )
-                }
-                
-                // Add ship label
-                this.routeCvs.addText(
-                    `ship-label-${index}`,
-                    shipX,
-                    shipY + 30,
-                    0,
-                    0,
-                    ship.shipType.name,
-                    [255, 255, 255, 255],
-                    12
-                )
+                this.renderThruster(index, shipX, shipY)
+                this.renderShip(ship, index, shipX, shipY, 20, -30, false, 'player')
             })
+            
+            // Draw enemy ships if they exist
+            if (this.encounter.enemyShips && this.encounter.enemyShips.length > 0) {
+                this.encounter.enemyShips.forEach((ship, index) => {
+                    if (this.isShipDestroyed(ship)) return
+                    
+                    const jitter = this.updateShipJitter(ship, 10, 30)
+                    const rightOffset = centerX * 1.5 // 75% to right
+                    const shipY = centerY + (index - (this.encounter.enemyShips.length - 1) / 2) * shipSpacing + jitter.y
+                    const shipX = rightOffset + jitter.x
+                    
+                    this.renderThruster(index, shipX, shipY, 25)
+                    this.renderShip(ship, index, shipX, shipY, 20, -30, true, 'enemy')
+                })
+            }
             
             this.routeCvs.redraw(true)
             

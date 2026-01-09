@@ -105,6 +105,25 @@ class PlanetDecorator {
         const zoom = this.cvs.zoom
         const pixelRatio = this.cvs.pixelRatio
         
+        // Check if parent is on-screen - skip update if not visible
+        const canvasWidth = this.cvs.canvas.width / pixelRatio
+        const canvasHeight = this.cvs.canvas.height / pixelRatio
+        const viewWidth = canvasWidth / zoom
+        const viewHeight = canvasHeight / zoom
+        
+        const viewLeft = this.cvs.cameraX - viewWidth / 2
+        const viewRight = this.cvs.cameraX + viewWidth / 2
+        const viewTop = this.cvs.cameraY - viewHeight / 2
+        const viewBottom = this.cvs.cameraY + viewHeight / 2
+        
+        // Add padding equal to planet size to catch planets partially on screen
+        const padding = parent.size * 2
+        if (parent.x + padding < viewLeft || parent.x - padding > viewRight ||
+            parent.y + padding < viewTop || parent.y - padding > viewBottom) {
+            // Planet is off-screen, skip update
+            return
+        }
+        
         // Determine if parent is rendering at minScreenSize or at world-space size
         // The actual rendered size is: Math.max(minScreenSize, size * zoom) / pixelRatio
         const worldSpaceSize = parent.size * zoom

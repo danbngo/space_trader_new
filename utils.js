@@ -49,6 +49,15 @@ function calcDistance(x1 = 0, y1 = 0, x2 = 0, y2 = 0) {
 }
 
 /**
+ * Inverts (mirrors) polygon vertices horizontally by negating their x coordinates.
+ * @param {Array<{x: number, y: number}>} vertices - Array of vertex objects with x and y properties.
+ * @returns {Array<{x: number, y: number}>} New array of inverted vertices.
+ */
+function invertPolygons(vertices) {
+    return vertices.map(v => ({x: -v.x, y: v.y}));
+}
+
+/**
  * Darkens an RGBA color array by reducing the RGB components.
  * @param {number[]} color - The RGBA color array [r, g, b, a] with values 0-255.
  * @param {number} factor - The darkening factor (0.0 to 1.0, default 0.3).
