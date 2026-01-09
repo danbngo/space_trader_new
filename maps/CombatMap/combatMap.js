@@ -49,7 +49,8 @@ class CombatMap extends BaseMap {
         })
         
         // Create starfield background
-        this.createStarfield()
+        const starfieldCanvas = this.createStarfield()
+        this.root.appendChild(starfieldCanvas)
         
         // Create combat area with ships
         this.combatArea = this.createCombatArea()
@@ -79,10 +80,11 @@ class CombatMap extends BaseMap {
         })
         
         // Create starfield background
-        this.createStarfield()
+        const starfieldCanvas = this.createStarfield()
+        this.root.appendChild(starfieldCanvas)
         
         // Create canvas for ships and thrusters
-        this.routeCvs = new CanvasWrapper()
+        this.routeCvs = new CanvasWrapper(1, 1, 1, 0, false)
         this.routeCvs.root.id = 'route-canvas-wrapper'
         this.routeCvs.root.style.position = 'absolute'
         this.routeCvs.root.style.top = '0'
@@ -144,7 +146,7 @@ class CombatMap extends BaseMap {
         // Update game year
         gs.year += elapsedYears
         
-        // Update travel progress
+        // Update travel time remaining
         gs.travelYearsRemaining -= elapsedYears
         
         // Update positions of planets/stars
@@ -162,6 +164,9 @@ class CombatMap extends BaseMap {
             const progressRatio = progressPercent / 100
             gs.fleet.x = gs.previousLocation.x + (gs.destination.x - gs.previousLocation.x) * progressRatio
             gs.fleet.y = gs.previousLocation.y + (gs.destination.y - gs.previousLocation.y) * progressRatio
+            
+            // Update travelProgress for serialization
+            gs.travelProgress = progressPercent
         }
         
         // Update progress bar
@@ -446,11 +451,12 @@ class CombatMap extends BaseMap {
             this.routeCvs.clear()
             this.routeCvs.pixels = [] // Keep background stars
             
-            // Update progress (chance of encounter per frame)
-            const encounterChancePerFrame = PLANET_ENCOUNTER_CHANCE_PER_DAY / 60 / 60 // Convert from per day to per frame (assuming 60fps)
-            if (Math.random() < encounterChancePerFrame) {
-                this.routeProgress += 0.5 // Small increment when encounter chance triggers
-            }
+            // Calculate elapsed time and update progress
+            const currentTime = Date.now()
+            const elapsedMs = currentTime - this.lastTickMs
+            this.lastTickMs = currentTime
+            
+            this.routeProgress += elapsedMs * COMBAT_MAP_PROGRESS_PERCENT_PER_MS
             this.routeProgress = Math.min(this.routeProgress, 100)
             
             // Update progress bar if it exists
@@ -530,10 +536,6 @@ class CombatMap extends BaseMap {
             this.routeCvs.clear()
             this.routeCvs.pixels = [] // Keep background stars
             
-            // Update travel progress (approximately 60 FPS)
-            const elapsedYears = (1 / 60) * STAR_MAP_YEARS_PER_MS / 1000
-            gs.updateTravelProgress(elapsedYears)
-            
             // Calculate progress based on start ETA vs remaining ETA
             let progressPercent = 0
             if (gs.travelStartYear !== null && gs.destination && gs.previousLocation) {
@@ -607,47 +609,40 @@ class CombatMap extends BaseMap {
      * @returns {HTMLElement}
      */
     createStarfield() {
-    // Create canvas wrapper for starfield
-    const cvs = new CanvasWrapper()
-    cvs.canvas.id = 'combat-starfield'
-    cvs.canvas.style.position = 'absolute'
-    cvs.canvas.style.top = '0'
-    cvs.canvas.style.left = '0'
-    cvs.canvas.style.width = '100%'
-    cvs.canvas.style.height = '100%'
-    cvs.canvas.style.zIndex = '0'
-    
-    // Size the canvas
-    cvs.canvas.width = window.innerWidth
-    cvs.canvas.height = window.innerHeight
-    
-    // Generate random background stars
-    const numStars = 300
-    const width = cvs.canvas.width
-    const height = cvs.canvas.height
-    
-    for (let i = 0; i < numStars; i++) {
-        const x = Math.random() * width
-        const y = Math.random() * height
-        const size = Math.random() * 2 + 0.5 // Size between 0.5 and 2.5
+        // Create canvas wrapper for starfield
+        const cvs = new CanvasWrapper(1, 1, 1, 0, false)
+        cvs.canvas.id = 'combat-starfield'
+        cvs.canvas.style.position = 'absolute'
+        cvs.canvas.style.top = '0'
+        cvs.canvas.style.left = '0'
+        cvs.canvas.style.width = '100%'
+        cvs.canvas.style.height = '100%'
+        cvs.canvas.style.zIndex = '0'
         
-        // Create star color with brightness variance
-        const baseBrightness = Math.floor(Math.random() * 128 + 127) // 127-255
-        const colorVariance = Math.floor(Math.random() * 20)
-        const r = Math.min(255, baseBrightness + colorVariance)
-        const g = Math.min(255, baseBrightness + colorVariance)
-        const b = Math.min(255, baseBrightness + colorVariance)
-        const color = [r, g, b, 255]
+        // Size the canvas
+        cvs.canvas.width = window.innerWidth
+        cvs.canvas.height = window.innerHeight
         
-        // Add pixel with parallax = true (static screen position)
-        cvs.addPixel(0, 0, color, size, x, y, true)
+        // Generate background stars using generator
+        const radius = Math.max(window.innerWidth, window.innerHeight)
+        const numStars = 300
+        const backgroundStars = generateBackgroundStars(radius, numStars)
+        
+        // Add stars to canvas as pixels with random screen positions
+        backgroundStars.forEach((star, i) => {
+            const x = Math.random() * cvs.canvas.width
+            const y = Math.random() * cvs.canvas.height
+            const size = Math.random() * 2 + 0.5 // Size between 0.5 and 2.5
+            
+            // Add pixel with parallax = true (static screen position)
+            cvs.addPixel(0, 0, star.color, size, x, y, true)
+        })
+        
+        // Redraw the canvas
+        cvs.redraw(true)
+        
+        return cvs.canvas
     }
-    
-    // Redraw the canvas
-    cvs.redraw(true)
-    
-    return cvs.canvas
-}
 
     /**
      * Creates the main combat area with ship formations

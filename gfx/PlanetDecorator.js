@@ -14,15 +14,6 @@ class PlanetDecorator {
         /** @type {CanvasObject|null} */
         this.parentCanvasObject = null
 
-        /** @type {Planet|null} */
-        this.parentObject = null
-
-        /** @type {number} */
-        this.lastParentX = 0
-        
-        /** @type {number} */
-        this.lastParentY = 0
-        
         /** @type {Array<CanvasObject>} */
         this.canvasObjects = []
 
@@ -31,34 +22,30 @@ class PlanetDecorator {
     
     /**
      * Associates this decorator with a parent canvas object
+     * @param {CanvasWrapper} canvas - The canvas wrapper
      * @param {CanvasObject} canvasObject - The parent planet canvas object
      */
-    associate(object, canvasObject) {
-        this.parentObject = object
+    associate(canvas, canvasObject) {
         this.parentCanvasObject = canvasObject
-        this.lastParentX = canvasObject.x
-        this.lastParentY = canvasObject.y
+        this.cvs = canvas
     }
     
     /**
      * Creates canvas objects for all decorations based on parent properties
-     * @param {CanvasWrapper} cvs - The canvas wrapper to add objects to
-     * @param {string} parentId - The parent planet's ID for unique naming
      * @returns {Array<CanvasObject>} Array of created canvas objects
      */
-    decorate(cvs, parentId) {
+    decorate() {
         if (!this.parentCanvasObject) {
             console.warn('PlanetDecorator.decorate() called without associated parent canvas object')
             return []
         }
-        this.cvs = cvs
-        
         const parent = this.parentCanvasObject
         const parentZIndex = parent.zIndex || 10
+        const parentId = this.parentCanvasObject.id
         
         // Clear existing canvas objects
         this.canvasObjects.forEach(obj => {
-            cvs.deleteObject(obj.id)
+            this.cvs.deleteObject(obj.id)
         })
         this.canvasObjects = []
         
@@ -73,7 +60,7 @@ class PlanetDecorator {
             
             // Create a dark filled circle for the crater
             const craterColor = [0, 0, 0, 0.6] // Semi-transparent black
-            const craterObj = cvs.addFilledCircle(
+            const craterObj = this.cvs.addFilledCircle(
                 craterId,
                 craterX,
                 craterY,
@@ -163,8 +150,5 @@ class PlanetDecorator {
             }
         })
         
-        // Update last known position
-        this.lastParentX = parent.x
-        this.lastParentY = parent.y
     }
 }

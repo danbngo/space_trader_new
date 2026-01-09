@@ -123,7 +123,7 @@ class GameState {
     }
 
     /**
-     * Update travel progress and check if destination reached
+     * Update travel time remaining (simple helper used by combat map)
      * @param {number} elapsedYears - Years elapsed since last update
      */
     updateTravelProgress(elapsedYears) {
@@ -133,36 +133,5 @@ class GameState {
 
         // Reduce remaining travel time
         this.travelYearsRemaining -= elapsedYears;
-
-        // Calculate progress percentage (0-100)
-        const totalTravelTime = this.travelYearsRemaining + elapsedYears;
-        this.travelProgress = Math.min(100, Math.max(0, ((totalTravelTime - this.travelYearsRemaining) / totalTravelTime) * 100));
-
-        // Update position along the route
-        if (this.fleet && this.destination) {
-            const startX = this.fleet.x || 0;
-            const startY = this.fleet.y || 0;
-            const endX = this.destination.x;
-            const endY = this.destination.y;
-            
-            const progressRatio = this.travelProgress / 100;
-            this.x = startX + (endX - startX) * progressRatio;
-            this.y = startY + (endY - startY) * progressRatio;
-        }
-
-        // Check if arrived
-        if (this.travelYearsRemaining <= 0) {
-            console.log('Travel complete! Arriving at destination:', this.destination.name);
-            this.fleet.dock(this.destination);
-            
-            // Clear travel state
-            this.previousLocation = null;
-            this.destination = null;
-            this.travelYearsRemaining = null;
-            this.travelProgress = null;
-            this.travelStartYear = null;
-            this.x = null;
-            this.y = null;
-        }
     }
 }

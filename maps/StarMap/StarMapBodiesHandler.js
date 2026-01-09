@@ -214,8 +214,8 @@ class StarMapBodiesHandler {
                 // Associate and create decorators
                 if (body.decorators && body.decorators.length > 0) {
                     body.decorators.forEach(decorator => {
-                        decorator.associate(body, planetObj)
-                        decorator.decorate(cvs, planetId)
+                        decorator.associate(cvs, planetObj)
+                        decorator.decorate()
                     })
                 }
                 

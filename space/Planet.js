@@ -112,6 +112,22 @@ class Planet extends OrbitingObject {
             }
         })
         
+        // Add radial gradient overlay for shading effect
+        const gradientOverlay = ce({
+            style: {
+                position: 'absolute',
+                top: '0',
+                left: '0',
+                width: '100%',
+                height: '100%',
+                borderRadius: '50%',
+                background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.6) 100%)',
+                pointerEvents: 'none',
+                zIndex: '10'
+            }
+        })
+        container.appendChild(gradientOverlay)
+        
         // Create a CanvasWrapper to properly render the planet
         const cvs = new CanvasWrapper(1, 1, 1, 0)
         cvs.canvas.style.display = 'block'
@@ -130,14 +146,14 @@ class Planet extends OrbitingObject {
         // Position camera at center
         cvs.cameraX = 0
         cvs.cameraY = 0
-        cvs.zoom = 0 // Scale so planet radius of 1 fills half the canvas
+        cvs.zoom = size/4 // Scale so planet radius of 1 fills half the canvas
         
         // Add the planet as a filled circle at origin
         const planetObj = cvs.addFilledCircle(
             `planet-${this.uuid}-canvas`,
             0, // x at origin
             0, // y at origin
-            0, // radius (will be scaled by zoom)
+            1, // radius (will be scaled by zoom)
             size/3, // min screen size
             this.color,
             null // no click handler
@@ -146,11 +162,10 @@ class Planet extends OrbitingObject {
         // Add decorators using the decorate method
         if (this.decorators && this.decorators.length > 0) {
             this.decorators.forEach(decorator => {
-                decorator.associate(this, planetObj)
-                decorator.decorate(cvs, `planet-${this.uuid}-canvas`)
+                decorator.associate(cvs, planetObj)
+                decorator.decorate()
             })
         }
-        
         // Auto-resize canvas to fit container
         cvs.autoResize()
         

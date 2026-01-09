@@ -112,3 +112,4 @@ const CRIMINAL_MAX_BOUNTY_PER_LEVEL = 500
 
 const YEARS_PER_TRAVEL_TICK = 1/365/24/10 //1 hour per 10 tick
 const BASE_ENCOUNTER_CHANCE_PER_YEAR = 0//1/365/24 //1 encounter per day
+const COMBAT_MAP_PROGRESS_PERCENT_PER_MS = 1/1000 // Progress percentage per millisecond

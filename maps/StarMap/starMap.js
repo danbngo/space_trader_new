@@ -603,7 +603,8 @@ class StarMap extends BaseMap {
             }
             // Hide travel button if this planet is already the destination of the current route
             const isCurrentDestination = gs.fleet.route && gs.fleet.route.destination === obj
-            if (!isCurrentDestination) {
+            const isAlreadyDockedHere = gs.fleet.location === obj
+            if (!isCurrentDestination && !isAlreadyDockedHere) {
                 const stranded = gs.fleet.stranded
                 const hasEnoughFuel = gs.fleet.fuel >= distance * FUEL_COST_PER_1_AU
                 const canTravel = !stranded && hasEnoughFuel && !fliesIntoSun
