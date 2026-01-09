@@ -63,6 +63,8 @@ const PLANET_FEATURE_TYPES = Object.freeze({
     
     // Pollution
     HEAVY_POLLUTION: new PlanetFeatureType("Heavy Pollution", "Severe environmental contamination", COLORS.DarkGreen),
+
+    ASTEROID_BOMBARDMENT: new PlanetFeatureType("Asteroid Bombardment", "Frequent asteroid impacts pose a constant threat", COLORS.Brown),
     
     WATER_ICE_SURFACE: new PlanetFeatureType("Water Ice Surface", "Surface covered in frozen water", COLORS.White),
     ICE_GEYSERS: new PlanetFeatureType("Ice Geysers", "Cryovolcanic geysers ejecting water ice and vapor", COLORS.LightBlue),

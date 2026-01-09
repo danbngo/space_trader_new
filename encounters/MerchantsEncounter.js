@@ -1,5 +1,47 @@
 class MerchantsEncounter extends Encounter {
     
+    /**
+     * Show initial contact modal with merchant ship
+     * Merchant has 50% chance to want to trade, 50% to ignore player
+     */
+    showInitialContactModal() {
+        const fleetName = coloredName(this.fleet)
+        const wantsToTrade = Math.random() > 0.5
+        
+        let msg = `You encounter ${fleetName}!<br/><br/>`
+        
+        if (wantsToTrade) {
+            msg += `The merchant fleet signals they're open for business.<br/>`
+            msg += `"Greetings traveler! Care to trade?"<br/>`
+            
+            showModal(fleetName, msg, [
+                ['Trade', () => this.showTradeOfferModal()],
+                ['Attack', () => this.startCombat()],
+                ['Leave', () => this.endEncounter()]
+            ])
+        } else {
+            msg += `The merchant fleet broadcasts on all channels:<br/>`
+            msg += `"Not interested in dealing right now. Move along."<br/>`
+            
+            showModal(fleetName, msg, [
+                ['Attack', () => this.startCombat()],
+                ['Leave', () => this.endEncounter()]
+            ])
+        }
+    }
+    
+    /**
+     * Initiate combat with the merchant
+     */
+    startCombat() {
+        const fleetName = coloredName(this.fleet)
+        showModal(fleetName, 
+            `The ${fleetName} prepares for combat!<br/>
+            Their ships power up weapons systems...<br/>`, 
+            [['Enter Combat', () => showCombatMap(this)]]
+        )
+    }
+    
     showTradeOfferModal(allowSell = true, buyCargoTypes = null, sellCargoTypes = null) {
         if (allowSell && Math.random() > .5) this.showTradeOfferPlayerSellModal(sellCargoTypes) 
         else this.showTradeOfferPlayerBuyModal(buyCargoTypes)
