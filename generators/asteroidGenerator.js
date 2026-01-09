@@ -55,3 +55,29 @@ function generateAsteroids(asteroidBelt = new AsteroidBelt(), averageColor = COL
     }
     return asteroids
 }
+
+function generateAsteroidShape(baseRadius = 1.0, irregularity = 0.35, chunkiness = 0.4) {
+    // Start with 8-12 points around a circle (octagon-ish base)
+    const numPoints = rng(12, 8);
+    const angleStep = (Math.PI * 2) / numPoints;
+    /** @type {Array<[number, number]>} */
+    const vertices = [];
+    
+    for (let i = 0; i < numPoints; i++) {
+        const angle = angleStep * i;
+        // Add irregularity to radius (each point varies)
+        const radiusVariation = 1.0 + (Math.random() - 0.5) * irregularity;
+        const r = baseRadius * radiusVariation;
+        
+        // Randomly decide if this should be a "chunk" (indentation)
+        const isChunk = Math.random() < chunkiness;
+        const chunkDepth = isChunk ? 0.6 + Math.random() * 0.3 : 1.0; // 60-90% depth for chunks
+        
+        const x = Math.cos(angle) * r * chunkDepth;
+        const y = Math.sin(angle) * r * chunkDepth;
+        
+        vertices.push([x, y]);
+    }
+    
+    return vertices;
+}

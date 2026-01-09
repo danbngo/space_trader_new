@@ -9,7 +9,7 @@ function describeTimespan(years = 0, roundToPlaces = 2) {
     const hours = days * 24;
     
     const format = (value, unit) =>
-        `${parseFloat(value.toFixed(unit == 'day' ? 0 : roundToPlaces))} ${unit}${value === 1 ? "" : "s"}`;
+        `${parseFloat(value.toFixed(unit == 'day' || unit == 'hour' ? 0 : roundToPlaces))} ${unit}${value === 1 ? "" : "s"}`;
     
     // Choose only the LARGEST meaningful unit
     if (years >= 1) return format(years, "year");

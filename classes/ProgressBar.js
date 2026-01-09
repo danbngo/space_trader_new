@@ -74,8 +74,8 @@ class ProgressBar {
     _formatText(percentage) {
         // Add ASCII progress bar visualization
         const barLength = this.width
-        const filledLength = Math.round((percentage / 100) * barLength)
-        const emptyLength = barLength - filledLength
+        const filledLength = Math.max(0, Math.min(barLength, Math.round((percentage / 100) * barLength)))
+        const emptyLength = Math.max(0, barLength - filledLength)
         const asciiBar = '[' + '█'.repeat(filledLength) + '░'.repeat(emptyLength) + ']'
         return asciiBar
     }

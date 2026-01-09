@@ -15,9 +15,8 @@ class Ship {
      * @param {number} engine - The engine power of the ship.
      * @param {number} cargoSpace - The cargo space available on the ship.
      * @param {number} radars - The radar capability of the ship.
-     * @param {number} maxActionsPerTurn - The maximum number of actions the ship can take per turn.
      */
-    constructor(name = "Unnamed", shipType = SHIP_TYPES[0], color = COLORS.White, hull = [0, 0], shields = [0, 0], lasers = [0, 0], engine = 0, cargoSpace = 0, radars = 0, fuelCapacity = 0, maxActionsPerTurn = SHIP_NUM_MOVES_PER_TURN) {
+    constructor(name = "Unnamed", shipType = SHIP_TYPES[0], color = COLORS.White, hull = [0, 0], shields = [0, 0], lasers = [0, 0], engine = 0, cargoSpace = 0, radars = 0, fuelCapacity = 0) {
         /** @type {string} */
         this.name = name;
         /** @type {ShipType} */
@@ -54,10 +53,6 @@ class Ship {
         this.escaped = false;
         /** @type {boolean} */
         this.evading = false;
-        /** @type {number} */
-        this.maxActionsPerTurn = maxActionsPerTurn;
-        /** @type {number} */
-        this.actionsRemaining = this.maxActionsPerTurn; //for encounter turn processing
         /** @type {AI_TYPES} */
         this.aiType = null
         /** @type {ShipModule[]} */
@@ -122,13 +117,11 @@ class Ship {
     }
 
     get radius() {
-        //use formula based on mass and radius of a sphere
-        const modifier = this instanceof AsteroidShip && this.radiusModifier !== undefined ? this.radiusModifier : 1;
-        return BASE_SHIP_RADIUS_IN_MILES * (1+Math.sqrt(this.mass)) * modifier;
+        return BASE_SHIP_RADIUS_IN_MILES * (1+Math.sqrt(this.mass))
     }
 
     get mass() {
-        return (this instanceof AsteroidShip ? this.radiusModifier : 1) * AVERAGE_SHIP_MASS
+        return 1 * AVERAGE_SHIP_MASS
         * (this.hull[1]/AVERAGE_SHIP_HULL
         + this.shields[1]/AVERAGE_SHIP_SHIELDS 
         + this.lasers[1]/AVERAGE_SHIP_LASERS

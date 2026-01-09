@@ -64,7 +64,7 @@ class BackgroundMap extends BaseMap {
             angle: angle, // Direction from center
             rotation: Math.random() * Math.PI * 2, // Current rotation
             rotationSpeed: (Math.random() - 0.5) * 0.05, // Rotation per frame
-            vertices: AsteroidShip.generateShape(1.0, 0.4, 0.5),
+            vertices: generateAsteroidShape(1.0, 0.4, 0.5),
             color: Math.random() > 0.5 ? [
                 baseR + rng(3, -3),
                 baseG + rng(3, -3),

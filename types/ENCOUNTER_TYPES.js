@@ -18,6 +18,7 @@
  * 
  * @constructor
  * @param {string} name - The name of the encounter type.
+ * @param {number} weight - The weight/probability of this encounter type occurring.
  * @param {number[]} enemyColor - The color associated with the enemy fleet.
  * @param {string} description - A brief description of the encounter type.
  * @param {FleetType} fleetType - The type of fleet associated with the encounter.
@@ -26,8 +27,9 @@
  * @param {boolean} canBribe
  */
 class EncounterType {
-    constructor(name = '', enemyColor = COLORS.LightRed, description = '', fleetType = FLEET_TYPES_ALL[0], encounterClass = Encounter, reputationMultiplier = 1, canBribe = false) {
+    constructor(name = '', weight = 1.0, enemyColor = COLORS.LightRed, description = '', fleetType = FLEET_TYPES_ALL[0], encounterClass = Encounter, reputationMultiplier = 1, canBribe = false) {
         this.name = name;
+        this.weight = weight;
         this.enemyColor = enemyColor;
         this.description = description;
         this.fleetType = fleetType;
@@ -41,7 +43,7 @@ class EncounterType {
 
 const ENCOUNTER_TYPES = {
     //MINERS: new EncounterType('Miners', COLORS.Brown, 'You encountered: miners.', FLEET_TYPES.MINERS, MinersEncounter, 1, true),
-    MERCHANTS: new EncounterType('Merchants', COLORS.Yellow, 'You encountered: merchants.', FLEET_TYPES.MERCHANTS, MerchantsEncounter, 1, true),
+    MERCHANTS: new EncounterType('Merchants', 1.0, COLORS.Yellow, 'You encountered: merchants.', FLEET_TYPES.MERCHANTS, MerchantsEncounter, 1, true),
     //PIRATES: new EncounterType('Pirates', COLORS.LightRed, 'You encountered: pirates.', FLEET_TYPES.PIRATES, PiratesEncounter, -2, false),
     //POLICE: new EncounterType('Police', COLORS.LightBlue, 'You encountered: police.', FLEET_TYPES.POLICE, PoliceEncounter, 2, false),
     //SOLDIERS: new EncounterType('Soldiers', COLORS.LightGreen, 'You encountered: soldiers.', FLEET_TYPES.SOLDIERS, SoldiersEncounter, 3, false),

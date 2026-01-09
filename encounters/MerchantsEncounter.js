@@ -21,7 +21,7 @@ class MerchantsEncounter extends Encounter {
             ])
         } else {
             msg += `The merchant fleet broadcasts on all channels:<br/>`
-            msg += `"Not interested in dealing right now. Move along."<br/>`
+            msg += `"Would love to stay and chat, but we're late to drop the cargo. Maybe next time."<br/>`
             
             showModal(fleetName, msg, [
                 ['Attack', () => this.startCombat()],
@@ -36,7 +36,7 @@ class MerchantsEncounter extends Encounter {
     startCombat() {
         const fleetName = coloredName(this.fleet)
         showModal(fleetName, 
-            `The ${fleetName} prepares for combat!<br/>
+            `The ${fleetName} broadcasts, "We won't go down without a fight!"<br/>
             Their ships power up weapons systems...<br/>`, 
             [['Enter Combat', () => showCombatMap(this)]]
         )

@@ -124,10 +124,8 @@ class CombatMap extends BaseMap {
             return
         }
         
-        const currentTime = Date.now()
-        const elapsedMs = Math.min(200, currentTime - this.lastTickMs) // Cap at 200ms
-        this.lastTickMs = currentTime
-        const elapsedYears = elapsedMs * STAR_MAP_YEARS_PER_MS * 0.25 // 4x slower travel time
+        // Use YEARS_PER_TRAVEL_TICK for elapsed years
+        const elapsedYears = YEARS_PER_TRAVEL_TICK
         
         // Update game year
         gs.year += elapsedYears
@@ -135,7 +133,7 @@ class CombatMap extends BaseMap {
         // Update travel progress
         gs.travelYearsRemaining -= elapsedYears
         
-        // Update positions
+        // Update positions of planets/stars
         gs.system.updatePositions()
         
         // Calculate and update progress percentage
@@ -145,6 +143,11 @@ class CombatMap extends BaseMap {
             const startETA = totalDistance / gs.fleet.speed
             const remainingETA = Math.max(0, gs.travelYearsRemaining)
             progressPercent = startETA > 0 ? ((startETA - remainingETA) / startETA) * 100 : 100
+            
+            // Update player location as weighted average based on progress
+            const progressRatio = progressPercent / 100
+            gs.fleet.x = gs.previousLocation.x + (gs.destination.x - gs.previousLocation.x) * progressRatio
+            gs.fleet.y = gs.previousLocation.y + (gs.destination.y - gs.previousLocation.y) * progressRatio
         }
         
         // Update progress bar
@@ -152,9 +155,26 @@ class CombatMap extends BaseMap {
             this.routeProgressBar.update(progressPercent)
         }
         
+        // Update distance display
+        if (this.routeDistanceEl && gs.destination && gs.fleet) {
+            const currentDistance = calcDistance(gs.fleet.x, gs.fleet.y, gs.destination.x, gs.destination.y)
+            this.routeDistanceEl.innerHTML = `Distance: ${roundToPlaces(currentDistance, 1)} AU`
+        }
+        
         // Update ETA display
         if (this.routeETAEl) {
             this.routeETAEl.innerHTML = `ETA: ${describeTimespan(Math.max(0, gs.travelYearsRemaining), 1)}`
+        }
+        
+        // Roll for encounter
+        const encounterOccurrences = calcOccurrencesPerTimespan(BASE_ENCOUNTER_CHANCE_PER_YEAR, elapsedYears)
+        if (encounterOccurrences >= 1) {
+            console.log('Encounter triggered!')
+            // Trigger encounter
+            const encounterType = this.rollEncounterType()
+            const encounterPlanet = this.rollEncounterPlanet(encounterType)
+            console.log('Encounter type:', encounterType.name, 'at planet:', encounterPlanet?.name)
+            // TODO: Create and show encounter
         }
         
         // Render ships
@@ -182,8 +202,56 @@ class CombatMap extends BaseMap {
             return
         }
         
-        // Continue tick loop
-        requestAnimationFrame(() => this.tick())
+        // Continue tick loop with 60fps target
+        setTimeout(() => requestAnimationFrame(() => this.tick()), 1000 / 60)
+    }
+    
+    /**
+     * Rolls which encounter type occurs, with weights skewed by planet economies
+     * @returns {EncounterType} The selected encounter type
+     */
+    rollEncounterType() {
+        const encounterTypes = ENCOUNTER_TYPES_ALL
+        const weights = []
+        
+        for (const encounterType of encounterTypes) {
+            let weight = encounterType.weight
+            
+            // Skew weights based on planet economies
+            if (encounterType === ENCOUNTER_TYPES.MERCHANTS) {
+                const fromEconomy = gs.previousLocation?.c?.economy || 0
+                const toEconomy = gs.destination?.c?.economy || 0
+                weight *= (fromEconomy + toEconomy)
+            }
+            
+            weights.push(weight)
+        }
+        
+        const selectedIndex = rndIndexWeighted(weights)
+        return encounterTypes[selectedIndex]
+    }
+    
+    /**
+     * Rolls which planet triggered the encounter based on economy/distance ratio
+     * @param {EncounterType} encounterType - The type of encounter
+     * @returns {Planet|null} The planet that triggered the encounter
+     */
+    rollEncounterPlanet(encounterType) {
+        if (!gs.previousLocation || !gs.destination) return null
+        
+        // Calculate distance from fleet to each planet
+        const fromDistance = calcDistance(gs.fleet.x, gs.fleet.y, gs.previousLocation.x, gs.previousLocation.y)
+        const toDistance = calcDistance(gs.fleet.x, gs.fleet.y, gs.destination.x, gs.destination.y)
+        
+        // Avoid division by zero
+        const fromWeight = fromDistance > 0 ? (gs.previousLocation.c?.economy || 0) / fromDistance : 0
+        const toWeight = toDistance > 0 ? (gs.destination.c?.economy || 0) / toDistance : 0
+        
+        const weights = [fromWeight, toWeight]
+        const planets = [gs.previousLocation, gs.destination]
+        
+        const selectedIndex = rndIndexWeighted(weights)
+        return planets[selectedIndex]
     }
     
     /**
@@ -892,8 +960,6 @@ class CombatMap extends BaseMap {
         const toName = gs.destination ? gs.destination.name : 'Unknown'
         const distance = gs.destination && gs.previousLocation ? 
             roundToPlaces(calcDistance(gs.previousLocation.x, gs.previousLocation.y, gs.destination.x, gs.destination.y), 1) : 0
-        const fuelCost = distance * FUEL_COST_PER_1_AU
-        const fuelPercent = gs.fleet.totalFuelCapacity > 0 ? (fuelCost / gs.fleet.totalFuelCapacity) * 100 : 0
         
         // Planet images container
         const planetImagesContainer = ce({
@@ -962,12 +1028,6 @@ class CombatMap extends BaseMap {
             innerHTML: `Distance: ${distance} AU`
         })
         statsContainer.appendChild(this.routeDistanceEl)
-        
-        // Fuel Cost
-        this.routeFuelCostEl = ce({
-            innerHTML: `Fuel Cost: ${roundToPlaces(fuelPercent, 1)}%`
-        })
-        statsContainer.appendChild(this.routeFuelCostEl)
         
         // ETA Remaining
         this.routeETAEl = ce({

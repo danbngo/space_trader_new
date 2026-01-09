@@ -582,6 +582,9 @@ class StarMap extends BaseMap {
             // Check if route passes too close to sun
             const fliesIntoSun = this.checkFlyIntoSun(obj)
             
+            // Check if reachable with full fuel tank
+            const reachableWithFullTank = fuelCost <= gs.fleet.totalFuelCapacity
+            
             ce({parent:container, children: [
                 'Distance: ',
                 this.objPaneDistanceEl = ce({id: 'star_map_distance_object_pane', innerHTML: statColorSpan(`${distance} AU`, ratio)})
@@ -593,7 +596,7 @@ class StarMap extends BaseMap {
             ce({parent:container, style: {display: 'flex'}, children: [
                 'Fuel Cost: ',
                 fliesIntoSun ? ce({innerHTML: colorSpan('(Can\'t fly into sun)', COLORS.Orange)}) :
-                    !canReach ? ce({innerHTML: colorSpan('(Too far)', COLORS.Red)}) : 
+                    !canReach ? ce({innerHTML: colorSpan(reachableWithFullTank ? '(Need more fuel)' : '(Too far)', COLORS.Red)}) : 
                         (this.objPaneFuelCostEl = ce({id: 'star_map_fuel_cost_object_pane', innerHTML: statColorSpan(`${roundToPlaces(fuelPercent, 1)}%`, ratio)}))
             ]})
             

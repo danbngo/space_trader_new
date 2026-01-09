@@ -12,40 +12,21 @@ const MILES_PER_AU = 432288*EARTH_RADII_PER_AU
 
 //TODO: try to make some of these vars more dynamic in future - different sizes for ships, projectiles etc.
 const FLEET_RADIUS = 1/1000 * 1/EARTH_RADII_PER_AU
-const RUINS_RADIUS = 1/100 * 1/EARTH_RADII_PER_AU
-const ANOMALY_RADIUS = 1/10 * 1/EARTH_RADII_PER_AU
-
 
 const ASTEROID_MIN_SCREEN_RADIUS = 1 // Hide asteroids when they would appear smaller than 1px radius
-const MINING_HAZARD_CHANCE = 0.1 // 10% chance of encountering a hazard when mining
 const REPAIR_COST_PER_1_HULL = 10 // Base cost to repair 1 hull point at shipyard
 const BASE_FUEL_COST_PER_UNIT = 5 // Base cost per unit of fuel at shipyard
 const FUEL_COST_PER_1_AU = 5 // Fuel units consumed per AU traveled
-const WARN_INTERCEPT_DURATION_YEARS = 1/30 // Show confirmation modal for intercept routes longer than this (1 day)
 
 const PLANET_ENCOUNTER_CHANCE_PER_DAY = 0//0.01; //chance of random encounter per day when right next to an 'average' planet
 const ASTEROIDS_ENCOUNTER_CHANCE_PER_DAY = 0.01//0.5; //chance of fooroid storms when in the middle of an asteroid belt
 const BANK_BOUNTY_CHANCE_PER_DAY = 0.01;
 const NEWS_CHANCE_PER_DAY = 1/30;
-const ANOMALY_CHANCE_PER_DAY = 1/30;
-const MAX_NUM_ANOMALIES = 5;
-const FLEET_SPAWN_CHANCE_PER_DAY = 1/365
-const ABANDONED_OFFICER_DEATH_CHANCE_PER_DAY = 1/100
-const ABANDONED_SHIP_DESTROYED_CHANCE_PER_DAY = 1/100
-const AVG_NUM_FLEETS_PER_PLANET = 7;
-const ENCOUNTER_IMMUNITY_DAYS = 2; //days of immunity after an encounter ends
-const ENCOUNTER_DENIED_DAYS = 0.25; //days player can't bump into fleets after denying an encounter (0.25 = 6 hours)
 
 //combat distances = miles, time = seconds
-const ENCOUNTER_SHIP_MIN_SPAWN_DISTANCE_RATIO = 0.11
-const ENCOUNTER_SHIP_MAX_SPAWN_DISTANCE_RATIO = 0.66
-const ENCOUNTER_MAP_RADIUS_MILES = 100
 const BASE_SHIP_RADIUS_IN_MILES = 1/2
 const AVERAGE_SHIP_MASS = 1
 const AVERAGE_FLEET_SPEED = Math.pow(250,2) //in AU per year. must be pow2 as its sqrted later
-const AVERGE_RAMMING_KNOCKBACK_DISTANCE = 1 //in miles
-const ASTEROID_STORM_SPEED_MULTIPLIER = 8
-
 
 const STARTING_SKILL_POINTS = 5;
 const SKILL_POINTS_PER_LEVEL = 5;
@@ -54,23 +35,18 @@ const CAPTAIN_LEVELS_PER_OFFICER = 3;
 const AVERAGE_EXP_FROM_COMBAT = 50;
 const AVERAGE_EXP_FROM_MINING = 10;
 const AVERAGE_EXP_FROM_ESCAPING = 10;
+const AVERAGE_EXP_FROM_TRADING = 10;
 
 const MARKET_AVERAGE_CARGO_PER_TYPE = 100
 const MARKET_AVERAGE_CREDITS = 200*1000*1000
 const MARKET_MAX_CARGO_PRICE_MODIFIER = 5
 const MARKET_MIN_CARGO_PRICE_MODIFIER = 1/5
 const MARKET_AVERAGE_CARGO_PRICE_MODIFIER = (MARKET_MAX_CARGO_PRICE_MODIFIER + MARKET_MIN_CARGO_PRICE_MODIFIER) / 2
-const ACADEMY_MAX_SKILL_PRICE_MODIFIER = 3
-const ACADEMY_MIN_SKILL_PRICE_MODIFIER = 1/3
-const ACADEMY_AVERAGE_SKILL_PRICE_MODIFIER = (ACADEMY_MAX_SKILL_PRICE_MODIFIER + ACADEMY_MIN_SKILL_PRICE_MODIFIER) / 2
 
 const SHIPYARD_AVERAGE_NUM_SHIPS = 3
 const SHIPYARD_AVERAGE_NUM_MODULES = 2
-const CYBER_SURGEON_AVERAGE_NUM_IMPLANTS = 3
-const GENETICIST_AVERAGE_NUM_MODIFICATIONS = 3
 const GUILD_AVERAGE_NUM_OFFICERS = 3
 const GUILD_AVERAGE_NUM_MISSIONS = 5
-const PALACE_AVERAGE_NUM_MISSIONS = 3
 
 const AVERAGE_TAX_RATE = 0.05
 const AVERAGE_INFLATION_RATE = 0.05
@@ -85,8 +61,6 @@ const AVERAGE_SHIP_CARGO_SPACE = 5
 const AVERAGE_SHIP_RADARS = 5
 const AVERAGE_SHIP_FUEL_CAPACITY = 50
 
-const AVERAGE_SHIP_MOVE_DISTANCE = 7.5
-const AVERAGE_SHIP_ATTACK_DISTANCE = 40 //have increased this a lot because you can miss now
 const AVERAGE_SHIP_LASER_DMG = 5
 const AVERAGE_SHIP_RAM_DMG = 2.5
 
@@ -94,17 +68,12 @@ const BANK_MAX_LOAN_YEARS = 5
 const BANK_MIN_LOAN_AMOUNT = 100
 const BANK_AVERAGE_CREDITS = 50*1000
 
-const SHIP_NUM_MOVES_PER_TURN = 2
-
 const GAME_START_YEAR = 3000
 const GAME_END_YEAR = 3100
 
 const MAXIMUM_RETIREMENT_AGE = 100
 const MINIMUM_OFFICER_AGE = 20
 const AVERAGE_OFFICER_LEVEL = 10
-
-const AMBIENT_EFFECT_MIN_RADIUS_MODIFIER = 2
-const AMBIENT_EFFECT_MAX_RADIUS_MODIFIER = 2
 
 const STAR_MAP_YEARS_PER_MS = 1/365/24/60 * 2
 const MAX_FRAMES_PER_SECOND = 120
@@ -127,15 +96,8 @@ const ENCOUNTER_MAX_TAX_RATIO = 0.2 //if tax collectors catch you, they'll take 
 const ENCOUNTER_MAX_EXTORT_RATIO = 0.5 //if syndicates catch you, they'll take up to this much of your credits (min 100)
 
 const CIVILIZATION_BONUS_RATE_PER_YEAR = 0.1 //each year a democracy will MULTIPLY its economy by 1 + this, for instance
-const CIVILIZATION_CONVERT_CULTURE_PER_YEAR = 0.1 //each year a civilization will convert this fraction of its population to its dominant culture
-const CIVILIZATION_CULTURE_DISAPPEAR_THRESHOLD = 0.0001
 
-
-const SIMULATE_FLEET_ACTIVITY_YEARS = 0.1
 const SIMULATE_HISTORY_NUM_YEARS = 1
-const CLOAK_REGEN_RATE = 30*4 //takes 1 week to fully cloak
-const NPC_FLEET_MAX_PURCHASE_CARGO_RATIO = 0.5 //max fraction of market cargo NPC fleets will buy when trading
-
 const STAR_MAP_AVERAGE_VIEW_DISTANCE = 5 // in au 
 
 const SUN_MIN_SCREEN_SIZE = 18
@@ -146,7 +108,7 @@ const SPACE_STATION_MIN_SCREEN_SIZE = 3
 const DWARF_PLANET_MIN_BUILDINGS = 2
 const SPACE_STATION_MIN_BUILDINGS = 1
 
-const FLEET_COLLISION_DISTANCE = 0.1
-const ASTEROID_MINING_DISTANCE = 0.2 // 2x easier to mine than fleet collision range
-
 const CRIMINAL_MAX_BOUNTY_PER_LEVEL = 500
+
+const YEARS_PER_TRAVEL_TICK = 1/365/24 //1 hour per tick
+const BASE_ENCOUNTER_CHANCE_PER_YEAR = 1/365 //1 encounter per day

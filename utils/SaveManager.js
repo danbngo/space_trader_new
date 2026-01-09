@@ -345,14 +345,10 @@ const SaveManager = {
             engine: ship.engine,
             cargoSpace: ship.cargoSpace,
             radars: ship.radars,
-            maxActionsPerTurn: ship.maxActionsPerTurn,
-            actionsRemaining: ship.actionsRemaining,
             x: ship.x,
             y: ship.y,
             angle: ship.angle,
             escaped: ship.escaped,
-            radiusModifier: ship instanceof AsteroidShip ? ship.radiusModifier : 1,
-            widthModifier: ship instanceof AsteroidShip ? ship.widthModifier : 1,
             
             shipTypeName: ship.shipType ? ship.shipType.name : null,
             fleetUUID: this.objectToUUID(ship.fleet),
@@ -363,9 +359,6 @@ const SaveManager = {
             localModules: (ship.localModules || []).map(m => this.serializeShipModule(m)),
             moduleCooldowns: this.serializeCountsMap(ship.moduleCooldowns),
             statusEffects: this.serializeCountsMap(ship.statusEffects),
-            
-            // For asteroids
-            asteroidVertices: ship instanceof AsteroidShip ? ship.asteroidVertices || null : null,
         };
     },
 
@@ -639,25 +632,16 @@ const SaveManager = {
             data.engine,
             data.cargoSpace,
             data.radars,
-            data.maxActionsPerTurn
         );
         
         // Restore UUID
         ship.uuid = data.uuid;
         gameRegistry.registerShip(ship);
         
-        // Restore properties
-        ship.actionsRemaining = data.actionsRemaining;
         ship.x = data.x;
         ship.y = data.y;
         ship.angle = data.angle;
         ship.escaped = data.escaped || false;
-        // Only restore radiusModifier/widthModifier for AsteroidShips
-        Object.assign(ship, {
-            radiusModifier: data.radiusModifier || 1,
-            widthModifier: data.widthModifier || 1,
-            asteroidVertices: data.asteroidVertices || null,
-        })
         
         // Restore modules
         ship.localModules = (data.localModules || []).map(m => this.deserializeShipModule(m));

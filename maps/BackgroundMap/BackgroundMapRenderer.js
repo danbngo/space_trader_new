@@ -180,7 +180,7 @@ class BackgroundMapRenderer {
                 asteroid.angle = newAngle
                 asteroid.rotation = Math.random() * Math.PI * 2
                 asteroid.rotationSpeed = (Math.random() - 0.5) * 0.05
-                asteroid.vertices = AsteroidShip.generateShape(1.0, 0.4, 0.5)
+                asteroid.vertices = generateAsteroidShape(1.0, 0.4, 0.5)
             }
         })
     }
