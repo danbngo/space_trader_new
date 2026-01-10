@@ -53,36 +53,22 @@ class StarMapBodiesHandler {
         const { asteroids} = starSystem
         
         asteroids.forEach((asteroid, index) => {
-            const pixelIndex = index
-            if (!cvs.pixels[pixelIndex]) {
-                cvs.addPixel(asteroid.x, asteroid.y, asteroid.color, asteroid.radius)
+            const asteroidId = `asteroid${asteroid.uuid}`
+            if (!cvs.getObject(asteroidId)) {
+                const circle = cvs.addFilledCircle(asteroidId, asteroid.x, asteroid.y, asteroid.radius, 3, [...asteroid.color], null)
+                circle.strokeColor = [...COLORS.Black]
             }
-            /** @type {CanvasPixel} */
-            const pixel = cvs.pixels[pixelIndex]
-            pixel.x = asteroid.x
-            pixel.y = asteroid.y
+            const asteroidObj = cvs.getObject(asteroidId)
+            asteroidObj.x = asteroid.x
+            asteroidObj.y = asteroid.y
             
             // Calculate screen radius and hide if too small when zoomed out
             const screenRadius = asteroid.radius * cvs.zoom
             if (screenRadius < ASTEROID_MIN_SCREEN_RADIUS) {
-                pixel.visible = false
+                asteroidObj.visible = false
                 return
             }
-            
-            pixel.visible = true
-            
-            // Check if within player's vision range
-            if (gs.fleet && gs.fleet.mapViewDistance) {
-                const distance = calcDistance(asteroid.x, asteroid.y, gs.fleet.x, gs.fleet.y)
-                
-                if (distance > gs.fleet.mapViewDistance) {
-                    //pixel.visible = false // Hide outside vision range
-                    pixel.color = darkenColor(asteroid.color, 0.25)
-                } else {
-                    //pixel.visible = true
-                    pixel.color = asteroid.color
-                }
-            } 
+            asteroidObj.visible = true
         })
     }
 
@@ -176,7 +162,6 @@ class StarMapBodiesHandler {
             
             // Check if discovered
             const hasBeenSeen = gs.lastSeenDates.has(body)
-            console.log(gs.lastSeenDates)
             const isInVisionRange = gs.fleet && gs.fleet.mapViewDistance && 
                 calcDistance(body.x, body.y, gs.fleet.x, gs.fleet.y) <= gs.fleet.mapViewDistance
             

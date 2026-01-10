@@ -35,20 +35,20 @@ function generateAsteroids(asteroidBelt = new AsteroidBelt(), averageColor = COL
     const beltDistance = asteroidBelt.orbit.radius
     const maxOrbitalRadiusDifference = asteroidBelt.maxOrbitalRadiusDifference
 
-    function randomizeColor(baseColor = [128,128,128,255], variation = 32) {
+    function randomizeColor(baseColor = [128,128,128,255], variation = 4) {
         const r = Math.max(Math.min(baseColor[0] + rng(-variation, variation), 255), 0)
         const g = Math.max(Math.min(baseColor[1] + rng(-variation, variation), 255), 0)
         const b = Math.max(Math.min(baseColor[2] + rng(-variation, variation), 255), 0)
-        return [r, g, b, 255]
+        return [r, g, b, 1]
     }
 
     for (let i = 0; i < numAsteroids; i++) {
         const distMod = 1 + (maxOrbitalRadiusDifference*(inverseNormalCurve( Math.random() )-0.5)) - (maxOrbitalRadiusDifference*(inverseNormalCurve( Math.random() )-0.5))
         const distance = beltDistance * distMod
         //y *= Math.random()
-        const color = randomizeColor(averageColor, 16)
+        const color = randomizeColor(averageColor, 4)
         //minutes
-        const radius = Math.min(rng(maxRadius, maxRadius/3, false), rng(maxRadius, maxRadius/3, false), rng(maxRadius, maxRadius/3, false), rng(maxRadius, maxRadius/3, false), rng(maxRadius, maxRadius/3, false))
+        const radius = Math.min(rng(maxRadius, maxRadius/2, false))
         const progress = startingProgress !== null ? startingProgress + rng(maxProgressDifference, 0, false) - rng(maxProgressDifference, 0, false) : Math.random()
         const asteroid = new Asteroid("", color, radius, new Orbit(distance, progress), asteroidBelt)
         asteroids.push(asteroid)

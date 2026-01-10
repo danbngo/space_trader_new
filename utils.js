@@ -58,21 +58,6 @@ function invertPolygons(vertices) {
 }
 
 /**
- * Darkens an RGBA color array by reducing the RGB components.
- * @param {number[]} color - The RGBA color array [r, g, b, a] with values 0-255.
- * @param {number} factor - The darkening factor (0.0 to 1.0, default 0.3).
- * @returns {number[]} A new darkened RGBA color array.
- */
-function darkenColor(color, factor = 0.3) {
-    return [
-        Math.floor(color[0] * factor),
-        Math.floor(color[1] * factor),
-        Math.floor(color[2] * factor),
-        color[3] // Keep alpha unchanged
-    ];
-}
-
-/**
  * Rounds a number to a specified number of decimal places.
  * @param {number} num - The number to round.
  * @param {number} places - The number of decimal places.
