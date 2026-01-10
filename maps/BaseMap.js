@@ -142,4 +142,41 @@ class BaseMap {
     tick() {
         // Override in subclass
     }
+    
+    /**
+     * Wait for all images in the given canvases to load, then redraw them
+     * @param {CanvasWrapper[]} canvases - Array of CanvasWrapper instances to check
+     */
+    waitForImagesLoaded(canvases) {
+        const checkInterval = 50 // ms
+        
+        const checkAndRedraw = () => {
+            let allLoaded = true
+            
+            for (const canvas of canvases) {
+                for (const obj of canvas.drawOrder) {
+                    // Check if object has an image that's still loading
+                    if (obj.imageLoaded === false) {
+                        allLoaded = false
+                        break
+                    }
+                }
+                if (!allLoaded) break
+            }
+            
+            if (allLoaded) {
+                // All images loaded (or no images present), redraw all canvases
+                for (const canvas of canvases) {
+                    canvas.redraw(true)
+                }
+                console.log('✨ All images loaded, canvases redrawn')
+            } else {
+                // Keep checking
+                setTimeout(checkAndRedraw, checkInterval)
+            }
+        }
+        
+        // Start checking
+        checkAndRedraw()
+    }
 }

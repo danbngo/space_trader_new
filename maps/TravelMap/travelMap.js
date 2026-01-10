@@ -56,7 +56,6 @@ class TravelMap extends BaseMap {
         
         // Create background canvas for static stars (rendered once)
         this.bgCvs = new CanvasWrapper(`travelmap-background-map-canvas`, 1, 1, 1, 100, false, false)
-        this.bgCvs.fillColor = 'rgba(255, 0, 255, 1)' // Solid black background
         this.bgCvs.canvas.style.pointerEvents = 'none' // Don't capture mouse events
         
         // Create main canvas for dynamic content (ships, labels, etc)
@@ -171,26 +170,31 @@ class TravelMap extends BaseMap {
      * Render background stars to background canvas (called once on init and on resize)
      */
     renderBackgroundStars() {
-        if (!this.bgCvs) return
-        
         const {width, height} = this.bgCvs.canvas
-        const radius = Math.max(width, height)
-        const numStars = TRAVEL_MAP_CONFIG.starfieldStarCount
-        const backgroundStars = generateBackgroundStars(radius*this.bgCvs.pixelRatio, numStars)
         
-        // Clear existing pixels
-        this.bgCvs.pixels = []
+        // Add bitmap background if not already present
+        const bgId = 'starmap-background'
+        if (!this.bgCvs.getObject(bgId)) {
+            const canvasSize = Math.max(width, height) / this.bgCvs.pixelRatio
+            const bmp = this.bgCvs.addBitmap(
+                bgId,
+                0, 0,
+                BACKGROUNDS.STARFIELD_1.src,
+                canvasSize, // Size to cover canvas
+                0,
+                [255, 255, 255, 1],
+                0,
+                null,
+                -1000, // Behind everything
+                true, // parallax = true (immune to zoom)
+                true  // overlap = true (covers at least the available space)
+            )
+            console.log('Created starmap background bitmap', bmp)
+        }
         
-        backgroundStars.forEach((star) => {
-            this.bgCvs.addPixel(0, 0, star.color, star.radius, star.x, star.y)
-        })
-        
-        // Redraw background canvas once
-        this.bgCvs.redraw(true)
-        console.log('✨ Rendered', numStars, 'background stars to static canvas')
+        // Wait for images to load, then redraw
+        this.waitForImagesLoaded([this.bgCvs])
     }
-    
-
     
     /**
      * Checks if a ship belongs to the player

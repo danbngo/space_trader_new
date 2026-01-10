@@ -59,7 +59,6 @@ class StarMapBodiesHandler {
             if (!cvs.getObject(asteroidId)) {
                 const circle = cvs.addFilledCircle(asteroidId, asteroid.x, asteroid.y, asteroid.radius, 2, asteroid.color, null)
                 circle.strokeColor = [...COLORS.Black]
-                console.log(circle)
             }
             const asteroidObj = cvs.getObject(asteroidId)
             asteroidObj.zIndex = -0.1

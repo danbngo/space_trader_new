@@ -146,7 +146,7 @@ class StarMap extends BaseMap {
         const bgId = 'starmap-background'
         if (!this.bgCvs.getObject(bgId)) {
             const canvasSize = Math.max(width, height) / this.bgCvs.pixelRatio
-            this.bgCvs.addBitmap(
+            const bmp = this.bgCvs.addBitmap(
                 bgId,
                 0, 0,
                 BACKGROUNDS.STARFIELD_1.src,
@@ -159,7 +159,7 @@ class StarMap extends BaseMap {
                 true, // parallax = true (immune to zoom)
                 true  // overlap = true (covers at least the available space)
             )
-            console.log('Created starmap background bitmap')
+            console.log('Created starmap background bitmap',bmp)
         }
         
         // Redraw background canvas once
