@@ -1,7 +1,7 @@
 /**
- * Configuration for CombatMap rendering and behavior
+ * Configuration for TravelMap rendering and behavior
  */
-const COMBAT_MAP_CONFIG = {
+const TRAVEL_MAP_CONFIG = {
     // Ship rendering
     shipSpacing: 60,
     shipSize: 20,

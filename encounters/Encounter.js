@@ -147,6 +147,12 @@ class Encounter {
         else if (result == ENCOUNTER_RESULTS.Escaped) {
             showModal(`Escape`, `You fled from the battlefield!`, [['Continue', ()=>this.onEscape()]])
         }
+        else if (result == ENCOUNTER_RESULTS.Surrendered) {
+            showModal(`Surrender`, `You surrendered to the enemy fleet.`, [['Continue', ()=>this.onSurrender()]])
+        }
+        else {
+            throw new Error('Encounter.endCombat called with unknown result: '+result)
+        }
     }
 
     /**
@@ -249,8 +255,6 @@ class Encounter {
         
         this.combat = null
         gs.encounter = undefined
-        showStarMap(gs.fleet)
-        //pause and show modal if player has no working ships, cant move
         checkPlayerStranded()
     }
 
@@ -272,13 +276,13 @@ class Encounter {
         showModal(coloredName(this.fleet), msg, [['Continue', ()=>this.startCombat(false)]])
     }
 
-    showPlayerDidSurrenderModal() {
+    /*showPlayerDidSurrenderModal() {
         console.log('showPlayerDidSurrenderModal');
         const fleetName = coloredName(this.fleet)
         let msg = `There's no other choice. You power your ships down and broadcast the universal signal for surrender.<br/>`
         // No reputation change on surrender
         showModal(fleetName, msg, [['Continue', ()=>this.onSurrender()]])
-    }
+    }*/
 
 
     /**

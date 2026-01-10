@@ -124,7 +124,7 @@ function createSellShipMenu(ships = [], shipyard = new Shipyard(), onSelectShip 
     if (ships.length == 0) return `(None)`
     /** @type {any[]} */
     const rows = [
-        ['Ship Name', 'Quality', 'Hull', 'Shields', 'Lasers', 'Engine', 'Cargo Space', 'Repair Cost', 'Sell Price']
+        ['Ship Name', 'Quality', 'Hull', 'Shields', 'Lasers', 'Engine', 'Fuel', 'Cargo Space', 'Repair Cost', 'Sell Price']
     ]
     for (const ship of ships) {
         const sellPrice = shipyard.calcSellPrice(ship)
@@ -137,12 +137,13 @@ function createSellShipMenu(ships = [], shipyard = new Shipyard(), onSelectShip 
             statColorSpan(ship.shields[1], ship.shields[1]/10),
             statColorSpan(ship.lasers, ship.lasers/10),
             statColorSpan(ship.engine, ship.engine/10),
+            statColorSpan(ship.fuel, ship.fuel/10),
             statColorSpan(ship.cargoSpace, ship.cargoSpace/10),
             damageAmount > 0 ? statColorSpan(repairCost, 1/repairCost*100) : colorSpan('—', COLORS.Gray),
             statColorSpan(sellPrice, sellPrice/ship.value)
         ])
     }
-    const table = createTable(rows, (rowIndex = 0)=>onSelectShip(ships[rowIndex - 1]))
+    const table = createTable(rows, (rowIndex = 0)=>onSelectShip(ships[rowIndex - 1]), 1)
     
     // Add popovers to stat header cells
     const headerRow = table.rows[0];
@@ -153,9 +154,10 @@ function createSellShipMenu(ships = [], shipyard = new Shipyard(), onSelectShip 
         createPopoverElement(headerRow.cells[3], SHIP_STATS.SHIELDS.description); // Shields
         createPopoverElement(headerRow.cells[4], SHIP_STATS.LASERS.description); // Lasers
         createPopoverElement(headerRow.cells[5], SHIP_STATS.ENGINES.description); // Engine
-        createPopoverElement(headerRow.cells[6], SHIP_STATS.CARGO_CAPACITY.description); // Cargo Space
-        createPopoverElement(headerRow.cells[7], 'The total cost to fully repair this ship at this shipyard'); // Repair Cost
-        if (headerRow.cells[8]) createPopoverElement(headerRow.cells[8], 'Price the shipyard will pay you for this ship');
+        createPopoverElement(headerRow.cells[6], SHIP_STATS.FUEL.description); // Fuel
+        createPopoverElement(headerRow.cells[7], SHIP_STATS.CARGO_CAPACITY.description); // Cargo Space
+        createPopoverElement(headerRow.cells[8], 'The total cost to fully repair this ship at this shipyard'); // Repair Cost
+        if (headerRow.cells[9]) createPopoverElement(headerRow.cells[9], 'Price the shipyard will pay you for this ship');
     }
     
     // Add popovers to each row
@@ -169,16 +171,16 @@ function createSellShipMenu(ships = [], shipyard = new Shipyard(), onSelectShip 
             createPopoverElement(shipNameCell, ship.shipType.description);
         }
         
-        // Repair cost popover (column 7)
-        const repairCostCell = row.cells[7];
+        // Repair cost popover (column 8)
+        const repairCostCell = row.cells[8];
         const damageAmount = ship.hull[1] - ship.hull[0];
         if (repairCostCell && damageAmount > 0) {
             const repairCostCalc = shipyard.getRepairCostCalculation(ship, damageAmount);
             createPopoverElement(repairCostCell, repairCostCalc.createPopover(REPAIR_COST_PER_1_HULL, 'repair cost', true)); // true = lower is better
         }
         
-        // Sell price popover (column 8)
-        const sellPriceCell = row.cells[8];
+        // Sell price popover (column 9)
+        const sellPriceCell = row.cells[9];
         if (sellPriceCell) {
             const sellPriceCalc = shipyard.getSellPriceCalculation(ship);
             createPopoverElement(sellPriceCell, sellPriceCalc.createPopover(ship.value, 'price', false)); // false = higher is better for selling

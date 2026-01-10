@@ -97,8 +97,8 @@ function rollEncounterPlanet(encounterType, previousLocation, destination, fleet
     return planets[selectedIndex]
 }
 
-function  checkPlayerStranded() {
-    if (!gs.fleet.stranded) return
+function checkPlayerStranded() {
+    if (!gs.fleet.stranded) return false
     console.log('checkPlayerStranded');
     
     // Find the last visited planet (most recent year in lastVisitedDates)
@@ -147,4 +147,5 @@ function  checkPlayerStranded() {
     currentMap.refresh()
 
     showModal(`Stranded`, msg, [['Continue', ()=>showPlanetMenu(towDestination)]])
+    return true
 }

@@ -10,12 +10,11 @@
  * Combat and route travel map
  * Shows tactical combat when enemies are present, or animated route travel when traveling peacefully
  */
-class CombatMap extends BaseMap {
-    constructor(encounter) {
+class TravelMap extends BaseMap {
+    constructor() {
         super()
-        console.log('CREATING COMBAT MAP FOR ENCOUNTER:', encounter)
+        console.log('CREATING TRAVEL MAP')
         
-        this.encounter = encounter
         this.selectedPlayerShip = null
         this.selectedEnemyShip = null
         this.routeAnimationFrame = null
@@ -46,14 +45,14 @@ class CombatMap extends BaseMap {
         this.routeETAEl = null
         
         // Initialize handlers
-        this.combatHandler = new CombatMapCombatHandler(this)
-        this.routeHandler = new CombatMapRouteHandler(this)
+        this.combatHandler = new TravelMapCombatHandler(this)
+        this.routeHandler = new TravelMapRouteHandler(this)
         
         // Create container
-        this.root = ce({id: 'combat-map-container'})
+        this.root = ce({id: 'travel-map-container'})
         
         // Create canvas for rendering
-        this.routeCvs = new CanvasWrapper(1, 1, 1, 0, false, false)
+        this.routeCvs = new CanvasWrapper(60, 1, 1, 0, false, false)
         this.root.appendChild(this.routeCvs.root)
         
         // Create UI panel at bottom (will be updated dynamically)
@@ -74,15 +73,12 @@ class CombatMap extends BaseMap {
         // Defer canvas sizing and initial render until after DOM is rendered
         requestAnimationFrame(() => {
             this.routeCvs.autoResize()
-            this.routeCvs.cameraX = 0
-            this.routeCvs.cameraY = 0
-            this.routeCvs.zoom = 60
+            //this.routeCvs.cameraX = 0
+            //this.routeCvs.cameraY = 0
+            //this.routeCvs.zoom = 60
             
             // Render stars once
             this.initializeStars()
-            
-            // Initial render of ships
-            this.renderShips()
             
             // Start animation loop (handles both combat and travel)
             this.startAnimation()
@@ -95,13 +91,10 @@ class CombatMap extends BaseMap {
      */
     startAnimation() {
         const animate = () => {
-            // Check if encounter changed (new enemies appeared)
-            this.checkForEncounterChanges()
-            
             // Update UI panel if combat state changed
             const inCombat = gs.encounter && gs.encounter.combatEnabled
             if ((inCombat && this.uiPanel?.classList?.contains('route-ui')) ||
-                (!inCombat && this.uiPanel?.classList?.contains('combat-ui'))) {
+                (!inCombat && this.uiPanel?.classList?.contains('travel-ui'))) {
                 this.updateUIPanel()
             }
             
@@ -110,6 +103,7 @@ class CombatMap extends BaseMap {
             
             // Run tick logic for travel mode
             if (!inCombat && gs.destination && gs.travelYearsRemaining !== null) {
+                // && gs.travelYearsRemaining > 0 <-- dont include this check, we want to detect whether route is complete in the subclass
                 this.routeHandler.tick()
             }
             
@@ -122,21 +116,18 @@ class CombatMap extends BaseMap {
     /**
      * Checks if gs.encounter changed and updates encounter reference
      */
-    checkForEncounterChanges() {
-        if (gs.encounter && gs.encounter !== this.encounter) {
-            console.log('🔄 Encounter changed, updating CombatMap')
-            this.encounter = gs.encounter
-            
-            // Reset fade states for new encounter
-            this.enemyShipGroupConfig.fadedIn = false
-            this.enemyShipGroupConfig.opacity = 0
-            this.enemyShipGroupConfig.fadeStartTime = 0
-            
-            // Update selected ships if in combat
-            if (gs.combat) {
-                this.selectedPlayerShip = gs.combat.activePlayerShips?.[0] || null
-                this.selectedEnemyShip = gs.combat.activeEnemyShips?.[0] || null
-            }
+    resetNPCShipsConfig() {
+        console.log('🔄 Encounter changed, updating TravelMap')
+        
+        // Reset fade states for new encounter
+        this.enemyShipGroupConfig.fadedIn = false
+        this.enemyShipGroupConfig.opacity = 0
+        this.enemyShipGroupConfig.fadeStartTime = 0
+        
+        // Update selected ships if in combat
+        if (gs.combat) {
+            this.selectedPlayerShip = gs.combat.activePlayerShips?.[0] || null
+            this.selectedEnemyShip = gs.combat.activeEnemyShips?.[0] || null
         }
     }
     
@@ -155,21 +146,11 @@ class CombatMap extends BaseMap {
         this.uiPanel = newPanel
     }
     
-    /**
-     * Main game loop tick for travel mode - delegated to route handler
-     */
-    tick() {
-        this.routeHandler.tick()
-    }
-    
-    /**
-     * Initializes background stars on the canvas (only called if no encounter visual exists)
-     */
     initializeStars() {
         if (!this.routeCvs) return
         
         const radius = Math.max(window.innerWidth, window.innerHeight)
-        const numStars = COMBAT_MAP_CONFIG.starfieldStarCount
+        const numStars = TRAVEL_MAP_CONFIG.starfieldStarCount
         const backgroundStars = generateBackgroundStars(radius, numStars)
         
         backgroundStars.forEach((star) => {
@@ -200,7 +181,7 @@ class CombatMap extends BaseMap {
      * @param {number} maxX - Maximum horizontal jitter (±)
      * @param {number} maxY - Maximum vertical jitter (±)
      */
-    updateShipJitter(ship, maxX = COMBAT_MAP_CONFIG.defaultJitterX, maxY = COMBAT_MAP_CONFIG.defaultJitterY) {
+    updateShipJitter(ship, maxX = TRAVEL_MAP_CONFIG.defaultJitterX, maxY = TRAVEL_MAP_CONFIG.defaultJitterY) {
         if (!this.shipJitterOffsets.has(ship)) {
             // Initialize with random target values so jitter starts immediately
             const initialTargetX = (Math.random() - 0.5) * maxX
@@ -210,14 +191,14 @@ class CombatMap extends BaseMap {
         const jitter = this.shipJitterOffsets.get(ship)
         
         // Update jitter target occasionally
-        if (Math.random() < COMBAT_MAP_CONFIG.jitterUpdateChance) {
+        if (Math.random() < TRAVEL_MAP_CONFIG.jitterUpdateChance) {
             jitter.targetX = (Math.random() - 0.5) * maxX
             jitter.targetY = (Math.random() - 0.5) * maxY
         }
         
         // Smooth movement toward target
-        jitter.x += (jitter.targetX - jitter.x) * COMBAT_MAP_CONFIG.jitterSmoothness
-        jitter.y += (jitter.targetY - jitter.y) * COMBAT_MAP_CONFIG.jitterSmoothness
+        jitter.x += (jitter.targetX - jitter.x) * TRAVEL_MAP_CONFIG.jitterSmoothness
+        jitter.y += (jitter.targetY - jitter.y) * TRAVEL_MAP_CONFIG.jitterSmoothness
         
         return jitter
     }
@@ -232,9 +213,9 @@ class CombatMap extends BaseMap {
         const isPlayer = this.isPlayerShip(ship)
         const mirror = !isPlayer // Enemy ships face left (mirrored)
         
-        const flickerRange = COMBAT_MAP_CONFIG.thrusterFlickerMax - COMBAT_MAP_CONFIG.thrusterFlickerMin
-        const thrusterFlicker = COMBAT_MAP_CONFIG.thrusterFlickerMin + Math.random() * flickerRange
-        const thrusterSize = ship.radius * COMBAT_MAP_CONFIG.thrusterSizeMultiplier * thrusterFlicker
+        const flickerRange = TRAVEL_MAP_CONFIG.thrusterFlickerMax - TRAVEL_MAP_CONFIG.thrusterFlickerMin
+        const thrusterFlicker = TRAVEL_MAP_CONFIG.thrusterFlickerMin + Math.random() * flickerRange
+        const thrusterSize = ship.radius * TRAVEL_MAP_CONFIG.thrusterSizeMultiplier * thrusterFlicker
         const thrusterColor = [255, Math.floor(150 * thrusterFlicker), 0, Math.floor(1 * thrusterFlicker)]
         const offsetX = mirror ? ship.radius : -ship.radius
         const rotation = mirror ? 0 : Math.PI
@@ -260,8 +241,8 @@ class CombatMap extends BaseMap {
     renderShip(ship, x, y) {
         const isPlayer = this.isPlayerShip(ship)
         const mirror = !isPlayer // Enemy ships face left (mirrored)
-        const shipSize = COMBAT_MAP_CONFIG.shipSize
-        const labelOffsetY = COMBAT_MAP_CONFIG.labelOffsetY
+        const shipSize = TRAVEL_MAP_CONFIG.shipSize
+        const labelOffsetY = TRAVEL_MAP_CONFIG.labelOffsetY
         const shipColor = gs.fleet && gs.fleet.color ? gs.fleet.color : COLORS.White
         
         let shipObj
@@ -334,18 +315,18 @@ class CombatMap extends BaseMap {
         if (!bg) {
             bg = this.routeCvs.addLine(
                 bgId,
-                x - COMBAT_MAP_CONFIG.shipBarWidth / 2,
+                x - TRAVEL_MAP_CONFIG.shipBarWidth / 2,
                 barY,
-                x + COMBAT_MAP_CONFIG.shipBarWidth / 2,
+                x + TRAVEL_MAP_CONFIG.shipBarWidth / 2,
                 barY,
                 COLORS.Black,
-                COMBAT_MAP_CONFIG.shipBarHeight
+                TRAVEL_MAP_CONFIG.shipBarHeight
             )
             bg.zIndex = 100
         } else {
-            bg.x = x - COMBAT_MAP_CONFIG.shipBarWidth / 2
+            bg.x = x - TRAVEL_MAP_CONFIG.shipBarWidth / 2
             bg.y = barY
-            bg.x2 = x + COMBAT_MAP_CONFIG.shipBarWidth / 2
+            bg.x2 = x + TRAVEL_MAP_CONFIG.shipBarWidth / 2
             bg.y2 = barY
         }
         
@@ -355,18 +336,18 @@ class CombatMap extends BaseMap {
         if (!fg) {
             fg = this.routeCvs.addLine(
                 fgId,
-                x - COMBAT_MAP_CONFIG.shipBarWidth / 2,
+                x - TRAVEL_MAP_CONFIG.shipBarWidth / 2,
                 barY,
-                x - COMBAT_MAP_CONFIG.shipBarWidth / 2 + COMBAT_MAP_CONFIG.shipBarWidth * fillRatio,
+                x - TRAVEL_MAP_CONFIG.shipBarWidth / 2 + TRAVEL_MAP_CONFIG.shipBarWidth * fillRatio,
                 barY,
                 fillColor,
-                COMBAT_MAP_CONFIG.shipBarHeight - 2
+                TRAVEL_MAP_CONFIG.shipBarHeight - 2
             )
             fg.zIndex = 101
         } else {
-            fg.x = x - COMBAT_MAP_CONFIG.shipBarWidth / 2
+            fg.x = x - TRAVEL_MAP_CONFIG.shipBarWidth / 2
             fg.y = barY
-            fg.x2 = x - COMBAT_MAP_CONFIG.shipBarWidth / 2 + COMBAT_MAP_CONFIG.shipBarWidth * fillRatio
+            fg.x2 = x - TRAVEL_MAP_CONFIG.shipBarWidth / 2 + TRAVEL_MAP_CONFIG.shipBarWidth * fillRatio
             fg.y2 = barY
             fg.strokeColor = fillColor
         }
@@ -381,9 +362,9 @@ class CombatMap extends BaseMap {
         const y = shipObj.y
         
         // Calculate bar positions
-        const barY = y - ship.radius + COMBAT_MAP_CONFIG.shipBarYOffset
+        const barY = y - ship.radius + TRAVEL_MAP_CONFIG.shipBarYOffset
         const hullBarY = barY
-        const shieldBarY = barY - COMBAT_MAP_CONFIG.shipBarHeight - COMBAT_MAP_CONFIG.shipBarSpacing
+        const shieldBarY = barY - TRAVEL_MAP_CONFIG.shipBarHeight - TRAVEL_MAP_CONFIG.shipBarSpacing
         
         // Calculate fill ratios
         const hullPercent = ship.hull[0] / ship.hull[1]
@@ -402,12 +383,10 @@ class CombatMap extends BaseMap {
     /**
      * Renders a group of ships with fade-in animation
      * @param {Ship[]} ships - Array of ships to render
-
-     * @param {string} groupType - 'player' or 'enemy' prefix for IDs
      * @param {ShipGroupConfig} config - Configuration object for this ship group
      */
-    renderShipGroup(ships, groupType, config) {
-        const shipSpacing = COMBAT_MAP_CONFIG.shipSpacing
+    renderShipGroup(ships, config) {
+        const shipSpacing = TRAVEL_MAP_CONFIG.shipSpacing
         
         // Handle fade-in animation
         if (!config.fadedIn) {
@@ -415,7 +394,7 @@ class CombatMap extends BaseMap {
                 config.fadeStartTime = Date.now()
             }
             const elapsed = Date.now() - config.fadeStartTime
-            const fadeTime = COMBAT_MAP_CONFIG.enemyFadeInDuration
+            const fadeTime = TRAVEL_MAP_CONFIG.enemyFadeInDuration
             config.opacity = Math.min(1, elapsed / fadeTime)
             
             if (config.opacity >= 1) {
@@ -472,21 +451,16 @@ class CombatMap extends BaseMap {
      * Creates ship objects once, then updates their positions on subsequent calls
      */
     renderShips() {
-        if (!this.routeCvs || !this.encounter || !this.encounter.playerShips) {
-            console.error('❌ renderShips: routeCvs or encounter is null!')
-            return
-        }
-        
         // Update offsets based on current canvas size
-        this.playerShipGroupConfig.xOffset = -(this.routeCvs.canvas.width / this.routeCvs.zoom) * Math.abs(COMBAT_MAP_CONFIG.playerShipsOffset)
-        this.enemyShipGroupConfig.xOffset = (this.routeCvs.canvas.width / this.routeCvs.zoom) * COMBAT_MAP_CONFIG.enemyShipsOffset
+        this.playerShipGroupConfig.xOffset = -(this.routeCvs.canvas.width / this.routeCvs.zoom) * Math.abs(TRAVEL_MAP_CONFIG.playerShipsOffset)
+        this.enemyShipGroupConfig.xOffset = (this.routeCvs.canvas.width / this.routeCvs.zoom) * TRAVEL_MAP_CONFIG.enemyShipsOffset
         
         // Render player ships
-        this.renderShipGroup(this.encounter.playerShips, 'player', this.playerShipGroupConfig)
+        this.renderShipGroup(gs.fleet.ships, this.playerShipGroupConfig)
         
         // Render enemy ships if they exist
-        if (this.encounter.enemyShips && this.encounter.enemyShips.length > 0) {
-            this.renderShipGroup(this.encounter.enemyShips, 'enemy', this.enemyShipGroupConfig)
+        if (gs.encounter && gs.encounter.enemyShips && gs.encounter.enemyShips.length > 0) {
+            this.renderShipGroup(gs.encounter.enemyShips, this.enemyShipGroupConfig)
         }
         
         this.routeCvs.redraw(true)
@@ -502,7 +476,7 @@ class CombatMap extends BaseMap {
         // Update polygons or circle
         if (ship.shipType.shipShape && ship.shipType.shipShape.toPolygons) {
             const shipColor = gs.fleet && gs.fleet.color ? gs.fleet.color : COLORS.White
-            const shipSize = COMBAT_MAP_CONFIG.shipSize
+            const shipSize = TRAVEL_MAP_CONFIG.shipSize
             const polygons = ship.shipType.shipShape.toPolygons(shipColor, shipSize)
             polygons.forEach((poly) => {
                 const obj = this.routeCvs.getObject(`${ship.uuid}-poly-${poly.id}`)
@@ -562,9 +536,7 @@ class CombatMap extends BaseMap {
     /**
      * Refreshes the combat map display
      */
-    refreshCombatMap() {
-        if (!this.encounter) return
-        
+    refreshTravelMap() {
         // Re-render the ships on canvas
         if (this.routeCvs) {
             this.renderShips()
@@ -596,7 +568,7 @@ class CombatMap extends BaseMap {
 /**
  * Factory function to create and show a combat map
  */
-function showCombatMap() {
-    const map = new CombatMap()
+function showTravelMap() {
+    const map = new TravelMap()
     showMap(map)
 }

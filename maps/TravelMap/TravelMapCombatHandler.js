@@ -1,12 +1,12 @@
 /**
- * Handles combat-specific functionality for CombatMap
+ * Handles travel-specific functionality for TravelMap
  */
-class CombatMapCombatHandler {
+class TravelMapCombatHandler {
     /**
-     * @param {CombatMap} combatMap - Reference to parent CombatMap instance
+     * @param {TravelMap} travelMap - Reference to parent TravelMap instance
      */
-    constructor(combatMap) {
-        this.combatMap = combatMap
+    constructor(travelMap) {
+        this.travelMap = travelMap
     }
 
     /**
@@ -14,18 +14,18 @@ class CombatMapCombatHandler {
      * @returns {HTMLElement}
      */
     createCombatUIPanel() {
-        const panel = ce({id: 'combat-ui-panel'})
+        const panel = ce({id: 'travel-ui-panel'})
         
         // Left side: Ship info and actions
         const leftPanel = ce({
-            classNames: ['combat-ui-left-panel'],
+            classNames: ['travel-ui-left-panel'],
             children: [
-                ce({id: 'combat-ship-info'})
+                ce({id: 'travel-ship-info'})
             ]
         })
         
         // Update ship info
-        const shipInfo = leftPanel.querySelector('#combat-ship-info')
+        const shipInfo = leftPanel.querySelector('#travel-ship-info')
         this.updateShipInfo(shipInfo)
         
         // Action buttons
@@ -35,11 +35,11 @@ class CombatMapCombatHandler {
         
         // Right side: Combat log
         panel.appendChild(ce({
-            id: 'combat-log',
+            id: 'travel-log',
             children: [
                 ce({
                     innerHTML: '=== Combat Log ===',
-                    classNames: ['combat-log-header']
+                    classNames: ['travel-log-header']
                 })
             ]
         }))
@@ -52,7 +52,7 @@ class CombatMapCombatHandler {
      * @param {HTMLElement|Element} infoElement
      */
     updateShipInfo(infoElement) {
-        const {selectedPlayerShip, selectedEnemyShip} = this.combatMap
+        const {selectedPlayerShip, selectedEnemyShip} = this.travelMap
         
         if (!selectedPlayerShip || !selectedEnemyShip) {
             infoElement.innerHTML = 'Select ships to begin combat'
@@ -102,14 +102,14 @@ class CombatMapCombatHandler {
      * @returns {HTMLElement}
      */
     createActionButtons() {
-        const {selectedPlayerShip} = this.combatMap
+        const {selectedPlayerShip} = this.travelMap
         
-        const buttonContainer = ce({classNames: ['combat-action-buttons']})
+        const buttonContainer = ce({classNames: ['travel-action-buttons']})
         
-        if (!selectedPlayerShip || this.combatMap.isShipDestroyed(selectedPlayerShip)) {
+        if (!selectedPlayerShip || selectedPlayerShip.disabled) {
             buttonContainer.appendChild(ce({
                 innerHTML: 'No active ship',
-                classNames: ['combat-action-button-inactive']
+                classNames: ['travel-action-button-inactive']
             }))
             return buttonContainer
         }
@@ -135,7 +135,7 @@ class CombatMapCombatHandler {
         const button = ce({
             tag: 'button',
             innerHTML: label,
-            classNames: ['combat-action-button'],
+            classNames: ['travel-action-button'],
             disabled: disabled
         })
         
@@ -150,7 +150,7 @@ class CombatMapCombatHandler {
      * Handles laser attack action
      */
     handleLaserAttack() {
-        const {selectedPlayerShip, selectedEnemyShip} = this.combatMap
+        const {selectedPlayerShip, selectedEnemyShip} = this.travelMap
         
         if (!selectedPlayerShip || !selectedEnemyShip) {
             gs.combat.addToCombatLog('Select a target first!')
@@ -158,7 +158,7 @@ class CombatMapCombatHandler {
             return
         }
         
-        if (this.combatMap.isShipDestroyed(selectedEnemyShip)) {
+        if (selectedEnemyShip.disabled) {
             gs.combat.addToCombatLog('Target is already destroyed!')
             this.refreshCombatLog()
             return
@@ -176,7 +176,7 @@ class CombatMapCombatHandler {
      * Handles ram action
      */
     handleRam() {
-        const {selectedPlayerShip, selectedEnemyShip} = this.combatMap
+        const {selectedPlayerShip, selectedEnemyShip} = this.travelMap
         
         if (!selectedPlayerShip || !selectedEnemyShip) {
             gs.combat.addToCombatLog('Select a target first!')
@@ -184,7 +184,7 @@ class CombatMapCombatHandler {
             return
         }
         
-        if (this.combatMap.isShipDestroyed(selectedEnemyShip)) {
+        if (selectedEnemyShip.disabled) {
             gs.combat.addToCombatLog('Target is already destroyed!')
             this.refreshCombatLog()
             return
@@ -200,7 +200,7 @@ class CombatMapCombatHandler {
      * Handles evade action
      */
     handleEvade() {
-        const {selectedPlayerShip} = this.combatMap
+        const {selectedPlayerShip} = this.travelMap
         if (!selectedPlayerShip) return
         
         const result = gs.combat.executeAction(selectedPlayerShip, 'evade')
@@ -213,7 +213,7 @@ class CombatMapCombatHandler {
      * Handles recharge action
      */
     handleRecharge() {
-        const {selectedPlayerShip} = this.combatMap
+        const {selectedPlayerShip} = this.travelMap
         if (!selectedPlayerShip) return
         
         const result = gs.combat.executeAction(selectedPlayerShip, 'recharge')
@@ -226,7 +226,7 @@ class CombatMapCombatHandler {
      * Handles flee action
      */
     handleFlee() {
-        const {selectedPlayerShip} = this.combatMap
+        const {selectedPlayerShip} = this.travelMap
         if (!selectedPlayerShip) return
         
         const result = gs.combat.executeAction(selectedPlayerShip, 'flee')
@@ -264,7 +264,7 @@ class CombatMapCombatHandler {
             }, 1000)
         } else {
             // Refresh display for player's turn
-            this.combatMap.refreshCombatMap()
+            this.travelMap.refreshTravelMap()
         }
     }
 
@@ -282,7 +282,7 @@ class CombatMapCombatHandler {
         }
         
         // Refresh the display for player turn
-        this.combatMap.refreshCombatMap()
+        this.travelMap.refreshTravelMap()
     }
 
     /**
@@ -309,9 +309,8 @@ class CombatMapCombatHandler {
         setTimeout(() => {
             showModal('Combat Ended', message, [
                 ['Continue', () => {
-                    if (this.combatMap.encounter) {
-                        this.combatMap.encounter.endEncounter()
-                    }
+                    this.travelMap.resetNPCShipsConfig()
+                    gs.encounter.endCombat()
                 }]
             ])
         }, 1500)
@@ -321,7 +320,7 @@ class CombatMapCombatHandler {
      * Refreshes the combat log display from encounter's log
      */
     refreshCombatLog() {
-        const logElement = document.getElementById('combat-log')
+        const logElement = document.getElementById('travel-log')
         if (!logElement) return
         
         // Clear existing log
@@ -331,7 +330,7 @@ class CombatMapCombatHandler {
         for (const message of gs.combat.log.getAll()) {
             logElement.appendChild(ce({
                 innerHTML: message,
-                classNames: ['combat-log-message']
+                classNames: ['travel-log-message']
             }))
         }
         

@@ -1,14 +1,14 @@
 /* Combat Map Styles */
 
 
-#combat-ship-info {
+#travel-ship-info {
     color: #fff;
     font-size: 14px;
 }
 
 
 /* Main container */
-#combat-map-container {
+#travel-map-container {
     width: 100%;
     height: 100vh;
     background-color: #000;
@@ -17,8 +17,8 @@
 }
 
 /* Canvas elements */
-#combat-starfield,
-#combat-canvas-wrapper {
+#travel-starfield,
+#travel-canvas-wrapper {
     position: absolute;
     top: 0;
     left: 0;
@@ -26,17 +26,17 @@
     height: 75%;
 }
 
-#combat-starfield {
+#travel-starfield {
     height: 100%;
     z-index: 0;
 }
 
-#combat-canvas-wrapper {
+#travel-canvas-wrapper {
     z-index: 1;
 }
 
 /* Combat UI Panel */
-#combat-ui-panel {
+#travel-ui-panel {
     position: absolute;
     bottom: 0;
     left: 0;
@@ -51,7 +51,7 @@
     z-index: 2;
 }
 
-.combat-ui-left-panel {
+.travel-ui-left-panel {
     flex: 2;
     display: flex;
     flex-direction: column;
@@ -79,7 +79,7 @@
 }
 
 /* Combat log */
-#combat-log {
+#travel-log {
     flex: 1;
     background-color: rgba(0, 0, 0, 0.5);
     border: 1px solid #666;
@@ -91,26 +91,26 @@
     max-height: 100%;
 }
 
-.combat-log-header {
+.travel-log-header {
     font-weight: bold;
     margin-bottom: 10px;
     color: #ffff00;
 }
 
-.combat-log-message {
+.travel-log-message {
     margin-bottom: 5px;
     padding-bottom: 5px;
     border-bottom: 1px solid #333;
 }
 
 /* Combat action buttons */
-.combat-action-buttons {
+.travel-action-buttons {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
 }
 
-.combat-action-button {
+.travel-action-button {
     padding: 10px 20px;
     background-color: #333;
     color: #fff;
@@ -122,19 +122,19 @@
     transition: all 0.2s;
 }
 
-.combat-action-button:disabled {
+.travel-action-button:disabled {
     background-color: #222;
     color: #666;
     border-color: #444;
     cursor: not-allowed;
 }
 
-.combat-action-button:not(:disabled):hover {
+.travel-action-button:not(:disabled):hover {
     background-color: #555;
     border-color: #888;
 }
 
-.combat-action-button-inactive {
+.travel-action-button-inactive {
     color: #fff;
 }
 

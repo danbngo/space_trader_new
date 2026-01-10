@@ -199,7 +199,7 @@ class Ship {
     }
 
     /**
-     * Resets all combat-related variables to initial state.
+     * Resets all travel-related variables to initial state.
      */
     resetCombatVars() {
         this.actionsRemaining = 1;

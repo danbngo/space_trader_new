@@ -684,7 +684,7 @@ class StarMap extends BaseMap {
             remainingFuel: gs.fleet.fuel
         })
 
-        showCombatMap()
+        showTravelMap()
     }
 
     selectObject(obj) {

@@ -1,12 +1,12 @@
 /**
- * Handles route travel-specific functionality for CombatMap
+ * Handles route travel-specific functionality for TravelMap
  */
-class CombatMapRouteHandler {
+class TravelMapRouteHandler {
     /**
-     * @param {CombatMap} combatMap - Reference to parent CombatMap instance
+     * @param {TravelMap} travelMap - Reference to parent TravelMap instance
      */
-    constructor(combatMap) {
-        this.combatMap = combatMap
+    constructor(travelMap) {
+        this.travelMap = travelMap
     }
 
     /**
@@ -17,14 +17,6 @@ class CombatMapRouteHandler {
         if (!gs.destination || gs.travelYearsRemaining === null || gs.travelYearsRemaining <= 0) {
             this.handleTravelComplete()
             console.log('Travel ended')
-            return
-        }
-        
-        // Pause travel progress if there's an active encounter
-        if (gs.encounter) {
-            // Continue rendering ships but don't update time/progress
-            this.combatMap.renderShips()
-            setTimeout(() => requestAnimationFrame(() => this.tick()), COMBAT_MAP_CONFIG.tickRate)
             return
         }
         
@@ -43,10 +35,10 @@ class CombatMapRouteHandler {
         this.checkForEncounter()
         
         // Render ships
-        this.combatMap.renderShips()
+        this.travelMap.renderShips()
         
-        // Continue tick loop with 60fps target
-        setTimeout(() => requestAnimationFrame(() => this.tick()), COMBAT_MAP_CONFIG.tickRate)
+        // Continue tick loop with 60fps target - not needed, handled in parent class
+        //setTimeout(() => requestAnimationFrame(() => this.tick()), TRAVEL_MAP_CONFIG.tickRate)
     }
 
     /**
@@ -54,8 +46,8 @@ class CombatMapRouteHandler {
      * @param {number} progressPercent
      */
     updateProgressBar(progressPercent) {
-        if (this.combatMap.routeProgressBar) {
-            this.combatMap.routeProgressBar.update(progressPercent)
+        if (this.travelMap.routeProgressBar) {
+            this.travelMap.routeProgressBar.update(progressPercent)
         }
     }
 
@@ -63,9 +55,9 @@ class CombatMapRouteHandler {
      * Updates the distance display UI element
      */
     updateDistanceDisplay() {
-        if (this.combatMap.routeDistanceEl && gs.destination && gs.fleet) {
+        if (this.travelMap.routeDistanceEl && gs.destination && gs.fleet) {
             const currentDistance = calcDistance(gs.fleet.x, gs.fleet.y, gs.destination.x, gs.destination.y)
-            this.combatMap.routeDistanceEl.innerHTML = `Distance: ${roundToPlaces(currentDistance, 1)} AU`
+            this.travelMap.routeDistanceEl.innerHTML = `Distance: ${roundToPlaces(currentDistance, 1)} AU`
         }
     }
 
@@ -73,8 +65,8 @@ class CombatMapRouteHandler {
      * Updates the ETA display UI element
      */
     updateETADisplay() {
-        if (this.combatMap.routeETAEl) {
-            this.combatMap.routeETAEl.innerHTML = `ETA: ${describeTimespan(Math.max(0, gs.travelYearsRemaining), 1)}`
+        if (this.travelMap.routeETAEl) {
+            this.travelMap.routeETAEl.innerHTML = `ETA: ${describeTimespan(Math.max(0, gs.travelYearsRemaining), 1)}`
         }
     }
 
@@ -104,10 +96,10 @@ class CombatMapRouteHandler {
      * Handles completion of travel
      */
     handleTravelComplete(dockAt = gs.destination) {
-        console.log('Travel completed - docking at', gs.destination.name)
+        console.log('Travel completed - docking at', dockAt)
         
         // Dock at destination
-        gs.fleet.dock(gs.destination)
+        gs.fleet.dock(dockAt)
         
         // Clear travel state
         gs.previousLocation = null
@@ -167,28 +159,28 @@ class CombatMapRouteHandler {
         const statsContainer = ce({classNames: ['route-stats']})
         
         // Distance
-        this.combatMap.routeDistanceEl = ce({
+        this.travelMap.routeDistanceEl = ce({
             innerHTML: `Distance: ${distance} AU`
         })
-        statsContainer.appendChild(this.combatMap.routeDistanceEl)
+        statsContainer.appendChild(this.travelMap.routeDistanceEl)
         
         // ETA Remaining
-        this.combatMap.routeETAEl = ce({
+        this.travelMap.routeETAEl = ce({
             innerHTML: `ETA: ${describeTimespan(gs.travelYearsRemaining || 0, 1)}`
         })
-        statsContainer.appendChild(this.combatMap.routeETAEl)
+        statsContainer.appendChild(this.travelMap.routeETAEl)
         
         panel.appendChild(statsContainer)
         
         // Create progress bar using ProgressBar class
-        this.combatMap.routeProgressBar = new ProgressBar({
+        this.travelMap.routeProgressBar = new ProgressBar({
             value: 0,
             width: 60,
             fillColor: '#4CAF50',
             borderColor: '#666',
             overrideLabel: ''
         })
-        panel.appendChild(this.combatMap.routeProgressBar.container)
+        panel.appendChild(this.travelMap.routeProgressBar.container)
         
         // Cancel button
         const cancelButton = ce({

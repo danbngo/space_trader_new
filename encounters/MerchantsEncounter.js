@@ -53,7 +53,7 @@ class MerchantsEncounter extends Encounter {
             this.combatEnabled = true
         }
         
-        // CombatMap will automatically pick up combatEnabled flag and switch to combat UI
+        // TravelMap will automatically pick up combatEnabled flag and switch to combat UI
         this.endEncounter()
     }
     
