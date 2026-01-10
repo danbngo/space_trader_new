@@ -9,7 +9,7 @@ default zoom distances: 1200px = half the size of the solar system
  * Set any value to false to skip that element's computation and rendering entirely
  */
 const STARMAP_DEBUG_CONFIG = {
-    displayBackgroundStars: true,    // Background parallax stars (5000+ pixels updated every frame)
+    displayBackgroundStars: true,    // Background stars (5000+ pixels updated every frame)
     displayAsteroids: true,           // Floating asteroids
     displayOrbits: true,              // Orbital path circles
     displayStars: true,               // Sun/stars

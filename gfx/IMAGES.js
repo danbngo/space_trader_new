@@ -25,5 +25,6 @@ const SHIP_SHAPES = {
 
 const BACKGROUNDS = {
     STARFIELD_1: new ImageHandler('images/bg_space.png'),
+    SPOTLIGHT: new ImageHandler('images/visibility_circle.png'),
 }
 

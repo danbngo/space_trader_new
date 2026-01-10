@@ -69,7 +69,7 @@ class StarMap extends BaseMap {
         console.log('  - AVERAGE_SHIP_RADARS:', AVERAGE_SHIP_RADARS);
         console.log('  - Calculation: 0.5 +', STAR_MAP_AVERAGE_VIEW_DISTANCE, '*', gs.fleet.totalRadar, '/', AVERAGE_SHIP_RADARS, '=', radius);
         
-        this.spotlight = this.overlayCvs.addClearCircle(spotlightId, x, y, radius)
+        this.spotlight = this.overlayCvs.addClearCircle(spotlightId+'rect', 0, 0, 0, 0)
         
         console.log('🔦 Spotlight created:', this.spotlight);
     }
@@ -77,9 +77,11 @@ class StarMap extends BaseMap {
     updateSpotlight() {
         if (!this.spotlight || !gs.fleet || !gs.fleet.mapViewDistance) return
         // Update spotlight position to follow player
-        this.spotlight.x = gs.fleet.x
-        this.spotlight.y = gs.fleet.y
-        this.spotlight.size = gs.fleet.mapViewDistance
+            this.spotlight.x = gs.fleet.x
+            this.spotlight.y = gs.fleet.y
+            this.spotlight.size = gs.fleet.mapViewDistance
+            this.spotlight.minorSize = gs.fleet.mapViewDistance
+            console.log(this.spotlight.size,'vs zoom:',this.cvs.zoom)
         this.overlayCvs.cameraX = this.cvs.cameraX
         this.overlayCvs.cameraY = this.cvs.cameraY
         this.overlayCvs.zoom = this.cvs.zoom
@@ -89,7 +91,6 @@ class StarMap extends BaseMap {
      * Initialize DOM with background canvas layer under main canvas
      */
     initializeDOM(baseZoom, minZoom, maxZoom, cameraPanLimit) {
-        // Create background canvas for parallax stars (static, never moves)
         this.bgCvs = new CanvasWrapper('starmap-background-map-canvas', baseZoom, minZoom, maxZoom, cameraPanLimit)
         this.bgCvs.canvas.style.pointerEvents = 'none' // Don't capture mouse events
         
@@ -140,29 +141,30 @@ class StarMap extends BaseMap {
      * Render background stars to background canvas (called once on init and on resize)
      */
     renderBackgroundStars() {
-        const {backgroundStars} = this.starSystem
         const {width, height} = this.bgCvs.canvas
-        //const pixelRatio = this.bgCvs.pixelRatio
         
-        // Clear existing pixels
-        this.bgCvs.pixels = []
-        
-        // Calculate offset for parallax positioning
-        const sizeOffset = Math.max(width, height) / SOLAR_SYSTEM_RADIUS_IN_AU * 4
-        
-        backgroundStars.forEach((bgStar) => {
-            // Background stars use parallax (static screen positions)
-            let sx = bgStar.x * sizeOffset
-            let sy = bgStar.y * sizeOffset
-            
-            // Add pixel with screen offset (parallax = true means it won't move with camera)
-            this.bgCvs.addPixel(0, 0, bgStar.color, bgStar.radius, sx, sy)
-        })
+        // Add bitmap background if not already present
+        const bgId = 'starmap-background'
+        if (!this.bgCvs.getObject(bgId)) {
+            const canvasSize = Math.max(width, height) / this.bgCvs.pixelRatio
+            this.bgCvs.addBitmap(
+                bgId,
+                0, 0,
+                BACKGROUNDS.STARFIELD_1.src,
+                canvasSize*8, // Size to cover canvas
+                0,
+                [255, 255, 255, 1],
+                0,
+                null,
+                -1000, // Behind everything
+                true, // parallax = true (immune to zoom)
+                true  // overlap = true (covers at least the available space)
+            )
+            console.log('Created starmap background bitmap')
+        }
         
         // Redraw background canvas once
         this.bgCvs.redraw(true)
-        
-        console.log(`Rendered ${backgroundStars.length} background stars to static canvas`)
     }
 
     static lastZoom = 1

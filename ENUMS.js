@@ -1,6 +1,6 @@
 /** @typedef {'Victory'|'Defeat'|'Surrendered'|'Escaped'} EncounterResultType */
 /** @typedef {'Attack'|'Escape'|'Asteroid'} CombatStrategyType */
-/** @typedef {'FilledCircle'|'EmptyCircle'|'FilledTriangle'|'EmptyTriangle'|'Text'|'Line'|'FilledOval'|'EmptyOval'|'FilledRectangle'|'RadialGradient'} ShapeType */
+/** @typedef {'FilledCircle'|'EmptyCircle'|'FilledTriangle'|'EmptyTriangle'|'Text'|'Line'|'FilledOval'|'EmptyOval'|'FilledRectangle'} ShapeType */
 /** @typedef {'Move'|'Laser'|'Ram'|'Recharge'|'Wait'|'Blink'|'Booster'|'Cloak'|'Warhead'|'EMPPulse'|'Magnetize'|'SmokeBomb'|'Drill'|'PlasmaSpray'|'NaniteBeam'|'Scanner'} MoveType */
 /** @typedef {'Default'|'Storm'|'PlayerEncircle'|'PlayerEncircled'} FormationType */
 /** @typedef {'Ship'|'Asteroid'} AIType */
@@ -34,8 +34,8 @@ const SHAPES = Object.freeze({
     FilledRectangle: 'FilledRectangle',
     EmptyRectangle: 'EmptyRectangle',
     Polygon: 'Polygon', // For custom polygons defined by vertices
-    RadialGradient: 'RadialGradient', // Radial gradient (spotlight effect)
-    ClearCircle: 'ClearCircle', // Black overlay with cleared circular area (efficient spotlight)
+    //ClearRect: 'ClearRect', // Black overlay with cleared rectangular area (efficient spotlight)
+    ClearCircle: 'ClearCircle', // Black overlay with cleared rectangular area (efficient spotlight)
     Bitmap: 'Bitmap', // For rendering images
 })
 

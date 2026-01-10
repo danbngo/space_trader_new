@@ -182,7 +182,6 @@ class TravelMap extends BaseMap {
         this.bgCvs.pixels = []
         
         backgroundStars.forEach((star) => {
-            // Use parallax = true so stars stay fixed on screen
             this.bgCvs.addPixel(0, 0, star.color, star.radius, star.x, star.y)
         })
         

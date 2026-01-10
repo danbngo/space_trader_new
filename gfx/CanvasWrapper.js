@@ -141,8 +141,14 @@ class CanvasWrapper {
         return this.addObject(obj)
     }
     
-    addClearCircle(id = "", x = 0, y = 0, radius = 100) {
-        const obj = new CanvasObject({ id, shape: SHAPES.ClearCircle, x, y, size: radius});
+    /*addClearRect(id = "", x = 0, y = 0, width = 100, height = 100) {
+        const obj = new CanvasObject({ id, shape: SHAPES.ClearRect, x, y, size: width, minorSize: height});
+        obj.zIndex = -1000
+        return this.addObject(obj)
+    }*/
+
+    addClearCircle(id = "", x = 0, y = 0, width = 100, height = 100) {
+        const obj = new CanvasObject({ id, shape: SHAPES.ClearCircle, x, y, size: width, minorSize: height});
         obj.zIndex = -1000
         return this.addObject(obj)
     }
@@ -176,8 +182,10 @@ class CanvasWrapper {
         return this.addObject(obj)
     }
     
-    addBitmap(id = "", x = 0, y = 0, src = null, size = 1, minScreenSize = 0, fillColor = COLORS.White, angle = 0, onClick = null, zIndex = 0) {
+    addBitmap(id = "", x = 0, y = 0, src = null, size = 1, minScreenSize = 0, fillColor = COLORS.White, angle = 0, onClick = null, zIndex = 0, parallax = false, overlap = false) {
         const obj = new CanvasObject({ id, shape: SHAPES.Bitmap, x, y, src, size, minScreenSize, fillColor, angle, onClick, zIndex });
+        obj.parallax = parallax
+        obj.overlap = overlap
         return this.addObject(obj)
     }
     
@@ -505,10 +513,12 @@ class CanvasWrapper {
         const drawOrder = this.drawOrder
         for (const obj of drawOrder) {
             if (!obj.visible) continue
-            let [sx, sy] = this.worldToScreen(obj.x, obj.y);
+            let [sx, sy] = 
+                obj.parallax ? [ (obj.x + (this.canvas.width / 2)) / this.pixelRatio, (obj.y + (this.canvas.height / 2)) / this.pixelRatio] 
+                : this.worldToScreen(obj.x, obj.y);
             sx += obj.screenOffsetX;
             sy += obj.screenOffsetY;
-            const size = Math.max(obj.minScreenSize, obj.size * zoom / pixelRatio)
+            const size = obj.parallax ? obj.size : Math.max(obj.minScreenSize, obj.size * zoom / pixelRatio)
             
             // Special visibility check for lines
             if (obj.shape === SHAPES.Line && obj.x2 !== undefined && obj.y2 !== undefined) {
@@ -530,7 +540,7 @@ class CanvasWrapper {
             let x2Offset = 0;
             let y2Offset = 0;
             if (obj.x2 !== undefined && obj.y2 !== undefined) {
-                const [sx2, sy2] = this.worldToScreen(obj.x2, obj.y2);
+                const [sx2, sy2] = obj.parallax ? this.worldToScreen(obj.x2, obj.y2) : [obj.x2, obj.y2];
                 x2Offset = sx2 - sx
                 y2Offset = sy2 - sy
             }

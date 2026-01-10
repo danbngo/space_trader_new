@@ -37,6 +37,7 @@ class BackgroundMapRenderer {
                 0,
                 [255, 255, 255, 1]
             )
+            bgObj.parallax = true // Enable parallax effect
             bgObj.zIndex = -1000 // Put it behind everything
             console.log('Created background bitmap:', bgId, 'size:', canvasSize * 2)
         }

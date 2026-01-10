@@ -112,9 +112,8 @@ class CanvasObject {
             this.imageLoaded = src.complete;
         }
 
-        this.centerRadius = 0
-        this.centerOpacity = 0
-        this.edgeOpacity = 0
+        this.parallax = false
+        this.overlap = false
     }
 
     setDurationMs(durationMs = 1000) {
@@ -298,72 +297,45 @@ class CanvasObject {
             }
             break;
             
-            case SHAPES.RadialGradient:
-            const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, size);
-            const centerOpacity = this.centerOpacity !== undefined ? this.centerOpacity : 0;
-            const edgeOpacity = this.edgeOpacity !== undefined ? this.edgeOpacity : 1;
-            const [r, g, b] = this.fillColor || COLORS.Black;
-            gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${centerOpacity})`);
-            gradient.addColorStop(1, `rgba(${r}, ${g}, ${b}, ${edgeOpacity})`);
-            ctx.fillStyle = gradient;
-            ctx.fillRect(-size, -size, size * 2, size * 2);
-            break;
-            
             case SHAPES.ClearCircle:
-            // Draw magenta rectangle covering entire viewport
-            // Note: ctx is already translated to (sx, sy), so we need to draw relative to that
-            
-            // Clear a roughly circular area using ~30 rectangular passes
-            // Using clearRect to reveal background stars underneath
-            const clearRadius = size; // Radius in screen pixels (already converted from world coords)
-            const numPasses = 30;
+            ctx.globalCompositeOperation = 'destination-out'; // Cuts out pixels where you draw
+            ctx.beginPath();
+            ctx.arc(0, 0, size, 0, Math.PI * 2, false);
+            ctx.fill(); // Fills the circle with transparency
+            ctx.globalCompositeOperation = 'source-over'; // Reset for normal drawing
 
-            for (let i = 0; i < numPasses; i++) {
-                const angle = (i / numPasses) * Math.PI * 2;
-                const nextAngle = ((i + 1) / numPasses) * Math.PI * 2;
-                
-                // Calculate multiple rectangles arranged in a circle
-                // Each rectangle clears a segment, creating rough circular shape
-                const x1 = Math.cos(angle) * clearRadius;
-                const y1 = Math.sin(angle) * clearRadius;
-                const x2 = Math.cos(nextAngle) * clearRadius;
-                const y2 = Math.sin(nextAngle) * clearRadius;
-                
-                // Calculate rectangle dimensions to approximate circle segment
-                const rectWidth = Math.abs(x2 - x1) + clearRadius * 0.3;
-                const rectHeight = Math.abs(y2 - y1) + clearRadius * 0.3;
-                const rectX = (x1 + x2) / 2 - rectWidth / 2;
-                const rectY = (y1 + y2) / 2 - rectHeight / 2;
-                
-                ctx.clearRect(rectX, rectY, rectWidth, rectHeight);
-            }
-            
-            // Clear center circle to ensure it's fully transparent
-            const centerSize = clearRadius * 0.7;
-            for (let pass = 0; pass < 8; pass++) {
-                const angle = (pass / 8) * Math.PI * 2;
-                const offsetX = Math.cos(angle) * centerSize * 0.3;
-                const offsetY = Math.sin(angle) * centerSize * 0.3;
-                ctx.clearRect(offsetX - centerSize, offsetY - centerSize, centerSize * 2, centerSize * 2);
-            }
-            break;
-            
             case SHAPES.Bitmap:
             if (this.image && this.imageLoaded) {
                 if (this.angle) ctx.rotate(this.angle);
                 
                 // Calculate dimensions maintaining aspect ratio
-                // Larger dimension matches size, smaller scales proportionally
                 const aspectRatio = this.image.width / this.image.height;
                 let width, height;
-                if (aspectRatio > 1) {
-                    // Width is larger
-                    width = size;
-                    height = size / aspectRatio;
+                
+                if (this.overlap) {
+                    // Overlap mode: ensure bitmap covers AT LEAST the target size
+                    // Smaller dimension matches size, larger scales proportionally
+                    if (aspectRatio > 1) {
+                        // Width is larger - match height to size, width scales up
+                        height = size;
+                        width = size * aspectRatio;
+                    } else {
+                        // Height is larger or square - match width to size, height scales up
+                        width = size;
+                        height = size / aspectRatio;
+                    }
                 } else {
-                    // Height is larger or square
-                    height = size;
-                    width = size * aspectRatio;
+                    // Normal mode: ensure bitmap fits WITHIN the target size
+                    // Larger dimension matches size, smaller scales proportionally
+                    if (aspectRatio > 1) {
+                        // Width is larger
+                        width = size;
+                        height = size / aspectRatio;
+                    } else {
+                        // Height is larger or square
+                        height = size;
+                        width = size * aspectRatio;
+                    }
                 }
                 
                 // Apply color tint using globalCompositeOperation if fillColor is set
