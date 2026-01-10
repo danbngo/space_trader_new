@@ -162,8 +162,8 @@ class StarMap extends BaseMap {
             console.log('Created starmap background bitmap',bmp)
         }
         
-        // Redraw background canvas once
-        this.bgCvs.redraw(true)
+        // Wait for images to load, then redraw
+        this.waitForImagesLoaded([this.bgCvs])
     }
 
     static lastZoom = 1
