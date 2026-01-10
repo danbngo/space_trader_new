@@ -4,7 +4,7 @@
 const TRAVEL_MAP_CONFIG = {
     // Ship rendering
     shipSpacing: 60,
-    shipSize: 20,
+    shipSize: 200,
     labelOffsetY: 30,
     
     // Ship positioning (as fraction of canvas width/zoom)
@@ -30,7 +30,7 @@ const TRAVEL_MAP_CONFIG = {
     defaultZoom: 60,
     
     // Starfield
-    starfieldStarCount: 300,
+    starfieldStarCount: 2000,
     
     // Ship progress bars
     shipBarWidth: 50,

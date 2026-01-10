@@ -2,6 +2,7 @@
 
 class CanvasWrapper {
     constructor(
+        id = '',
         zoom = 100,
         minZoom = 10,
         maxZoom = 1000,
@@ -11,7 +12,7 @@ class CanvasWrapper {
     ) {
         // Root element for the user to attach anywhere
         /** @type {HTMLElement} */
-        this.root = ce({classNames:['canvas-root']})
+        this.root = ce({id, classNames:['canvas-root']})
         /** @type {HTMLCanvasElement} */
         // @ts-ignore
         this.canvas = ce({parent:this.root, tag:'canvas'})
@@ -172,6 +173,11 @@ class CanvasWrapper {
     
     addPolygon(id = "", x = 0, y = 0, vertices = [], size = 1, minScreenSize = 0, fillColor = COLORS.LightGray, strokeColor = null, angle = 0, onClick = null, zIndex = 0) {
         const obj = new CanvasObject({ id, shape: SHAPES.Polygon, x, y, vertices, size, minScreenSize, fillColor, strokeColor, angle, onClick, zIndex });
+        return this.addObject(obj)
+    }
+    
+    addBitmap(id = "", x = 0, y = 0, src = null, size = 1, minScreenSize = 0, fillColor = COLORS.White, angle = 0, onClick = null, zIndex = 0) {
+        const obj = new CanvasObject({ id, shape: SHAPES.Bitmap, x, y, src, size, minScreenSize, fillColor, angle, onClick, zIndex });
         return this.addObject(obj)
     }
     
@@ -460,6 +466,7 @@ class CanvasWrapper {
         if (this.fillColor) {
             ctx.fillStyle = this.fillColor;
             ctx.fillRect(0, 0, width/pixelRatio, height/pixelRatio);
+            console.log('filling canvas with color', this.fillColor, width, height, pixelRatio);
         }
 
         // Draw pixels (asteroids, etc)

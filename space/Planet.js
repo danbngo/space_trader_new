@@ -129,7 +129,7 @@ class Planet extends OrbitingObject {
         container.appendChild(gradientOverlay)
         
         // Create a CanvasWrapper to properly render the planet
-        const cvs = new CanvasWrapper(1, 1, 1, 0)
+        const cvs = new CanvasWrapper(`planet-canvas`, 1, 1, 1, 0)
         cvs.canvas.style.display = 'block'
         cvs.canvas.style.position = 'absolute'
         cvs.canvas.style.top = '0'

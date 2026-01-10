@@ -7,8 +7,14 @@
 function generateBackgroundStars(radius = 1, numStars = 1) {
     const backgroundStars = []
     for (let i = 0; i < numStars; i++) {
-        const distance = radius*Math.random()//*Math.random()*radius
-        let [x,y] = rotatePoint(distance, 0, 0, 0, Math.PI*4*Math.random())
+        //const distance = radius*Math.random()
+        //let [x,y] = rotatePoint(distance, 0, 0, 0, Math.PI*4*Math.random())
+        let x = rng(radius, -radius)
+        let y = rng(radius, -radius)
+        if (calcDistance(0, 0, x, y) > radius) {
+            i--
+            continue
+        }
         //y *= Math.random()
         // Make stars mostly white with slight color variance and brightness variance
         const baseBrightness = rng(192, 64)

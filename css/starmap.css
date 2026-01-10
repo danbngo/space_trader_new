@@ -21,6 +21,15 @@
 /* === PAUSED INDICATOR === */
 
 .paused-indicator {
+    position: absolute;
+    bottom: 25%;
+    left: 50%;
+    transform: translate(-50%, 50%);
+    color: cyan;
+    font-size: 24px;
+    font-weight: bold;
+    pointer-events: none;
+    display: none;
     animation: pulse-brightness 2s ease-in-out infinite;
 }
 

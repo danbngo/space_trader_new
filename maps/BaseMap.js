@@ -42,8 +42,8 @@ class BaseMap {
      * @param {number} maxZoom 
      * @param {number} cameraPanLimit 
      */
-    initializeDOM(baseZoom, minZoom, maxZoom, cameraPanLimit) {
-        this.cvs = new CanvasWrapper(baseZoom, minZoom, maxZoom, cameraPanLimit)
+    initializeDOM(id, baseZoom, minZoom, maxZoom, cameraPanLimit) {
+        /*this.cvs = new CanvasWrapper(id, baseZoom, minZoom, maxZoom, cameraPanLimit)
         this.root = ce({classNames: ['starmap-root'], children: [this.cvs.root]})
         this.controls = ce({parent: this.root, style: {position: 'absolute', top: 0, left: 0}})
         this.infoBar = ce({parent: this.root, style:{position:'absolute', bottom: 0, left: 0}})
@@ -55,7 +55,7 @@ class BaseMap {
         requestAnimationFrame(()=> requestAnimationFrame(()=>{
             this.cvs.autoResize()
             this.onDeferredInit()
-        }))
+        }))*/
     }
     
     /**

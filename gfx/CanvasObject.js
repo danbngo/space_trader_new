@@ -25,6 +25,7 @@ class CanvasObject {
     * @param {number | null} [params.durationMs]
     * @param {number} [params.zIndex] - Draw order priority (higher values draw on top)
     * @param {Array<[number, number]>} [params.vertices] - Array of [x, y] coordinates for polygon shape
+    * @param {string | HTMLImageElement | null} [params.src] - Image source for bitmap rendering
     * @property {number} centerOpacity - For radial gradient
     * @property {number} centerOpacity - For radial gradient
     * @property {number} edgeOpacity - For radial gradient
@@ -54,7 +55,8 @@ class CanvasObject {
         visible = true,
         durationMs = null,
         zIndex = 0,
-        vertices = []
+        vertices = [],
+        src = null
     }) {
         this.id = id;
         this.shape = shape;
@@ -96,6 +98,19 @@ class CanvasObject {
         this.endMs = durationMs ? this.startMs + durationMs : null;
         this.initialScreenOffsetY = screenOffsetY;
         this.expired = false
+
+        // For bitmap rendering
+        this.src = src;
+        this.image = null;
+        this.imageLoaded = false;
+        if (src && typeof src === 'string') {
+            this.image = new Image();
+            this.image.onload = () => { this.imageLoaded = true; };
+            this.image.src = src;
+        } else if (src instanceof HTMLImageElement) {
+            this.image = src;
+            this.imageLoaded = src.complete;
+        }
 
         this.centerRadius = 0
         this.centerOpacity = 0
@@ -330,6 +345,46 @@ class CanvasObject {
                 const offsetX = Math.cos(angle) * centerSize * 0.3;
                 const offsetY = Math.sin(angle) * centerSize * 0.3;
                 ctx.clearRect(offsetX - centerSize, offsetY - centerSize, centerSize * 2, centerSize * 2);
+            }
+            break;
+            
+            case SHAPES.Bitmap:
+            if (this.image && this.imageLoaded) {
+                if (this.angle) ctx.rotate(this.angle);
+                
+                // Calculate dimensions maintaining aspect ratio
+                // Larger dimension matches size, smaller scales proportionally
+                const aspectRatio = this.image.width / this.image.height;
+                let width, height;
+                if (aspectRatio > 1) {
+                    // Width is larger
+                    width = size;
+                    height = size / aspectRatio;
+                } else {
+                    // Height is larger or square
+                    height = size;
+                    width = size * aspectRatio;
+                }
+                
+                // Apply color tint using globalCompositeOperation if fillColor is set
+                if (this.fillColor && (this.fillColor[0] !== 255 || this.fillColor[1] !== 255 || this.fillColor[2] !== 255)) {
+                    ctx.save();
+                    // Draw image normally first with alpha
+                    ctx.globalAlpha = this.fillColor[3] || 1;
+                    ctx.drawImage(this.image, -width / 2, -height / 2, width, height);
+                    // Apply color tint
+                    ctx.globalCompositeOperation = 'multiply';
+                    ctx.fillStyle = colorArrToRgbaString([this.fillColor[0], this.fillColor[1], this.fillColor[2], 1]);
+                    ctx.fillRect(-width / 2, -height / 2, width, height);
+                    // Restore alpha channel (preserves transparency)
+                    ctx.globalCompositeOperation = 'destination-in';
+                    ctx.drawImage(this.image, -width / 2, -height / 2, width, height);
+                    ctx.restore();
+                } else {
+                    // Draw image normally with opacity (transparency is preserved automatically)
+                    ctx.globalAlpha = this.fillColor ? this.fillColor[3] || 1 : 1;
+                    ctx.drawImage(this.image, -width / 2, -height / 2, width, height);
+                }
             }
             break;
         }

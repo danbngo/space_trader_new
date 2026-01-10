@@ -54,8 +54,16 @@ class TravelMap extends BaseMap {
         // Create container
         this.root = ce({id: 'travel-map-container'})
         
-        // Create canvas for rendering
-        this.routeCvs = new CanvasWrapper(60, 1, 1, 0, false, false)
+        // Create background canvas for static stars (rendered once)
+        this.bgCvs = new CanvasWrapper(`travelmap-background-map-canvas`, 1, 1, 1, 100, false, false)
+        this.bgCvs.fillColor = 'rgba(255, 0, 255, 1)' // Solid black background
+        this.bgCvs.canvas.style.pointerEvents = 'none' // Don't capture mouse events
+        
+        // Create main canvas for dynamic content (ships, labels, etc)
+        this.routeCvs = new CanvasWrapper(`travelmap-main-map-canvas`, 1, 1, 1, 100, false, false)
+        
+        // Add both canvases to root (bg first, then main on top)
+        this.root.appendChild(this.bgCvs.root)
         this.root.appendChild(this.routeCvs.root)
         
         // Create UI panel at bottom (will be updated dynamically)
@@ -67,7 +75,11 @@ class TravelMap extends BaseMap {
         
         // Add resize listener
         this.resizeHandler = () => {
+            console.log('resizing travel map canvases')
             this.routeCvs.autoResize()
+            this.bgCvs.autoResize()
+            // Re-render background stars when canvas size changes
+            this.renderBackgroundStars()
         }
         window.addEventListener("resize", this.resizeHandler)
         
@@ -76,12 +88,10 @@ class TravelMap extends BaseMap {
         // Defer canvas sizing and initial render until after DOM is rendered
         requestAnimationFrame(() => {
             this.routeCvs.autoResize()
-            //this.routeCvs.cameraX = 0
-            //this.routeCvs.cameraY = 0
-            //this.routeCvs.zoom = 60
+            this.bgCvs.autoResize()
             
-            // Render stars once
-            this.initializeStars()
+            // Render stars once to background canvas
+            this.renderBackgroundStars()
             
             // Start animation loop (handles both combat and travel)
             this.startAnimation()
@@ -93,7 +103,15 @@ class TravelMap extends BaseMap {
      * Handles both combat and travel rendering, checks for encounter changes
      */
     startAnimation() {
+        console.log('STARTING TRAVEL MAP ANIMATION')
+        this.isAnimating = true
         const animate = () => {
+            // Check if animation should continue
+            if (!this.isAnimating) {
+                console.log('Animation loop stopped')
+                return
+            }
+            
             // Update UI panel if combat state changed
             const inCombat = gs.encounter && gs.encounter.combatEnabled
             if ((inCombat && this.uiPanel?.classList?.contains('route-ui')) ||
@@ -110,7 +128,7 @@ class TravelMap extends BaseMap {
                 this.routeHandler.tick()
             }
             
-            // Continue animation indefinitely
+            // Continue animation
             this.routeAnimationFrame = requestAnimationFrame(animate)
         }
         animate()
@@ -149,22 +167,28 @@ class TravelMap extends BaseMap {
         this.uiPanel = newPanel
     }
     
-    initializeStars() {
-        if (!this.routeCvs) return
+    /**
+     * Render background stars to background canvas (called once on init and on resize)
+     */
+    renderBackgroundStars() {
+        if (!this.bgCvs) return
         
-        const radius = Math.max(window.innerWidth, window.innerHeight)
+        const {width, height} = this.bgCvs.canvas
+        const radius = Math.max(width, height)
         const numStars = TRAVEL_MAP_CONFIG.starfieldStarCount
-        const backgroundStars = generateBackgroundStars(radius, numStars)
+        const backgroundStars = generateBackgroundStars(radius*this.bgCvs.pixelRatio, numStars)
+        
+        // Clear existing pixels
+        this.bgCvs.pixels = []
         
         backgroundStars.forEach((star) => {
-            const x = Math.random() * this.routeCvs.canvas.width
-            const y = Math.random() * this.routeCvs.canvas.height
-            const size = Math.random() * 2 + 0.5
-            this.routeCvs.addPixel(0, 0, star.color, size, x, y, true)
+            // Use parallax = true so stars stay fixed on screen
+            this.bgCvs.addPixel(0, 0, star.color, star.radius, star.x, star.y, false)
         })
         
-        this.routeCvs.redraw(true)
-        console.log('✨ Initialized stars on canvas')
+        // Redraw background canvas once
+        this.bgCvs.redraw(true)
+        console.log('✨ Rendered', numStars, 'background stars to static canvas')
     }
     
 
@@ -256,29 +280,14 @@ class TravelMap extends BaseMap {
         }
         
         let shipObj
-        if (ship.shipType.shipShape && ship.shipType.shipShape.toPolygons) {
-            // Use ship shape polygons
-            const polygons = ship.shipType.shipShape.toPolygons(shipColor, shipSize)
-            polygons.forEach((poly) => {
-                const vertices = mirror ? invertPolygons(poly.vertices) : poly.vertices
-                const polyObj = this.routeCvs.addPolygon(
-                    `${ship.uuid}-poly-${poly.id}`,
-                    x,
-                    y,
-                    vertices,
-                    1,
-                    0,
-                    shipColor,
-                    null,
-                    0,
-                    null,
-                    poly.zIndex
-                )
-                // Use first polygon as reference for positioning bars
-                if (!shipObj) shipObj = polyObj
-            })
+        if (ship.shipType.shipShape && ship.shipType.shipShape.addCanvasObject) {
+            // Use bitmap ship shape
+            shipObj = ship.shipType.shipShape.addCanvasObject(this.routeCvs, ship, shipColor, shipSize)
+            shipObj.x = x
+            shipObj.y = y
+            shipObj.angle = mirror ? Math.PI : 0
         } else {
-            // Fallback to circle if no shape generator
+            // Fallback to circle if no shape
             shipObj = this.routeCvs.addFilledCircle(
                 `${ship.uuid}`,
                 x,
@@ -321,7 +330,7 @@ class TravelMap extends BaseMap {
      * @param {number} barY - Y position for this bar
      */
     addShipStatBar(ship, shipObj, barType, fillColor, fillRatio, barY) {
-        console.log(`Adding ${barType} bar for ship:`, ship.shipType.name, 'Fill ratio:', fillRatio)
+        //console.log(`Adding ${barType} bar for ship:`, ship.shipType.name, 'Fill ratio:', fillRatio)
         const x = shipObj.x
         
         // Bar background (black) - note: fillColor already has opacity applied from caller
@@ -406,7 +415,7 @@ class TravelMap extends BaseMap {
         }
         this.addShipStatBar(ship, shipObj, 'shield', shieldColor, shieldPercent, shieldBarY)
 
-        console.log('✅ Added/updated progress bars for ship:', ship.shipType.name, shipObj.x, y, shieldPercent, hullPercent)
+        //console.log('✅ Added/updated progress bars for ship:', ship.shipType.name, shipObj.x, y, shieldPercent, hullPercent)
     }
     
     /**
@@ -425,7 +434,7 @@ class TravelMap extends BaseMap {
             const elapsed = Date.now() - config.fadeStartTime
             const fadeTime = TRAVEL_MAP_CONFIG.enemyFadeInDuration
             config.opacity = Math.min(1, elapsed / fadeTime)
-            console.log('Fading in ships, opacity:', config.opacity)
+            //console.log('Fading in ships, opacity:', config.opacity)
             
             if (config.opacity >= 1) {
                 config.fadedIn = true
@@ -506,24 +515,11 @@ class TravelMap extends BaseMap {
      * @param {ShipGroupConfig} shipGroupConfig - Configuration for opacity and other settings
      */
     updateShipPosition(ship, x, y, shipGroupConfig) {
-        // Update polygons or circle
-        if (ship.shipType.shipShape && ship.shipType.shipShape.toPolygons) {
-            const shipColor = gs.fleet && gs.fleet.color ? gs.fleet.color : COLORS.White
-            const shipSize = TRAVEL_MAP_CONFIG.shipSize
-            const polygons = ship.shipType.shipShape.toPolygons(shipColor, shipSize)
-            polygons.forEach((poly) => {
-                const obj = this.routeCvs.getObject(`${ship.uuid}-poly-${poly.id}`)
-                if (obj) {
-                    obj.x = x
-                    obj.y = y
-                }
-            })
-        } else {
-            const obj = this.routeCvs.getObject(`${ship.uuid}`)
-            if (obj) {
-                obj.x = x
-                obj.y = y
-            }
+        // Update ship object position
+        const shipObj = this.routeCvs.getObject(`ship-bitmap-${ship.uuid}`) || this.routeCvs.getObject(`${ship.uuid}`)
+        if (shipObj) {
+            shipObj.x = x
+            shipObj.y = y
         }
         
         // Update label
@@ -531,14 +527,6 @@ class TravelMap extends BaseMap {
         if (label) {
             label.x = x
             label.y = y
-        }
-        
-        // Get the ship's main canvas object and update progress bars
-        let shipObj
-        if (ship.shipType.shipShape && ship.shipType.shipShape.toPolygons) {
-            shipObj = this.routeCvs.getObject(`${ship.uuid}-poly-0`)
-        } else {
-            shipObj = this.routeCvs.getObject(`${ship.uuid}`)
         }
         
         // Update progress bars
@@ -587,6 +575,9 @@ class TravelMap extends BaseMap {
      * Cleans up resources (animations, event listeners)
      */
     cleanup() {
+        console.log('CLEANUP CALLED ON TRAVEL MAP')
+        // Stop animation loop
+        this.isAnimating = false
         if (this.routeAnimationFrame) {
             cancelAnimationFrame(this.routeAnimationFrame)
             this.routeAnimationFrame = null

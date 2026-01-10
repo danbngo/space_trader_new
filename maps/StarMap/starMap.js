@@ -17,6 +17,7 @@ class StarMap extends BaseMap {
         this.lastCameraX = 0
         this.lastCameraY = 0
         this.lastZoom = 1
+        this.isAnimating = false
         
         // FPS tracking
         this.fpsFrames = 0
@@ -41,6 +42,7 @@ class StarMap extends BaseMap {
         this.createSpotlight()
         
         // Start continuous background star update loop (runs even when paused)
+        this.isAnimating = true
         this.animate()
         
         // REMOVED: FleetAI references
@@ -88,15 +90,16 @@ class StarMap extends BaseMap {
      */
     initializeDOM(baseZoom, minZoom, maxZoom, cameraPanLimit) {
         // Create background canvas for parallax stars (static, never moves)
-        this.bgCvs = new CanvasWrapper(baseZoom, minZoom, maxZoom, cameraPanLimit)
+        this.bgCvs = new CanvasWrapper('starmap-background-map-canvas', baseZoom, minZoom, maxZoom, cameraPanLimit)
         this.bgCvs.canvas.style.pointerEvents = 'none' // Don't capture mouse events
         
         // Create main canvas
-        this.cvs = new CanvasWrapper(baseZoom, minZoom, maxZoom, cameraPanLimit)
+        this.cvs = new CanvasWrapper('starmap-main-map-canvas', baseZoom, minZoom, maxZoom, cameraPanLimit)
         
         // Create overlay canvas for spotlight (between background and main)
-        this.overlayCvs = new CanvasWrapper(baseZoom, minZoom, maxZoom, cameraPanLimit)
+        this.overlayCvs = new CanvasWrapper('starmap-overlay-map-canvas', baseZoom, minZoom, maxZoom, cameraPanLimit)
         this.overlayCvs.fillColor = 'rgba(0, 0, 0, 0.5)' // Semi-transparent black
+
         this.overlayCvs.root.style.pointerEvents = 'none' // Don't capture mouse events on container
         this.overlayCvs.canvas.style.pointerEvents = 'none' // Don't capture mouse events on canvas
         
@@ -112,18 +115,7 @@ class StarMap extends BaseMap {
         this.pausedIndicator = ce({
             parent: this.root,
             innerHTML: 'PAUSED',
-            classNames: ['paused-indicator'],
-            style: {
-                position: 'absolute',
-                bottom: '25%',
-                left: '50%',
-                transform: 'translate(-50%, 50%)',
-                color: 'cyan',
-                fontSize: '24px',
-                fontWeight: 'bold',
-                pointerEvents: 'none',
-                display: 'none'
-            }
+            classNames: ['paused-indicator']
         })
         this.objectPane = ce({parent: this.root, style: {position: 'absolute', top: 0, right: 0, height: '100%', pointerEvents: 'none'}})
         
@@ -164,7 +156,7 @@ class StarMap extends BaseMap {
             let sy = bgStar.y * sizeOffset
             
             // Add pixel with screen offset (parallax = true means it won't move with camera)
-            this.bgCvs.addPixel(0, 0, bgStar.color, bgStar.radius, sx, sy, true)
+            this.bgCvs.addPixel(0, 0, bgStar.color, bgStar.radius, sx, sy, false)
         })
         
         // Redraw background canvas once
@@ -176,6 +168,12 @@ class StarMap extends BaseMap {
     static lastZoom = 1
 
     animate() {
+        // Check if animation should continue
+        if (!this.isAnimating) {
+            console.log('StarMap animation loop stopped')
+            return
+        }
+        
         this.frameCounter++
         
         // Track FPS
@@ -787,15 +785,10 @@ class StarMap extends BaseMap {
      * Clean up resources when closing the star map
      */
     cleanup() {
+        // Stop animation loop
+        this.isAnimating = false
         // Pause any running loops
         this.paused = true;
-        
-        // Cancel any pending animation frames
-        if (this.routeAnimationFrame) {
-            cancelAnimationFrame(this.routeAnimationFrame);
-            this.routeAnimationFrame = null;
-        }
-        
         console.log('StarMap cleaned up');
     }
 }
