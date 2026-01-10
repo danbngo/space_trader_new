@@ -24,6 +24,8 @@ class StarMapBodiesHandler {
         if (STARMAP_DEBUG_CONFIG.displaySpaceStations) this.handleSpaceStations();
         this.handleDestinationLine();
         this.handlePlayerLocationIndicator();
+
+        this.starMap.cvs.recalculateDrawOrder()
         
         if (STARMAP_DEBUG_CONFIG.logPerformance) {
             const perfEnd = performance.now();
@@ -55,19 +57,21 @@ class StarMapBodiesHandler {
         asteroids.forEach((asteroid, index) => {
             const asteroidId = `asteroid${asteroid.uuid}`
             if (!cvs.getObject(asteroidId)) {
-                const circle = cvs.addFilledCircle(asteroidId, asteroid.x, asteroid.y, asteroid.radius, 3, [...asteroid.color], null)
+                const circle = cvs.addFilledCircle(asteroidId, asteroid.x, asteroid.y, asteroid.radius, 2, asteroid.color, null)
                 circle.strokeColor = [...COLORS.Black]
+                console.log(circle)
             }
             const asteroidObj = cvs.getObject(asteroidId)
+            asteroidObj.zIndex = -0.1
             asteroidObj.x = asteroid.x
             asteroidObj.y = asteroid.y
             
             // Calculate screen radius and hide if too small when zoomed out
-            const screenRadius = asteroid.radius * cvs.zoom
-            if (screenRadius < ASTEROID_MIN_SCREEN_RADIUS) {
+            const screenRadius = asteroid.radius
+            /*if (screenRadius < ASTEROID_MIN_SCREEN_RADIUS) {
                 asteroidObj.visible = false
                 return
-            }
+            }*/
             asteroidObj.visible = true
         })
     }
@@ -84,6 +88,7 @@ class StarMapBodiesHandler {
             
             if (!cvsObject) {
                 cvsObject = cvs.addEmptyCircle(id, orbitingBody.parent.x, orbitingBody.parent.y, orbitingBody.orbit.radius, 1, orbitingBody.color, 0.25)
+                cvsObject.zIndex = -1
             }
             
             cvsObject.x = orbitingBody.parent.x

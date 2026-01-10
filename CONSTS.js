@@ -13,7 +13,7 @@ const MILES_PER_AU = 432288*EARTH_RADII_PER_AU
 //TODO: try to make some of these vars more dynamic in future - different sizes for ships, projectiles etc.
 const FLEET_RADIUS = 1/1000 * 1/EARTH_RADII_PER_AU
 
-const ASTEROID_MIN_SCREEN_RADIUS = 0.1 // Hide asteroids when they would appear smaller than 1px radius
+const ASTEROID_MIN_SCREEN_RADIUS = 1 // Hide asteroids when they would appear smaller than 1px radius
 const REPAIR_COST_PER_1_HULL = 10 // Base cost to repair 1 hull point at shipyard
 const BASE_FUEL_COST_PER_UNIT = 5 // Base cost per unit of fuel at shipyard
 const FUEL_COST_PER_1_AU = 5 // Fuel units consumed per AU traveled
@@ -99,8 +99,8 @@ const STAR_MAP_AVERAGE_VIEW_DISTANCE = 5 // in au
 
 const SUN_MIN_SCREEN_SIZE = 18
 const PLANET_MIN_SCREEN_SIZE = 14
-const DWARF_PLANET_MIN_SCREEN_SIZE = 4
-const SPACE_STATION_MIN_SCREEN_SIZE = 3
+const DWARF_PLANET_MIN_SCREEN_SIZE = 10
+const SPACE_STATION_MIN_SCREEN_SIZE = 10
 
 const DWARF_PLANET_MIN_BUILDINGS = 2
 const SPACE_STATION_MIN_BUILDINGS = 1

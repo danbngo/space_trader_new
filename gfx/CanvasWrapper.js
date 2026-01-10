@@ -140,16 +140,9 @@ class CanvasWrapper {
         const obj = new CanvasObject({ id, shape: SHAPES.FilledRectangle, x, y, size: width, minorSize: height, minScreenSize, angle, fillColor, onClick });
         return this.addObject(obj)
     }
-    
-    /*addClearRect(id = "", x = 0, y = 0, width = 100, height = 100) {
-        const obj = new CanvasObject({ id, shape: SHAPES.ClearRect, x, y, size: width, minorSize: height});
-        obj.zIndex = -1000
-        return this.addObject(obj)
-    }*/
 
     addClearCircle(id = "", x = 0, y = 0, width = 100, height = 100) {
         const obj = new CanvasObject({ id, shape: SHAPES.ClearCircle, x, y, size: width, minorSize: height});
-        obj.zIndex = -1000
         return this.addObject(obj)
     }
     
