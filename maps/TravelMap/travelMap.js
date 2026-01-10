@@ -4,6 +4,7 @@
  * @property {number} opacity - Current opacity value (0-1)
  * @property {number} fadeStartTime - Timestamp when fade animation started
  * @property {number} xOffset - Horizontal offset for this ship group
+ * @property {boolean} mirror - Whether ships in this group should be mirrored horizontally
  */
 
 /**
@@ -27,7 +28,8 @@ class TravelMap extends BaseMap {
             fadedIn: false,
             opacity: 0,
             fadeStartTime: 0,
-            xOffset: 0
+            xOffset: 0,
+            mirror: false
         }
         
         /** @type {ShipGroupConfig} */
@@ -35,7 +37,8 @@ class TravelMap extends BaseMap {
             fadedIn: false,
             opacity: 0,
             fadeStartTime: 0,
-            xOffset: 0
+            xOffset: 0,
+            mirror: true
         }
         
         this.shipsCreated = new Set() // Track which ships have been created by UUID
@@ -208,15 +211,16 @@ class TravelMap extends BaseMap {
      * @param {Ship} ship - The ship to render thruster for
      * @param {number} x - X position
      * @param {number} y - Y position
+     * @param {ShipGroupConfig} shipGroupConfig - Configuration for this ship's group
      */
-    renderThruster(ship, x, y) {
-        const isPlayer = this.isPlayerShip(ship)
-        const mirror = !isPlayer // Enemy ships face left (mirrored)
+    renderThruster(ship, x, y, shipGroupConfig) {
+        console.log('Rendering thruster for ship:', ship.shipType.name)
+        const mirror = shipGroupConfig.mirror // Use mirror from config
         
         const flickerRange = TRAVEL_MAP_CONFIG.thrusterFlickerMax - TRAVEL_MAP_CONFIG.thrusterFlickerMin
         const thrusterFlicker = TRAVEL_MAP_CONFIG.thrusterFlickerMin + Math.random() * flickerRange
         const thrusterSize = ship.radius * TRAVEL_MAP_CONFIG.thrusterSizeMultiplier * thrusterFlicker
-        const thrusterColor = [255, Math.floor(150 * thrusterFlicker), 0, Math.floor(1 * thrusterFlicker)]
+        const thrusterColor = [255, Math.floor(150 * thrusterFlicker), 0, shipGroupConfig.opacity * thrusterFlicker]
         const offsetX = mirror ? ship.radius : -ship.radius
         const rotation = mirror ? 0 : Math.PI
         this.routeCvs.addFilledTriangle(
@@ -237,13 +241,19 @@ class TravelMap extends BaseMap {
      * @param {Ship} ship - The ship to render
      * @param {number} x - X position
      * @param {number} y - Y position
+     * @param {ShipGroupConfig} shipGroupConfig - Configuration for this ship's group
      */
-    renderShip(ship, x, y) {
-        const isPlayer = this.isPlayerShip(ship)
-        const mirror = !isPlayer // Enemy ships face left (mirrored)
+    renderShip(ship, x, y, shipGroupConfig) {
+        console.log('Rendering ship:', ship.shipType.name, 'Config:', shipGroupConfig)
+        const mirror = shipGroupConfig.mirror // Use mirror from config
         const shipSize = TRAVEL_MAP_CONFIG.shipSize
         const labelOffsetY = TRAVEL_MAP_CONFIG.labelOffsetY
-        const shipColor = gs.fleet && gs.fleet.color ? gs.fleet.color : COLORS.White
+        const baseShipColor = gs.fleet && gs.fleet.color ? gs.fleet.color : COLORS.White
+        // Apply fade opacity to ship color at creation time
+        const shipColor = [...baseShipColor]
+        if (shipColor.length >= 4) {
+            shipColor[3] = shipGroupConfig.opacity
+        }
         
         let shipObj
         if (ship.shipType.shipShape && ship.shipType.shipShape.toPolygons) {
@@ -280,6 +290,10 @@ class TravelMap extends BaseMap {
         }
         
         // Add ship label
+        const labelColor = [...COLORS.White]
+        if (labelColor.length >= 4) {
+            labelColor[3] = shipGroupConfig.opacity
+        }
         this.routeCvs.addText(
             `label-${ship.uuid}`,
             x,
@@ -287,13 +301,13 @@ class TravelMap extends BaseMap {
             0,
             labelOffsetY,
             ship.shipType.name,
-            COLORS.White,
+            labelColor,
             12
         )
         
         // Add progress bars using the ship object we just created
         if (shipObj) {
-            this.addShipProgressBars(ship, shipObj)
+            this.addShipProgressBars(ship, shipObj, shipGroupConfig)
         }
     }
     
@@ -307,19 +321,25 @@ class TravelMap extends BaseMap {
      * @param {number} barY - Y position for this bar
      */
     addShipStatBar(ship, shipObj, barType, fillColor, fillRatio, barY) {
+        console.log(`Adding ${barType} bar for ship:`, ship.shipType.name, 'Fill ratio:', fillRatio)
         const x = shipObj.x
         
-        // Bar background (black)
+        // Bar background (black) - note: fillColor already has opacity applied from caller
         const bgId = `${barType}-bg-${ship.uuid}`
         let bg = this.routeCvs.getObject(bgId)
         if (!bg) {
+            const bgColor = [...COLORS.Black]
+            // Apply same opacity as fillColor to background
+            if (bgColor.length >= 4 && fillColor.length >= 4) {
+                bgColor[3] = fillColor[3]
+            }
             bg = this.routeCvs.addLine(
                 bgId,
                 x - TRAVEL_MAP_CONFIG.shipBarWidth / 2,
                 barY,
                 x + TRAVEL_MAP_CONFIG.shipBarWidth / 2,
                 barY,
-                COLORS.Black,
+                bgColor,
                 TRAVEL_MAP_CONFIG.shipBarHeight
             )
             bg.zIndex = 100
@@ -357,8 +377,9 @@ class TravelMap extends BaseMap {
      * Adds canvas-rendered progress bars for hull and shields above a ship
      * @param {Ship} ship
      * @param {CanvasObject} shipObj - The ship's canvas object to position bars relative to
+     * @param {ShipGroupConfig} shipGroupConfig - Configuration for opacity and other settings
      */
-    addShipProgressBars(ship, shipObj) {
+    addShipProgressBars(ship, shipObj, shipGroupConfig) {
         const y = shipObj.y
         
         // Calculate bar positions
@@ -370,12 +391,20 @@ class TravelMap extends BaseMap {
         const hullPercent = ship.hull[0] / ship.hull[1]
         const shieldPercent = ship.shields[0] / ship.shields[1]
         
-        // Render hull bar
-        const hullColor = hullPercent < 0.3 ? COLORS.Red : COLORS.Orange
+        // Render hull bar with opacity applied
+        const baseHullColor = hullPercent < 0.3 ? COLORS.Red : COLORS.Orange
+        const hullColor = [...baseHullColor]
+        if (hullColor.length >= 4) {
+            hullColor[3] = shipGroupConfig.opacity
+        }
         this.addShipStatBar(ship, shipObj, 'hull', hullColor, hullPercent, hullBarY)
         
-        // Render shield bar
-        this.addShipStatBar(ship, shipObj, 'shield', COLORS.Blue, shieldPercent, shieldBarY)
+        // Render shield bar with opacity applied
+        const shieldColor = [...COLORS.Blue]
+        if (shieldColor.length >= 4) {
+            shieldColor[3] = shipGroupConfig.opacity
+        }
+        this.addShipStatBar(ship, shipObj, 'shield', shieldColor, shieldPercent, shieldBarY)
 
         console.log('✅ Added/updated progress bars for ship:', ship.shipType.name, shipObj.x, y, shieldPercent, hullPercent)
     }
@@ -390,12 +419,13 @@ class TravelMap extends BaseMap {
         
         // Handle fade-in animation
         if (!config.fadedIn) {
-            if (config.opacity === 0) {
+            if (config.fadeStartTime === 0) {
                 config.fadeStartTime = Date.now()
             }
             const elapsed = Date.now() - config.fadeStartTime
             const fadeTime = TRAVEL_MAP_CONFIG.enemyFadeInDuration
             config.opacity = Math.min(1, elapsed / fadeTime)
+            console.log('Fading in ships, opacity:', config.opacity)
             
             if (config.opacity >= 1) {
                 config.fadedIn = true
@@ -406,7 +436,6 @@ class TravelMap extends BaseMap {
         ships.forEach((ship, index) => {
             if (ship.disabled) return
             
-            const isPlayer = this.isPlayerShip(ship)
             const jitter = this.updateShipJitter(ship)
             const shipY = 0 + (index - (ships.length - 1) / 2) * shipSpacing + jitter.y
             const shipX = config.xOffset + jitter.x
@@ -418,19 +447,19 @@ class TravelMap extends BaseMap {
             const thrusterId = `thruster-${ship.uuid}`
             const thrusterObj = this.routeCvs.getObject(thrusterId)
             if (thrusterObj) {
-                const thrusterOffset = isPlayer ? -ship.radius : ship.radius
+                const thrusterOffset = config.mirror ? ship.radius : -ship.radius
                 thrusterObj.x = shipX + thrusterOffset
                 thrusterObj.y = shipY
             } else {
-                this.renderThruster(ship, shipX, shipY)
+                this.renderThruster(ship, shipX, shipY, config)
             }
             
             // Create or update ship
             if (!shipExists) {
-                this.renderShip(ship, shipX, shipY)
+                this.renderShip(ship, shipX, shipY, config)
                 this.shipsCreated.add(ship.uuid)
             } else {
-                this.updateShipPosition(ship, shipX, shipY)
+                this.updateShipPosition(ship, shipX, shipY, config)
             }
             
             // Apply fade-in opacity
@@ -438,7 +467,10 @@ class TravelMap extends BaseMap {
                 this.routeCvs.drawOrder.forEach(obj => {
                     if (obj.id && obj.id.includes(ship.uuid)) {
                         if (obj.fillColor && obj.fillColor.length >= 4) {
-                            obj.fillColor[3] = Math.floor(1 * config.opacity)
+                            obj.fillColor[3] = config.opacity
+                        }
+                        if (obj.strokeColor && obj.strokeColor.length >= 4) {
+                            obj.strokeColor[3] = config.opacity
                         }
                     }
                 })
@@ -471,8 +503,9 @@ class TravelMap extends BaseMap {
      * @param {Ship} ship
      * @param {number} x
      * @param {number} y
+     * @param {ShipGroupConfig} shipGroupConfig - Configuration for opacity and other settings
      */
-    updateShipPosition(ship, x, y) {
+    updateShipPosition(ship, x, y, shipGroupConfig) {
         // Update polygons or circle
         if (ship.shipType.shipShape && ship.shipType.shipShape.toPolygons) {
             const shipColor = gs.fleet && gs.fleet.color ? gs.fleet.color : COLORS.White
@@ -510,7 +543,7 @@ class TravelMap extends BaseMap {
         
         // Update progress bars
         if (shipObj) {
-            this.addShipProgressBars(ship, shipObj)
+            this.addShipProgressBars(ship, shipObj, shipGroupConfig)
         }
     }
 

@@ -36,6 +36,7 @@ const SHAPES = Object.freeze({
     Polygon: 'Polygon', // For custom polygons defined by vertices
     RadialGradient: 'RadialGradient', // Radial gradient (spotlight effect)
     ClearCircle: 'ClearCircle', // Black overlay with cleared circular area (efficient spotlight)
+    Bitmap: 'Bitmap', // For rendering images
 })
 
 /**
