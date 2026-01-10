@@ -1,5 +1,12 @@
 /* Combat Map Styles */
 
+
+#combat-ship-info {
+    color: #fff;
+    font-size: 14px;
+}
+
+
 /* Main container */
 #combat-map-container {
     width: 100%;
@@ -50,12 +57,6 @@
     flex-direction: column;
     gap: 10px;
 }
-
-#combat-ship-info {
-    color: #fff;
-    font-size: 14px;
-}
-
 .ship-info-title {
     margin-bottom: 5px;
 }
@@ -236,93 +237,3 @@
     background-color: #4444ff;
 }
 
-/* Ship elements (old HTML-based, mostly unused now) */
-.combat-ship {
-    width: 120px;
-    min-height: 80px;
-    border: 2px solid;
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    position: relative;
-    transition: all 0.3s;
-    padding: 8px;
-}
-
-.combat-ship.player-ship {
-    background-color: #00ff00;
-    border-color: #00aa00;
-    transform: scaleX(1);
-}
-
-.combat-ship.enemy-ship {
-    background-color: #ff0000;
-    border-color: #aa0000;
-    transform: scaleX(-1);
-}
-
-.combat-ship.selected {
-    border-color: #ffff00;
-}
-
-.combat-ship.destroyed {
-    background-color: #444;
-    opacity: 0.3;
-    cursor: not-allowed;
-}
-
-.combat-ship-name {
-    color: #fff;
-    font-size: 12px;
-    font-weight: bold;
-    pointer-events: none;
-    margin-bottom: 4px;
-}
-
-.combat-ship.player-ship .combat-ship-name {
-    transform: none;
-}
-
-.combat-ship.enemy-ship .combat-ship-name {
-    transform: scaleX(-1);
-}
-
-.combat-ship-stat {
-    font-size: 10px;
-    pointer-events: none;
-}
-
-.combat-ship.player-ship .combat-ship-stat {
-    transform: none;
-}
-
-.combat-ship.enemy-ship .combat-ship-stat {
-    transform: scaleX(-1);
-}
-
-.combat-ship-stat-hull {
-    color: #fff;
-}
-
-.combat-ship-stat-hull-low {
-    color: #ff6666;
-}
-
-.combat-ship-stat-shields {
-    color: #6666ff;
-}
-
-.combat-ship-stat-shields-empty {
-    color: #888;
-}
-
-.combat-ship-stat-lasers {
-    color: #ffff66;
-}
-
-.combat-ship-stat-lasers-empty {
-    color: #888;
-}

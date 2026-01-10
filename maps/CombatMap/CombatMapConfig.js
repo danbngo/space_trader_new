@@ -32,6 +32,12 @@ const COMBAT_MAP_CONFIG = {
     // Starfield
     starfieldStarCount: 300,
     
+    // Ship progress bars
+    shipBarWidth: 50,
+    shipBarHeight: 8,
+    shipBarSpacing: 4,
+    shipBarYOffset: -10,
+    
     // Progress bars
     progressBarHeight: 6,
     progressBarGap: 2,

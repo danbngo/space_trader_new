@@ -1,4 +1,12 @@
 /**
+ * @typedef {Object} ShipGroupConfig
+ * @property {boolean} fadedIn - Whether the fade-in animation has completed
+ * @property {number} opacity - Current opacity value (0-1)
+ * @property {number} fadeStartTime - Timestamp when fade animation started
+ * @property {number} xOffset - Horizontal offset for this ship group
+ */
+
+/**
  * Combat and route travel map
  * Shows tactical combat when enemies are present, or animated route travel when traveling peacefully
  */
@@ -14,12 +22,23 @@ class CombatMap extends BaseMap {
         this.routeProgress = 0
         this.shipJitterOffsets = new Map()
         this.routeProgressBar = null
-        this.playerShipsFadedIn = false
-        this.playerShipsOpacity = 0
-        this.playerShipsFadeStartTime = 0
-        this.enemyShipsFadedIn = false
-        this.enemyShipsOpacity = 0
-        this.enemyShipsFadeStartTime = 0
+        
+        /** @type {ShipGroupConfig} */
+        this.playerShipGroupConfig = {
+            fadedIn: false,
+            opacity: 0,
+            fadeStartTime: 0,
+            xOffset: 0
+        }
+        
+        /** @type {ShipGroupConfig} */
+        this.enemyShipGroupConfig = {
+            fadedIn: false,
+            opacity: 0,
+            fadeStartTime: 0,
+            xOffset: 0
+        }
+        
         this.shipsCreated = new Set() // Track which ships have been created by UUID
         
         // Route travel UI element references (set by route handler)
@@ -109,9 +128,9 @@ class CombatMap extends BaseMap {
             this.encounter = gs.encounter
             
             // Reset fade states for new encounter
-            this.enemyShipsFadedIn = false
-            this.enemyShipsOpacity = 0
-            this.enemyShipsFadeStartTime = 0
+            this.enemyShipGroupConfig.fadedIn = false
+            this.enemyShipGroupConfig.opacity = 0
+            this.enemyShipGroupConfig.fadeStartTime = 0
             
             // Update selected ships if in combat
             if (gs.combat) {
@@ -212,7 +231,6 @@ class CombatMap extends BaseMap {
     renderThruster(ship, x, y) {
         const isPlayer = this.isPlayerShip(ship)
         const mirror = !isPlayer // Enemy ships face left (mirrored)
-        const idPrefix = isPlayer ? 'player' : 'enemy'
         
         const flickerRange = COMBAT_MAP_CONFIG.thrusterFlickerMax - COMBAT_MAP_CONFIG.thrusterFlickerMin
         const thrusterFlicker = COMBAT_MAP_CONFIG.thrusterFlickerMin + Math.random() * flickerRange
@@ -221,7 +239,7 @@ class CombatMap extends BaseMap {
         const offsetX = mirror ? ship.radius : -ship.radius
         const rotation = mirror ? 0 : Math.PI
         this.routeCvs.addFilledTriangle(
-            `thruster-${idPrefix}-${ship.uuid}`,
+            `thruster-${ship.uuid}`,
             x + offsetX,
             y,
             thrusterSize/2,
@@ -241,7 +259,6 @@ class CombatMap extends BaseMap {
      */
     renderShip(ship, x, y) {
         const isPlayer = this.isPlayerShip(ship)
-        const idPrefix = isPlayer ? 'player' : 'enemy'
         const mirror = !isPlayer // Enemy ships face left (mirrored)
         const shipSize = COMBAT_MAP_CONFIG.shipSize
         const labelOffsetY = COMBAT_MAP_CONFIG.labelOffsetY
@@ -254,7 +271,7 @@ class CombatMap extends BaseMap {
             polygons.forEach((poly) => {
                 const vertices = mirror ? invertPolygons(poly.vertices) : poly.vertices
                 const polyObj = this.routeCvs.addPolygon(
-                    `${idPrefix}-${ship.uuid}-poly-${poly.id}`,
+                    `${ship.uuid}-poly-${poly.id}`,
                     x,
                     y,
                     vertices,
@@ -272,7 +289,7 @@ class CombatMap extends BaseMap {
         } else {
             // Fallback to circle if no shape generator
             shipObj = this.routeCvs.addFilledCircle(
-                `${idPrefix}-${ship.uuid}`,
+                `${ship.uuid}`,
                 x,
                 y,
                 shipSize,
@@ -283,7 +300,7 @@ class CombatMap extends BaseMap {
         
         // Add ship label
         this.routeCvs.addText(
-            `${idPrefix}-label-${ship.uuid}`,
+            `label-${ship.uuid}`,
             x,
             y-ship.radius,
             0,
@@ -300,172 +317,130 @@ class CombatMap extends BaseMap {
     }
     
     /**
+     * Renders a single stat bar (hull or shields) for a ship
+     * @param {Ship} ship - The ship this bar belongs to
+     * @param {CanvasObject} shipObj - The ship's canvas object for positioning
+     * @param {string} barType - Type identifier ('hull' or 'shield')
+     * @param {Array} fillColor - RGBA color array for the foreground bar
+     * @param {number} fillRatio - Fill percentage (0-1)
+     * @param {number} barY - Y position for this bar
+     */
+    addShipStatBar(ship, shipObj, barType, fillColor, fillRatio, barY) {
+        const x = shipObj.x
+        
+        // Bar background (black)
+        const bgId = `${barType}-bg-${ship.uuid}`
+        let bg = this.routeCvs.getObject(bgId)
+        if (!bg) {
+            bg = this.routeCvs.addLine(
+                bgId,
+                x - COMBAT_MAP_CONFIG.shipBarWidth / 2,
+                barY,
+                x + COMBAT_MAP_CONFIG.shipBarWidth / 2,
+                barY,
+                COLORS.Black,
+                COMBAT_MAP_CONFIG.shipBarHeight
+            )
+            bg.zIndex = 100
+        } else {
+            bg.x = x - COMBAT_MAP_CONFIG.shipBarWidth / 2
+            bg.y = barY
+            bg.x2 = x + COMBAT_MAP_CONFIG.shipBarWidth / 2
+            bg.y2 = barY
+        }
+        
+        // Bar foreground (colored based on type and health)
+        const fgId = `${barType}-fg-${ship.uuid}`
+        let fg = this.routeCvs.getObject(fgId)
+        if (!fg) {
+            fg = this.routeCvs.addLine(
+                fgId,
+                x - COMBAT_MAP_CONFIG.shipBarWidth / 2,
+                barY,
+                x - COMBAT_MAP_CONFIG.shipBarWidth / 2 + COMBAT_MAP_CONFIG.shipBarWidth * fillRatio,
+                barY,
+                fillColor,
+                COMBAT_MAP_CONFIG.shipBarHeight - 2
+            )
+            fg.zIndex = 101
+        } else {
+            fg.x = x - COMBAT_MAP_CONFIG.shipBarWidth / 2
+            fg.y = barY
+            fg.x2 = x - COMBAT_MAP_CONFIG.shipBarWidth / 2 + COMBAT_MAP_CONFIG.shipBarWidth * fillRatio
+            fg.y2 = barY
+            fg.strokeColor = fillColor
+        }
+    }
+    
+    /**
      * Adds canvas-rendered progress bars for hull and shields above a ship
      * @param {Ship} ship
      * @param {CanvasObject} shipObj - The ship's canvas object to position bars relative to
      */
     addShipProgressBars(ship, shipObj) {
-        const isPlayer = this.isPlayerShip(ship)
-        const idPrefix = isPlayer ? 'player' : 'enemy'
-        
-        const barWidth = 50
-        const barHeight = 8
-        const barSpacing = 4
-        const yOffset = -10
-        
-        // Use ship canvas object's actual position
-        const x = shipObj.x
         const y = shipObj.y
         
-        // Position bars above the ship
-        const barY = y - ship.radius + yOffset
+        // Calculate bar positions
+        const barY = y - ship.radius + COMBAT_MAP_CONFIG.shipBarYOffset
         const hullBarY = barY
-        const shieldBarY = barY - barHeight - barSpacing
+        const shieldBarY = barY - COMBAT_MAP_CONFIG.shipBarHeight - COMBAT_MAP_CONFIG.shipBarSpacing
         
+        // Calculate fill ratios
         const hullPercent = ship.hull[0] / ship.hull[1]
         const shieldPercent = ship.shields[0] / ship.shields[1]
         
-        // Hull bar background (black)
-        const hullBgId = `${idPrefix}-hull-bg-${ship.uuid}`
-        let hullBg = this.routeCvs.getObject(hullBgId)
-        if (!hullBg) {
-            hullBg = this.routeCvs.addLine(
-                hullBgId,
-                x - barWidth / 2,
-                hullBarY,
-                x + barWidth / 2,
-                hullBarY,
-                COLORS.Black,
-                barHeight
-            )
-            hullBg.zIndex = 100
-        } else {
-            hullBg.x = x - barWidth / 2
-            hullBg.y = hullBarY
-            hullBg.x2 = x + barWidth / 2
-            hullBg.y2 = hullBarY
-        }
-        
-        // Hull bar foreground (red/orange based on health)
+        // Render hull bar
         const hullColor = hullPercent < 0.3 ? COLORS.Red : COLORS.Orange
-        const hullFgId = `${idPrefix}-hull-fg-${ship.uuid}`
-        let hullFg = this.routeCvs.getObject(hullFgId)
-        if (!hullFg) {
-            hullFg = this.routeCvs.addLine(
-                hullFgId,
-                x - barWidth / 2,
-                hullBarY,
-                x - barWidth / 2 + barWidth * hullPercent,
-                hullBarY,
-                hullColor,
-                barHeight - 2
-            )
-            hullFg.zIndex = 101
-        } else {
-            hullFg.x = x - barWidth / 2
-            hullFg.y = hullBarY
-            hullFg.x2 = x - barWidth / 2 + barWidth * hullPercent
-            hullFg.y2 = hullBarY
-            hullFg.strokeColor = hullColor
-        }
+        this.addShipStatBar(ship, shipObj, 'hull', hullColor, hullPercent, hullBarY)
         
-        // Shield bar background (black)
-        const shieldBgId = `${idPrefix}-shield-bg-${ship.uuid}`
-        let shieldBg = this.routeCvs.getObject(shieldBgId)
-        if (!shieldBg) {
-            shieldBg = this.routeCvs.addLine(
-                shieldBgId,
-                x - barWidth / 2,
-                shieldBarY,
-                x + barWidth / 2,
-                shieldBarY,
-                COLORS.Black,
-                barHeight
-            )
-            shieldBg.zIndex = 100
-        } else {
-            shieldBg.x = x - barWidth / 2
-            shieldBg.y = shieldBarY
-            shieldBg.x2 = x + barWidth / 2
-            shieldBg.y2 = shieldBarY
-        }
-        
-        // Shield bar foreground (blue/cyan)
-        const shieldColor = COLORS.Blue
-        const shieldFgId = `${idPrefix}-shield-fg-${ship.uuid}`
-        let shieldFg = this.routeCvs.getObject(shieldFgId)
-        if (!shieldFg) {
-            shieldFg = this.routeCvs.addLine(
-                shieldFgId,
-                x - barWidth / 2,
-                shieldBarY,
-                x - barWidth / 2 + barWidth * shieldPercent,
-                shieldBarY,
-                shieldColor,
-                barHeight - 2
-            )
-            shieldFg.zIndex = 101
-        } else {
-            shieldFg.x = x - barWidth / 2
-            shieldFg.y = shieldBarY
-            shieldFg.x2 = x - barWidth / 2 + barWidth * shieldPercent
-            shieldFg.y2 = shieldBarY
-        }
+        // Render shield bar
+        this.addShipStatBar(ship, shipObj, 'shield', COLORS.Blue, shieldPercent, shieldBarY)
 
-        console.log('✅ Added/updated progress bars for ship:', ship.shipType.name, shieldFg, hullFg, x, y, shieldPercent, hullPercent)
-        console.log('Compare with ship canvas object:', shipObj)
+        console.log('✅ Added/updated progress bars for ship:', ship.shipType.name, shipObj.x, y, shieldPercent, hullPercent)
     }
     
     /**
-     * Renders ships with thrusters and jitter
-     * Creates ship objects once, then updates their positions on subsequent calls
+     * Renders a group of ships with fade-in animation
+     * @param {Ship[]} ships - Array of ships to render
+
+     * @param {string} groupType - 'player' or 'enemy' prefix for IDs
+     * @param {ShipGroupConfig} config - Configuration object for this ship group
      */
-    renderShips() {
-        
-        if (!this.routeCvs) {
-            console.error('❌ renderShips: routeCvs is null!')
-            return
-        }
-        
-        if (!this.encounter || !this.encounter.playerShips) {
-            console.error('❌ renderShips: encounter or playerShips is null!')
-            return
-        }
-        
+    renderShipGroup(ships, groupType, config) {
         const shipSpacing = COMBAT_MAP_CONFIG.shipSpacing
-        const leftOffset = -(this.routeCvs.canvas.width / this.routeCvs.zoom) * Math.abs(COMBAT_MAP_CONFIG.playerShipsOffset)
-        const rightOffset = (this.routeCvs.canvas.width / this.routeCvs.zoom) * COMBAT_MAP_CONFIG.enemyShipsOffset
         
-        // Handle player ships fade-in animation
-        if (!this.playerShipsFadedIn) {
-            if (this.playerShipsOpacity === 0) {
-                this.playerShipsFadeStartTime = Date.now()
+        // Handle fade-in animation
+        if (!config.fadedIn) {
+            if (config.opacity === 0) {
+                config.fadeStartTime = Date.now()
             }
-            const elapsed = Date.now() - this.playerShipsFadeStartTime
+            const elapsed = Date.now() - config.fadeStartTime
             const fadeTime = COMBAT_MAP_CONFIG.enemyFadeInDuration
-            this.playerShipsOpacity = Math.min(1, elapsed / fadeTime)
+            config.opacity = Math.min(1, elapsed / fadeTime)
             
-            if (this.playerShipsOpacity >= 1) {
-                this.playerShipsFadedIn = true
+            if (config.opacity >= 1) {
+                config.fadedIn = true
             }
         }
         
-        // Update player ships
-        this.encounter.playerShips.forEach((ship, index) => {
+        // Render each ship
+        ships.forEach((ship, index) => {
             if (ship.disabled) return
             
+            const isPlayer = this.isPlayerShip(ship)
             const jitter = this.updateShipJitter(ship)
-            const shipY = 0 + (index - (this.encounter.playerShips.length - 1) / 2) * shipSpacing + jitter.y
-            const shipX = leftOffset + jitter.x
+            const shipY = 0 + (index - (ships.length - 1) / 2) * shipSpacing + jitter.y
+            const shipX = config.xOffset + jitter.x
             
             // Check if ship already exists on canvas
             const shipExists = this.shipsCreated.has(ship.uuid)
             
             // Create or update thruster
-            const thrusterId = `thruster-player-${ship.uuid}`
+            const thrusterId = `thruster-${ship.uuid}`
             const thrusterObj = this.routeCvs.getObject(thrusterId)
             if (thrusterObj) {
-                thrusterObj.x = shipX + (false ? ship.radius : -ship.radius)
+                const thrusterOffset = isPlayer ? -ship.radius : ship.radius
+                thrusterObj.x = shipX + thrusterOffset
                 thrusterObj.y = shipY
             } else {
                 this.renderThruster(ship, shipX, shipY)
@@ -475,96 +450,43 @@ class CombatMap extends BaseMap {
             if (!shipExists) {
                 this.renderShip(ship, shipX, shipY)
                 this.shipsCreated.add(ship.uuid)
-                
-                // Apply fade-in to newly created player ship
+            } else {
+                this.updateShipPosition(ship, shipX, shipY)
+            }
+            
+            // Apply fade-in opacity
+            if (!config.fadedIn) {
                 this.routeCvs.drawOrder.forEach(obj => {
-                    if (obj.id && obj.id.includes(ship.uuid) && obj.id.startsWith('player-')) {
+                    if (obj.id && obj.id.includes(ship.uuid)) {
                         if (obj.fillColor && obj.fillColor.length >= 4) {
-                            obj.fillColor[3] = Math.floor(1 * this.playerShipsOpacity)
+                            obj.fillColor[3] = Math.floor(1 * config.opacity)
                         }
                     }
                 })
-            } else {
-                // Update positions of existing objects
-                this.updateShipPosition(ship, shipX, shipY)
-                
-                // Continue fade-in if not complete
-                if (!this.playerShipsFadedIn) {
-                    this.routeCvs.drawOrder.forEach(obj => {
-                        if (obj.id && obj.id.includes(ship.uuid) && obj.id.startsWith('player-')) {
-                            if (obj.fillColor && obj.fillColor.length >= 4) {
-                                obj.fillColor[3] = Math.floor(1 * this.playerShipsOpacity)
-                            }
-                        }
-                    })
-                }
             }
         })
+    }
+    
+    /**
+     * Renders ships with thrusters and jitter
+     * Creates ship objects once, then updates their positions on subsequent calls
+     */
+    renderShips() {
+        if (!this.routeCvs || !this.encounter || !this.encounter.playerShips) {
+            console.error('❌ renderShips: routeCvs or encounter is null!')
+            return
+        }
         
-        // Update enemy ships if they exist
+        // Update offsets based on current canvas size
+        this.playerShipGroupConfig.xOffset = -(this.routeCvs.canvas.width / this.routeCvs.zoom) * Math.abs(COMBAT_MAP_CONFIG.playerShipsOffset)
+        this.enemyShipGroupConfig.xOffset = (this.routeCvs.canvas.width / this.routeCvs.zoom) * COMBAT_MAP_CONFIG.enemyShipsOffset
+        
+        // Render player ships
+        this.renderShipGroup(this.encounter.playerShips, 'player', this.playerShipGroupConfig)
+        
+        // Render enemy ships if they exist
         if (this.encounter.enemyShips && this.encounter.enemyShips.length > 0) {
-            // Handle fade-in animation
-            if (!this.enemyShipsFadedIn) {
-                if (this.enemyShipsOpacity === 0) {
-                    this.enemyShipsFadeStartTime = Date.now()
-                }
-                const elapsed = Date.now() - this.enemyShipsFadeStartTime
-                const fadeTime = COMBAT_MAP_CONFIG.enemyFadeInDuration
-                this.enemyShipsOpacity = Math.min(1, elapsed / fadeTime)
-                
-                if (this.enemyShipsOpacity >= 1) {
-                    this.enemyShipsFadedIn = true
-                }
-            }
-            
-            this.encounter.enemyShips.forEach((ship, index) => {
-                if (ship.disabled) return
-                
-                const jitter = this.updateShipJitter(ship)
-                const shipY = 0 + (index - (this.encounter.enemyShips.length - 1) / 2) * shipSpacing + jitter.y
-                const shipX = rightOffset + jitter.x
-                
-                // Check if ship already exists on canvas
-                const shipExists = this.shipsCreated.has(ship.uuid)
-                
-                // Create or update thruster
-                const thrusterId = `thruster-enemy-${ship.uuid}`
-                const thrusterObj = this.routeCvs.getObject(thrusterId)
-                if (thrusterObj) {
-                    thrusterObj.x = shipX + (true ? ship.radius : -ship.radius)
-                    thrusterObj.y = shipY
-                } else {
-                    this.renderThruster(ship, shipX, shipY)
-                }
-                
-                // Create or update ship
-                if (!shipExists) {
-                    this.renderShip(ship, shipX, shipY)
-                    this.shipsCreated.add(ship.uuid)
-                    
-                    // Apply fade-in to newly created enemy ship
-                    this.routeCvs.drawOrder.forEach(obj => {
-                        if (obj.id && obj.id.includes(ship.uuid) && obj.id.startsWith('enemy-')) {
-                            if (obj.fillColor && obj.fillColor.length >= 4) {
-                                obj.fillColor[3] = Math.floor(1 * this.enemyShipsOpacity)
-                            }
-                        }
-                    })
-                } else {
-                    this.updateShipPosition(ship, shipX, shipY)
-                    
-                    // Continue fade-in if not complete
-                    if (!this.enemyShipsFadedIn) {
-                        this.routeCvs.drawOrder.forEach(obj => {
-                            if (obj.id && obj.id.includes(ship.uuid) && obj.id.startsWith('enemy-')) {
-                                if (obj.fillColor && obj.fillColor.length >= 4) {
-                                    obj.fillColor[3] = Math.floor(1 * this.enemyShipsOpacity)
-                                }
-                            }
-                        })
-                    }
-                }
-            })
+            this.renderShipGroup(this.encounter.enemyShips, 'enemy', this.enemyShipGroupConfig)
         }
         
         this.routeCvs.redraw(true)
@@ -577,23 +499,20 @@ class CombatMap extends BaseMap {
      * @param {number} y
      */
     updateShipPosition(ship, x, y) {
-        const isPlayer = this.isPlayerShip(ship)
-        const idPrefix = isPlayer ? 'player' : 'enemy'
-        
         // Update polygons or circle
         if (ship.shipType.shipShape && ship.shipType.shipShape.toPolygons) {
             const shipColor = gs.fleet && gs.fleet.color ? gs.fleet.color : COLORS.White
             const shipSize = COMBAT_MAP_CONFIG.shipSize
             const polygons = ship.shipType.shipShape.toPolygons(shipColor, shipSize)
             polygons.forEach((poly) => {
-                const obj = this.routeCvs.getObject(`${idPrefix}-${ship.uuid}-poly-${poly.id}`)
+                const obj = this.routeCvs.getObject(`${ship.uuid}-poly-${poly.id}`)
                 if (obj) {
                     obj.x = x
                     obj.y = y
                 }
             })
         } else {
-            const obj = this.routeCvs.getObject(`${idPrefix}-${ship.uuid}`)
+            const obj = this.routeCvs.getObject(`${ship.uuid}`)
             if (obj) {
                 obj.x = x
                 obj.y = y
@@ -601,7 +520,7 @@ class CombatMap extends BaseMap {
         }
         
         // Update label
-        const label = this.routeCvs.getObject(`${idPrefix}-label-${ship.uuid}`)
+        const label = this.routeCvs.getObject(`label-${ship.uuid}`)
         if (label) {
             label.x = x
             label.y = y
@@ -610,325 +529,15 @@ class CombatMap extends BaseMap {
         // Get the ship's main canvas object and update progress bars
         let shipObj
         if (ship.shipType.shipShape && ship.shipType.shipShape.toPolygons) {
-            shipObj = this.routeCvs.getObject(`${idPrefix}-${ship.uuid}-poly-0`)
+            shipObj = this.routeCvs.getObject(`${ship.uuid}-poly-0`)
         } else {
-            shipObj = this.routeCvs.getObject(`${idPrefix}-${ship.uuid}`)
+            shipObj = this.routeCvs.getObject(`${ship.uuid}`)
         }
         
         // Update progress bars
         if (shipObj) {
             this.addShipProgressBars(ship, shipObj)
         }
-    }
-
-    animateRouteTravel() {
-        // If we're in travel mode (gs.destination is set), use custom travel animation
-        if (gs.destination && gs.travelYearsRemaining !== null) {
-            this.animateTravelMode()
-            return
-        }
-        
-        const centerX = this.routeCvs.canvas.width / 2
-        const centerY = this.routeCvs.canvas.height / 2
-        const shipSpacing = 60
-        
-        const animate = () => {
-            // Calculate elapsed time and update progress
-            const currentTime = Date.now()
-            const elapsedMs = currentTime - this.lastTickMs
-            this.lastTickMs = currentTime
-            
-            this.routeProgress += elapsedMs * COMBAT_MAP_PROGRESS_PERCENT_PER_MS
-            this.routeProgress = Math.min(this.routeProgress, 100)
-            
-            // Update progress bar if it exists
-            if (this.routeProgressBar) {
-                this.routeProgressBar.update(this.routeProgress)
-            }
-            
-            // Update ship positions (ships already created by renderShips)
-            this.encounter.playerShips.forEach((ship, index) => {
-                if (ship.disabled) return
-                
-                const jitter = this.updateShipJitter(ship, 10, 30)
-                const leftOffset = centerX * 0.5 // 75% to left (centerX = 50%, so 0.5 * centerX = 25% from left)
-                const shipY = centerY + (index - (this.encounter.playerShips.length - 1) / 2) * shipSpacing + jitter.y
-                const shipX = leftOffset + jitter.x
-                
-                this.updateShipPosition(ship, shipX, shipY)
-                
-                // Update thruster position
-                const isPlayer = this.isPlayerShip(ship)
-                const idPrefix = isPlayer ? 'player' : 'enemy'
-                const thrusterId = `thruster-${idPrefix}-${ship.uuid}`
-                const thrusterObj = this.routeCvs.getObject(thrusterId)
-                if (thrusterObj) {
-                    thrusterObj.x = shipX + (isPlayer ? -ship.radius : ship.radius)
-                    thrusterObj.y = shipY
-                }
-            })
-            
-            // Update enemy ship positions if they exist
-            if (this.encounter.enemyShips && this.encounter.enemyShips.length > 0) {
-                this.encounter.enemyShips.forEach((ship, index) => {
-                    if (ship.disabled) return
-                    
-                    const jitter = this.updateShipJitter(ship, 10, 30)
-                    const rightOffset = centerX * 1.5 // 75% to right
-                    const shipY = centerY + (index - (this.encounter.enemyShips.length - 1) / 2) * shipSpacing + jitter.y
-                    const shipX = rightOffset + jitter.x
-                    
-                    this.updateShipPosition(ship, shipX, shipY)
-                    
-                    // Update thruster position
-                    const isPlayer = this.isPlayerShip(ship)
-                    const idPrefix = isPlayer ? 'player' : 'enemy'
-                    const thrusterId = `thruster-${idPrefix}-${ship.uuid}`
-                    const thrusterObj = this.routeCvs.getObject(thrusterId)
-                    if (thrusterObj) {
-                        thrusterObj.x = shipX + (isPlayer ? -ship.radius : ship.radius)
-                        thrusterObj.y = shipY
-                    }
-                })
-            }
-            
-            this.routeCvs.redraw(true)
-            
-            // Continue animation
-            this.routeAnimationFrame = requestAnimationFrame(animate)
-        }
-        
-        animate()
-    }
-
-    /**
-     * Animates ships during travel mode (using GameState travel progress)
-     */
-    animateTravelMode() {
-        const centerX = this.routeCvs.canvas.width / 2
-        const centerY = this.routeCvs.canvas.height / 2
-        const shipSpacing = 60
-        
-        const animate = () => {
-            if (!gs.destination || gs.travelYearsRemaining === null) {
-                // Travel ended
-                if (this.encounter && this.encounter.endEncounter) {
-                    this.encounter.endEncounter()
-                }
-                return
-            }
-            
-            // Calculate progress based on start ETA vs remaining ETA
-            let progressPercent = 0
-            if (gs.travelStartYear !== null && gs.destination && gs.previousLocation) {
-                const totalDistance = calcDistance(gs.previousLocation.x, gs.previousLocation.y, gs.destination.x, gs.destination.y)
-                const startETA = totalDistance / gs.fleet.speed
-                const remainingETA = gs.travelYearsRemaining || 0
-                progressPercent = startETA > 0 ? ((startETA - remainingETA) / startETA) * 100 : 0
-            }
-            
-            // Update progress bar
-            if (this.routeProgressBar) {
-                this.routeProgressBar.update(progressPercent)
-            }
-            
-            // Update ETA display
-            if (this.routeETAEl) {
-                this.routeETAEl.innerHTML = `ETA: ${describeTimespan(gs.travelYearsRemaining || 0, 1)}`
-            }
-            
-            // Update player ship positions (ships already created by renderShips)
-            this.encounter.playerShips.forEach((ship, index) => {
-                if (ship.disabled) return
-                
-                const jitter = this.updateShipJitter(ship, 10, 30)
-                const leftOffset = centerX * 0.5 // 75% to left (centerX = 50%, so 0.5 * centerX = 25% from left)
-                const shipY = centerY + (index - (this.encounter.playerShips.length - 1) / 2) * shipSpacing + jitter.y
-                const shipX = leftOffset + jitter.x
-                
-                this.updateShipPosition(ship, shipX, shipY)
-                
-                // Update thruster position
-                const isPlayer = this.isPlayerShip(ship)
-                const idPrefix = isPlayer ? 'player' : 'enemy'
-                const thrusterId = `thruster-${idPrefix}-${ship.uuid}`
-                const thrusterObj = this.routeCvs.getObject(thrusterId)
-                if (thrusterObj) {
-                    thrusterObj.x = shipX + (isPlayer ? -ship.radius : ship.radius)
-                    thrusterObj.y = shipY
-                }
-            })
-            
-            // Update enemy ship positions if they exist
-            if (this.encounter.enemyShips && this.encounter.enemyShips.length > 0) {
-                this.encounter.enemyShips.forEach((ship, index) => {
-                    if (ship.disabled) return
-                    
-                    const jitter = this.updateShipJitter(ship, 10, 30)
-                    const rightOffset = centerX * 1.5 // 75% to right
-                    const shipY = centerY + (index - (this.encounter.enemyShips.length - 1) / 2) * shipSpacing + jitter.y
-                    const shipX = rightOffset + jitter.x
-                    
-                    this.updateShipPosition(ship, shipX, shipY)
-                    
-                    // Update thruster position
-                    const isPlayer = this.isPlayerShip(ship)
-                    const idPrefix = isPlayer ? 'player' : 'enemy'
-                    const thrusterId = `thruster-${idPrefix}-${ship.uuid}`
-                    const thrusterObj = this.routeCvs.getObject(thrusterId)
-                    if (thrusterObj) {
-                        thrusterObj.x = shipX + (isPlayer ? -ship.radius : ship.radius)
-                        thrusterObj.y = shipY
-                    }
-                })
-            }
-            
-            this.routeCvs.redraw(true)
-            
-            // Check if travel completed
-            if (gs.travelYearsRemaining <= 0 || gs.travelProgress >= 100) {
-                console.log('Travel completed')
-                
-                // Trigger encounter end to return to star map
-                if (this.encounter && this.encounter.endEncounter) {
-                    this.encounter.endEncounter()
-                }
-                return
-            }
-            
-            // Continue animation
-            this.routeAnimationFrame = requestAnimationFrame(animate)
-        }
-        
-        animate()
-    }
-
-    /**
-     * Creates a ship formation (column of ships)
-     * @param {Ship[]} ships
-     * @returns {HTMLElement}
-     */
-    createShipFormation(ships) {
-        const isPlayer = ships.length > 0 && this.isPlayerShip(ships[0])
-        const side = isPlayer ? 'player' : 'enemy'
-        const formation = ce({
-            classNames: ['ship-formation', `${side}-formation`],
-            style: {
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '40px',
-                alignItems: 'center',
-                backgroundColor: side === 'enemy' ? 'magenta' : 'transparent'
-            }
-        })
-        
-        ships.forEach((ship, index) => {
-            const shipElement = this.createShipElement(ship)
-            formation.appendChild(shipElement)
-        })
-        
-        return formation
-    }
-
-    /**
-     * Creates a ship element for the combat map
-     * @param {Ship} ship
-     * @returns {HTMLElement}
-     */
-    createShipElement(ship) {
-        const isPlayer = this.isPlayerShip(ship)
-        const side = isPlayer ? 'player' : 'enemy'
-        const isDestroyed = ship.disabled
-        const isSelected = (isPlayer && ship === this.selectedPlayerShip) || (!isPlayer && ship === this.selectedEnemyShip)
-    
-    const classNames = ['combat-ship', `${side}-ship`]
-    if (isSelected) classNames.push('selected')
-    
-    const shipEl = ce({
-        classNames,
-        style: {
-            width: '120px',
-            minHeight: '80px',
-            backgroundColor: isDestroyed ? '#444' : (isPlayer ? '#00ff00' : '#ff0000'),
-            border: '2px solid ' + (isSelected ? '#ffff00' : (isPlayer ? '#00aa00' : '#aa0000')),
-            borderRadius: '10px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            cursor: isDestroyed ? 'not-allowed' : 'pointer',
-            position: 'relative',
-            transform: isPlayer ? 'scaleX(1)' : 'scaleX(-1)', // Mirror enemy ships
-            transition: 'all 0.3s',
-            opacity: isDestroyed ? 0.3 : 1,
-            padding: '8px'
-        },
-        children: [
-            ce({
-                innerHTML: ship.shipType.name,
-                style: {
-                    color: '#fff',
-                    fontSize: '12px',
-                    fontWeight: 'bold',
-                    transform: isPlayer ? 'none' : 'scaleX(-1)', // Un-mirror text
-                    pointerEvents: 'none',
-                    marginBottom: '4px'
-                }
-            }),
-            ce({
-                innerHTML: `Hull: ${ship.hull[0]}/${ship.hull[1]}`,
-                style: {
-                    color: ship.hull[0] / ship.hull[1] < 0.3 ? '#ff6666' : '#fff',
-                    fontSize: '10px',
-                    transform: isPlayer ? 'none' : 'scaleX(-1)', // Un-mirror text
-                    pointerEvents: 'none'
-                }
-            }),
-            ce({
-                innerHTML: `Shields: ${ship.shields[0]}/${ship.shields[1]}`,
-                style: {
-                    color: ship.shields[0] > 0 ? '#6666ff' : '#888',
-                    fontSize: '10px',
-                    transform: isPlayer ? 'none' : 'scaleX(-1)', // Un-mirror text
-                    pointerEvents: 'none'
-                }
-            }),
-            ce({
-                innerHTML: `Lasers: ${ship.lasers}`,
-                style: {
-                    color: ship.lasers > 0 ? '#ffff66' : '#888',
-                    fontSize: '10px',
-                    transform: isPlayer ? 'none' : 'scaleX(-1)', // Un-mirror text
-                    pointerEvents: 'none'
-                }
-            })
-        ]
-    })
-    
-        // Click to select
-        if (!isDestroyed) {
-            shipEl.addEventListener('click', () => {
-                if (isPlayer) {
-                    this.selectedPlayerShip = ship
-                } else {
-                    this.selectedEnemyShip = ship
-                }
-                this.refreshCombatMap()
-            })
-        
-        // Highlight on hover
-        shipEl.addEventListener('mouseenter', () => {
-            shipEl.style.boxShadow = '0 0 20px ' + (isPlayer ? '#00ff00' : '#ff0000')
-            shipEl.style.transform = isPlayer ? 'scaleX(1.1)' : 'scaleX(-1.1)'
-        })
-        
-            shipEl.addEventListener('mouseleave', () => {
-                shipEl.style.boxShadow = 'none'
-                shipEl.style.transform = isPlayer ? 'scaleX(1)' : 'scaleX(-1)'
-            })
-        }
-        
-        return shipEl
     }
 
     /**
