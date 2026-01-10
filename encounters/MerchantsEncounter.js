@@ -8,9 +8,6 @@ class MerchantsEncounter extends Encounter {
         if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
         gs.encounter = this
         
-        // Show the encounter visually (ships on canvas)
-        showEncounterVisual(this)
-        
         // Show merchant modal instead of going straight to combat
         this.showInitialContactModal()
     }
@@ -56,13 +53,8 @@ class MerchantsEncounter extends Encounter {
             this.combatEnabled = true
         }
         
-        const fleetName = coloredName(this.fleet)
-        showModal(fleetName, 
-            `The ${fleetName} broadcasts, "We won't go down without a fight!"<br/>
-            Their ships power up weapons systems...<br/>`, 
-            [['Enter Combat', () => showCombatMap(this)]],
-            '', null, 0
-        )
+        // CombatMap will automatically pick up combatEnabled flag and switch to combat UI
+        this.endEncounter()
     }
     
     showTradeOfferModal(allowSell = true, buyCargoTypes = null, sellCargoTypes = null) {

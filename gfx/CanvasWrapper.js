@@ -198,6 +198,7 @@ class CanvasWrapper {
             x, y, x2, y2,
             strokeColor,
             size,
+            lineWidth: size,
         });
         return this.addObject(obj)
     }

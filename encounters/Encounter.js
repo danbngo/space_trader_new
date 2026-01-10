@@ -229,9 +229,6 @@ class Encounter {
         if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
         gs.encounter = this
         
-        // Show visual representation of encounter (ships on canvas)
-        showEncounterVisual(this)
-        
         // Create combat if this encounter has combat
         if (this.fleet && this.fleet.ships && this.fleet.ships.length > 0) {
             this.combat = new Combat(gs.fleet, this.fleet)

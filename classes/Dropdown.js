@@ -241,7 +241,7 @@ class Dropdown {
         this.labelElement.innerHTML = newLabel
         
         // Update all button states
-        this.itemsContainer.childNodes.forEach((btn, index) => {
+        Array.from(this.itemsContainer.children).forEach((btn, index) => {
             if (index === newIndex) {
                 btn.classList.add('disabled')
             } else {

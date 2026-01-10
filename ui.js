@@ -204,6 +204,7 @@ let currentMap;
  * @param {BaseMap} map - The map to display
  */
 function showMap(map) {
+    if (currentMap && currentMap.cleanup) currentMap.cleanup()
     currentMap = map
     showElement(map.root)
 }

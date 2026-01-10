@@ -14,9 +14,9 @@ class CombatMapRouteHandler {
      */
     tick() {
         // Check if travel is still active
-        if (!gs.destination || gs.travelYearsRemaining === null) {
+        if (!gs.destination || gs.travelYearsRemaining === null || gs.travelYearsRemaining <= 0) {
+            this.handleTravelComplete()
             console.log('Travel ended')
-            this.combatMap.cleanup()
             return
         }
         
@@ -44,12 +44,6 @@ class CombatMapRouteHandler {
         
         // Render ships
         this.combatMap.renderShips()
-        
-        // Check if travel completed
-        if (gs.travelYearsRemaining <= 0) {
-            this.handleTravelComplete()
-            return
-        }
         
         // Continue tick loop with 60fps target
         setTimeout(() => requestAnimationFrame(() => this.tick()), COMBAT_MAP_CONFIG.tickRate)
@@ -109,7 +103,7 @@ class CombatMapRouteHandler {
     /**
      * Handles completion of travel
      */
-    handleTravelComplete() {
+    handleTravelComplete(dockAt = gs.destination) {
         console.log('Travel completed - docking at', gs.destination.name)
         
         // Dock at destination
@@ -124,9 +118,7 @@ class CombatMapRouteHandler {
         gs.x = null
         gs.y = null
         
-        // Return to star map
-        this.combatMap.cleanup()
-        showStarMap(gs.location)
+        showStarMap(dockAt)
     }
 
     /**
@@ -206,11 +198,7 @@ class CombatMapRouteHandler {
         })
         
         cancelButton.addEventListener('click', () => {
-            // Stop animation and cleanup
-            this.combatMap.cleanup()
-            
-            // Return to star map without completing travel
-            showStarMap()
+            this.handleTravelComplete(gs.previousLocation)
         })
         
         panel.appendChild(cancelButton)
