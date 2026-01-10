@@ -19,7 +19,7 @@ const TRAVEL_MAP_CONFIG = {
     
     // Thruster settings
     thrusterSizeMultiplier: 0.2,
-    thrusterFlickerMin: 0.7,
+    thrusterFlickerMin: 0.9,
     thrusterFlickerMax: 1.0,
     
     // Animation

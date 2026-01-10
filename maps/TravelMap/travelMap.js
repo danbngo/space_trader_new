@@ -231,25 +231,20 @@ class TravelMap extends BaseMap {
     }
     
     /**
-     * Renders a thruster for a ship
+     * Renders a thruster for a ship (initial creation only)
      * @param {Ship} ship - The ship to render thruster for
      * @param {ShipGroupConfig} shipGroupConfig - Configuration for this ship's group
      */
     renderThruster(ship, shipGroupConfig) {
-        console.log('Rendering thruster for ship:', ship.shipType.name, shipGroupConfig)
-        
-        const flickerRange = TRAVEL_MAP_CONFIG.thrusterFlickerMax - TRAVEL_MAP_CONFIG.thrusterFlickerMin
-        const thrusterFlicker = TRAVEL_MAP_CONFIG.thrusterFlickerMin + Math.random() * flickerRange
-        const thrusterSize = ship.radius * TRAVEL_MAP_CONFIG.thrusterSizeMultiplier * thrusterFlicker
-        const thrusterColor = [255, Math.floor(150 * thrusterFlicker), 0, shipGroupConfig.opacity * thrusterFlicker]
+        console.log('Creating initial thruster for ship:', ship.shipType.name, shipGroupConfig)
         const rotation = shipGroupConfig.mirror ? 0 : Math.PI
         this.routeCvs.addFilledTriangle(
             `thruster-${ship.uuid}`,
-            0,0,
-            100,//thrusterSize/2,
-            100,//thrusterSize,
+            0, 0,
+            100,
+            100,
             2,
-            COLORS.Red,//thrusterColor,
+            COLORS.Red,
             rotation,
             null
         )
@@ -373,7 +368,7 @@ class TravelMap extends BaseMap {
         const y = shipObj.y
         
         // Calculate bar positions
-        const barY = y - TRAVEL_MAP_CONFIG.shipSize + TRAVEL_MAP_CONFIG.shipBarYOffset
+        const barY = y - TRAVEL_MAP_CONFIG.shipSize/2 + TRAVEL_MAP_CONFIG.shipBarYOffset
         const hullBarY = barY
         const shieldBarY = barY - TRAVEL_MAP_CONFIG.shipBarHeight - TRAVEL_MAP_CONFIG.shipBarSpacing
         
@@ -492,20 +487,33 @@ class TravelMap extends BaseMap {
             shipObj.y = y
         }
         
-        // Update thruster position
+        // Update thruster position, size, and color with flicker effect
         const thrusterObj = this.routeCvs.getObject(`thruster-${ship.uuid}`)
         if (thrusterObj) {
-            const thrusterOffset = shipGroupConfig.mirror ? -TRAVEL_MAP_CONFIG.shipSize : -TRAVEL_MAP_CONFIG.shipSize
+            // Calculate flicker
+            const flickerRange = TRAVEL_MAP_CONFIG.thrusterFlickerMax - TRAVEL_MAP_CONFIG.thrusterFlickerMin
+            const thrusterFlicker = TRAVEL_MAP_CONFIG.thrusterFlickerMin + Math.random() * flickerRange
+            
+            // Update size with flicker
+            const thrusterSize = TRAVEL_MAP_CONFIG.shipSize/2 * TRAVEL_MAP_CONFIG.thrusterSizeMultiplier * thrusterFlicker
+            thrusterObj.size = thrusterSize / 2
+            thrusterObj.minorSize = thrusterSize
+            
+            // Update color with flicker
+            const thrusterColor = [255, Math.floor(150 * thrusterFlicker), 0, shipGroupConfig.opacity * thrusterFlicker]
+            thrusterObj.fillColor = thrusterColor
+            
+            // Update position
+            const thrusterOffset = shipGroupConfig.mirror ? TRAVEL_MAP_CONFIG.shipSize/2 : -TRAVEL_MAP_CONFIG.shipSize/2
             thrusterObj.x = x + thrusterOffset
             thrusterObj.y = y
-            console.log('updated thruster pos:', thrusterObj.x, thrusterObj.y)
         }
         
         // Update label
         const label = this.routeCvs.getObject(`label-${ship.uuid}`)
         if (label) {
             label.x = x
-            label.y = y-TRAVEL_MAP_CONFIG.shipSize
+            label.y = y - TRAVEL_MAP_CONFIG.shipSize/2
         }
         
         // Update progress bars
