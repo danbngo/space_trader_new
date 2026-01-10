@@ -224,6 +224,7 @@ class Fleet extends SpaceObject {
         const baseSpeed = this.totalEngine/AVERAGE_SHIP_ENGINE / weight
         const totalPilotSkill = this.totalSkills.getAmount(SKILLS.Pilot)
         const speed = Math.sqrt(baseSpeed* AVERAGE_FLEET_SPEED) * (1 + totalPilotSkill/50) 
+        console.log(speed,'speed calc: baseSpeed:',baseSpeed,'pilot skill:',totalPilotSkill,'weight:',weight,'engines:',this.totalEngine)
         return speed
         //fleets are a lil too fast, slow ones are a lil too slow
     }

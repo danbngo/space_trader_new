@@ -16,6 +16,7 @@ class ShipShape {
      * @returns {Array<CanvasObject>} Array of CanvasObject instances with SHAPES.Polygon
      */
     toPolygons(color, size) {
+        if (!color || !size) throw new Error('ShipShape.toPolygons requires color and size parameters')
         const polygons = []
         
         // Add positive areas with lower z-index (rendered first, behind)

@@ -36,17 +36,11 @@ class CombatMap extends BaseMap {
             this.selectedEnemyShip = gs.combat.activeEnemyShips[0] || null
         }
         
-        // Use the canvas created by showEncounterVisual, or create new if needed
-        this.routeCvs = new CanvasWrapper(1, 1, 1, 0, false, false)
-        
         // Get or create container
         this.root = document.getElementById('encounter-visual-container') || ce({id: 'combat-map-container'})
         this.root.id = 'combat-map-container'
         
-        // Ensure canvas is in container
-        if (!this.root.contains(this.routeCvs.root)) {
-            this.root.appendChild(this.routeCvs.root)
-        }
+        this.routeCvs = new CanvasWrapper(1, 1, 1, 0, false, false)
         
         // Create UI panel at bottom
         if (this.hasEnemies) {
@@ -424,7 +418,9 @@ class CombatMap extends BaseMap {
         
         // Update polygons or circle
         if (ship.shipType.shipShape && ship.shipType.shipShape.toPolygons) {
-            const polygons = ship.shipType.shipShape.toPolygons()
+            const shipColor = gs.fleet && gs.fleet.color ? gs.fleet.color : [0, 255, 0, 255]
+            const shipSize = COMBAT_MAP_CONFIG.shipSize
+            const polygons = ship.shipType.shipShape.toPolygons(shipColor, shipSize)
             polygons.forEach((poly) => {
                 const obj = this.routeCvs.getObject(`${idPrefix}-${ship.uuid}-poly-${poly.id}`)
                 if (obj) {
@@ -463,10 +459,6 @@ class CombatMap extends BaseMap {
         const shipSpacing = 60
         
         const animate = () => {
-            // Clear only objects (ships), NOT pixels (stars remain)
-            this.routeCvs.objectMap.clear()
-            this.routeCvs.drawOrder = []
-            
             // Calculate elapsed time and update progress
             const currentTime = Date.now()
             const elapsedMs = currentTime - this.lastTickMs
@@ -480,7 +472,7 @@ class CombatMap extends BaseMap {
                 this.routeProgressBar.update(this.routeProgress)
             }
             
-            // Draw player ships with jitter and thruster
+            // Update ship positions (ships already created by renderShips)
             this.encounter.playerShips.forEach((ship, index) => {
                 if (this.isShipDestroyed(ship)) return
                 
@@ -489,11 +481,20 @@ class CombatMap extends BaseMap {
                 const shipY = centerY + (index - (this.encounter.playerShips.length - 1) / 2) * shipSpacing + jitter.y
                 const shipX = leftOffset + jitter.x
                 
-                this.renderThruster(ship, shipX, shipY)
-                this.renderShip(ship, shipX, shipY)
+                this.updateShipPosition(ship, shipX, shipY)
+                
+                // Update thruster position
+                const isPlayer = this.isPlayerShip(ship)
+                const idPrefix = isPlayer ? 'player' : 'enemy'
+                const thrusterId = `thruster-${idPrefix}-${ship.uuid}`
+                const thrusterObj = this.routeCvs.getObject(thrusterId)
+                if (thrusterObj) {
+                    thrusterObj.x = shipX + (isPlayer ? -ship.radius : ship.radius)
+                    thrusterObj.y = shipY
+                }
             })
             
-            // Draw enemy ships if they exist
+            // Update enemy ship positions if they exist
             if (this.encounter.enemyShips && this.encounter.enemyShips.length > 0) {
                 this.encounter.enemyShips.forEach((ship, index) => {
                     if (this.isShipDestroyed(ship)) return
@@ -503,8 +504,17 @@ class CombatMap extends BaseMap {
                     const shipY = centerY + (index - (this.encounter.enemyShips.length - 1) / 2) * shipSpacing + jitter.y
                     const shipX = rightOffset + jitter.x
                     
-                    this.renderThruster(ship, shipX, shipY)
-                    this.renderShip(ship, shipX, shipY)
+                    this.updateShipPosition(ship, shipX, shipY)
+                    
+                    // Update thruster position
+                    const isPlayer = this.isPlayerShip(ship)
+                    const idPrefix = isPlayer ? 'player' : 'enemy'
+                    const thrusterId = `thruster-${idPrefix}-${ship.uuid}`
+                    const thrusterObj = this.routeCvs.getObject(thrusterId)
+                    if (thrusterObj) {
+                        thrusterObj.x = shipX + (isPlayer ? -ship.radius : ship.radius)
+                        thrusterObj.y = shipY
+                    }
                 })
             }
             
@@ -547,10 +557,6 @@ class CombatMap extends BaseMap {
                 }
                 return
             }
-
-            // Clear only objects (ships), NOT pixels (stars remain)
-            this.routeCvs.objectMap.clear()
-            this.routeCvs.drawOrder = []
             
             // Calculate progress based on start ETA vs remaining ETA
             let progressPercent = 0
@@ -571,7 +577,7 @@ class CombatMap extends BaseMap {
                 this.routeETAEl.innerHTML = `ETA: ${describeTimespan(gs.travelYearsRemaining || 0, 1)}`
             }
             
-            // Draw player ships with jitter and thruster
+            // Update player ship positions (ships already created by renderShips)
             this.encounter.playerShips.forEach((ship, index) => {
                 if (this.isShipDestroyed(ship)) return
                 
@@ -580,11 +586,20 @@ class CombatMap extends BaseMap {
                 const shipY = centerY + (index - (this.encounter.playerShips.length - 1) / 2) * shipSpacing + jitter.y
                 const shipX = leftOffset + jitter.x
                 
-                this.renderThruster(ship, shipX, shipY)
-                this.renderShip(ship, shipX, shipY)
+                this.updateShipPosition(ship, shipX, shipY)
+                
+                // Update thruster position
+                const isPlayer = this.isPlayerShip(ship)
+                const idPrefix = isPlayer ? 'player' : 'enemy'
+                const thrusterId = `thruster-${idPrefix}-${ship.uuid}`
+                const thrusterObj = this.routeCvs.getObject(thrusterId)
+                if (thrusterObj) {
+                    thrusterObj.x = shipX + (isPlayer ? -ship.radius : ship.radius)
+                    thrusterObj.y = shipY
+                }
             })
             
-            // Draw enemy ships if they exist
+            // Update enemy ship positions if they exist
             if (this.encounter.enemyShips && this.encounter.enemyShips.length > 0) {
                 this.encounter.enemyShips.forEach((ship, index) => {
                     if (this.isShipDestroyed(ship)) return
@@ -594,8 +609,17 @@ class CombatMap extends BaseMap {
                     const shipY = centerY + (index - (this.encounter.enemyShips.length - 1) / 2) * shipSpacing + jitter.y
                     const shipX = rightOffset + jitter.x
                     
-                    this.renderThruster(ship, shipX, shipY)
-                    this.renderShip(ship, shipX, shipY)
+                    this.updateShipPosition(ship, shipX, shipY)
+                    
+                    // Update thruster position
+                    const isPlayer = this.isPlayerShip(ship)
+                    const idPrefix = isPlayer ? 'player' : 'enemy'
+                    const thrusterId = `thruster-${idPrefix}-${ship.uuid}`
+                    const thrusterObj = this.routeCvs.getObject(thrusterId)
+                    if (thrusterObj) {
+                        thrusterObj.x = shipX + (isPlayer ? -ship.radius : ship.radius)
+                        thrusterObj.y = shipY
+                    }
                 })
             }
             
@@ -852,7 +876,7 @@ function showEncounterVisual(encounter) {
     cvs.root.style.height = '100%'
     container.appendChild(cvs.root)
     
-     document.body.appendChild(container)
+    document.body.appendChild(container)
     
     // Render stars and ships after DOM is ready
     requestAnimationFrame(() => {
