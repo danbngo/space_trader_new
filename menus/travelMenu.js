@@ -26,7 +26,6 @@ function showTravelMap() {
         }
     }
 
-    // Create combat map in route travel mode
-    // CombatMap will detect gs.destination and use travel mode automatically
+    // Create combat map in route travel mode (creates its own canvas and renders stars)
     currentMap = new CombatMap(travelEncounter)
 }

@@ -36,11 +36,12 @@ class CombatMap extends BaseMap {
             this.selectedEnemyShip = gs.combat.activeEnemyShips[0] || null
         }
         
-        // Get or create container
-        this.root = document.getElementById('encounter-visual-container') || ce({id: 'combat-map-container'})
-        this.root.id = 'combat-map-container'
+        // Create container
+        this.root = ce({id: 'combat-map-container'})
         
+        // Create canvas for rendering
         this.routeCvs = new CanvasWrapper(1, 1, 1, 0, false, false)
+        this.root.appendChild(this.routeCvs.root)
         
         // Create UI panel at bottom
         if (this.hasEnemies) {
@@ -60,6 +61,9 @@ class CombatMap extends BaseMap {
             this.routeCvs.cameraX = 0
             this.routeCvs.cameraY = 0
             this.routeCvs.zoom = 60
+            
+            // Render stars once
+            this.initializeStars()
             
             // Initial render of ships
             this.renderShips()

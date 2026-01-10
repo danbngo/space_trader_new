@@ -88,7 +88,7 @@ class CombatMapRouteHandler {
      * Checks if an encounter should occur and triggers it if so
      */
     checkForEncounter() {
-        console.log('rolling for encounter:', YEARS_PER_TRAVEL_TICK, 'years elapsed, base encounter chance per day:', BASE_ENCOUNTER_CHANCE_PER_DAY)
+        //console.log('rolling for encounter:', YEARS_PER_TRAVEL_TICK, 'years elapsed, base encounter chance per day:', BASE_ENCOUNTER_CHANCE_PER_DAY)
         
         const encounterOccurrences = calcOccurrencesPerTimespan(BASE_ENCOUNTER_CHANCE_PER_DAY, YEARS_PER_TRAVEL_TICK*365)
         if (encounterOccurrences >= 1) {
