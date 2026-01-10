@@ -44,6 +44,59 @@ function tickPlanets(elapsedYears = 1) {
 
 
 
+/**
+ * Rolls which encounter type occurs, with weights skewed by planet economies
+ * @param {Planet} previousLocation - Origin planet
+ * @param {Planet} destination - Destination planet
+ * @returns {EncounterType} The selected encounter type
+ */
+function rollEncounterType(previousLocation, destination) {
+    const encounterTypes = ENCOUNTER_TYPES_ALL
+    const weights = []
+    
+    for (const encounterType of encounterTypes) {
+        let weight = encounterType.weight
+        
+        // Skew weights based on planet economies
+        if (encounterType === ENCOUNTER_TYPES.MERCHANTS) {
+            const fromEconomy = previousLocation?.c?.economy || 0
+            const toEconomy = destination?.c?.economy || 0
+            weight *= (fromEconomy + toEconomy)
+        }
+        
+        weights.push(weight)
+    }
+    
+    const selectedIndex = rndIndexWeighted(weights)
+    return encounterTypes[selectedIndex]
+}
+
+/**
+ * Rolls which planet triggered the encounter based on economy/distance ratio
+ * @param {EncounterType} encounterType - The type of encounter
+ * @param {Planet} previousLocation - Origin planet
+ * @param {Planet} destination - Destination planet
+ * @param {Fleet} fleet - The fleet traveling
+ * @returns {Planet|null} The planet that triggered the encounter
+ */
+function rollEncounterPlanet(encounterType, previousLocation, destination, fleet) {
+    if (!previousLocation || !destination || !fleet) return null
+    
+    // Calculate distance from fleet to each planet
+    const fromDistance = calcDistance(fleet.x, fleet.y, previousLocation.x, previousLocation.y)
+    const toDistance = calcDistance(fleet.x, fleet.y, destination.x, destination.y)
+    
+    // Avoid division by zero
+    const fromWeight = fromDistance > 0 ? (previousLocation.c?.economy || 0) / fromDistance : 0
+    const toWeight = toDistance > 0 ? (destination.c?.economy || 0) / toDistance : 0
+    
+    const weights = [fromWeight, toWeight]
+    const planets = [previousLocation, destination]
+    
+    const selectedIndex = rndIndexWeighted(weights)
+    return planets[selectedIndex]
+}
+
 function  checkPlayerStranded() {
     if (!gs.fleet.stranded) return
     console.log('checkPlayerStranded');

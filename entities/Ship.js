@@ -11,12 +11,12 @@ class Ship {
      * @param {number[]} hull - The current and maximum hull integrity [current, max].
      * @param {number[]} shields - The current and maximum shield strength [current, max].
      * @param {number} fuelCapacity - The fuel capacity of the ship.
-     * @param {number[]} lasers - The current and maximum laser charge [current, max].
+     * @param {number} lasers - The laser power of the ship.
      * @param {number} engine - The engine power of the ship.
      * @param {number} cargoSpace - The cargo space available on the ship.
      * @param {number} radars - The radar capability of the ship.
      */
-    constructor(name = "Unnamed", shipType = SHIP_TYPES[0], color = COLORS.White, hull = [0, 0], shields = [0, 0], lasers = [0, 0], engine = 0, cargoSpace = 0, radars = 0, fuelCapacity = 0) {
+    constructor(name = "Unnamed", shipType = SHIP_TYPES[0], color = COLORS.White, hull = [0, 0], shields = [0, 0], lasers = 0, engine = 0, cargoSpace = 0, radars = 0, fuelCapacity = 0) {
         /** @type {string} */
         this.name = name;
         /** @type {ShipType} */
@@ -29,8 +29,8 @@ class Ship {
         this.shields = shields; //take less damage from lasers
         /** @type {number} */
         this.fuelCapacity = fuelCapacity; //maximum fuel capacity
-        /** @type {number[]} */
-        this.lasers = lasers; //do more damage in combat, and vs. asteroids [current, max]
+        /** @type {number} */
+        this.lasers = lasers; //do more damage in combat, and vs. asteroids
         /** @type {number} */
         this.radars = radars; //shoot further, and detect enemies and asteroids at greater distances
         /** @type {number} */
@@ -76,13 +76,15 @@ class Ship {
         this._disabledByShipUUID = undefined;
         /** @type {string} */
         this._aiTypeName = undefined;
+
+        this.actionsRemaining = 1
         
         gameRegistry.registerShip(this)
     }
 
     get quality() {
         console.log('getting quality:',this,this.shipType)
-        let totalStats = this.lasers[1] + this.hull[1] + this.shields[1] + this.engine + this.cargoSpace + this.radars
+        let totalStats = this.lasers + this.hull[1] + this.shields[1] + this.engine + this.cargoSpace + this.radars
         let expectedStats = this.shipType.lasers * AVERAGE_SHIP_LASERS + this.shipType.hull * AVERAGE_SHIP_HULL + this.shipType.shields * AVERAGE_SHIP_SHIELDS + this.shipType.engine * AVERAGE_SHIP_ENGINE + this.shipType.cargoSpace * AVERAGE_SHIP_CARGO_SPACE + this.shipType.radars * AVERAGE_SHIP_RADARS  
         return totalStats / expectedStats
     }
@@ -124,7 +126,7 @@ class Ship {
         return 1 * AVERAGE_SHIP_MASS
         * (this.hull[1]/AVERAGE_SHIP_HULL
         + this.shields[1]/AVERAGE_SHIP_SHIELDS 
-        + this.lasers[1]/AVERAGE_SHIP_LASERS
+        + this.lasers/AVERAGE_SHIP_LASERS
         + this.cargoSpace/AVERAGE_SHIP_CARGO_SPACE
         + this.engine/AVERAGE_SHIP_ENGINE
         + this.radars/AVERAGE_SHIP_RADARS) / 6
@@ -148,7 +150,7 @@ class Ship {
             this.hull[0] / AVERAGE_SHIP_HULL
             + this.shields[0] / (AVERAGE_SHIP_SHIELDS*2)
             + this.shields[1] / (AVERAGE_SHIP_SHIELDS*2)
-        const atkRating = this.lasers[1] / AVERAGE_SHIP_LASERS * this.radars / AVERAGE_SHIP_RADARS + this.engine / AVERAGE_SHIP_ENGINE
+        const atkRating = this.lasers / AVERAGE_SHIP_LASERS * this.radars / AVERAGE_SHIP_RADARS + this.engine / AVERAGE_SHIP_ENGINE
         return Math.pow(hpRating * atkRating, 0.5)
     }
 
@@ -200,6 +202,7 @@ class Ship {
      * Resets all combat-related variables to initial state.
      */
     resetCombatVars() {
+        this.actionsRemaining = 1;
         this.escaped = false;
     }
 

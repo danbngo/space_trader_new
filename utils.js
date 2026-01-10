@@ -361,25 +361,39 @@ function rndShuffle(arr = []) {
 
 /**
  * Calculates the number of occurrences of a probabilistic event over a timespan.
- * Handles fractional ticks by applying proportional probability to the remainder.
+ * Uses exponential probability: P(event in time t) = 1 - (1-p)^t
+ * This correctly handles both small and large probabilities over fractional time periods.
  * @param {number} chancePerTick - The probability of the event occurring per tick (0-1).
  * @param {number} numTicks - The number of ticks (can be fractional, e.g., 10.3).
  * @returns {number} The number of times the event occurred.
  */
 function calcOccurrencesPerTimespan(chancePerTick = 0.1, numTicks = 1) {
-    // returns a potentially infinite (with infinitesimal chance) number representing the number of occurrences of a small probability event over a timespan
-    let occurrences = 0;
-    const wholeTicks = Math.floor(numTicks);
-    const tickFraction = numTicks - wholeTicks;
-
-    // Process whole ticks
-    for (let i = 0; i < wholeTicks; i++) {
-        if (Math.random() < chancePerTick) occurrences++;
-    }
+    if (chancePerTick <= 0 || numTicks <= 0) return 0;
+    if (chancePerTick >= 1) return Math.ceil(numTicks); // Guaranteed event
     
-    // Process fractional tick with proportional probability
-    if (tickFraction > 0 && Math.random() < chancePerTick * tickFraction) {
+    let occurrences = 0;
+    
+    // Use exponential probability formula: P(event) = 1 - (1-p)^t
+    // This correctly models the probability of an event happening over time
+    const probabilityOfNotHappening = Math.pow(1 - chancePerTick, numTicks);
+    const probabilityOfHappening = 1 - probabilityOfNotHappening;
+    
+    // Roll once for the event happening at least once
+    if (Math.random() < probabilityOfHappening) {
         occurrences++;
+        
+        // For additional occurrences, continue rolling with the base probability
+        // This handles cases where multiple events could occur
+        let remainingTicks = numTicks - 1;
+        while (remainingTicks > 0) {
+            const nextProbability = 1 - Math.pow(1 - chancePerTick, Math.min(remainingTicks, 1));
+            if (Math.random() < nextProbability) {
+                occurrences++;
+                remainingTicks -= 1;
+            } else {
+                break;
+            }
+        }
     }
 
     return occurrences;

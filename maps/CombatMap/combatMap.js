@@ -10,268 +10,100 @@ class CombatMap extends BaseMap {
         this.encounter = encounter
         this.selectedPlayerShip = null
         this.selectedEnemyShip = null
-        this.combatLog = []
-        this.isPlayerTurn = true
         this.routeAnimationFrame = null
         this.routeProgress = 0
         this.shipJitterOffsets = new Map()
         this.routeProgressBar = null
-        this.routeCvs = null // Canvas for route travel animation
+        this.enemyShipsFadedIn = false
+        this.enemyShipsOpacity = 0
+        this.enemyShipsFadeStartTime = 0
+        
+        // Route travel UI element references (set by route handler)
+        this.routeDistanceEl = null
+        this.routeETAEl = null
         
         // Determine mode
-        this.hasEnemies = encounter.enemyShips && encounter.enemyShips.length > 0
+        this.hasEnemies = gs.combat && gs.combat.enemyShips && gs.combat.enemyShips.length > 0
+        
+        // Initialize handlers
+        this.combatHandler = new CombatMapCombatHandler(this)
+        this.routeHandler = new CombatMapRouteHandler(this)
         
         if (this.hasEnemies) {
             // Combat mode
-            this.selectedPlayerShip = this.getAliveShips(encounter.playerShips)[0] || null
-            this.selectedEnemyShip = this.getAliveShips(encounter.enemyShips)[0] || null
-            this.initializeCombatMode()
-        } else {
-            // Route travel mode
-            this.initializeRouteTravelMode()
+            this.selectedPlayerShip = gs.combat.activePlayerShips[0] || null
+            this.selectedEnemyShip = gs.combat.activeEnemyShips[0] || null
         }
-    }
-    
-    /**
-     * Initialize DOM for combat mode
-     */
-    initializeCombatMode() {
-        // Create main container
-        this.root = ce({
-            id: 'combat-map-container',
-            style: {
-                width: '100%',
-                height: '100vh',
-                backgroundColor: '#000',
-                position: 'relative',
-                overflow: 'hidden'
-            }
-        })
+        
+        // Initialize main container
+        this.root = ce({id: 'combat-map-container'})
         
         // Create starfield background
         const starfieldCanvas = this.createStarfield()
         this.root.appendChild(starfieldCanvas)
         
-        // Create combat area with ships
-        this.combatArea = this.createCombatArea()
-        this.root.appendChild(this.combatArea)
+        // Create canvas for ships
+        this.routeCvs = new CanvasWrapper(1, 1, 1, 0, false, false)
+        this.routeCvs.root.id = 'combat-canvas-wrapper'
+        this.root.appendChild(this.routeCvs.root)
         
         // Create UI panel at bottom
-        this.uiPanel = this.createCombatUIPanel()
+        if (this.hasEnemies) {
+            this.uiPanel = this.combatHandler.createCombatUIPanel()
+        } else {
+            this.uiPanel = this.routeHandler.createRouteTravelUIPanel()
+            // Initialize tick system for travel mode
+            this.lastTickMs = Date.now()
+        }
         this.root.appendChild(this.uiPanel)
         
         showElement(this.root)
-    }
-    
-    /**
-     * Initialize DOM for route travel mode
-     */
-    initializeRouteTravelMode() {
-        // Create main container
-        this.root = ce({
-            id: 'combat-map-container',
-            style: {
-                width: '100%',
-                height: '100vh',
-                backgroundColor: '#000',
-                position: 'relative',
-                overflow: 'hidden'
-            }
-        })
         
-        // Create starfield background
-        const starfieldCanvas = this.createStarfield()
-        this.root.appendChild(starfieldCanvas)
-        
-        // Create canvas for ships and thrusters
-        this.routeCvs = new CanvasWrapper(1, 1, 1, 0, false)
-        this.routeCvs.root.id = 'route-canvas-wrapper'
-        this.routeCvs.root.style.position = 'absolute'
-        this.routeCvs.root.style.top = '0'
-        this.routeCvs.root.style.left = '0'
-        this.routeCvs.root.style.width = '100%'
-        this.routeCvs.root.style.height = '75%'
-        this.routeCvs.root.style.zIndex = '1'
-        this.root.appendChild(this.routeCvs.root)
-        
-        // Create route UI panel at bottom
-        this.routePanel = this.createRouteTravelUIPanel()
-        this.root.appendChild(this.routePanel)
-        
-        showElement(this.root)
-        
-        // Defer canvas sizing until after DOM is rendered
+        // Defer canvas sizing and initial render until after DOM is rendered
         requestAnimationFrame(() => {
-            // Auto-resize canvas to fit its container
             this.routeCvs.autoResize()
-            
-            // Set up camera for screen-space rendering (1:1 pixel mapping)
             this.routeCvs.cameraX = 0
             this.routeCvs.cameraY = 0
             this.routeCvs.zoom = 60
             
-            console.log('Canvas resized - dimensions:', this.routeCvs.canvas.width, 'x', this.routeCvs.canvas.height)
-            
-            // Initial render
+            // Initial render of ships
             this.renderShips()
+            
+            // Start animation/tick loop
+            if (this.hasEnemies) {
+                this.startCombatAnimation()
+            } else {
+                this.routeHandler.tick()
+            }
         })
-        
-        // Initialize tick system
-        this.lastTickMs = Date.now()
-        this.paused = false
-        
-        // Start tick loop
-        this.tick()
+    }
+    
+
+    
+    /**
+     * Starts the combat animation loop
+     * This runs independently of pause state to ensure enemy ships fade in properly
+     */
+    startCombatAnimation() {
+        const animate = () => {
+            // Always render ships to allow fade-in to complete
+            this.renderShips()
+            
+            // Continue animating indefinitely (not just during fade)
+            // This ensures smooth rendering even when modal is shown
+            this.routeAnimationFrame = requestAnimationFrame(animate)
+        }
+        animate()
     }
     
     /**
-     * Animates ships during route travel
-     */
-    /**
-     * Main game loop tick for travel mode
+     * Main game loop tick for travel mode - delegated to route handler
      */
     tick() {
-        if (this.paused) return
-        
-        // Check if travel is still active
-        if (!gs.destination || gs.travelYearsRemaining === null) {
-            console.log('Travel ended')
-            this.cleanup()
-            return
-        }
-        
-        // Use YEARS_PER_TRAVEL_TICK for elapsed years
-        const elapsedYears = YEARS_PER_TRAVEL_TICK
-        
-        // Update game year
-        gs.year += elapsedYears
-        
-        // Update travel time remaining
-        gs.travelYearsRemaining -= elapsedYears
-        
-        // Update positions of planets/stars
-        gs.system.updatePositions()
-        
-        // Calculate and update progress percentage
-        let progressPercent = 0
-        if (gs.travelStartYear !== null && gs.destination && gs.previousLocation) {
-            const totalDistance = calcDistance(gs.previousLocation.x, gs.previousLocation.y, gs.destination.x, gs.destination.y)
-            const startETA = totalDistance / gs.fleet.speed
-            const remainingETA = Math.max(0, gs.travelYearsRemaining)
-            progressPercent = startETA > 0 ? ((startETA - remainingETA) / startETA) * 100 : 100
-            
-            // Update player location as weighted average based on progress
-            const progressRatio = progressPercent / 100
-            gs.fleet.x = gs.previousLocation.x + (gs.destination.x - gs.previousLocation.x) * progressRatio
-            gs.fleet.y = gs.previousLocation.y + (gs.destination.y - gs.previousLocation.y) * progressRatio
-            
-            // Update travelProgress for serialization
-            gs.travelProgress = progressPercent
-        }
-        
-        // Update progress bar
-        if (this.routeProgressBar) {
-            this.routeProgressBar.update(progressPercent)
-        }
-        
-        // Update distance display
-        if (this.routeDistanceEl && gs.destination && gs.fleet) {
-            const currentDistance = calcDistance(gs.fleet.x, gs.fleet.y, gs.destination.x, gs.destination.y)
-            this.routeDistanceEl.innerHTML = `Distance: ${roundToPlaces(currentDistance, 1)} AU`
-        }
-        
-        // Update ETA display
-        if (this.routeETAEl) {
-            this.routeETAEl.innerHTML = `ETA: ${describeTimespan(Math.max(0, gs.travelYearsRemaining), 1)}`
-        }
-        
-        // Roll for encounter
-        const encounterOccurrences = calcOccurrencesPerTimespan(BASE_ENCOUNTER_CHANCE_PER_YEAR, elapsedYears)
-        if (encounterOccurrences >= 1) {
-            console.log('Encounter triggered!')
-            // Trigger encounter
-            const encounterType = this.rollEncounterType()
-            const encounterPlanet = this.rollEncounterPlanet(encounterType)
-            console.log('Encounter type:', encounterType.name, 'at planet:', encounterPlanet?.name)
-            // TODO: Create and show encounter
-        }
-        
-        // Render ships
-        this.renderShips()
-        
-        // Check if travel completed
-        if (gs.travelYearsRemaining <= 0) {
-            console.log('Travel completed - docking at', gs.destination.name)
-            
-            // Dock at destination
-            gs.fleet.dock(gs.destination)
-            
-            // Clear travel state
-            gs.previousLocation = null
-            gs.destination = null
-            gs.travelYearsRemaining = null
-            gs.travelProgress = null
-            gs.travelStartYear = null
-            gs.x = null
-            gs.y = null
-            
-            // Return to star map
-            this.cleanup()
-            showStarMap(gs.location)
-            return
-        }
-        
-        // Continue tick loop with 60fps target
-        setTimeout(() => requestAnimationFrame(() => this.tick()), 1000 / 60)
+        this.routeHandler.tick()
     }
     
-    /**
-     * Rolls which encounter type occurs, with weights skewed by planet economies
-     * @returns {EncounterType} The selected encounter type
-     */
-    rollEncounterType() {
-        const encounterTypes = ENCOUNTER_TYPES_ALL
-        const weights = []
-        
-        for (const encounterType of encounterTypes) {
-            let weight = encounterType.weight
-            
-            // Skew weights based on planet economies
-            if (encounterType === ENCOUNTER_TYPES.MERCHANTS) {
-                const fromEconomy = gs.previousLocation?.c?.economy || 0
-                const toEconomy = gs.destination?.c?.economy || 0
-                weight *= (fromEconomy + toEconomy)
-            }
-            
-            weights.push(weight)
-        }
-        
-        const selectedIndex = rndIndexWeighted(weights)
-        return encounterTypes[selectedIndex]
-    }
-    
-    /**
-     * Rolls which planet triggered the encounter based on economy/distance ratio
-     * @param {EncounterType} encounterType - The type of encounter
-     * @returns {Planet|null} The planet that triggered the encounter
-     */
-    rollEncounterPlanet(encounterType) {
-        if (!gs.previousLocation || !gs.destination) return null
-        
-        // Calculate distance from fleet to each planet
-        const fromDistance = calcDistance(gs.fleet.x, gs.fleet.y, gs.previousLocation.x, gs.previousLocation.y)
-        const toDistance = calcDistance(gs.fleet.x, gs.fleet.y, gs.destination.x, gs.destination.y)
-        
-        // Avoid division by zero
-        const fromWeight = fromDistance > 0 ? (gs.previousLocation.c?.economy || 0) / fromDistance : 0
-        const toWeight = toDistance > 0 ? (gs.destination.c?.economy || 0) / toDistance : 0
-        
-        const weights = [fromWeight, toWeight]
-        const planets = [gs.previousLocation, gs.destination]
-        
-        const selectedIndex = rndIndexWeighted(weights)
-        return planets[selectedIndex]
-    }
+
     
     /**
      * Updates jitter offset for a ship (smooth random movement)
@@ -279,46 +111,53 @@ class CombatMap extends BaseMap {
      * @param {number} maxX - Maximum horizontal jitter (±)
      * @param {number} maxY - Maximum vertical jitter (±)
      */
-    updateShipJitter(ship, maxX = 2, maxY = 1) {
+    updateShipJitter(ship, maxX = COMBAT_MAP_CONFIG.defaultJitterX, maxY = COMBAT_MAP_CONFIG.defaultJitterY) {
         if (!this.shipJitterOffsets.has(ship)) {
-            this.shipJitterOffsets.set(ship, {x: 0, y: 0, targetX: 0, targetY: 0})
+            // Initialize with random target values so jitter starts immediately
+            const initialTargetX = (Math.random() - 0.5) * maxX
+            const initialTargetY = (Math.random() - 0.5) * maxY
+            this.shipJitterOffsets.set(ship, {x: 0, y: 0, targetX: initialTargetX, targetY: initialTargetY})
         }
         const jitter = this.shipJitterOffsets.get(ship)
         
-        // Update jitter target occasionally (every ~30 frames)
-        if (Math.random() < 0.03) {
+        // Update jitter target occasionally
+        if (Math.random() < COMBAT_MAP_CONFIG.jitterUpdateChance) {
             jitter.targetX = (Math.random() - 0.5) * maxX
             jitter.targetY = (Math.random() - 0.5) * maxY
         }
         
         // Smooth movement toward target
-        jitter.x += (jitter.targetX - jitter.x) * 0.1
-        jitter.y += (jitter.targetY - jitter.y) * 0.1
+        jitter.x += (jitter.targetX - jitter.x) * COMBAT_MAP_CONFIG.jitterSmoothness
+        jitter.y += (jitter.targetY - jitter.y) * COMBAT_MAP_CONFIG.jitterSmoothness
         
         return jitter
     }
     
     /**
      * Renders a thruster for a ship
+     * @param {Ship} ship - The ship to render thruster for
      * @param {number} index - Ship index for unique ID
      * @param {number} x - X position
      * @param {number} y - Y position
-     * @param {number} offsetX - X offset from ship center (negative = behind)
+     * @param {boolean} mirror - Whether to mirror the thruster horizontally
      */
-    renderThruster(index, x, y, offsetX = -25) {
-        const thrusterSize = 15
-        const thrusterFlicker = 0.7 + Math.random() * 0.3
-        const thrusterColor = [255, Math.floor(100 * thrusterFlicker), 0, Math.floor(255 * thrusterFlicker)]
+    renderThruster(ship, index, x, y, mirror = false) {
+        const flickerRange = COMBAT_MAP_CONFIG.thrusterFlickerMax - COMBAT_MAP_CONFIG.thrusterFlickerMin
+        const thrusterFlicker = COMBAT_MAP_CONFIG.thrusterFlickerMin + Math.random() * flickerRange
+        const thrusterSize = ship.radius * COMBAT_MAP_CONFIG.thrusterSizeMultiplier * thrusterFlicker
+        const thrusterColor = [255, Math.floor(150 * thrusterFlicker), 0, Math.floor(255 * thrusterFlicker)]
+        const offsetX = mirror ? ship.radius : -ship.radius
+        const rotation = mirror ? 0 : Math.PI
         this.routeCvs.addFilledTriangle(
             `thruster-${index}`,
             x + offsetX,
             y,
+            thrusterSize/2,
             thrusterSize,
-            0,
             2,
             thrusterColor,
-            null,
-            Math.PI
+            rotation,
+            null
         )
     }
     
@@ -378,6 +217,59 @@ class CombatMap extends BaseMap {
             [255, 255, 255, 255],
             12
         )
+        
+        // Add progress bar container above ship
+        this.addShipProgressBars(ship, index, x, y, idPrefix)
+    }
+    
+    /**
+     * Adds HTML progress bars for hull and shields above a ship
+     * @param {Ship} ship
+     * @param {number} index
+     * @param {number} x - Canvas X position
+     * @param {number} y - Canvas Y position  
+     * @param {string} idPrefix
+     */
+    addShipProgressBars(ship, index, x, y, idPrefix) {
+        const existingBar = document.getElementById(`${idPrefix}-bars-${index}`)
+        if (existingBar) existingBar.remove()
+        
+        // Convert canvas coords to screen coords
+        const rect = this.routeCvs.canvas.getBoundingClientRect()
+        const screenX = rect.left + x + this.routeCvs.canvas.width / 2
+        const screenY = rect.top + y + this.routeCvs.canvas.height / 2 - ship.radius + COMBAT_MAP_CONFIG.progressBarOffsetY
+        
+        const hullPercent = ship.hull[0] / ship.hull[1]
+        const hullClass = hullPercent < 0.3 ? 'ship-progress-bar-hull-low' : 'ship-progress-bar-hull'
+        
+        const barContainer = ce({
+            id: `${idPrefix}-bars-${index}`,
+            classNames: ['ship-progress-bars'],
+            style: {
+                left: screenX + 'px',
+                top: screenY + 'px'
+            },
+            children: [
+                // Hull bar
+                ce({
+                    classNames: ['ship-progress-bar'],
+                    children: [ce({
+                        classNames: ['ship-progress-bar-fill', hullClass],
+                        style: {width: (hullPercent * 100) + '%'}
+                    })]
+                }),
+                // Shields bar
+                ce({
+                    classNames: ['ship-progress-bar'],
+                    children: [ce({
+                        classNames: ['ship-progress-bar-fill', 'ship-progress-bar-shields'],
+                        style: {width: (ship.shields[0] / ship.shields[1] * 100) + '%'}
+                    })]
+                })
+            ]
+        })
+        
+        document.body.appendChild(barContainer)
     }
     
     /**
@@ -395,13 +287,12 @@ class CombatMap extends BaseMap {
             return
         }
         
-        // Clear canvas objects
+        // Clear canvas objects (but preserve starfield pixels)
         this.routeCvs.clear()
-        this.routeCvs.pixels = [] // Keep background stars
         
-        const shipSpacing = 60
-        const leftOffset = -(this.routeCvs.canvas.width / this.routeCvs.zoom) * 0.375 // 75% to left edge
-        const rightOffset = (this.routeCvs.canvas.width / this.routeCvs.zoom) * 0.375 // 75% to right edge
+        const shipSpacing = COMBAT_MAP_CONFIG.shipSpacing
+        const leftOffset = -(this.routeCvs.canvas.width / this.routeCvs.zoom) * Math.abs(COMBAT_MAP_CONFIG.playerShipsOffset)
+        const rightOffset = (this.routeCvs.canvas.width / this.routeCvs.zoom) * COMBAT_MAP_CONFIG.enemyShipsOffset
         
         // Draw player ships with jitter and thruster
         this.encounter.playerShips.forEach((ship, index) => {
@@ -411,12 +302,18 @@ class CombatMap extends BaseMap {
             const shipY = 0 + (index - (this.encounter.playerShips.length - 1) / 2) * shipSpacing + jitter.y
             const shipX = leftOffset + jitter.x
             
-            this.renderThruster(index, shipX, shipY)
-            this.renderShip(ship, index, shipX, shipY, 20, 30, false, 'player')
+            this.renderThruster(ship, index, shipX, shipY, false)
+            this.renderShip(ship, index, shipX, shipY, COMBAT_MAP_CONFIG.shipSize, COMBAT_MAP_CONFIG.labelOffsetY, false, 'player')
         })
         
         // Draw enemy ships if they exist
         if (this.encounter.enemyShips && this.encounter.enemyShips.length > 0) {
+            // Start fade-in animation if not already started
+            if (!this.enemyShipsFadedIn) {
+                this.enemyShipsOpacity = 0
+                this.enemyShipsFadeStartTime = Date.now()
+            }
+            
             this.encounter.enemyShips.forEach((ship, index) => {
                 if (this.isShipDestroyed(ship)) return
                 
@@ -424,15 +321,32 @@ class CombatMap extends BaseMap {
                 const shipY = 0 + (index - (this.encounter.enemyShips.length - 1) / 2) * shipSpacing + jitter.y
                 const shipX = rightOffset + jitter.x
                 
-                this.renderThruster(index, shipX, shipY, 25) // Thruster on right side (in front when mirrored)
-                this.renderShip(ship, index, shipX, shipY, 20, 30, true, 'enemy')
+                this.renderThruster(ship, index, shipX, shipY, true)
+                this.renderShip(ship, index, shipX, shipY, COMBAT_MAP_CONFIG.shipSize, COMBAT_MAP_CONFIG.labelOffsetY, true, 'enemy')
             })
+            
+            // Update fade-in animation
+            if (!this.enemyShipsFadedIn) {
+                const elapsed = Date.now() - this.enemyShipsFadeStartTime
+                const fadeTime = COMBAT_MAP_CONFIG.enemyFadeInDuration
+                this.enemyShipsOpacity = Math.min(1, elapsed / fadeTime)
+                
+                // Apply opacity to all enemy ship objects
+                this.routeCvs.drawOrder.forEach(obj => {
+                    if (obj.id && obj.id.startsWith('enemy-')) {
+                        if (obj.fillColor && obj.fillColor.length >= 4) {
+                            obj.fillColor[3] = Math.floor(255 * this.enemyShipsOpacity)
+                        }
+                    }
+                })
+                
+                if (this.enemyShipsOpacity >= 1) {
+                    this.enemyShipsFadedIn = true
+                }
+            }
         }
         
-        //console.log('About to call routeCvs.redraw()')
-        //console.log('routeCvs.drawOrder length:', this.routeCvs.drawOrder?.length)
         this.routeCvs.redraw(true)
-        //console.log('=== renderShips() complete ===')
     }
 
     animateRouteTravel() {
@@ -447,9 +361,8 @@ class CombatMap extends BaseMap {
         const shipSpacing = 60
         
         const animate = () => {
-            // Clear canvas objects
+            // Clear canvas objects (preserve starfield)
             this.routeCvs.clear()
-            this.routeCvs.pixels = [] // Keep background stars
             
             // Calculate elapsed time and update progress
             const currentTime = Date.now()
@@ -473,7 +386,7 @@ class CombatMap extends BaseMap {
                 const shipY = centerY + (index - (this.encounter.playerShips.length - 1) / 2) * shipSpacing + jitter.y
                 const shipX = leftOffset + jitter.x
                 
-                this.renderThruster(index, shipX, shipY)
+                this.renderThruster(ship, index, shipX, shipY, false)
                 this.renderShip(ship, index, shipX, shipY, 20, -30, false, 'player')
             })
             
@@ -487,7 +400,7 @@ class CombatMap extends BaseMap {
                     const shipY = centerY + (index - (this.encounter.enemyShips.length - 1) / 2) * shipSpacing + jitter.y
                     const shipX = rightOffset + jitter.x
                     
-                    this.renderThruster(index, shipX, shipY, 25)
+                    this.renderThruster(ship, index, shipX, shipY, true)
                     this.renderShip(ship, index, shipX, shipY, 20, -30, true, 'enemy')
                 })
             }
@@ -564,7 +477,7 @@ class CombatMap extends BaseMap {
                 const shipY = centerY + (index - (this.encounter.playerShips.length - 1) / 2) * shipSpacing + jitter.y
                 const shipX = leftOffset + jitter.x
                 
-                this.renderThruster(index, shipX, shipY)
+                this.renderThruster(ship, index, shipX, shipY, false)
                 this.renderShip(ship, index, shipX, shipY, 20, -30, false, 'player')
             })
             
@@ -578,7 +491,7 @@ class CombatMap extends BaseMap {
                     const shipY = centerY + (index - (this.encounter.enemyShips.length - 1) / 2) * shipSpacing + jitter.y
                     const shipX = rightOffset + jitter.x
                     
-                    this.renderThruster(index, shipX, shipY, 25)
+                    this.renderThruster(ship, index, shipX, shipY, true)
                     this.renderShip(ship, index, shipX, shipY, 20, -30, true, 'enemy')
                 })
             }
@@ -610,7 +523,7 @@ class CombatMap extends BaseMap {
      */
     createStarfield() {
         // Create canvas wrapper for starfield
-        const cvs = new CanvasWrapper(1, 1, 1, 0, false)
+        const cvs = new CanvasWrapper(1, 1, 1, 0, false, false)
         cvs.canvas.id = 'combat-starfield'
         cvs.canvas.style.position = 'absolute'
         cvs.canvas.style.top = '0'
@@ -625,7 +538,7 @@ class CombatMap extends BaseMap {
         
         // Generate background stars using generator
         const radius = Math.max(window.innerWidth, window.innerHeight)
-        const numStars = 300
+        const numStars = COMBAT_MAP_CONFIG.starfieldStarCount
         const backgroundStars = generateBackgroundStars(radius, numStars)
         
         // Add stars to canvas as pixels with random screen positions
@@ -688,7 +601,8 @@ class CombatMap extends BaseMap {
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '40px',
-                alignItems: 'center'
+                alignItems: 'center',
+                backgroundColor: side === 'enemy' ? 'magenta' : 'transparent'
             }
         })
         
@@ -764,9 +678,9 @@ class CombatMap extends BaseMap {
                 }
             }),
             ce({
-                innerHTML: `Lasers: ${ship.lasers[0]}/${ship.lasers[1]}`,
+                innerHTML: `Lasers: ${ship.lasers}`,
                 style: {
-                    color: ship.lasers[0] > 0 ? '#ffff66' : '#888',
+                    color: ship.lasers > 0 ? '#ffff66' : '#888',
                     fontSize: '10px',
                     transform: isPlayer ? 'none' : 'scaleX(-1)', // Un-mirror text
                     pointerEvents: 'none'
@@ -802,582 +716,22 @@ class CombatMap extends BaseMap {
     }
 
     /**
-     * Creates the UI panel at the bottom with action buttons
-     * @returns {HTMLElement}
-     */
-    createCombatUIPanel() {
-        const panel = ce({
-            id: 'combat-ui-panel',
-            style: {
-                position: 'absolute',
-                bottom: '0',
-                left: '0',
-                width: '100%',
-                height: '30%',
-                backgroundColor: 'rgba(0, 0, 0, 0.9)',
-                borderTop: '2px solid #444',
-                padding: '20px',
-                display: 'flex',
-                flexDirection: 'row',
-                gap: '20px',
-                zIndex: '2'
-            }
-        })
-        
-        // Left side: Ship info and actions
-        const leftPanel = ce({
-            style: {
-                flex: '2',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '10px'
-            }
-        })
-        
-        // Ship info section
-        const shipInfo = ce({
-            id: 'combat-ship-info',
-            style: {
-                color: '#fff',
-                fontSize: '14px'
-            }
-        })
-        this.updateShipInfo(shipInfo)
-        leftPanel.appendChild(shipInfo)
-        
-        // Action buttons
-        const actionButtons = this.createActionButtons()
-        leftPanel.appendChild(actionButtons)
-        
-        panel.appendChild(leftPanel)
-        
-        // Right side: Combat log
-        const combatLogPanel = ce({
-            id: 'combat-log',
-            style: {
-                flex: '1',
-                backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                border: '1px solid #666',
-                borderRadius: '5px',
-                padding: '10px',
-                color: '#fff',
-                fontSize: '12px',
-                overflowY: 'auto',
-                maxHeight: '100%'
-            },
-            children: [
-                ce({
-                    innerHTML: '=== Combat Log ===',
-                    style: {
-                        fontWeight: 'bold',
-                        marginBottom: '10px',
-                        color: '#ffff00'
-                    }
-                })
-            ]
-        })
-        panel.appendChild(combatLogPanel)
-        
-        return panel
-    }
-
-    /**
-     * Creates the route travel UI panel with progress bar
-     * @returns {HTMLElement}
-     */
-    createRouteTravelUIPanel() {
-        const panel = ce({
-            id: 'route-ui-panel',
-            style: {
-                position: 'absolute',
-                bottom: '0',
-                left: '0',
-                width: '100%',
-                height: '25%',
-                backgroundColor: 'rgba(0, 0, 0, 0.9)',
-                borderTop: '2px solid #444',
-                padding: '20px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '10px',
-                zIndex: '2',
-                alignItems: 'center',
-                justifyContent: 'center'
-            }
-        })
-        
-        // Calculate travel details
-        const fromName = gs.previousLocation ? gs.previousLocation.name : 'Unknown'
-        const toName = gs.destination ? gs.destination.name : 'Unknown'
-        const distance = gs.destination && gs.previousLocation ? 
-            roundToPlaces(calcDistance(gs.previousLocation.x, gs.previousLocation.y, gs.destination.x, gs.destination.y), 1) : 0
-        
-        // Planet images container
-        const planetImagesContainer = ce({
-            style: {
-                display: 'flex',
-                alignItems: 'center',
-                gap: '20px',
-                marginBottom: '10px'
-            }
-        })
-        
-        // From planet image
-        if (gs.previousLocation && gs.previousLocation.asCanvas) {
-            const fromCanvas = gs.previousLocation.asCanvas()
-            planetImagesContainer.appendChild(fromCanvas)
-        }
-        
-        // Arrow
-        const arrow = ce({
-            innerHTML: '→',
-            style: {
-                color: '#fff',
-                fontSize: '32px',
-                fontWeight: 'bold'
-            }
-        })
-        planetImagesContainer.appendChild(arrow)
-        
-        // To planet image
-        if (gs.destination && gs.destination.asCanvas) {
-            const toCanvas = gs.destination.asCanvas()
-            planetImagesContainer.appendChild(toCanvas)
-        }
-        
-        panel.appendChild(planetImagesContainer)
-        
-        // Progress info with route
-        const routeInfo = ce({
-            style: {
-                color: '#fff',
-                fontSize: '16px',
-                fontWeight: 'bold',
-                marginBottom: '5px'
-            },
-            innerHTML: `Traveling from ${fromName} to ${toName}`
-        })
-        panel.appendChild(routeInfo)
-        
-        // Travel stats container
-        const statsContainer = ce({
-            style: {
-                display: 'flex',
-                gap: '20px',
-                color: '#aaa',
-                fontSize: '14px',
-                marginBottom: '10px'
-            }
-        })
-        
-        // Distance
-        this.routeDistanceEl = ce({
-            innerHTML: `Distance: ${distance} AU`
-        })
-        statsContainer.appendChild(this.routeDistanceEl)
-        
-        // ETA Remaining
-        this.routeETAEl = ce({
-            innerHTML: `ETA: ${describeTimespan(gs.travelYearsRemaining || 0, 1)}`
-        })
-        statsContainer.appendChild(this.routeETAEl)
-        
-        panel.appendChild(statsContainer)
-        
-        // Create progress bar using ProgressBar class
-        this.routeProgressBar = new ProgressBar({
-            value: 0,
-            width: 60,
-            fillColor: '#4CAF50',
-            borderColor: '#666',
-            overrideLabel: ''
-        })
-        panel.appendChild(this.routeProgressBar.container)
-        
-        // Cancel button
-        const cancelButton = ce({
-            tag: 'button',
-            innerHTML: 'Cancel Travel',
-            style: {
-                padding: '10px 20px',
-                backgroundColor: '#660000',
-                color: '#fff',
-                border: '2px solid #aa0000',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                fontSize: '14px',
-                fontWeight: 'bold',
-                marginTop: '10px'
-            }
-        })
-        
-        cancelButton.addEventListener('click', () => {
-            // Pause the map
-            this.paused = true
-            
-            // Stop animation
-            if (this.routeAnimationFrame) {
-                cancelAnimationFrame(this.routeAnimationFrame)
-                this.routeAnimationFrame = null
-            }
-            
-            // Return to star map without completing travel
-            this.cleanup()
-            showStarMap()
-        })
-        
-        panel.appendChild(cancelButton)
-        
-        return panel
-    }
-
-    /**
-     * Updates the ship info display
+     * Updates the ship info display - delegated to combat handler
      * @param {HTMLElement} infoElement
      */
     updateShipInfo(infoElement) {
-        if (!this.selectedPlayerShip || !this.selectedEnemyShip) {
-            infoElement.innerHTML = 'Select ships to begin combat'
-            return
-        }
-        
-        infoElement.innerHTML = `
-            <div style="margin-bottom: 5px;">
-                <strong style="color: #00ff00;">Your Ship:</strong> ${this.selectedPlayerShip.shipType.name}
-            </div>
-            <div style="margin-bottom: 10px; font-size: 12px;">
-                Hull: ${this.selectedPlayerShip.hull[0]}/${this.selectedPlayerShip.hull[1]} | 
-                Shields: ${this.selectedPlayerShip.shields[0]}/${this.selectedPlayerShip.shields[1]} | 
-                Lasers: ${this.selectedPlayerShip.lasers[0]}/${this.selectedPlayerShip.lasers[1]} | 
-                Engine: ${this.selectedPlayerShip.engine}
-                ${this.selectedPlayerShip.evading ? ' | <span style="color: #ffff00;">EVADING</span>' : ''}
-            </div>
-            <div style="margin-bottom: 5px;">
-                <strong style="color: #ff0000;">Target:</strong> ${this.selectedEnemyShip.shipType.name}
-            </div>
-            <div style="font-size: 12px;">
-                Hull: ${this.selectedEnemyShip.hull[0]}/${this.selectedEnemyShip.hull[1]} | 
-                Shields: ${this.selectedEnemyShip.shields[0]}/${this.selectedEnemyShip.shields[1]}
-                ${this.selectedEnemyShip.evading ? ' | <span style="color: #ffff00;">EVADING</span>' : ''}
-            </div>
-        `
+        this.combatHandler.updateShipInfo(infoElement)
     }
 
     /**
      * Creates action buttons based on available move types
      * @returns {HTMLElement}
      */
-    createActionButtons() {
-        const buttonContainer = ce({
-            style: {
-                display: 'flex',
-                gap: '10px',
-                flexWrap: 'wrap'
-            }
-        })
-        
-        if (!this.selectedPlayerShip || this.isShipDestroyed(this.selectedPlayerShip)) {
-            buttonContainer.appendChild(ce({
-                innerHTML: 'No active ship',
-                style: { color: '#fff' }
-            }))
-            return buttonContainer
-        }
-        
-        // Laser button
-        const laserButton = this.createCombatButton('Laser', () => this.handleLaserAttack(), this.selectedPlayerShip.lasers[0] <= 0)
-        buttonContainer.appendChild(laserButton)
-        
-        // Ram button
-        const ramButton = this.createCombatButton('Ram', () => this.handleRam())
-        buttonContainer.appendChild(ramButton)
-        
-        // Evade button
-        const evadeButton = this.createCombatButton('Evade', () => this.handleEvade())
-        buttonContainer.appendChild(evadeButton)
-        
-        // Recharge button
-        const rechargeButton = this.createCombatButton('Recharge', () => this.handleRecharge())
-        buttonContainer.appendChild(rechargeButton)
-        
-        // Flee button
-        const fleeButton = this.createCombatButton('Flee', () => this.handleFlee())
-        buttonContainer.appendChild(fleeButton)
-        
-        return buttonContainer
-    }
-
     /**
-     * Creates a single combat action button
-     * @param {string} label
-     * @param {Function} onClick
-     * @param {boolean} disabled
-     * @returns {HTMLElement}
+     * Refreshes the combat log display from encounter's log
      */
-    createCombatButton(label, onClick, disabled = false) {
-        const button = ce({
-            tag: 'button',
-            innerHTML: label,
-            classNames: ['combat-action-button'],
-            style: {
-                padding: '10px 20px',
-                backgroundColor: disabled ? '#222' : '#333',
-                color: disabled ? '#666' : '#fff',
-                border: '2px solid ' + (disabled ? '#444' : '#666'),
-                borderRadius: '5px',
-                cursor: disabled ? 'not-allowed' : 'pointer',
-                fontSize: '14px',
-                fontWeight: 'bold',
-                transition: 'all 0.2s'
-            }
-        })
-        
-        if (!disabled) {
-            button.addEventListener('mouseenter', () => {
-                button.style.backgroundColor = '#555'
-                button.style.borderColor = '#888'
-            })
-            
-            button.addEventListener('mouseleave', () => {
-                button.style.backgroundColor = '#333'
-                button.style.borderColor = '#666'
-            })
-            
-            button.addEventListener('click', (e)=>onClick())
-        }
-        
-        return button
-    }
-
-    /**
-     * Handles laser attack action
-     */
-    handleLaserAttack() {
-        if (!this.selectedPlayerShip || !this.selectedEnemyShip) {
-            this.addToCombatLog('Select a target first!')
-            return
-        }
-        
-        if (this.isShipDestroyed(this.selectedEnemyShip)) {
-            this.addToCombatLog('Target is already destroyed!')
-            return
-        }
-        
-        const result = executeLaserAttack(this.selectedPlayerShip, this.selectedEnemyShip)
-        this.addToCombatLog(result.message)
-        
-        if (result.hit) {
-            this.endPlayerTurn()
-        }
-    }
-
-    /**
-     * Handles ram action
-     */
-    handleRam() {
-        if (!this.selectedPlayerShip || !this.selectedEnemyShip) {
-            this.addToCombatLog('Select a target first!')
-            return
-        }
-        
-        if (this.isShipDestroyed(this.selectedEnemyShip)) {
-            this.addToCombatLog('Target is already destroyed!')
-            return
-        }
-        
-        const result = executeRam(this.selectedPlayerShip, this.selectedEnemyShip)
-        this.addToCombatLog(result.message)
-        
-        this.endPlayerTurn()
-    }
-
-    /**
-     * Handles evade action
-     */
-    handleEvade() {
-        if (!this.selectedPlayerShip) return
-        
-        const result = executeEvade(this.selectedPlayerShip)
-        this.addToCombatLog(result.message)
-        
-        this.endPlayerTurn()
-    }
-
-    /**
-     * Handles recharge action
-     */
-    handleRecharge() {
-        if (!this.selectedPlayerShip) return
-        
-        const shieldResult = rechargeShields(this.selectedPlayerShip)
-        const laserResult = rechargeLasers(this.selectedPlayerShip)
-        
-        if (shieldResult.amount > 0) {
-            this.addToCombatLog(shieldResult.message)
-        }
-        if (laserResult.amount > 0) {
-            this.addToCombatLog(laserResult.message)
-        }
-        if (shieldResult.amount === 0 && laserResult.amount === 0) {
-            this.addToCombatLog(`${this.selectedPlayerShip.name} is already fully charged.`)
-        }
-        
-        this.endPlayerTurn()
-    }
-
-    /**
-     * Handles flee action
-     */
-    handleFlee() {
-        if (!this.selectedPlayerShip) return
-        
-        // Check if any enemy is about to ram (simplified - assume no ramming for now)
-        const enemyRamming = false
-        
-        const result = executeFlee(this.selectedPlayerShip, enemyRamming)
-        this.addToCombatLog(result.message)
-        
-        if (result.escaped) {
-            // Check if all player ships have escaped or been destroyed
-            this.checkForCombatEnd()
-        } else {
-            this.endPlayerTurn()
-        }
-    }
-
-    /**
-     * Ends the player's turn and starts enemy turn
-     */
-    endPlayerTurn() {
-        // Reset turn status for player ship
-        resetTurnStatus(this.selectedPlayerShip)
-        
-        // Check if combat should end
-        const combatEnd = this.checkForCombatEnd()
-        if (combatEnd) return
-        
-        // Switch to enemy turn
-        this.isPlayerTurn = false
-        
-        // Execute enemy AI turn after a brief delay
-        setTimeout(() => {
-            this.executeEnemyTurn()
-        }, 1000)
-    }
-
-    /**
-     * Executes enemy AI turn
-     */
-    executeEnemyTurn() {
-        const aliveEnemies = this.getAliveShips(this.encounter.enemyShips)
-        const alivePlayers = this.getAliveShips(this.encounter.playerShips)
-        
-        if (aliveEnemies.length === 0 || alivePlayers.length === 0) {
-            this.checkForCombatEnd()
-            return
-        }
-        
-        // Simple AI: each enemy ship attacks
-        aliveEnemies.forEach(enemyShip => {
-            // Pick a random player target
-            const target = alivePlayers[Math.floor(Math.random() * alivePlayers.length)]
-            
-            // Decide on action (simplified AI)
-            const needsRecharge = enemyShip.shields[0] < enemyShip.shields[1] * 0.3 || enemyShip.lasers[0] <= 0
-            
-            if (needsRecharge) {
-                // Recharge if low
-                const shieldResult = rechargeShields(enemyShip)
-                const laserResult = rechargeLasers(enemyShip)
-                if (shieldResult.amount > 0 || laserResult.amount > 0) {
-                    this.addToCombatLog(`${enemyShip.name} recharges systems.`)
-                }
-            } else {
-                // Attack with lasers or ram
-                const useLasers = enemyShip.lasers[0] > 0 && Math.random() > 0.3
-                
-                if (useLasers) {
-                    const result = executeLaserAttack(enemyShip, target)
-                    this.addToCombatLog(result.message)
-                } else {
-                    const result = executeRam(enemyShip, target)
-                    this.addToCombatLog(result.message)
-                }
-            }
-            
-            resetTurnStatus(enemyShip)
-        })
-        
-        // Check for combat end
-        const combatEnd = this.checkForCombatEnd()
-        if (combatEnd) return
-        
-        // Return to player turn
-        this.isPlayerTurn = true
-        this.addToCombatLog('--- Your Turn ---')
-        
-        // Refresh the display
-        this.refreshCombatMap()
-    }
-
-    /**
-     * Checks if combat should end and handles end state
-     * @returns {boolean} True if combat ended
-     */
-    checkForCombatEnd() {
-        const result = checkCombatEnd(this.encounter.playerShips, this.encounter.enemyShips)
-        
-        if (result.ended) {
-            let message = ''
-            if (result.winner === 'player') {
-                message = 'Victory! All enemy ships have been destroyed or fled.'
-            } else if (result.winner === 'enemy') {
-                message = 'Defeat! All your ships have been destroyed or fled.'
-            } else {
-                message = 'Draw! All ships have been destroyed.'
-            }
-            
-            this.addToCombatLog(message)
-            
-            // Show end modal after a delay
-            setTimeout(() => {
-                showModal('Combat Ended', message, [
-                    ['Continue', () => {
-                        if (this.encounter) {
-                            this.encounter.endEncounter()
-                        }
-                    }]
-                ])
-            }, 1500)
-            
-            return true
-        }
-        
-        return false
-    }
-
-    /**
-     * Adds a message to the combat log
-     * @param {string} message
-     */
-    addToCombatLog(message) {
-        this.combatLog.push(message)
-        
-        const logElement = document.getElementById('combat-log')
-        if (logElement) {
-            const messageElement = ce({
-                innerHTML: message,
-                style: {
-                    marginBottom: '5px',
-                    paddingBottom: '5px',
-                    borderBottom: '1px solid #333'
-                }
-            })
-            logElement.appendChild(messageElement)
-            
-            // Auto-scroll to bottom
-            logElement.scrollTop = logElement.scrollHeight
-        }
+    refreshCombatLog() {
+        this.combatHandler.refreshCombatLog()
     }
 
     /**
@@ -1386,10 +740,17 @@ class CombatMap extends BaseMap {
     refreshCombatMap() {
         if (!this.encounter) return
         
-        // Cleanup any ongoing animation
-        this.cleanup()
+        // Re-render the ships on canvas
+        if (this.routeCvs) {
+            this.renderShips()
+        }
         
-        showCombatMap(this.encounter)
+        // Update UI panel
+        if (this.uiPanel) {
+            const newPanel = this.combatHandler.createCombatUIPanel()
+            this.uiPanel.replaceWith(newPanel)
+            this.uiPanel = newPanel
+        }
     }
 
     /**
@@ -1411,14 +772,6 @@ class CombatMap extends BaseMap {
         return ship.hull[0] <= 0
     }
 
-    /**
-     * Gets all alive ships from an array
-     * @param {Ship[]} ships
-     * @returns {Ship[]}
-     */
-    getAliveShips(ships) {
-        return ships.filter(ship => !this.isShipDestroyed(ship))
-    }
 }
 
 /**
@@ -1428,4 +781,144 @@ class CombatMap extends BaseMap {
  */
 function showCombatMap(encounter) {
     return new CombatMap(encounter)
+}
+
+/**
+ * Shows encounter visual (ships on canvas) without entering combat mode
+ * Used to display ships in background while encounter modal is showing
+ * @param {Encounter} encounter
+ */
+function showEncounterVisual(encounter) {
+    // Remove any existing encounter visual
+    const existing = document.getElementById('encounter-visual-container')
+    if (existing) existing.remove()
+    
+    // Create simplified canvas map
+    const container = ce({
+        id: 'encounter-visual-container',
+        style: {
+            width: '100%',
+            height: '100vh',
+            backgroundColor: '#000',
+            position: 'fixed',
+            top: '0',
+            left: '0',
+            zIndex: '0', // Behind modals (modals are typically z-index 1000+)
+            overflow: 'hidden',
+            pointerEvents: 'none' // Don't block modal interactions
+        }
+    })
+    
+    // Create starfield canvas (static background)
+    const starfieldCvs = new CanvasWrapper(1, 1, 1, 0, false, false)
+    starfieldCvs.canvas.id = 'encounter-starfield'
+    starfieldCvs.canvas.style.position = 'absolute'
+    starfieldCvs.canvas.style.top = '0'
+    starfieldCvs.canvas.style.left = '0'
+    starfieldCvs.canvas.style.width = '100%'
+    starfieldCvs.canvas.style.height = '100%'
+    starfieldCvs.canvas.style.zIndex = '0'
+    starfieldCvs.canvas.width = window.innerWidth
+    starfieldCvs.canvas.height = window.innerHeight
+    
+    // Generate and render stars once
+    const radius = Math.max(window.innerWidth, window.innerHeight)
+    const numStars = COMBAT_MAP_CONFIG.starfieldStarCount
+    const backgroundStars = generateBackgroundStars(radius, numStars)
+    backgroundStars.forEach((star) => {
+        const x = Math.random() * starfieldCvs.canvas.width
+        const y = Math.random() * starfieldCvs.canvas.height
+        const size = Math.random() * 2 + 0.5
+        starfieldCvs.addPixel(0, 0, star.color, size, x, y, true)
+    })
+    starfieldCvs.redraw(true)
+    container.appendChild(starfieldCvs.canvas)
+    
+    // Create ships canvas (animated foreground)
+    const cvs = new CanvasWrapper(1, 1, 1, 0, false, false)
+    cvs.root.style.position = 'absolute'
+    cvs.root.style.top = '0'
+    cvs.root.style.left = '0'
+    cvs.root.style.width = '100%'
+    cvs.root.style.height = '100%'
+    container.appendChild(cvs.root)
+    
+    document.body.appendChild(container)
+    
+    // Render ships after DOM is ready
+    requestAnimationFrame(() => {
+        cvs.autoResize()
+        cvs.cameraX = 0
+        cvs.cameraY = 0
+        cvs.zoom = 60
+        
+        // Animation state
+        const shipJitterOffsets = new Map()
+        let enemyShipsOpacity = 0
+        let enemyShipsFadedIn = false
+        let enemyShipsFadeStartTime = Date.now()
+        
+        const renderEncounterShips = () => {
+            // Clear only ship objects, not pixels (starfield is on separate canvas anyway)
+            cvs.clear()
+            
+            const shipSpacing = 60
+            const leftOffset = -(cvs.canvas.width / cvs.zoom) * 0.375
+            const rightOffset = (cvs.canvas.width / cvs.zoom) * 0.375
+            
+            // Helper to update jitter
+            const updateJitter = (ship) => {
+                if (!shipJitterOffsets.has(ship)) {
+                    const initialTargetX = (Math.random() - 0.5) * 2
+                    const initialTargetY = (Math.random() - 0.5) * 1
+                    shipJitterOffsets.set(ship, {x: 0, y: 0, targetX: initialTargetX, targetY: initialTargetY})
+                }
+                const jitter = shipJitterOffsets.get(ship)
+                if (Math.random() < 0.03) {
+                    jitter.targetX = (Math.random() - 0.5) * 2
+                    jitter.targetY = (Math.random() - 0.5) * 1
+                }
+                jitter.x += (jitter.targetX - jitter.x) * 0.1
+                jitter.y += (jitter.targetY - jitter.y) * 0.1
+                return jitter
+            }
+            
+            // Draw player ships
+            if (encounter.playerShips) {
+                encounter.playerShips.forEach((ship, index) => {
+                    const jitter = updateJitter(ship)
+                    const shipY = (index - (encounter.playerShips.length - 1) / 2) * shipSpacing + jitter.y
+                    const shipX = leftOffset + jitter.x
+                    
+                    const shipColor = gs.fleet && gs.fleet.color ? gs.fleet.color : [0, 255, 0, 255]
+                    cvs.addFilledCircle(`player-${index}`, shipX, shipY, 20, 5, shipColor)
+                })
+            }
+            
+            // Draw enemy ships with fade-in
+            if (encounter.enemyShips && encounter.enemyShips.length > 0) {
+                if (!enemyShipsFadedIn) {
+                    const elapsed = Date.now() - enemyShipsFadeStartTime
+                    enemyShipsOpacity = Math.min(1, elapsed / 2000) // 2 second fade
+                    if (enemyShipsOpacity >= 1) enemyShipsFadedIn = true
+                }
+                
+                encounter.enemyShips.forEach((ship, index) => {
+                    const jitter = updateJitter(ship)
+                    const shipY = (index - (encounter.enemyShips.length - 1) / 2) * shipSpacing + jitter.y
+                    const shipX = rightOffset + jitter.x
+                    
+                    const shipColor = [255, 0, 0, Math.floor(255 * enemyShipsOpacity)]
+                    cvs.addFilledCircle(`enemy-${index}`, shipX, shipY, 20, 5, shipColor)
+                })
+            }
+            
+            cvs.redraw(true)
+            
+            // Continue animation continuously
+            requestAnimationFrame(renderEncounterShips)
+        }
+        
+        renderEncounterShips()
+    })
 }

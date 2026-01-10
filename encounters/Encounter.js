@@ -25,34 +25,20 @@ class Encounter {
         this.undetectedFleet = undetectedFleet;
         /** @type {boolean} */
         this.combatEnabled = false;
-        /** @type {Fleet} */
-        this.playerFleet = gs.fleet
-        /** @type {Ship[]} */
-        this.playerShips = this.playerFleet.ships
-        /** @type {Fleet} */
-        this.enemyFleet = this.fleet
-        /** @type {Ship[]} */
-        this.enemyShips = this.enemyFleet.ships
-        /** @type {Ship[]} */
-        //this.ships = [...this.playerShips, ...this.enemyShips]
-        /** @type {ENCOUNTER_RESULTS|null} */
-        this.result = null //playerVictory, playerDefeat, playerSurrendered,
-        /** @type {Fleet} */
-        this.activeTurnFleet = this.playerFleet
+        /** @type {boolean} */
+        this.playerUndetected = undetectedFleet !== gs.fleet
+        /** @type {Map<Ship, number>} */
         this.playerShipHullsAtStart = new Map()
-        for (const ship of this.playerShips) {
+        for (const ship of gs.fleet.ships) {
             this.playerShipHullsAtStart.set(ship, ship.hull[0])
         }
-        this.playerUndetected = undetectedFleet !== gs.fleet
-    }
-
-    get ships() {
-        return [...this.playerShips, ...this.enemyShips]
+        /** @type {Combat|null} */
+        this.combat = null
     }
 
     calcPlayerHullDamages() {
         let totalDamage = 0
-        for (const ship of this.playerShips) {
+        for (const ship of gs.fleet.ships) {
             const hullAtStart = this.playerShipHullsAtStart.get(ship) || ship.hull[1]
             const damage = hullAtStart - ship.hull[0]
             if (damage > 0) totalDamage += damage
@@ -62,7 +48,7 @@ class Encounter {
 
     calcPlayerRepairableHull() {
         let totalRepairable = 0
-        for (const ship of this.playerShips) {
+        for (const ship of gs.fleet.ships) {
             if (ship.disabled) continue
             const hullAtStart = this.playerShipHullsAtStart.get(ship) || ship.hull[1]
             const repairable = hullAtStart - ship.hull[0]
@@ -73,7 +59,7 @@ class Encounter {
 
     calcPlayerDamagedShips() {
         const damagedShips = []
-        for (const ship of this.playerShips) {
+        for (const ship of gs.fleet.ships) {
             const hullAtStart = this.playerShipHullsAtStart.get(ship) || ship.hull[1]
             if (ship.hull[0] < hullAtStart && !ship.disabled) {
                 damagedShips.push(ship)
@@ -82,84 +68,15 @@ class Encounter {
         return damagedShips
     }
 
-    get disabledPlayerShips () { return this.playerShips.filter(s=>(s.disabled)) }
-    get escapedPlayerShips () {return this.playerShips.filter(s=>(s.escaped)) }
-    get disabledEnemyShips () {return this.enemyShips.filter(s=>(s.disabled)) }
-    get activePlayerShips () {return this.playerShips.filter(s=>(!s.disabled && !s.escaped)) }
-    get activeEnemyShips () {return this.enemyShips.filter(s=>(!s.disabled && !s.escaped)) }
-    get activeShips () {return this.ships.filter(s=>(!s.disabled && !s.escaped)) }
-    //get ships() { return [...this.playerShips, ...this.enemyShips] } //dont use. static.
-
-    isTurnComplete() {
-        //console.log('Encounter.isTurnComplete', { activeTurnFleet: this.activeTurnFleet });
-        const activeFleetShips = this.activeTurnFleet.ships.filter(s=>(!s.disabled && !s.escaped))
-        for (const ship of activeFleetShips) {
-            if (ship.actionsRemaining > 0) {
-                return false
-            }
-        }
-        return true
+    // Getters for accessing combat ships
+    get playerShips() {
+        return this.combat ? this.combat.playerShips : []
     }
 
-    handleTurnComplete() {
-        console.log('Encounter.handleTurnComplete', { activeTurnFleet: this.activeTurnFleet });
-        if (!this.isTurnComplete()) return
-        if (this.activeTurnFleet === this.playerFleet) {
-            this.activeTurnFleet = this.enemyFleet
-        }
-        else if (this.activeTurnFleet === this.enemyFleet) {
-            this.activeTurnFleet = this.playerFleet
-        }
-        this.updateEncounterResult()
+    get enemyShips() {
+        return this.combat ? this.combat.enemyShips : []
     }
 
-    updateEncounterResult() {
-        console.log('Encounter.updateEncounterResult:',this.activeEnemyShips,this.activePlayerShips);
-        const {activeEnemyShips, activePlayerShips, escapedPlayerShips, playerShips} = this
-        
-        // Track disabled enemy ships for missions (initialize tracking set if needed)
-        if (!this._missionTrackedShips) this._missionTrackedShips = new Set()
-        
-        for (const ship of this.ships) {
-            if (ship.disabled && !this._missionTrackedShips.has(ship) && !this.playerShips.includes(ship)) {
-                this._missionTrackedShips.add(ship)
-                for (const mission of gs.missions) {
-                    mission.onPlayerDestroyShip(ship, this.fleet)
-                }
-            }
-        }
-        
-        // Victory: No active enemy ships remain
-        if (activeEnemyShips.length === 0) {
-            this.result = ENCOUNTER_RESULTS.Victory
-            this.combatEnabled = false
-            return
-        }
-        
-        // Escaped: All player ships have escaped
-        if (activePlayerShips.length === 0 && escapedPlayerShips.length === playerShips.length) {
-            this.result = ENCOUNTER_RESULTS.Escaped
-            this.combatEnabled = false
-            return
-        }
-        
-        // Defeat: No player ships escaped (all disabled)
-        if (activePlayerShips.length === 0 && escapedPlayerShips.length === 0) {
-            this.result = ENCOUNTER_RESULTS.Defeat
-            this.combatEnabled = false
-            return
-        }
-
-        throw new Error('partial escapes not implemented yet')
-        
-        console.log('Encounter result:',this.result);
-    }
-
-    calcOpposingFleet(fleet = new Fleet()) {
-        console.log('EncounterAI.calcOpposingFleet', { fleet });
-        if (fleet == this.playerFleet || fleet == gs.fleet) return this.fleet
-        else return this.playerFleet
-    }
     /**
      * Called when the encounter starts. Override in subclasses.
      */
@@ -198,10 +115,16 @@ class Encounter {
      * Starts active combat.
      * @param {boolean} playerHasInitiative - Whether the player acts first.
      */
-    startCombat(playerHasInitiative = false) {
+    startCombat(playerHasInitiative = true) {
         console.log('Encounter.startCombat', { playerHasInitiative })
+        
+        if (!this.combat) {
+            this.combat = new Combat(gs.fleet, this.fleet)
+        }
+        
+        this.combat.start(playerHasInitiative)
         this.combatEnabled = true
-        this.activeTurnFleet = playerHasInitiative ? gs.fleet : this.enemyFleet
+        
         closeModal()
         if (currentMap && currentMap.togglePause && currentMap.refreshLogic) {
             currentMap.togglePause(false)
@@ -214,7 +137,7 @@ class Encounter {
      */
     endCombat() {
         console.log('Encounter.endCombat')
-        const {result} = this
+        const result = gs.combat ? gs.combat.result : null
         if (result == ENCOUNTER_RESULTS.Defeat) {
             showModal(`Defeat`, `All your ships have been disabled!`, [['Continue', ()=>this.onDefeat()]])
         }
@@ -298,23 +221,38 @@ class Encounter {
         }
     }
 
-        /**
+    /**
      * Initializes and starts a space encounter, positioning ships and setting up combat.
      */
     startEncounter() {
         console.log('startEncounter:',this)
         if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
         gs.encounter = this
+        
+        // Show visual representation of encounter (ships on canvas)
+        showEncounterVisual(this)
+        
+        // Create combat if this encounter has combat
+        if (this.fleet && this.fleet.ships && this.fleet.ships.length > 0) {
+            this.combat = new Combat(gs.fleet, this.fleet)
+            this.combat.start(true) // Player has initiative by default
+            this.combatEnabled = true
+        }
     }
     /**
      * Ends the current encounter and returns to the star map.
      */
     endEncounter() {
         console.log('endEncounter');
+        
+        // End combat if active
+        if (gs.combat) {
+            gs.combat.end()
+        }
+        
+        this.combat = null
         gs.encounter = undefined
         showStarMap(gs.fleet)
-        //restore all shields
-        for (const s of gs.fleet.ships) s.restoreShields()
         //pause and show modal if player has no working ships, cant move
         checkPlayerStranded()
     }
@@ -362,7 +300,7 @@ class Encounter {
 
         if (playerUndetected) {
             // Drop shields after repositioning
-            for (const ship of this.ships) ship.shields[0] = 0
+            for (const ship of this.fleet.ships) ship.shields[0] = 0
         }
 
         let msg = `You ${playerUndetected ? 'sneakily ' : ''}attack the ${fleetName}!<br/>`
@@ -411,7 +349,7 @@ class Encounter {
 
         if (playerUndetected) {
             // Drop shields after repositioning
-            for (const ship of this.ships) ship.shields[0] = 0
+            for (const ship of this.fleet.ships) ship.shields[0] = 0
         }
 
         let msg = `You ${playerUndetected ? 'sneakily ' : ''}attack the ${fleetName}!<br/>`
@@ -431,7 +369,8 @@ class Encounter {
 
     showPlayerDefeatedByNeutralsModal( infamyLossMultiplier = 1) {
         console.log('showPlayerDefeatedByNeutralsModal', { infamyLossMultiplier });
-        const {enemyFleet, disabledPlayerShips} = this
+        const enemyFleet = this.fleet
+        const disabledPlayerShips = gs.combat.disabledPlayerShips
 
         let msg = ''
         msg += `The ${coloredName(enemyFleet)} seem shocked to have defeated you.<br/>`

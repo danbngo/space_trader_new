@@ -6,7 +6,8 @@ class CanvasWrapper {
         minZoom = 10,
         maxZoom = 1000,
         cameraPanLimit = 500,
-        dragEnabled = true
+        dragEnabled = true,
+        zoomEnabled = true
     ) {
         // Root element for the user to attach anywhere
         /** @type {HTMLElement} */
@@ -28,6 +29,7 @@ class CanvasWrapper {
         this.maxZoom = maxZoom;
         this.cameraPanLimit = cameraPanLimit;
         this.dragEnabled = dragEnabled;
+        this.zoomEnabled = zoomEnabled;
         
         // Object lists
         this.objectMap = new Map();  // easy lookup by id
@@ -49,9 +51,11 @@ class CanvasWrapper {
         if (dragEnabled) {
             attachDragHandler(this.canvas, (x,y)=>this.onDragMap(x,y))
         }
-        attachMouseWheelHandler(this.canvas, (direction=1)=>{
-            this.adjustZoom(direction > 0 ? 1.33 : direction < 0 ? 0.66 : 1.0)
-        })
+        if (zoomEnabled) {
+            attachMouseWheelHandler(this.canvas, (direction=1)=>{
+                this.adjustZoom(direction > 0 ? 1.33 : direction < 0 ? 0.66 : 1.0)
+            })
+        }
         
         this.pixelRatio = CanvasWrapper.getPixelRatio(this.ctx);
         

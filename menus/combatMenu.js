@@ -72,13 +72,13 @@ function applyDamage(ship, damage, penetratesShields = false) {
  * @returns {Object} - Result of the attack {hit, damage, destroyed, message}
  */
 function executeLaserAttack(attacker, defender) {
-    // Check if attacker has laser charge
-    if (attacker.lasers[0] <= 0) {
+    // Check if attacker has lasers
+    if (attacker.lasers <= 0) {
         return {
             hit: false,
             damage: 0,
             destroyed: false,
-            message: `${attacker.name} has no laser charge!`
+            message: `${attacker.name} has no lasers!`
         };
     }
     
@@ -95,11 +95,8 @@ function executeLaserAttack(attacker, defender) {
         };
     }
     
-    // Deplete laser charge
-    attacker.lasers[0] = Math.max(0, attacker.lasers[0] - 1);
-    
     // Calculate damage based on laser power
-    const baseDamage = attacker.lasers[1] * 0.5; // 50% of max lasers as base damage
+    const baseDamage = attacker.lasers * 0.5; // 50% of lasers as base damage
     const variance = baseDamage * 0.3; // ±30% variance
     const damage = Math.ceil(baseDamage + (Math.random() * variance * 2 - variance));
     
@@ -240,26 +237,14 @@ function rechargeShields(ship) {
 
 /**
  * Recharges a ship's lasers based on engine power.
+ * Note: Lasers are now a static damage value, so this just returns a message.
  * @param {Ship} ship - The ship recharging lasers
  * @returns {Object} - Result {amount, message}
  */
 function rechargeLasers(ship) {
-    if (ship.lasers[0] >= ship.lasers[1]) {
-        return {
-            amount: 0,
-            message: `${ship.name}'s lasers are already at maximum charge.`
-        };
-    }
-    
-    // Recharge amount based on engine power (30% of engine per turn)
-    const rechargeAmount = Math.ceil(ship.engine * 0.3);
-    const actualRecharge = Math.min(rechargeAmount, ship.lasers[1] - ship.lasers[0]);
-    
-    ship.lasers[0] += actualRecharge;
-    
     return {
-        amount: actualRecharge,
-        message: `${ship.name} recharges lasers by ${actualRecharge}. (${ship.lasers[0]}/${ship.lasers[1]})`
+        amount: 0,
+        message: `${ship.name} powers up weapons systems.`
     };
 }
 

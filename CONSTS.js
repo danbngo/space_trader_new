@@ -18,9 +18,6 @@ const REPAIR_COST_PER_1_HULL = 10 // Base cost to repair 1 hull point at shipyar
 const BASE_FUEL_COST_PER_UNIT = 5 // Base cost per unit of fuel at shipyard
 const FUEL_COST_PER_1_AU = 5 // Fuel units consumed per AU traveled
 
-const PLANET_ENCOUNTER_CHANCE_PER_DAY = 0//0.01; //chance of random encounter per day when right next to an 'average' planet
-const ASTEROIDS_ENCOUNTER_CHANCE_PER_DAY = 0.01//0.5; //chance of fooroid storms when in the middle of an asteroid belt
-const BANK_BOUNTY_CHANCE_PER_DAY = 0.01;
 const NEWS_CHANCE_PER_DAY = 1/30;
 
 //combat distances = miles, time = seconds
@@ -111,5 +108,5 @@ const SPACE_STATION_MIN_BUILDINGS = 1
 const CRIMINAL_MAX_BOUNTY_PER_LEVEL = 500
 
 const YEARS_PER_TRAVEL_TICK = 1/365/24/10 //1 hour per 10 tick
-const BASE_ENCOUNTER_CHANCE_PER_YEAR = 0//1/365/24 //1 encounter per day
+const BASE_ENCOUNTER_CHANCE_PER_DAY = 0.99999999 //1 encounter per day
 const COMBAT_MAP_PROGRESS_PERCENT_PER_MS = 1/1000 // Progress percentage per millisecond

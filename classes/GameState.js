@@ -13,6 +13,8 @@ class GameState {
         this.fleet = null;
         /** @type {any} */ // REMOVED: Encounter type
         this.encounter = null;
+        /** @type {Combat|null} */
+        this.combat = null;
         /** @type {Mission[]} */
         this.missions = [];
         /** @type {Mission[]} */

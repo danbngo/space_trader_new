@@ -1,6 +1,21 @@
 class MerchantsEncounter extends Encounter {
     
     /**
+     * Override startEncounter to show merchant contact modal instead of going straight to combat
+     */
+    startEncounter() {
+        console.log('MerchantsEncounter.startEncounter:', this)
+        if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
+        gs.encounter = this
+        
+        // Show the encounter visually (ships on canvas)
+        showEncounterVisual(this)
+        
+        // Show merchant modal instead of going straight to combat
+        this.showInitialContactModal()
+    }
+    
+    /**
      * Show initial contact modal with merchant ship
      * Merchant has 50% chance to want to trade, 50% to ignore player
      */
@@ -18,7 +33,7 @@ class MerchantsEncounter extends Encounter {
                 ['Trade', () => this.showTradeOfferModal()],
                 ['Attack', () => this.startCombat()],
                 ['Leave', () => this.endEncounter()]
-            ])
+            ], '', null, 0)
         } else {
             msg += `The merchant fleet broadcasts on all channels:<br/>`
             msg += `"Would love to stay and chat, but we're late to drop the cargo. Maybe next time."<br/>`
@@ -26,7 +41,7 @@ class MerchantsEncounter extends Encounter {
             showModal(fleetName, msg, [
                 ['Attack', () => this.startCombat()],
                 ['Leave', () => this.endEncounter()]
-            ])
+            ], '', null, 0)
         }
     }
     
@@ -34,11 +49,19 @@ class MerchantsEncounter extends Encounter {
      * Initiate combat with the merchant
      */
     startCombat() {
+        // Initialize combat system
+        if (this.fleet && this.fleet.ships && this.fleet.ships.length > 0) {
+            this.combat = new Combat(gs.fleet, this.fleet)
+            this.combat.start(true) // Player has initiative by default
+            this.combatEnabled = true
+        }
+        
         const fleetName = coloredName(this.fleet)
         showModal(fleetName, 
             `The ${fleetName} broadcasts, "We won't go down without a fight!"<br/>
             Their ships power up weapons systems...<br/>`, 
-            [['Enter Combat', () => showCombatMap(this)]]
+            [['Enter Combat', () => showCombatMap(this)]],
+            '', null, 0
         )
     }
     
@@ -89,7 +112,7 @@ class MerchantsEncounter extends Encounter {
                     this.fleet.captain.credits -= totalPrice
                     showModal(fleetName, 
                         `You sold ${sellAmount} units of ${ct.symbol} ${coloredName(ct)} for ${totalPrice}CR${officersShare ? ` (-${officersShare}CR for officers)` : ''}.<br/>
-                        Transaction complete.<br/>`, [['Continue', ()=>this.endEncounter()]])
+                        Transaction complete.<br/>`, [['Continue', ()=>this.endEncounter()]], '', null, 0)
                 }
 
                 msg += `They offer to buy ${sellAmount} ${ct.symbol} ${coloredName(ct)} for ${pricePerUnit}CR each (total: ${totalPrice}CR).<br/>`
@@ -104,7 +127,7 @@ class MerchantsEncounter extends Encounter {
             ['Accept', ()=>onSell()],
             ['Decline', ()=>this.endEncounter()]
         ] :
-        [['Continue', ()=>this.endEncounter()]])
+        [['Continue', ()=>this.endEncounter()]], '', null, 0)
     }
 
     showTradeOfferPlayerBuyModal(cargoTypesOfInterest = null) {
@@ -154,7 +177,7 @@ class MerchantsEncounter extends Encounter {
                     this.fleet.captain.credits += totalPrice
                     showModal(fleetName, 
                         `You bought ${buyAmount} units of ${ct.symbol} ${coloredName(ct)} for ${totalPrice}CR.<br/>
-                        Transaction complete.<br/>`, [['Continue', ()=>this.endEncounter()]])
+                        Transaction complete.<br/>`, [['Continue', ()=>this.endEncounter()]], '', null, 0)
                 }
             }
         }
@@ -162,6 +185,6 @@ class MerchantsEncounter extends Encounter {
             ['Accept', ()=>onBuy()],
             ['Decline', ()=>this.endEncounter()] 
         ] :
-        [['Continue', ()=>this.endEncounter()]])
+        [['Continue', ()=>this.endEncounter()]], '', null, 0)
     }
 }

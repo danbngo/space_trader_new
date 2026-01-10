@@ -93,6 +93,34 @@ class StarSystem extends SpaceObject {
         fleet.fuel = Math.max(0, fleet.fuel - fuelCost)
     }
 
+    /**
+     * Updates fleet travel progress and position during interplanetary travel
+     * @param {number} elapsedYears - Time elapsed in years
+     */
+    travel(elapsedYears) {
+        if (!gs.destination || gs.travelYearsRemaining === null || !gs.previousLocation) return
+        
+        // Update game year
+        gs.year += elapsedYears
+        
+        // Update travel time remaining
+        gs.travelYearsRemaining -= elapsedYears
+        
+        // Calculate and update progress percentage
+        const totalDistance = calcDistance(gs.previousLocation.x, gs.previousLocation.y, gs.destination.x, gs.destination.y)
+        const startETA = totalDistance / gs.fleet.speed
+        const remainingETA = Math.max(0, gs.travelYearsRemaining)
+        const progressPercent = startETA > 0 ? ((startETA - remainingETA) / startETA) * 100 : 100
+        
+        // Update player location as weighted average based on progress
+        const progressRatio = progressPercent / 100
+        gs.fleet.x = gs.previousLocation.x + (gs.destination.x - gs.previousLocation.x) * progressRatio
+        gs.fleet.y = gs.previousLocation.y + (gs.destination.y - gs.previousLocation.y) * progressRatio
+        
+        // Update travelProgress for serialization
+        gs.travelProgress = progressPercent
+    }
+
     updatePositions(year = gs.year) {
         const objects = [...this.stars, ...this.planets, ...this.dwarfPlanets, ...this.spaceStations, ...this.asteroids]
         for (const obj of objects) {
@@ -108,6 +136,11 @@ class StarSystem extends SpaceObject {
         if (gs.fleet && gs.fleet.location) {
             gs.fleet.x = gs.fleet.location.x
             gs.fleet.y = gs.fleet.location.y
+        }
+        
+        // Update travel progress if currently traveling
+        if (gs.destination && gs.travelYearsRemaining !== null) {
+            this.travel(YEARS_PER_TRAVEL_TICK)
         }
     }
 }
