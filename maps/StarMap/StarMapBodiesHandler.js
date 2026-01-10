@@ -105,31 +105,6 @@ class StarMapBodiesHandler {
         })
     }
 
-    handleViewDistanceCircle() {
-        const {cvs} = this.starMap
-        const viewDistanceId = 'playerViewDistance'
-        
-        if (!gs.fleet || !gs.fleet.x || !gs.fleet.y) {
-            // Hide circle if player fleet doesn't exist or isn't positioned
-            const circle = cvs.getObject(viewDistanceId)
-            if (circle) circle.visible = false
-            return
-        }
-        
-        let circle = cvs.getObject(viewDistanceId)
-        
-        if (!circle) {
-            // Create the view distance circle with subtle alpha
-            circle = cvs.addEmptyCircle(viewDistanceId, gs.fleet.x, gs.fleet.y, gs.fleet.mapViewDistance, 1, COLORS.Cyan, 0.33)
-        }
-        
-        // Update position and radius
-        circle.visible = true
-        circle.x = gs.fleet.x
-        circle.y = gs.fleet.y
-        circle.radius = gs.fleet.mapViewDistance
-    }
-
     handleStars() {
         const {starSystem, cvs, selectedObject, selectObject} = this.starMap
         const {stars} = starSystem
@@ -201,6 +176,7 @@ class StarMapBodiesHandler {
             
             // Check if discovered
             const hasBeenSeen = gs.lastSeenDates.has(body)
+            console.log(gs.lastSeenDates)
             const isInVisionRange = gs.fleet && gs.fleet.mapViewDistance && 
                 calcDistance(body.x, body.y, gs.fleet.x, gs.fleet.y) <= gs.fleet.mapViewDistance
             

@@ -540,7 +540,7 @@ class CanvasWrapper {
             let x2Offset = 0;
             let y2Offset = 0;
             if (obj.x2 !== undefined && obj.y2 !== undefined) {
-                const [sx2, sy2] = obj.parallax ? this.worldToScreen(obj.x2, obj.y2) : [obj.x2, obj.y2];
+                const [sx2, sy2] = obj.parallax ? [obj.x2, obj.y2] : this.worldToScreen(obj.x2, obj.y2)
                 x2Offset = sx2 - sx
                 y2Offset = sy2 - sy
             }

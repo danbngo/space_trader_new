@@ -178,6 +178,9 @@ async function startNewGame() {
     
     // Auto-assign captain to starting ship
     gs.fleet.autoAssignPilots()
+    
+    // Update positions again now that fleet exists to mark nearby objects as seen
+    gs.system.updatePositions(gs.year)
 
     console.log("New game started.",gs);
     createCharacter()

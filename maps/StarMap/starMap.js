@@ -77,11 +77,10 @@ class StarMap extends BaseMap {
     updateSpotlight() {
         if (!this.spotlight || !gs.fleet || !gs.fleet.mapViewDistance) return
         // Update spotlight position to follow player
-            this.spotlight.x = gs.fleet.x
-            this.spotlight.y = gs.fleet.y
-            this.spotlight.size = gs.fleet.mapViewDistance
-            this.spotlight.minorSize = gs.fleet.mapViewDistance
-            console.log(this.spotlight.size,'vs zoom:',this.cvs.zoom)
+        this.spotlight.x = gs.fleet.x
+        this.spotlight.y = gs.fleet.y
+        this.spotlight.size = gs.fleet.mapViewDistance
+        this.spotlight.minorSize = gs.fleet.mapViewDistance
         this.overlayCvs.cameraX = this.cvs.cameraX
         this.overlayCvs.cameraY = this.cvs.cameraY
         this.overlayCvs.zoom = this.cvs.zoom
@@ -449,7 +448,7 @@ class StarMap extends BaseMap {
             return;
         }
         const isDockedHere = obj == gs.location
-        const cantTravelHere = (obj == gs.location) || gs.fleet.stranded
+        //const cantTravelHere = (obj == gs.location) || gs.fleet.stranded
         const container = ce({parent:this.objectPane, classNames:['starmap-object-panel']})
         
         // Check if object has been discovered

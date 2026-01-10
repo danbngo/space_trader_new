@@ -138,6 +138,17 @@ class StarSystem extends SpaceObject {
             gs.fleet.y = gs.fleet.location.y
         }
         
+        // Update lastSeenDates for objects within radar range
+        if (gs.fleet && gs.fleet.mapViewDistance) {
+            const viewableObjects = [...this.planets, ...this.dwarfPlanets, ...this.spaceStations]
+            for (const obj of viewableObjects) {
+                const distance = calcDistance(gs.fleet.x, gs.fleet.y, obj.x, obj.y)
+                if (distance <= gs.fleet.mapViewDistance) {
+                    gs.lastSeenDates.set(obj, gs.year)
+                }
+            }
+        }
+        
         // Update travel progress if currently traveling
         if (gs.destination && gs.travelYearsRemaining !== null) {
             this.travel(YEARS_PER_TRAVEL_TICK)
