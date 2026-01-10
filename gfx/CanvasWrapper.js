@@ -466,7 +466,6 @@ class CanvasWrapper {
         if (this.fillColor) {
             ctx.fillStyle = this.fillColor;
             ctx.fillRect(0, 0, width/pixelRatio, height/pixelRatio);
-            console.log('filling canvas with color', this.fillColor, width, height, pixelRatio);
         }
 
         // Draw pixels (asteroids, etc)

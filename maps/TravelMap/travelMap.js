@@ -233,28 +233,23 @@ class TravelMap extends BaseMap {
     /**
      * Renders a thruster for a ship
      * @param {Ship} ship - The ship to render thruster for
-     * @param {number} x - X position
-     * @param {number} y - Y position
      * @param {ShipGroupConfig} shipGroupConfig - Configuration for this ship's group
      */
-    renderThruster(ship, x, y, shipGroupConfig) {
-        console.log('Rendering thruster for ship:', ship.shipType.name)
-        const mirror = shipGroupConfig.mirror // Use mirror from config
+    renderThruster(ship, shipGroupConfig) {
+        console.log('Rendering thruster for ship:', ship.shipType.name, shipGroupConfig)
         
         const flickerRange = TRAVEL_MAP_CONFIG.thrusterFlickerMax - TRAVEL_MAP_CONFIG.thrusterFlickerMin
         const thrusterFlicker = TRAVEL_MAP_CONFIG.thrusterFlickerMin + Math.random() * flickerRange
         const thrusterSize = ship.radius * TRAVEL_MAP_CONFIG.thrusterSizeMultiplier * thrusterFlicker
         const thrusterColor = [255, Math.floor(150 * thrusterFlicker), 0, shipGroupConfig.opacity * thrusterFlicker]
-        const offsetX = mirror ? ship.radius : -ship.radius
-        const rotation = mirror ? 0 : Math.PI
+        const rotation = shipGroupConfig.mirror ? 0 : Math.PI
         this.routeCvs.addFilledTriangle(
             `thruster-${ship.uuid}`,
-            x + offsetX,
-            y,
-            thrusterSize/2,
-            thrusterSize,
+            0,0,
+            100,//thrusterSize/2,
+            100,//thrusterSize,
             2,
-            thrusterColor,
+            COLORS.Red,//thrusterColor,
             rotation,
             null
         )
@@ -263,13 +258,10 @@ class TravelMap extends BaseMap {
     /**
      * Renders a ship with its shape and label
      * @param {Ship} ship - The ship to render
-     * @param {number} x - X position
-     * @param {number} y - Y position
      * @param {ShipGroupConfig} shipGroupConfig - Configuration for this ship's group
      */
-    renderShip(ship, x, y, shipGroupConfig) {
+    renderShip(ship, shipGroupConfig) {
         console.log('Rendering ship:', ship.shipType.name, 'Config:', shipGroupConfig)
-        const mirror = shipGroupConfig.mirror // Use mirror from config
         const shipSize = TRAVEL_MAP_CONFIG.shipSize
         const labelOffsetY = TRAVEL_MAP_CONFIG.labelOffsetY
         const baseShipColor = gs.fleet && gs.fleet.color ? gs.fleet.color : COLORS.White
@@ -281,32 +273,20 @@ class TravelMap extends BaseMap {
         
         let shipObj
         if (ship.shipType.shipShape && ship.shipType.shipShape.addCanvasObject) {
-            // Use bitmap ship shape
             shipObj = ship.shipType.shipShape.addCanvasObject(this.routeCvs, ship, shipColor, shipSize)
-            shipObj.x = x
-            shipObj.y = y
-            shipObj.angle = mirror ? Math.PI : 0
         } else {
-            // Fallback to circle if no shape
-            shipObj = this.routeCvs.addFilledCircle(
-                `${ship.uuid}`,
-                x,
-                y,
-                shipSize,
-                5,
-                shipColor
-            )
+            throw new Error('ship must have a shipshape')
         }
         
         // Add ship label
         const labelColor = [...COLORS.White]
-        if (labelColor.length >= 4) {
-            labelColor[3] = shipGroupConfig.opacity
-        }
+        //if (labelColor.length >= 4) {
+            //labelColor[3] = shipGroupConfig.opacity
+        //}
         this.routeCvs.addText(
             `label-${ship.uuid}`,
-            x,
-            y-ship.radius,
+            shipObj.x,
+            shipObj.y-ship.radius,
             0,
             labelOffsetY,
             ship.shipType.name,
@@ -317,6 +297,7 @@ class TravelMap extends BaseMap {
         // Add progress bars using the ship object we just created
         if (shipObj) {
             this.addShipProgressBars(ship, shipObj, shipGroupConfig)
+            this.renderThruster(ship, shipGroupConfig)
         }
     }
     
@@ -392,7 +373,7 @@ class TravelMap extends BaseMap {
         const y = shipObj.y
         
         // Calculate bar positions
-        const barY = y - ship.radius + TRAVEL_MAP_CONFIG.shipBarYOffset
+        const barY = y - TRAVEL_MAP_CONFIG.shipSize + TRAVEL_MAP_CONFIG.shipBarYOffset
         const hullBarY = barY
         const shieldBarY = barY - TRAVEL_MAP_CONFIG.shipBarHeight - TRAVEL_MAP_CONFIG.shipBarSpacing
         
@@ -452,20 +433,9 @@ class TravelMap extends BaseMap {
             // Check if ship already exists on canvas
             const shipExists = this.shipsCreated.has(ship.uuid)
             
-            // Create or update thruster
-            const thrusterId = `thruster-${ship.uuid}`
-            const thrusterObj = this.routeCvs.getObject(thrusterId)
-            if (thrusterObj) {
-                const thrusterOffset = config.mirror ? ship.radius : -ship.radius
-                thrusterObj.x = shipX + thrusterOffset
-                thrusterObj.y = shipY
-            } else {
-                this.renderThruster(ship, shipX, shipY, config)
-            }
-            
             // Create or update ship
             if (!shipExists) {
-                this.renderShip(ship, shipX, shipY, config)
+                this.renderShip(ship, config)
                 this.shipsCreated.add(ship.uuid)
             } else {
                 this.updateShipPosition(ship, shipX, shipY, config)
@@ -522,11 +492,20 @@ class TravelMap extends BaseMap {
             shipObj.y = y
         }
         
+        // Update thruster position
+        const thrusterObj = this.routeCvs.getObject(`thruster-${ship.uuid}`)
+        if (thrusterObj) {
+            const thrusterOffset = shipGroupConfig.mirror ? -TRAVEL_MAP_CONFIG.shipSize : -TRAVEL_MAP_CONFIG.shipSize
+            thrusterObj.x = x + thrusterOffset
+            thrusterObj.y = y
+            console.log('updated thruster pos:', thrusterObj.x, thrusterObj.y)
+        }
+        
         // Update label
         const label = this.routeCvs.getObject(`label-${ship.uuid}`)
         if (label) {
             label.x = x
-            label.y = y
+            label.y = y-TRAVEL_MAP_CONFIG.shipSize
         }
         
         // Update progress bars
