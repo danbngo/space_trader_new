@@ -156,7 +156,7 @@ class StarMap extends BaseMap {
             let sy = bgStar.y * sizeOffset
             
             // Add pixel with screen offset (parallax = true means it won't move with camera)
-            this.bgCvs.addPixel(0, 0, bgStar.color, bgStar.radius, sx, sy, false)
+            this.bgCvs.addPixel(0, 0, bgStar.color, bgStar.radius, sx, sy)
         })
         
         // Redraw background canvas once

@@ -186,8 +186,8 @@ class CanvasWrapper {
         return this.addObject(obj)
     }
     
-    addPixel(x = 0, y = 0, color = COLORS.White, size = 1, screenOffsetX = 0, screenOffsetY = 0, parallax = false) {
-        const pixel = new CanvasPixel({x, y, color, size, screenOffsetX, screenOffsetY, parallax})
+    addPixel(x = 0, y = 0, color = COLORS.White, size = 1, screenOffsetX = 0, screenOffsetY = 0) {
+        const pixel = new CanvasPixel({x, y, color, size, screenOffsetX, screenOffsetY})
         this.pixels.push(pixel)
         return pixel
     }
@@ -483,9 +483,7 @@ class CanvasWrapper {
             
             for (const pixel of pixels) {
                 if (!pixel.visible) continue;
-                let sx = 0//pixel.offsetY;
-                let sy = 0//pixel.offsetY;
-                if (!pixel.parallax) [sx, sy] = this.worldToScreen(pixel.x, pixel.y);
+                let [sx, sy] = this.worldToScreen(pixel.x, pixel.y);
                 sx += pixel.screenOffsetX;
                 sy += pixel.screenOffsetY;
                 sx = Math.round(sx*pixelRatio)

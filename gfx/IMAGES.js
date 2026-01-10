@@ -1,4 +1,4 @@
-class BitmapShipShape {
+class ImageHandler {
     constructor(src) {
         this.src = src;
     }
@@ -12,14 +12,18 @@ class BitmapShipShape {
      * @returns {CanvasObject} The created canvas object
      */
     addCanvasObject(canvas, ship, color, size) {
-        console.log('BitmapShipShape.toCanvasObject called with size:', size);
-        if (!color || !size) throw new Error('BitmapShipShape.toCanvasObject requires color and size parameters')
+        console.log('ImageHandler.toCanvasObject called with size:', size);
+        if (!color || !size) throw new Error('ImageHandler.toCanvasObject requires color and size parameters')
         return canvas.addBitmap(`ship-bitmap-${ship.uuid}`, 0, 0, this.src, size, 0, [...color]);
     }
 }
 
 
 const SHIP_SHAPES = {
-    COURIER: new BitmapShipShape('images/ship_courier.png'),
+    COURIER: new ImageHandler('images/ship_courier.png'),
+}
+
+const BACKGROUNDS = {
+    STARFIELD_1: new ImageHandler('images/bg_space.png'),
 }
 
