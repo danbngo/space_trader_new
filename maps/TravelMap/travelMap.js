@@ -509,11 +509,11 @@ class TravelMap extends BaseMap {
                         // Display damage text over the target ship
                         if (result.shieldsAbsorbed && result.shieldsAbsorbed > 0) {
                             console.log('Displaying shield damage text')
-                            this.displayTextOverShip(ship, [100, 150, 255, 1], `-${result.shieldsAbsorbed}`, 1500)
+                            this.displayTextOverShip(ship, [100, 150, 255, 1], `-${result.shieldsAbsorbed}`, 1500, -30)
                         }
                         if (result.hullDamage && result.hullDamage > 0) {
                             console.log('Displaying hull damage text')
-                            this.displayTextOverShip(ship, [255, 255, 255, 1], `-${result.hullDamage}`, 1500)
+                            this.displayTextOverShip(ship, [255, 255, 255, 1], `-${result.hullDamage}`, 1500, 30)
                         }
                         
                         if (result.success || attackType === 'ram') {
@@ -651,11 +651,11 @@ class TravelMap extends BaseMap {
                             // Display damage text over the target ship
                             if (result.shieldsAbsorbed && result.shieldsAbsorbed > 0) {
                                 console.log('Displaying shield damage text')
-                                this.displayTextOverShip(ship, [100, 150, 255, 1], `-${result.shieldsAbsorbed}`, 1500)
+                                this.displayTextOverShip(ship, [100, 150, 255, 1], `-${result.shieldsAbsorbed}`, 1500, -30)
                             }
                             if (result.hullDamage && result.hullDamage > 0) {
                                 console.log('Displaying hull damage text')
-                                this.displayTextOverShip(ship, [255, 255, 255, 1], `-${result.hullDamage}`, 1500)
+                                this.displayTextOverShip(ship, [255, 255, 255, 1], `-${result.hullDamage}`, 1500, 30)
                             }
                             
                             if (result.success || attackType === 'ram') {
@@ -980,11 +980,12 @@ class TravelMap extends BaseMap {
      * @param {number[]} color - RGBA color array for the text
      * @param {string} text - The text to display
      * @param {number} durationMs - How long the text should display (default 1000ms)
+     * @param {number} xOffset - Horizontal offset from ship center (default 0)
      */
-    displayTextOverShip(ship, color, text, durationMs = 1000) {
+    displayTextOverShip(ship, color, text, durationMs = 1000, xOffset = 0) {
         console.log('=== displayTextOverShip called ===')
         console.log('Ship:', ship.shipType.name, 'UUID:', ship.uuid)
-        console.log('Text:', text, 'Color:', color, 'Duration:', durationMs)
+        console.log('Text:', text, 'Color:', color, 'Duration:', durationMs, 'X Offset:', xOffset)
         
         const shipObj = this.cvs.getObject(`ship-${ship.uuid}`)
         console.log('Ship object found:', shipObj)
@@ -1002,7 +1003,7 @@ class TravelMap extends BaseMap {
             shape: SHAPES.Text,
             x: shipObj.x,
             y: shipObj.y,
-            screenOffsetX: 0,
+            screenOffsetX: xOffset,
             screenOffsetY: -TRAVEL_MAP_CONFIG.shipSize / 2 - 30,
             textContent: text,
             fillColor: color,
