@@ -154,6 +154,51 @@ class TravelMap extends BaseMap {
     }
     
     /**
+     * Removes canvas objects for ships that no longer exist
+     */
+    cleanupRemovedShips() {
+        // Get current ship UUIDs
+        const currentShipUUIDs = new Set()
+        
+        // Add player ships
+        if (gs.fleet && gs.fleet.ships) {
+            gs.fleet.ships.forEach(ship => currentShipUUIDs.add(ship.uuid))
+        }
+        
+        // Add enemy ships if encounter exists
+        if (gs.encounter && gs.encounter.fleet && gs.encounter.fleet.ships) {
+            gs.encounter.fleet.ships.forEach(ship => currentShipUUIDs.add(ship.uuid))
+        }
+        
+        // Find and remove canvas objects for ships that no longer exist
+        const objectsToRemove = []
+        this.cvs.drawOrder.forEach(obj => {
+            if (obj.id) {
+                // Check if this is a ship-related object
+                const prefixes = ['ship-', 'label-', 'thruster-', 'hull-bg-', 'hull-fg-', 'shield-bg-', 'shield-fg-']
+                for (const prefix of prefixes) {
+                    if (obj.id.startsWith(prefix)) {
+                        const uuid = obj.id.substring(prefix.length)
+                        if (!currentShipUUIDs.has(uuid)) {
+                            objectsToRemove.push(obj.id)
+                        }
+                        break
+                    }
+                }
+            }
+        })
+        
+        // Remove the objects
+        objectsToRemove.forEach(id => {
+            this.cvs.deleteObject(id)
+        })
+        
+        if (objectsToRemove.length > 0) {
+            console.log('Cleaned up', objectsToRemove.length, 'canvas objects for removed ships')
+        }
+    }
+    
+    /**
      * Updates the UI panel based on current combat state
      */
     updateUIPanel() {
@@ -509,6 +554,10 @@ class TravelMap extends BaseMap {
      */
     renderShips() {
         //console.log('🚢 Rendering ships on travel map')
+        
+        // Clean up canvas objects for ships that no longer exist
+        this.cleanupRemovedShips()
+        
         // Update offsets based on current canvas size
         this.playerShipGroupConfig.xOffset = -(this.cvs.canvas.width / this.cvs.zoom) * Math.abs(TRAVEL_MAP_CONFIG.playerShipsOffset)
         this.enemyShipGroupConfig.xOffset = (this.cvs.canvas.width / this.cvs.zoom) * TRAVEL_MAP_CONFIG.enemyShipsOffset
