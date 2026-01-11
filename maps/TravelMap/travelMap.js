@@ -26,7 +26,6 @@ class TravelMap extends BaseMap {
         this.shipJitterOffsets = new Map()
         this.routeProgressBar = null
         this.targetingMode = null // 'laser', 'ram', or null
-        this.shipOriginalColors = new Map() // Store original colors for dimming/restoring
         this.animations = [] // Active animations (Loop instances)
         
         /** @type {ShipGroupConfig} */
@@ -274,94 +273,6 @@ class TravelMap extends BaseMap {
     }
     
     /**
-     * Dims all ships except the selected one
-     * @param {Ship} selectedShip - The ship to keep at normal brightness
-     */
-    dimOtherShips(selectedShip) {
-        // Get all ships
-        const allShips = [...gs.fleet.ships]
-        if (gs.encounter && gs.encounter.fleet && gs.encounter.fleet.ships) {
-            allShips.push(...gs.encounter.fleet.ships)
-        }
-        
-        allShips.forEach(ship => {
-            if (ship === selectedShip) return // Don't dim the selected ship
-            
-            const shipObj = this.cvs.getObject(`ship-${ship.uuid}`)
-            if (shipObj && shipObj.fillColor) {
-                // Store original color if not already stored
-                if (!this.shipOriginalColors.has(ship.uuid)) {
-                    this.shipOriginalColors.set(ship.uuid, [...shipObj.fillColor])
-                }
-                // Darken the ship (50% brightness)
-                shipObj.fillColor = darkenColor(this.shipOriginalColors.get(ship.uuid), 0.5)
-            }
-        })
-    }
-    
-    /**
-     * Restores all ships to their original colors
-     */
-    restoreShipColors() {
-        this.shipOriginalColors.forEach((originalColor, uuid) => {
-            const shipObj = this.cvs.getObject(`ship-${uuid}`)
-            if (shipObj && shipObj.fillColor) {
-                shipObj.fillColor = [...originalColor]
-            }
-        })
-        this.shipOriginalColors.clear()
-        
-        // After restoring, darken ships with no actions remaining
-        this.applyActionBasedDarkening()
-    }
-    
-    /**
-     * Applies brightness changes to ships based on their state:
-     * - 50% lighter: selected player ship
-     * - Normal: player ships with actions remaining, enemy ships (when not targeting)
-     * - 50% darker: player ships that already acted
-     */
-    applyActionBasedDarkening() {
-        // Handle player ships
-        gs.fleet.ships.forEach(ship => {
-            const shipObj = this.cvs.getObject(`ship-${ship.uuid}`)
-            if (shipObj && shipObj.fillColor) {
-                if (!this.shipOriginalColors.has(ship.uuid)) {
-                    this.shipOriginalColors.set(ship.uuid, [...shipObj.fillColor])
-                }
-                
-                if (ship === this.selectedPlayerShip) {
-                    // Selected player ship: 50% lighter
-                    shipObj.fillColor = lightenColor(this.shipOriginalColors.get(ship.uuid), 0.5)
-                } else if (this.selectedPlayerShip) {
-                    // When a player ship is selected, all other player ships are 50% darker
-                    shipObj.fillColor = darkenColor(this.shipOriginalColors.get(ship.uuid), 0.5)
-                } else if (ship.actionsRemaining <= 0) {
-                    // Player ship that already acted (when no ship is selected): 50% darker
-                    shipObj.fillColor = darkenColor(this.shipOriginalColors.get(ship.uuid), 0.5)
-                } else {
-                    // Player ship with actions remaining (when no ship is selected): normal brightness
-                    shipObj.fillColor = [...this.shipOriginalColors.get(ship.uuid)]
-                }
-            }
-        })
-        
-        // Handle enemy ships - normal brightness when not in targeting mode
-        if (gs.encounter && gs.encounter.fleet && gs.encounter.fleet.ships) {
-            gs.encounter.fleet.ships.forEach(ship => {
-                const shipObj = this.cvs.getObject(`ship-${ship.uuid}`)
-                if (shipObj && shipObj.fillColor) {
-                    if (!this.shipOriginalColors.has(ship.uuid)) {
-                        this.shipOriginalColors.set(ship.uuid, [...shipObj.fillColor])
-                    }
-                    // Enemy ships stay at normal brightness unless in targeting mode
-                    shipObj.fillColor = [...this.shipOriginalColors.get(ship.uuid)]
-                }
-            })
-        }
-    }
-    
-    /**
      * Sets up targeting mode - brightens enemy ships for targeting, keeps selected ship bright
      */
     setupTargetingMode() {
@@ -370,52 +281,11 @@ class TravelMap extends BaseMap {
         // Handle player ships during targeting
         gs.fleet.ships.forEach(ship => {
             const shipObj = this.cvs.getObject(`ship-${ship.uuid}`)
-            if (shipObj && shipObj.fillColor) {
-                // Store original color if not already stored
-                if (!this.shipOriginalColors.has(ship.uuid)) {
-                    this.shipOriginalColors.set(ship.uuid, [...shipObj.fillColor])
-                }
-                
-                // Selected ship: 50% lighter, others: darken if no actions, normal if actions remain
-                if (ship === this.selectedPlayerShip) {
-                    shipObj.fillColor = lightenColor(this.shipOriginalColors.get(ship.uuid), 0.5)
-                } else if (ship.actionsRemaining <= 0) {
-                    shipObj.fillColor = darkenColor(this.shipOriginalColors.get(ship.uuid), 0.5)
-                } else {
-                    shipObj.fillColor = [...this.shipOriginalColors.get(ship.uuid)]
-                }
-                
+            if (shipObj) {
                 // Disable all player ship interactions during targeting
                 shipObj.onClick = null
                 shipObj.onHover = null
                 shipObj.onHoverEnd = null
-            }
-        })
-        
-        // Lighten enemy ships and add hover handlers
-        gs.encounter.fleet.ships.forEach(ship => {
-            const shipObj = this.cvs.getObject(`ship-${ship.uuid}`)
-            if (shipObj && shipObj.fillColor) {
-                // Store original color if not already stored
-                if (!this.shipOriginalColors.has(ship.uuid)) {
-                    this.shipOriginalColors.set(ship.uuid, [...shipObj.fillColor])
-                }
-                // Lighten enemy ships during targeting (50% lighter)
-                shipObj.fillColor = lightenColor(this.shipOriginalColors.get(ship.uuid), 0.5)
-                
-                // Add hover handlers for even more brightness on hover
-                shipObj.onHover = () => {
-                    if (this.targetingMode) {
-                        // Make it even brighter on hover (75% lighter)
-                        shipObj.fillColor = lightenColor(this.shipOriginalColors.get(ship.uuid), 0.75)
-                    }
-                }
-                shipObj.onHoverEnd = () => {
-                    if (this.targetingMode) {
-                        // Return to 50% lighter
-                        shipObj.fillColor = lightenColor(this.shipOriginalColors.get(ship.uuid), 0.5)
-                    }
-                }
             }
         })
     }
@@ -503,95 +373,7 @@ class TravelMap extends BaseMap {
             
             // Create onClick handler for ship selection
             const onClick = () => {
-                console.log('Ship clicked:', ship.shipType.name, 'Fleet:', ship.fleet?.name, 'Mirror:', shipGroupConfig.mirror)
-                if (shipGroupConfig.mirror) {
-                    // Enemy ship clicked
-                    console.log('Enemy ship clicked, targetingMode:', this.targetingMode)
-                    
-                    if (this.targetingMode) {
-                        // Player is targeting this enemy ship for an attack
-                        if (ship.disabled) {
-                            gs.combat.addToCombatLog('Target is already destroyed!')
-                            this.combatHandler.refreshCombatLog()
-                            return
-                        }
-                        
-                        const attackType = this.targetingMode
-                        this.targetingMode = null // Clear targeting mode
-                        
-                        // Restore all ship colors
-                        this.restoreShipColors()
-                        
-                        // Execute the attack
-                        const result = gs.combat.executeAction(this.selectedPlayerShip, attackType, ship)
-                        this.selectedPlayerShip.actionsRemaining--
-                        
-                        // Display laser beam if it's a laser attack, or animate ram
-                        if (attackType === 'laser') {
-                            this.displayLaserBeam(this.selectedPlayerShip, ship, [255, 0, 0, 1], 500)
-                        } else if (attackType === 'ram') {
-                            this.animateRam(this.selectedPlayerShip, ship, 600)
-                        }
-                        
-                        console.log('Combat result:', result)
-                        console.log('Shields absorbed:', result.shieldsAbsorbed, 'Hull damage:', result.hullDamage)
-                        
-                        // Display damage text over the target ship
-                        if (!result.success && attackType !== 'ram') {
-                            // Attack missed - show "Missed" in dark gray
-                            this.displayTextOverShip(ship, [100, 100, 100, 1], 'Missed', 1500, 0)
-                        } else {
-                            if (result.shieldsAbsorbed && result.shieldsAbsorbed > 0) {
-                                console.log('Displaying shield damage text')
-                                this.displayTextOverShip(ship, [100, 150, 255, 1], `-${result.shieldsAbsorbed}`, 1500, -30)
-                            }
-                            if (result.hullDamage && result.hullDamage > 0) {
-                                console.log('Displaying hull damage text')
-                                this.displayTextOverShip(ship, [255, 255, 255, 1], `-${result.hullDamage}`, 1500, 30)
-                            }
-                        }
-                        
-                        // Display "Disabled" if ship was destroyed
-                        if (result.destroyed) {
-                            this.displayTextOverShip(ship, [255, 0, 0, 1], 'Disabled', 2000, 0)
-                        }
-                        
-                        // Display self-damage for ram attacks
-                        if (attackType === 'ram' && result.selfHullDamage && result.selfHullDamage > 0) {
-                            this.displayTextOverShip(this.selectedPlayerShip, [255, 200, 0, 1], `-${result.selfHullDamage}`, 1500, 0)
-                        }
-                        
-                        if (result.success || attackType === 'ram') {
-                            this.combatHandler.handleActionComplete()
-                        } else {
-                            // Refresh UI even if attack failed
-                            this.updateUIPanel()
-                        }
-                    } else {
-                        // Normal selection
-                        console.log('Setting selectedEnemyShip to:', ship.shipType.name)
-                        this.selectedEnemyShip = ship
-                        // Update UI panel to reflect selection
-                        this.updateUIPanel()
-                    }
-                } else {
-                    // Player ship clicked
-                    // Don't allow selection if ship has no actions remaining
-                    if (ship.actionsRemaining <= 0) {
-                        console.log('Ship has no actions remaining:', ship.shipType.name)
-                        return
-                    }
-                    
-                    console.log('Setting selectedPlayerShip to:', ship.shipType.name)
-                    this.selectedPlayerShip = ship
-                    
-                    // Dim all other ships
-                    this.restoreShipColors() // Clear any existing dimming first
-                    this.dimOtherShips(ship)
-                    
-                    // Update UI panel to reflect selection
-                    this.updateUIPanel()
-                }
+                this.combatHandler.onClickShip(ship, shipGroupConfig)
             }
             
             if (ship.shipType.shipShape && ship.shipType.shipShape.addCanvasObject) {
@@ -608,30 +390,9 @@ class TravelMap extends BaseMap {
                 }
                 // Set smaller hit radius for more precise clicking
                 shipObj.hitRadius = TRAVEL_MAP_CONFIG.shipHitRadius
-                
-                // Darken ships with no actions remaining (50% brightness)
-                if (ship.actionsRemaining <= 0) {
-                    if (!this.shipOriginalColors.has(ship.uuid)) {
-                        this.shipOriginalColors.set(ship.uuid, [...shipObj.fillColor])
-                    }
-                    shipObj.fillColor = darkenColor(shipObj.fillColor, 0.5)
-                }
             } else {
                 throw new Error('ship must have a shipshape')
             }
-            
-            // Create ship label (hidden by default)
-            // const labelColor = [...COLORS.White]
-            // this.cvs.addText(
-            //     `label-${ship.uuid}`,
-            //     0,
-            //     0,
-            //     0,
-            //     labelOffsetY,
-            //     ship.shipType.name,
-            //     labelColor,
-            //     12
-            // )
             
             // Create thruster
             const rotation = shipGroupConfig.mirror ? 0 : Math.PI
@@ -659,77 +420,13 @@ class TravelMap extends BaseMap {
                 shipColor[3] = shipGroupConfig.opacity
             }
             
-            // Apply darkening for ships with no actions (unless already stored/modified)
-            if (!this.shipOriginalColors.has(ship.uuid)) {
-                if (ship.actionsRemaining <= 0) {
-                    this.shipOriginalColors.set(ship.uuid, shipColor)
-                    shipObj.fillColor = darkenColor(shipColor, 0.5)
-                } else {
-                    shipObj.fillColor = shipColor
-                }
-            }
-            
             // Update onClick handler based on ship type and state
             if (shipGroupConfig.mirror) {
                 // Enemy ships: only clickable during targeting mode
                 if (this.targetingMode) {
                     if (!shipObj.onClick) {
                         shipObj.onClick = () => {
-                            if (ship.disabled) {
-                                gs.combat.addToCombatLog('Target is already destroyed!')
-                                this.combatHandler.refreshCombatLog()
-                                return
-                            }
-                            
-                            const attackType = this.targetingMode
-                            this.targetingMode = null
-                            this.restoreShipColors()
-                            
-                            const result = gs.combat.executeAction(this.selectedPlayerShip, attackType, ship)
-                            this.selectedPlayerShip.actionsRemaining--
-                            this.combatHandler.refreshCombatLog()
-                            
-                            // Display laser beam if it's a laser attack, or animate ram
-                            if (attackType === 'laser') {
-                                this.displayLaserBeam(this.selectedPlayerShip, ship, [255, 0, 0, 1], 500)
-                            } else if (attackType === 'ram') {
-                                this.animateRam(this.selectedPlayerShip, ship, 600)
-                            }
-                            
-                            console.log('Combat result:', result)
-                            console.log('Result properties:', Object.keys(result))
-                            console.log('Shields absorbed:', result.shieldsAbsorbed, 'Hull damage:', result.hullDamage)
-                            
-                            // Display damage text over the target ship
-                            if (!result.success && attackType !== 'ram') {
-                                // Attack missed - show "Missed" in dark gray
-                                this.displayTextOverShip(ship, [100, 100, 100, 1], 'Missed', 1500, 0)
-                            } else {
-                                if (result.shieldsAbsorbed && result.shieldsAbsorbed > 0) {
-                                    console.log('Displaying shield damage text')
-                                    this.displayTextOverShip(ship, [100, 150, 255, 1], `-${result.shieldsAbsorbed}`, 1500, -30)
-                                }
-                                if (result.hullDamage && result.hullDamage > 0) {
-                                    console.log('Displaying hull damage text')
-                                    this.displayTextOverShip(ship, [255, 255, 255, 1], `-${result.hullDamage}`, 1500, 30)
-                                }
-                            }
-                            
-                            // Display "Disabled" if ship was destroyed
-                            if (result.destroyed) {
-                                this.displayTextOverShip(ship, [255, 0, 0, 1], 'Disabled', 2000, 0)
-                            }
-                            
-                            // Display self-damage for ram attacks
-                            if (attackType === 'ram' && result.selfHullDamage && result.selfHullDamage > 0) {
-                                this.displayTextOverShip(this.selectedPlayerShip, [255, 200, 0, 1], `-${result.selfHullDamage}`, 1500, 0)
-                            }
-                            
-                            if (result.success || attackType === 'ram') {
-                                this.combatHandler.handleActionComplete()
-                            } else {
-                                this.updateUIPanel()
-                            }
+                            this.combatHandler.onClickShip(ship, shipGroupConfig)
                         }
                     }
                 } else {
@@ -748,12 +445,7 @@ class TravelMap extends BaseMap {
                 } else if (!shipObj.onClick) {
                     // Re-enable interactions if they were disabled
                     shipObj.onClick = () => {
-                        if (ship.actionsRemaining <= 0) return
-                        console.log('Setting selectedPlayerShip to:', ship.shipType.name)
-                        this.selectedPlayerShip = ship
-                        this.restoreShipColors()
-                        this.dimOtherShips(ship)
-                        this.updateUIPanel()
+                        this.combatHandler.onClickShip(ship, shipGroupConfig)
                     }
                 }
             }
@@ -1020,165 +712,6 @@ class TravelMap extends BaseMap {
         }
         
         this.cvs.redraw(true)
-    }
-
-    /**
-     * Updates the ship info display - delegated to combat handler
-     * @param {HTMLElement} infoElement
-     */
-    updateShipInfo(infoElement) {
-        this.combatHandler.updateShipInfo(infoElement)
-    }
-
-    /**
-     * Creates action buttons based on available move types
-     * @returns {HTMLElement}
-     */
-    /**
-     * Refreshes the combat log display from encounter's log
-     */
-    refreshCombatLog() {
-        this.combatHandler.refreshCombatLog()
-    }
-
-    /**
-     * Displays floating text over a ship that disappears after a duration
-     * @param {Ship} ship - The ship to display text over
-     * @param {number[]} color - RGBA color array for the text
-     * @param {string} text - The text to display
-     * @param {number} durationMs - How long the text should display (default 1000ms)
-     * @param {number} xOffset - Horizontal offset from ship center (default 0)
-     */
-    displayTextOverShip(ship, color, text, durationMs = 1000, xOffset = 0) {
-        console.log('=== displayTextOverShip called ===')
-        console.log('Ship:', ship.shipType.name, 'UUID:', ship.uuid)
-        console.log('Text:', text, 'Color:', color, 'Duration:', durationMs, 'X Offset:', xOffset)
-        
-        const shipObj = this.cvs.getObject(`ship-${ship.uuid}`)
-        console.log('Ship object found:', shipObj)
-        if (!shipObj) {
-            console.warn('Could not find ship object for:', ship.shipType.name)
-            return
-        }
-        console.log('Ship position:', shipObj.x, shipObj.y)
-        
-        const textId = `damage-text-${ship.uuid}-${Date.now()}`
-        console.log('Creating text object with ID:', textId)
-        
-        const textObj = new CanvasObject({
-            id: textId,
-            shape: SHAPES.Text,
-            x: shipObj.x,
-            y: shipObj.y,
-            screenOffsetX: xOffset,
-            screenOffsetY: -TRAVEL_MAP_CONFIG.shipSize / 2 - 30,
-            textContent: text,
-            fillColor: color,
-            size: 24,
-            fontModifier: 'bold',
-            durationMs: durationMs
-        })
-        console.log('Text object created:', textObj)
-        console.log('Text object properties - visible:', textObj.visible, 'expired:', textObj.expired)
-        console.log('Text object position - x:', textObj.x, 'y:', textObj.y, 'offsets:', textObj.screenOffsetX, textObj.screenOffsetY)
-        
-        const addedObj = this.cvs.addObject(textObj)
-        console.log('Text object added to canvas, returned object:', addedObj)
-        console.log('Canvas object count:', this.cvs.objectMap.size)
-        console.log('Text in canvas objectMap:', this.cvs.objectMap.has(textId))
-    }
-
-    /**
-     * Displays a laser beam from attacker to target that disappears after a duration
-     * @param {Ship} attacker - The ship firing the laser
-     * @param {Ship} target - The ship being targeted
-     * @param {number[]} color - RGBA color array for the laser
-     * @param {number} durationMs - How long the laser should display (default 500ms)
-     */
-    displayLaserBeam(attacker, target, color = [255, 0, 0, 1], durationMs = 500) {
-        const attackerObj = this.cvs.getObject(`ship-${attacker.uuid}`)
-        const targetObj = this.cvs.getObject(`ship-${target.uuid}`)
-        
-        if (!attackerObj || !targetObj) {
-            console.warn('Could not find ship objects for laser beam')
-            return
-        }
-        
-        // Calculate front of attacker ship
-        // Player ships (left side) face right, enemy ships (right side) face left
-        const shipRadius = TRAVEL_MAP_CONFIG.shipSize / 2
-        const attackerIsPlayer = gs.fleet.ships.includes(attacker)
-        const attackerFrontX = attackerIsPlayer ? 
-            attackerObj.x + shipRadius : 
-            attackerObj.x - shipRadius
-        
-        // Laser goes from front of attacker to center of target
-        const laserId = `laser-${attacker.uuid}-${Date.now()}`
-        const laserObj = new CanvasObject({
-            id: laserId,
-            shape: SHAPES.Line,
-            x: attackerFrontX,
-            y: attackerObj.y,
-            x2: targetObj.x,
-            y2: targetObj.y,
-            strokeColor: color,
-            lineWidth: 4,
-            size: 4,
-            durationMs: durationMs
-        })
-        
-        this.cvs.addObject(laserObj)
-    }
-
-    /**
-     * Animates a ramming ship surging forward and back
-     * @param {Ship} attacker - The ship doing the ramming
-     * @param {Ship} target - The ship being rammed
-     * @param {number} durationMs - Total animation duration (default 600ms)
-     */
-    animateRam(attacker, target, durationMs = 600) {
-        const attackerObj = this.cvs.getObject(`ship-${attacker.uuid}`)
-        const targetObj = this.cvs.getObject(`ship-${target.uuid}`)
-        
-        if (!attackerObj || !targetObj) {
-            console.warn('Could not find ship objects for ram animation')
-            return
-        }
-        
-        const startX = attackerObj.x
-        const targetX = targetObj.x
-        const midpointX = (startX + targetX) / 2
-        
-        // Store original position on the ship object
-        attackerObj.ramStartX = startX
-        attackerObj.ramMidpointX = midpointX
-        
-        const ramAnimation = new Loop(
-            durationMs,
-            (progressRatio) => {
-                const shipObj = this.cvs.getObject(`ship-${attacker.uuid}`)
-                if (!shipObj) return
-                
-                if (progressRatio <= 0.5) {
-                    // First half: surge forward to midpoint
-                    const forwardProgress = progressRatio * 2 // 0 to 1
-                    shipObj.x = startX + (midpointX - startX) * forwardProgress
-                } else {
-                    // Second half: return to start
-                    const returnProgress = (progressRatio - 0.5) * 2 // 0 to 1
-                    shipObj.x = midpointX + (startX - midpointX) * returnProgress
-                }
-            },
-            () => {
-                // On complete: ensure ship is back at start position
-                const shipObj = this.cvs.getObject(`ship-${attacker.uuid}`)
-                if (shipObj) {
-                    shipObj.x = startX
-                }
-            }
-        )
-        
-        this.animations.push(ramAnimation)
     }
 
     /**

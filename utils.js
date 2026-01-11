@@ -21,24 +21,6 @@ function rng(max = 10, min = 0, rounded = true) {
     return rounded ? Math.round(result) : result
 }
 
-/**
- * Darkens a color by a given factor
- * @param {number[]} color - RGBA color array [r, g, b, a]
- * @param {number} factor - Darkening factor (0-1), where 0.5 makes it 50% darker
- * @returns {number[]} Darkened RGBA color array
- */
-function darkenColor(color, factor = 0.5) {
-    if (!color || color.length < 3) return color
-    const darkened = [
-        Math.floor(color[0] * factor),
-        Math.floor(color[1] * factor),
-        Math.floor(color[2] * factor)
-    ]
-    if (color.length >= 4) {
-        darkened.push(color[3]) // Preserve alpha
-    }
-    return darkened
-}
 
 /**
  * Lightens a color by a given factor
