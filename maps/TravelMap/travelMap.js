@@ -195,15 +195,6 @@ class TravelMap extends BaseMap {
     }
     
     /**
-     * Checks if a ship belongs to the player
-     * @param {Ship} ship
-     * @returns {boolean}
-     */
-    isPlayerShip(ship) {
-        return gs.fleet && gs.fleet.ships && gs.fleet.ships.some(s => s.uuid === ship.uuid)
-    }
-    
-    /**
      * Updates jitter offset for a ship (smooth random movement)
      * @param {Ship} ship - The ship to update jitter for
      * @param {number} maxX - Maximum horizontal jitter (±)
@@ -248,7 +239,7 @@ class TravelMap extends BaseMap {
         
         // Create ship if it doesn't exist
         if (!shipObj) {
-            const baseShipColor = gs.fleet && gs.fleet.color ? gs.fleet.color : COLORS.White
+            const baseShipColor = ship.fleet && ship.fleet.color ? ship.fleet.color : COLORS.White
             const shipColor = [...baseShipColor]
             if (shipColor.length >= 4) {
                 shipColor[3] = shipGroupConfig.opacity

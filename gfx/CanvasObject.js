@@ -347,18 +347,15 @@ class CanvasObject {
                 
                 // Apply color tint using globalCompositeOperation if fillColor is set
                 if (this.fillColor && (this.fillColor[0] !== 255 || this.fillColor[1] !== 255 || this.fillColor[2] !== 255)) {
-                    ctx.save();
                     // Draw image normally first with alpha
                     ctx.globalAlpha = this.fillColor[3] || 1;
                     ctx.drawImage(this.image, -width / 2, -height / 2, width, height);
-                    // Apply color tint
-                    ctx.globalCompositeOperation = 'multiply';
-                    ctx.fillStyle = colorArrToRgbaString([this.fillColor[0], this.fillColor[1], this.fillColor[2], 1]);
+                    // Apply color tint using source-atop (only tints existing pixels, preserves transparency)
+                    ctx.globalCompositeOperation = 'source-atop';
+                    ctx.fillStyle = colorArrToRgbaString([this.fillColor[0], this.fillColor[1], this.fillColor[2], 0.25]);
                     ctx.fillRect(-width / 2, -height / 2, width, height);
-                    // Restore alpha channel (preserves transparency)
-                    ctx.globalCompositeOperation = 'destination-in';
-                    ctx.drawImage(this.image, -width / 2, -height / 2, width, height);
-                    ctx.restore();
+                    // Reset to default composite mode
+                    ctx.globalCompositeOperation = 'source-over';
                 } else {
                     // Draw image normally with opacity (transparency is preserved automatically)
                     ctx.globalAlpha = this.fillColor ? this.fillColor[3] || 1 : 1;

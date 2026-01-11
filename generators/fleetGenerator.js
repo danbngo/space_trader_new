@@ -26,7 +26,7 @@ function generateCrew(planet) {
     const crew = []
     const numCrew = rng(5, 1) // 1-5 crew members
     for (let i = 0; i < numCrew; i++) {
-        crew.push(generateOfficer(planet, null))
+        crew.push(generateOfficer(planet))
     }
     return crew
 }
@@ -60,7 +60,7 @@ function generateFleet(fleetType = FLEET_TYPES_ALL[0], planet = null, startAt = 
     
     if (planet) {
         // Generate captain
-        fleet.captain = generateOfficer(planet, null)
+        fleet.captain = generateOfficer(planet)
         fleet.captain.credits = rng(fleetType.maxCredits, 0)
         
         // Generate crew members (non-captain officers)
