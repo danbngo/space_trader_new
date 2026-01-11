@@ -323,6 +323,8 @@ class Combat {
         return {
             hit: true,
             damage: result.totalDamage,
+            shieldsAbsorbed: result.shieldDamage,
+            hullDamage: result.hullDamage,
             destroyed: result.destroyed,
             message
         };

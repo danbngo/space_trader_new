@@ -240,34 +240,20 @@ class TravelMap extends BaseMap {
      * Updates the UI panel based on current combat state
      */
     updateUIPanel() {
-        console.log('=== updateUIPanel called ===', 'gs.encounter:', gs.encounter, 'combatEnabled:', gs.encounter?.combatEnabled)
         const inCombat = gs.encounter && gs.encounter.combatEnabled
         let newPanel
         
         if (inCombat) {
-            console.log('Creating combat UI panel...')
             newPanel = this.combatHandler.createCombatUIPanel()
-            console.log('Combat UI panel created:', newPanel)
-            console.log('Log element in new panel:', newPanel.querySelector('#travel-log'))
             
             // Replace the panel
             if (this.uiPanel) {
-                console.log('Replacing existing panel:', this.uiPanel)
                 this.uiPanel.replaceWith(newPanel)
             }
             this.uiPanel = newPanel
-            console.log('Panel replaced, new uiPanel:', this.uiPanel)
             
             // Populate the combat log after creating the panel
-            console.log('About to refresh combat log...')
             this.combatHandler.refreshCombatLog()
-            console.log('Combat log refreshed')
-            
-            // Check final state
-            const finalLogElement = document.getElementById('travel-log')
-            console.log('Final log element in DOM:', finalLogElement)
-            console.log('Final log element innerHTML:', finalLogElement?.innerHTML)
-            console.log('Final log element children count:', finalLogElement?.children.length)
         } else if (gs.encounter) {
             // Hide UI panel during encounters (when modal is shown)
             newPanel = ce({innerHTML: 'test', style: {color: 'red', fontSize: '40px'}})
@@ -276,11 +262,9 @@ class TravelMap extends BaseMap {
         }
         
         if (this.uiPanel && !inCombat) {
-            console.log('Replacing panel (non-combat):', this.uiPanel, 'with:', newPanel)
             this.uiPanel.replaceWith(newPanel)
         }
         this.uiPanel = newPanel
-        console.log('=== updateUIPanel complete, final uiPanel:', this.uiPanel, '===')
     }
     
     /**
@@ -519,6 +503,19 @@ class TravelMap extends BaseMap {
                         const result = gs.combat.executeAction(this.selectedPlayerShip, attackType, ship)
                         this.selectedPlayerShip.actionsRemaining--
                         
+                        console.log('Combat result:', result)
+                        console.log('Shields absorbed:', result.shieldsAbsorbed, 'Hull damage:', result.hullDamage)
+                        
+                        // Display damage text over the target ship
+                        if (result.shieldsAbsorbed && result.shieldsAbsorbed > 0) {
+                            console.log('Displaying shield damage text')
+                            this.displayTextOverShip(ship, [100, 150, 255, 1], `-${result.shieldsAbsorbed}`, 1500)
+                        }
+                        if (result.hullDamage && result.hullDamage > 0) {
+                            console.log('Displaying hull damage text')
+                            this.displayTextOverShip(ship, [255, 255, 255, 1], `-${result.hullDamage}`, 1500)
+                        }
+                        
                         if (result.success || attackType === 'ram') {
                             this.combatHandler.handleActionComplete()
                         } else {
@@ -646,6 +643,20 @@ class TravelMap extends BaseMap {
                             const result = gs.combat.executeAction(this.selectedPlayerShip, attackType, ship)
                             this.selectedPlayerShip.actionsRemaining--
                             this.combatHandler.refreshCombatLog()
+                            
+                            console.log('Combat result:', result)
+                            console.log('Result properties:', Object.keys(result))
+                            console.log('Shields absorbed:', result.shieldsAbsorbed, 'Hull damage:', result.hullDamage)
+                            
+                            // Display damage text over the target ship
+                            if (result.shieldsAbsorbed && result.shieldsAbsorbed > 0) {
+                                console.log('Displaying shield damage text')
+                                this.displayTextOverShip(ship, [100, 150, 255, 1], `-${result.shieldsAbsorbed}`, 1500)
+                            }
+                            if (result.hullDamage && result.hullDamage > 0) {
+                                console.log('Displaying hull damage text')
+                                this.displayTextOverShip(ship, [255, 255, 255, 1], `-${result.hullDamage}`, 1500)
+                            }
                             
                             if (result.success || attackType === 'ram') {
                                 this.combatHandler.handleActionComplete()
@@ -961,6 +972,52 @@ class TravelMap extends BaseMap {
      */
     refreshCombatLog() {
         this.combatHandler.refreshCombatLog()
+    }
+
+    /**
+     * Displays floating text over a ship that disappears after a duration
+     * @param {Ship} ship - The ship to display text over
+     * @param {number[]} color - RGBA color array for the text
+     * @param {string} text - The text to display
+     * @param {number} durationMs - How long the text should display (default 1000ms)
+     */
+    displayTextOverShip(ship, color, text, durationMs = 1000) {
+        console.log('=== displayTextOverShip called ===')
+        console.log('Ship:', ship.shipType.name, 'UUID:', ship.uuid)
+        console.log('Text:', text, 'Color:', color, 'Duration:', durationMs)
+        
+        const shipObj = this.cvs.getObject(`ship-${ship.uuid}`)
+        console.log('Ship object found:', shipObj)
+        if (!shipObj) {
+            console.warn('Could not find ship object for:', ship.shipType.name)
+            return
+        }
+        console.log('Ship position:', shipObj.x, shipObj.y)
+        
+        const textId = `damage-text-${ship.uuid}-${Date.now()}`
+        console.log('Creating text object with ID:', textId)
+        
+        const textObj = new CanvasObject({
+            id: textId,
+            shape: SHAPES.Text,
+            x: shipObj.x,
+            y: shipObj.y,
+            screenOffsetX: 0,
+            screenOffsetY: -TRAVEL_MAP_CONFIG.shipSize / 2 - 30,
+            textContent: text,
+            fillColor: color,
+            size: 24,
+            fontModifier: 'bold',
+            durationMs: durationMs
+        })
+        console.log('Text object created:', textObj)
+        console.log('Text object properties - visible:', textObj.visible, 'expired:', textObj.expired)
+        console.log('Text object position - x:', textObj.x, 'y:', textObj.y, 'offsets:', textObj.screenOffsetX, textObj.screenOffsetY)
+        
+        const addedObj = this.cvs.addObject(textObj)
+        console.log('Text object added to canvas, returned object:', addedObj)
+        console.log('Canvas object count:', this.cvs.objectMap.size)
+        console.log('Text in canvas objectMap:', this.cvs.objectMap.has(textId))
     }
 
     /**

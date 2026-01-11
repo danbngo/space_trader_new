@@ -79,6 +79,8 @@
 /* Combat log */
 #travel-log {
     flex: 1;
+    min-height: 150px;
+    max-height: 200px;
     background-color: rgba(0, 0, 0, 0.5);
     border: 1px solid #666;
     border-radius: 5px;
@@ -86,7 +88,6 @@
     color: #fff;
     font-size: 12px;
     overflow-y: auto;
-    max-height: 100%;
 }
 
 .travel-log-header {
