@@ -451,6 +451,12 @@ class TravelMap extends BaseMap {
                     }
                 } else {
                     // Player ship clicked
+                    // Don't allow selection if ship has no actions remaining
+                    if (ship.actionsRemaining <= 0) {
+                        console.log('Ship has no actions remaining:', ship.shipType.name)
+                        return
+                    }
+                    
                     console.log('Setting selectedPlayerShip to:', ship.shipType.name)
                     this.selectedPlayerShip = ship
                     
@@ -465,8 +471,10 @@ class TravelMap extends BaseMap {
             
             if (ship.shipType.shipShape && ship.shipType.shipShape.addCanvasObject) {
                 shipObj = ship.shipType.shipShape.addCanvasObject(`ship-${ship.uuid}`, this.cvs, shipColor, shipSize, shipGroupConfig.mirror)
-                // Add onClick handler to the created ship object
-                shipObj.onClick = onClick
+                // Add onClick handler to the created ship object (only for enemies or players with actions)
+                if (shipGroupConfig.mirror || ship.actionsRemaining > 0) {
+                    shipObj.onClick = onClick
+                }
                 // Set smaller hit radius for more precise clicking
                 shipObj.hitRadius = TRAVEL_MAP_CONFIG.shipHitRadius
             } else {
@@ -504,6 +512,26 @@ class TravelMap extends BaseMap {
         if (shipObj) {
             shipObj.x = x
             shipObj.y = y
+            
+            // Update onClick handler based on actionsRemaining for player ships
+            if (!shipGroupConfig.mirror) {
+                if (ship.actionsRemaining <= 0) {
+                    // Disable interactions for ships with no actions
+                    shipObj.onClick = null
+                    shipObj.onHover = null
+                    shipObj.onHoverEnd = null
+                } else if (!shipObj.onClick) {
+                    // Re-enable interactions if they were disabled
+                    shipObj.onClick = () => {
+                        if (ship.actionsRemaining <= 0) return
+                        console.log('Setting selectedPlayerShip to:', ship.shipType.name)
+                        this.selectedPlayerShip = ship
+                        this.restoreShipColors()
+                        this.dimOtherShips(ship)
+                        this.updateUIPanel()
+                    }
+                }
+            }
         }
         
         // Update thruster position, size, and color with flicker effect
