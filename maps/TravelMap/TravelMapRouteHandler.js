@@ -20,6 +20,11 @@ class TravelMapRouteHandler {
             return
         }
         
+        // Pause time progression if encounter modal is open
+        if (gs.encounter) {
+            return
+        }
+        
         // Update positions of planets/stars (this also calls system.travel() internally)
         gs.system.updatePositions()
         
@@ -85,9 +90,12 @@ class TravelMapRouteHandler {
             const encounterPlanet = rollEncounterPlanet(encounterType, gs.previousLocation, gs.destination, gs.fleet)
             console.log('Encounter type:', encounterType.name, 'at planet:', encounterPlanet?.name)
             
+            // Generate enemy fleet for the encounter
+            const enemyFleet = generateFleet(encounterType.fleetType, encounterPlanet)
+            
             // Create and start the encounter
             const EncounterClass = encounterType.encounterClass
-            const encounter = new EncounterClass(encounterType, encounterPlanet, gs.fleet, null)
+            const encounter = new EncounterClass(encounterType, encounterPlanet, enemyFleet, null)
             encounter.startEncounter()
         }
     }

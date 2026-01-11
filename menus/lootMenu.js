@@ -47,8 +47,11 @@ function showLootMenu(loot = new CountsMap()) {
                     Total Cargo After Taking: ${fleet.cargo.total+amt}/${fleet.totalCargoSpace}<br/>
                 `
             },
-            'Take', 'Cancel', (amt = 0)=>takeCargo(ct, amt), ()=>reloadMenu(),
-            [['Take All', ()=>takeCargo(ct, takeableAmount), takeableAmount == 0]]
+            'Take', 'Cancel', 
+            (amt = 0)=>takeCargo(ct, amt), 
+            ()=>reloadMenu(),
+            'Take All',
+            ()=>takeCargo(ct, takeableAmount)
         )
     }
 
@@ -62,7 +65,11 @@ function showLootMenu(loot = new CountsMap()) {
                     Total Cargo After Dumping: ${fleet.cargo.total}/${fleet.totalCargoSpace}<br/>
                 `
             },
-            'Dump', 'Cancel', (amt = 0)=>dumpCargo(ct, amt), ()=>reloadMenu(),
+            'Dump', 'Cancel', 
+            (amt = 0)=>dumpCargo(ct, amt), 
+            ()=>reloadMenu(),
+            'Dump All',
+            ()=>dumpCargo(ct, dumpableAmount)
         )
     }
 
@@ -70,6 +77,7 @@ function showLootMenu(loot = new CountsMap()) {
         const playerAmount = fleet.cargo.getAmount(ct)
         const lootAmount = loot.getAmount(ct)
         const maxLootAmount = Math.min(lootAmount, fleet.availableCargoSpace)
+        /** @type {ButtonData[]} */
         const buttons = [
             ['Take', ()=>showTakeCargoSlider(ct, maxLootAmount), maxLootAmount == 0],
             ['Dump', ()=>showDumpCargoSlider(ct, playerAmount), playerAmount == 0],

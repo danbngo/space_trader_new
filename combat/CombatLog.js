@@ -12,6 +12,7 @@ class CombatLog {
      * @param {string} message
      */
     add(message) {
+        console.log('Combat log: ', message)
         this.messages.push(message)
     }
 

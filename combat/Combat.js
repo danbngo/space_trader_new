@@ -586,6 +586,7 @@ class Combat {
     start(playerHasInitiative = true) {
         console.log('Combat.start', { playerHasInitiative })
         gs.combat = this
+        if (gs.encounter) gs.encounter.combatEnabled = true
         
         // Set initial turn
         this.activeTurnFleet = playerHasInitiative ? this.playerFleet : this.enemyFleet

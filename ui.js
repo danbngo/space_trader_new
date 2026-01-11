@@ -132,7 +132,7 @@ function showPanel(title = '', text = '', buttons = [], id = '') {
  * @param {() => void} onCancel - Callback when cancel button is clicked
  * @returns {HTMLElement} The created modal panel
  */
-function showSliderModal(min = 0, max = 10, title = '', description = '', footerGenerator = (value = 0)=>'', acceptLabel = 'Accept', cancelLabel = 'Cancel', onAccept = (value = 0) => {}, onCancel = () =>closeModal()) {
+function showSliderModal(min = 0, max = 10, title = '', description = '', footerGenerator = (value = 0)=>'', acceptLabel = 'Accept', cancelLabel = 'Cancel', onAccept = (value = 0) => {}, onCancel = () =>closeModal(), acceptAllLabel = '', onAcceptAll = () => {}) {
     let currentValue = min;
     
     const slider = ce({tag: 'input', style: {width: '100%'}});
@@ -169,6 +169,14 @@ function showSliderModal(min = 0, max = 10, title = '', description = '', footer
             onCancel()
         }, false]
     ];
+
+    // Add "Accept All" button if label and callback are provided
+    if (acceptAllLabel && onAcceptAll) {
+        buttons.splice(1, 0, [acceptAllLabel, () => {
+            closeModal()
+            onAcceptAll()
+        }, false])
+    }
 
     const panel = showModal(
         title,

@@ -50,11 +50,11 @@ class MerchantsEncounter extends Encounter {
         if (this.fleet && this.fleet.ships && this.fleet.ships.length > 0) {
             this.combat = new Combat(gs.fleet, this.fleet)
             this.combat.start(true) // Player has initiative by default
-            this.combatEnabled = true
         }
+        closeModal()
         
         // TravelMap will automatically pick up combatEnabled flag and switch to combat UI
-        this.endEncounter()
+        //this.endEncounter() - this was wrong, ending encounter ends combat too.
     }
     
     showTradeOfferModal(allowSell = true, buyCargoTypes = null, sellCargoTypes = null) {

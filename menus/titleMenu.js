@@ -155,6 +155,7 @@ async function startNewGame() {
     const captain = new Officer("Captain", rndMember(gs.system.planets), MINIMUM_OFFICER_AGE, STARTING_CREDITS);
     
     const playerShip = new Ship("Starting Ship", SHIP_TYPES.COURIER, COLORS.LightGray, [30,30], [20,20], 10, 10, 10, 10, 10)
+    const playerShip2 = new Ship("Starting Ship 2", SHIP_TYPES.BATTLESHIP, COLORS.LightGray, [30,30], [20,20], 10, 10, 10, 10, 10)
     
     // Give player all modules for testing (only in debug mode)
     if (DEBUG_MODE) {
@@ -172,6 +173,7 @@ async function startNewGame() {
     )
 
     gs.fleet.addShip(playerShip)
+    gs.fleet.addShip(playerShip2)
     gs.fleet.addOfficer(captain)
     gs.fleet.fuel = gs.fleet.totalFuelCapacity // Start with full fuel tank
 

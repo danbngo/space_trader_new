@@ -114,6 +114,7 @@ class CanvasObject {
 
         this.parallax = false
         this.overlap = false
+        this.mirror = false
     }
 
     setDurationMs(durationMs = 1000) {
@@ -303,10 +304,16 @@ class CanvasObject {
             ctx.arc(0, 0, size, 0, Math.PI * 2, false);
             ctx.fill(); // Fills the circle with transparency
             ctx.globalCompositeOperation = 'source-over'; // Reset for normal drawing
+            break;
 
             case SHAPES.Bitmap:
             if (this.image && this.imageLoaded) {
                 if (this.angle) ctx.rotate(this.angle);
+                
+                // Apply horizontal flip if mirror flag is set
+                if (this.mirror) {
+                    ctx.scale(-1, 1);
+                }
                 
                 // Calculate dimensions maintaining aspect ratio
                 const aspectRatio = this.image.width / this.image.height;

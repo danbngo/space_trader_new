@@ -41,8 +41,6 @@ class TravelMap extends BaseMap {
             mirror: true
         }
         
-        this.shipsCreated = new Set() // Track which ships have been created by UUID
-        
         // Route travel UI element references (set by route handler)
         this.routeDistanceEl = null
         this.routeETAEl = null
@@ -59,11 +57,11 @@ class TravelMap extends BaseMap {
         this.bgCvs.canvas.style.pointerEvents = 'none' // Don't capture mouse events
         
         // Create main canvas for dynamic content (ships, labels, etc)
-        this.routeCvs = new CanvasWrapper(`travelmap-main-map-canvas`, 1, 1, 1, 100, false, false)
+        this.cvs = new CanvasWrapper(`travelmap-main-map-canvas`, 1, 1, 1, 100, false, false)
         
         // Add both canvases to root (bg first, then main on top)
         this.root.appendChild(this.bgCvs.root)
-        this.root.appendChild(this.routeCvs.root)
+        this.root.appendChild(this.cvs.root)
         
         // Create UI panel at bottom (will be updated dynamically)
         this.updateUIPanel()
@@ -75,7 +73,7 @@ class TravelMap extends BaseMap {
         // Add resize listener
         this.resizeHandler = () => {
             console.log('resizing travel map canvases')
-            this.routeCvs.autoResize()
+            this.cvs.autoResize()
             this.bgCvs.autoResize()
             // Re-render background stars when canvas size changes
             this.renderBackgroundStars()
@@ -86,7 +84,7 @@ class TravelMap extends BaseMap {
         
         // Defer canvas sizing and initial render until after DOM is rendered
         requestAnimationFrame(() => {
-            this.routeCvs.autoResize()
+            this.cvs.autoResize()
             this.bgCvs.autoResize()
             
             // Render stars once to background canvas
@@ -234,68 +232,99 @@ class TravelMap extends BaseMap {
     }
     
     /**
-     * Renders a thruster for a ship (initial creation only)
-     * @param {Ship} ship - The ship to render thruster for
-     * @param {ShipGroupConfig} shipGroupConfig - Configuration for this ship's group
-     */
-    renderThruster(ship, shipGroupConfig) {
-        console.log('Creating initial thruster for ship:', ship.shipType.name, shipGroupConfig)
-        const rotation = shipGroupConfig.mirror ? 0 : Math.PI
-        this.routeCvs.addFilledTriangle(
-            `thruster-${ship.uuid}`,
-            0, 0,
-            100,
-            100,
-            2,
-            COLORS.Red,
-            rotation,
-            null
-        )
-    }
-    
-    /**
-     * Renders a ship with its shape and label
+     * Renders a ship with its shape and label (creates if doesn't exist, then updates position)
      * @param {Ship} ship - The ship to render
+     * @param {number} x - Target x position
+     * @param {number} y - Target y position
      * @param {ShipGroupConfig} shipGroupConfig - Configuration for this ship's group
      */
-    renderShip(ship, shipGroupConfig) {
-        console.log('Rendering ship:', ship.shipType.name, 'Config:', shipGroupConfig)
+    renderShip(ship, x, y, shipGroupConfig) {
+        //console.log('Rendering ship:', ship.shipType.name, 'at', x, y)
         const shipSize = TRAVEL_MAP_CONFIG.shipSize
         const labelOffsetY = TRAVEL_MAP_CONFIG.labelOffsetY
-        const baseShipColor = gs.fleet && gs.fleet.color ? gs.fleet.color : COLORS.White
-        // Apply fade opacity to ship color at creation time
-        const shipColor = [...baseShipColor]
-        if (shipColor.length >= 4) {
-            shipColor[3] = shipGroupConfig.opacity
+        
+        // Check if ship already exists
+        let shipObj = this.cvs.getObject(`ship-${ship.uuid}`)
+        
+        // Create ship if it doesn't exist
+        if (!shipObj) {
+            const baseShipColor = gs.fleet && gs.fleet.color ? gs.fleet.color : COLORS.White
+            const shipColor = [...baseShipColor]
+            if (shipColor.length >= 4) {
+                shipColor[3] = shipGroupConfig.opacity
+            }
+            
+            if (ship.shipType.shipShape && ship.shipType.shipShape.addCanvasObject) {
+                shipObj = ship.shipType.shipShape.addCanvasObject(`ship-${ship.uuid}`, this.cvs, shipColor, shipSize, shipGroupConfig.mirror)
+            } else {
+                throw new Error('ship must have a shipshape')
+            }
+            
+            // Create ship label
+            const labelColor = [...COLORS.White]
+            this.cvs.addText(
+                `label-${ship.uuid}`,
+                0,
+                0,
+                0,
+                labelOffsetY,
+                ship.shipType.name,
+                labelColor,
+                12
+            )
+            
+            // Create thruster
+            const rotation = shipGroupConfig.mirror ? 0 : Math.PI
+            this.cvs.addFilledTriangle(
+                `thruster-${ship.uuid}`,
+                0, 0,
+                100,
+                100,
+                2,
+                COLORS.Red,
+                rotation,
+                null
+            )
+        }
+
+        // Update ship position
+        if (shipObj) {
+            shipObj.x = x
+            shipObj.y = y
         }
         
-        let shipObj
-        if (ship.shipType.shipShape && ship.shipType.shipShape.addCanvasObject) {
-            shipObj = ship.shipType.shipShape.addCanvasObject(this.routeCvs, ship, shipColor, shipSize)
-        } else {
-            throw new Error('ship must have a shipshape')
+        // Update thruster position, size, and color with flicker effect
+        const thrusterObj = this.cvs.getObject(`thruster-${ship.uuid}`)
+        if (thrusterObj) {
+            // Calculate flicker
+            const flickerRange = TRAVEL_MAP_CONFIG.thrusterFlickerMax - TRAVEL_MAP_CONFIG.thrusterFlickerMin
+            const thrusterFlicker = TRAVEL_MAP_CONFIG.thrusterFlickerMin + Math.random() * flickerRange
+            
+            // Update size with flicker
+            const thrusterSize = shipSize/2 * TRAVEL_MAP_CONFIG.thrusterSizeMultiplier * thrusterFlicker
+            thrusterObj.size = thrusterSize / 2
+            thrusterObj.minorSize = thrusterSize
+            
+            // Update color with flicker
+            const thrusterColor = [255, Math.floor(150 * thrusterFlicker), 0, shipGroupConfig.opacity * thrusterFlicker]
+            thrusterObj.fillColor = thrusterColor
+            
+            // Update position
+            const thrusterOffset = shipGroupConfig.mirror ? shipSize/2 : -shipSize/2
+            thrusterObj.x = x + thrusterOffset
+            thrusterObj.y = y
         }
         
-        // Add ship label
-        const labelColor = [...COLORS.White]
-        //if (labelColor.length >= 4) {
-            //labelColor[3] = shipGroupConfig.opacity
-        //}
-        this.routeCvs.addText(
-            `label-${ship.uuid}`,
-            shipObj.x,
-            shipObj.y-ship.radius,
-            0,
-            labelOffsetY,
-            ship.shipType.name,
-            labelColor,
-            12
-        )
+        // Update label position
+        const label = this.cvs.getObject(`label-${ship.uuid}`)
+        if (label) {
+            label.x = x
+            label.y = y - shipSize/2
+        }
         
-        // Add progress bars using the ship object we just created
+        // Update progress bars
         if (shipObj) {
             this.addShipProgressBars(ship, shipObj, shipGroupConfig)
-            this.renderThruster(ship, shipGroupConfig)
         }
     }
     
@@ -314,14 +343,14 @@ class TravelMap extends BaseMap {
         
         // Bar background (black) - note: fillColor already has opacity applied from caller
         const bgId = `${barType}-bg-${ship.uuid}`
-        let bg = this.routeCvs.getObject(bgId)
+        let bg = this.cvs.getObject(bgId)
         if (!bg) {
             const bgColor = [...COLORS.Black]
             // Apply same opacity as fillColor to background
             if (bgColor.length >= 4 && fillColor.length >= 4) {
                 bgColor[3] = fillColor[3]
             }
-            bg = this.routeCvs.addLine(
+            bg = this.cvs.addLine(
                 bgId,
                 x - TRAVEL_MAP_CONFIG.shipBarWidth / 2,
                 barY,
@@ -340,9 +369,9 @@ class TravelMap extends BaseMap {
         
         // Bar foreground (colored based on type and health)
         const fgId = `${barType}-fg-${ship.uuid}`
-        let fg = this.routeCvs.getObject(fgId)
+        let fg = this.cvs.getObject(fgId)
         if (!fg) {
-            fg = this.routeCvs.addLine(
+            fg = this.cvs.addLine(
                 fgId,
                 x - TRAVEL_MAP_CONFIG.shipBarWidth / 2,
                 barY,
@@ -403,6 +432,7 @@ class TravelMap extends BaseMap {
      * @param {ShipGroupConfig} config - Configuration object for this ship group
      */
     renderShipGroup(ships, config) {
+        //console.log('📋 renderShipGroup called with', ships, 'ships, mirror:', config.mirror)
         const shipSpacing = TRAVEL_MAP_CONFIG.shipSpacing
         
         // Handle fade-in animation
@@ -428,20 +458,12 @@ class TravelMap extends BaseMap {
             const shipY = 0 + (index - (ships.length - 1) / 2) * shipSpacing + jitter.y
             const shipX = config.xOffset + jitter.x
             
-            // Check if ship already exists on canvas
-            const shipExists = this.shipsCreated.has(ship.uuid)
-            
-            // Create or update ship
-            if (!shipExists) {
-                this.renderShip(ship, config)
-                this.shipsCreated.add(ship.uuid)
-            } else {
-                this.updateShipPosition(ship, shipX, shipY, config)
-            }
+            // Render ship (handles both creation and position updates)
+            this.renderShip(ship, shipX, shipY, config)
             
             // Apply fade-in opacity
             if (!config.fadedIn) {
-                this.routeCvs.drawOrder.forEach(obj => {
+                this.cvs.drawOrder.forEach(obj => {
                     if (obj.id && obj.id.includes(ship.uuid)) {
                         if (obj.fillColor && obj.fillColor.length >= 4) {
                             obj.fillColor[3] = config.opacity
@@ -460,69 +482,21 @@ class TravelMap extends BaseMap {
      * Creates ship objects once, then updates their positions on subsequent calls
      */
     renderShips() {
+        //console.log('🚢 Rendering ships on travel map')
         // Update offsets based on current canvas size
-        this.playerShipGroupConfig.xOffset = -(this.routeCvs.canvas.width / this.routeCvs.zoom) * Math.abs(TRAVEL_MAP_CONFIG.playerShipsOffset)
-        this.enemyShipGroupConfig.xOffset = (this.routeCvs.canvas.width / this.routeCvs.zoom) * TRAVEL_MAP_CONFIG.enemyShipsOffset
+        this.playerShipGroupConfig.xOffset = -(this.cvs.canvas.width / this.cvs.zoom) * Math.abs(TRAVEL_MAP_CONFIG.playerShipsOffset)
+        this.enemyShipGroupConfig.xOffset = (this.cvs.canvas.width / this.cvs.zoom) * TRAVEL_MAP_CONFIG.enemyShipsOffset
         
         // Render player ships
         this.renderShipGroup(gs.fleet.ships, this.playerShipGroupConfig)
         
         // Render enemy ships if they exist
-        if (gs.encounter && gs.encounter.enemyShips && gs.encounter.enemyShips.length > 0) {
-            this.renderShipGroup(gs.encounter.enemyShips, this.enemyShipGroupConfig)
+        if (gs.encounter && gs.encounter.fleet && gs.encounter.fleet.ships && gs.encounter.fleet.ships.length > 0) {
+            //console.log('🚀 Rendering enemy ships from encounter:', gs.encounter.fleet.ships.length, 'ships', gs.encounter.fleet.ships, gs.encounter)
+            this.renderShipGroup(gs.encounter.fleet.ships, this.enemyShipGroupConfig)
         }
         
-        this.routeCvs.redraw(true)
-    }
-
-    /**
-     * Updates the position of existing ship objects on canvas
-     * @param {Ship} ship
-     * @param {number} x
-     * @param {number} y
-     * @param {ShipGroupConfig} shipGroupConfig - Configuration for opacity and other settings
-     */
-    updateShipPosition(ship, x, y, shipGroupConfig) {
-        // Update ship object position
-        const shipObj = this.routeCvs.getObject(`ship-bitmap-${ship.uuid}`) || this.routeCvs.getObject(`${ship.uuid}`)
-        if (shipObj) {
-            shipObj.x = x
-            shipObj.y = y
-        }
-        
-        // Update thruster position, size, and color with flicker effect
-        const thrusterObj = this.routeCvs.getObject(`thruster-${ship.uuid}`)
-        if (thrusterObj) {
-            // Calculate flicker
-            const flickerRange = TRAVEL_MAP_CONFIG.thrusterFlickerMax - TRAVEL_MAP_CONFIG.thrusterFlickerMin
-            const thrusterFlicker = TRAVEL_MAP_CONFIG.thrusterFlickerMin + Math.random() * flickerRange
-            
-            // Update size with flicker
-            const thrusterSize = TRAVEL_MAP_CONFIG.shipSize/2 * TRAVEL_MAP_CONFIG.thrusterSizeMultiplier * thrusterFlicker
-            thrusterObj.size = thrusterSize / 2
-            thrusterObj.minorSize = thrusterSize
-            
-            // Update color with flicker
-            const thrusterColor = [255, Math.floor(150 * thrusterFlicker), 0, shipGroupConfig.opacity * thrusterFlicker]
-            thrusterObj.fillColor = thrusterColor
-            
-            // Update position
-            const thrusterOffset = shipGroupConfig.mirror ? TRAVEL_MAP_CONFIG.shipSize/2 : -TRAVEL_MAP_CONFIG.shipSize/2
-            thrusterObj.x = x + thrusterOffset
-            thrusterObj.y = y
-        }
-        
-        // Update label
-        const label = this.routeCvs.getObject(`label-${ship.uuid}`)
-        if (label) {
-            label.x = x
-            label.y = y - TRAVEL_MAP_CONFIG.shipSize/2
-        }
-        
-        // Update progress bars
-        if (shipObj) {
-            this.addShipProgressBars(ship, shipObj, shipGroupConfig)
-        }
+        this.cvs.redraw(true)
     }
 
     /**
@@ -549,7 +523,7 @@ class TravelMap extends BaseMap {
      */
     refreshTravelMap() {
         // Re-render the ships on canvas
-        if (this.routeCvs) {
+        if (this.cvs) {
             this.renderShips()
         }
         
