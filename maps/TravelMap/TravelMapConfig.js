@@ -6,6 +6,7 @@ const TRAVEL_MAP_CONFIG = {
     shipSpacingX: 60,
     shipSpacingY: 120,
     shipSize: 200,
+    shipHitRadius: 80,  // Smaller hit detection radius for more precise clicking
     labelOffsetY: 30,
     
     // Ship positioning (as fraction of canvas width/zoom)

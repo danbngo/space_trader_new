@@ -34,7 +34,10 @@ class TravelMap extends BaseMap {
             opacity: 0,
             fadeStartTime: 0,
             xOffset: 0,
-            mirror: false
+            mirror: false,
+            onFadeOutComplete: null,
+            fadeOutShips: null,
+            fadingOut: null,
         }
         
         /** @type {ShipGroupConfig} */
@@ -460,6 +463,8 @@ class TravelMap extends BaseMap {
                 shipObj = ship.shipType.shipShape.addCanvasObject(`ship-${ship.uuid}`, this.cvs, shipColor, shipSize, shipGroupConfig.mirror)
                 // Add onClick handler to the created ship object
                 shipObj.onClick = onClick
+                // Set smaller hit radius for more precise clicking
+                shipObj.hitRadius = TRAVEL_MAP_CONFIG.shipHitRadius
             } else {
                 throw new Error('ship must have a shipshape')
             }
@@ -526,8 +531,8 @@ class TravelMap extends BaseMap {
         //     label.y = y - shipSize/2
         // }
         
-        // Update progress bars
-        if (shipObj) {
+        // Update progress bars (only show during encounters)
+        if (shipObj && gs.encounter) {
             this.addShipProgressBars(ship, shipObj, shipGroupConfig)
         }
     }

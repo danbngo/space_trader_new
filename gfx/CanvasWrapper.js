@@ -299,7 +299,9 @@ class CanvasWrapper {
         else {
             // basic circular hitbox for all other shapes
             const dist = Math.hypot(ox - mouseX, oy - mouseY);
-            const hitRadius = Math.max(obj.minScreenSize, obj.size * this.zoom)/this.pixelRatio
+            // Use hitRadius if specified, otherwise use size
+            const effectiveRadius = obj.hitRadius !== null ? obj.hitRadius : obj.size;
+            const hitRadius = Math.max(obj.minScreenSize, effectiveRadius * this.zoom)/this.pixelRatio
             if (dist > hitRadius) return false
         }
         return true

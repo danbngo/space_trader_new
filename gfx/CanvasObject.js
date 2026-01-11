@@ -26,6 +26,7 @@ class CanvasObject {
     * @param {number} [params.zIndex] - Draw order priority (higher values draw on top)
     * @param {Array<[number, number]>} [params.vertices] - Array of [x, y] coordinates for polygon shape
     * @param {string | HTMLImageElement | null} [params.src] - Image source for bitmap rendering
+    * @param {number | null} [params.hitRadius] - Override hit detection radius (defaults to size for circular hitbox)
     * @property {number} centerOpacity - For radial gradient
     * @property {number} centerOpacity - For radial gradient
     * @property {number} edgeOpacity - For radial gradient
@@ -38,6 +39,7 @@ class CanvasObject {
         size = 1,        // for triangle
         minorSize = 1,   // for oval
         angle = 0,    // radians for triangle
+        hitRadius = null,
         fillColor = COLORS.White,
         strokeColor = null,
         textContent = null,
@@ -115,6 +117,9 @@ class CanvasObject {
         this.parallax = false
         this.overlap = false
         this.mirror = false
+        
+        // Hit detection
+        this.hitRadius = hitRadius; // If null, uses size for circular hitbox
     }
 
     setDurationMs(durationMs = 1000) {
