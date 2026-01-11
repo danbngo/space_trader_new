@@ -240,12 +240,34 @@ class TravelMap extends BaseMap {
      * Updates the UI panel based on current combat state
      */
     updateUIPanel() {
-        console.log('updateUIPanel called, gs.encounter:', gs.encounter, 'combatEnabled:', gs.encounter?.combatEnabled)
+        console.log('=== updateUIPanel called ===', 'gs.encounter:', gs.encounter, 'combatEnabled:', gs.encounter?.combatEnabled)
         const inCombat = gs.encounter && gs.encounter.combatEnabled
         let newPanel
         
         if (inCombat) {
+            console.log('Creating combat UI panel...')
             newPanel = this.combatHandler.createCombatUIPanel()
+            console.log('Combat UI panel created:', newPanel)
+            console.log('Log element in new panel:', newPanel.querySelector('#travel-log'))
+            
+            // Replace the panel
+            if (this.uiPanel) {
+                console.log('Replacing existing panel:', this.uiPanel)
+                this.uiPanel.replaceWith(newPanel)
+            }
+            this.uiPanel = newPanel
+            console.log('Panel replaced, new uiPanel:', this.uiPanel)
+            
+            // Populate the combat log after creating the panel
+            console.log('About to refresh combat log...')
+            this.combatHandler.refreshCombatLog()
+            console.log('Combat log refreshed')
+            
+            // Check final state
+            const finalLogElement = document.getElementById('travel-log')
+            console.log('Final log element in DOM:', finalLogElement)
+            console.log('Final log element innerHTML:', finalLogElement?.innerHTML)
+            console.log('Final log element children count:', finalLogElement?.children.length)
         } else if (gs.encounter) {
             // Hide UI panel during encounters (when modal is shown)
             newPanel = ce({innerHTML: 'test', style: {color: 'red', fontSize: '40px'}})
@@ -253,10 +275,12 @@ class TravelMap extends BaseMap {
             newPanel = this.routeHandler.createRouteTravelUIPanel()
         }
         
-        if (this.uiPanel) {
+        if (this.uiPanel && !inCombat) {
+            console.log('Replacing panel (non-combat):', this.uiPanel, 'with:', newPanel)
             this.uiPanel.replaceWith(newPanel)
         }
         this.uiPanel = newPanel
+        console.log('=== updateUIPanel complete, final uiPanel:', this.uiPanel, '===')
     }
     
     /**
@@ -494,7 +518,6 @@ class TravelMap extends BaseMap {
                         // Execute the attack
                         const result = gs.combat.executeAction(this.selectedPlayerShip, attackType, ship)
                         this.selectedPlayerShip.actionsRemaining--
-                        this.combatHandler.refreshCombatLog()
                         
                         if (result.success || attackType === 'ram') {
                             this.combatHandler.handleActionComplete()
@@ -954,6 +977,8 @@ class TravelMap extends BaseMap {
             const newPanel = this.combatHandler.createCombatUIPanel()
             this.uiPanel.replaceWith(newPanel)
             this.uiPanel = newPanel
+            // Always refresh combat log after recreating the panel
+            this.combatHandler.refreshCombatLog()
         }
     }
 

@@ -320,19 +320,38 @@ class TravelMapCombatHandler {
      * Refreshes the combat log display from encounter's log
      */
     refreshCombatLog() {
+        console.log('=== refreshCombatLog called ===')
         const logElement = document.getElementById('travel-log')
-        if (!logElement) return
+        console.log('logElement:', logElement)
+        if (!logElement) {
+            console.log('No log element found!')
+            return
+        }
         
-        // Clear existing log
+        console.log('gs.combat:', gs.combat)
+        console.log('gs.combat.log:', gs.combat.log)
+        const messages = gs.combat.log.getAll()
+        console.log('Combat log messages:', messages)
+        console.log('Number of messages:', messages.length)
+        
+        // Clear existing log but keep header
         logElement.innerHTML = ''
+        logElement.appendChild(ce({
+            innerHTML: '=== Combat Log ===',
+            classNames: ['travel-log-header']
+        }))
         
         // Display all messages from combat log
-        for (const message of gs.combat.log.getAll()) {
+        for (const message of messages) {
+            console.log('Adding message to log:', message)
             logElement.appendChild(ce({
                 innerHTML: message,
                 classNames: ['travel-log-message']
             }))
         }
+        
+        console.log('Log element innerHTML after update:', logElement.innerHTML)
+        console.log('Log element children count:', logElement.children.length)
         
         // Auto-scroll to bottom
         logElement.scrollTop = logElement.scrollHeight
