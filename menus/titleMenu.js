@@ -156,6 +156,10 @@ async function startNewGame() {
     
     const playerShip = new Ship("Starting Ship", SHIP_TYPES.COURIER, COLORS.LightGray, [30,30], [20,20], 10, 10, 10, 10, 10)
     const playerShip2 = new Ship("Starting Ship 2", SHIP_TYPES.BATTLESHIP, COLORS.LightGray, [30,30], [20,20], 10, 10, 10, 10, 10)
+    const playerShip3 = new Ship("Starting Ship 2", SHIP_TYPES.INTERCEPTOR, COLORS.LightGray, [30,30], [20,20], 10, 10, 10, 10, 10)
+    const playerShip4 = new Ship("Starting Ship 2", SHIP_TYPES.TANKER, COLORS.LightGray, [30,30], [20,20], 10, 10, 10, 10, 10)
+    const playerShip5 = new Ship("Starting Ship 2", SHIP_TYPES.RAIDER, COLORS.LightGray, [30,30], [20,20], 10, 10, 10, 10, 10)
+
     
     // Give player all modules for testing (only in debug mode)
     if (DEBUG_MODE) {
@@ -174,6 +178,10 @@ async function startNewGame() {
 
     gs.fleet.addShip(playerShip)
     gs.fleet.addShip(playerShip2)
+    gs.fleet.addShip(playerShip3)
+    gs.fleet.addShip(playerShip4)
+    gs.fleet.addShip(playerShip5)
+
     gs.fleet.addOfficer(captain)
     gs.fleet.fuel = gs.fleet.totalFuelCapacity // Start with full fuel tank
 

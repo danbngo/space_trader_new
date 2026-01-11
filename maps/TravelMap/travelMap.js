@@ -446,8 +446,30 @@ class TravelMap extends BaseMap {
             if (ship.disabled) return
             
             const jitter = this.updateShipJitter(ship)
-            const shipY = 0 + (index - (ships.length - 1) / 2) * shipSpacing + jitter.y
-            const shipX = config.xOffset + jitter.x
+            
+            // Flying V formation positioning
+            // ships[0] is lead (center), ships[1,2] are wing pair 1, ships[3,4] are wing pair 2
+            const shipSpacing = TRAVEL_MAP_CONFIG.shipSpacing
+            let shipY = 0
+            let xDepthOffset = 0 // How far back from lead ship
+            
+            if (index === 0) {
+                // Lead ship - centered
+                shipY = 0
+                xDepthOffset = 0
+            } else {
+                // Wing ships - alternate above/below, progressively further back
+                const pairIndex = Math.floor((index - 1) / 2) // 0 for ships[1,2], 1 for ships[3,4]
+                const isUpper = (index % 2 === 1) // ships[1,3] above, ships[2,4] below
+                
+                shipY = (isUpper ? -1 : 1) * shipSpacing * (pairIndex + 1)
+                // For mirrored (enemy) ships, flip the depth offset direction
+                const depthDirection = config.mirror ? 1 : -1
+                xDepthOffset = depthDirection * shipSpacing * 0.8 * (pairIndex + 1) // Each pair further back
+            }
+            
+            const shipX = config.xOffset + xDepthOffset + jitter.x
+            shipY = shipY + jitter.y
             
             // Render ship (handles both creation and position updates)
             this.renderShip(ship, shipX, shipY, config)
