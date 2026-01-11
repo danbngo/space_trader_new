@@ -17,8 +17,6 @@ class TravelMapCombatRamHandler {
         const {selectedPlayerShip} = this.travelMap
         
         if (!selectedPlayerShip) {
-            gs.combat.addToCombatLog('Select your ship first!')
-            this.combatHandler.refreshCombatLog()
             return
         }
         

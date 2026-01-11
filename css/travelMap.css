@@ -57,33 +57,6 @@
     color: #ff0000;
 }
 
-
-/* Combat log */
-#travel-log {
-    flex: 1;
-    min-height: 150px;
-    max-height: 200px;
-    background-color: rgba(0, 0, 0, 0.5);
-    border: 1px solid #666;
-    border-radius: 5px;
-    padding: 10px;
-    color: #fff;
-    font-size: 12px;
-    overflow-y: auto;
-}
-
-.travel-log-header {
-    font-weight: bold;
-    margin-bottom: 10px;
-    color: #ffff00;
-}
-
-.travel-log-message {
-    margin-bottom: 5px;
-    padding-bottom: 5px;
-    border-bottom: 1px solid #333;
-}
-
 /* Combat action buttons */
 .travel-action-buttons {
     display: flex;

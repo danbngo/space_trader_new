@@ -19,36 +19,6 @@ class TravelMapCombatHandler {
     }
 
     /**
-     * Creates the combat log UI element for the top of the screen
-     * @returns {HTMLElement}
-     */
-    createCombatLogPanel() {
-        return ce({
-            id: 'travel-log-panel',
-            classNames: ['panel'],
-            style: {
-                position: 'absolute',
-                top: '0',
-                left: '0',
-                right: '0',
-                maxHeight: '30vh',
-                overflow: 'auto'
-            },
-            children: [
-                ce({
-                    id: 'travel-log',
-                    children: [
-                        ce({
-                            innerHTML: '=== Combat Log ===',
-                            classNames: ['travel-log-header']
-                        })
-                    ]
-                })
-            ]
-        })
-    }
-
-    /**
      * Creates the UI panel at the bottom with action buttons
      * @returns {HTMLElement}
      */
@@ -170,8 +140,6 @@ class TravelMapCombatHandler {
         this.travelMap.targetingMode = null
         this.targetingShip = null
         this.targetedShips.clear()
-        gs.combat.addToCombatLog('Targeting cancelled')
-        this.refreshCombatLog()
         this.travelMap.updateUIPanel() // Refresh to show normal UI
     }
 
@@ -191,7 +159,6 @@ class TravelMapCombatHandler {
         
         const result = gs.combat.executeAction(selectedPlayerShip, 'flee')
         selectedPlayerShip.actionsRemaining--
-        this.refreshCombatLog()
         
         if (result.escaped) {
             // Update combat result and check if all ships escaped
@@ -239,8 +206,6 @@ class TravelMapCombatHandler {
      */
     executeEnemyTurn() {
         const results = gs.combat.executeEnemyTurn()
-        this.refreshCombatLog()
-        
         // Check if combat ended
         if (gs.combat.result) {
             this.showCombatEndModal()
@@ -268,9 +233,6 @@ class TravelMapCombatHandler {
             message = 'Combat ended.'
         }
         
-        gs.combat.addToCombatLog(message)
-        this.refreshCombatLog()
-        
         // Show end modal after a delay
         setTimeout(() => {
             showModal('Combat Ended', message, [
@@ -281,37 +243,6 @@ class TravelMapCombatHandler {
             ])
         }, 1500)
     }
-
-    /**
-     * Refreshes the combat log display from encounter's log
-     */
-    refreshCombatLog() {
-        const logElement = document.getElementById('travel-log')
-        if (!logElement) {
-            return
-        }
-        
-        const messages = gs.combat.log.getAll()
-        
-        // Clear existing log but keep header
-        logElement.innerHTML = ''
-        logElement.appendChild(ce({
-            innerHTML: '=== Combat Log ===',
-            classNames: ['travel-log-header']
-        }))
-        
-        // Display all messages from combat log
-        for (const message of messages) {
-            logElement.appendChild(ce({
-                innerHTML: message,
-                classNames: ['travel-log-message']
-            }))
-        }
-        
-        // Auto-scroll to bottom
-        logElement.scrollTop = logElement.scrollHeight
-    }
-
 
     /**
      * Displays floating text over a ship that disappears after a duration
@@ -373,8 +304,6 @@ class TravelMapCombatHandler {
             if (this.travelMap.targetingMode) {
                 // Player is targeting this enemy ship for an attack
                 if (ship.disabled) {
-                    gs.combat.addToCombatLog('Target is already destroyed!')
-                    this.refreshCombatLog()
                     return
                 }
                 

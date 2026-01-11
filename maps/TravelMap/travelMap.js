@@ -25,7 +25,6 @@ class TravelMap extends BaseMap {
         this.routeProgressBar = null
         this.targetingMode = null // 'laser', 'ram', or null
         this.animations = [] // Active animations (Loop instances)
-        this.logPanel = null // Combat log panel at top
         
         // Route travel UI element references (set by route handler)
         this.routeDistanceEl = null
@@ -55,7 +54,6 @@ class TravelMap extends BaseMap {
         
         // Create UI panels (will be updated dynamically)
         this.updateUIPanel()
-        if (this.logPanel) this.root.appendChild(this.logPanel)
         this.root.appendChild(this.uiPanel)
         
         // Initialize tick system
@@ -156,36 +154,17 @@ class TravelMap extends BaseMap {
     updateUIPanel() {
         const inCombat = gs.encounter && gs.encounter.combatEnabled
         let newPanel
-        let newLogPanel = null
         
         if (inCombat) {
             // Create both log panel (top) and button panel (bottom)
-            newLogPanel = this.combatHandler.createCombatLogPanel()
             newPanel = this.combatHandler.createCombatUIPanel()
-            
-            // Replace or add the log panel
-            if (this.logPanel) {
-                this.logPanel.replaceWith(newLogPanel)
-            } else {
-                this.root.insertBefore(newLogPanel, this.uiPanel || this.root.firstChild)
-            }
-            this.logPanel = newLogPanel
-            
+
             // Replace the button panel
             if (this.uiPanel) {
                 this.uiPanel.replaceWith(newPanel)
             }
             this.uiPanel = newPanel
-            
-            // Populate the combat log after creating the panels
-            this.combatHandler.refreshCombatLog()
         } else {
-            // Remove log panel when not in combat
-            if (this.logPanel) {
-                this.logPanel.remove()
-                this.logPanel = null
-            }
-            
             if (gs.encounter) {
                 // Hide UI panel during encounters (when modal is shown)
                 newPanel = ce({innerHTML: 'test', style: {color: 'red', fontSize: '40px'}})
@@ -262,8 +241,6 @@ class TravelMap extends BaseMap {
             const newPanel = this.combatHandler.createCombatUIPanel()
             this.uiPanel.replaceWith(newPanel)
             this.uiPanel = newPanel
-            // Always refresh combat log after recreating the panel
-            this.combatHandler.refreshCombatLog()
         }
     }
 

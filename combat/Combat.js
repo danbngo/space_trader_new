@@ -25,9 +25,6 @@ class Combat {
         /** @type {ENCOUNTER_RESULTS|null} */
         this.result = null
         
-        /** @type {CombatLog} */
-        this.log = new CombatLog()
-        
         /** @type {CombatAI} */
         this.combatAI = new CombatAI(this)
         
@@ -199,14 +196,6 @@ class Combat {
         }
         
         console.log('Combat result:', this.result)
-    }
-
-    /**
-     * Adds a message to the combat log
-     * @param {string} message
-     */
-    addToCombatLog(message) {
-        this.log.add(message)
     }
 
     /**
@@ -453,7 +442,6 @@ class Combat {
         switch (action) {
             case 'laser':
                 result = this.executeLaserAttack(ship, target)
-                this.addToCombatLog(result.message)
                 return new CombatResult({
                     attacker: ship,
                     defender: target,
@@ -468,7 +456,6 @@ class Combat {
 
             case 'ram':
                 result = this.executeRam(ship, target)
-                this.addToCombatLog(result.message)
                 return new CombatResult({
                     attacker: ship,
                     defender: target,
@@ -488,16 +475,13 @@ class Combat {
                 let message = ''
                 if (shieldResult.amount > 0) {
                     message += shieldResult.message
-                    this.addToCombatLog(shieldResult.message)
                 }
                 if (laserResult.amount > 0) {
                     if (message) message += ' '
                     message += laserResult.message
-                    this.addToCombatLog(laserResult.message)
                 }
                 if (!message) {
                     message = `${ship.name} is already fully charged.`
-                    this.addToCombatLog(message)
                 }
                 return new CombatResult({
                     attacker: ship,
@@ -511,7 +495,6 @@ class Combat {
             case 'flee':
                 // Simplified - assume no enemy ramming for now
                 result = this.executeFlee(ship, false)
-                this.addToCombatLog(result.message)
                 return new CombatResult({
                     attacker: ship,
                     action: 'flee',
@@ -543,7 +526,6 @@ class Combat {
         // If combat didn't end, complete the turn
         if (!this.result) {
             this.handleTurnComplete()
-            this.addToCombatLog('--- Your Turn ---')
         }
         
         return results
@@ -560,13 +542,6 @@ class Combat {
         
         // Set initial turn
         this.activeTurnFleet = playerHasInitiative ? this.playerFleet : this.enemyFleet
-        
-        this.log.add('--- Combat Started ---')
-        if (playerHasInitiative) {
-            this.log.add('--- Your Turn ---')
-        } else {
-            this.log.add('--- Enemy Turn ---')
-        }
     }
 
     /**
