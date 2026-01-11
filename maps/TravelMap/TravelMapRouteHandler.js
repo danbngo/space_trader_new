@@ -127,7 +127,8 @@ class TravelMapRouteHandler {
      */
     createRouteTravelUIPanel() {
         const panel = ce({
-            id: 'route-ui-panel'
+            id: 'route-ui-panel',
+            classNames: ['panel']
         })
         
         // Calculate travel details
@@ -139,10 +140,16 @@ class TravelMapRouteHandler {
         // Planet images container
         const planetImagesContainer = ce({classNames: ['route-planet-images']})
         
-        // From planet image
+        // From planet with name
+        const fromContainer = ce({style: {display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px'}})
         if (gs.previousLocation && gs.previousLocation.asCanvas) {
-            planetImagesContainer.appendChild(gs.previousLocation.asCanvas())
+            fromContainer.appendChild(gs.previousLocation.asCanvas(60, false))
         }
+        fromContainer.appendChild(ce({
+            innerHTML: fromName,
+            style: {fontSize: '12px', color: '#fff', fontWeight: 'bold'}
+        }))
+        planetImagesContainer.appendChild(fromContainer)
         
         // Arrow
         planetImagesContainer.appendChild(ce({
@@ -150,18 +157,18 @@ class TravelMapRouteHandler {
             classNames: ['route-arrow']
         }))
         
-        // To planet image
+        // To planet with name
+        const toContainer = ce({style: {display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px'}})
         if (gs.destination && gs.destination.asCanvas) {
-            planetImagesContainer.appendChild(gs.destination.asCanvas())
+            toContainer.appendChild(gs.destination.asCanvas(60, false))
         }
+        toContainer.appendChild(ce({
+            innerHTML: toName,
+            style: {fontSize: '12px', color: '#fff', fontWeight: 'bold'}
+        }))
+        planetImagesContainer.appendChild(toContainer)
         
         panel.appendChild(planetImagesContainer)
-        
-        // Progress info with route
-        panel.appendChild(ce({
-            classNames: ['route-info'],
-            innerHTML: `Traveling from ${fromName} to ${toName}`
-        }))
         
         // Travel stats container
         const statsContainer = ce({classNames: ['route-stats']})
@@ -183,7 +190,7 @@ class TravelMapRouteHandler {
         // Create progress bar using ProgressBar class
         this.travelMap.routeProgressBar = new ProgressBar({
             value: 0,
-            width: 60,
+            width: 30,
             fillColor: '#4CAF50',
             borderColor: '#666',
             overrideLabel: ''
@@ -194,7 +201,6 @@ class TravelMapRouteHandler {
         const cancelButton = ce({
             tag: 'button',
             innerHTML: 'Cancel Travel',
-            classNames: ['route-cancel-button']
         })
         
         cancelButton.addEventListener('click', () => {

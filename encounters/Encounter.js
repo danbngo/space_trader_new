@@ -255,6 +255,7 @@ class Encounter {
         
         this.combat = null
         gs.encounter = undefined
+        closeModal()
         checkPlayerStranded()
     }
 

@@ -45,6 +45,9 @@ class TravelMap extends BaseMap {
         this.routeDistanceEl = null
         this.routeETAEl = null
         
+        // Track UI state to detect changes
+        this.previousUIState = null
+        
         // Initialize handlers
         this.combatHandler = new TravelMapCombatHandler(this)
         this.routeHandler = new TravelMapRouteHandler(this)
@@ -109,10 +112,11 @@ class TravelMap extends BaseMap {
                 return
             }
             
-            // Update UI panel if combat state changed
-            const inCombat = gs.encounter && gs.encounter.combatEnabled
-            if ((inCombat && this.uiPanel?.classList?.contains('route-ui')) ||
-                (!inCombat && this.uiPanel?.classList?.contains('travel-ui'))) {
+            // Update UI panel if state changed
+            const currentUIState = gs.encounter ? (gs.encounter.combatEnabled ? 'combat' : 'encounter') : 'travel'
+            if (currentUIState !== this.previousUIState) {
+                console.log('UI state changed from', this.previousUIState, 'to', currentUIState)
+                this.previousUIState = currentUIState
                 this.updateUIPanel()
             }
             
@@ -120,7 +124,7 @@ class TravelMap extends BaseMap {
             this.renderShips()
             
             // Run tick logic for travel mode
-            if (!inCombat && gs.destination && gs.travelYearsRemaining !== null) {
+            if (currentUIState === 'travel' && gs.destination && gs.travelYearsRemaining !== null) {
                 // && gs.travelYearsRemaining > 0 <-- dont include this check, we want to detect whether route is complete in the subclass
                 this.routeHandler.tick()
             }
@@ -153,10 +157,18 @@ class TravelMap extends BaseMap {
      * Updates the UI panel based on current combat state
      */
     updateUIPanel() {
+        console.log('updateUIPanel called, gs.encounter:', gs.encounter, 'combatEnabled:', gs.encounter?.combatEnabled)
         const inCombat = gs.encounter && gs.encounter.combatEnabled
-        const newPanel = inCombat 
-            ? this.combatHandler.createCombatUIPanel()
-            : this.routeHandler.createRouteTravelUIPanel()
+        let newPanel
+        
+        if (inCombat) {
+            newPanel = this.combatHandler.createCombatUIPanel()
+        } else if (gs.encounter) {
+            // Hide UI panel during encounters (when modal is shown)
+            newPanel = ce({innerHTML: 'test', style: {color: 'red', fontSize: '40px'}})
+        } else {
+            newPanel = this.routeHandler.createRouteTravelUIPanel()
+        }
         
         if (this.uiPanel) {
             this.uiPanel.replaceWith(newPanel)

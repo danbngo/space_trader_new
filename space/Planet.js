@@ -99,9 +99,10 @@ class Planet extends OrbitingObject {
     /**
      * Renders the planet to a canvas element using CanvasWrapper
      * @param {number} size - The size of the canvas in pixels
+     * @param {boolean} shading - Whether to apply gradient shading effect
      * @returns {HTMLElement} - Container element with the rendered planet canvas
      */
-    asCanvas(size = 80) {
+    asCanvas(size = 80, shading = true) {
         // Create a container element to set bounds
         const container = ce({
             style: {
@@ -113,20 +114,22 @@ class Planet extends OrbitingObject {
         })
         
         // Add radial gradient overlay for shading effect
-        const gradientOverlay = ce({
-            style: {
-                position: 'absolute',
-                top: '0',
-                left: '0',
-                width: '100%',
-                height: '100%',
-                borderRadius: '50%',
-                background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.6) 100%)',
-                pointerEvents: 'none',
-                zIndex: '10'
-            }
-        })
-        container.appendChild(gradientOverlay)
+        if (shading) {
+            const gradientOverlay = ce({
+                style: {
+                    position: 'absolute',
+                    top: '0',
+                    left: '0',
+                    width: '100%',
+                    height: '100%',
+                    borderRadius: '50%',
+                    background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.6) 100%)',
+                    pointerEvents: 'none',
+                    zIndex: '10'
+                }
+            })
+            container.appendChild(gradientOverlay)
+        }
         
         // Create a CanvasWrapper to properly render the planet
         const cvs = new CanvasWrapper(`planet-canvas`, 1, 1, 1, 0)
