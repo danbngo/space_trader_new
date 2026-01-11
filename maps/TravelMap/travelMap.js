@@ -5,6 +5,9 @@
  * @property {number} fadeStartTime - Timestamp when fade animation started
  * @property {number} xOffset - Horizontal offset for this ship group
  * @property {boolean} mirror - Whether ships in this group should be mirrored horizontally
+ * @property {boolean} fadingOut - Whether this group is currently fading out
+ * @property {Function|null} onFadeOutComplete - Callback to execute when fade-out completes
+ * @property {Ship[]|null} fadeOutShips - Ships to render during fade-out (stored when encounter ends)
  */
 
 /**
@@ -38,7 +41,10 @@ class TravelMap extends BaseMap {
             opacity: 0,
             fadeStartTime: 0,
             xOffset: 0,
-            mirror: true
+            mirror: true,
+            fadingOut: false,
+            onFadeOutComplete: null,
+            fadeOutShips: null
         }
         
         // Route travel UI element references (set by route handler)
@@ -150,6 +156,33 @@ class TravelMap extends BaseMap {
         if (gs.combat) {
             this.selectedPlayerShip = gs.combat.activePlayerShips?.[0] || null
             this.selectedEnemyShip = gs.combat.activeEnemyShips?.[0] || null
+        }
+    }
+    
+    /**
+     * Triggers fade-out animation for enemy ships
+     * @param {Function} onComplete - Callback to execute when fade-out completes
+     */
+    fadeOutEnemyShips(onComplete) {
+        // Store current enemy ships before they're removed
+        if (gs.encounter && gs.encounter.fleet && gs.encounter.fleet.ships) {
+            console.log('fadeOutEnemyShips: Storing', gs.encounter.fleet.ships.length, 'ships for fade-out')
+            this.enemyShipGroupConfig.fadeOutShips = [...gs.encounter.fleet.ships]
+            this.enemyShipGroupConfig.fadingOut = true
+            this.enemyShipGroupConfig.fadeStartTime = Date.now()
+            this.enemyShipGroupConfig.onFadeOutComplete = () => {
+                console.log('Fade-out complete, cleaning up')
+                // Clean up after fade-out
+                this.cleanupRemovedShips()
+                if (onComplete) onComplete()
+            }
+            console.log('Starting enemy ship fade-out animation, opacity:', this.enemyShipGroupConfig.opacity)
+        } else {
+            console.log('fadeOutEnemyShips: No ships to fade out')
+            if (onComplete) {
+                // No ships to fade out, call completion immediately
+                onComplete()
+            }
         }
     }
     
@@ -475,7 +508,7 @@ class TravelMap extends BaseMap {
     }
     
     /**
-     * Renders a group of ships with fade-in animation
+     * Renders a group of ships with fade-in and fade-out animation
      * @param {Ship[]} ships - Array of ships to render
      * @param {ShipGroupConfig} config - Configuration object for this ship group
      */
@@ -483,18 +516,40 @@ class TravelMap extends BaseMap {
         //console.log('📋 renderShipGroup called with', ships, 'ships, mirror:', config.mirror)
         const shipSpacing = TRAVEL_MAP_CONFIG.shipSpacing
         
-        // Handle fade-in animation
-        if (!config.fadedIn) {
-            if (config.fadeStartTime === 0) {
-                config.fadeStartTime = Date.now()
-            }
+        // Handle fade-out animation
+        if (config.fadingOut) {
             const elapsed = Date.now() - config.fadeStartTime
             const fadeTime = TRAVEL_MAP_CONFIG.enemyFadeInDuration
-            config.opacity = Math.min(1, elapsed / fadeTime)
-            //console.log('Fading in ships, opacity:', config.opacity)
+            config.opacity = Math.max(0, 1 - (elapsed / fadeTime))
+            console.log('Fading out, elapsed:', elapsed, 'opacity:', config.opacity)
             
-            if (config.opacity >= 1) {
-                config.fadedIn = true
+            if (config.opacity <= 0) {
+                // Fade-out complete
+                console.log('Fade-out animation complete')
+                config.fadingOut = false
+                config.fadeOutShips = null
+                if (config.onFadeOutComplete) {
+                    config.onFadeOutComplete()
+                    config.onFadeOutComplete = null
+                }
+                return // Don't render ships after fade-out completes
+            }
+            // Use stored ships during fade-out
+            ships = config.fadeOutShips || []
+        } else {
+            // Handle fade-in animation
+            if (!config.fadedIn) {
+                if (config.fadeStartTime === 0) {
+                    config.fadeStartTime = Date.now()
+                }
+                const elapsed = Date.now() - config.fadeStartTime
+                const fadeTime = TRAVEL_MAP_CONFIG.enemyFadeInDuration
+                config.opacity = Math.min(1, elapsed / fadeTime)
+                //console.log('Fading in ships, opacity:', config.opacity)
+                
+                if (config.opacity >= 1) {
+                    config.fadedIn = true
+                }
             }
         }
         
@@ -532,8 +587,8 @@ class TravelMap extends BaseMap {
             // Render ship (handles both creation and position updates)
             this.renderShip(ship, shipX, shipY, config)
             
-            // Apply fade-in opacity
-            if (!config.fadedIn) {
+            // Apply opacity for fade-in or fade-out
+            if (!config.fadedIn || config.fadingOut) {
                 this.cvs.drawOrder.forEach(obj => {
                     if (obj.id && obj.id.includes(ship.uuid)) {
                         if (obj.fillColor && obj.fillColor.length >= 4) {
@@ -555,9 +610,6 @@ class TravelMap extends BaseMap {
     renderShips() {
         //console.log('🚢 Rendering ships on travel map')
         
-        // Clean up canvas objects for ships that no longer exist
-        this.cleanupRemovedShips()
-        
         // Update offsets based on current canvas size
         this.playerShipGroupConfig.xOffset = -(this.cvs.canvas.width / this.cvs.zoom) * Math.abs(TRAVEL_MAP_CONFIG.playerShipsOffset)
         this.enemyShipGroupConfig.xOffset = (this.cvs.canvas.width / this.cvs.zoom) * TRAVEL_MAP_CONFIG.enemyShipsOffset
@@ -565,10 +617,17 @@ class TravelMap extends BaseMap {
         // Render player ships
         this.renderShipGroup(gs.fleet.ships, this.playerShipGroupConfig)
         
-        // Render enemy ships if they exist
-        if (gs.encounter && gs.encounter.fleet && gs.encounter.fleet.ships && gs.encounter.fleet.ships.length > 0) {
+        // Render enemy ships if they exist OR if they are fading out
+        if (this.enemyShipGroupConfig.fadingOut) {
+            console.log('Rendering fade-out ships, count:', this.enemyShipGroupConfig.fadeOutShips?.length)
+            // Continue rendering stored ships during fade-out
+            this.renderShipGroup(this.enemyShipGroupConfig.fadeOutShips || [], this.enemyShipGroupConfig)
+        } else if (gs.encounter && gs.encounter.fleet && gs.encounter.fleet.ships && gs.encounter.fleet.ships.length > 0) {
             //console.log('🚀 Rendering enemy ships from encounter:', gs.encounter.fleet.ships.length, 'ships', gs.encounter.fleet.ships, gs.encounter)
             this.renderShipGroup(gs.encounter.fleet.ships, this.enemyShipGroupConfig)
+        } else {
+            // No encounter and not fading out - clean up any remaining ship objects
+            this.cleanupRemovedShips()
         }
         
         this.cvs.redraw(true)

@@ -254,9 +254,22 @@ class Encounter {
         }
         
         this.combat = null
-        gs.encounter = undefined
-        closeModal()
-        checkPlayerStranded()
+        
+        // Trigger fade-out animation if travel map exists
+        const travelMap = currentMap && (currentMap instanceof TravelMap) ? currentMap : null
+        if (travelMap && typeof travelMap.fadeOutEnemyShips === 'function') {
+            travelMap.fadeOutEnemyShips(() => {
+                // After fade-out completes, fully end encounter
+                gs.encounter = undefined
+                closeModal()
+                checkPlayerStranded()
+            })
+        } else {
+            // No fade-out available, end immediately
+            gs.encounter = undefined
+            closeModal()
+            checkPlayerStranded()
+        }
     }
 
     showPlayerRefuseSurrenderModal() {

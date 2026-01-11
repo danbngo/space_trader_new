@@ -20,8 +20,8 @@ class TravelMapRouteHandler {
             return
         }
         
-        // Pause time progression if encounter modal is open
-        if (gs.encounter) {
+        // Pause time progression if encounter modal is open OR if enemy ships are fading out
+        if (gs.encounter || this.travelMap.enemyShipGroupConfig.fadingOut) {
             return
         }
         
