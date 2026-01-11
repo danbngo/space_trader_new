@@ -51,8 +51,6 @@ class Ship {
         this.angle = Math.PI*2; //direction ship is facing in. it can only accelerate/decelerate and shoot in that direction
         /** @type {boolean} */
         this.escaped = false;
-        /** @type {boolean} */
-        this.evading = false;
         /** @type {AI_TYPES} */
         this.aiType = null
         /** @type {ShipModule[]} */

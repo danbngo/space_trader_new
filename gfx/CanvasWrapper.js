@@ -540,6 +540,7 @@ class CanvasWrapper {
                 y2Offset = sy2 - sy
             }
             
+            if (obj.outlineColor && obj.fillColor && obj.fillColor[3] >= 1) obj.drawOutlines(now, ctx, size, sx, sy, x2Offset, y2Offset);
             obj.draw(now, ctx, size, sx, sy, x2Offset, y2Offset)
         }
     }

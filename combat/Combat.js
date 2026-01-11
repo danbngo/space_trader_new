@@ -218,11 +218,6 @@ class Combat {
     calculateHitChance(attacker, defender) {
         let baseChance = 0.7; // 70% base hit chance
         
-        // Evasion reduces hit chance
-        if (defender.evading) {
-            baseChance -= 0.3; // Evading reduces hit chance by 30%
-        }
-        
         // Radar helps hit chance
         if (attacker.radars > 0) {
             baseChance += Math.min(0.15, attacker.radars * 0.01); // Up to +15% from radars
@@ -374,21 +369,6 @@ class Combat {
             message
         };
     }
-
-    /**
-     * Sets a ship to evade mode, reducing incoming hit chances.
-     * @param {Ship} ship - The ship evading
-     * @returns {Object} - Result {message}
-     */
-    executeEvade(ship) {
-        ship.evading = true;
-        
-        return {
-            evading: true,
-            message: `${ship.name} prepares to evade incoming attacks!`
-        };
-    }
-
     /**
      * Attempts to flee from combat.
      * @param {Ship} ship - The ship attempting to flee
@@ -461,14 +441,6 @@ class Combat {
     }
 
     /**
-     * Resets end-of-turn status flags like evading.
-     * @param {Ship} ship - The ship to reset
-     */
-    resetTurnStatus(ship) {
-        ship.evading = false;
-    }
-
-    /**
      * Executes an action and returns the result
      * @param {Ship} ship - The ship performing the action
      * @param {string} action - 'laser', 'ram', 'evade', 'recharge', 'flee'
@@ -508,16 +480,6 @@ class Combat {
                     shieldsAbsorbed: result.shieldsAbsorbed || 0,
                     selfHullDamage: result.selfHullDamage || 0,
                     destroyed: target && target.hull[0] <= 0
-                })
-
-            case 'evade':
-                result = this.executeEvade(ship)
-                this.addToCombatLog(result.message)
-                return new CombatResult({
-                    attacker: ship,
-                    action: 'evade',
-                    success: result.evading,
-                    message: result.message
                 })
 
             case 'recharge':

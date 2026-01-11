@@ -19,6 +19,36 @@ class TravelMapCombatHandler {
     }
 
     /**
+     * Creates the combat log UI element for the top of the screen
+     * @returns {HTMLElement}
+     */
+    createCombatLogPanel() {
+        return ce({
+            id: 'travel-log-panel',
+            classNames: ['panel'],
+            style: {
+                position: 'absolute',
+                top: '0',
+                left: '0',
+                right: '0',
+                maxHeight: '30vh',
+                overflow: 'auto'
+            },
+            children: [
+                ce({
+                    id: 'travel-log',
+                    children: [
+                        ce({
+                            innerHTML: '=== Combat Log ===',
+                            classNames: ['travel-log-header']
+                        })
+                    ]
+                })
+            ]
+        })
+    }
+
+    /**
      * Creates the UI panel at the bottom with action buttons
      * @returns {HTMLElement}
      */
@@ -41,17 +71,6 @@ class TravelMapCombatHandler {
         
         panel.appendChild(leftPanel)
         
-        // Right side: Combat log
-        panel.appendChild(ce({
-            id: 'travel-log',
-            children: [
-                ce({
-                    innerHTML: '=== Combat Log ===',
-                    classNames: ['travel-log-header']
-                })
-            ]
-        }))
-        
         return panel
     }
 
@@ -60,9 +79,10 @@ class TravelMapCombatHandler {
      * @param {HTMLElement|Element} infoElement
      */
     updateShipInfo(infoElement) {
-        const {selectedPlayerShip, selectedEnemyShip} = this.travelMap
+        const {selectedPlayerShip} = this.travelMap
+        console.log('updating ship info:',infoElement, selectedPlayerShip)
         
-        if (!selectedPlayerShip || !selectedEnemyShip) {
+        if (!selectedPlayerShip) {
             infoElement.innerHTML = 'Select ships to begin combat'
             return
         }
@@ -70,38 +90,10 @@ class TravelMapCombatHandler {
         // Clear existing content
         infoElement.innerHTML = ''
         
-        // Your Ship info
-        infoElement.appendChild(ce({
-            classNames: ['ship-info-title'],
-            children: [
-                ce({tag: 'strong', classNames: ['ship-info-player'], innerHTML: 'Your Ship:'}),
-                ce({innerHTML: ` ${selectedPlayerShip.shipType.name}`})
-            ]
-        }))
-        
         infoElement.appendChild(ce({
             classNames: ['ship-info-stats'],
             innerHTML: `Hull: ${selectedPlayerShip.hull[0]}/${selectedPlayerShip.hull[1]} | 
-                Shields: ${selectedPlayerShip.shields[0]}/${selectedPlayerShip.shields[1]} | 
-                Lasers: ${selectedPlayerShip.lasers} | 
-                Engine: ${selectedPlayerShip.engine}
-                ${selectedPlayerShip.evading ? ' | <span class="ship-info-evading">EVADING</span>' : ''}`
-        }))
-        
-        // Target info
-        infoElement.appendChild(ce({
-            classNames: ['ship-info-title'],
-            children: [
-                ce({tag: 'strong', classNames: ['ship-info-enemy'], innerHTML: 'Target:'}),
-                ce({innerHTML: ` ${selectedEnemyShip.shipType.name}`})
-            ]
-        }))
-        
-        infoElement.appendChild(ce({
-            classNames: ['ship-info-stats'],
-            innerHTML: `Hull: ${selectedEnemyShip.hull[0]}/${selectedEnemyShip.hull[1]} | 
-                Shields: ${selectedEnemyShip.shields[0]}/${selectedEnemyShip.shields[1]}
-                ${selectedEnemyShip.evading ? ' | <span class="ship-info-evading">EVADING</span>' : ''}`
+                Shields: ${selectedPlayerShip.shields[0]}/${selectedPlayerShip.shields[1]}`
         }))
     }
 
@@ -376,10 +368,9 @@ class TravelMapCombatHandler {
      */
     onClickShip(ship, shipGroupConfig) {
         console.log('Ship clicked:', ship.shipType.name, 'Fleet:', ship.fleet?.name, 'Mirror:', shipGroupConfig.mirror)
-        if (shipGroupConfig.mirror) {
+        if (!gs.fleet.ships.includes(ship)) {
             // Enemy ship clicked
             console.log('Enemy ship clicked, targetingMode:', this.travelMap.targetingMode)
-            
             if (this.travelMap.targetingMode) {
                 // Player is targeting this enemy ship for an attack
                 if (ship.disabled) {
@@ -395,12 +386,6 @@ class TravelMapCombatHandler {
                 
                 // Execute the attack
                 this.performAttack(attackType, ship)
-            } else {
-                // Normal selection
-                console.log('Setting selectedEnemyShip to:', ship.shipType.name)
-                this.travelMap.selectedEnemyShip = ship
-                // Update UI panel to reflect selection
-                this.travelMap.updateUIPanel()
             }
         } else {
             // Player ship clicked

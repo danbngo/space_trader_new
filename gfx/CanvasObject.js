@@ -119,6 +119,7 @@ class CanvasObject {
         this.mirror = false
         this.tintRatio = 0.5
         this.darkenRatio = 0
+        this.outlineColor = null
         
         // Hit detection
         this.hitRadius = hitRadius; // If null, uses size for circular hitbox
@@ -377,6 +378,44 @@ class CanvasObject {
         }
         
         ctx.restore();
+    }
+
+    drawOutlines(currentMs = null, ctx, size = 1, sx = 0, sy = 0, x2Offset = 0, y2Offset = 0) {
+        // Only draw outlines for bitmaps with an outlineColor set
+        if (this.shape !== SHAPES.Bitmap || !this.outlineColor) return;
+        
+        // Offsets for outline (cardinal directions: left, right, up, down)
+        const OFFSETS = [
+            [-2, -2], [2, 2],
+            [-2, 2], [-2, 2],
+        ];
+        
+        // Temporarily store the original fillColor
+        const originalFillColor = this.fillColor;
+        const originalTintRatio = this.tintRatio;
+        
+        // Set fillColor to outlineColor for the outline draws
+        this.fillColor = this.outlineColor;
+        this.tintRatio = 1; // Use full color for outline;
+        
+        // Draw the image 4 times at offset positions to create outline
+        OFFSETS.forEach(([dx, dy]) => {
+            // Save context state
+            ctx.save();
+            
+            // Translate to offset position
+            ctx.translate(dx, dy);
+            
+            // Draw at the offset position
+            this.draw(currentMs, ctx, size, sx, sy, x2Offset, y2Offset);
+            
+            // Restore context
+            ctx.restore();
+        });
+        
+        // Restore the original fillColor
+        this.fillColor = originalFillColor;
+        this.tintRatio = originalTintRatio;
     }
     
     asImage(size = 0, strokeColor = undefined) {

@@ -114,6 +114,13 @@ class TravelMapShipHandler {
                 shipObj.darkenRatio = 0.5 //darken ships with no moves remaining
             }
         }
+        if (ship.shields[0] > 0) {
+            const shieldRatio = ship.shields[0] / ship.shields[1]
+            shipObj.outlineColor = [Math.round(128*shieldRatio),Math.round(128*shieldRatio),Math.round(255*shieldRatio),1]
+        }
+        else {
+            shipObj.outlineColor = null
+        }
     }
 
 
@@ -257,8 +264,9 @@ class TravelMapShipHandler {
      * @param {Array} fillColor - RGBA color array for the foreground bar
      * @param {number} fillRatio - Fill percentage (0-1)
      * @param {number} barY - Y position for this bar
+     * @param {boolean} isHidden - Whether to hide this bar
      */
-    addShipStatBar(ship, shipObj, barType, fillColor, fillRatio, barY) {
+    addShipStatBar(ship, shipObj, barType, fillColor, fillRatio, barY, isHidden = false) {
         const x = shipObj.x
         
         // Bar background (black) - note: fillColor already has opacity applied from caller
@@ -289,6 +297,9 @@ class TravelMapShipHandler {
             bg.y2 = barY
         }
         
+        // Set visibility based on isHidden flag
+        bg.visible = !isHidden
+        
         // Bar foreground (colored based on type and health)
         const fgId = `${barType}-fg-${ship.uuid}`
         let fg = this.travelMap.cvs.getObject(fgId)
@@ -312,6 +323,9 @@ class TravelMapShipHandler {
             fg.y2 = barY
             fg.strokeColor = fillColor
         }
+        
+        // Set visibility based on isHidden flag
+        fg.visible = !isHidden
     }
 
     /**
@@ -332,20 +346,25 @@ class TravelMapShipHandler {
         const hullPercent = ship.hull[0] / ship.hull[1]
         const shieldPercent = ship.shields[0] / ship.shields[1]
         
+        // Check visibility: hull shows when shields are depleted, shield shows when present
+        // Hide both bars for disabled ships
+        const hideHull = ship.disabled || ship.shields[0] > 0  // Hide if disabled or shields still present
+        const hideShield = ship.disabled || ship.shields[0] <= 0  // Hide if disabled or zero
+        
         // Render hull bar with opacity applied
         const baseHullColor = hullPercent < 0.3 ? COLORS.Red : COLORS.Orange
         const hullColor = [...baseHullColor]
         //if (hullColor.length >= 4) {
         //    hullColor[3] = shipGroupConfig.opacity
         //}
-        this.addShipStatBar(ship, shipObj, 'hull', hullColor, hullPercent, hullBarY)
+        this.addShipStatBar(ship, shipObj, 'hull', hullColor, hullPercent, hullBarY, hideHull)
         
         // Render shield bar with opacity applied
         const shieldColor = [...COLORS.Blue]
         //if (shieldColor.length >= 4) {
         //    shieldColor[3] = shipGroupConfig.opacity
         //}
-        this.addShipStatBar(ship, shipObj, 'shield', shieldColor, shieldPercent, shieldBarY)
+        this.addShipStatBar(ship, shipObj, 'shield', shieldColor, shieldPercent, shieldBarY, hideShield)
     }
 
     /**
@@ -512,7 +531,6 @@ class TravelMapShipHandler {
         // Update selected ships if in combat
         if (gs.combat) {
             this.travelMap.selectedPlayerShip = gs.combat.activePlayerShips?.[0] || null
-            this.travelMap.selectedEnemyShip = gs.combat.activeEnemyShips?.[0] || null
         }
     }
 
