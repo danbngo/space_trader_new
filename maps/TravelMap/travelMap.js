@@ -531,8 +531,14 @@ class TravelMap extends BaseMap {
             
             if (ship.shipType.shipShape && ship.shipType.shipShape.addCanvasObject) {
                 shipObj = ship.shipType.shipShape.addCanvasObject(`ship-${ship.uuid}`, this.cvs, shipColor, shipSize, shipGroupConfig.mirror)
-                // Add onClick handler to the created ship object (only for enemies or players with actions)
-                if (shipGroupConfig.mirror || ship.actionsRemaining > 0) {
+                // Add onClick handler based on ship type and state
+                if (shipGroupConfig.mirror) {
+                    // Enemy ships: only clickable during targeting mode
+                    if (this.targetingMode) {
+                        shipObj.onClick = onClick
+                    }
+                } else if (ship.actionsRemaining > 0) {
+                    // Player ships: only clickable if they have actions
                     shipObj.onClick = onClick
                 }
                 // Set smaller hit radius for more precise clicking
@@ -598,8 +604,41 @@ class TravelMap extends BaseMap {
                 }
             }
             
-            // Update onClick handler based on actionsRemaining for player ships
-            if (!shipGroupConfig.mirror) {
+            // Update onClick handler based on ship type and state
+            if (shipGroupConfig.mirror) {
+                // Enemy ships: only clickable during targeting mode
+                if (this.targetingMode) {
+                    if (!shipObj.onClick) {
+                        shipObj.onClick = () => {
+                            if (ship.disabled) {
+                                gs.combat.addToCombatLog('Target is already destroyed!')
+                                this.combatHandler.refreshCombatLog()
+                                return
+                            }
+                            
+                            const attackType = this.targetingMode
+                            this.targetingMode = null
+                            this.restoreShipColors()
+                            
+                            const result = gs.combat.executeAction(this.selectedPlayerShip, attackType, ship)
+                            this.selectedPlayerShip.actionsRemaining--
+                            this.combatHandler.refreshCombatLog()
+                            
+                            if (result.success || attackType === 'ram') {
+                                this.combatHandler.handleActionComplete()
+                            } else {
+                                this.updateUIPanel()
+                            }
+                        }
+                    }
+                } else {
+                    // Not in targeting mode - disable enemy ship clicks
+                    shipObj.onClick = null
+                    shipObj.onHover = null
+                    shipObj.onHoverEnd = null
+                }
+            } else {
+                // Player ships: handle based on actionsRemaining
                 if (ship.actionsRemaining <= 0 || this.targetingMode) {
                     // Disable interactions for ships with no actions or during targeting
                     shipObj.onClick = null
