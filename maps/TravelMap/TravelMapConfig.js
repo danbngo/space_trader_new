@@ -3,13 +3,14 @@
  */
 const TRAVEL_MAP_CONFIG = {
     // Ship rendering
-    shipSpacing: 60,
+    shipSpacingX: 60,
+    shipSpacingY: 120,
     shipSize: 200,
     labelOffsetY: 30,
     
     // Ship positioning (as fraction of canvas width/zoom)
-    playerShipsOffset: -0.375,  // 75% to left edge
-    enemyShipsOffset: 0.375,     // 75% to right edge
+    playerShipsOffset: -0.2,  // Closer to center
+    enemyShipsOffset: 0.2,     // Closer to center
     
     // Jitter settings
     defaultJitterX: 2,

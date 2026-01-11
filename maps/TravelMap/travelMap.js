@@ -449,7 +449,8 @@ class TravelMap extends BaseMap {
             
             // Flying V formation positioning
             // ships[0] is lead (center), ships[1,2] are wing pair 1, ships[3,4] are wing pair 2
-            const shipSpacing = TRAVEL_MAP_CONFIG.shipSpacing
+            const shipSpacingX = TRAVEL_MAP_CONFIG.shipSpacingX
+            const shipSpacingY = TRAVEL_MAP_CONFIG.shipSpacingY
             let shipY = 0
             let xDepthOffset = 0 // How far back from lead ship
             
@@ -462,10 +463,10 @@ class TravelMap extends BaseMap {
                 const pairIndex = Math.floor((index - 1) / 2) // 0 for ships[1,2], 1 for ships[3,4]
                 const isUpper = (index % 2 === 1) // ships[1,3] above, ships[2,4] below
                 
-                shipY = (isUpper ? -1 : 1) * shipSpacing * (pairIndex + 1)
+                shipY = (isUpper ? -1 : 1) * shipSpacingY * (pairIndex + 1)
                 // For mirrored (enemy) ships, flip the depth offset direction
                 const depthDirection = config.mirror ? 1 : -1
-                xDepthOffset = depthDirection * shipSpacing * 0.8 * (pairIndex + 1) // Each pair further back
+                xDepthOffset = depthDirection * shipSpacingX * 1.8 * (pairIndex + 1) // Each pair further back
             }
             
             const shipX = config.xOffset + xDepthOffset + jitter.x
