@@ -7,6 +7,15 @@ class TravelMapCombatHandler {
      */
     constructor(travelMap) {
         this.travelMap = travelMap
+        
+        // Initialize specialized handlers
+        this.laserHandler = new TravelMapCombatLaserHandler(this)
+        this.ramHandler = new TravelMapCombatRamHandler(this)
+        this.rechargeHandler = new TravelMapCombatRechargeHandler(this)
+        
+        // Targeting state
+        this.targetingShip = null
+        this.targetedShips = new Set()
     }
 
     /**
@@ -112,7 +121,11 @@ class TravelMapCombatHandler {
                 innerHTML: `<strong>${targetingLabel}</strong> - Select an enemy ship`,
                 classNames: ['targeting-mode-label']
             }))
-            buttonContainer.appendChild(this.createCombatButton('Cancel', () => this.handleCancelTargeting()))
+            buttonContainer.appendChild(ce({
+                tag: 'button',
+                innerHTML: 'Cancel',
+                onClick: () => this.handleCancelTargeting()
+            }))
             return buttonContainer
         }
         
@@ -131,69 +144,32 @@ class TravelMapCombatHandler {
         const shieldsFull = selectedPlayerShip.shields[0] >= selectedPlayerShip.shields[1]
         
         // Create all action buttons
-        buttonContainer.appendChild(this.createCombatButton('Laser', () => this.handleLaserAttack(), selectedPlayerShip.lasers <= 0 || noActionsLeft))
-        buttonContainer.appendChild(this.createCombatButton('Ram', () => this.handleRam(), noActionsLeft))
-        buttonContainer.appendChild(this.createCombatButton('Recharge', () => this.handleRecharge(), shieldsFull || noActionsLeft))
-        buttonContainer.appendChild(this.createCombatButton('Flee', () => this.handleFlee(), noActionsLeft))
+        buttonContainer.appendChild(ce({
+            tag: 'button',
+            innerHTML: 'Laser',
+            disabled: selectedPlayerShip.lasers <= 0 || noActionsLeft,
+            onClick: () => this.laserHandler.handleLaserAttack()
+        }))
+        buttonContainer.appendChild(ce({
+            tag: 'button',
+            innerHTML: 'Ram',
+            disabled: noActionsLeft,
+            onClick: () => this.ramHandler.handleRam()
+        }))
+        buttonContainer.appendChild(ce({
+            tag: 'button',
+            innerHTML: 'Recharge',
+            disabled: shieldsFull || noActionsLeft,
+            onClick: () => this.rechargeHandler.handleRecharge()
+        }))
+        buttonContainer.appendChild(ce({
+            tag: 'button',
+            innerHTML: 'Flee',
+            disabled: noActionsLeft,
+            onClick: () => this.handleFlee()
+        }))
         
         return buttonContainer
-    }
-
-    /**
-     * Creates a single combat action button
-     * @param {string} label
-     * @param {Function} onClick
-     * @param {boolean} disabled
-     * @returns {HTMLElement}
-     */
-    createCombatButton(label, onClick, disabled = false) {
-        const button = ce({
-            tag: 'button',
-            innerHTML: label,
-            disabled: disabled
-        })
-        
-        if (!disabled) {
-            button.addEventListener('click', (e)=>onClick())
-        }
-        
-        return button
-    }
-
-    /**
-     * Handles laser attack action
-     */
-    handleLaserAttack() {
-        const {selectedPlayerShip} = this.travelMap
-        
-        if (!selectedPlayerShip) {
-            gs.combat.addToCombatLog('Select your ship first!')
-            this.refreshCombatLog()
-            return
-        }
-        
-        // Enter targeting mode
-        this.travelMap.targetingMode = 'laser'
-        this.travelMap.setupTargetingMode()
-        this.travelMap.updateUIPanel() // Refresh to show targeting UI
-    }
-
-    /**
-     * Handles ram action
-     */
-    handleRam() {
-        const {selectedPlayerShip} = this.travelMap
-        
-        if (!selectedPlayerShip) {
-            gs.combat.addToCombatLog('Select your ship first!')
-            this.refreshCombatLog()
-            return
-        }
-        
-        // Enter targeting mode
-        this.travelMap.targetingMode = 'ram'
-        this.travelMap.setupTargetingMode()
-        this.travelMap.updateUIPanel() // Refresh to show targeting UI
     }
 
     /**
@@ -201,6 +177,8 @@ class TravelMapCombatHandler {
      */
     handleCancelTargeting() {
         this.travelMap.targetingMode = null
+        this.targetingShip = null
+        this.targetedShips.clear()
         gs.combat.addToCombatLog('Targeting cancelled')
         this.refreshCombatLog()
         this.travelMap.updateUIPanel() // Refresh to show normal UI
@@ -210,14 +188,7 @@ class TravelMapCombatHandler {
      * Handles recharge action
      */
     handleRecharge() {
-        const {selectedPlayerShip} = this.travelMap
-        if (!selectedPlayerShip) return
-        
-        const result = gs.combat.executeAction(selectedPlayerShip, 'recharge')
-        selectedPlayerShip.actionsRemaining--
-        this.refreshCombatLog()
-        
-        this.handleActionComplete()
+        this.rechargeHandler.handleRecharge()
     }
 
     /**
@@ -394,99 +365,6 @@ class TravelMapCombatHandler {
     }
 
     /**
-     * Displays a laser beam from attacker to target that disappears after a duration
-     * @param {Ship} attacker - The ship firing the laser
-     * @param {Ship} target - The ship being targeted
-     * @param {number[]} color - RGBA color array for the laser
-     * @param {number} durationMs - How long the laser should display (default 500ms)
-     */
-    displayLaserBeam(attacker, target, color = [255, 0, 0, 1], durationMs = 500) {
-        const attackerObj = this.travelMap.cvs.getObject(`ship-${attacker.uuid}`)
-        const targetObj = this.travelMap.cvs.getObject(`ship-${target.uuid}`)
-        
-        if (!attackerObj || !targetObj) {
-            console.warn('Could not find ship objects for laser beam')
-            return
-        }
-        
-        // Calculate front of attacker ship
-        // Player ships (left side) face right, enemy ships (right side) face left
-        const shipRadius = TRAVEL_MAP_CONFIG.shipSize / 2
-        const attackerIsPlayer = gs.fleet.ships.includes(attacker)
-        const attackerFrontX = attackerIsPlayer ? 
-            attackerObj.x + shipRadius : 
-            attackerObj.x - shipRadius
-        
-        // Laser goes from front of attacker to center of target
-        const laserId = `laser-${attacker.uuid}-${Date.now()}`
-        const laserObj = new CanvasObject({
-            id: laserId,
-            shape: SHAPES.Line,
-            x: attackerFrontX,
-            y: attackerObj.y,
-            x2: targetObj.x,
-            y2: targetObj.y,
-            strokeColor: color,
-            lineWidth: 4,
-            size: 4,
-            durationMs: durationMs
-        })
-        
-        this.travelMap.cvs.addObject(laserObj)
-    }
-
-    /**
-     * Animates a ramming ship surging forward and back
-     * @param {Ship} attacker - The ship doing the ramming
-     * @param {Ship} target - The ship being rammed
-     * @param {number} durationMs - Total animation duration (default 600ms)
-     */
-    animateRam(attacker, target, durationMs = 600) {
-        const attackerObj = this.travelMap.cvs.getObject(`ship-${attacker.uuid}`)
-        const targetObj = this.travelMap.cvs.getObject(`ship-${target.uuid}`)
-        
-        if (!attackerObj || !targetObj) {
-            console.warn('Could not find ship objects for ram animation')
-            return
-        }
-        
-        const startX = attackerObj.x
-        const targetX = targetObj.x
-        const midpointX = (startX + targetX) / 2
-        
-        // Store original position on the ship object
-        attackerObj.ramStartX = startX
-        attackerObj.ramMidpointX = midpointX
-        
-        const ramAnimation = new Loop(
-            durationMs,
-            (progressRatio) => {
-                const shipObj = this.travelMap.cvs.getObject(`ship-${attacker.uuid}`)
-                if (!shipObj) return
-                
-                if (progressRatio <= 0.5) {
-                    // First half: surge forward to midpoint
-                    const forwardProgress = progressRatio * 2 // 0 to 1
-                    shipObj.x = startX + (midpointX - startX) * forwardProgress
-                } else {
-                    // Second half: return to start
-                    const returnProgress = (progressRatio - 0.5) * 2 // 0 to 1
-                    shipObj.x = midpointX + (startX - midpointX) * returnProgress
-                }
-            },
-            () => {
-                // On complete: ensure ship is back at start position
-                const shipObj = this.travelMap.cvs.getObject(`ship-${attacker.uuid}`)
-                if (shipObj) {
-                    shipObj.x = startX
-                }
-            }
-        )
-        
-        this.travelMap.animations.push(ramAnimation)
-    }
-
-    /**
      * Handles ship click events - both player and enemy ships
      * @param {Ship} ship - The ship that was clicked
      * @param {Object} shipGroupConfig - Configuration object with mirror flag
@@ -507,6 +385,8 @@ class TravelMapCombatHandler {
                 
                 const attackType = this.travelMap.targetingMode
                 this.travelMap.targetingMode = null // Clear targeting mode
+                this.targetingShip = null
+                this.targetedShips.clear()
                 
                 // Execute the attack
                 this.performAttack(attackType, ship)
@@ -544,9 +424,9 @@ class TravelMapCombatHandler {
         
         // Display laser beam if it's a laser attack, or animate ram
         if (attackType === 'laser') {
-            this.displayLaserBeam(this.travelMap.selectedPlayerShip, targetShip, [255, 0, 0, 1], 500)
+            this.laserHandler.displayLaserBeam(this.travelMap.selectedPlayerShip, targetShip, [255, 0, 0, 1], 500)
         } else if (attackType === 'ram') {
-            this.animateRam(this.travelMap.selectedPlayerShip, targetShip, 600)
+            this.ramHandler.animateRam(this.travelMap.selectedPlayerShip, targetShip, 600)
         }
         
         console.log('Combat result:', result)

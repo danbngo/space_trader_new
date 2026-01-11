@@ -64,47 +64,85 @@ class TravelMapShipHandler {
     }
 
     /**
+     * Calculates the color to apply to a ship based on fleet color and opacity
+     * @param {Ship} ship - The ship to calculate color for
+     * @param {ShipGroupConfig} shipGroupConfig - Configuration for opacity
+     * @returns {Array} RGBA color array
+     */
+    calcColorForShip(ship, shipGroupConfig) {
+        const baseShipColor = ship.fleet && ship.fleet.color ? ship.fleet.color : COLORS.White
+        const shipColor = [...baseShipColor]
+        if (shipColor.length >= 4) {
+            shipColor[3] = shipGroupConfig.opacity
+        }
+        // Don't make tint completely blot out the image itself (only during creation)
+        return shipColor
+    }
+
+    /**
+     * Applies click handlers to a ship canvas object based on ship type and state
+     * @param {CanvasObject} shipObj - The ship's canvas object
+     * @param {Ship} ship - The ship entity
+     * @param {ShipGroupConfig} shipGroupConfig - Configuration for this ship's group
+     */
+    applyClickFunctionsToShipObj(shipObj, ship, shipGroupConfig) {
+        const onClick = () => {
+            this.travelMap.combatHandler.onClickShip(ship, shipGroupConfig)
+        }
+        
+        if (shipGroupConfig.mirror) {
+            // Enemy ships: only clickable during targeting mode
+            if (this.travelMap.targetingMode) {
+                if (!shipObj.onClick) {
+                    shipObj.onClick = onClick
+                }
+            } else {
+                // Not in targeting mode - disable enemy ship clicks
+                shipObj.onClick = null
+                shipObj.onHover = null
+                shipObj.onHoverEnd = null
+            }
+        } else {
+            // Player ships: handle based on actionsRemaining
+            if (ship.actionsRemaining <= 0 || this.travelMap.targetingMode) {
+                // Disable interactions for ships with no actions or during targeting
+                shipObj.onClick = null
+                shipObj.onHover = null
+                shipObj.onHoverEnd = null
+            } else if (!shipObj.onClick) {
+                // Re-enable interactions if they were disabled
+                shipObj.onClick = onClick
+            }
+        }
+    }
+
+    /**
      * Renders a ship with its shape and label (creates if doesn't exist, then updates position)
      * @param {Ship} ship - The ship to render
-     * @param {number} x - Target x position
-     * @param {number} y - Target y position
+     * @param {number} x - Target x position (base position, jitter will be applied)
+     * @param {number} y - Target y position (base position, jitter will be applied)
      * @param {ShipGroupConfig} shipGroupConfig - Configuration for this ship's group
      */
     renderShip(ship, x, y, shipGroupConfig) {
         const shipSize = TRAVEL_MAP_CONFIG.shipSize
-        const labelOffsetY = TRAVEL_MAP_CONFIG.labelOffsetY
+        //const labelOffsetY = TRAVEL_MAP_CONFIG.labelOffsetY
+        
+        // Apply jitter to position
+        const jitter = this.updateShipJitter(ship)
+        const jitteredX = x + jitter.x
+        const jitteredY = y + jitter.y
         
         // Check if ship already exists
         let shipObj = this.travelMap.cvs.getObject(`ship-${ship.uuid}`)
         
         // Create ship if it doesn't exist
         if (!shipObj) {
-            const baseShipColor = ship.fleet && ship.fleet.color ? ship.fleet.color : COLORS.White
-            const shipColor = [...baseShipColor]
-            if (shipColor.length >= 4) {
-                shipColor[3] = shipGroupConfig.opacity
-            }
-
+            const shipColor = this.calcColorForShip(ship, shipGroupConfig)
             // Don't make tint completely blot out the image itself
             shipColor[3] = Math.round(shipColor[3] * 0.25)
             
-            // Create onClick handler for ship selection
-            const onClick = () => {
-                this.travelMap.combatHandler.onClickShip(ship, shipGroupConfig)
-            }
-            
             if (ship.shipType.shipShape && ship.shipType.shipShape.addCanvasObject) {
                 shipObj = ship.shipType.shipShape.addCanvasObject(`ship-${ship.uuid}`, this.travelMap.cvs, shipColor, shipSize, shipGroupConfig.mirror)
-                // Add onClick handler based on ship type and state
-                if (shipGroupConfig.mirror) {
-                    // Enemy ships: only clickable during targeting mode
-                    if (this.travelMap.targetingMode) {
-                        shipObj.onClick = onClick
-                    }
-                } else if (ship.actionsRemaining > 0) {
-                    // Player ships: only clickable if they have actions
-                    shipObj.onClick = onClick
-                }
                 // Set smaller hit radius for more precise clicking
                 shipObj.hitRadius = TRAVEL_MAP_CONFIG.shipHitRadius
             } else {
@@ -125,51 +163,17 @@ class TravelMapShipHandler {
             )
         }
 
-        // Update ship position
+        // Update ship position and interactions
         if (shipObj) {
-            shipObj.x = x
-            shipObj.y = y
-            
-            // Update color and interactions based on actionsRemaining
-            const baseShipColor = ship.fleet && ship.fleet.color ? ship.fleet.color : COLORS.White
-            const shipColor = [...baseShipColor]
-            if (shipColor.length >= 4) {
-                shipColor[3] = shipGroupConfig.opacity
-            }
+            shipObj.x = jitteredX
+            shipObj.y = jitteredY
             
             // Update onClick handler based on ship type and state
-            if (shipGroupConfig.mirror) {
-                // Enemy ships: only clickable during targeting mode
-                if (this.travelMap.targetingMode) {
-                    if (!shipObj.onClick) {
-                        shipObj.onClick = () => {
-                            this.travelMap.combatHandler.onClickShip(ship, shipGroupConfig)
-                        }
-                    }
-                } else {
-                    // Not in targeting mode - disable enemy ship clicks
-                    shipObj.onClick = null
-                    shipObj.onHover = null
-                    shipObj.onHoverEnd = null
-                }
-            } else {
-                // Player ships: handle based on actionsRemaining
-                if (ship.actionsRemaining <= 0 || this.travelMap.targetingMode) {
-                    // Disable interactions for ships with no actions or during targeting
-                    shipObj.onClick = null
-                    shipObj.onHover = null
-                    shipObj.onHoverEnd = null
-                } else if (!shipObj.onClick) {
-                    // Re-enable interactions if they were disabled
-                    shipObj.onClick = () => {
-                        this.travelMap.combatHandler.onClickShip(ship, shipGroupConfig)
-                    }
-                }
-            }
+            this.applyClickFunctionsToShipObj(shipObj, ship, shipGroupConfig)
         }
         
         // Update thruster position, size, and color with flicker effect
-        this.updateThruster(ship, x, y, shipSize, shipGroupConfig)
+        this.updateThruster(ship, jitteredX, jitteredY, shipSize, shipGroupConfig)
         
         // Update progress bars (only show during encounters)
         if (shipObj && gs.encounter) {
@@ -313,7 +317,7 @@ class TravelMapShipHandler {
      * @param {ShipGroupConfig} config - Configuration object for this ship group
      */
     renderShipGroup(ships, config) {
-        const shipSpacing = TRAVEL_MAP_CONFIG.shipSpacing
+        //const shipSpacing = TRAVEL_MAP_CONFIG.shipSpacing
         
         // Handle fade-out animation
         if (config.fadingOut) {
@@ -355,8 +359,6 @@ class TravelMapShipHandler {
         ships.forEach((ship, index) => {
             if (ship.disabled) return
             
-            const jitter = this.updateShipJitter(ship)
-            
             // Flying V formation positioning
             // ships[0] is lead (center), ships[1,2] are wing pair 1, ships[3,4] are wing pair 2
             const shipSpacingX = TRAVEL_MAP_CONFIG.shipSpacingX
@@ -379,14 +381,15 @@ class TravelMapShipHandler {
                 xDepthOffset = depthDirection * shipSpacingX * 1.8 * (pairIndex + 1) // Each pair further back
             }
             
-            const shipX = config.xOffset + xDepthOffset + jitter.x
-            shipY = shipY + jitter.y
+            const shipX = config.xOffset + xDepthOffset
+            // shipY already set above
             
-            // Render ship (handles both creation and position updates)
+            // Render ship (handles both creation and position updates, including jitter)
             this.renderShip(ship, shipX, shipY, config)
             
             // Apply opacity for fade-in or fade-out
             if (!config.fadedIn || config.fadingOut) {
+                const shipColor = this.calcColorForShip(ship, config)
                 this.travelMap.cvs.drawOrder.forEach(obj => {
                     if (obj.id && obj.id.includes(ship.uuid)) {
                         if (obj.fillColor && obj.fillColor.length >= 4) {
