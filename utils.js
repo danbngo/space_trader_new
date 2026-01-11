@@ -41,6 +41,25 @@ function darkenColor(color, factor = 0.5) {
 }
 
 /**
+ * Lightens a color by a given factor
+ * @param {number[]} color - RGBA color array [r, g, b, a]
+ * @param {number} factor - Lightening factor (0-1), where 0.5 makes it 50% lighter
+ * @returns {number[]} Lightened RGBA color array
+ */
+function lightenColor(color, factor = 0.5) {
+    if (!color || color.length < 3) return color
+    const lightened = [
+        Math.floor(color[0] + (255 - color[0]) * factor),
+        Math.floor(color[1] + (255 - color[1]) * factor),
+        Math.floor(color[2] + (255 - color[2]) * factor)
+    ]
+    if (color.length >= 4) {
+        lightened.push(color[3]) // Preserve alpha
+    }
+    return lightened
+}
+
+/**
  * Calculates the sum of all numeric values in a Map.
  * @param {Map<any, number>} map - The map whose values to sum.
  * @returns {number} The total sum of all values.

@@ -310,45 +310,58 @@ class TravelMap extends BaseMap {
     }
     
     /**
-     * Darkens ships that have no actions remaining
+     * Applies brightness changes to ships based on their state:
+     * - 50% lighter: selected player ship
+     * - Normal: player ships with actions remaining, enemy ships (when not targeting)
+     * - 50% darker: player ships that already acted
      */
     applyActionBasedDarkening() {
-        // Darken player ships with no actions
+        // Handle player ships
         gs.fleet.ships.forEach(ship => {
-            if (ship.actionsRemaining <= 0) {
+            const shipObj = this.cvs.getObject(`ship-${ship.uuid}`)
+            if (shipObj && shipObj.fillColor) {
+                if (!this.shipOriginalColors.has(ship.uuid)) {
+                    this.shipOriginalColors.set(ship.uuid, [...shipObj.fillColor])
+                }
+                
+                if (ship === this.selectedPlayerShip) {
+                    // Selected player ship: 50% lighter
+                    shipObj.fillColor = lightenColor(this.shipOriginalColors.get(ship.uuid), 0.5)
+                } else if (this.selectedPlayerShip) {
+                    // When a player ship is selected, all other player ships are 50% darker
+                    shipObj.fillColor = darkenColor(this.shipOriginalColors.get(ship.uuid), 0.5)
+                } else if (ship.actionsRemaining <= 0) {
+                    // Player ship that already acted (when no ship is selected): 50% darker
+                    shipObj.fillColor = darkenColor(this.shipOriginalColors.get(ship.uuid), 0.5)
+                } else {
+                    // Player ship with actions remaining (when no ship is selected): normal brightness
+                    shipObj.fillColor = [...this.shipOriginalColors.get(ship.uuid)]
+                }
+            }
+        })
+        
+        // Handle enemy ships - normal brightness when not in targeting mode
+        if (gs.encounter && gs.encounter.fleet && gs.encounter.fleet.ships) {
+            gs.encounter.fleet.ships.forEach(ship => {
                 const shipObj = this.cvs.getObject(`ship-${ship.uuid}`)
                 if (shipObj && shipObj.fillColor) {
                     if (!this.shipOriginalColors.has(ship.uuid)) {
                         this.shipOriginalColors.set(ship.uuid, [...shipObj.fillColor])
                     }
-                    shipObj.fillColor = darkenColor(this.shipOriginalColors.get(ship.uuid), 0.5)
-                }
-            }
-        })
-        
-        // Darken enemy ships with no actions
-        if (gs.encounter && gs.encounter.fleet && gs.encounter.fleet.ships) {
-            gs.encounter.fleet.ships.forEach(ship => {
-                if (ship.actionsRemaining <= 0) {
-                    const shipObj = this.cvs.getObject(`ship-${ship.uuid}`)
-                    if (shipObj && shipObj.fillColor) {
-                        if (!this.shipOriginalColors.has(ship.uuid)) {
-                            this.shipOriginalColors.set(ship.uuid, [...shipObj.fillColor])
-                        }
-                        shipObj.fillColor = darkenColor(this.shipOriginalColors.get(ship.uuid), 0.5)
-                    }
+                    // Enemy ships stay at normal brightness unless in targeting mode
+                    shipObj.fillColor = [...this.shipOriginalColors.get(ship.uuid)]
                 }
             })
         }
     }
     
     /**
-     * Sets up targeting mode - dims all ships except attacker, disables player ship clicks
+     * Sets up targeting mode - brightens enemy ships for targeting, keeps selected ship bright
      */
     setupTargetingMode() {
         if (!gs.encounter || !gs.encounter.fleet || !gs.encounter.fleet.ships) return
         
-        // Dim and disable all player ships
+        // Handle player ships during targeting
         gs.fleet.ships.forEach(ship => {
             const shipObj = this.cvs.getObject(`ship-${ship.uuid}`)
             if (shipObj && shipObj.fillColor) {
@@ -357,11 +370,13 @@ class TravelMap extends BaseMap {
                     this.shipOriginalColors.set(ship.uuid, [...shipObj.fillColor])
                 }
                 
-                // Keep the attacking ship at normal brightness, darken others
+                // Selected ship: 50% lighter, others: darken if no actions, normal if actions remain
                 if (ship === this.selectedPlayerShip) {
-                    shipObj.fillColor = [...this.shipOriginalColors.get(ship.uuid)]
-                } else {
+                    shipObj.fillColor = lightenColor(this.shipOriginalColors.get(ship.uuid), 0.5)
+                } else if (ship.actionsRemaining <= 0) {
                     shipObj.fillColor = darkenColor(this.shipOriginalColors.get(ship.uuid), 0.5)
+                } else {
+                    shipObj.fillColor = [...this.shipOriginalColors.get(ship.uuid)]
                 }
                 
                 // Disable all player ship interactions during targeting
@@ -371,7 +386,7 @@ class TravelMap extends BaseMap {
             }
         })
         
-        // Dim enemy ships and add hover handlers
+        // Lighten enemy ships and add hover handlers
         gs.encounter.fleet.ships.forEach(ship => {
             const shipObj = this.cvs.getObject(`ship-${ship.uuid}`)
             if (shipObj && shipObj.fillColor) {
@@ -379,18 +394,20 @@ class TravelMap extends BaseMap {
                 if (!this.shipOriginalColors.has(ship.uuid)) {
                     this.shipOriginalColors.set(ship.uuid, [...shipObj.fillColor])
                 }
-                // Darken the ship (50% brightness)
-                shipObj.fillColor = darkenColor(this.shipOriginalColors.get(ship.uuid), 0.5)
+                // Lighten enemy ships during targeting (50% lighter)
+                shipObj.fillColor = lightenColor(this.shipOriginalColors.get(ship.uuid), 0.5)
                 
-                // Add hover handlers for enemy ships
+                // Add hover handlers for even more brightness on hover
                 shipObj.onHover = () => {
                     if (this.targetingMode) {
-                        shipObj.fillColor = [...this.shipOriginalColors.get(ship.uuid)]
+                        // Make it even brighter on hover (75% lighter)
+                        shipObj.fillColor = lightenColor(this.shipOriginalColors.get(ship.uuid), 0.75)
                     }
                 }
                 shipObj.onHoverEnd = () => {
                     if (this.targetingMode) {
-                        shipObj.fillColor = darkenColor(this.shipOriginalColors.get(ship.uuid), 0.5)
+                        // Return to 50% lighter
+                        shipObj.fillColor = lightenColor(this.shipOriginalColors.get(ship.uuid), 0.5)
                     }
                 }
             }
