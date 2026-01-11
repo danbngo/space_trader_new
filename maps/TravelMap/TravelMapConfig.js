@@ -10,8 +10,8 @@ const TRAVEL_MAP_CONFIG = {
     labelOffsetY: 30,
     
     // Ship positioning (as fraction of canvas width/zoom)
-    playerShipsOffset: -0.2,  // Closer to center
-    enemyShipsOffset: 0.2,     // Closer to center
+    playerShipsOffset: -0.15,  // Closer to center
+    enemyShipsOffset: 0.15,     // Closer to center
     
     // Jitter settings
     defaultJitterX: 2,
