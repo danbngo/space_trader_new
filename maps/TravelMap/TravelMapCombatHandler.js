@@ -211,6 +211,11 @@ class TravelMapCombatHandler {
             }
         }
         
+        // Deselect ship if it has no actions remaining
+        if (selectedPlayerShip.actionsRemaining <= 0) {
+            this.travelMap.selectedPlayerShip = null
+        }
+        
         this.handleActionComplete()
     }
 
@@ -455,6 +460,11 @@ class TravelMapCombatHandler {
         // Display self-damage for ram attacks
         if (attackType === 'ram' && result.selfHullDamage && result.selfHullDamage > 0) {
             this.displayTextOverShip(this.travelMap.selectedPlayerShip, TRAVEL_MAP_CONFIG.floatingTextColors.selfDamage, `-${result.selfHullDamage}`, TRAVEL_MAP_CONFIG.floatingTextDuration, 0)
+        }
+        
+        // Deselect ship if it has no actions remaining
+        if (this.travelMap.selectedPlayerShip.actionsRemaining <= 0) {
+            this.travelMap.selectedPlayerShip = null
         }
         
         if (result.success || attackType === 'ram') {

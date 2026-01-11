@@ -24,6 +24,11 @@ class TravelMapCombatRechargeHandler {
         // Animate recharge visual effect
         this.animateRecharge(selectedPlayerShip)
         
+        // Deselect ship if it has no actions remaining
+        if (selectedPlayerShip.actionsRemaining <= 0) {
+            this.travelMap.selectedPlayerShip = null
+        }
+        
         this.combatHandler.handleActionComplete()
     }
 
