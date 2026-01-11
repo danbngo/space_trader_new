@@ -34,10 +34,10 @@ const TRAVEL_MAP_CONFIG = {
     starfieldStarCount: 2000,
     
     // Ship progress bars
-    shipBarWidth: 50,
+    shipBarWidth: 75,
     shipBarHeight: 8,
     shipBarSpacing: 4,
-    shipBarYOffset: -10,
+    shipBarYOffset: 60,
     
     // Progress bars
     progressBarHeight: 6,

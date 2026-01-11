@@ -464,18 +464,18 @@ class TravelMap extends BaseMap {
                 throw new Error('ship must have a shipshape')
             }
             
-            // Create ship label
-            const labelColor = [...COLORS.White]
-            this.cvs.addText(
-                `label-${ship.uuid}`,
-                0,
-                0,
-                0,
-                labelOffsetY,
-                ship.shipType.name,
-                labelColor,
-                12
-            )
+            // Create ship label (hidden by default)
+            // const labelColor = [...COLORS.White]
+            // this.cvs.addText(
+            //     `label-${ship.uuid}`,
+            //     0,
+            //     0,
+            //     0,
+            //     labelOffsetY,
+            //     ship.shipType.name,
+            //     labelColor,
+            //     12
+            // )
             
             // Create thruster
             const rotation = shipGroupConfig.mirror ? 0 : Math.PI
@@ -519,12 +519,12 @@ class TravelMap extends BaseMap {
             thrusterObj.y = y
         }
         
-        // Update label position
-        const label = this.cvs.getObject(`label-${ship.uuid}`)
-        if (label) {
-            label.x = x
-            label.y = y - shipSize/2
-        }
+        // Update label position (hidden by default)
+        // const label = this.cvs.getObject(`label-${ship.uuid}`)
+        // if (label) {
+        //     label.x = x
+        //     label.y = y - shipSize/2
+        // }
         
         // Update progress bars
         if (shipObj) {
@@ -563,6 +563,8 @@ class TravelMap extends BaseMap {
                 bgColor,
                 TRAVEL_MAP_CONFIG.shipBarHeight
             )
+            bg.strokeColor = [255, 255, 255, 255]
+            bg.lineWidth = 2
             bg.zIndex = 100
         } else {
             bg.x = x - TRAVEL_MAP_CONFIG.shipBarWidth / 2
@@ -584,6 +586,8 @@ class TravelMap extends BaseMap {
                 fillColor,
                 TRAVEL_MAP_CONFIG.shipBarHeight - 2
             )
+            fg.strokeColor = [255, 255, 255, 255]
+            fg.lineWidth = 2
             fg.zIndex = 101
         } else {
             fg.x = x - TRAVEL_MAP_CONFIG.shipBarWidth / 2
