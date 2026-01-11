@@ -25,6 +25,8 @@ class TravelMap extends BaseMap {
         this.routeProgress = 0
         this.shipJitterOffsets = new Map()
         this.routeProgressBar = null
+        this.targetingMode = null // 'laser', 'ram', or null
+        this.shipOriginalColors = new Map() // Store original colors for dimming/restoring
         
         /** @type {ShipGroupConfig} */
         this.playerShipGroupConfig = {
@@ -255,6 +257,76 @@ class TravelMap extends BaseMap {
     }
     
     /**
+     * Dims all ships except the selected one
+     * @param {Ship} selectedShip - The ship to keep at normal brightness
+     */
+    dimOtherShips(selectedShip) {
+        // Get all ships
+        const allShips = [...gs.fleet.ships]
+        if (gs.encounter && gs.encounter.fleet && gs.encounter.fleet.ships) {
+            allShips.push(...gs.encounter.fleet.ships)
+        }
+        
+        allShips.forEach(ship => {
+            if (ship === selectedShip) return // Don't dim the selected ship
+            
+            const shipObj = this.cvs.getObject(`ship-${ship.uuid}`)
+            if (shipObj && shipObj.fillColor) {
+                // Store original color if not already stored
+                if (!this.shipOriginalColors.has(ship.uuid)) {
+                    this.shipOriginalColors.set(ship.uuid, [...shipObj.fillColor])
+                }
+                // Darken the ship
+                shipObj.fillColor = darkenColor(this.shipOriginalColors.get(ship.uuid), 0.4)
+            }
+        })
+    }
+    
+    /**
+     * Restores all ships to their original colors
+     */
+    restoreShipColors() {
+        this.shipOriginalColors.forEach((originalColor, uuid) => {
+            const shipObj = this.cvs.getObject(`ship-${uuid}`)
+            if (shipObj && shipObj.fillColor) {
+                shipObj.fillColor = [...originalColor]
+            }
+        })
+        this.shipOriginalColors.clear()
+    }
+    
+    /**
+     * Sets up targeting mode - dims all enemy ships and adds hover handlers
+     */
+    setupTargetingMode() {
+        if (!gs.encounter || !gs.encounter.fleet || !gs.encounter.fleet.ships) return
+        
+        gs.encounter.fleet.ships.forEach(ship => {
+            const shipObj = this.cvs.getObject(`ship-${ship.uuid}`)
+            if (shipObj && shipObj.fillColor) {
+                // Store original color if not already stored
+                if (!this.shipOriginalColors.has(ship.uuid)) {
+                    this.shipOriginalColors.set(ship.uuid, [...shipObj.fillColor])
+                }
+                // Darken the ship
+                shipObj.fillColor = darkenColor(this.shipOriginalColors.get(ship.uuid), 0.4)
+                
+                // Add hover handlers
+                shipObj.onHover = () => {
+                    if (this.targetingMode) {
+                        shipObj.fillColor = [...this.shipOriginalColors.get(ship.uuid)]
+                    }
+                }
+                shipObj.onHoverEnd = () => {
+                    if (this.targetingMode) {
+                        shipObj.fillColor = darkenColor(this.shipOriginalColors.get(ship.uuid), 0.4)
+                    }
+                }
+            }
+        })
+    }
+    
+    /**
      * Render background stars to background canvas (called once on init and on resize)
      */
     renderBackgroundStars() {
@@ -335,8 +407,59 @@ class TravelMap extends BaseMap {
                 shipColor[3] = shipGroupConfig.opacity
             }
             
+            // Create onClick handler for ship selection
+            const onClick = () => {
+                console.log('Ship clicked:', ship.shipType.name, 'Fleet:', ship.fleet?.name, 'Mirror:', shipGroupConfig.mirror)
+                if (shipGroupConfig.mirror) {
+                    // Enemy ship clicked
+                    console.log('Enemy ship clicked, targetingMode:', this.targetingMode)
+                    
+                    if (this.targetingMode) {
+                        // Player is targeting this enemy ship for an attack
+                        if (ship.disabled) {
+                            gs.combat.addToCombatLog('Target is already destroyed!')
+                            this.combatHandler.refreshCombatLog()
+                            return
+                        }
+                        
+                        const attackType = this.targetingMode
+                        this.targetingMode = null // Clear targeting mode
+                        
+                        // Restore all ship colors
+                        this.restoreShipColors()
+                        
+                        // Execute the attack
+                        const result = gs.combat.executeAction(this.selectedPlayerShip, attackType, ship)
+                        this.combatHandler.refreshCombatLog()
+                        
+                        if (result.success || attackType === 'ram') {
+                            this.combatHandler.handleActionComplete()
+                        }
+                    } else {
+                        // Normal selection
+                        console.log('Setting selectedEnemyShip to:', ship.shipType.name)
+                        this.selectedEnemyShip = ship
+                        // Update UI panel to reflect selection
+                        this.updateUIPanel()
+                    }
+                } else {
+                    // Player ship clicked
+                    console.log('Setting selectedPlayerShip to:', ship.shipType.name)
+                    this.selectedPlayerShip = ship
+                    
+                    // Dim all other ships
+                    this.restoreShipColors() // Clear any existing dimming first
+                    this.dimOtherShips(ship)
+                    
+                    // Update UI panel to reflect selection
+                    this.updateUIPanel()
+                }
+            }
+            
             if (ship.shipType.shipShape && ship.shipType.shipShape.addCanvasObject) {
                 shipObj = ship.shipType.shipShape.addCanvasObject(`ship-${ship.uuid}`, this.cvs, shipColor, shipSize, shipGroupConfig.mirror)
+                // Add onClick handler to the created ship object
+                shipObj.onClick = onClick
             } else {
                 throw new Error('ship must have a shipshape')
             }

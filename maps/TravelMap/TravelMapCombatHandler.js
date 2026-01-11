@@ -14,11 +14,10 @@ class TravelMapCombatHandler {
      * @returns {HTMLElement}
      */
     createCombatUIPanel() {
-        const panel = ce({id: 'travel-ui-panel'})
+        const panel = ce({id: 'travel-ui-panel', classNames: ['panel']})
         
         // Left side: Ship info and actions
         const leftPanel = ce({
-            classNames: ['travel-ui-left-panel'],
             children: [
                 ce({id: 'travel-ship-info'})
             ]
@@ -114,11 +113,13 @@ class TravelMapCombatHandler {
             return buttonContainer
         }
         
+        // Check if shields are full for recharge button
+        const shieldsFull = selectedPlayerShip.shields[0] >= selectedPlayerShip.shields[1]
+        
         // Create all action buttons
         buttonContainer.appendChild(this.createCombatButton('Laser', () => this.handleLaserAttack(), selectedPlayerShip.lasers <= 0))
         buttonContainer.appendChild(this.createCombatButton('Ram', () => this.handleRam()))
-        buttonContainer.appendChild(this.createCombatButton('Evade', () => this.handleEvade()))
-        buttonContainer.appendChild(this.createCombatButton('Recharge', () => this.handleRecharge()))
+        buttonContainer.appendChild(this.createCombatButton('Recharge', () => this.handleRecharge(), shieldsFull))
         buttonContainer.appendChild(this.createCombatButton('Flee', () => this.handleFlee()))
         
         return buttonContainer
@@ -135,7 +136,6 @@ class TravelMapCombatHandler {
         const button = ce({
             tag: 'button',
             innerHTML: label,
-            classNames: ['travel-action-button'],
             disabled: disabled
         })
         
@@ -150,63 +150,38 @@ class TravelMapCombatHandler {
      * Handles laser attack action
      */
     handleLaserAttack() {
-        const {selectedPlayerShip, selectedEnemyShip} = this.travelMap
+        const {selectedPlayerShip} = this.travelMap
         
-        if (!selectedPlayerShip || !selectedEnemyShip) {
-            gs.combat.addToCombatLog('Select a target first!')
+        if (!selectedPlayerShip) {
+            gs.combat.addToCombatLog('Select your ship first!')
             this.refreshCombatLog()
             return
         }
         
-        if (selectedEnemyShip.disabled) {
-            gs.combat.addToCombatLog('Target is already destroyed!')
-            this.refreshCombatLog()
-            return
-        }
-        
-        const result = gs.combat.executeAction(selectedPlayerShip, 'laser', selectedEnemyShip)
+        // Prompt user to select target
+        gs.combat.addToCombatLog('Select an enemy ship to target with lasers...')
         this.refreshCombatLog()
-        
-        if (result.success) {
-            this.handleActionComplete()
-        }
+        this.travelMap.targetingMode = 'laser'
+        this.travelMap.setupTargetingMode()
     }
 
     /**
      * Handles ram action
      */
     handleRam() {
-        const {selectedPlayerShip, selectedEnemyShip} = this.travelMap
-        
-        if (!selectedPlayerShip || !selectedEnemyShip) {
-            gs.combat.addToCombatLog('Select a target first!')
-            this.refreshCombatLog()
-            return
-        }
-        
-        if (selectedEnemyShip.disabled) {
-            gs.combat.addToCombatLog('Target is already destroyed!')
-            this.refreshCombatLog()
-            return
-        }
-        
-        const result = gs.combat.executeAction(selectedPlayerShip, 'ram', selectedEnemyShip)
-        this.refreshCombatLog()
-        
-        this.handleActionComplete()
-    }
-
-    /**
-     * Handles evade action
-     */
-    handleEvade() {
         const {selectedPlayerShip} = this.travelMap
-        if (!selectedPlayerShip) return
         
-        const result = gs.combat.executeAction(selectedPlayerShip, 'evade')
+        if (!selectedPlayerShip) {
+            gs.combat.addToCombatLog('Select your ship first!')
+            this.refreshCombatLog()
+            return
+        }
+        
+        // Prompt user to select target
+        gs.combat.addToCombatLog('Select an enemy ship to ram...')
         this.refreshCombatLog()
-        
-        this.handleActionComplete()
+        this.travelMap.targetingMode = 'ram'
+        this.travelMap.setupTargetingMode()
     }
 
     /**
