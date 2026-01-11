@@ -35,7 +35,7 @@ class BackgroundMapRenderer {
                 backgroundImage.src,
                 canvasSize*8, // Make it larger to allow for movement
                 0,
-                [255, 255, 255, 1]
+                null
             )
             bgObj.parallax = true // Enable parallax effect
             bgObj.zIndex = -1000 // Put it behind everything

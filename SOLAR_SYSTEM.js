@@ -137,8 +137,6 @@ const ASTEROIDS_ALL = [...ASTEROIDS, ...KUIPER_ASTEROIDS, ...OORT_ASTEROIDS, ...
 
 SOL.addChildren(ASTEROIDS_ALL)
 
-const BACKGROUND_STARS = generateBackgroundStars(SOLAR_SYSTEM_RADIUS_IN_AU*2, 5000)
-
 // Religions and space stations will be initialized in titleMenu.js before game start
 const SPACE_STATIONS = []
 
@@ -153,7 +151,7 @@ const SOLAR_SYSTEM = new StarSystem(
     [],
     [ASTEROID_BELT, TROJANS, GREEKS, KUIPER_BELT, OORT_CLOUD],
     [...ASTEROIDS_ALL],
-    BACKGROUND_STARS,
+    [],
 );
 
 console.log("Generated solar system:", SOLAR_SYSTEM)

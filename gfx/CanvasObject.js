@@ -194,7 +194,7 @@ class CanvasObject {
         ctx.save();
         ctx.translate(sx, sy);
         
-        ctx.fillStyle = colorArrToRgbaString(this.fillColor);
+        ctx.fillStyle = this.fillColor ? colorArrToRgbaString(this.fillColor) : null
         const effectiveStrokeColor = overrideStrokeColor !== undefined ? overrideStrokeColor : this.strokeColor
         ctx.strokeStyle = effectiveStrokeColor ? colorArrToRgbaString(effectiveStrokeColor) : null;
         ctx.lineWidth = this.lineWidth;
@@ -351,13 +351,13 @@ class CanvasObject {
                 }
                 
                 // Apply color tint using globalCompositeOperation if fillColor is set
-                if (this.fillColor && (this.fillColor[0] !== 255 || this.fillColor[1] !== 255 || this.fillColor[2] !== 255)) {
+                if (this.fillColor) {
                     // Draw image normally first with alpha
                     ctx.globalAlpha = this.fillColor[3] || 1;
                     ctx.drawImage(this.image, -width / 2, -height / 2, width, height);
                     // Apply color tint using source-atop (only tints existing pixels, preserves transparency)
                     ctx.globalCompositeOperation = 'source-atop';
-                    ctx.fillStyle = colorArrToRgbaString([this.fillColor[0], this.fillColor[1], this.fillColor[2], 0.33]);
+                    ctx.fillStyle = colorArrToRgbaString([this.fillColor[0], this.fillColor[1], this.fillColor[2], this.fillColor[3]]);
                     ctx.fillRect(-width / 2, -height / 2, width, height);
                     // Reset to default composite mode
                     ctx.globalCompositeOperation = 'source-over';

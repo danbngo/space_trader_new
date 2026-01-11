@@ -562,3 +562,12 @@ function asteroidShapeGenerator(baseRadius = 1.0, irregularity = 0.3, chunkiness
     
     return vertices;
 }
+
+
+function tintColor(sourceColor = [255, 255, 255, 1], tintColor = [255, 0, 0, 1], tintRatio = 0.5) {
+    const r = Math.floor(sourceColor[0] * (1 - tintRatio) + tintColor[0] * tintRatio);
+    const g = Math.floor(sourceColor[1] * (1 - tintRatio) + tintColor[1] * tintRatio);
+    const b = Math.floor(sourceColor[2] * (1 - tintRatio) + tintColor[2] * tintRatio);
+    const a = sourceColor.length >= 4 ? sourceColor[3] : 1;
+    return [r, g, b, a];
+}

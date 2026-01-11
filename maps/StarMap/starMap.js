@@ -152,7 +152,7 @@ class StarMap extends BaseMap {
                 BACKGROUNDS.STARFIELD_1.src,
                 canvasSize*8, // Size to cover canvas
                 0,
-                [255, 255, 255, 1],
+                null,
                 0,
                 null,
                 -1000, // Behind everything

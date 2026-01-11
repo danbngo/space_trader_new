@@ -21,7 +21,7 @@ class TravelMapRouteHandler {
         }
         
         // Pause time progression if encounter modal is open OR if enemy ships are fading out
-        if (gs.encounter || this.travelMap.enemyShipGroupConfig.fadingOut) {
+        if (gs.encounter || this.travelMap.shipHandler.enemyShipGroupConfig.fadingOut || !this.travelMap.shipHandler.playerShipGroupConfig.fadedIn) {
             return
         }
         
@@ -40,7 +40,7 @@ class TravelMapRouteHandler {
         this.checkForEncounter()
         
         // Render ships
-        this.travelMap.renderShips()
+        this.travelMap.shipHandler.renderShips()
         
         // Continue tick loop with 60fps target - not needed, handled in parent class
         //setTimeout(() => requestAnimationFrame(() => this.tick()), TRAVEL_MAP_CONFIG.tickRate)
