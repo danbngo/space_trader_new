@@ -524,13 +524,18 @@ class TravelMap extends BaseMap {
                         console.log('Shields absorbed:', result.shieldsAbsorbed, 'Hull damage:', result.hullDamage)
                         
                         // Display damage text over the target ship
-                        if (result.shieldsAbsorbed && result.shieldsAbsorbed > 0) {
-                            console.log('Displaying shield damage text')
-                            this.displayTextOverShip(ship, [100, 150, 255, 1], `-${result.shieldsAbsorbed}`, 1500, -30)
-                        }
-                        if (result.hullDamage && result.hullDamage > 0) {
-                            console.log('Displaying hull damage text')
-                            this.displayTextOverShip(ship, [255, 255, 255, 1], `-${result.hullDamage}`, 1500, 30)
+                        if (!result.success && attackType !== 'ram') {
+                            // Attack missed - show "Missed" in red
+                            this.displayTextOverShip(ship, [255, 0, 0, 1], 'Missed', 1500, 0)
+                        } else {
+                            if (result.shieldsAbsorbed && result.shieldsAbsorbed > 0) {
+                                console.log('Displaying shield damage text')
+                                this.displayTextOverShip(ship, [100, 150, 255, 1], `-${result.shieldsAbsorbed}`, 1500, -30)
+                            }
+                            if (result.hullDamage && result.hullDamage > 0) {
+                                console.log('Displaying hull damage text')
+                                this.displayTextOverShip(ship, [255, 255, 255, 1], `-${result.hullDamage}`, 1500, 30)
+                            }
                         }
                         
                         if (result.success || attackType === 'ram') {
@@ -666,13 +671,18 @@ class TravelMap extends BaseMap {
                             console.log('Shields absorbed:', result.shieldsAbsorbed, 'Hull damage:', result.hullDamage)
                             
                             // Display damage text over the target ship
-                            if (result.shieldsAbsorbed && result.shieldsAbsorbed > 0) {
-                                console.log('Displaying shield damage text')
-                                this.displayTextOverShip(ship, [100, 150, 255, 1], `-${result.shieldsAbsorbed}`, 1500, -30)
-                            }
-                            if (result.hullDamage && result.hullDamage > 0) {
-                                console.log('Displaying hull damage text')
-                                this.displayTextOverShip(ship, [255, 255, 255, 1], `-${result.hullDamage}`, 1500, 30)
+                            if (!result.success && attackType !== 'ram') {
+                                // Attack missed - show "Missed" in red
+                                this.displayTextOverShip(ship, [255, 0, 0, 1], 'Missed', 1500, 0)
+                            } else {
+                                if (result.shieldsAbsorbed && result.shieldsAbsorbed > 0) {
+                                    console.log('Displaying shield damage text')
+                                    this.displayTextOverShip(ship, [100, 150, 255, 1], `-${result.shieldsAbsorbed}`, 1500, -30)
+                                }
+                                if (result.hullDamage && result.hullDamage > 0) {
+                                    console.log('Displaying hull damage text')
+                                    this.displayTextOverShip(ship, [255, 255, 255, 1], `-${result.hullDamage}`, 1500, 30)
+                                }
                             }
                             
                             if (result.success || attackType === 'ram') {
