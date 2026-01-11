@@ -45,4 +45,14 @@ const TRAVEL_MAP_CONFIG = {
     progressBarGap: 2,
     progressBarMinWidth: 60,
     progressBarOffsetY: -25,
+    
+    // Floating text over ships
+    floatingTextDuration: 1500, // ms - standardized duration for all floating text
+    floatingTextColors: {
+        missed: [100, 100, 100, 1],      // Dark gray
+        shieldDamage: [100, 150, 255, 1], // Light blue
+        hullDamage: [255, 255, 255, 1],   // White
+        disabled: [255, 0, 0, 1],         // Red
+        selfDamage: [255, 200, 0, 1],     // Orange/yellow
+    },
 }

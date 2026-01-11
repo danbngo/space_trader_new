@@ -69,11 +69,11 @@ class TravelMapShipHandler {
      * @param {ShipGroupConfig} shipGroupConfig - Configuration for opacity
      * @returns {Array} RGBA color array
      */
-    calcColorForShip(ship, shipGroupConfig) {
+    calcColorForShip(ship, shipGroupConfig) { 
         const baseShipColor = ship.fleet && ship.fleet.color ? ship.fleet.color : COLORS.White
         const shipColor = [...baseShipColor]
         if (shipColor.length >= 4) {
-            shipColor[3] = shipGroupConfig.opacity
+            shipColor[3] *= shipGroupConfig.opacity
         }
         // Don't make tint completely blot out the image itself (only during creation)
         return shipColor
@@ -138,8 +138,6 @@ class TravelMapShipHandler {
         // Create ship if it doesn't exist
         if (!shipObj) {
             const shipColor = this.calcColorForShip(ship, shipGroupConfig)
-            // Don't make tint completely blot out the image itself
-            shipColor[3] = Math.round(shipColor[3] * 0.25)
             
             if (ship.shipType.shipShape && ship.shipType.shipShape.addCanvasObject) {
                 shipObj = ship.shipType.shipShape.addCanvasObject(`ship-${ship.uuid}`, this.travelMap.cvs, shipColor, shipSize, shipGroupConfig.mirror)
@@ -389,7 +387,6 @@ class TravelMapShipHandler {
             
             // Apply opacity for fade-in or fade-out
             if (!config.fadedIn || config.fadingOut) {
-                const shipColor = this.calcColorForShip(ship, config)
                 this.travelMap.cvs.drawOrder.forEach(obj => {
                     if (obj.id && obj.id.includes(ship.uuid)) {
                         if (obj.fillColor && obj.fillColor.length >= 4) {

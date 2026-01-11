@@ -117,6 +117,7 @@ class CanvasObject {
         this.parallax = false
         this.overlap = false
         this.mirror = false
+        this.tintRatio = 0.5
         
         // Hit detection
         this.hitRadius = hitRadius; // If null, uses size for circular hitbox
@@ -357,7 +358,7 @@ class CanvasObject {
                     ctx.drawImage(this.image, -width / 2, -height / 2, width, height);
                     // Apply color tint using source-atop (only tints existing pixels, preserves transparency)
                     ctx.globalCompositeOperation = 'source-atop';
-                    ctx.fillStyle = colorArrToRgbaString([this.fillColor[0], this.fillColor[1], this.fillColor[2], this.fillColor[3]]);
+                    ctx.fillStyle = colorArrToRgbaString([this.fillColor[0], this.fillColor[1], this.fillColor[2], this.tintRatio]);
                     ctx.fillRect(-width / 2, -height / 2, width, height);
                     // Reset to default composite mode
                     ctx.globalCompositeOperation = 'source-over';

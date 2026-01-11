@@ -435,26 +435,26 @@ class TravelMapCombatHandler {
         // Display damage text over the target ship
         if (!result.success && attackType !== 'ram') {
             // Attack missed - show "Missed" in dark gray
-            this.displayTextOverShip(targetShip, [100, 100, 100, 1], 'Missed', 1500, 0)
+            this.displayTextOverShip(targetShip, TRAVEL_MAP_CONFIG.floatingTextColors.missed, 'Missed', TRAVEL_MAP_CONFIG.floatingTextDuration, 0)
         } else {
             if (result.shieldsAbsorbed && result.shieldsAbsorbed > 0) {
                 console.log('Displaying shield damage text')
-                this.displayTextOverShip(targetShip, [100, 150, 255, 1], `-${result.shieldsAbsorbed}`, 1500, -30)
+                this.displayTextOverShip(targetShip, TRAVEL_MAP_CONFIG.floatingTextColors.shieldDamage, `-${result.shieldsAbsorbed}`, TRAVEL_MAP_CONFIG.floatingTextDuration, -30)
             }
             if (result.hullDamage && result.hullDamage > 0) {
                 console.log('Displaying hull damage text')
-                this.displayTextOverShip(targetShip, [255, 255, 255, 1], `-${result.hullDamage}`, 1500, 30)
+                this.displayTextOverShip(targetShip, TRAVEL_MAP_CONFIG.floatingTextColors.hullDamage, `-${result.hullDamage}`, TRAVEL_MAP_CONFIG.floatingTextDuration, 30)
             }
         }
         
         // Display "Disabled" if ship was destroyed
         if (result.destroyed) {
-            this.displayTextOverShip(targetShip, [255, 0, 0, 1], 'Disabled', 2000, 0)
+            this.displayTextOverShip(targetShip, TRAVEL_MAP_CONFIG.floatingTextColors.disabled, 'Disabled', TRAVEL_MAP_CONFIG.floatingTextDuration, 0)
         }
         
         // Display self-damage for ram attacks
         if (attackType === 'ram' && result.selfHullDamage && result.selfHullDamage > 0) {
-            this.displayTextOverShip(this.travelMap.selectedPlayerShip, [255, 200, 0, 1], `-${result.selfHullDamage}`, 1500, 0)
+            this.displayTextOverShip(this.travelMap.selectedPlayerShip, TRAVEL_MAP_CONFIG.floatingTextColors.selfDamage, `-${result.selfHullDamage}`, TRAVEL_MAP_CONFIG.floatingTextDuration, 0)
         }
         
         if (result.success || attackType === 'ram') {

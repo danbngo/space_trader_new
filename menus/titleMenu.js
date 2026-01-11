@@ -173,7 +173,7 @@ async function startNewGame() {
         "Player Fleet",
         null,
         PLAYER_FLEET_TYPE,
-        COLORS.LightGray,
+        COLORS.Gray,
     )
 
     gs.fleet.addShip(playerShip)
