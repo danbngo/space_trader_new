@@ -1,12 +1,6 @@
 /* Combat Map Styles */
 
 
-#travel-ship-info {
-    color: #fff;
-    font-size: 14px;
-}
-
-
 /* Main container */
 #travel-map-container {
     width: 100%;
@@ -63,11 +57,6 @@
     color: #ff0000;
 }
 
-.ship-info-stats {
-    margin-bottom: 10px;
-    font-size: 12px;
-}
-
 
 /* Combat log */
 #travel-log {
@@ -100,10 +89,6 @@
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
-}
-
-.travel-action-button-inactive {
-    color: #fff;
 }
 
 /* Route Travel UI Panel */

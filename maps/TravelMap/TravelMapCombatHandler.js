@@ -81,19 +81,19 @@ class TravelMapCombatHandler {
     updateShipInfo(infoElement) {
         const {selectedPlayerShip} = this.travelMap
         console.log('updating ship info:',infoElement, selectedPlayerShip)
-        
         if (!selectedPlayerShip) {
-            infoElement.innerHTML = 'Select ships to begin combat'
+            infoElement.innerHTML = ''//Select ships to begin combat'
             return
         }
         
-        // Clear existing content
         infoElement.innerHTML = ''
         
         infoElement.appendChild(ce({
-            classNames: ['ship-info-stats'],
-            innerHTML: `Hull: ${selectedPlayerShip.hull[0]}/${selectedPlayerShip.hull[1]} | 
+            children: [
+                `<u>${selectedPlayerShip.shipType.name}</u>`,
+                `Hull: ${selectedPlayerShip.hull[0]}/${selectedPlayerShip.hull[1]} | 
                 Shields: ${selectedPlayerShip.shields[0]}/${selectedPlayerShip.shields[1]}`
+            ]
         }))
     }
 
@@ -123,8 +123,7 @@ class TravelMapCombatHandler {
         
         if (!selectedPlayerShip || selectedPlayerShip.disabled) {
             buttonContainer.appendChild(ce({
-                innerHTML: 'No active ship',
-                classNames: ['travel-action-button-inactive']
+                innerHTML: '(Select a ship)',
             }))
             return buttonContainer
         }
