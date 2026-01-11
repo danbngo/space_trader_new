@@ -27,6 +27,7 @@ class TravelMap extends BaseMap {
         this.routeProgressBar = null
         this.targetingMode = null // 'laser', 'ram', or null
         this.shipOriginalColors = new Map() // Store original colors for dimming/restoring
+        this.animations = [] // Active animations (Loop instances)
         
         /** @type {ShipGroupConfig} */
         this.playerShipGroupConfig = {
@@ -122,6 +123,11 @@ class TravelMap extends BaseMap {
                 console.log('Animation loop stopped')
                 return
             }
+            
+            // Update active animations and remove completed ones
+            const currentMs = Date.now()
+            this.animations.forEach(anim => anim.update(currentMs))
+            this.animations = this.animations.filter(anim => !anim.completed)
             
             // Update UI panel if state changed
             const currentUIState = gs.encounter ? (gs.encounter.combatEnabled ? 'combat' : 'encounter') : 'travel'
@@ -520,13 +526,20 @@ class TravelMap extends BaseMap {
                         const result = gs.combat.executeAction(this.selectedPlayerShip, attackType, ship)
                         this.selectedPlayerShip.actionsRemaining--
                         
+                        // Display laser beam if it's a laser attack, or animate ram
+                        if (attackType === 'laser') {
+                            this.displayLaserBeam(this.selectedPlayerShip, ship, [255, 0, 0, 1], 500)
+                        } else if (attackType === 'ram') {
+                            this.animateRam(this.selectedPlayerShip, ship, 600)
+                        }
+                        
                         console.log('Combat result:', result)
                         console.log('Shields absorbed:', result.shieldsAbsorbed, 'Hull damage:', result.hullDamage)
                         
                         // Display damage text over the target ship
                         if (!result.success && attackType !== 'ram') {
-                            // Attack missed - show "Missed" in red
-                            this.displayTextOverShip(ship, [255, 0, 0, 1], 'Missed', 1500, 0)
+                            // Attack missed - show "Missed" in dark gray
+                            this.displayTextOverShip(ship, [100, 100, 100, 1], 'Missed', 1500, 0)
                         } else {
                             if (result.shieldsAbsorbed && result.shieldsAbsorbed > 0) {
                                 console.log('Displaying shield damage text')
@@ -536,6 +549,16 @@ class TravelMap extends BaseMap {
                                 console.log('Displaying hull damage text')
                                 this.displayTextOverShip(ship, [255, 255, 255, 1], `-${result.hullDamage}`, 1500, 30)
                             }
+                        }
+                        
+                        // Display "Disabled" if ship was destroyed
+                        if (result.destroyed) {
+                            this.displayTextOverShip(ship, [255, 0, 0, 1], 'Disabled', 2000, 0)
+                        }
+                        
+                        // Display self-damage for ram attacks
+                        if (attackType === 'ram' && result.selfHullDamage && result.selfHullDamage > 0) {
+                            this.displayTextOverShip(this.selectedPlayerShip, [255, 200, 0, 1], `-${result.selfHullDamage}`, 1500, 0)
                         }
                         
                         if (result.success || attackType === 'ram') {
@@ -666,14 +689,21 @@ class TravelMap extends BaseMap {
                             this.selectedPlayerShip.actionsRemaining--
                             this.combatHandler.refreshCombatLog()
                             
+                            // Display laser beam if it's a laser attack, or animate ram
+                            if (attackType === 'laser') {
+                                this.displayLaserBeam(this.selectedPlayerShip, ship, [255, 0, 0, 1], 500)
+                            } else if (attackType === 'ram') {
+                                this.animateRam(this.selectedPlayerShip, ship, 600)
+                            }
+                            
                             console.log('Combat result:', result)
                             console.log('Result properties:', Object.keys(result))
                             console.log('Shields absorbed:', result.shieldsAbsorbed, 'Hull damage:', result.hullDamage)
                             
                             // Display damage text over the target ship
                             if (!result.success && attackType !== 'ram') {
-                                // Attack missed - show "Missed" in red
-                                this.displayTextOverShip(ship, [255, 0, 0, 1], 'Missed', 1500, 0)
+                                // Attack missed - show "Missed" in dark gray
+                                this.displayTextOverShip(ship, [100, 100, 100, 1], 'Missed', 1500, 0)
                             } else {
                                 if (result.shieldsAbsorbed && result.shieldsAbsorbed > 0) {
                                     console.log('Displaying shield damage text')
@@ -683,6 +713,16 @@ class TravelMap extends BaseMap {
                                     console.log('Displaying hull damage text')
                                     this.displayTextOverShip(ship, [255, 255, 255, 1], `-${result.hullDamage}`, 1500, 30)
                                 }
+                            }
+                            
+                            // Display "Disabled" if ship was destroyed
+                            if (result.destroyed) {
+                                this.displayTextOverShip(ship, [255, 0, 0, 1], 'Disabled', 2000, 0)
+                            }
+                            
+                            // Display self-damage for ram attacks
+                            if (attackType === 'ram' && result.selfHullDamage && result.selfHullDamage > 0) {
+                                this.displayTextOverShip(this.selectedPlayerShip, [255, 200, 0, 1], `-${result.selfHullDamage}`, 1500, 0)
                             }
                             
                             if (result.success || attackType === 'ram') {
@@ -1046,6 +1086,99 @@ class TravelMap extends BaseMap {
         console.log('Text object added to canvas, returned object:', addedObj)
         console.log('Canvas object count:', this.cvs.objectMap.size)
         console.log('Text in canvas objectMap:', this.cvs.objectMap.has(textId))
+    }
+
+    /**
+     * Displays a laser beam from attacker to target that disappears after a duration
+     * @param {Ship} attacker - The ship firing the laser
+     * @param {Ship} target - The ship being targeted
+     * @param {number[]} color - RGBA color array for the laser
+     * @param {number} durationMs - How long the laser should display (default 500ms)
+     */
+    displayLaserBeam(attacker, target, color = [255, 0, 0, 1], durationMs = 500) {
+        const attackerObj = this.cvs.getObject(`ship-${attacker.uuid}`)
+        const targetObj = this.cvs.getObject(`ship-${target.uuid}`)
+        
+        if (!attackerObj || !targetObj) {
+            console.warn('Could not find ship objects for laser beam')
+            return
+        }
+        
+        // Calculate front of attacker ship
+        // Player ships (left side) face right, enemy ships (right side) face left
+        const shipRadius = TRAVEL_MAP_CONFIG.shipSize / 2
+        const attackerIsPlayer = gs.fleet.ships.includes(attacker)
+        const attackerFrontX = attackerIsPlayer ? 
+            attackerObj.x + shipRadius : 
+            attackerObj.x - shipRadius
+        
+        // Laser goes from front of attacker to center of target
+        const laserId = `laser-${attacker.uuid}-${Date.now()}`
+        const laserObj = new CanvasObject({
+            id: laserId,
+            shape: SHAPES.Line,
+            x: attackerFrontX,
+            y: attackerObj.y,
+            x2: targetObj.x,
+            y2: targetObj.y,
+            strokeColor: color,
+            lineWidth: 4,
+            size: 4,
+            durationMs: durationMs
+        })
+        
+        this.cvs.addObject(laserObj)
+    }
+
+    /**
+     * Animates a ramming ship surging forward and back
+     * @param {Ship} attacker - The ship doing the ramming
+     * @param {Ship} target - The ship being rammed
+     * @param {number} durationMs - Total animation duration (default 600ms)
+     */
+    animateRam(attacker, target, durationMs = 600) {
+        const attackerObj = this.cvs.getObject(`ship-${attacker.uuid}`)
+        const targetObj = this.cvs.getObject(`ship-${target.uuid}`)
+        
+        if (!attackerObj || !targetObj) {
+            console.warn('Could not find ship objects for ram animation')
+            return
+        }
+        
+        const startX = attackerObj.x
+        const targetX = targetObj.x
+        const midpointX = (startX + targetX) / 2
+        
+        // Store original position on the ship object
+        attackerObj.ramStartX = startX
+        attackerObj.ramMidpointX = midpointX
+        
+        const ramAnimation = new Loop(
+            durationMs,
+            (progressRatio) => {
+                const shipObj = this.cvs.getObject(`ship-${attacker.uuid}`)
+                if (!shipObj) return
+                
+                if (progressRatio <= 0.5) {
+                    // First half: surge forward to midpoint
+                    const forwardProgress = progressRatio * 2 // 0 to 1
+                    shipObj.x = startX + (midpointX - startX) * forwardProgress
+                } else {
+                    // Second half: return to start
+                    const returnProgress = (progressRatio - 0.5) * 2 // 0 to 1
+                    shipObj.x = midpointX + (startX - midpointX) * returnProgress
+                }
+            },
+            () => {
+                // On complete: ensure ship is back at start position
+                const shipObj = this.cvs.getObject(`ship-${attacker.uuid}`)
+                if (shipObj) {
+                    shipObj.x = startX
+                }
+            }
+        )
+        
+        this.animations.push(ramAnimation)
     }
 
     /**

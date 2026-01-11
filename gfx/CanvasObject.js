@@ -184,7 +184,7 @@ class CanvasObject {
             this.expired = true
             return
         }
-        this.screenOffsetY = this.getCurrentOffsetY(currentMs)
+        // No longer automatically drift y offset - this was part of legacy system
         this.fillColor = this.getCurrentColor(currentMs)
     }
 

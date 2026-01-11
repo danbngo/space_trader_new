@@ -12,6 +12,7 @@ class CombatResult {
      * @param {number} [data.damage] - Damage dealt (if applicable)
      * @param {number} [data.shieldsAbsorbed] - Shields that absorbed damage
      * @param {number} [data.hullDamage] - Hull damage dealt
+     * @param {number} [data.selfHullDamage] - Self damage taken (for ram attacks)
      * @param {number} [data.shieldsRecharged] - Shields recharged
      * @param {number} [data.lasersRecharged] - Lasers recharged
      * @param {boolean} [data.destroyed] - Whether defender was destroyed
@@ -26,6 +27,7 @@ class CombatResult {
         this.damage = data.damage || 0
         this.shieldsAbsorbed = data.shieldsAbsorbed || 0
         this.hullDamage = data.hullDamage || 0
+        this.selfHullDamage = data.selfHullDamage || 0
         this.shieldsRecharged = data.shieldsRecharged || 0
         this.lasersRecharged = data.lasersRecharged || 0
         this.destroyed = data.destroyed || false

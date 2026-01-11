@@ -2,6 +2,7 @@ DONE:
 
 
 TODO:
+-the ENTIRETY of combat.js needs to be tweaked, rebalanced
 -test new travel, encounter, combat systems. get em working.
 -fix craters collapsing bug
 -planetMap! shows the moons, where each building is and causes the player ship to move around to use buildings

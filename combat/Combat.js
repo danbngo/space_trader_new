@@ -339,7 +339,7 @@ class Combat {
      */
     executeRam(attacker, defender) {
         // Calculate ram damage based on engine power
-        const baseDamage = attacker.engine * 2; // Engine * 2 as ram damage
+        const baseDamage = attacker.engine; // Engine * 2 as ram damage
         const variance = baseDamage * 0.2; // ±20% variance
         const damage = Math.ceil(baseDamage + (Math.random() * variance * 2 - variance));
         
@@ -366,8 +366,11 @@ class Combat {
         return {
             damage: defenderResult.totalDamage,
             selfDamage: attackerResult.totalDamage,
+            hullDamage: defenderResult.hullDamage,
+            shieldsAbsorbed: defenderResult.shieldsAbsorbed,
             destroyed: defenderResult.destroyed,
             selfDestroyed: attackerResult.destroyed,
+            selfHullDamage: attackerResult.hullDamage,
             message
         };
     }
@@ -501,6 +504,9 @@ class Combat {
                     success: true,
                     message: result.message,
                     damage: result.damage || 0,
+                    hullDamage: result.hullDamage || 0,
+                    shieldsAbsorbed: result.shieldsAbsorbed || 0,
+                    selfHullDamage: result.selfHullDamage || 0,
                     destroyed: target && target.hull[0] <= 0
                 })
 
