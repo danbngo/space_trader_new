@@ -80,12 +80,50 @@ class TravelMapShipHandler {
     }
 
     /**
+     * Applies color modifications to a ship based on state (selected, targeting, disabled, etc.)
+     * @param {Ship} ship - The ship to modify colors for
+     * @param {CanvasObject} shipObj - The ship's canvas object
+     * @param {ShipGroupConfig} shipGroupConfig - Configuration for opacity and group settings
+     */
+    applyShipColorModifications(ship, shipObj, shipGroupConfig) {
+        const isPlayerShip = gs.fleet.ships.includes(ship)
+        const shipColor = this.calcColorForShip(ship, shipGroupConfig)
+        //apply opacity during fadein / fadeout
+        shipObj.fillColor = shipColor
+        shipObj.fillColor[3] = shipGroupConfig.opacity
+        if (ship.disabled) {
+            shipObj.darkenRatio = 1; //darkest ships are disabled ones
+        }
+        shipObj.darkenRatio = 0 //default = no darken
+        if (this.travelMap.selectedPlayerShip === ship) {
+            shipObj.darkenRatio = -0.5 //lighten selected player ship
+        }
+        else if (this.travelMap.targetingMode) {
+            if (isPlayerShip) {
+                shipObj.darkenRatio = 0.5 //darken other player ships while targeting
+            }
+            else if (this.travelMap.combatHandler.targetedShips.has(ship)) {
+                shipObj.darkenRatio = -0.5 //lighten enemy ships that are valid targets
+            }
+            else {
+                shipObj.darkenRatio = 0.5 //darken invalid targets
+            }
+        }
+        else {
+            if (ship.actionsRemaining <= 0) {
+                shipObj.darkenRatio = 0.5 //darken ships with no moves remaining
+            }
+        }
+    }
+
+
+    /**
      * Applies click handlers to a ship canvas object based on ship type and state
      * @param {CanvasObject} shipObj - The ship's canvas object
      * @param {Ship} ship - The ship entity
      * @param {ShipGroupConfig} shipGroupConfig - Configuration for this ship's group
      */
-    applyClickFunctionsToShipObj(shipObj, ship, shipGroupConfig) {
+    applyShipClickFunctions(shipObj, ship, shipGroupConfig) {
         const onClick = () => {
             this.travelMap.combatHandler.onClickShip(ship, shipGroupConfig)
         }
@@ -167,7 +205,8 @@ class TravelMapShipHandler {
             shipObj.y = jitteredY
             
             // Update onClick handler based on ship type and state
-            this.applyClickFunctionsToShipObj(shipObj, ship, shipGroupConfig)
+            this.applyShipClickFunctions(shipObj, ship, shipGroupConfig)
+            this.applyShipColorModifications(ship, shipObj, shipGroupConfig)
         }
         
         // Update thruster position, size, and color with flicker effect
@@ -228,9 +267,9 @@ class TravelMapShipHandler {
         if (!bg) {
             const bgColor = [...COLORS.Black]
             // Apply same opacity as fillColor to background
-            if (bgColor.length >= 4 && fillColor.length >= 4) {
-                bgColor[3] = fillColor[3]
-            }
+            //if (bgColor.length >= 4 && fillColor.length >= 4) {
+            //    bgColor[3] = fillColor[3]
+            //}
             bg = this.travelMap.cvs.addLine(
                 bgId,
                 x - TRAVEL_MAP_CONFIG.shipBarWidth / 2,
@@ -296,16 +335,16 @@ class TravelMapShipHandler {
         // Render hull bar with opacity applied
         const baseHullColor = hullPercent < 0.3 ? COLORS.Red : COLORS.Orange
         const hullColor = [...baseHullColor]
-        if (hullColor.length >= 4) {
-            hullColor[3] = shipGroupConfig.opacity
-        }
+        //if (hullColor.length >= 4) {
+        //    hullColor[3] = shipGroupConfig.opacity
+        //}
         this.addShipStatBar(ship, shipObj, 'hull', hullColor, hullPercent, hullBarY)
         
         // Render shield bar with opacity applied
         const shieldColor = [...COLORS.Blue]
-        if (shieldColor.length >= 4) {
-            shieldColor[3] = shipGroupConfig.opacity
-        }
+        //if (shieldColor.length >= 4) {
+        //    shieldColor[3] = shipGroupConfig.opacity
+        //}
         this.addShipStatBar(ship, shipObj, 'shield', shieldColor, shieldPercent, shieldBarY)
     }
 
@@ -384,20 +423,6 @@ class TravelMapShipHandler {
             
             // Render ship (handles both creation and position updates, including jitter)
             this.renderShip(ship, shipX, shipY, config)
-            
-            // Apply opacity for fade-in or fade-out
-            if (!config.fadedIn || config.fadingOut) {
-                this.travelMap.cvs.drawOrder.forEach(obj => {
-                    if (obj.id && obj.id.includes(ship.uuid)) {
-                        if (obj.fillColor && obj.fillColor.length >= 4) {
-                            obj.fillColor[3] = config.opacity
-                        }
-                        if (obj.strokeColor && obj.strokeColor.length >= 4) {
-                            obj.strokeColor[3] = config.opacity
-                        }
-                    }
-                })
-            }
         })
     }
 
