@@ -563,11 +563,13 @@ function asteroidShapeGenerator(baseRadius = 1.0, irregularity = 0.3, chunkiness
     return vertices;
 }
 
-
-function tintColor(sourceColor = [255, 255, 255, 1], tintColor = [255, 0, 0, 1], tintRatio = 0.5) {
-    const r = Math.floor(sourceColor[0] * (1 - tintRatio) + tintColor[0] * tintRatio);
-    const g = Math.floor(sourceColor[1] * (1 - tintRatio) + tintColor[1] * tintRatio);
-    const b = Math.floor(sourceColor[2] * (1 - tintRatio) + tintColor[2] * tintRatio);
-    const a = sourceColor.length >= 4 ? sourceColor[3] : 1;
-    return [r, g, b, a];
+function darkenColor(color, factor = 0.5) {
+    if (!color || color.length < 3) return color
+    const darkened = [
+        Math.max(0, Math.min(255, Math.floor(color[0] * (1 - factor)))),
+        Math.max(0, Math.min(255, Math.floor(color[1] * (1 - factor)))),
+        Math.max(0, Math.min(255, Math.floor(color[2] * (1 - factor))))
+    ]
+    darkened.push(color[3]) // Preserve alpha
+    return darkened
 }

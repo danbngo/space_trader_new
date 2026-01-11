@@ -118,6 +118,7 @@ class CanvasObject {
         this.overlap = false
         this.mirror = false
         this.tintRatio = 0.5
+        this.darkenRatio = 0
         
         // Hit detection
         this.hitRadius = hitRadius; // If null, uses size for circular hitbox
@@ -353,12 +354,16 @@ class CanvasObject {
                 
                 // Apply color tint using globalCompositeOperation if fillColor is set
                 if (this.fillColor) {
+                    const color = this.darkenRatio !== 0 ?
+                        darkenColor(this.fillColor, this.darkenRatio) :
+                        [this.fillColor[0], this.fillColor[1], this.fillColor[2], this.fillColor[3]];
+
                     // Draw image normally first with alpha
                     ctx.globalAlpha = this.fillColor[3] || 1;
                     ctx.drawImage(this.image, -width / 2, -height / 2, width, height);
                     // Apply color tint using source-atop (only tints existing pixels, preserves transparency)
                     ctx.globalCompositeOperation = 'source-atop';
-                    ctx.fillStyle = colorArrToRgbaString([this.fillColor[0], this.fillColor[1], this.fillColor[2], this.tintRatio]);
+                    ctx.fillStyle = colorArrToRgbaString([color[0], color[1], color[2], this.tintRatio]);
                     ctx.fillRect(-width / 2, -height / 2, width, height);
                     // Reset to default composite mode
                     ctx.globalCompositeOperation = 'source-over';
