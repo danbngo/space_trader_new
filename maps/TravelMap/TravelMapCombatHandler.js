@@ -101,9 +101,20 @@ class TravelMapCombatHandler {
      * @returns {HTMLElement}
      */
     createActionButtons() {
-        const {selectedPlayerShip} = this.travelMap
+        const {selectedPlayerShip, targetingMode} = this.travelMap
         
         const buttonContainer = ce({classNames: ['travel-action-buttons']})
+        
+        // If in targeting mode, show targeting UI with cancel button
+        if (targetingMode) {
+            const targetingLabel = targetingMode === 'laser' ? 'Targeting Laser' : 'Targeting Ram'
+            buttonContainer.appendChild(ce({
+                innerHTML: `<strong>${targetingLabel}</strong> - Select an enemy ship`,
+                classNames: ['targeting-mode-label']
+            }))
+            buttonContainer.appendChild(this.createCombatButton('Cancel', () => this.handleCancelTargeting()))
+            return buttonContainer
+        }
         
         if (!selectedPlayerShip || selectedPlayerShip.disabled) {
             buttonContainer.appendChild(ce({
@@ -113,14 +124,17 @@ class TravelMapCombatHandler {
             return buttonContainer
         }
         
+        // Check if ship has actions remaining
+        const noActionsLeft = selectedPlayerShip.actionsRemaining <= 0
+        
         // Check if shields are full for recharge button
         const shieldsFull = selectedPlayerShip.shields[0] >= selectedPlayerShip.shields[1]
         
         // Create all action buttons
-        buttonContainer.appendChild(this.createCombatButton('Laser', () => this.handleLaserAttack(), selectedPlayerShip.lasers <= 0))
-        buttonContainer.appendChild(this.createCombatButton('Ram', () => this.handleRam()))
-        buttonContainer.appendChild(this.createCombatButton('Recharge', () => this.handleRecharge(), shieldsFull))
-        buttonContainer.appendChild(this.createCombatButton('Flee', () => this.handleFlee()))
+        buttonContainer.appendChild(this.createCombatButton('Laser', () => this.handleLaserAttack(), selectedPlayerShip.lasers <= 0 || noActionsLeft))
+        buttonContainer.appendChild(this.createCombatButton('Ram', () => this.handleRam(), noActionsLeft))
+        buttonContainer.appendChild(this.createCombatButton('Recharge', () => this.handleRecharge(), shieldsFull || noActionsLeft))
+        buttonContainer.appendChild(this.createCombatButton('Flee', () => this.handleFlee(), noActionsLeft))
         
         return buttonContainer
     }
@@ -158,11 +172,10 @@ class TravelMapCombatHandler {
             return
         }
         
-        // Prompt user to select target
-        gs.combat.addToCombatLog('Select an enemy ship to target with lasers...')
-        this.refreshCombatLog()
+        // Enter targeting mode
         this.travelMap.targetingMode = 'laser'
         this.travelMap.setupTargetingMode()
+        this.travelMap.updateUIPanel() // Refresh to show targeting UI
     }
 
     /**
@@ -177,11 +190,21 @@ class TravelMapCombatHandler {
             return
         }
         
-        // Prompt user to select target
-        gs.combat.addToCombatLog('Select an enemy ship to ram...')
-        this.refreshCombatLog()
+        // Enter targeting mode
         this.travelMap.targetingMode = 'ram'
         this.travelMap.setupTargetingMode()
+        this.travelMap.updateUIPanel() // Refresh to show targeting UI
+    }
+
+    /**
+     * Handles canceling targeting mode
+     */
+    handleCancelTargeting() {
+        this.travelMap.targetingMode = null
+        this.travelMap.restoreShipColors()
+        gs.combat.addToCombatLog('Targeting cancelled')
+        this.refreshCombatLog()
+        this.travelMap.updateUIPanel() // Refresh to show normal UI
     }
 
     /**
@@ -192,6 +215,7 @@ class TravelMapCombatHandler {
         if (!selectedPlayerShip) return
         
         const result = gs.combat.executeAction(selectedPlayerShip, 'recharge')
+        selectedPlayerShip.actionsRemaining--
         this.refreshCombatLog()
         
         this.handleActionComplete()
@@ -205,6 +229,7 @@ class TravelMapCombatHandler {
         if (!selectedPlayerShip) return
         
         const result = gs.combat.executeAction(selectedPlayerShip, 'flee')
+        selectedPlayerShip.actionsRemaining--
         this.refreshCombatLog()
         
         if (result.escaped) {

@@ -433,10 +433,14 @@ class TravelMap extends BaseMap {
                         
                         // Execute the attack
                         const result = gs.combat.executeAction(this.selectedPlayerShip, attackType, ship)
+                        this.selectedPlayerShip.actionsRemaining--
                         this.combatHandler.refreshCombatLog()
                         
                         if (result.success || attackType === 'ram') {
                             this.combatHandler.handleActionComplete()
+                        } else {
+                            // Refresh UI even if attack failed
+                            this.updateUIPanel()
                         }
                     } else {
                         // Normal selection
