@@ -180,8 +180,7 @@ class Encounter {
         if (wouldLoseAllShips) {
             // Spare one ship with 1 hull
             const sparedShip = disabledShips[0]
-            sparedShip.hull[0] = 1
-            sparedShip.disabled = false
+            //sparedShip.hull[0] = 1 //its ok, let the player be towed
             
             // Remove all other disabled ships
             for (let i = 1; i < disabledShips.length; i++) {
@@ -189,7 +188,7 @@ class Encounter {
             }
             
             msg += `<span style="color: rgb(${COLORS.Red.join(',')})">All your ships were disabled!</span><br/>`
-            msg += `You manage to barely restore emergency power to ${coloredName(sparedShip)} with 1 hull remaining.<br/>`
+            msg += `You manage to barely restore emergency power to ${coloredName(sparedShip)}.<br/>`
             if (disabledShips.length > 1) {
                 msg += `Your other ${disabledShips.length - 1} disabled ships are lost.<br/>`
             }

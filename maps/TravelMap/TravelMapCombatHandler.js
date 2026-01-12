@@ -309,7 +309,16 @@ class TravelMapCombatHandler {
                 this.waitForCurrentEnemyActionComplete()
             }, 100)
         } else {
-            console.log('Current enemy action animation complete, processing next')
+            console.log('Current enemy action animation complete')
+            
+            // Check if combat ended (e.g., enemy ship rammed and destroyed itself, or all player ships disabled)
+            gs.combat.updateCombatResult()
+            if (gs.combat.result) {
+                console.log('Combat ended during enemy turn with result:', gs.combat.result)
+                gs.encounter.endCombat()
+                return
+            }
+            
             // Animation complete, process next action
             this.processNextEnemyAction()
         }
@@ -495,12 +504,12 @@ class TravelMapCombatHandler {
             // All animations complete, check if combat should end
             console.log('All animations complete')
             
-            // Update combat result to check for victory/defeat
+            // Update combat result to check for victory/defeat/escape
             gs.combat.updateCombatResult()
             
-            // If all enemies are disabled/escaped (victory), end player turn immediately
-            if (gs.combat.result === ENCOUNTER_RESULTS.Victory) {
-                console.log('All enemies disabled - ending combat')
+            // If combat has ended, end it immediately
+            if (gs.combat.result) {
+                console.log('Combat ended with result:', gs.combat.result)
                 gs.encounter.endCombat()
                 return
             }
