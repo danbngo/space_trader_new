@@ -397,6 +397,64 @@ class Encounter {
         }
     }
 
+    showPlayerSurrenderedToCriminalsModal() {
+        console.log('showPlayerSurrenderedToCriminalsModal');
+        const enemyFleet = this.fleet
+        const disabledPlayerShips = this.playerShips.filter(s=>s.disabled)
+        
+        let msg = `You signal surrender to the ${coloredName(enemyFleet)}.<br/>`
+        msg += `They board your vessels with weapons drawn...<br/><br/>`
+        
+        // Take ALL cargo
+        const totalCargo = gs.fleet.cargo.total
+        if (totalCargo > 0) {
+            msg += `The ${coloredName(enemyFleet)} strip your cargo holds completely!<br/>`
+            msg += `All ${totalCargo} units of cargo are taken.<br/>`
+            gs.fleet.cargo.clear()
+        }
+        
+        // Take ALL credits
+        const totalCredits = gs.credits
+        if (totalCredits > 0) {
+            msg += `They plunder your credit accounts: ${totalCredits}CR stolen!<br/>`
+            gs.credits = 0
+        }
+        
+        // Randomly take ships (50% chance per ship, but leave at least 1)
+        const shipsToSteal = []
+        for (const ship of gs.fleet.ships) {
+            // Always keep at least one ship
+            if (gs.fleet.ships.length - shipsToSteal.length <= 1) break
+            
+            if (Math.random() < 0.5) {
+                shipsToSteal.push(ship)
+            }
+        }
+        
+        if (shipsToSteal.length > 0) {
+            msg += `<br/>The ${coloredName(enemyFleet)} eye your vessels greedily...<br/>`
+            msg += `They seize ${shipsToSteal.length} of your ships!<br/>`
+            
+            for (const ship of shipsToSteal) {
+                msg += `- ${coloredName(ship)}<br/>`
+                gs.fleet.removeShip(ship)
+            }
+            
+            msg += `<br/>`
+        }
+        
+        if (disabledPlayerShips.length > 0) {
+            msg += `${disabledPlayerShips.length} of your ships were disabled in the fighting.<br/>`
+        }
+        
+        msg += `<br/>The ${coloredName(enemyFleet)} leave you with the bare minimum to survive.<br/>`
+        msg += `"Consider yourself lucky we're leaving you alive," they sneer before departing.<br/>`
+        
+        msg += this.conductRepairs()
+        
+        showModal('Plundered', msg, [['Continue', ()=>this.endEncounter()]])
+    }
+
 
     /**
      * Ends the current encounter and returns to the star map.
