@@ -663,12 +663,11 @@ class StarMap {
         
         // Set travel state
         gs.previousLocation = gs.fleet.location
+        gs.fleet.location = null
         gs.destination = destination
         gs.travelYearsRemaining = travelTime
         gs.travelProgress = 0
         gs.travelStartYear = gs.year
-        gs.x = gs.fleet.x
-        gs.y = gs.fleet.y
 
         // Deduct fuel cost
         gs.fleet.fuel -= fuelCost

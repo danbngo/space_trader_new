@@ -28,11 +28,6 @@ class GameState {
         /** @type {boolean} - Whether the game was saved this tick */
         this.savedThisTick = false;
         
-        // Travel properties
-        /** @type {number|null} - X coordinate during travel */
-        this.x = null;
-        /** @type {number|null} - Y coordinate during travel */
-        this.y = null;
         /** @type {Planet|SpaceStation|null} - Previous location before travel */
         this.previousLocation = null;
         /** @type {Planet|null} - Destination planet */

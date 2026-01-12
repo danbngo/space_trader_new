@@ -237,8 +237,6 @@ const SaveManager = {
                 lastSeenDates: this.serializeMapWithObjectKeys(gs.lastSeenDates),
                 
                 // Travel properties
-                x: gs.x,
-                y: gs.y,
                 destinationUUID: this.objectToUUID(gs.destination),
                 travelYearsRemaining: gs.travelYearsRemaining,
                 travelProgress: gs.travelProgress,
@@ -524,8 +522,6 @@ const SaveManager = {
             gs.lastSeenDates = this.deserializeMapWithObjectKeys(saveData.lastSeenDates, 'planet');
             
             // Restore travel properties
-            gs.x = saveData.x !== undefined ? saveData.x : null;
-            gs.y = saveData.y !== undefined ? saveData.y : null;
             gs.destination = saveData.destinationUUID ? this.uuidToObject(saveData.destinationUUID, 'planet') : null;
             gs.travelYearsRemaining = saveData.travelYearsRemaining !== undefined ? saveData.travelYearsRemaining : null;
             gs.travelProgress = saveData.travelProgress !== undefined ? saveData.travelProgress : null;

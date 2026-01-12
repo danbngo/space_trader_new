@@ -74,6 +74,7 @@ class TravelMapRouteHandler {
         const encounterOccurrences = calcOccurrencesPerTimespan(BASE_ENCOUNTER_CHANCE_PER_DAY, YEARS_PER_TRAVEL_TICK*365)
         if (encounterOccurrences >= 1) {
             console.log('Encounter triggered!')
+            console.log('gamestate:',gs)
             
             // Determine encounter type and planet using standalone functions
             const encounterType = rollEncounterType(gs.previousLocation, gs.destination)
