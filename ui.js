@@ -368,8 +368,7 @@ function createTable(rows = [[ce()]], onSelectRow = null, firstSelectedIndex = o
     let currentSort = {columnIndex: -1, ascending: true};
     
     // Store original row data with indices for sorting
-    // Add 1 to originalIndex to account for header row
-    const dataRows = rows.slice(1).map((row, idx) => ({row, originalIndex: idx + 1}));
+    const dataRows = rows.slice(1).map((row, idx) => ({row, originalIndex: idx}));
     
     /**
      * Sorts the table by the specified column
@@ -424,14 +423,35 @@ function createTable(rows = [[ce()]], onSelectRow = null, firstSelectedIndex = o
      * Renders the data rows into the table
      */
     function renderDataRows() {
+        console.log('=== renderDataRows called ===', {
+            dataRowsCount: dataRows.length,
+            firstSelectedIndex: firstSelectedIndex
+        });
+        
         dataRows.forEach(({row, originalIndex}, displayIndex) => {
             const isFirstSelected = originalIndex === firstSelectedIndex;
             
+            console.log('Rendering row', {
+                displayIndex,
+                originalIndex,
+                isFirstSelected,
+                firstSelectedIndex
+            });
+            
             const onRowClicked = () => {
+                console.log('=== Row clicked ===', {
+                    displayIndex,
+                    originalIndex,
+                    rowElement: tr,
+                    firstSelectedIndex
+                });
+                
                 if (!onSelectRow) return;
                 if (selectedRow) selectedRow.classList.remove('selected');
                 tr.classList.add('selected');
                 selectedRow = tr;
+                
+                console.log('Calling onSelectRow with originalIndex:', originalIndex);
                 onSelectRow(originalIndex); // Use original index for callback
             };
             
@@ -441,15 +461,17 @@ function createTable(rows = [[ce()]], onSelectRow = null, firstSelectedIndex = o
                 classNames: ['ui-table-row', isFirstSelected ? 'selected' : null],
                 onClick: onRowClicked
             });
-            if (isFirstSelected) selectedRow = tr;
+            if (isFirstSelected) {
+                selectedRow = tr;
+                console.log('Set selectedRow to tr with originalIndex:', originalIndex);
+            }
             
             for (let i = 0; i < colCount; i++) {
                 ce({
                     parent: tr,
                     tag: 'td',
                     classNames: ['ui-table-cell'],
-                    children: [row[i]],
-                    onClick: onRowClicked
+                    children: [row[i]]
                 });
             }
         });

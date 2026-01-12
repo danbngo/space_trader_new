@@ -73,7 +73,7 @@ function showCaptainCreationMenu(captain = gs.captain, onClose = ()=>{}, selecte
         })
     ]
 
-    const skillTable = createTable(skillTableRows, (rowIndex) => onSelectSkill(SKILLS_ALL[rowIndex]), selectedSkill ? SKILLS_ALL.indexOf(selectedSkill) + 1 : null)
+    const skillTable = createTable(skillTableRows, (rowIndex) => onSelectSkill(SKILLS_ALL[rowIndex]), selectedSkill ? SKILLS_ALL.indexOf(selectedSkill) : null)
 
     // Add popovers to skill rows
     const skillRows = skillTable.querySelectorAll('tr')

@@ -78,7 +78,7 @@ function showLootMenu(loot = new CountsMap()) {
         const lootAmount = loot.getAmount(ct)
         const maxLootAmount = Math.min(lootAmount, fleet.availableCargoSpace)
 
-        console.log('selected cargo type, vars:', {ct, playerAmount, lootAmount, maxLootAmount, availableCargoSpace: fleet.availableCargoSpace})
+        console.log('selected cargo type, vars:', {ct, playerAmount, lootAmount, maxLootAmount, availableCargoSpace: fleet.availableCargoSpace, loot})
         /** @type {ButtonData[]} */
         const buttons = [
             ['Take', ()=>showTakeCargoSlider(ct, maxLootAmount), maxLootAmount == 0],
