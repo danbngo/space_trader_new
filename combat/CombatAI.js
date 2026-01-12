@@ -2,12 +2,6 @@
  * CombatAI - handles enemy AI decision making during combat
  */
 class CombatAI {
-    /**
-     * @param {Combat} combat
-     */
-    constructor(combat) {
-        this.combat = combat
-    }
 
     /**
      * Decides what action an enemy ship should take
@@ -15,7 +9,7 @@ class CombatAI {
      * @returns {Object} - { action: string, target: Ship|null }
      */
     decideAction(ship) {
-        const alivePlayers = this.combat.activePlayerShips
+        const alivePlayers = gs.combat.activePlayerShips
         
         if (alivePlayers.length === 0) {
             return { action: 'none', target: null }
@@ -50,13 +44,13 @@ class CombatAI {
      */
     executeEnemyTurn() {
         const results = []
-        const aliveEnemies = this.combat.activeEnemyShips
+        const aliveEnemies = gs.combat.activeEnemyShips
 
         for (const enemyShip of aliveEnemies) {
             const decision = this.decideAction(enemyShip)
             
             if (decision.action !== 'none') {
-                const result = this.combat.executeAction(enemyShip, decision.action, decision.target)
+                const result = gs.combat.executeAction(enemyShip, decision.action, decision.target)
                 results.push(result)
             }
         }

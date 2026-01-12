@@ -31,14 +31,24 @@ class RamAnimation extends Anim {
                 console.log('Ram animation progress:', progressRatio, attackerShipObj, targetShipObj)
                 if (!attackerShipObj) return
                 
-                // Display damage text at 15% progress (midway through the forward surge)
-                if (!damageDisplayed && progressRatio >= 0.15) {
+                // Execute damage and display text at 30% progress (at the end of the forward surge)
+                if (!damageDisplayed && progressRatio >= 0.3) {
                     damageDisplayed = true
+                    // Execute the combat result to apply damage
+                    gs.combat.executeResult(combatResult)
+                    // Display damage text
                     travelMap.combatHandler.displayDamageText(
                         targetShip,
                         combatResult.hullDamage || 0,
                         combatResult.shieldsAbsorbed || 0,
                         combatResult.destroyed
+                    )
+
+                    travelMap.combatHandler.displayDamageText(
+                        attackingShip,
+                        combatResult.selfHullDamage || 0,
+                        0,
+                        false
                     )
                 }
                 

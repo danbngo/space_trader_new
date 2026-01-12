@@ -266,6 +266,9 @@ class TravelMapCombatHandler {
      * @param {boolean} missed - Whether the attack missed
      */
     displayDamageText(ship, hullDamage = 0, shieldDamage = 0, destroyed = false, missed = false) {
+        if (hullDamage == 0 && shieldDamage == 0 && !destroyed && !missed) {
+            return
+        }
         if (missed) {
             this.displayTextOverShip(ship, TRAVEL_MAP_CONFIG.floatingTextColors.missed, 'Missed', TRAVEL_MAP_CONFIG.floatingTextDuration, 0)
             return
@@ -383,7 +386,8 @@ class TravelMapCombatHandler {
             return
         }
 
-        const result = gs.combat.executeAction(this.travelMap.selectedShip, attackType, targetShip)
+        // Calculate the result without executing it
+        const result = gs.combat.calculateAction(this.travelMap.selectedShip, attackType, targetShip)
         this.travelMap.selectedShip.actionsRemaining--
         
         console.log('Combat result:', result)
@@ -391,6 +395,9 @@ class TravelMapCombatHandler {
         
         // Display laser beam if it's a laser attack, or animate ram
         if (attackType === 'laser') {
+            // Execute result immediately for laser attacks
+            gs.combat.executeResult(result)
+            
             this.laserHandler.displayLaserBeam(this.travelMap.selectedShip, targetShip, [255, 0, 0, 1], 500)
             
             // Display damage text immediately for laser attacks
@@ -400,13 +407,9 @@ class TravelMapCombatHandler {
                 this.displayDamageText(targetShip, result.hullDamage || 0, result.shieldsAbsorbed || 0, result.destroyed)
             }
         } else if (attackType === 'ram') {
-            // Pass result to animateRam - it will display damage text midway through animation
+            // Pass result to animateRam - it will execute and display damage text midway through animation
             this.ramHandler.animateRam(this.travelMap.selectedShip, targetShip, result)
-            
-            // Display self-damage immediately for ram attacks
-            if (result.selfHullDamage && result.selfHullDamage > 0) {
-                this.displayTextOverShip(this.travelMap.selectedShip, TRAVEL_MAP_CONFIG.floatingTextColors.selfTotalDamage, `-${result.selfHullDamage}`, TRAVEL_MAP_CONFIG.floatingTextDuration, 0)
-            }
+
         }
         
         // Deselect ship if it has no actions remaining

@@ -32,8 +32,6 @@ class Encounter {
         for (const ship of gs.fleet.ships) {
             this.playerShipHullsAtStart.set(ship, ship.hull[0])
         }
-        /** @type {Combat|null} */
-        this.combat = null
     }
 
     calcPlayerHullDamages() {
@@ -70,11 +68,11 @@ class Encounter {
 
     // Getters for accessing combat ships
     get playerShips() {
-        return this.combat ? this.combat.playerShips : []
+        return gs.combat ? gs.combat.playerShips : []
     }
 
     get enemyShips() {
-        return this.combat ? this.combat.enemyShips : []
+        return gs.combat ? gs.combat.enemyShips : []
     }
 
     /**
@@ -118,11 +116,11 @@ class Encounter {
     startCombat(playerHasInitiative = true) {
         console.log('Encounter.startCombat', { playerHasInitiative })
         
-        if (!this.combat) {
-            this.combat = new Combat(gs.fleet, this.fleet)
+        if (!gs.combat) {
+            gs.combat = new Combat(gs.fleet, this.fleet)
         }
         
-        this.combat.start(playerHasInitiative)
+        gs.combat.start(playerHasInitiative)
         this.combatEnabled = true
         
         closeModal()
@@ -236,8 +234,8 @@ class Encounter {
         
         // Create combat if this encounter has combat
         if (this.fleet && this.fleet.ships && this.fleet.ships.length > 0) {
-            this.combat = new Combat(gs.fleet, this.fleet)
-            this.combat.start(true) // Player has initiative by default
+            gs.combat = new Combat(gs.fleet, this.fleet)
+            gs.combat.start(true) // Player has initiative by default
             this.combatEnabled = true
         }
     }
@@ -252,7 +250,7 @@ class Encounter {
             gs.combat.end()
         }
         
-        this.combat = null
+        gs.combat = null
         
         // Trigger fade-out animation if travel map exists
         const travelMap = currentMap && (currentMap instanceof TravelMap) ? currentMap : null

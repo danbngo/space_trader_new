@@ -26,7 +26,7 @@ class Combat {
         this.result = null
         
         /** @type {CombatAI} */
-        this.combatAI = new CombatAI(this)
+        this.combatAI = new CombatAI()
         
         /** @type {Map<Ship, number>} */
         this.playerShipHullsAtStart = new Map()
@@ -216,36 +216,38 @@ class Combat {
     }
 
     /**
-     * Applies damage to a ship, accounting for shields unless penetrating.
+     * Calculates damage to a ship without applying it, accounting for shields unless penetrating.
      * @param {Ship} ship - The ship taking damage
-     * @param {number} damage - Amount of damage to apply
+     * @param {number} damage - Amount of damage to calculate
      * @param {boolean} penetratesShields - If true, damage bypasses shields
      * @returns {Object} - Damage breakdown {shieldDamage, hullDamage, destroyed}
      */
-    applyDamage(ship, damage, penetratesShields = false) {
+    calculateDamage(ship, damage, penetratesShields = false) {
         let shieldDamage = 0;
         let hullDamage = 0;
+        let currentShields = ship.shields[0];
+        let currentHull = ship.hull[0];
         
         if (penetratesShields) {
             // Ram damage goes straight to hull
-            hullDamage = Math.min(damage, ship.hull[0]);
-            ship.hull[0] = Math.max(0, ship.hull[0] - damage);
+            hullDamage = Math.min(damage, currentHull);
+            currentHull = Math.max(0, currentHull - damage);
         } else {
             // Normal damage hits shields first
-            if (ship.shields[0] > 0) {
-                shieldDamage = Math.min(damage, ship.shields[0]);
-                ship.shields[0] -= shieldDamage;
+            if (currentShields > 0) {
+                shieldDamage = Math.min(damage, currentShields);
+                currentShields -= shieldDamage;
                 damage -= shieldDamage;
             }
             
             // Remaining damage goes to hull
             if (damage > 0) {
-                hullDamage = Math.min(damage, ship.hull[0]);
-                ship.hull[0] = Math.max(0, ship.hull[0] - damage);
+                hullDamage = Math.min(damage, currentHull);
+                currentHull = Math.max(0, currentHull - damage);
             }
         }
         
-        const destroyed = ship.hull[0] <= 0;
+        const destroyed = currentHull <= 0;
         
         return {
             shieldDamage,
@@ -256,12 +258,12 @@ class Combat {
     }
 
     /**
-     * Executes a laser attack from attacker to defender.
+     * Calculates a laser attack from attacker to defender without applying damage.
      * @param {Ship} attacker - The attacking ship
      * @param {Ship} defender - The defending ship
      * @returns {Object} - Result of the attack {hit, damage, destroyed, message}
      */
-    executeLaserAttack(attacker, defender) {
+    calculateLaserAttack(attacker, defender) {
         // Check if attacker has lasers
         if (attacker.lasers <= 0) {
             return {
@@ -290,8 +292,8 @@ class Combat {
         const variance = baseDamage * 0.3; // ±30% variance
         const damage = Math.ceil(baseDamage + (Math.random() * variance * 2 - variance));
         
-        // Apply damage
-        const result = this.applyDamage(defender, damage, false);
+        // Calculate damage (without applying)
+        const result = this.calculateDamage(defender, damage, false);
         
         let message = `${attacker.name} fires lasers at ${defender.name}! `;
         if (result.shieldDamage > 0) {
@@ -315,13 +317,13 @@ class Combat {
     }
 
     /**
-     * Executes a ramming attack from attacker to defender.
+     * Calculates a ramming attack from attacker to defender without applying damage.
      * Rams penetrate shields but also damage the attacker.
      * @param {Ship} attacker - The ramming ship
      * @param {Ship} defender - The ship being rammed
      * @returns {Object} - Result of the ram {damage, selfTotalDamage, destroyed, message}
      */
-    executeRam(attacker, defender) {
+    calculateRam(attacker, defender) {
         // Calculate ram damage based on engine power
         const baseDamage = attacker.engine; // Engine * 2 as ram damage
         const variance = baseDamage * 0.2; // ±20% variance
@@ -330,11 +332,11 @@ class Combat {
         // Calculate self-damage (30% of ram damage)
         const selfTotalDamage = Math.ceil(damage * 0.3);
         
-        // Apply damage to defender (penetrates shields)
-        const defenderResult = this.applyDamage(defender, damage, true);
+        // Calculate damage to defender (penetrates shields)
+        const defenderResult = this.calculateDamage(defender, damage, true);
         
-        // Apply self-damage to attacker
-        const attackerResult = this.applyDamage(attacker, selfTotalDamage, true);
+        // Calculate self-damage to attacker
+        const attackerResult = this.calculateDamage(attacker, selfTotalDamage, true);
         
         let message = `${attacker.name} rams ${defender.name}! `;
         message += `${defender.name} takes ${defenderResult.hullDamage} hull damage! `;
@@ -359,12 +361,12 @@ class Combat {
         };
     }
     /**
-     * Attempts to flee from combat.
+     * Calculates flee attempt without modifying ship state.
      * @param {Ship} ship - The ship attempting to flee
      * @param {boolean} enemyIsRamming - Whether an enemy is ramming this turn
      * @returns {Object} - Result {escaped, message}
      */
-    executeFlee(ship, enemyIsRamming = false) {
+    calculateFlee(ship, enemyIsRamming = false) {
         // Base flee chance is 50%, modified by engine power
         let fleeChance = 0.5 + (ship.engine * 0.01); // +1% per engine point
         
@@ -378,7 +380,6 @@ class Combat {
         const escaped = Math.random() < fleeChance;
         
         if (escaped) {
-            ship.escaped = true;
             return {
                 escaped: true,
                 message: `${ship.name} successfully escapes from combat!`
@@ -392,11 +393,11 @@ class Combat {
     }
 
     /**
-     * Recharges a ship's shields based on engine power.
+     * Calculates shield recharge amount based on engine power without applying it.
      * @param {Ship} ship - The ship recharging shields
      * @returns {Object} - Result {amount, message}
      */
-    rechargeShields(ship) {
+    calculateRechargeShields(ship) {
         if (ship.shields[0] >= ship.shields[1]) {
             return {
                 amount: 0,
@@ -408,21 +409,19 @@ class Combat {
         const rechargeAmount = Math.ceil(ship.engine * 0.2);
         const actualRecharge = Math.min(rechargeAmount, ship.shields[1] - ship.shields[0]);
         
-        ship.shields[0] += actualRecharge;
-        
         return {
             amount: actualRecharge,
-            message: `${ship.name} recharges shields by ${actualRecharge}. (${ship.shields[0]}/${ship.shields[1]})`
+            message: `${ship.name} recharges shields by ${actualRecharge}. (${ship.shields[0] + actualRecharge}/${ship.shields[1]})`
         };
     }
 
     /**
-     * Recharges a ship's lasers based on engine power.
+     * Calculates laser recharge (currently lasers are static, so no actual recharge).
      * Note: Lasers are now a static damage value, so this just returns a message.
      * @param {Ship} ship - The ship recharging lasers
      * @returns {Object} - Result {amount, message}
      */
-    rechargeLasers(ship) {
+    calculateRechargeLasers(ship) {
         return {
             amount: 0,
             message: `${ship.name} powers up weapons systems.`
@@ -430,18 +429,18 @@ class Combat {
     }
 
     /**
-     * Executes an action and returns the result
+     * Calculates an action result without executing it
      * @param {Ship} ship - The ship performing the action
      * @param {string} action - 'laser', 'ram', 'evade', 'recharge', 'flee'
      * @param {Ship} [target] - The target ship (if applicable)
      * @returns {CombatResult}
      */
-    executeAction(ship, action, target = null) {
+    calculateAction(ship, action, target = null) {
         let result
 
         switch (action) {
             case 'laser':
-                result = this.executeLaserAttack(ship, target)
+                result = this.calculateLaserAttack(ship, target)
                 return new CombatResult({
                     attacker: ship,
                     defender: target,
@@ -451,11 +450,11 @@ class Combat {
                     damage: result.damage || 0,
                     shieldsAbsorbed: result.shieldsAbsorbed || 0,
                     hullDamage: result.hullDamage || 0,
-                    destroyed: target && target.hull[0] <= 0
+                    destroyed: result.destroyed
                 })
 
             case 'ram':
-                result = this.executeRam(ship, target)
+                result = this.calculateRam(ship, target)
                 return new CombatResult({
                     attacker: ship,
                     defender: target,
@@ -466,12 +465,12 @@ class Combat {
                     hullDamage: result.hullDamage || 0,
                     shieldsAbsorbed: result.shieldsAbsorbed || 0,
                     selfHullDamage: result.selfHullDamage || 0,
-                    destroyed: target && target.hull[0] <= 0
+                    destroyed: result.destroyed
                 })
 
             case 'recharge':
-                const shieldResult = this.rechargeShields(ship)
-                const laserResult = this.rechargeLasers(ship)
+                const shieldResult = this.calculateRechargeShields(ship)
+                const laserResult = this.calculateRechargeLasers(ship)
                 let message = ''
                 if (shieldResult.amount > 0) {
                     message += shieldResult.message
@@ -494,7 +493,7 @@ class Combat {
 
             case 'flee':
                 // Simplified - assume no enemy ramming for now
-                result = this.executeFlee(ship, false)
+                result = this.calculateFlee(ship, false)
                 return new CombatResult({
                     attacker: ship,
                     action: 'flee',
@@ -510,6 +509,70 @@ class Combat {
                     success: false,
                     message: 'Invalid action'
                 })
+        }
+    }
+
+    /**
+     * Executes an action and applies the result immediately (legacy method)
+     * @param {Ship} ship - The ship performing the action
+     * @param {string} action - 'laser', 'ram', 'evade', 'recharge', 'flee'
+     * @param {Ship} [target] - The target ship (if applicable)
+     * @returns {CombatResult}
+     */
+    executeAction(ship, action, target = null) {
+        const result = this.calculateAction(ship, action, target)
+        this.executeResult(result)
+        return result
+    }
+
+    /**
+     * Executes a combat result by applying its effects to ship stats
+     * @param {CombatResult} result - The combat result to execute
+     */
+    executeResult(result) {
+        if (!result) return
+        
+        switch (result.action) {
+            case 'laser':
+                if (result.success && result.defender) {
+                    // Apply shield damage
+                    if (result.shieldsAbsorbed > 0) {
+                        result.defender.shields[0] = Math.max(0, result.defender.shields[0] - result.shieldsAbsorbed)
+                    }
+                    // Apply hull damage
+                    if (result.hullDamage > 0) {
+                        result.defender.hull[0] = Math.max(0, result.defender.hull[0] - result.hullDamage)
+                    }
+                }
+                break
+                
+            case 'ram':
+                if (result.defender) {
+                    // Apply damage to defender (hull only since ram penetrates shields)
+                    if (result.hullDamage > 0) {
+                        result.defender.hull[0] = Math.max(0, result.defender.hull[0] - result.hullDamage)
+                    }
+                }
+                if (result.attacker && result.selfHullDamage > 0) {
+                    // Apply self-damage to attacker
+                    result.attacker.hull[0] = Math.max(0, result.attacker.hull[0] - result.selfHullDamage)
+                }
+                break
+                
+            case 'recharge':
+                if (result.attacker && result.shieldsRecharged > 0) {
+                    result.attacker.shields[0] = Math.min(
+                        result.attacker.shields[1],
+                        result.attacker.shields[0] + result.shieldsRecharged
+                    )
+                }
+                break
+                
+            case 'flee':
+                if (result.escaped && result.attacker) {
+                    result.attacker.escaped = true
+                }
+                break
         }
     }
 
