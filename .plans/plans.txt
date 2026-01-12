@@ -2,6 +2,7 @@ DONE:
 
 
 TODO:
+-check if player ships (non disabled) have enough room for cargo after a battle, if not dump some
 -the ENTIRETY of combat.js needs to be tweaked, rebalanced
 -test new travel, encounter, combat systems. get em working.
 -fix craters collapsing bug

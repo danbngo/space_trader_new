@@ -354,9 +354,11 @@ class Encounter {
         // End combat if active
         if (gs.combat) {
             gs.combat.end()
+            gs.combat = null
         }
-        
-        gs.combat = null
+
+        if (currentModal) closeModal()
+        if (!gs.location) checkPlayerStranded() //dont check this if player already docked (likely involuntarily)
         
         // Trigger fade-out animation if travel map exists
         const travelMap = currentMap && (currentMap instanceof TravelMap) ? currentMap : null
@@ -364,14 +366,10 @@ class Encounter {
             travelMap.fadeOutEnemyShips(() => {
                 // After fade-out completes, fully end encounter
                 gs.encounter = undefined
-                closeModal()
-                checkPlayerStranded()
             })
         } else {
             // No fade-out available, end immediately
             gs.encounter = undefined
-            closeModal()
-            checkPlayerStranded()
         }
     }
 

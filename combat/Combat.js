@@ -658,9 +658,11 @@ class Combat {
     end() {
         console.log('Combat.end')
         
-        // Restore all shields for player ships
+        // Restore all shields for player ships and reset combat state
         for (const ship of this.playerShips) {
             ship.restoreShields()
+            ship.escaped = false
+            ship.actionsRemaining = 1
         }
         
         gs.combat = null
