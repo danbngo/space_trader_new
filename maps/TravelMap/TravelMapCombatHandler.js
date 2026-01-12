@@ -16,6 +16,7 @@ class TravelMapCombatHandler {
         // Targeting state
         this.targetingShip = null
         this.targetedShips = new Set()
+        this.targetingMode = null // 'laser', 'ram', or null
     }
 
     /**
@@ -49,9 +50,9 @@ class TravelMapCombatHandler {
      * @param {HTMLElement|Element} infoElement
      */
     updateShipInfo(infoElement) {
-        const {selectedPlayerShip} = this.travelMap
-        console.log('updating ship info:',infoElement, selectedPlayerShip)
-        if (!selectedPlayerShip) {
+        const {selectedShip} = this.travelMap
+        console.log('updating ship info:',infoElement, selectedShip)
+        if (!selectedShip) {
             infoElement.innerHTML = ''//Select ships to begin combat'
             return
         }
@@ -60,9 +61,9 @@ class TravelMapCombatHandler {
         
         infoElement.appendChild(ce({
             children: [
-                `<u>${selectedPlayerShip.shipType.name}</u>`,
-                `Hull: ${selectedPlayerShip.hull[0]}/${selectedPlayerShip.hull[1]} | 
-                Shields: ${selectedPlayerShip.shields[0]}/${selectedPlayerShip.shields[1]}`
+                `<u>${coloredName(selectedShip.fleet)} ${selectedShip.shipType.name}</u>`,
+                this.targetingMode ? `Hull: ${selectedShip.hull[0]}/${selectedShip.hull[1]} | 
+                Shields: ${selectedShip.shields[0]}/${selectedShip.shields[1]}` : ''
             ]
         }))
     }
@@ -72,7 +73,8 @@ class TravelMapCombatHandler {
      * @returns {HTMLElement}
      */
     createActionButtons() {
-        const {selectedPlayerShip, targetingMode} = this.travelMap
+        const {selectedShip} = this.travelMap
+        const {targetingMode} = this
         
         const buttonContainer = ce({classNames: ['travel-action-buttons']})
         
@@ -80,7 +82,7 @@ class TravelMapCombatHandler {
         if (targetingMode) {
             const targetingLabel = targetingMode === 'laser' ? 'Targeting Laser' : 'Targeting Ram'
             buttonContainer.appendChild(ce({
-                innerHTML: `<strong>${targetingLabel}</strong> - Select an enemy ship`,
+                innerHTML: `<strong>${targetingLabel}</strong> - Select a target`,
                 classNames: ['targeting-mode-label']
             }))
             buttonContainer.appendChild(ce({
@@ -90,43 +92,51 @@ class TravelMapCombatHandler {
             }))
             return buttonContainer
         }
+
+        if (!gs.fleet.ships.includes(selectedShip)) {
+            return buttonContainer
+        }
         
-        if (!selectedPlayerShip || selectedPlayerShip.disabled) {
+        if (!selectedShip || selectedShip.disabled) {
             buttonContainer.appendChild(ce({
                 innerHTML: '(Select a ship)',
             }))
             return buttonContainer
         }
-        
+
         // Check if ship has actions remaining
-        const noActionsLeft = selectedPlayerShip.actionsRemaining <= 0
+        const noActionsLeft = selectedShip.actionsRemaining <= 0
+        if (noActionsLeft) {
+            buttonContainer.appendChild(ce({
+                innerHTML: '(No actions remaining)',
+            }))
+            return buttonContainer
+        }
         
         // Check if shields are full for recharge button
-        const shieldsFull = selectedPlayerShip.shields[0] >= selectedPlayerShip.shields[1]
+        const shieldsFull = selectedShip.shields[0] >= selectedShip.shields[1]
         
         // Create all action buttons
         buttonContainer.appendChild(ce({
             tag: 'button',
             innerHTML: 'Laser',
-            disabled: selectedPlayerShip.lasers <= 0 || noActionsLeft,
+            disabled: selectedShip.lasers <= 0,
             onClick: () => this.laserHandler.handleLaserAttack()
         }))
         buttonContainer.appendChild(ce({
             tag: 'button',
             innerHTML: 'Ram',
-            disabled: noActionsLeft,
             onClick: () => this.ramHandler.handleRam()
         }))
         buttonContainer.appendChild(ce({
             tag: 'button',
             innerHTML: 'Recharge',
-            disabled: shieldsFull || noActionsLeft,
+            disabled: shieldsFull,
             onClick: () => this.rechargeHandler.handleRecharge()
         }))
         buttonContainer.appendChild(ce({
             tag: 'button',
             innerHTML: 'Flee',
-            disabled: noActionsLeft,
             onClick: () => this.handleFlee()
         }))
         
@@ -137,7 +147,7 @@ class TravelMapCombatHandler {
      * Handles canceling targeting mode
      */
     handleCancelTargeting() {
-        this.travelMap.targetingMode = null
+        this.targetingMode = null
         this.targetingShip = null
         this.targetedShips.clear()
         this.travelMap.updateUIPanel() // Refresh to show normal UI
@@ -154,11 +164,11 @@ class TravelMapCombatHandler {
      * Handles flee action
      */
     handleFlee() {
-        const {selectedPlayerShip} = this.travelMap
-        if (!selectedPlayerShip) return
+        const {selectedShip} = this.travelMap
+        if (!selectedShip) return
         
-        const result = gs.combat.executeAction(selectedPlayerShip, 'flee')
-        selectedPlayerShip.actionsRemaining--
+        const result = gs.combat.executeAction(selectedShip, 'flee')
+        selectedShip.actionsRemaining--
         
         if (result.escaped) {
             // Update combat result and check if all ships escaped
@@ -170,8 +180,8 @@ class TravelMapCombatHandler {
         }
         
         // Deselect ship if it has no actions remaining
-        if (selectedPlayerShip.actionsRemaining <= 0) {
-            this.travelMap.selectedPlayerShip = null
+        if (selectedShip.actionsRemaining <= 0) {
+            this.travelMap.selectedShip = null
         }
         
         this.handleActionComplete()
@@ -300,35 +310,31 @@ class TravelMapCombatHandler {
         console.log('Ship clicked:', ship.shipType.name, 'Fleet:', ship.fleet?.name, 'Mirror:', shipGroupConfig.mirror)
         if (!gs.fleet.ships.includes(ship)) {
             // Enemy ship clicked
-            console.log('Enemy ship clicked, targetingMode:', this.travelMap.targetingMode)
-            if (this.travelMap.targetingMode) {
+            console.log('Enemy ship clicked, targetingMode:', this.targetingMode)
+            if (this.targetingMode) {
                 // Player is targeting this enemy ship for an attack
-                if (ship.disabled) {
+                if (ship.disabled || !this.targetedShips.has(ship)) {
                     return
                 }
                 
-                const attackType = this.travelMap.targetingMode
-                this.travelMap.targetingMode = null // Clear targeting mode
+                const attackType = this.targetingMode
+                this.targetingMode = null // Clear targeting mode
                 this.targetingShip = null
                 this.targetedShips.clear()
                 
                 // Execute the attack
                 this.performAttack(attackType, ship)
             }
-        } else {
-            // Player ship clicked
-            // Don't allow selection if ship has no actions remaining
-            if (ship.actionsRemaining <= 0) {
-                console.log('Ship has no actions remaining:', ship.shipType.name)
-                return
+            else {
+                this.travelMap.selectedShip = ship
             }
-            
-            console.log('Setting selectedPlayerShip to:', ship.shipType.name)
-            this.travelMap.selectedPlayerShip = ship
+        } else {
+            console.log('Setting selectedShip to:', ship.shipType.name)
+            this.travelMap.selectedShip = ship
             
             // Update UI panel to reflect selection
-            this.travelMap.updateUIPanel()
         }
+        this.travelMap.updateUIPanel()
     }
 
     /**
@@ -337,14 +343,18 @@ class TravelMapCombatHandler {
      * @param {Ship} targetShip - The ship being attacked
      */
     performAttack(attackType, targetShip) {
-        const result = gs.combat.executeAction(this.travelMap.selectedPlayerShip, attackType, targetShip)
-        this.travelMap.selectedPlayerShip.actionsRemaining--
+        if (!this.travelMap.selectedShip || !gs.fleet.ships.includes(this.travelMap.selectedShip)) {
+            return
+        }
+
+        const result = gs.combat.executeAction(this.travelMap.selectedShip, attackType, targetShip)
+        this.travelMap.selectedShip.actionsRemaining--
         
         // Display laser beam if it's a laser attack, or animate ram
         if (attackType === 'laser') {
-            this.laserHandler.displayLaserBeam(this.travelMap.selectedPlayerShip, targetShip, [255, 0, 0, 1], 500)
+            this.laserHandler.displayLaserBeam(this.travelMap.selectedShip, targetShip, [255, 0, 0, 1], 500)
         } else if (attackType === 'ram') {
-            this.ramHandler.animateRam(this.travelMap.selectedPlayerShip, targetShip, 600)
+            this.ramHandler.animateRam(this.travelMap.selectedShip, targetShip, 600)
         }
         
         console.log('Combat result:', result)
@@ -372,12 +382,12 @@ class TravelMapCombatHandler {
         
         // Display self-damage for ram attacks
         if (attackType === 'ram' && result.selfHullDamage && result.selfHullDamage > 0) {
-            this.displayTextOverShip(this.travelMap.selectedPlayerShip, TRAVEL_MAP_CONFIG.floatingTextColors.selfDamage, `-${result.selfHullDamage}`, TRAVEL_MAP_CONFIG.floatingTextDuration, 0)
+            this.displayTextOverShip(this.travelMap.selectedShip, TRAVEL_MAP_CONFIG.floatingTextColors.selfDamage, `-${result.selfHullDamage}`, TRAVEL_MAP_CONFIG.floatingTextDuration, 0)
         }
         
         // Deselect ship if it has no actions remaining
-        if (this.travelMap.selectedPlayerShip.actionsRemaining <= 0) {
-            this.travelMap.selectedPlayerShip = null
+        if (this.travelMap.selectedShip.actionsRemaining <= 0) {
+            this.travelMap.selectedShip = null
         }
         
         if (result.success || attackType === 'ram') {

@@ -95,10 +95,10 @@ class TravelMapShipHandler {
             shipObj.darkenRatio = 1; //darkest ships are disabled ones
         }
         shipObj.darkenRatio = 0 //default = no darken
-        if (this.travelMap.selectedPlayerShip === ship) {
+        if (this.travelMap.selectedShip === ship) {
             shipObj.darkenRatio = -0.5 //lighten selected player ship
         }
-        else if (this.travelMap.targetingMode) {
+        else if (this.travelMap.combatHandler.targetingMode) {
             if (isPlayerShip) {
                 shipObj.darkenRatio = 0.5 //darken other player ships while targeting
             }
@@ -120,44 +120,6 @@ class TravelMapShipHandler {
         }
         else {
             shipObj.outlineColor = null
-        }
-    }
-
-
-    /**
-     * Applies click handlers to a ship canvas object based on ship type and state
-     * @param {CanvasObject} shipObj - The ship's canvas object
-     * @param {Ship} ship - The ship entity
-     * @param {ShipGroupConfig} shipGroupConfig - Configuration for this ship's group
-     */
-    applyShipClickFunctions(shipObj, ship, shipGroupConfig) {
-        const onClick = () => {
-            this.travelMap.combatHandler.onClickShip(ship, shipGroupConfig)
-        }
-        
-        if (shipGroupConfig.mirror) {
-            // Enemy ships: only clickable during targeting mode
-            if (this.travelMap.targetingMode) {
-                if (!shipObj.onClick) {
-                    shipObj.onClick = onClick
-                }
-            } else {
-                // Not in targeting mode - disable enemy ship clicks
-                shipObj.onClick = null
-                shipObj.onHover = null
-                shipObj.onHoverEnd = null
-            }
-        } else {
-            // Player ships: handle based on actionsRemaining
-            if (ship.actionsRemaining <= 0 || this.travelMap.targetingMode) {
-                // Disable interactions for ships with no actions or during targeting
-                shipObj.onClick = null
-                shipObj.onHover = null
-                shipObj.onHoverEnd = null
-            } else if (!shipObj.onClick) {
-                // Re-enable interactions if they were disabled
-                shipObj.onClick = onClick
-            }
         }
     }
 
@@ -188,6 +150,7 @@ class TravelMapShipHandler {
                 shipObj = ship.shipType.shipShape.addCanvasObject(`ship-${ship.uuid}`, this.travelMap.cvs, shipColor, shipSize, shipGroupConfig.mirror)
                 // Set smaller hit radius for more precise clicking
                 shipObj.hitRadius = TRAVEL_MAP_CONFIG.shipHitRadius
+                shipObj.onClick = ()=>this.travelMap.combatHandler.onClickShip(ship, shipGroupConfig)
             } else {
                 throw new Error('ship must have a shipshape')
             }
@@ -207,20 +170,17 @@ class TravelMapShipHandler {
         }
 
         // Update ship position and interactions
-        if (shipObj) {
-            shipObj.x = jitteredX
-            shipObj.y = jitteredY
-            
-            // Update onClick handler based on ship type and state
-            this.applyShipClickFunctions(shipObj, ship, shipGroupConfig)
-            this.applyShipColorModifications(ship, shipObj, shipGroupConfig)
-        }
+        shipObj.x = jitteredX
+        shipObj.y = jitteredY
+        
+        // Update onClick handler based on ship type and state
+        this.applyShipColorModifications(ship, shipObj, shipGroupConfig)
         
         // Update thruster position, size, and color with flicker effect
         this.updateThruster(ship, jitteredX, jitteredY, shipSize, shipGroupConfig)
         
         // Update progress bars (only show during encounters)
-        if (shipObj && gs.encounter) {
+        if (gs.encounter) {
             this.addShipProgressBars(ship, shipObj, shipGroupConfig)
         }
     }
@@ -530,7 +490,7 @@ class TravelMapShipHandler {
         
         // Update selected ships if in combat
         if (gs.combat) {
-            this.travelMap.selectedPlayerShip = gs.combat.activePlayerShips?.[0] || null
+            this.travelMap.selectedShip = gs.combat.activePlayerShips?.[0] || null
         }
     }
 

@@ -14,16 +14,14 @@ class TravelMapCombatRechargeHandler {
      * Handles recharge action
      */
     handleRecharge() {
-        const {selectedPlayerShip} = this.travelMap
-        if (!selectedPlayerShip) return
-        
-        const result = gs.combat.executeAction(selectedPlayerShip, 'recharge')
-        selectedPlayerShip.actionsRemaining--
+        const {selectedShip} = this.travelMap
+        const result = gs.combat.executeAction(selectedShip, 'recharge')
+        selectedShip.actionsRemaining--
         
         // Display amount recharged over ship
         if (result.shieldsRecharged && result.shieldsRecharged > 0) {
             this.combatHandler.displayTextOverShip(
-                selectedPlayerShip, 
+                selectedShip, 
                 TRAVEL_MAP_CONFIG.floatingTextColors.shieldDamage, 
                 `+${result.shieldsRecharged}`, 
                 TRAVEL_MAP_CONFIG.floatingTextDuration, 
@@ -32,11 +30,11 @@ class TravelMapCombatRechargeHandler {
         }
         
         // Animate recharge visual effect
-        this.animateRecharge(selectedPlayerShip)
+        this.animateRecharge(selectedShip)
         
         // Deselect ship if it has no actions remaining
-        if (selectedPlayerShip.actionsRemaining <= 0) {
-            this.travelMap.selectedPlayerShip = null
+        if (selectedShip.actionsRemaining <= 0) {
+            this.travelMap.selectedShip = null
         }
         
         this.combatHandler.handleActionComplete()

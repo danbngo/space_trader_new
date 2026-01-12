@@ -34,7 +34,6 @@ class TravelMapRouteHandler {
         // Update UI elements
         this.updateProgressBar(progressPercent)
         this.updateDistanceDisplay()
-        this.updateETADisplay()
         
         // Roll for encounter
         this.checkForEncounter()
@@ -60,18 +59,9 @@ class TravelMapRouteHandler {
      * Updates the distance display UI element
      */
     updateDistanceDisplay() {
-        if (this.travelMap.routeDistanceEl && gs.destination && gs.fleet) {
+        if (this.distanceContainer && gs.destination && gs.fleet) {
             const currentDistance = calcDistance(gs.fleet.x, gs.fleet.y, gs.destination.x, gs.destination.y)
-            this.travelMap.routeDistanceEl.innerHTML = `Distance: ${roundToPlaces(currentDistance, 1)} AU`
-        }
-    }
-
-    /**
-     * Updates the ETA display UI element
-     */
-    updateETADisplay() {
-        if (this.travelMap.routeETAEl) {
-            this.travelMap.routeETAEl.innerHTML = `ETA: ${describeTimespan(Math.max(0, gs.travelYearsRemaining), 1)}`
+            this.distanceContainer.innerHTML = `Distance: ${roundToPlaces(currentDistance, 1)} AU | ETA: ${describeTimespan(gs.travelYearsRemaining || 0, 1)}`
         }
     }
 
@@ -171,21 +161,10 @@ class TravelMapRouteHandler {
         panel.appendChild(planetImagesContainer)
         
         // Travel stats container
-        const statsContainer = ce({classNames: ['route-stats']})
-        
-        // Distance
-        this.travelMap.routeDistanceEl = ce({
-            innerHTML: `Distance: ${distance} AU`
+        this.distanceContainer = ce({
+            innerHTML: `Distance: ${distance} AU  | ETA: ${describeTimespan(gs.travelYearsRemaining || 0, 1)}`
         })
-        statsContainer.appendChild(this.travelMap.routeDistanceEl)
-        
-        // ETA Remaining
-        this.travelMap.routeETAEl = ce({
-            innerHTML: `ETA: ${describeTimespan(gs.travelYearsRemaining || 0, 1)}`
-        })
-        statsContainer.appendChild(this.travelMap.routeETAEl)
-        
-        panel.appendChild(statsContainer)
+        panel.appendChild(this.distanceContainer)
         
         // Create progress bar using ProgressBar class
         this.travelMap.routeProgressBar = new ProgressBar({

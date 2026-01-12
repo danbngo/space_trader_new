@@ -101,14 +101,6 @@
     margin-bottom: 5px;
 }
 
-.route-stats {
-    display: flex;
-    gap: 20px;
-    color: #aaa;
-    font-size: 14px;
-    margin-bottom: 10px;
-}
-
 .route-cancel-button {
     padding: 10px 20px;
     background-color: #660000;

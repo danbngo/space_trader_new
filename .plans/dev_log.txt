@@ -20,6 +20,10 @@ another feature. actually review the agent's code to make sure it isn't just cre
 -a small investment up front is worth it. check the AI's work to make sure it isn't going off the rails. once it starts to GROK what you're doing
 the efficiency goes way up over the long term.
 
+-AI is great at delivering new features but along the way, IT MAKES DESIGN CHOICES. usually those choices are not what i would've done.
+it's best for me to lay the groundwork as much as possible when creating new features ESPECIALLY UI.
+AI is very good for "filling in the gaps" from there.
+
 
 PROJECT PLANNING TIPS:
 -get feedback early and often. timmi's one little comment about pixel art made me question a bunch of core assumptions about my game and

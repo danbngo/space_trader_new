@@ -14,15 +14,10 @@ class TravelMapCombatLaserHandler {
      * Handles laser attack action
      */
     handleLaserAttack() {
-        const {selectedPlayerShip} = this.travelMap
-        
-        if (!selectedPlayerShip) {
-            return
-        }
-        
+        const {selectedShip} = this.travelMap
         // Enter targeting mode
-        this.travelMap.targetingMode = 'laser'
-        this.combatHandler.targetingShip = selectedPlayerShip
+        this.combatHandler.targetingMode = 'laser'
+        this.combatHandler.targetingShip = selectedShip
         
         // Populate valid targets (all non-disabled enemy ships)
         this.combatHandler.targetedShips.clear()
@@ -34,7 +29,6 @@ class TravelMapCombatLaserHandler {
             })
         }
         
-        this.travelMap.setupTargetingMode()
         this.travelMap.updateUIPanel() // Refresh to show targeting UI
     }
 

@@ -14,15 +14,10 @@ class TravelMapCombatRamHandler {
      * Handles ram action
      */
     handleRam() {
-        const {selectedPlayerShip} = this.travelMap
-        
-        if (!selectedPlayerShip) {
-            return
-        }
-        
+        const {selectedShip} = this.travelMap
         // Enter targeting mode
-        this.travelMap.targetingMode = 'ram'
-        this.combatHandler.targetingShip = selectedPlayerShip
+        this.combatHandler.targetingMode = 'ram'
+        this.combatHandler.targetingShip = selectedShip
         
         // Populate valid targets (all non-disabled enemy ships)
         this.combatHandler.targetedShips.clear()
@@ -34,7 +29,6 @@ class TravelMapCombatRamHandler {
             })
         }
         
-        this.travelMap.setupTargetingMode()
         this.travelMap.updateUIPanel() // Refresh to show targeting UI
     }
 

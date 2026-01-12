@@ -19,16 +19,11 @@ class TravelMap extends BaseMap {
         super()
         console.log('CREATING TRAVEL MAP')
         
-        this.selectedPlayerShip = null
+        this.selectedShip = null
         this.routeAnimationFrame = null
         this.routeProgress = 0
         this.routeProgressBar = null
-        this.targetingMode = null // 'laser', 'ram', or null
         this.animations = [] // Active animations (Loop instances)
-        
-        // Route travel UI element references (set by route handler)
-        this.routeDistanceEl = null
-        this.routeETAEl = null
         
         // Track UI state to detect changes
         this.previousUIState = null
@@ -55,6 +50,7 @@ class TravelMap extends BaseMap {
         // Create UI panels (will be updated dynamically)
         this.updateUIPanel()
         this.root.appendChild(this.uiPanel)
+        this.statsContainer = null;
         
         // Initialize tick system
         this.lastTickMs = Date.now()
@@ -177,24 +173,6 @@ class TravelMap extends BaseMap {
             }
             this.uiPanel = newPanel
         }
-    }
-    
-    /**
-     * Sets up targeting mode - brightens enemy ships for targeting, keeps selected ship bright
-     */
-    setupTargetingMode() {
-        if (!gs.encounter || !gs.encounter.fleet || !gs.encounter.fleet.ships) return
-        
-        // Handle player ships during targeting
-        gs.fleet.ships.forEach(ship => {
-            const shipObj = this.cvs.getObject(`ship-${ship.uuid}`)
-            if (shipObj) {
-                // Disable all player ship interactions during targeting
-                shipObj.onClick = null
-                shipObj.onHover = null
-                shipObj.onHoverEnd = null
-            }
-        })
     }
     
     /**
