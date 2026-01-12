@@ -34,51 +34,6 @@ class MerchantsEncounter extends Encounter {
     }
 
     /**
-     * Called when the player surrenders. Override in subclasses.
-     */
-    onSurrender() {
-        const enemyFleet = this.fleet
-        const disabledPlayerShips = this.playerShips.filter(s=>s.disabled)
-        
-        // Merchants might demand cargo or credits as compensation
-        const demandCargo = Math.random() > 0.5 && gs.fleet.cargo.total > 0
-        const demandAmount = demandCargo 
-            ? Math.min(gs.fleet.cargo.total, Math.ceil(Math.random() * 50))
-            : Math.min(gs.credits, Math.ceil(Math.random() * enemyFleet.captain.credits))
-        
-        let msg = `You power down your ships and signal surrender to the ${coloredName(enemyFleet)}.<br/>`
-        
-        if (demandCargo) {
-            if (demandAmount > 0) {
-                const lostCargo = gs.fleet.cargo.randomSubset(demandAmount)
-                gs.fleet.cargo.subtractAmounts(lostCargo)
-                msg += `The merchants demand ${demandAmount} units of cargo as compensation for the attack.<br/>`
-                msg += `They take what they want and depart.<br/>`
-            } else {
-                msg += `The merchants find nothing of value in your holds.<br/>`
-                msg += `They leave you with a stern warning about attacking peaceful traders.<br/>`
-            }
-        } else {
-            if (demandAmount > 0) {
-                gs.credits -= demandAmount
-                msg += `The merchants demand ${demandAmount}CR as compensation for the attack.<br/>`
-                msg += `They transfer the credits and depart.<br/>`
-            } else {
-                msg += `The merchants see you have nothing of value.<br/>`
-                msg += `They leave you with a stern warning about attacking peaceful traders.<br/>`
-            }
-        }
-        
-        if (disabledPlayerShips.length > 0) {
-            msg += `${disabledPlayerShips.length} of your ships were disabled before you could surrender.<br/>`
-        }
-        
-        msg += this.conductRepairs()
-        
-        showModal('Surrender', msg, [['Continue', ()=>this.endEncounter()]])
-    }
-    
-    /**
      * Show initial contact modal with merchant ship
      * Merchant has 50% chance to want to trade, 50% to ignore player
      */
