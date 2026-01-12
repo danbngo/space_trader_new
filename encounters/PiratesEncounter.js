@@ -10,7 +10,7 @@ class PiratesEncounter extends Encounter {
         }
         
         const fleetName = coloredName(this.fleet)
-        const demandsSurrender = (Math.random() > 0.5 || this.enemyUndetected) && !this.alwaysAttack
+        const demandsSurrender = this.alwaysAttack || Math.random() > 0.5 || this.enemyUndetected
         
         let msg = `You encounter ${fleetName}!<br/><br/>`
         

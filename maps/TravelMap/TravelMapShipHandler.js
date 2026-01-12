@@ -178,6 +178,10 @@ class TravelMapShipHandler {
             shipObj.x = jitteredX
             shipObj.y = jitteredY
         }
+        else {
+            shipObj.x = x
+            shipObj.y = y
+        }
         
         // Hide escaped ships
         if (ship.escaped) {

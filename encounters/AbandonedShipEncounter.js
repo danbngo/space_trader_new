@@ -9,6 +9,13 @@ class AbandonedShipEncounter extends Encounter {
         this.undetectedFleet = null
         this.playerUndetected = false
         this.enemyUndetected = false
+        
+        // Disable the abandoned ship fleet (it's derelict)
+        if (this.fleet) {
+            for (const ship of this.fleet.ships) {
+                ship.hull[0] = 0
+            }
+        }
     }
     
     /**
@@ -74,6 +81,14 @@ class AbandonedShipEncounter extends Encounter {
             // Replace current encounter with pirate encounter
             gs.encounter = pirateEncounter
             
+            // Notify TravelMap to clean up old encounter ships and reset config
+            if (currentMap && currentMap.resetNPCShipsConfig) {
+                currentMap.resetNPCShipsConfig()
+            }
+            if (currentMap && currentMap.cleanupRemovedShips) {
+                currentMap.cleanupRemovedShips()
+            }
+            
             // Start the pirate encounter
             pirateEncounter.onStart()
         }]], '', null, 0)
@@ -97,19 +112,12 @@ class AbandonedShipEncounter extends Encounter {
             loot.increment(ct, 1)
         }
         
-        // Random credits
-        const credits = rng(5000, 100)
-        const officersShare = gs.fleet.calcTotalCRShare(credits, true)
-        const finalCredits = credits - officersShare
-        gs.credits += finalCredits
-        
         let msg = `You board the abandoned vessel.<br/>`
         msg += `The crew seems to have evacuated in a hurry...<br/><br/>`
         msg += `Your scanners reveal ${baseLootAmt} units of cargo in the hold.<br/>`
         if (lootAmt > baseLootAmt) {
             msg += `Your salvaging skills allow you to recover an additional ${lootAmt - baseLootAmt} units of cargo.<br/>`
         }
-        msg += `You also find ${finalCredits}CR in the ship's safe${officersShare ? ` (-${officersShare}CR for officers)` : ''}.<br/>`
         
         showModal('Salvage', msg, [
             lootAmt > 0 ? ['Loot', () => showLootMenu(loot)] : ['Continue', () => this.endEncounter()]
