@@ -9,10 +9,9 @@ class Encounter {
      * @param {EncounterType} encounterType - The type of encounter.
      * @param {Planet} planet - The planet where the encounter occurs.
      * @param {Fleet} fleet - The enemy fleet.
-     * @param {Fleet|null} undetectedFleet
      */
-    constructor(encounterType = ENCOUNTER_TYPES_ALL[0], planet, fleet, undetectedFleet) {
-        console.log('Encounter.constructor', { encounterType, planet, fleet, undetectedFleet });
+    constructor(encounterType = ENCOUNTER_TYPES_ALL[0], planet, fleet) {
+        console.log('Encounter.constructor', { encounterType, planet, fleet });
         /** @type {string} */
         this.uuid = generateUUID('encounter_')
         /** @type {EncounterType} */
@@ -22,15 +21,39 @@ class Encounter {
         /** @type {Fleet} */
         this.fleet = fleet;
         /** @type {Fleet|null} */
-        this.undetectedFleet = undetectedFleet;
+        this.undetectedFleet = null;
         /** @type {boolean} */
         this.combatEnabled = false;
-        /** @type {boolean} */
-        this.playerUndetected = undetectedFleet !== gs.fleet
+        
         /** @type {Map<Ship, number>} */
         this.playerShipHullsAtStart = new Map()
         for (const ship of gs.fleet.ships) {
             this.playerShipHullsAtStart.set(ship, ship.hull[0])
+        }
+        this.rollUndetected()
+    }
+
+    rollUndetected() {
+        // Calculate detection based on radar scores
+        if (this.undetectedFleet === null) {
+            // Neither fleet is pre-determined as undetected, calculate based on radars
+            const playerRadar = gs.fleet.totalRadar
+            const enemyRadar = this.fleet.totalRadar
+            const detectionChance = enemyRadar / (playerRadar + enemyRadar) // 0 to 1
+            const playerDetected = Math.random() < detectionChance
+            
+            if (!playerDetected) {
+                // Player avoided detection
+                this.undetectedFleet = gs.fleet
+                this.playerUndetected = true
+                console.log('Player undetected! Radar advantage:', playerRadar, 'vs', enemyRadar)
+            } else {
+                this.playerUndetected = false
+                console.log('Player detected. Enemy radar:', enemyRadar, 'vs player:', playerRadar)
+            }
+        } else {
+            // Use the provided undetectedFleet value
+            this.playerUndetected = (this.undetectedFleet == gs.fleet)
         }
     }
 
@@ -198,8 +221,39 @@ class Encounter {
         console.log('onStart:',this)
         if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
         gs.encounter = this
+        
+        if (this.playerUndetected) {
+            this.showPlayerUndetectedModal()
+        }
+        else {
+            //subclass must implement
+        }
     }
 
+    /**
+     * Shows modal when player is undetected by enemy
+     */
+    showPlayerUndetectedModal() {
+        const fleetName = coloredName(this.fleet)
+        
+        let msg = `Your advanced sensors detect ${fleetName} ahead!<br/>`
+        msg += `They haven't noticed you yet. You have the element of surprise.<br/>`
+        
+        showModal('Undetected', msg, [
+            ['Sneak Attack', () => {
+                this.showPlayerAttackModal()
+            }],
+            ['Avoid', () => {
+                this.endEncounter()
+            }],
+            ['Engage', ()=>{
+                this.playerUndetected = false
+                this.undetectedFleet = null
+                this.onStart()
+            }]
+        ], '', null, 0)
+    }
+    
     /**
      * Called when the player wins the encounter. Override in subclasses.
      */
@@ -228,7 +282,6 @@ class Encounter {
     showPlayerSurrenderedToNeutralsModal() {
         console.log('showPlayerSurrenderedToNeutralsModal');
         const enemyFleet = this.fleet
-        const planet = this.planet
         
         let msg = `You power down your ships and signal surrender to the ${coloredName(enemyFleet)}.<br/>`
         msg += `The ${coloredName(enemyFleet)} conduct a citizen's arrest and transmit your location to local authorities.<br/>`

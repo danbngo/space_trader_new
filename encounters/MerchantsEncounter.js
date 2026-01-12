@@ -5,6 +5,9 @@ class MerchantsEncounter extends Encounter {
      */
     onStart() {
         super.onStart()
+        if (this.playerUndetected) {
+            return
+        }
         const fleetName = coloredName(this.fleet)
         const wantsToTrade = Math.random() > 0.5
         

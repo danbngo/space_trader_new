@@ -260,6 +260,20 @@ class Fleet extends SpaceObject {
         this.ships.push(ship)
         ship.fleet = this
     }
+
+    removeShip(ship) {
+        if (ship === this.flagship) {
+            const newFlagship = this.ships.find(s => s !== ship);
+            this.flagship = newFlagship || null;
+        }
+        const index = this.ships.indexOf(ship);
+        if (index !== -1) {
+            this.ships.splice(index, 1);
+            ship.fleet = null;
+        }
+    }
+
+
     /**
      * Adds an officer to the fleet.
      * @param {Officer} officer - The officer to add.

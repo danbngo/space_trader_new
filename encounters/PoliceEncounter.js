@@ -5,6 +5,9 @@ class PoliceEncounter extends Encounter {
      */
     onStart() {
         super.onStart()
+        if (this.playerUndetected) {
+            return
+        }
         const fleetName = coloredName(this.fleet)
         const wantsToSearch = Math.random() > 0.5
         
