@@ -200,21 +200,27 @@ class TravelMapCombatHandler {
      * Handles action completion - checks turn completion and switches turns if needed
      */
     handleActionComplete() {
+        console.log('=== handleActionComplete called ===')
         // Check if combat should end first
         if (gs.combat.result) {
+            console.log('Combat has ended with result:', gs.combat.result)
             this.showCombatEndModal()
             return
         }
         
+        console.log('Before handleTurnComplete - activeTurnFleet:', gs.combat.activeTurnFleet.name)
         // Let combat handle turn completion
         gs.combat.handleTurnComplete()
+        console.log('After handleTurnComplete - activeTurnFleet:', gs.combat.activeTurnFleet.name)
         
         // If it's now enemy turn, execute AI after a brief delay
         if (gs.combat.activeTurnFleet === gs.combat.enemyFleet) {
+            console.log('Detected enemy turn, scheduling enemy turn execution in 1s')
             setTimeout(() => {
                 this.executeEnemyTurn()
             }, 1000)
         } else {
+            console.log('Still player turn, refreshing display')
             // Refresh display for player's turn
             this.travelMap.refresh()
         }
@@ -224,15 +230,57 @@ class TravelMapCombatHandler {
      * Executes enemy AI turn
      */
     executeEnemyTurn() {
-        const results = gs.combat.executeEnemyTurn()
-        // Check if combat ended
-        if (gs.combat.result) {
-            this.showCombatEndModal()
-            return
+        console.log('=== executeEnemyTurn called ===')
+        const actions = gs.combat.executeEnemyTurn()
+        console.log('Enemy turn actions:', actions)
+        
+        // Animate each action
+        for (const action of actions) {
+            if (action.action === 'laser') {
+                console.log('Animating enemy laser from', action.ship.name, 'to', action.target.name)
+                this.laserHandler.animateLaser(action.ship, action.target, action.result)
+            } else if (action.action === 'ram') {
+                console.log('Animating enemy ram from', action.ship.name, 'to', action.target.name)
+                this.ramHandler.animateRam(action.ship, action.target, action.result)
+            } else if (action.action === 'recharge') {
+                console.log('Enemy recharging:', action.ship.name)
+                // Execute recharge immediately (no animation)
+                gs.combat.executeResult(action.result)
+            }
         }
         
-        // Refresh the display for player turn
-        this.travelMap.refresh()
+        // Wait for enemy animations to complete before continuing
+        this.waitForEnemyAnimationsThenContinue()
+    }
+
+    /**
+     * Waits for enemy animations to complete, then continues turn
+     */
+    waitForEnemyAnimationsThenContinue() {
+        // Check if any enemy ships are still acting (animating)
+        const anyActing = gs.combat.enemyShips.some(ship => ship.acting)
+        console.log('=== waitForEnemyAnimationsThenContinue ===', { anyActing, actingShips: gs.combat.enemyShips.filter(s => s.acting).map(s => s.name) })
+        
+        if (anyActing) {
+            // Wait and check again
+            setTimeout(() => {
+                this.waitForEnemyAnimationsThenContinue()
+            }, 100)
+        } else {
+            console.log('All enemy animations complete')
+            // Check if combat ended
+            if (gs.combat.result) {
+                console.log('Combat ended after enemy turn with result:', gs.combat.result)
+                this.showCombatEndModal()
+                return
+            }
+            
+            console.log('Enemy animations complete, switching back to player turn')
+            // Switch back to player turn
+            gs.combat.handleTurnComplete()
+            // Refresh the display for player turn
+            this.travelMap.refresh()
+        }
     }
 
     /**
@@ -413,8 +461,29 @@ class TravelMapCombatHandler {
             this.travelMap.selectedShip = null
         }
         
-        this.handleActionComplete()
+        // Wait for animations to complete before handling action completion
+        this.waitForAnimationsThenComplete()
         this.travelMap.updateUIPanel()
+    }
+
+    /**
+     * Waits for all combat animations to complete, then handles action completion
+     */
+    waitForAnimationsThenComplete() {
+        // Check if any player ships are still acting (animating)
+        const anyActing = gs.fleet.ships.some(ship => ship.acting)
+        console.log('=== waitForAnimationsThenComplete ===', { anyActing, actingShips: gs.fleet.ships.filter(s => s.acting).map(s => s.name) })
+        
+        if (anyActing) {
+            // Wait and check again
+            setTimeout(() => {
+                this.waitForAnimationsThenComplete()
+            }, 100)
+        } else {
+            // All animations complete, handle action completion
+            console.log('All animations complete, calling handleActionComplete')
+            this.handleActionComplete()
+        }
     }
 
 }

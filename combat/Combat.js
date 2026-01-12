@@ -131,11 +131,18 @@ class Combat {
      */
     isTurnComplete() {
         const activeFleetShips = this.activeTurnFleet.ships.filter(s => !s.disabled && !s.escaped)
+        console.log('=== isTurnComplete check ===', {
+            fleet: this.activeTurnFleet.name,
+            activeShips: activeFleetShips.length,
+            shipsWithActions: activeFleetShips.filter(s => s.actionsRemaining > 0).map(s => ({ name: s.name, actions: s.actionsRemaining }))
+        })
         for (const ship of activeFleetShips) {
             if (ship.actionsRemaining > 0) {
+                console.log('Turn NOT complete - ship has actions:', ship.name, 'actions:', ship.actionsRemaining)
                 return false
             }
         }
+        console.log('Turn IS complete - all ships used their actions')
         return true
     }
 
@@ -143,14 +150,23 @@ class Combat {
      * Handle turn completion and switch turns
      */
     handleTurnComplete() {
-        console.log('Combat.handleTurnComplete', { activeTurnFleet: this.activeTurnFleet })
-        if (!this.isTurnComplete()) return
+        console.log('=== Combat.handleTurnComplete ===', { activeTurnFleet: this.activeTurnFleet.name })
+        const isComplete = this.isTurnComplete()
+        console.log('Turn complete check result:', isComplete)
+        if (!isComplete) {
+            console.log('Turn not complete, returning early')
+            return
+        }
         
+        const previousFleet = this.activeTurnFleet
         if (this.activeTurnFleet === this.playerFleet) {
             this.activeTurnFleet = this.enemyFleet
+            console.log('Switching from player fleet to enemy fleet')
         } else if (this.activeTurnFleet === this.enemyFleet) {
             this.activeTurnFleet = this.playerFleet
+            console.log('Switching from enemy fleet to player fleet')
         }
+        console.log('Fleet changed from', previousFleet.name, 'to', this.activeTurnFleet.name)
         
         this.updateCombatResult()
     }
@@ -579,20 +595,21 @@ class Combat {
 
     /**
      * Executes a full enemy turn using the AI
-     * @returns {CombatResult[]}
+     * @returns {Array<{ship: Ship, action: string, target: Ship|null, result: CombatResult}>}
      */
     executeEnemyTurn() {
-        const results = this.combatAI.executeEnemyTurn()
+        console.log('=== Combat.executeEnemyTurn called ===')
+        console.log('Active turn fleet:', this.activeTurnFleet.name)
+        console.log('Enemy fleet:', this.enemyFleet.name)
+        console.log('Enemy ships:', this.enemyShips.map(s => ({ name: s.name, disabled: s.disabled, actions: s.actionsRemaining })))
+        
+        const actions = this.combatAI.executeEnemyTurn()
+        console.log('CombatAI returned actions:', actions)
         
         // Update combat result after enemy actions
         this.updateCombatResult()
         
-        // If combat didn't end, complete the turn
-        if (!this.result) {
-            this.handleTurnComplete()
-        }
-        
-        return results
+        return actions
     }
 
     /**

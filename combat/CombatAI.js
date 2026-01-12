@@ -40,21 +40,28 @@ class CombatAI {
 
     /**
      * Executes a full turn for all enemy ships
-     * @returns {CombatResult[]} - Array of results from all enemy actions
+     * @returns {Array<{ship: Ship, action: string, target: Ship|null, result: CombatResult}>} - Array of actions with results
      */
     executeEnemyTurn() {
-        const results = []
+        const actions = []
         const aliveEnemies = gs.combat.activeEnemyShips
 
         for (const enemyShip of aliveEnemies) {
             const decision = this.decideAction(enemyShip)
             
             if (decision.action !== 'none') {
-                const result = gs.combat.executeAction(enemyShip, decision.action, decision.target)
-                results.push(result)
+                // Calculate result without executing it (animations will execute it)
+                const result = gs.combat.calculateAction(enemyShip, decision.action, decision.target)
+                enemyShip.actionsRemaining--
+                actions.push({
+                    ship: enemyShip,
+                    action: decision.action,
+                    target: decision.target,
+                    result: result
+                })
             }
         }
 
-        return results
+        return actions
     }
 }
