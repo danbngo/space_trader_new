@@ -24,6 +24,8 @@ class Encounter {
         this.undetectedFleet = null;
         /** @type {boolean} */
         this.combatEnabled = false;
+        /** @type {boolean} */
+        this.alwaysAttack = false;
         
         /** @type {Map<Ship, number>} */
         this.playerShipHullsAtStart = new Map()
@@ -46,14 +48,19 @@ class Encounter {
                 // Player avoided detection
                 this.undetectedFleet = gs.fleet
                 this.playerUndetected = true
+                this.enemyUndetected = false
                 console.log('Player undetected! Radar advantage:', playerRadar, 'vs', enemyRadar)
             } else {
+                // Enemy avoided detection
+                this.undetectedFleet = this.fleet
                 this.playerUndetected = false
-                console.log('Player detected. Enemy radar:', enemyRadar, 'vs player:', playerRadar)
+                this.enemyUndetected = true
+                console.log('Enemy undetected! Enemy radar:', enemyRadar, 'vs player:', playerRadar)
             }
         } else {
             // Use the provided undetectedFleet value
             this.playerUndetected = (this.undetectedFleet == gs.fleet)
+            this.enemyUndetected = (this.undetectedFleet == this.fleet)
         }
     }
 
@@ -405,9 +412,15 @@ class Encounter {
         let msg = `You signal surrender to the ${coloredName(enemyFleet)}.<br/>`
         msg += `They board your vessels with weapons drawn...<br/><br/>`
         
+        // Track what was actually stolen
+        let stolenCargo = 0
+        let stolenCredits = 0
+        let stolenShipsCount = 0
+        
         // Take ALL cargo
         const totalCargo = gs.fleet.cargo.total
         if (totalCargo > 0) {
+            stolenCargo = totalCargo
             msg += `The ${coloredName(enemyFleet)} strip your cargo holds completely!<br/>`
             msg += `All ${totalCargo} units of cargo are taken.<br/>`
             gs.fleet.cargo.clear()
@@ -416,6 +429,7 @@ class Encounter {
         // Take ALL credits
         const totalCredits = gs.credits
         if (totalCredits > 0) {
+            stolenCredits = totalCredits
             msg += `They plunder your credit accounts: ${totalCredits}CR stolen!<br/>`
             gs.credits = 0
         }
@@ -432,6 +446,7 @@ class Encounter {
         }
         
         if (shipsToSteal.length > 0) {
+            stolenShipsCount = shipsToSteal.length
             msg += `<br/>The ${coloredName(enemyFleet)} eye your vessels greedily...<br/>`
             msg += `They seize ${shipsToSteal.length} of your ships!<br/>`
             
@@ -447,8 +462,19 @@ class Encounter {
             msg += `${disabledPlayerShips.length} of your ships were disabled in the fighting.<br/>`
         }
         
-        msg += `<br/>The ${coloredName(enemyFleet)} leave you with the bare minimum to survive.<br/>`
-        msg += `"Consider yourself lucky we're leaving you alive," they sneer before departing.<br/>`
+        // Check if anything was actually stolen
+        const anythingStolen = stolenCargo > 0 || stolenCredits > 0 || stolenShipsCount > 0
+        
+        if (anythingStolen) {
+            msg += `<br/>The ${coloredName(enemyFleet)} leave you with the bare minimum to survive.<br/>`
+            msg += `"Consider yourself lucky we're leaving you alive," they sneer before departing.<br/>`
+        } else {
+            // Player was broke
+            msg += `<br/>The ${coloredName(enemyFleet)} search thoroughly but find nothing of value.<br/>`
+            msg += `"You're not even worth robbing!" one of them spits in disgust.<br/>`
+            msg += `"Get lost before we change our minds about leaving you breathing."<br/>`
+            msg += `They shove you aside and depart, clearly disappointed.<br/>`
+        }
         
         msg += this.conductRepairs()
         

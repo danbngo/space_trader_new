@@ -8,10 +8,22 @@ class PiratesEncounter extends Encounter {
         if (this.playerUndetected) {
             return
         }
+        
         const fleetName = coloredName(this.fleet)
-        const demandsSurrender = Math.random() > 0.5
+        const demandsSurrender = (Math.random() > 0.5 || this.enemyUndetected) && !this.alwaysAttack
         
         let msg = `You encounter ${fleetName}!<br/><br/>`
+        
+        // If enemy is undetected, inform player and drop shields
+        if (this.enemyUndetected) {
+            msg += `<span style="color: rgb(${COLORS.Red.join(',')})">Your sensors failed to detect them in time!</span><br/>`
+            msg += `<span style="color: rgb(${COLORS.Red.join(',')})">Your shields are offline!</span><br/><br/>`
+            
+            // Drop player shields
+            for (const ship of gs.fleet.ships) {
+                ship.shields[0] = 0
+            }
+        }
         
         if (demandsSurrender) {
             msg += `The pirates transmit: "Power down your weapons and prepare to be boarded. Resist and you'll regret it."<br/>`

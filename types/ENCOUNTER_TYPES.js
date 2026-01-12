@@ -40,12 +40,12 @@ class EncounterType {
 }
 
 const ENCOUNTER_TYPES = {
-    //MINERS: new EncounterType('Miners', COLORS.Brown, 'You encountered: miners.', FLEET_TYPES.MINERS, MinersEncounter, 1, true),
-    MERCHANTS: new EncounterType('Merchants', 1.0, COLORS.Yellow, 'You encountered: merchants.', FLEET_TYPES.MERCHANTS, MerchantsEncounter, 1, true),
-    PIRATES: new EncounterType('Pirates', 1.0, COLORS.Red, 'You encountered: pirates.', FLEET_TYPES.PIRATES, PiratesEncounter, -2, false),
-    POLICE: new EncounterType('Police', 1.0, COLORS.Blue, 'You encountered: police.', FLEET_TYPES.POLICE, PoliceEncounter, 2, false),
+    MINERS: new EncounterType('Miners', 0, COLORS.Brown, 'You encountered: miners.', FLEET_TYPES.MINERS, MinersEncounter, 1, true),
+    MERCHANTS: new EncounterType('Merchants', 0, COLORS.Yellow, 'You encountered: merchants.', FLEET_TYPES.MERCHANTS, MerchantsEncounter, 1, true),
+    PIRATES: new EncounterType('Pirates', 0, COLORS.Red, 'You encountered: pirates.', FLEET_TYPES.PIRATES, PiratesEncounter, -2, false),
+    POLICE: new EncounterType('Police', 0, COLORS.Blue, 'You encountered: police.', FLEET_TYPES.POLICE, PoliceEncounter, 2, false),
     //SOLDIERS: new EncounterType('Soldiers', COLORS.LightGreen, 'You encountered: soldiers.', FLEET_TYPES.SOLDIERS, SoldiersEncounter, 3, false),
-    //ABANDONED_SHIP: new EncounterType('Abandoned Ship', COLORS.Gray, 'You encountered: an abandoned ship.', PSEUDO_FLEET_TYPES.ABANDONED_SHIP, AbandonedShipEncounter, 0, false),
+    ABANDONED_SHIP: new EncounterType('Abandoned Ship', 1.0, COLORS.Gray, 'You encountered: an abandoned ship.', PSEUDO_FLEET_TYPES.ABANDONED_SHIP, AbandonedShipEncounter, 0, false),
     //ASTEROIDS_STORM: new EncounterType('Asteroid Storm', COLORS.Gray, 'You encountered: an asteroid storm.', PSEUDO_FLEET_TYPES.ASTEROIDS_STORM, AsteroidsStormEncounter, 0, false),
     //ASTEROIDS_CALM: new EncounterType('Asteroid Field', COLORS.Gray, 'You encountered: an asteroid field.', PSEUDO_FLEET_TYPES.ASTEROIDS_CALM, AsteroidsCalmEncounter, 0, false),
 }
