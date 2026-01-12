@@ -1,8 +1,8 @@
 /**
  * A loop that runs an animation or timed operation.
- * @class Loop
+ * @class Animaton
  */
-class Loop {
+class Anim {
     /**
      * @param {number} durationMs - The duration of the loop in milliseconds.
      * @param {function(number): void} onUpdate - Callback function called each frame with progress ratio (0-1).
@@ -27,6 +27,7 @@ class Loop {
     }
     update(currentMs = Date.now()) {
         if (this.completed) return;
+        console.log('anim running, time:', currentMs, 'start:', this.startTime, 'duration:', this.durationMs);
         if (this.startTime === null) {
             this.startTime = currentMs;
         }

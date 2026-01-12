@@ -1,25 +1,4 @@
 
-//need a really big overhaul here if we move to randomly generated asteroid belts
-/*function generateAsteroidBelts(radius = 1, numBelts = 1) {
-    const asteroidBelts = []
-    const beltDistances = []
-    beltLoop: for (let i = 0; i < numBelts; i++) {
-        const beltDistance = radius* (0.2 + 0.6*Math.random())
-        //if too close to any existing belt distance, skip
-        for (const existingBeltDistance of beltDistances) {
-            if (Math.abs(existingBeltDistance - beltDistance) < radius*0.1) {
-                continue beltLoop
-            }
-        }
-        beltDistances.push(beltDistance)
-    }
-    for (const beltDistance of beltDistances) {
-        const belt = new AsteroidBelt("Asteroid Belt", COLORS.Gray, 0, 0, 0, new Orbit(beltDistance, Math.random()))
-        asteroidBelts.push(belt)
-    }
-    return asteroidBelts
-}*/
-
 /**
  * Generates a field of asteroids for an asteroid belt.
  * @param {AsteroidBelt} asteroidBelt - The asteroid belt to populate.

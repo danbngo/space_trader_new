@@ -36,9 +36,9 @@ class TravelMapCombatHandler {
         // Update ship info
         const shipInfo = leftPanel.querySelector('#travel-ship-info')
         this.updateShipInfo(shipInfo)
-        if (shipInfo.innerHTML === '') {
+        /*if (shipInfo.innerHTML === '') {
             panel.style.display = 'none'
-        }
+        }*/
         
         // Action buttons
         leftPanel.appendChild(this.createActionButtons())
@@ -210,7 +210,7 @@ class TravelMapCombatHandler {
             }, 1000)
         } else {
             // Refresh display for player's turn
-            this.travelMap.refreshTravelMap()
+            this.travelMap.refresh()
         }
     }
 
@@ -226,7 +226,7 @@ class TravelMapCombatHandler {
         }
         
         // Refresh the display for player turn
-        this.travelMap.refreshTravelMap()
+        this.travelMap.refresh()
     }
 
     /**
@@ -357,7 +357,7 @@ class TravelMapCombatHandler {
         if (attackType === 'laser') {
             this.laserHandler.displayLaserBeam(this.travelMap.selectedShip, targetShip, [255, 0, 0, 1], 500)
         } else if (attackType === 'ram') {
-            this.ramHandler.animateRam(this.travelMap.selectedShip, targetShip, 600)
+            this.ramHandler.animateRam(this.travelMap.selectedShip, targetShip)
         }
         
         console.log('Combat result:', result)

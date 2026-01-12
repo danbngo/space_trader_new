@@ -36,50 +36,14 @@ class TravelMapCombatRamHandler {
      * Animates a ramming ship surging forward and back
      * @param {Ship} attacker - The ship doing the ramming
      * @param {Ship} target - The ship being rammed
-     * @param {number} durationMs - Total animation duration (default 600ms)
      */
-    animateRam(attacker, target, durationMs = 600) {
+    animateRam(attacker, target) {
         const attackerObj = this.travelMap.cvs.getObject(`ship-${attacker.uuid}`)
         const targetObj = this.travelMap.cvs.getObject(`ship-${target.uuid}`)
-        
         if (!attackerObj || !targetObj) {
             console.warn('Could not find ship objects for ram animation')
             return
         }
-        
-        const startX = attackerObj.x
-        const targetX = targetObj.x
-        const midpointX = (startX + targetX) / 2
-        
-        // Store original position on the ship object
-        attackerObj.ramStartX = startX
-        attackerObj.ramMidpointX = midpointX
-        
-        const ramAnimation = new Loop(
-            durationMs,
-            (progressRatio) => {
-                const shipObj = this.travelMap.cvs.getObject(`ship-${attacker.uuid}`)
-                if (!shipObj) return
-                
-                if (progressRatio <= 0.5) {
-                    // First half: surge forward to midpoint
-                    const forwardProgress = progressRatio * 2 // 0 to 1
-                    shipObj.x = startX + (midpointX - startX) * forwardProgress
-                } else {
-                    // Second half: return to start
-                    const returnProgress = (progressRatio - 0.5) * 2 // 0 to 1
-                    shipObj.x = midpointX + (startX - midpointX) * returnProgress
-                }
-            },
-            () => {
-                // On complete: ensure ship is back at start position
-                const shipObj = this.travelMap.cvs.getObject(`ship-${attacker.uuid}`)
-                if (shipObj) {
-                    shipObj.x = startX
-                }
-            }
-        )
-        
-        this.travelMap.animations.push(ramAnimation)
+        this.travelMap.animations.push(new RamAnimation(attackerObj, targetObj))
     }
 }

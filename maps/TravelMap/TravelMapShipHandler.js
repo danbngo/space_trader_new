@@ -430,7 +430,7 @@ class TravelMapShipHandler {
             this.cleanupRemovedShips()
         }
         
-        this.travelMap.cvs.redraw(true)
+        //this.travelMap.cvs.redraw(true) //dont place here, will screw up animations. must be handled in parent.
     }
 
     /**

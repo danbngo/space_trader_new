@@ -21,7 +21,7 @@ class TravelMap {
         this.selectedShip = null
         this.routeProgress = 0
         this.routeProgressBar = null
-        this.animations = [] // Active animations (Loop instances)
+        this.animations = [] // Active animations
         
         // Track UI state to detect changes
         this.previousUIState = null
@@ -84,20 +84,20 @@ class TravelMap {
      * Handles both combat and travel rendering, checks for encounter changes
      */
     tick() {
-        console.log('STARTING TRAVEL MAP TICK')
+        //console.log('STARTING TRAVEL MAP TICK')
         // Check if animation should continue
         if (!this.isAnimating) {
             console.log('Travel map tick stopped')
             return
         }
-        this.handleAnimations()
-        this.shipHandler.renderShips()
-        this.refreshUIState()
+        this.refresh()
         // Run tick logic for travel mode
         if (this.currentUIState === 'travel' && gs.destination && gs.travelYearsRemaining !== null) {
             // && gs.travelYearsRemaining > 0 <-- dont include this check, we want to detect whether route is complete in the subclass
             this.routeHandler.tick()
         }
+        this.handleAnimations() //must go after other updates to ensure ship positions are correct
+        this.cvs.redraw(true)
         requestAnimationFrame(() => this.tick())
     }
 
@@ -203,18 +203,10 @@ class TravelMap {
     /**
      * Refreshes the combat map display
      */
-    refreshTravelMap() {
+    refresh() {
         // Re-render the ships on canvas
-        if (this.cvs) {
-            this.shipHandler.renderShips()
-        }
-        
-        // Update UI panel
-        if (this.uiPanel) {
-            const newPanel = this.combatHandler.createCombatUIPanel()
-            this.uiPanel.replaceWith(newPanel)
-            this.uiPanel = newPanel
-        }
+        if (this.cvs) this.shipHandler.renderShips()
+        this.refreshUIState()
     }
 
     /**

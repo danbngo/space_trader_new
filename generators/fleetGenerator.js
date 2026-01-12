@@ -41,7 +41,13 @@ function generateCrew(planet) {
 function generateFleet(fleetType = FLEET_TYPES_ALL[0], planet = null, startAt = planet) {
     //console.log('generating a fleet:',fleetType,planet,startAt)
     const ships = []
-    const numShips = Math.ceil(0.1 + rng(fleetType.minShips, fleetType.maxShips))
+    let numShips = 1
+    const diff = fleetType.maxShips-fleetType.minShips
+    if (diff <= 0) numShips = fleetType.minShips
+    else {
+        numShips = rng(fleetType.minShips, fleetType.maxShips, false)
+    }
+    numShips = Math.min(numShips, MAX_SHIPS_PER_FLEET)
     for (let i = 0; i < numShips; i++) {
         const shipType = i == 0 ? fleetType.shipTypes[0] : rndMember(fleetType.shipTypes)
         ships.push(generateShip(planet, shipType))
