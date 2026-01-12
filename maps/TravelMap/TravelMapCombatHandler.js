@@ -122,6 +122,15 @@ class TravelMapCombatHandler {
             return buttonContainer
         }
         
+        // Check if animations are playing
+        const animationsPlaying = this.travelMap.animations.length > 0
+        if (animationsPlaying) {
+            buttonContainer.appendChild(ce({
+                innerHTML: '(Animation in progress...)',
+            }))
+            return buttonContainer
+        }
+        
         // Check if shields are full for recharge button
         const shieldsFull = selectedShip.shields[0] >= selectedShip.shields[1]
         

@@ -104,9 +104,15 @@ class TravelMap {
     handleAnimations() {
         // Update active animations and remove completed ones
         const currentMs = Date.now()
+        const prevAnimCount = this.animations.length
         //console.log('handling animations:', this.animations.length, 'active','time:',currentMs)
         this.animations.forEach(anim => anim.update(currentMs))
         this.animations = this.animations.filter(anim => !anim.completed)
+        
+        // If animations just finished, refresh UI panel to show action buttons again
+        if (prevAnimCount > 0 && this.animations.length === 0) {
+            this.updateUIPanel()
+        }
         // Render ships (always to allow fade-in and smooth animation)
     }
 
