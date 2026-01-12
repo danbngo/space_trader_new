@@ -24,7 +24,7 @@ class TravelMapCombatHandler {
      * @returns {HTMLElement}
      */
     createCombatUIPanel() {
-        const panel = ce({id: 'travel-ui-panel', classNames: ['panel']})
+        const panel = ce({id: 'travel-ui-panel', classNames: ['panel', !gs.fleet.ships.includes(this.travelMap.selectedShip) ? 'scanning-mode' : null]})
         
         // Left side: Ship info and actions
         const leftPanel = ce({
@@ -36,6 +36,9 @@ class TravelMapCombatHandler {
         // Update ship info
         const shipInfo = leftPanel.querySelector('#travel-ship-info')
         this.updateShipInfo(shipInfo)
+        if (shipInfo.innerHTML === '') {
+            panel.style.display = 'none'
+        }
         
         // Action buttons
         leftPanel.appendChild(this.createActionButtons())
@@ -53,7 +56,7 @@ class TravelMapCombatHandler {
         const {selectedShip} = this.travelMap
         console.log('updating ship info:',infoElement, selectedShip)
         if (!selectedShip) {
-            infoElement.innerHTML = ''//Select ships to begin combat'
+            infoElement.innerHTML = ''
             return
         }
         
@@ -99,7 +102,7 @@ class TravelMapCombatHandler {
         
         if (!selectedShip || selectedShip.disabled) {
             buttonContainer.appendChild(ce({
-                innerHTML: '(Select a ship)',
+                innerHTML: '',
             }))
             return buttonContainer
         }

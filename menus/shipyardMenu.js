@@ -137,7 +137,7 @@ function createSellShipMenu(ships = [], shipyard = new Shipyard(), onSelectShip 
             statColorSpan(ship.shields[1], ship.shields[1]/10),
             statColorSpan(ship.lasers, ship.lasers/10),
             statColorSpan(ship.engine, ship.engine/10),
-            statColorSpan(ship.fuel, ship.fuel/10),
+            statColorSpan(ship.fuelCapacity, ship.fuelCapacity/10),
             statColorSpan(ship.cargoSpace, ship.cargoSpace/10),
             damageAmount > 0 ? statColorSpan(repairCost, 1/repairCost*100) : colorSpan('—', COLORS.Gray),
             statColorSpan(sellPrice, sellPrice/ship.value)
