@@ -75,39 +75,6 @@ class Encounter {
         return gs.combat ? gs.combat.enemyShips : []
     }
 
-    /**
-     * Called when the encounter starts. Override in subclasses.
-     */
-    onStart() {
-    }
-
-    /**
-     * Called when the player wins the encounter. Override in subclasses.
-     */
-    onVictory() {
-        // Override in subclass
-    }
-
-    /**
-     * Called when the player loses the encounter. Override in subclasses.
-     */
-    onDefeat() {
-        // Override in subclass
-    }
-
-    /**
-     * Called when the player escapes the encounter. Override in subclasses.
-     */
-    onEscape() {
-        // Override in subclass
-    }
-
-    /**
-     * Called when the player surrenders. Override in subclasses.
-     */
-    onSurrender() {
-        // Override in subclass
-    }
 
     /**
      * Starts active combat.
@@ -227,18 +194,169 @@ class Encounter {
     /**
      * Initializes and starts a space encounter, positioning ships and setting up combat.
      */
-    startEncounter() {
-        console.log('startEncounter:',this)
+    onStart() {
+        console.log('onStart:',this)
         if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
         gs.encounter = this
+    }
+
+    /**
+     * Called when the player wins the encounter. Override in subclasses.
+     */
+    onVictory() {
+        this.showPlayerDefeatedEnemyModal()
+    }
+
+    /**
+     * Called when the player loses the encounter. Override in subclasses.
+     */
+    onDefeat() {
+        this.showPlayerDefeatedByNeutralsModal()
+    }
+
+    /**
+     * Called when the player escapes the encounter. Override in subclasses.
+     */
+    onEscape() {
+        this.showPlayerEscapedFromEnemyModal()
+    }
+
+    onSurrender() {
+        this.showPlayerSurrenderedToNeutralsModal()
+    }
+
+    showPlayerSurrenderedToNeutralsModal() {
+        console.log('showPlayerSurrenderedToNeutralsModal');
+        const enemyFleet = this.fleet
+        const planet = this.planet
         
-        // Create combat if this encounter has combat
-        if (this.fleet && this.fleet.ships && this.fleet.ships.length > 0) {
-            gs.combat = new Combat(gs.fleet, this.fleet)
-            gs.combat.start(true) // Player has initiative by default
-            this.combatEnabled = true
+        let msg = `You power down your ships and signal surrender to the ${coloredName(enemyFleet)}.<br/>`
+        msg += `The ${coloredName(enemyFleet)} conduct a citizen's arrest and transmit your location to local authorities.<br/>`
+        msg += `Within hours, police vessels arrive to take you into custody.<br/>`
+        
+        showModal('Surrender', msg, [['Continue', ()=>this.showPlayerSurrenderedToAuthoritiesModal()]])
+    }
+
+    showPlayerSurrenderedToAuthoritiesModal() {
+        console.log('showPlayerSurrenderedToAuthoritiesModal');
+        const planet = this.planet
+        const disabledPlayerShips = this.playerShips.filter(s=>s.disabled)
+        
+        if (!planet) {
+            // Fallback if no planet context
+            showModal('Authorities', 'The authorities take you to the nearest station for processing.', [['Continue', ()=>this.endEncounter()]])
+            return
+        }
+        
+        // Calculate total bounty/fine
+        const totalBounty = gs.captain.bounty.getAmount(planet)
+        
+        // Confiscate all cargo
+        const totalCargo = gs.fleet.cargo.total
+        const confiscatedCargo = gs.fleet.cargo.clone()
+        gs.fleet.cargo.clear()
+        
+        // Separate out illegal cargo
+        const illegalCargo = new CountsMap()
+        for (const cargoType of confiscatedCargo.keys) {
+            if (cargoType.illegal) {
+                illegalCargo.increment(cargoType, confiscatedCargo.getAmount(cargoType))
+            }
+        }
+        const hasIllegalCargo = illegalCargo.total > 0
+        
+        // Calculate jail time
+        const jailDays = Math.ceil((totalBounty / 1000) * JAIL_DAYS_PER_1000CR_FINE)
+        const jailYears = jailDays / 365
+        
+        let msg = `The authorities board your vessels and conduct a thorough inspection.<br/>`
+        
+        if (totalCargo > 0) {
+            msg += `All ${totalCargo} units of cargo are confiscated as evidence.<br/>`
+        }
+        
+        if (hasIllegalCargo) {
+            msg += `<span style="color: rgb(${COLORS.Red.join(',')})">They discover ${illegalCargo.total} units of illegal contraband!</span><br/>`
+            let illegalList = []
+            for (const cargoType of illegalCargo.keys) {
+                illegalList.push(`${cargoType.symbol} ${coloredName(cargoType)} (${illegalCargo.getAmount(cargoType)})`)
+            }
+            msg += `Illegal items: ${illegalList.join(', ')}<br/>`
+        }
+        
+        if (disabledPlayerShips.length > 0) {
+            msg += `${disabledPlayerShips.length} of your ships were disabled and require repairs.<br/>`
+        }
+        
+        msg += `<br/>You are transported to ${coloredName(planet)} to face justice.<br/>`
+        
+        if (totalBounty > 0) {
+            msg += `<br/>Your outstanding fine: <span style="color: rgb(${COLORS.Red.join(',')})">${totalBounty}CR</span><br/>`
+            msg += `Prison sentence: ${jailDays} days (${roundToPlaces(jailYears, 2)} years)<br/>`
+            msg += `<br/>How do you wish to resolve this?<br/>`
+            
+            /** @type {ButtonData[]} */
+            const buttons = []
+            
+            // Option to pay fine
+            if (gs.credits >= totalBounty) {
+                buttons.push(['Pay Fine', ()=>{
+                    gs.credits -= totalBounty
+                    gs.captain.bounty.increment(planet, -totalBounty)
+                    
+                    let payMsg = `You pay the ${totalBounty}CR fine in full.<br/>`
+                    payMsg += `Your record on ${coloredName(planet)} is cleared.<br/>`
+                    payMsg += this.conductRepairs()
+                    
+                    // Transport to planet
+                    gs.destination = null
+                    gs.travelYearsRemaining = null
+                    gs.previousLocation = null
+                    gs.fleet.dock(planet)
+                    
+                    showModal('Fine Paid', payMsg, [['Continue', ()=>this.endEncounter()]])
+                }])
+            } else {
+                msg += `<span style="color: rgb(${COLORS.Red.join(',')})">You don't have enough credits to pay the fine.</span><br/>`
+            }
+            
+            // Option to serve time
+            buttons.push(['Serve Time', ()=>{
+                gs.captain.bounty.increment(planet, -totalBounty)
+                gs.year += jailYears
+                
+                let jailMsg = `You serve ${jailDays} days in prison on ${coloredName(planet)}.<br/>`
+                jailMsg += `Time passes slowly behind bars...<br/>`
+                jailMsg += `<br/>${roundToPlaces(jailYears, 2)} years later, you are released.<br/>`
+                jailMsg += `Your record is cleared, but you've lost valuable time.<br/>`
+                jailMsg += this.conductRepairs()
+                
+                // Transport to planet
+                gs.destination = null
+                gs.travelYearsRemaining = null
+                gs.previousLocation = null
+                gs.fleet.dock(planet)
+                
+                showModal('Released', jailMsg, [['Continue', ()=>this.endEncounter()]])
+            }])
+            
+            showModal('Authorities', msg, buttons)
+        } else {
+            msg += `<br/>Surprisingly, you have no outstanding fines.<br/>`
+            msg += `After confiscating your cargo, they release you with a stern warning.<br/>`
+            msg += this.conductRepairs()
+            
+            // Transport to planet
+            gs.fleet.dock(planet)
+            gs.destination = null
+            gs.travelYearsRemaining = null
+            gs.previousLocation = null
+            
+            showModal('Released', msg, [['Continue', ()=>this.endEncounter()]])
         }
     }
+
+
     /**
      * Ends the current encounter and returns to the star map.
      */
@@ -286,15 +404,6 @@ class Encounter {
         }
         showModal(coloredName(this.fleet), msg, [['Continue', ()=>this.startCombat(false)]])
     }
-
-    /*showPlayerDidSurrenderModal() {
-        console.log('showPlayerDidSurrenderModal');
-        const fleetName = coloredName(this.fleet)
-        let msg = `There's no other choice. You power your ships down and broadcast the universal signal for surrender.<br/>`
-        // No reputation change on surrender
-        showModal(fleetName, msg, [['Continue', ()=>this.onSurrender()]])
-    }*/
-
 
     /**
      * Unified attack modal that handles both militant and non-militant factions.
@@ -379,8 +488,8 @@ class Encounter {
     }
 
 
-    showPlayerDefeatedByNeutralsModal( infamyLossMultiplier = 1) {
-        console.log('showPlayerDefeatedByNeutralsModal', { infamyLossMultiplier });
+    showPlayerDefeatedByNeutralsModal() {
+        console.log('showPlayerDefeatedByNeutralsModal',);
         const enemyFleet = this.fleet
         const disabledPlayerShips = gs.combat.disabledPlayerShips
 
@@ -428,7 +537,73 @@ class Encounter {
             }]
         ])
     }
+    showPlayerEscapedFromEnemyModal() {
+        console.log('showPlayerEscapedFromEnemyModal');
+        const {enemyFleet, disabledPlayerShips, escapedPlayerShips, playerShips} = gs.combat
+        
+        // Award experience points for successfully escaping
+        const expGained = Math.round(AVERAGE_EXP_FROM_ESCAPING * (enemyFleet.combatRating / gs.fleet.combatRating))
+        
+        let msg = `You escaped from the ${coloredName(enemyFleet)}!<br/>`
+        msg += gs.captain.grantExperience(expGained)
+        if (escapedPlayerShips.length > 0) msg += `${escapedPlayerShips.length == playerShips.length ? 'All' : escapedPlayerShips.length} of your ships exited the battlefield intact.<br/>`
+        if (disabledPlayerShips.length > 0) {
+            msg += `However, ${disabledPlayerShips.length} were disabled in the fighting.<br/>`
+            msg += this.loseCargoFromDisabledShips(disabledPlayerShips)
+        }
 
+        msg += this.conductRepairs()
+
+        showModal(this.encounterType.name, msg, [['Continue', ()=>this.endEncounter()]])
+    }
+
+    showPlayerDefeatedEnemyModal() {
+        console.log('showPlayerDefeatedEnemyModal');
+        const {enemyFleet, disabledEnemyShips} = gs.combat
+        const planet = this.planet
+        const reputation = Math.ceil(ENCOUNTER_BASE_REPUTATION_EFFECT_ON_VICTORY * this.encounterType.reputationMultiplier)
+        const abandonedCargoCapacity = disabledEnemyShips.reduce( (total, ship) => {
+            return total + ship.cargoSpace
+        }, 0)
+        let creditsAmt = Math.ceil(Math.random() * enemyFleet.captain.credits * (abandonedCargoCapacity / enemyFleet.totalCargoSpace))
+        const officersShare = gs.fleet.calcTotalCRShare(creditsAmt, true)
+        const finalCredits = creditsAmt - officersShare
+        gs.credits += finalCredits
+        if (isNaN(gs.credits)) throw new Error('creditsAmt was NaN!')
+        creditsAmt = finalCredits
+        const cargoRatio = abandonedCargoCapacity / enemyFleet.totalCargoSpace
+        const maxLootAmt = Math.ceil(enemyFleet.cargo.total * cargoRatio)
+        const baseLootAmt = Math.ceil(Math.random() * maxLootAmt)
+        const lootAmt = Math.floor(weightedAvg([baseLootAmt, maxLootAmt], [25, gs.fleet.totalSkills.getAmount(SKILLS.Salvage)]))
+        const loot = enemyFleet.cargo.randomSubset(lootAmt)
+        const disabledPlayerShips = this.playerShips.filter(s=>s.disabled)
+
+        // Award experience points based on enemy fleet strength
+        const expGained = Math.round(AVERAGE_EXP_FROM_COMBAT * (enemyFleet.combatRating / gs.fleet.combatRating))
+
+        let msg = `You defeated the ${coloredName(enemyFleet)}!<br/>`
+        msg += gs.captain.grantExperience(expGained)
+        if (reputation) {
+            if (planet) msg += gs.captain.grantReputation(planet, reputation)
+        }
+
+        if (disabledPlayerShips.length > 0) {
+            msg += `${disabledPlayerShips.length} of your ships were disabled in the fighting.<br/>`
+            msg += this.loseCargoFromDisabledShips(disabledPlayerShips)
+        }
+
+        msg += this.conductRepairs()
+
+        if (disabledEnemyShips.length > 0) {
+            msg += `The ${coloredName(enemyFleet)} left behind ${disabledEnemyShips.length} disabled ships!<br/>`
+            msg += `Your scanners reveal ${baseLootAmt} units of cargo amid the wreckage.<br/>`
+            if (lootAmt > baseLootAmt) msg += `Your salvaging skills allow you to recover an additional ${lootAmt - baseLootAmt} units of cargo.<br/>`
+            if (!isNaN(creditsAmt) && creditsAmt > 0) msg += `You also salvage ${finalCredits}CR from the wreckage${officersShare ? ` (-${officersShare}CR for officers)` : ''}.<br/>`
+        }
+        showModal(this.encounterType.name, msg, [
+            lootAmt > 0 ? ['Loot', ()=>showLootMenu(loot)] : ['Continue', ()=>this.endEncounter()]
+        ])
+    }
 
 
 }

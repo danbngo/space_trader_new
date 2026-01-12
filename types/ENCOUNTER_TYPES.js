@@ -36,8 +36,6 @@ class EncounterType {
         this.reputationMultiplier = reputationMultiplier
         this.encounterClass = encounterClass;
         this.canBribe = canBribe;
-        /** @type {function} */
-        this.onStart = function(encounter) {}
     }
 }
 

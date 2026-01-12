@@ -126,7 +126,7 @@ class TravelMapCombatHandler {
         const animationsPlaying = this.travelMap.animations.length > 0
         if (animationsPlaying) {
             buttonContainer.appendChild(ce({
-                innerHTML: '(Animation in progress...)',
+                innerHTML: '(Calibrating...)',
             }))
             return buttonContainer
         }

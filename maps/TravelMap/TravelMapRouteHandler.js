@@ -86,7 +86,7 @@ class TravelMapRouteHandler {
             // Create and start the encounter
             const EncounterClass = encounterType.encounterClass
             const encounter = new EncounterClass(encounterType, encounterPlanet, enemyFleet, null)
-            encounter.startEncounter()
+            encounter.onStart()
         }
     }
 
