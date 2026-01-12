@@ -168,6 +168,14 @@ class Combat {
         }
         console.log('Fleet changed from', previousFleet.name, 'to', this.activeTurnFleet.name)
         
+        // Reset actionsRemaining for all active ships in the new fleet
+        const activeShips = this.activeTurnFleet.ships.filter(s => !s.disabled && !s.escaped)
+        console.log('Resetting actions for', activeShips.length, 'ships in', this.activeTurnFleet.name)
+        for (const ship of activeShips) {
+            ship.actionsRemaining = 1
+            console.log('Reset actions for', ship.name, '- actionsRemaining:', ship.actionsRemaining)
+        }
+        
         this.updateCombatResult()
     }
 

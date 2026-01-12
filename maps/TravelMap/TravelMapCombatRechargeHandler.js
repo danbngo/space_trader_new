@@ -15,64 +15,35 @@ class TravelMapCombatRechargeHandler {
      */
     handleRecharge() {
         const {selectedShip} = this.travelMap
-        const result = gs.combat.executeAction(selectedShip, 'recharge')
+        
+        // Calculate the recharge result without executing it
+        const result = gs.combat.calculateAction(selectedShip, 'recharge')
         selectedShip.actionsRemaining--
         
-        // Display amount recharged over ship
-        if (result.shieldsRecharged && result.shieldsRecharged > 0) {
-            this.combatHandler.displayTextOverShip(
-                selectedShip, 
-                TRAVEL_MAP_CONFIG.floatingTextColors.shieldDamage, 
-                `+${result.shieldsRecharged}`, 
-                TRAVEL_MAP_CONFIG.floatingTextDuration, 
-                0
-            )
-        }
-        
-        // Animate recharge visual effect
-        this.animateRecharge(selectedShip)
+        // Animate the recharge (animation will execute result and display text)
+        this.animateRecharge(selectedShip, result)
         
         // Deselect ship if it has no actions remaining
         if (selectedShip.actionsRemaining <= 0) {
             this.travelMap.selectedShip = null
         }
         
-        this.combatHandler.handleActionComplete()
+        // Wait for animation to complete before handling action completion
+        this.combatHandler.waitForAnimationsThenComplete()
     }
 
     /**
-     * Animates a blue shield effect over the ship during recharge
+     * Animates a recharge effect for the ship
      * @param {Ship} ship - The ship that is recharging
-     * @param {number} durationMs - Duration of the animation (default 1500ms)
+     * @param {CombatResult} combatResult - The result of the recharge action
      */
-    animateRecharge(ship, durationMs = 1500) {
+    animateRecharge(ship, combatResult) {
         const shipObj = this.travelMap.cvs.getObject(`ship-${ship.uuid}`)
-        
         if (!shipObj) {
             console.warn('Could not find ship object for recharge animation')
             return
         }
-        
-        // Create a blue shield oval over the ship
-        const shieldId = `recharge-shield-${ship.uuid}-${Date.now()}`
-        const shieldSize = TRAVEL_MAP_CONFIG.shipSize * 0.8
-        
-        const shieldObj = this.travelMap.cvs.addFilledOval(
-            shieldId,
-            shipObj.x,
-            shipObj.y,
-            shieldSize,      // radiusX
-            shieldSize,      // radiusY
-            0,               // minScreenSize
-            [100, 150, 255, 0.7], // fillColor - Blue with transparency
-            0,               // angle
-            null             // No onClick
-        )
-        
-        if (shieldObj) {
-            // Set duration to make it automatically disappear
-            shieldObj.durationMs = durationMs
-            shieldObj.createdAt = Date.now()
-        }
+        this.travelMap.animations.push(new RechargeAnim(shipObj, ship, combatResult, this.travelMap))
     }
 }
+

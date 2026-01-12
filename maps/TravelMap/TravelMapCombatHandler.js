@@ -234,40 +234,19 @@ class TravelMapCombatHandler {
         const actions = gs.combat.executeEnemyTurn()
         console.log('Enemy turn actions:', actions)
         
-        // Animate each action
-        for (const action of actions) {
-            if (action.action === 'laser') {
-                console.log('Animating enemy laser from', action.ship.name, 'to', action.target.name)
-                this.laserHandler.animateLaser(action.ship, action.target, action.result)
-            } else if (action.action === 'ram') {
-                console.log('Animating enemy ram from', action.ship.name, 'to', action.target.name)
-                this.ramHandler.animateRam(action.ship, action.target, action.result)
-            } else if (action.action === 'recharge') {
-                console.log('Enemy recharging:', action.ship.name)
-                // Execute recharge immediately (no animation)
-                gs.combat.executeResult(action.result)
-            }
-        }
-        
-        // Wait for enemy animations to complete before continuing
-        this.waitForEnemyAnimationsThenContinue()
+        // Process actions sequentially (one at a time)
+        this.enemyActionQueue = actions
+        this.processNextEnemyAction()
     }
 
     /**
-     * Waits for enemy animations to complete, then continues turn
+     * Processes the next enemy action in the queue
      */
-    waitForEnemyAnimationsThenContinue() {
-        // Check if any enemy ships are still acting (animating)
-        const anyActing = gs.combat.enemyShips.some(ship => ship.acting)
-        console.log('=== waitForEnemyAnimationsThenContinue ===', { anyActing, actingShips: gs.combat.enemyShips.filter(s => s.acting).map(s => s.name) })
-        
-        if (anyActing) {
-            // Wait and check again
-            setTimeout(() => {
-                this.waitForEnemyAnimationsThenContinue()
-            }, 100)
-        } else {
-            console.log('All enemy animations complete')
+    processNextEnemyAction() {
+        if (this.enemyActionQueue.length === 0) {
+            // All enemy actions complete
+            console.log('All enemy actions complete')
+            
             // Check if combat ended
             if (gs.combat.result) {
                 console.log('Combat ended after enemy turn with result:', gs.combat.result)
@@ -275,11 +254,55 @@ class TravelMapCombatHandler {
                 return
             }
             
-            console.log('Enemy animations complete, switching back to player turn')
+            console.log('Enemy turn complete, switching back to player turn')
             // Switch back to player turn
             gs.combat.handleTurnComplete()
             // Refresh the display for player turn
             this.travelMap.refresh()
+            return
+        }
+        
+        // Get the next action
+        const action = this.enemyActionQueue.shift()
+        console.log('Processing enemy action:', action.action, 'from', action.ship.name)
+        
+        // Execute the action with animation
+        if (action.action === 'laser') {
+            console.log('Animating enemy laser from', action.ship.name, 'to', action.target.name)
+            this.laserHandler.animateLaser(action.ship, action.target, action.result)
+        } else if (action.action === 'ram') {
+            console.log('Animating enemy ram from', action.ship.name, 'to', action.target.name)
+            this.ramHandler.animateRam(action.ship, action.target, action.result)
+        } else if (action.action === 'recharge') {
+            console.log('Enemy recharging:', action.ship.name)
+            // Execute recharge immediately (no animation)
+            gs.combat.executeResult(action.result)
+        }
+        
+        // Wait for this action's animation to complete before processing next
+        this.waitForCurrentEnemyActionComplete()
+    }
+
+    /**
+     * Waits for current enemy action animation to complete, then processes next
+     */
+    waitForCurrentEnemyActionComplete() {
+        // Check if animations are still running
+        const animationsRunning = this.travelMap.animations.length > 0
+        console.log('=== waitForCurrentEnemyActionComplete ===', { 
+            animationsRunning, 
+            animationCount: this.travelMap.animations.length 
+        })
+        
+        if (animationsRunning) {
+            // Wait and check again
+            setTimeout(() => {
+                this.waitForCurrentEnemyActionComplete()
+            }, 100)
+        } else {
+            console.log('Current enemy action animation complete, processing next')
+            // Animation complete, process next action
+            this.processNextEnemyAction()
         }
     }
 
