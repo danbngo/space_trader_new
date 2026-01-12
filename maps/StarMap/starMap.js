@@ -17,7 +17,7 @@ class StarMap extends BaseMap {
         this.lastCameraX = 0
         this.lastCameraY = 0
         this.lastZoom = 1
-        this.isAnimating = false
+        this.isAnimating = true
         
         // FPS tracking
         this.fpsFrames = 0
@@ -42,7 +42,6 @@ class StarMap extends BaseMap {
         this.createSpotlight()
         
         // Start continuous background star update loop (runs even when paused)
-        this.isAnimating = true
         this.animate()
         
         // REMOVED: FleetAI references

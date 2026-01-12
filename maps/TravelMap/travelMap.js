@@ -20,13 +20,14 @@ class TravelMap extends BaseMap {
         console.log('CREATING TRAVEL MAP')
         
         this.selectedShip = null
-        this.routeAnimationFrame = null
         this.routeProgress = 0
         this.routeProgressBar = null
         this.animations = [] // Active animations (Loop instances)
         
         // Track UI state to detect changes
         this.previousUIState = null
+        this.currentUIState = 'travel'
+        this.isAnimating = true
         
         // Initialize handlers
         this.combatHandler = new TravelMapCombatHandler(this)
@@ -71,12 +72,12 @@ class TravelMap extends BaseMap {
         requestAnimationFrame(() => {
             this.cvs.autoResize()
             this.bgCvs.autoResize()
-            
+            this.refreshUIState()
             // Render stars once to background canvas
             this.renderBackgroundStars()
             
             // Start animation loop (handles both combat and travel)
-            this.startAnimation()
+            this.tick()
         })
     }
     
@@ -84,42 +85,40 @@ class TravelMap extends BaseMap {
      * Starts the animation loop
      * Handles both combat and travel rendering, checks for encounter changes
      */
-    startAnimation() {
+    tick() {
         console.log('STARTING TRAVEL MAP ANIMATION')
-        this.isAnimating = true
-        const animate = () => {
-            // Check if animation should continue
-            if (!this.isAnimating) {
-                console.log('Animation loop stopped')
-                return
-            }
-            
-            // Update active animations and remove completed ones
-            const currentMs = Date.now()
-            this.animations.forEach(anim => anim.update(currentMs))
-            this.animations = this.animations.filter(anim => !anim.completed)
-            
-            // Update UI panel if state changed
-            const currentUIState = gs.encounter ? (gs.encounter.combatEnabled ? 'combat' : 'encounter') : 'travel'
-            if (currentUIState !== this.previousUIState) {
-                console.log('UI state changed from', this.previousUIState, 'to', currentUIState)
-                this.previousUIState = currentUIState
-                this.updateUIPanel()
-            }
-            
-            // Render ships (always to allow fade-in and smooth animation)
-            this.shipHandler.renderShips()
-            
-            // Run tick logic for travel mode
-            if (currentUIState === 'travel' && gs.destination && gs.travelYearsRemaining !== null) {
-                // && gs.travelYearsRemaining > 0 <-- dont include this check, we want to detect whether route is complete in the subclass
-                this.routeHandler.tick()
-            }
-            
-            // Continue animation
-            this.routeAnimationFrame = requestAnimationFrame(animate)
+        // Check if animation should continue
+        if (!this.isAnimating) {
+            console.log('Animation loop stopped')
+            return
         }
-        animate()
+        this.handleAnimations()
+        this.shipHandler.renderShips()
+        // Run tick logic for travel mode
+        if (this.currentUIState === 'travel' && gs.destination && gs.travelYearsRemaining !== null) {
+            // && gs.travelYearsRemaining > 0 <-- dont include this check, we want to detect whether route is complete in the subclass
+            this.routeHandler.tick()
+        }
+        requestAnimationFrame(() => this.tick())
+    }
+
+    handleAnimations() {
+        // Update active animations and remove completed ones
+        const currentMs = Date.now()
+        console.log('handling animations:', this.animations.length, 'active','time:',currentMs)
+        this.animations.forEach(anim => anim.update(currentMs))
+        this.animations = this.animations.filter(anim => !anim.completed)
+        // Render ships (always to allow fade-in and smooth animation)
+    }
+
+    refreshUIState() {
+        // Update UI panel if state changed
+        const currentUIState = gs.encounter ? (gs.encounter.combatEnabled ? 'combat' : 'encounter') : 'travel'
+        if (currentUIState !== this.previousUIState) {
+            console.log('UI state changed from', this.previousUIState, 'to', currentUIState)
+            this.previousUIState = currentUIState
+            this.updateUIPanel()
+        }
     }
     
     /**
@@ -229,10 +228,6 @@ class TravelMap extends BaseMap {
         console.log('CLEANUP CALLED ON TRAVEL MAP')
         // Stop animation loop
         this.isAnimating = false
-        if (this.routeAnimationFrame) {
-            cancelAnimationFrame(this.routeAnimationFrame)
-            this.routeAnimationFrame = null
-        }
         // Remove resize listener
         if (this.resizeHandler) {
             window.removeEventListener("resize", this.resizeHandler)

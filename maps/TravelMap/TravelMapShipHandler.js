@@ -170,8 +170,10 @@ class TravelMapShipHandler {
         }
 
         // Update ship position and interactions
-        shipObj.x = jitteredX
-        shipObj.y = jitteredY
+        if (!ship.disabled) {
+            shipObj.x = jitteredX
+            shipObj.y = jitteredY
+        }
         
         // Update onClick handler based on ship type and state
         this.applyShipColorModifications(ship, shipObj, shipGroupConfig)
@@ -181,7 +183,7 @@ class TravelMapShipHandler {
         
         // Update progress bars (only show during encounters)
         if (gs.encounter) {
-            this.addShipProgressBars(ship, shipObj, shipGroupConfig)
+            this.addShipProgressBars(ship, shipObj)
         }
     }
 
@@ -195,25 +197,28 @@ class TravelMapShipHandler {
      */
     updateThruster(ship, x, y, shipSize, shipGroupConfig) {
         const thrusterObj = this.travelMap.cvs.getObject(`thruster-${ship.uuid}`)
-        if (thrusterObj) {
-            // Calculate flicker
-            const flickerRange = TRAVEL_MAP_CONFIG.thrusterFlickerMax - TRAVEL_MAP_CONFIG.thrusterFlickerMin
-            const thrusterFlicker = TRAVEL_MAP_CONFIG.thrusterFlickerMin + Math.random() * flickerRange
-            
-            // Update size with flicker
-            const thrusterSize = shipSize / 2 * TRAVEL_MAP_CONFIG.thrusterSizeMultiplier * thrusterFlicker
-            thrusterObj.size = thrusterSize / 2
-            thrusterObj.minorSize = thrusterSize
-            
-            // Update color with flicker
-            const thrusterColor = [255, Math.floor(150 * thrusterFlicker), 0, shipGroupConfig.opacity * thrusterFlicker]
-            thrusterObj.fillColor = thrusterColor
-            
-            // Update position
-            const thrusterOffset = shipGroupConfig.mirror ? shipSize / 2 : -shipSize / 2
-            thrusterObj.x = x + thrusterOffset
-            thrusterObj.y = y
+        if (!thrusterObj) return
+        if (ship.disabled) {
+            thrusterObj.visible = false
+            return
         }
+        // Calculate flicker
+        const flickerRange = TRAVEL_MAP_CONFIG.thrusterFlickerMax - TRAVEL_MAP_CONFIG.thrusterFlickerMin
+        const thrusterFlicker = TRAVEL_MAP_CONFIG.thrusterFlickerMin + Math.random() * flickerRange
+        
+        // Update size with flicker
+        const thrusterSize = shipSize / 2 * TRAVEL_MAP_CONFIG.thrusterSizeMultiplier * thrusterFlicker
+        thrusterObj.size = thrusterSize / 2
+        thrusterObj.minorSize = thrusterSize
+        
+        // Update color with flicker
+        const thrusterColor = [255, Math.floor(150 * thrusterFlicker), 0, shipGroupConfig.opacity * thrusterFlicker]
+        thrusterObj.fillColor = thrusterColor
+        
+        // Update position
+        const thrusterOffset = shipGroupConfig.mirror ? shipSize / 2 : -shipSize / 2
+        thrusterObj.x = x + thrusterOffset
+        thrusterObj.y = y
     }
 
     /**
@@ -292,9 +297,8 @@ class TravelMapShipHandler {
      * Adds canvas-rendered progress bars for hull and shields above a ship
      * @param {Ship} ship
      * @param {CanvasObject} shipObj - The ship's canvas object to position bars relative to
-     * @param {ShipGroupConfig} shipGroupConfig - Configuration for opacity and other settings
      */
-    addShipProgressBars(ship, shipObj, shipGroupConfig) {
+    addShipProgressBars(ship, shipObj) {
         const y = shipObj.y
         
         // Calculate bar positions
@@ -372,8 +376,6 @@ class TravelMapShipHandler {
         
         // Render each ship
         ships.forEach((ship, index) => {
-            if (ship.disabled) return
-            
             // Flying V formation positioning
             // ships[0] is lead (center), ships[1,2] are wing pair 1, ships[3,4] are wing pair 2
             const shipSpacingX = TRAVEL_MAP_CONFIG.shipSpacingX

@@ -38,8 +38,8 @@ class TravelMapRouteHandler {
         // Roll for encounter
         this.checkForEncounter()
         
-        // Render ships
-        this.travelMap.shipHandler.renderShips()
+        // Render ships - not needed, always called per frame in parent
+        //this.travelMap.shipHandler.renderShips()
         
         // Continue tick loop with 60fps target - not needed, handled in parent class
         //setTimeout(() => requestAnimationFrame(() => this.tick()), TRAVEL_MAP_CONFIG.tickRate)
