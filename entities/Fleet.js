@@ -94,7 +94,7 @@ class Fleet extends SpaceObject {
                 mission.onPlayerVisitLocation(planet)
             }
         }
-        if (currentMap && !(currentMap instanceof StarMap)) showStarMap(planet)
+        if (currentMap && currentMap instanceof TravelMap) showStarMap(planet)
     }
 
     // REMOVED: Route

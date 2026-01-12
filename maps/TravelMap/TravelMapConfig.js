@@ -25,7 +25,8 @@ const TRAVEL_MAP_CONFIG = {
     thrusterFlickerMax: 1.0,
     
     // Animation
-    enemyFadeInDuration: 2000, // ms
+    enemyFadeInDuration: 1000, // ms - fade-in duration for enemy ships
+    enemyFadeOutDuration: 1000, // ms - fade-out duration for enemy ships
     tickRate: 1000 / 60, // 60 fps
     
     // Camera

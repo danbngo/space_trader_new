@@ -65,8 +65,6 @@ class TravelMap {
         }
         window.addEventListener("resize", this.resizeHandler)
         
-        showElement(this.root)
-        
         // Defer canvas sizing and initial render until after DOM is rendered
         requestAnimationFrame(() => {
             this.cvs.autoResize()
@@ -231,5 +229,5 @@ class TravelMap {
 
 function showTravelMap() {
     const map = new TravelMap()
-    showMap(map)
+    showMapWithFade(map)
 }

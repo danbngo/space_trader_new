@@ -798,6 +798,6 @@ class StarMap {
  */
 function showStarMap(autoSelectObject = gs.fleet) {
     const starMap = new StarMap(gs.system, autoSelectObject)
-    showMap(starMap)
+    showMapWithFade(starMap)
 }
 

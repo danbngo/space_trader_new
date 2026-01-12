@@ -208,6 +208,49 @@ function showElement(element = ce()) {
 let currentMap;
 
 /**
+ * Gets or creates the fade-to-black overlay element
+ * @returns {HTMLElement}
+ */
+function getFadeToBlackElement() {
+    let fadeEl = document.getElementById('fade-to-black')
+    if (!fadeEl) {
+        fadeEl = ce({id: 'fade-to-black'})
+        document.body.appendChild(fadeEl)
+    }
+    return fadeEl
+}
+
+/**
+ * Triggers fade to black animation
+ * @param {Function} onComplete - Callback when fade completes
+ * @param {number} duration - Fade duration in ms (default 400ms)
+ */
+function fadeToBlack(onComplete, duration = 400) {
+    const fadeEl = getFadeToBlackElement()
+    fadeEl.style.transition = `opacity ${duration}ms ease-in-out`
+    fadeEl.classList.add('fading')
+    
+    setTimeout(() => {
+        if (onComplete) onComplete()
+    }, duration)
+}
+
+/**
+ * Triggers fade from black animation
+ * @param {Function} onComplete - Callback when fade completes
+ * @param {number} duration - Fade duration in ms (default 400ms)
+ */
+function fadeFromBlack(onComplete, duration = 400) {
+    const fadeEl = getFadeToBlackElement()
+    fadeEl.style.transition = `opacity ${duration}ms ease-in-out`
+    fadeEl.classList.remove('fading')
+    
+    setTimeout(() => {
+        if (onComplete) onComplete()
+    }, duration)
+}
+
+/**
  * Shows a map in the main UI container.
  * @param {StarMap|TravelMap|BackgroundMap} map - The map to display
  */
@@ -215,6 +258,70 @@ function showMap(map) {
     if (currentMap && currentMap.cleanup) currentMap.cleanup()
     currentMap = map
     showElement(map.root)
+}
+
+/**
+ * Shows a map with a fade-to-black transition effect
+ * @param {StarMap|TravelMap|BackgroundMap} map - The map to display
+ * @param {number} fadeDuration - Duration of each fade in ms (default 400ms)
+ * @param {number} pauseDuration - Duration to pause while black (default 250ms)
+ */
+function showMapWithFade(map, fadeDuration = 400, pauseDuration = 250) {
+    const oldMap = currentMap
+    
+    // Step 1: Add new map UNDER the old one (hidden beneath it)
+    // This allows the new map to initialize, calculate sizes, and set up canvases
+    map.root.style.position = 'absolute'
+    map.root.style.zIndex = '0'
+    map.root.style.top = '0'
+    map.root.style.left = '0'
+    map.root.style.width = '100%'
+    map.root.style.height = '100%'
+    
+    if (oldMap && oldMap.root && oldMap.root.parentNode === UI_CONTAINER) {
+        oldMap.root.style.position = 'absolute'
+        oldMap.root.style.zIndex = '1'
+        oldMap.root.style.top = '0'
+        oldMap.root.style.left = '0'
+        oldMap.root.style.width = '100%'
+        oldMap.root.style.height = '100%'
+        // Insert new map before old map so old map stays on top
+        UI_CONTAINER.insertBefore(map.root, oldMap.root)
+    } else {
+        // No old map, just append
+        UI_CONTAINER.appendChild(map.root)
+    }
+    
+    currentMap = map
+    
+    // Give the new map a moment to initialize and size itself
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            // Step 2: Fade to black
+            fadeToBlack(() => {
+                // Step 3: Remove old map during the black screen
+                if (oldMap) {
+                    if (oldMap.cleanup) oldMap.cleanup()
+                    if (oldMap.root && oldMap.root.parentNode) {
+                        oldMap.root.remove()
+                    }
+                }
+                
+                // Reset styles on new map to normal
+                map.root.style.position = ''
+                map.root.style.zIndex = ''
+                map.root.style.top = ''
+                map.root.style.left = ''
+                map.root.style.width = ''
+                map.root.style.height = ''
+                
+                // Step 4: Wait a moment, then fade from black
+                setTimeout(() => {
+                    fadeFromBlack(null, fadeDuration)
+                }, pauseDuration)
+            }, fadeDuration)
+        })
+    })
 }
 
 function calcStatColor(ratio = 1.0) {

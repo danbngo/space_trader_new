@@ -369,7 +369,7 @@ class TravelMapShipHandler {
         // Handle fade-out animation
         if (config.fadingOut) {
             const elapsed = Date.now() - config.fadeStartTime
-            const fadeTime = TRAVEL_MAP_CONFIG.enemyFadeInDuration
+            const fadeTime = TRAVEL_MAP_CONFIG.enemyFadeOutDuration
             config.opacity = Math.max(0, 1 - (elapsed / fadeTime))
             console.log('Fading out, elapsed:', elapsed, 'opacity:', config.opacity)
             
