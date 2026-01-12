@@ -19,11 +19,11 @@ class TravelMapCombatLaserHandler {
         this.combatHandler.targetingMode = 'laser'
         this.combatHandler.targetingShip = selectedShip
         
-        // Populate valid targets (all non-disabled enemy ships)
+        // Populate valid targets (all non-disabled, non-escaped enemy ships)
         this.combatHandler.targetedShips.clear()
         if (gs.encounter && gs.encounter.fleet && gs.encounter.fleet.ships) {
             gs.encounter.fleet.ships.forEach(ship => {
-                if (!ship.disabled) {
+                if (!ship.disabled && !ship.escaped) {
                     this.combatHandler.targetedShips.add(ship)
                 }
             })

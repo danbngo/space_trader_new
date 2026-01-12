@@ -33,7 +33,7 @@ class RechargeAnim extends Anim {
             0, // No hull damage
             -(combatResult.shieldsRecharged || 0), // Negative shield "damage" = healing
             false,
-            false
+            null
         )
         
         this.ship = ship

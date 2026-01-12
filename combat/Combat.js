@@ -391,28 +391,47 @@ class Combat {
      * @returns {Object} - Result {escaped, message}
      */
     calculateFlee(ship, enemyIsRamming = false) {
-        // Base flee chance is 50%, modified by engine power
-        let fleeChance = 0.5 + (ship.engine * 0.01); // +1% per engine point
+        // Find the fleet index of this ship
+        const playerFleet = gs.combat.playerFleet.ships
+        const enemyFleet = gs.combat.enemyFleet.ships
+        const isPlayer = playerFleet.includes(ship)
+        const fleetIndex = isPlayer ? playerFleet.indexOf(ship) : enemyFleet.indexOf(ship)
         
-        // Enemy ramming makes it much harder to flee
-        if (enemyIsRamming) {
-            fleeChance *= 0.3; // 70% reduction if enemy rams
+        // Find the enemy ship "across from" this ship (same index in opposing fleet)
+        const opposingFleet = isPlayer ? enemyFleet : playerFleet
+        const opposingShip = opposingFleet[fleetIndex]
+        
+        // If no ship is across from us (or they're disabled/escaped), auto-succeed
+        if (!opposingShip || opposingShip.disabled || opposingShip.escaped) {
+            return {
+                escaped: true,
+                message: `${ship.name} successfully escapes from combat!`
+            }
         }
         
-        fleeChance = Math.max(0.1, Math.min(0.9, fleeChance)); // Clamp between 10% and 90%
+        // Base flee chance is 50%, modified by engine differential
+        const engineDiff = ship.engine - opposingShip.engine
+        let fleeChance = 0.5 + (engineDiff * 0.02) // +2% per engine point difference
         
-        const escaped = Math.random() < fleeChance;
+        // Enemy ramming makes it harder to flee
+        if (enemyIsRamming) {
+            fleeChance *= 0.5 // 50% reduction if enemy rams
+        }
+        
+        fleeChance = Math.max(0.1, Math.min(0.9, fleeChance)) // Clamp between 10% and 90%
+        
+        const escaped = Math.random() < fleeChance
         
         if (escaped) {
             return {
                 escaped: true,
                 message: `${ship.name} successfully escapes from combat!`
-            };
+            }
         } else {
             return {
                 escaped: false,
                 message: `${ship.name} attempts to flee but fails!`
-            };
+            }
         }
     }
 

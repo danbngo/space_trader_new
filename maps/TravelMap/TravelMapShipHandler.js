@@ -179,6 +179,17 @@ class TravelMapShipHandler {
             shipObj.y = jitteredY
         }
         
+        // Hide escaped ships
+        if (ship.escaped) {
+            shipObj.visible = false
+            const thrusterObj = this.travelMap.cvs.getObject(`thruster-${ship.uuid}`)
+            if (thrusterObj) thrusterObj.visible = false
+            this.updateShipStatBars(ship, shipObj) //hides stat bars
+            return // Skip further rendering for escaped ships
+        } else {
+            shipObj.visible = true
+        }
+        
         // Update onClick handler based on ship type and state
         this.applyShipColorModifications(ship, shipObj, shipGroupConfig)
         
@@ -303,6 +314,19 @@ class TravelMapShipHandler {
      * @param {CanvasObject} shipObj - The ship's canvas object to position bars relative to
      */
     updateShipStatBars(ship, shipObj) {
+        // Hide stat bars for escaped ships
+        if (ship.escaped) {
+            const hullBg = this.travelMap.cvs.getObject(`hull-bg-${ship.uuid}`)
+            const hullFg = this.travelMap.cvs.getObject(`hull-fg-${ship.uuid}`)
+            const shieldBg = this.travelMap.cvs.getObject(`shield-bg-${ship.uuid}`)
+            const shieldFg = this.travelMap.cvs.getObject(`shield-fg-${ship.uuid}`)
+            if (hullBg) hullBg.visible = false
+            if (hullFg) hullFg.visible = false
+            if (shieldBg) shieldBg.visible = false
+            if (shieldFg) shieldFg.visible = false
+            return
+        }
+        
         const y = shipObj.y
         
         // Calculate bar positions

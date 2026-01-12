@@ -176,24 +176,21 @@ class TravelMapCombatHandler {
         const {selectedShip} = this.travelMap
         if (!selectedShip) return
         
-        const result = gs.combat.executeAction(selectedShip, 'flee')
+        const result = gs.combat.calculateAction(selectedShip, 'flee')
         selectedShip.actionsRemaining--
         
-        if (result.escaped) {
-            // Update combat result and check if all ships escaped
-            gs.combat.updateCombatResult()
-            if (gs.combat.result) {
-                this.showCombatEndModal()
-                return
-            }
-        }
+        // Create flee animation to display the result
+        const shipObj = this.travelMap.cvs.getObject(`ship-${selectedShip.uuid}`)
+        this.travelMap.animations.push(new FleeAnim(shipObj, selectedShip, result, this.travelMap))
         
         // Deselect ship if it has no actions remaining
         if (selectedShip.actionsRemaining <= 0) {
             this.travelMap.selectedShip = null
         }
         
-        this.handleActionComplete()
+        // Wait for animations then complete action
+        this.waitForAnimationsThenComplete()
+        this.travelMap.updateUIPanel()
     }
 
     /**
@@ -339,15 +336,15 @@ class TravelMapCombatHandler {
      * @param {number} hullDamage - Hull damage dealt (0 if none)
      * @param {number} shieldDamage - Shield damage dealt (0 if none)
      * @param {boolean} destroyed - Whether the ship was destroyed
-     * @param {boolean} missed - Whether the attack missed
+     * @param {string} missedText - Text to display for a miss/failure (empty string = no miss)
      */
-    displayDamageText(ship, hullDamage = 0, shieldDamage = 0, destroyed = false, missed = false) {
-        console.log('=== displayDamageText called ===', { ship: ship.shipType.name, hullDamage, shieldDamage, destroyed, missed })
-        if (hullDamage == 0 && shieldDamage == 0 && !destroyed && !missed) {
+    displayDamageText(ship, hullDamage = 0, shieldDamage = 0, destroyed = false, missedText = '') {
+        console.log('=== displayDamageText called ===', { ship: ship.shipType.name, hullDamage, shieldDamage, destroyed, missedText })
+        if (hullDamage == 0 && shieldDamage == 0 && !destroyed && !missedText) {
             return
         }
-        if (missed) {
-            this.displayTextOverShip(ship, TRAVEL_MAP_CONFIG.floatingTextColors.missed, 'Missed', TRAVEL_MAP_CONFIG.floatingTextDuration, 0)
+        if (missedText) {
+            this.displayTextOverShip(ship, TRAVEL_MAP_CONFIG.floatingTextColors.missed, missedText, TRAVEL_MAP_CONFIG.floatingTextDuration, 0)
             return
         }
         

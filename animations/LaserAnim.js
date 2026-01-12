@@ -37,7 +37,7 @@ class LaserAnim extends Anim {
                         combatResult.hullDamage || 0,
                         combatResult.shieldsAbsorbed || 0,
                         combatResult.destroyed,
-                        !combatResult.success
+                        !combatResult.success ? 'Missed' : ''
                     )
                 }
                 
