@@ -451,35 +451,6 @@ class Encounter {
         }]])
     }
 
-    showPlayerAttackFleetModal(onContinue = ()=>this.startCombat(true)) {
-        const {playerUndetected} = this
-        console.log('showPlayerAttackFleetModal', { playerUndetected });
-        const fleetName = coloredName(this.fleet)
-        const planet = this.planet
-        const reputationMultiplier = this.encounterType.reputationMultiplier
-        const reputation = Math.ceil(ENCOUNTER_BASE_REPUTATION_EFFECT_ON_ATTACK * reputationMultiplier)
-        const bounty = reputationMultiplier > 0 ? ENCOUNTER_BASE_FINE_ON_ATTACK * reputationMultiplier : 0
-
-        if (playerUndetected) {
-            // Drop shields after repositioning
-            for (const ship of this.fleet.ships) ship.shields[0] = 0
-        }
-
-        let msg = `You ${playerUndetected ? 'sneakily ' : ''}attack the ${fleetName}!<br/>`
-        if (playerUndetected) msg += `The ${fleetName} are caught with their shields down!<br/>`
-        if (reputation) {
-            if (planet) msg += gs.captain.grantReputation(planet, reputation)
-        }
-        if (bounty > 0 && planet) {
-            msg += gs.captain.grantBounty(planet, bounty)
-        }
-
-        showModal(fleetName, msg, [['Continue', ()=>{
-            this.startCombat()
-        }]])
-    }
-
-
     showPlayerDefeatedByNeutralsModal() {
         console.log('showPlayerDefeatedByNeutralsModal',);
         const enemyFleet = this.fleet

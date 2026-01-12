@@ -4,19 +4,29 @@ class PoliceEncounter extends Encounter {
      * Override onStart to show police contact modal
      */
     onStart() {
-        console.log('PoliceEncounter.onStart:', this)
-        if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
-        gs.encounter = this
+        super.onStart()
+        const fleetName = coloredName(this.fleet)
+        const wantsToSearch = Math.random() > 0.5
         
-        // Show police contact modal
-        this.showInitialPoliceContactModal()
-    }
-
-    /**
-     * Called when the player wins the encounter.
-     */
-    onVictory() {
-        this.showPlayerDefeatedEnemyModal()
+        let msg = `You encounter ${fleetName}!<br/><br/>`
+        
+        if (wantsToSearch) {
+            msg += `The police transmit: "This is a routine inspection. Prepare to be boarded for cargo search."<br/>`
+            
+            showModal(fleetName, msg, [
+                ['Submit to Search', () => this.showPoliceSearchModal()],
+                ['Resist', () => this.showPlayerRefuseSurrenderModal()],
+            ], '', null, 0)
+        } else {
+            msg += `The police scan your vessel briefly, then transmit:<br/>`
+            msg += `"All clear. Safe travels, citizen."<br/>`
+            msg += `They continue on their patrol route.<br/>`
+            
+            showModal(fleetName, msg, [
+                ['Continue', () => this.endEncounter()],
+                ['Attack', () => this.showPlayerAttackModal()]
+            ], '', null, 0)
+        }
     }
 
     /**
@@ -39,47 +49,10 @@ class PoliceEncounter extends Encounter {
     }
 
     /**
-     * Called when the player escapes the encounter.
-     */
-    onEscape() {
-        this.showPlayerEscapedFromEnemyModal()
-    }
-
-    /**
      * Called when the player surrenders.
      */
     onSurrender() {
         this.showPlayerSurrenderedToAuthoritiesModal()
-    }
-    
-    /**
-     * Show initial police contact modal
-     * Police have 50% chance to ignore player, 50% to search
-     */
-    showInitialPoliceContactModal() {
-        const fleetName = coloredName(this.fleet)
-        const wantsToSearch = Math.random() > 0.5
-        
-        let msg = `You encounter ${fleetName}!<br/><br/>`
-        
-        if (wantsToSearch) {
-            msg += `The police transmit: "This is a routine inspection. Prepare to be boarded for cargo search."<br/>`
-            
-            showModal(fleetName, msg, [
-                ['Submit to Search', () => this.showPoliceSearchModal()],
-                ['Resist', () => this.showResistSearchModal()],
-                ['Attack', () => this.showPlayerAttackPoliceModal()]
-            ], '', null, 0)
-        } else {
-            msg += `The police scan your vessel briefly, then transmit:<br/>`
-            msg += `"All clear. Safe travels, citizen."<br/>`
-            msg += `They continue on their patrol route.<br/>`
-            
-            showModal(fleetName, msg, [
-                ['Continue', () => this.endEncounter()],
-                ['Attack', () => this.showPlayerAttackPoliceModal()]
-            ], '', null, 0)
-        }
     }
     
     /**
@@ -151,59 +124,5 @@ class PoliceEncounter extends Encounter {
         }
         
         showModal('Contraband Found', msg, [['Continue', () => this.showPlayerSurrenderedToAuthoritiesModal()]], '', null, 0)
-    }
-    
-    /**
-     * Show modal when player resists search
-     * Grants 5k bounty and gives option to fight or surrender
-     */
-    showResistSearchModal() {
-        const fleetName = coloredName(this.fleet)
-        const planet = this.planet
-        const resistBounty = 5000
-        
-        let msg = `You refuse to allow the ${fleetName} to search your vessel!<br/>`
-        msg += `"Obstruction of justice! All units, suspect is non-compliant!"<br/>`
-        
-        if (planet) {
-            gs.captain.bounty.increment(planet, resistBounty)
-            msg += `<br/>Additional fine issued: <span style="color: rgb(${COLORS.Red.join(',')})">${resistBounty}CR</span><br/>`
-        }
-        
-        msg += `<br/>The ${fleetName} power up weapons and demand your immediate surrender.<br/>`
-        
-        showModal('Resisting Arrest', msg, [
-            ['Surrender', () => this.showPlayerSurrenderedToAuthoritiesModal()],
-            ['Fight', () => this.startCombat(false)]
-        ], '', null, 0)
-    }
-    
-    /**
-     * Show modal when player attacks police
-     * Grants large bounty and starts combat
-     */
-    showPlayerAttackPoliceModal() {
-        const {playerUndetected} = this
-        const fleetName = coloredName(this.fleet)
-        const planet = this.planet
-        const attackBounty = 10000
-        
-        if (playerUndetected) {
-            // Drop shields if player was undetected
-            for (const ship of this.fleet.ships) ship.shields[0] = 0
-        }
-        
-        let msg = `You ${playerUndetected ? 'sneakily ' : ''}open fire on the ${fleetName}!<br/>`
-        if (playerUndetected) msg += `The ${fleetName} are caught completely off-guard!<br/>`
-        msg += `<br/>"ALL UNITS! OFFICER UNDER ATTACK! SUSPECT IS HOSTILE!"<br/>`
-        
-        if (planet) {
-            gs.captain.bounty.increment(planet, attackBounty)
-            gs.captain.grantReputation(planet, -50) // Large reputation penalty
-            msg += `<br/>Warrant issued: <span style="color: rgb(${COLORS.Red.join(',')})">${attackBounty}CR</span><br/>`
-            msg += `Your reputation on ${coloredName(planet)} has been severely damaged!<br/>`
-        }
-        
-        showModal('Attacking Police', msg, [['Continue', () => this.startCombat(true)]], '', null, 0)
     }
 }

@@ -4,12 +4,30 @@ class MerchantsEncounter extends Encounter {
      * Override onStart to show merchant contact modal instead of going straight to combat
      */
     onStart() {
-        console.log('MerchantsEncounter.onStart:', this)
-        if (currentMap && currentMap.togglePause) currentMap.togglePause(true)
-        gs.encounter = this
+        super.onStart()
+        const fleetName = coloredName(this.fleet)
+        const wantsToTrade = Math.random() > 0.5
         
-        // Show merchant modal instead of going straight to combat
-        this.showInitialContactModal()
+        let msg = `You encounter ${fleetName}!<br/><br/>`
+        
+        if (wantsToTrade) {
+            msg += `The merchant fleet signals they're open for business.<br/>`
+            msg += `"Greetings traveler! Care to trade?"<br/>`
+            
+            showModal(fleetName, msg, [
+                ['Trade', () => this.showTradeOfferModal()],
+                ['Attack', () => this.showPlayerAttackModal()],
+                ['Leave', () => this.endEncounter()]
+            ], '', null, 0)
+        } else {
+            msg += `The merchant fleet broadcasts on all channels:<br/>`
+            msg += `"Would love to stay and chat, but we're late to drop the cargo. Maybe next time."<br/>`
+            
+            showModal(fleetName, msg, [
+                ['Attack', () => this.showPlayerAttackModal()],
+                ['Leave', () => this.endEncounter()]
+            ], '', null, 0)
+        }
     }
 
     /**
@@ -31,36 +49,6 @@ class MerchantsEncounter extends Encounter {
      */
     onEscape() {
         this.showPlayerEscapedFromEnemyModal()
-    }
-
-    /**
-     * Show initial contact modal with merchant ship
-     * Merchant has 50% chance to want to trade, 50% to ignore player
-     */
-    showInitialContactModal() {
-        const fleetName = coloredName(this.fleet)
-        const wantsToTrade = Math.random() > 0.5
-        
-        let msg = `You encounter ${fleetName}!<br/><br/>`
-        
-        if (wantsToTrade) {
-            msg += `The merchant fleet signals they're open for business.<br/>`
-            msg += `"Greetings traveler! Care to trade?"<br/>`
-            
-            showModal(fleetName, msg, [
-                ['Trade', () => this.showTradeOfferModal()],
-                ['Attack', () => this.startCombat()],
-                ['Leave', () => this.endEncounter()]
-            ], '', null, 0)
-        } else {
-            msg += `The merchant fleet broadcasts on all channels:<br/>`
-            msg += `"Would love to stay and chat, but we're late to drop the cargo. Maybe next time."<br/>`
-            
-            showModal(fleetName, msg, [
-                ['Attack', () => this.startCombat()],
-                ['Leave', () => this.endEncounter()]
-            ], '', null, 0)
-        }
     }
     
     /**
