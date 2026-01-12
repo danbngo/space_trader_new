@@ -227,6 +227,10 @@ class TravelMapCombatHandler {
             }, 1000)
         } else {
             console.log('Still player turn, refreshing display')
+            // Auto-select first non-disabled player ship for new player turn
+            const firstActiveShip = gs.combat.activePlayerShips[0] || null
+            this.travelMap.selectedShip = firstActiveShip
+            console.log('Auto-selected first player ship for new turn:', firstActiveShip?.name)
             // Refresh display for player's turn
             this.travelMap.refresh()
         }

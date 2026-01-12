@@ -650,6 +650,13 @@ class Combat {
         
         // Set initial turn
         this.activeTurnFleet = playerHasInitiative ? this.playerFleet : this.enemyFleet
+        
+        // Auto-select first non-disabled player ship if player has initiative
+        if (playerHasInitiative && currentMap && currentMap.selectedShip !== undefined) {
+            const firstActiveShip = this.activePlayerShips[0] || null
+            currentMap.selectedShip = firstActiveShip
+            console.log('Auto-selected first player ship:', firstActiveShip?.name)
+        }
     }
 
     /**
