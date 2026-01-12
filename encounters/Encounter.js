@@ -556,7 +556,7 @@ class Encounter {
         const fleetName = coloredName(this.fleet)
         const planet = this.planet
         const reputationMultiplier = this.encounterType.reputationMultiplier
-        const reputation = Math.ceil(ENCOUNTER_BASE_REPUTATION_EFFECT_ON_NO_SURRENDER * reputationMultiplier)
+        const reputation = Math.round(ENCOUNTER_BASE_REPUTATION_EFFECT_ON_NO_SURRENDER * reputationMultiplier)
         const bounty = reputationMultiplier > 0 ? ENCOUNTER_BASE_FINE_ON_ATTACK * reputationMultiplier : 0
         
         let msg = `You refuse to submit to the ${fleetName} demands, and the battle is joined!<br/>`

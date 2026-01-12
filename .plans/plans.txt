@@ -2,6 +2,9 @@ DONE:
 
 
 TODO:
+-which ship player has selected is not obvious enough - needs an arrow
+-pirates seem to have wrong effect on reputation
+-tow ship not working
 -check if player ships (non disabled) have enough room for cargo after a battle, if not dump some
 -handle player ships fleeing
 -simplify the news system

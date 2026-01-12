@@ -651,11 +651,21 @@ class Combat {
         // Set initial turn
         this.activeTurnFleet = playerHasInitiative ? this.playerFleet : this.enemyFleet
         
-        // Auto-select first non-disabled player ship if player has initiative
+        // Auto-select first non-disabled player ship if player has initiative, but only if no valid ship is selected
         if (playerHasInitiative && currentMap && currentMap.selectedShip !== undefined) {
-            const firstActiveShip = this.activePlayerShips[0] || null
-            currentMap.selectedShip = firstActiveShip
-            console.log('Auto-selected first player ship:', firstActiveShip?.name)
+            const currentlySelected = currentMap.selectedShip
+            const isValidSelection = currentlySelected && 
+                                    this.activePlayerShips.includes(currentlySelected) &&
+                                    !currentlySelected.disabled && 
+                                    !currentlySelected.escaped
+            
+            if (!isValidSelection) {
+                const firstActiveShip = this.activePlayerShips[0] || null
+                currentMap.selectedShip = firstActiveShip
+                console.log('Auto-selected first player ship:', firstActiveShip?.name)
+            } else {
+                console.log('Keeping currently selected ship:', currentlySelected?.name)
+            }
         }
     }
 

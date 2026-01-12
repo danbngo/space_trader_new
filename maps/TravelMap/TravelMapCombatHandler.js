@@ -219,20 +219,50 @@ class TravelMapCombatHandler {
         gs.combat.handleTurnComplete()
         console.log('After handleTurnComplete - activeTurnFleet:', gs.combat.activeTurnFleet.name)
         
-        // If it's now enemy turn, execute AI after a brief delay
+        // If it's now enemy turn, wait for animations then execute AI
         if (gs.combat.activeTurnFleet === gs.combat.enemyFleet) {
-            console.log('Detected enemy turn, scheduling enemy turn execution in 1s')
+            console.log('Detected enemy turn, waiting for animations to finish before starting')
+            this.waitForAnimationsBeforeEnemyTurn()
+        } else {
+            console.log('Still player turn, refreshing display')
+            // Auto-select first non-disabled player ship for new player turn, but only if no valid ship is already selected
+            const currentlySelected = this.travelMap.selectedShip
+            const isValidSelection = currentlySelected && 
+                                    gs.combat.activePlayerShips.includes(currentlySelected) &&
+                                    !currentlySelected.disabled && 
+                                    !currentlySelected.escaped
+            
+            if (!isValidSelection) {
+                const firstActiveShip = gs.combat.activePlayerShips[0] || null
+                this.travelMap.selectedShip = firstActiveShip
+                console.log('Auto-selected first player ship for new turn:', firstActiveShip?.name)
+            } else {
+                console.log('Keeping currently selected ship:', currentlySelected?.name)
+            }
+            
+            // Refresh display and UI panel for player's turn
+            this.travelMap.refresh()
+            this.travelMap.updateUIPanel()
+        }
+    }
+
+    /**
+     * Waits for all animations to finish before starting enemy turn
+     */
+    waitForAnimationsBeforeEnemyTurn() {
+        const animationsRunning = this.travelMap.animations.length > 0
+        console.log('=== waitForAnimationsBeforeEnemyTurn ===', { animationsRunning, animationCount: this.travelMap.animations.length })
+        
+        if (animationsRunning) {
+            // Wait and check again
+            setTimeout(() => {
+                this.waitForAnimationsBeforeEnemyTurn()
+            }, 100)
+        } else {
+            console.log('All animations complete, starting enemy turn after 1s delay')
             setTimeout(() => {
                 this.executeEnemyTurn()
             }, 1000)
-        } else {
-            console.log('Still player turn, refreshing display')
-            // Auto-select first non-disabled player ship for new player turn
-            const firstActiveShip = gs.combat.activePlayerShips[0] || null
-            this.travelMap.selectedShip = firstActiveShip
-            console.log('Auto-selected first player ship for new turn:', firstActiveShip?.name)
-            // Refresh display for player's turn
-            this.travelMap.refresh()
         }
     }
 
