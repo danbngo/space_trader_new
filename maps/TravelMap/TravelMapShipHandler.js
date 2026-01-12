@@ -306,10 +306,9 @@ class TravelMapShipHandler {
         const hullPercent = ship.hull[0] / ship.hull[1]
         const shieldPercent = ship.shields[0] / ship.shields[1]
         
-        // Check visibility: hull shows when shields are depleted, shield shows when present
         // Hide both bars for disabled ships
-        const hideHull = ship.disabled || ship.shields[0] > 0  // Hide if disabled or shields still present
-        const hideShield = ship.disabled || ship.shields[0] <= 0  // Hide if disabled or zero
+        const hideHull = ship.disabled || ((ship.shields[0] > 0) && (ship.hull[0] >= ship.hull[1]))  // Show if shields depleted OR (not disabled AND hull damaged)
+        const hideShield = ship.disabled || (ship.shields[0] <= 0)  // Hide if disabled or zero
         
         // Render hull bar with opacity applied
         const baseHullColor = hullPercent < 0.3 ? COLORS.Red : COLORS.Orange
