@@ -54,5 +54,7 @@ const TRAVEL_MAP_CONFIG = {
         hullDamage: [255, 255, 255, 1],   // White
         disabled: [255, 0, 0, 1],         // Red
         selfTotalDamage: [255, 200, 0, 1],     // Orange/yellow
+        shieldHeal: [0, 150, 255, 1],     // Blue
+        hullHeal: [0, 255, 100, 1],       // Green
     },
 }

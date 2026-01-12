@@ -274,9 +274,8 @@ class TravelMapCombatHandler {
             console.log('Animating enemy ram from', action.ship.name, 'to', action.target.name)
             this.ramHandler.animateRam(action.ship, action.target, action.result)
         } else if (action.action === 'recharge') {
-            console.log('Enemy recharging:', action.ship.name)
-            // Execute recharge immediately (no animation)
-            gs.combat.executeResult(action.result)
+            console.log('Animating enemy recharge:', action.ship.name)
+            this.rechargeHandler.animateRecharge(action.ship, action.result)
         }
         
         // Wait for this action's animation to complete before processing next
@@ -343,6 +342,7 @@ class TravelMapCombatHandler {
      * @param {boolean} missed - Whether the attack missed
      */
     displayDamageText(ship, hullDamage = 0, shieldDamage = 0, destroyed = false, missed = false) {
+        console.log('=== displayDamageText called ===', { ship: ship.shipType.name, hullDamage, shieldDamage, destroyed, missed })
         if (hullDamage == 0 && shieldDamage == 0 && !destroyed && !missed) {
             return
         }
@@ -351,11 +351,18 @@ class TravelMapCombatHandler {
             return
         }
         
-        if (shieldDamage > 0) {
-            this.displayTextOverShip(ship, TRAVEL_MAP_CONFIG.floatingTextColors.shieldDamage, `-${shieldDamage}`, TRAVEL_MAP_CONFIG.floatingTextDuration, -30)
+        const isShieldHeal = shieldDamage < 0
+        const isHullHeal = hullDamage < 0
+        const shieldColor = isShieldHeal ? TRAVEL_MAP_CONFIG.floatingTextColors.shieldHeal : TRAVEL_MAP_CONFIG.floatingTextColors.shieldDamage
+        const hullColor = isHullHeal ? TRAVEL_MAP_CONFIG.floatingTextColors.hullHeal : TRAVEL_MAP_CONFIG.floatingTextColors.hullDamage
+        const shieldText = isShieldHeal ? `+${Math.abs(shieldDamage)}` : `-${shieldDamage}`
+        const hullText = isHullHeal ? `+${Math.abs(hullDamage)}` : `-${hullDamage}`
+        
+        if (shieldDamage !== 0) {
+            this.displayTextOverShip(ship, shieldColor, shieldText, TRAVEL_MAP_CONFIG.floatingTextDuration, -30)
         }
-        if (hullDamage > 0) {
-            this.displayTextOverShip(ship, TRAVEL_MAP_CONFIG.floatingTextColors.hullDamage, `-${hullDamage}`, TRAVEL_MAP_CONFIG.floatingTextDuration, 30)
+        if (hullDamage !== 0) {
+            this.displayTextOverShip(ship, hullColor, hullText, TRAVEL_MAP_CONFIG.floatingTextDuration, 30)
         }
         if (destroyed) {
             this.displayTextOverShip(ship, TRAVEL_MAP_CONFIG.floatingTextColors.disabled, 'Disabled', TRAVEL_MAP_CONFIG.floatingTextDuration, 0)
@@ -503,8 +510,20 @@ class TravelMapCombatHandler {
                 this.waitForAnimationsThenComplete()
             }, 100)
         } else {
-            // All animations complete, handle action completion
-            console.log('All animations complete, calling handleActionComplete')
+            // All animations complete, check if combat should end
+            console.log('All animations complete')
+            
+            // Update combat result to check for victory/defeat
+            gs.combat.updateCombatResult()
+            
+            // If all enemies are disabled/escaped (victory), end player turn immediately
+            if (gs.combat.result === ENCOUNTER_RESULTS.Victory) {
+                console.log('All enemies disabled - ending combat')
+                this.showCombatEndModal()
+                return
+            }
+            
+            console.log('Calling handleActionComplete')
             this.handleActionComplete()
         }
     }
