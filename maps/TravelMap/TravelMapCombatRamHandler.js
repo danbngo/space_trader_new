@@ -36,14 +36,15 @@ class TravelMapCombatRamHandler {
      * Animates a ramming ship surging forward and back
      * @param {Ship} attacker - The ship doing the ramming
      * @param {Ship} target - The ship being rammed
+     * @param {Object} combatResult - The result of the ram attack
      */
-    animateRam(attacker, target) {
+    animateRam(attacker, target, combatResult) {
         const attackerObj = this.travelMap.cvs.getObject(`ship-${attacker.uuid}`)
         const targetObj = this.travelMap.cvs.getObject(`ship-${target.uuid}`)
         if (!attackerObj || !targetObj) {
             console.warn('Could not find ship objects for ram animation')
             return
         }
-        this.travelMap.animations.push(new RamAnimation(attackerObj, targetObj))
+        this.travelMap.animations.push(new RamAnimation(attackerObj, targetObj, target, combatResult, this.travelMap))
     }
 }

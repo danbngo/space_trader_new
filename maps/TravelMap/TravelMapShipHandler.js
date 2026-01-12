@@ -183,7 +183,7 @@ class TravelMapShipHandler {
         
         // Update progress bars (only show during encounters)
         if (gs.encounter) {
-            this.addShipProgressBars(ship, shipObj)
+            this.updateShipStatBars(ship, shipObj)
         }
     }
 
@@ -231,7 +231,7 @@ class TravelMapShipHandler {
      * @param {number} barY - Y position for this bar
      * @param {boolean} isHidden - Whether to hide this bar
      */
-    addShipStatBar(ship, shipObj, barType, fillColor, fillRatio, barY, isHidden = false) {
+    updateShipStatBar(ship, shipObj, barType, fillColor, fillRatio, barY, isHidden = false) {
         const x = shipObj.x
         
         // Bar background (black) - note: fillColor already has opacity applied from caller
@@ -298,7 +298,7 @@ class TravelMapShipHandler {
      * @param {Ship} ship
      * @param {CanvasObject} shipObj - The ship's canvas object to position bars relative to
      */
-    addShipProgressBars(ship, shipObj) {
+    updateShipStatBars(ship, shipObj) {
         const y = shipObj.y
         
         // Calculate bar positions
@@ -320,14 +320,14 @@ class TravelMapShipHandler {
         //if (hullColor.length >= 4) {
         //    hullColor[3] = shipGroupConfig.opacity
         //}
-        this.addShipStatBar(ship, shipObj, 'hull', hullColor, hullPercent, hullBarY, hideHull)
+        this.updateShipStatBar(ship, shipObj, 'hull', hullColor, hullPercent, hullBarY, hideHull)
         
         // Render shield bar with opacity applied
         const shieldColor = [...COLORS.Blue]
         //if (shieldColor.length >= 4) {
         //    shieldColor[3] = shipGroupConfig.opacity
         //}
-        this.addShipStatBar(ship, shipObj, 'shield', shieldColor, shieldPercent, shieldBarY, hideShield)
+        this.updateShipStatBar(ship, shipObj, 'shield', shieldColor, shieldPercent, shieldBarY, hideShield)
     }
 
     /**

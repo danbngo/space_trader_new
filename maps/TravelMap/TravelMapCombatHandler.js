@@ -258,6 +258,32 @@ class TravelMapCombatHandler {
     }
 
     /**
+     * Displays damage text over a ship based on combat result
+     * @param {Ship} ship - The ship to display damage over
+     * @param {number} hullDamage - Hull damage dealt (0 if none)
+     * @param {number} shieldDamage - Shield damage dealt (0 if none)
+     * @param {boolean} destroyed - Whether the ship was destroyed
+     * @param {boolean} missed - Whether the attack missed
+     */
+    displayDamageText(ship, hullDamage = 0, shieldDamage = 0, destroyed = false, missed = false) {
+        if (missed) {
+            this.displayTextOverShip(ship, TRAVEL_MAP_CONFIG.floatingTextColors.missed, 'Missed', TRAVEL_MAP_CONFIG.floatingTextDuration, 0)
+            return
+        }
+        
+        if (shieldDamage > 0) {
+            this.displayTextOverShip(ship, TRAVEL_MAP_CONFIG.floatingTextColors.shieldDamage, `-${shieldDamage}`, TRAVEL_MAP_CONFIG.floatingTextDuration, -30)
+        }
+        if (hullDamage > 0) {
+            this.displayTextOverShip(ship, TRAVEL_MAP_CONFIG.floatingTextColors.hullDamage, `-${hullDamage}`, TRAVEL_MAP_CONFIG.floatingTextDuration, 30)
+        }
+        if (destroyed) {
+            this.displayTextOverShip(ship, TRAVEL_MAP_CONFIG.floatingTextColors.disabled, 'Disabled', TRAVEL_MAP_CONFIG.floatingTextDuration, 0)
+        }
+        this.travelMap.shipHandler.updateShipStatBars(ship, this.travelMap.cvs.getObject(`ship-${ship.uuid}`))
+    }
+
+    /**
      * Displays floating text over a ship that disappears after a duration
      * @param {Ship} ship - The ship to display text over
      * @param {number[]} color - RGBA color array for the text
@@ -353,39 +379,27 @@ class TravelMapCombatHandler {
         const result = gs.combat.executeAction(this.travelMap.selectedShip, attackType, targetShip)
         this.travelMap.selectedShip.actionsRemaining--
         
-        // Display laser beam if it's a laser attack, or animate ram
-        if (attackType === 'laser') {
-            this.laserHandler.displayLaserBeam(this.travelMap.selectedShip, targetShip, [255, 0, 0, 1], 500)
-        } else if (attackType === 'ram') {
-            this.ramHandler.animateRam(this.travelMap.selectedShip, targetShip)
-        }
-        
         console.log('Combat result:', result)
         console.log('Shields absorbed:', result.shieldsAbsorbed, 'Hull damage:', result.hullDamage)
         
-        // Display damage text over the target ship
-        if (!result.success && attackType !== 'ram') {
-            // Attack missed - show "Missed" in dark gray
-            this.displayTextOverShip(targetShip, TRAVEL_MAP_CONFIG.floatingTextColors.missed, 'Missed', TRAVEL_MAP_CONFIG.floatingTextDuration, 0)
-        } else {
-            if (result.shieldsAbsorbed && result.shieldsAbsorbed > 0) {
-                console.log('Displaying shield damage text')
-                this.displayTextOverShip(targetShip, TRAVEL_MAP_CONFIG.floatingTextColors.shieldDamage, `-${result.shieldsAbsorbed}`, TRAVEL_MAP_CONFIG.floatingTextDuration, -30)
+        // Display laser beam if it's a laser attack, or animate ram
+        if (attackType === 'laser') {
+            this.laserHandler.displayLaserBeam(this.travelMap.selectedShip, targetShip, [255, 0, 0, 1], 500)
+            
+            // Display damage text immediately for laser attacks
+            if (!result.success) {
+                this.displayDamageText(targetShip, 0, 0, false, true)
+            } else {
+                this.displayDamageText(targetShip, result.hullDamage || 0, result.shieldsAbsorbed || 0, result.destroyed)
             }
-            if (result.hullDamage && result.hullDamage > 0) {
-                console.log('Displaying hull damage text')
-                this.displayTextOverShip(targetShip, TRAVEL_MAP_CONFIG.floatingTextColors.hullDamage, `-${result.hullDamage}`, TRAVEL_MAP_CONFIG.floatingTextDuration, 30)
+        } else if (attackType === 'ram') {
+            // Pass result to animateRam - it will display damage text midway through animation
+            this.ramHandler.animateRam(this.travelMap.selectedShip, targetShip, result)
+            
+            // Display self-damage immediately for ram attacks
+            if (result.selfHullDamage && result.selfHullDamage > 0) {
+                this.displayTextOverShip(this.travelMap.selectedShip, TRAVEL_MAP_CONFIG.floatingTextColors.selfDamage, `-${result.selfHullDamage}`, TRAVEL_MAP_CONFIG.floatingTextDuration, 0)
             }
-        }
-        
-        // Display "Disabled" if ship was destroyed
-        if (result.destroyed) {
-            this.displayTextOverShip(targetShip, TRAVEL_MAP_CONFIG.floatingTextColors.disabled, 'Disabled', TRAVEL_MAP_CONFIG.floatingTextDuration, 0)
-        }
-        
-        // Display self-damage for ram attacks
-        if (attackType === 'ram' && result.selfHullDamage && result.selfHullDamage > 0) {
-            this.displayTextOverShip(this.travelMap.selectedShip, TRAVEL_MAP_CONFIG.floatingTextColors.selfDamage, `-${result.selfHullDamage}`, TRAVEL_MAP_CONFIG.floatingTextDuration, 0)
         }
         
         // Deselect ship if it has no actions remaining

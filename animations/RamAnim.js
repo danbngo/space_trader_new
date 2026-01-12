@@ -7,14 +7,19 @@ class RamAnimation extends Anim {
     /**
      * @param {CanvasObject} attackerShipObj - The canvas object for the attacker
      * @param {CanvasObject} targetShipObj - The canvas object for the target
+     * @param {Ship} targetShip - The target ship entity
+     * @param {Object} combatResult - The result of the ram attack
+     * @param {TravelMap} travelMap - Reference to the travel map
      */
-    constructor(attackerShipObj, targetShipObj) {
+    constructor(attackerShipObj, targetShipObj, targetShip, combatResult, travelMap) {
         const startX = attackerShipObj.x
         const startY = attackerShipObj.y
         const targetX = targetShipObj.x
         const targetY = targetShipObj.y
         const midpointX = (startX + targetX) / 2
         const midpointY = (startY + targetY) / 2
+        
+        let damageDisplayed = false
 
         console.log('RAM ANIM PROPS:', attackerShipObj, targetShipObj, startX, targetX, midpointX)
         
@@ -23,6 +28,17 @@ class RamAnimation extends Anim {
             (progressRatio) => {
                 console.log('Ram animation progress:', progressRatio, attackerShipObj, targetShipObj)
                 if (!attackerShipObj) return
+                
+                // Display damage text at 15% progress (midway through the forward surge)
+                if (!damageDisplayed && progressRatio >= 0.15) {
+                    damageDisplayed = true
+                    travelMap.combatHandler.displayDamageText(
+                        targetShip,
+                        combatResult.hullDamage || 0,
+                        combatResult.shieldsAbsorbed || 0,
+                        combatResult.destroyed
+                    )
+                }
                 
                 if (progressRatio <= 0.3) {
                     // First 30%: fast surge forward to midpoint
@@ -44,5 +60,9 @@ class RamAnimation extends Anim {
                 }
             }
         )
+        
+        this.targetShip = targetShip
+        this.combatResult = combatResult
+        this.travelMap = travelMap
     }
 }
