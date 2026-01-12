@@ -16,6 +16,7 @@ class CombatResult {
      * @param {number} [data.shieldsRecharged] - Shields recharged
      * @param {number} [data.lasersRecharged] - Lasers recharged
      * @param {boolean} [data.destroyed] - Whether defender was destroyed
+     * @param {boolean} [data.selfDestroyed] - Whether attacker destroyed themselves (for ram attacks)
      * @param {boolean} [data.escaped] - Whether attacker escaped
      */
     constructor(data) {
@@ -31,6 +32,7 @@ class CombatResult {
         this.shieldsRecharged = data.shieldsRecharged || 0
         this.lasersRecharged = data.lasersRecharged || 0
         this.destroyed = data.destroyed || false
+        this.selfDestroyed = data.selfDestroyed || false
         this.escaped = data.escaped || false
     }
 }

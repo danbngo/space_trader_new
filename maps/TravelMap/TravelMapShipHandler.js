@@ -91,11 +91,13 @@ class TravelMapShipHandler {
         //apply opacity during fadein / fadeout
         shipObj.fillColor = shipColor
         shipObj.fillColor[3] = shipGroupConfig.opacity
-        if (ship.disabled) {
-            shipObj.darkenRatio = 1; //darkest ships are disabled ones
-        }
         shipObj.darkenRatio = 0 //default = no darken
-        if (this.travelMap.selectedShip === ship) {
+
+        //modify hull
+        if (ship.disabled) {
+            shipObj.darkenRatio = 0.75; //darkest ships are disabled ones. never darken to 1.0 or ship will appear dark gray instead of colorful
+        }
+        else if (this.travelMap.selectedShip === ship) {
             shipObj.darkenRatio = -0.5 //lighten selected player ship
         }
         else if (this.travelMap.combatHandler.targetingMode) {
@@ -114,6 +116,8 @@ class TravelMapShipHandler {
                 shipObj.darkenRatio = 0.5 //darken ships with no moves remaining
             }
         }
+
+        //modify shields
         if (ship.shields[0] > 0) {
             const shieldRatio = ship.shields[0] / ship.shields[1]
             shipObj.outlineColor = [Math.round(128*shieldRatio),Math.round(128*shieldRatio),Math.round(255*shieldRatio),1]

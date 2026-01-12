@@ -62,12 +62,18 @@ class TravelMapCombatHandler {
         
         infoElement.innerHTML = ''
         
-        infoElement.appendChild(ce({
-            children: [
-                `<u>${coloredName(selectedShip.fleet)} ${selectedShip.shipType.name}</u>`,
-                `Hull: ${selectedShip.hull[0]}/${selectedShip.hull[1]} | 
+        const children = [
+            `<u>${coloredName(selectedShip.fleet)} ${selectedShip.shipType.name}</u>`,
+            `Hull: ${selectedShip.hull[0]}/${selectedShip.hull[1]} | 
                 Shields: ${selectedShip.shields[0]}/${selectedShip.shields[1]}`
-            ]
+        ]
+        
+        if (selectedShip.hull[0] <= 0) {
+            children.push(colorSpan('Disabled', COLORS.Red))
+        }
+        
+        infoElement.appendChild(ce({
+            children: children
         }))
     }
 
@@ -407,12 +413,8 @@ class TravelMapCombatHandler {
             this.travelMap.selectedShip = null
         }
         
-        if (result.success || attackType === 'ram') {
-            this.handleActionComplete()
-        } else {
-            // Refresh UI even if attack failed
-            this.travelMap.updateUIPanel()
-        }
+        this.handleActionComplete()
+        this.travelMap.updateUIPanel()
     }
 
 }

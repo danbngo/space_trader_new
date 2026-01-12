@@ -465,7 +465,8 @@ class Combat {
                     hullDamage: result.hullDamage || 0,
                     shieldsAbsorbed: result.shieldsAbsorbed || 0,
                     selfHullDamage: result.selfHullDamage || 0,
-                    destroyed: result.destroyed
+                    destroyed: result.destroyed,
+                    selfDestroyed: result.selfDestroyed
                 })
 
             case 'recharge':

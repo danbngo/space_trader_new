@@ -9,7 +9,7 @@ class LaserAnim extends Anim {
      * @param {CanvasObject} targetShipObj - The canvas object for the target
      * @param {Ship} attackingShip - The attacking ship entity
      * @param {Ship} targetShip - The target ship entity
-     * @param {Object} combatResult - The result of the laser attack
+     * @param {CombatResult} combatResult - The result of the laser attack
      * @param {TravelMap} travelMap - Reference to the travel map
      */
     constructor(attackerShipObj, targetShipObj, attackingShip, targetShip, combatResult, travelMap) {
@@ -36,7 +36,8 @@ class LaserAnim extends Anim {
                         targetShip,
                         combatResult.hullDamage || 0,
                         combatResult.shieldsAbsorbed || 0,
-                        combatResult.destroyed
+                        combatResult.destroyed,
+                        !combatResult.success
                     )
                 }
                 
