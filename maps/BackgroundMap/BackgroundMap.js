@@ -1,6 +1,5 @@
-class BackgroundMap extends BaseMap {
+class BackgroundMap {
     constructor() {
-        super()
         this.paused = false // Never pause the background animation
         this.lastTickMs = Date.now()
         this.gameYearsPerMs = 1/365/24/60 * 2

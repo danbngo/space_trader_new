@@ -4,9 +4,8 @@
  * @param {Fleet|Planet} autoSelectObject
  * 
  */
-class StarMap extends BaseMap {
+class StarMap {
     constructor(starSystem = new StarSystem(), autoSelectObject) {
-        super()
         console.log('CREATING STAR MAP FOR SYSTEM:',starSystem,'with autoselect obj:',autoSelectObject)
         this.starSystem = starSystem
 
@@ -18,6 +17,7 @@ class StarMap extends BaseMap {
         this.lastCameraY = 0
         this.lastZoom = 1
         this.isAnimating = true
+        this.maxMsPerTick = 60;
         
         // FPS tracking
         this.fpsFrames = 0
@@ -160,9 +160,6 @@ class StarMap extends BaseMap {
             )
             console.log('Created starmap background bitmap',bmp)
         }
-        
-        // Wait for images to load, then redraw
-        this.waitForImagesLoaded([this.bgCvs])
     }
 
     static lastZoom = 1

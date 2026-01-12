@@ -40,9 +40,6 @@ class BackgroundMapRenderer {
             bgObj.parallax = true // Enable parallax effect
             bgObj.zIndex = -1000 // Put it behind everything
             console.log('Created background bitmap:', bgId, 'size:', canvasSize * 2)
-            
-            // Wait for images to load, then redraw
-            this.backgroundMap.waitForImagesLoaded([cvs])
         }
     }
 

@@ -14,9 +14,8 @@
  * Combat and route travel map
  * Shows tactical combat when enemies are present, or animated route travel when traveling peacefully
  */
-class TravelMap extends BaseMap {
+class TravelMap {
     constructor() {
-        super()
         console.log('CREATING TRAVEL MAP')
         
         this.selectedShip = null
@@ -72,7 +71,6 @@ class TravelMap extends BaseMap {
         requestAnimationFrame(() => {
             this.cvs.autoResize()
             this.bgCvs.autoResize()
-            this.refreshUIState()
             // Render stars once to background canvas
             this.renderBackgroundStars()
             
@@ -86,14 +84,15 @@ class TravelMap extends BaseMap {
      * Handles both combat and travel rendering, checks for encounter changes
      */
     tick() {
-        console.log('STARTING TRAVEL MAP ANIMATION')
+        console.log('STARTING TRAVEL MAP TICK')
         // Check if animation should continue
         if (!this.isAnimating) {
-            console.log('Animation loop stopped')
+            console.log('Travel map tick stopped')
             return
         }
         this.handleAnimations()
         this.shipHandler.renderShips()
+        this.refreshUIState()
         // Run tick logic for travel mode
         if (this.currentUIState === 'travel' && gs.destination && gs.travelYearsRemaining !== null) {
             // && gs.travelYearsRemaining > 0 <-- dont include this check, we want to detect whether route is complete in the subclass
@@ -105,7 +104,7 @@ class TravelMap extends BaseMap {
     handleAnimations() {
         // Update active animations and remove completed ones
         const currentMs = Date.now()
-        console.log('handling animations:', this.animations.length, 'active','time:',currentMs)
+        //console.log('handling animations:', this.animations.length, 'active','time:',currentMs)
         this.animations.forEach(anim => anim.update(currentMs))
         this.animations = this.animations.filter(anim => !anim.completed)
         // Render ships (always to allow fade-in and smooth animation)
@@ -199,9 +198,6 @@ class TravelMap extends BaseMap {
             )
             console.log('Created starmap background bitmap', bmp)
         }
-        
-        // Wait for images to load, then redraw
-        this.waitForImagesLoaded([this.bgCvs])
     }
 
     /**

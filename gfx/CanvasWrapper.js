@@ -63,6 +63,8 @@ class CanvasWrapper {
         this.maxFrameRate = MAX_FRAMES_PER_SECOND; //do not refresh more than 30 times per second
         this.lastRedrawAt = 0;
         this.fillColor = null
+
+        this.scheduledRedraw = false;
         
         this.autoResize()
     }
@@ -179,6 +181,7 @@ class CanvasWrapper {
         const obj = new CanvasObject({ id, shape: SHAPES.Bitmap, x, y, src, size, minScreenSize, fillColor, angle, onClick, zIndex });
         obj.parallax = parallax
         obj.overlap = overlap
+        this.checkScheduleRedraw() //force an eventual redraw when adding bitmaps as they may load asynchronously
         return this.addObject(obj)
     }
     
@@ -543,5 +546,30 @@ class CanvasWrapper {
             if (obj.outlineColor && obj.fillColor && obj.fillColor[3] >= 1) obj.drawOutlines(now, ctx, size, sx, sy, x2Offset, y2Offset);
             obj.draw(now, ctx, size, sx, sy, x2Offset, y2Offset)
         }
+    }
+
+    checkScheduleRedraw() {
+        if (this.scheduledRedraw == true) return
+        let allLoaded = true
+
+        for (const obj of this.drawOrder) {
+            // Check if object has an image that's still loading
+            if (obj.imageLoaded === false) {
+                allLoaded = false
+                break
+            }
+        }
+
+        if (allLoaded) {
+            setTimeout(() => {
+                this.redraw(true)
+            }, 1)
+            this.scheduledRedraw = false
+            return
+        }
+        this.scheduledRedraw = true
+        setTimeout(() => {
+            this.checkScheduleRedraw()
+        }, 1)
     }
 }
