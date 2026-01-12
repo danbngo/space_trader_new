@@ -150,21 +150,57 @@ class Encounter {
     }
 
     /**
-     * Calculates cargo lost from disabled ships.
+     * Removes disabled ships from fleet and loses their cargo.
+     * If all ships would be lost, spares one with 1 hull.
      * @param {Ship[]} disabledShips
-     * @returns {string} Message describing lost cargo
+     * @returns {string} Message describing lost ships and cargo
      */
-    loseCargoFromDisabledShips(disabledShips = []) {
-        console.log('Encounter.loseCargoFromDisabledShips', { disabledShips })
+    loseDisabledShipsAndCargo(disabledShips = []) {
+        console.log('Encounter.loseDisabledShipsAndCargo', { disabledShips })
+        if (disabledShips.length === 0) return ''
+        
         const disabledShipsCargoCapacity = disabledShips.reduce((total, ship) => {
             return total + ship.cargoSpace
         }, 0)
         const cargoRatio = disabledShipsCargoCapacity / gs.fleet.totalCargoSpace
         const lostCargoAmt = Math.floor(gs.fleet.cargo.total * cargoRatio)
-        if (lostCargoAmt <= 0) return ''
-        let totalLostCargo = gs.fleet.cargo.randomSubset(lostCargoAmt)
-        gs.fleet.cargo.subtractAmounts(totalLostCargo)
-        const msg = `${lostCargoAmt} units of cargo drift into space from your disabled ships.<br/>`
+        
+        let msg = ''
+        
+        // Lose cargo from disabled ships
+        if (lostCargoAmt > 0) {
+            let totalLostCargo = gs.fleet.cargo.randomSubset(lostCargoAmt)
+            gs.fleet.cargo.subtractAmounts(totalLostCargo)
+            msg += `${lostCargoAmt} units of cargo drift into space from your disabled ships.<br/>`
+        }
+        
+        // Remove disabled ships from fleet
+        const wouldLoseAllShips = disabledShips.length >= gs.fleet.ships.length
+        
+        if (wouldLoseAllShips) {
+            // Spare one ship with 1 hull
+            const sparedShip = disabledShips[0]
+            sparedShip.hull[0] = 1
+            sparedShip.disabled = false
+            
+            // Remove all other disabled ships
+            for (let i = 1; i < disabledShips.length; i++) {
+                gs.fleet.removeShip(disabledShips[i])
+            }
+            
+            msg += `<span style="color: rgb(${COLORS.Red.join(',')})">All your ships were disabled!</span><br/>`
+            msg += `You manage to barely restore emergency power to ${coloredName(sparedShip)} with 1 hull remaining.<br/>`
+            if (disabledShips.length > 1) {
+                msg += `Your other ${disabledShips.length - 1} disabled ships are lost.<br/>`
+            }
+        } else {
+            // Remove all disabled ships
+            for (const ship of disabledShips) {
+                gs.fleet.removeShip(ship)
+            }
+            msg += `<span style="color: rgb(${COLORS.Red.join(',')})">You lost ${disabledShips.length} disabled ships!</span><br/>`
+        }
+        
         return msg
     }
 
@@ -601,7 +637,7 @@ class Encounter {
         
         if (disabledPlayerShips.length > 0) {
             msg += `${disabledPlayerShips.length} of your ships were disabled in the fighting.<br/>`
-            msg += this.loseCargoFromDisabledShips(disabledPlayerShips)
+            msg += this.loseDisabledShipsAndCargo(disabledPlayerShips)
         }
 
         msg += this.conductRepairs()
@@ -649,7 +685,7 @@ class Encounter {
         if (escapedPlayerShips.length > 0) msg += `${escapedPlayerShips.length == playerShips.length ? 'All' : escapedPlayerShips.length} of your ships exited the battlefield intact.<br/>`
         if (disabledPlayerShips.length > 0) {
             msg += `However, ${disabledPlayerShips.length} were disabled in the fighting.<br/>`
-            msg += this.loseCargoFromDisabledShips(disabledPlayerShips)
+            msg += this.loseDisabledShipsAndCargo(disabledPlayerShips)
         }
 
         msg += this.conductRepairs()
@@ -689,7 +725,7 @@ class Encounter {
 
         if (disabledPlayerShips.length > 0) {
             msg += `${disabledPlayerShips.length} of your ships were disabled in the fighting.<br/>`
-            msg += this.loseCargoFromDisabledShips(disabledPlayerShips)
+            msg += this.loseDisabledShipsAndCargo(disabledPlayerShips)
         }
 
         msg += this.conductRepairs()

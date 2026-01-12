@@ -45,7 +45,7 @@ class PoliceEncounter extends Encounter {
         
         if (disabledPlayerShips.length > 0) {
             msg += `${disabledPlayerShips.length} of your ships were disabled in the fighting.<br/>`
-            msg += this.loseCargoFromDisabledShips(disabledPlayerShips)
+            msg += this.loseDisabledShipsAndCargo(disabledPlayerShips)
         }
 
         showModal('Defeated', msg, [['Continue', ()=>this.showPlayerSurrenderedToAuthoritiesModal()]])

@@ -3,9 +3,10 @@ DONE:
 
 TODO:
 -check if player ships (non disabled) have enough room for cargo after a battle, if not dump some
+-handle player ships fleeing
+-simplify the news system
 -the ENTIRETY of combat.js needs to be tweaked, rebalanced
--test new travel, encounter, combat systems. get em working.
--fix craters collapsing bug
+
 -planetMap! shows the moons, where each building is and causes the player ship to move around to use buildings
 -in general, add some modules that do things other than grant new moves-regen, etc. or other ways to upgrade ships.
 
