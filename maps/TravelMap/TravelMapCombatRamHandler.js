@@ -45,6 +45,6 @@ class TravelMapCombatRamHandler {
             console.warn('Could not find ship objects for ram animation')
             return
         }
-        this.travelMap.animations.push(new RamAnimation(attackerObj, targetObj, target, combatResult, this.travelMap))
+        this.travelMap.animations.push(new RamAnimation(attackerObj, targetObj, attacker, target, combatResult, this.travelMap))
     }
 }

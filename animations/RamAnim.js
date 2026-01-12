@@ -7,17 +7,19 @@ class RamAnimation extends Anim {
     /**
      * @param {CanvasObject} attackerShipObj - The canvas object for the attacker
      * @param {CanvasObject} targetShipObj - The canvas object for the target
+     * @param {Ship} attackingShip - The attacking ship entity
      * @param {Ship} targetShip - The target ship entity
      * @param {Object} combatResult - The result of the ram attack
      * @param {TravelMap} travelMap - Reference to the travel map
      */
-    constructor(attackerShipObj, targetShipObj, targetShip, combatResult, travelMap) {
+    constructor(attackerShipObj, targetShipObj, attackingShip, targetShip, combatResult, travelMap) {
         const startX = attackerShipObj.x
         const startY = attackerShipObj.y
         const targetX = targetShipObj.x
         const targetY = targetShipObj.y
         const midpointX = (startX + targetX) / 2
         const midpointY = (startY + targetY) / 2
+        attackingShip.acting = true
         
         let damageDisplayed = false
 
@@ -58,6 +60,7 @@ class RamAnimation extends Anim {
                     attackerShipObj.x = startX
                     attackerShipObj.y = startY
                 }
+                attackingShip.acting = false
             }
         )
         

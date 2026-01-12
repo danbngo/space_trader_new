@@ -76,6 +76,7 @@ class Ship {
         this._aiTypeName = undefined;
 
         this.actionsRemaining = 1
+        this.acting = false
         
         gameRegistry.registerShip(this)
     }

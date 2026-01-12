@@ -280,6 +280,13 @@ class TravelMapCombatHandler {
         if (destroyed) {
             this.displayTextOverShip(ship, TRAVEL_MAP_CONFIG.floatingTextColors.disabled, 'Disabled', TRAVEL_MAP_CONFIG.floatingTextDuration, 0)
         }
+        if (shieldDamage > 0 || hullDamage > 0) {
+            this.travelMap.animations.push(new DamageFlickerAnim(this.travelMap.cvs.getObject(`ship-${ship.uuid}`), ship, hullDamage <= 0, this.travelMap))
+        }
+        else if (shieldDamage < 0 || hullDamage < 0) {
+            this.travelMap.animations.push(new HealFlickerAnim(this.travelMap.cvs.getObject(`ship-${ship.uuid}`), ship, hullDamage < 0, this.travelMap))
+        }
+
         this.travelMap.shipHandler.updateShipStatBars(ship, this.travelMap.cvs.getObject(`ship-${ship.uuid}`))
     }
 
@@ -398,7 +405,7 @@ class TravelMapCombatHandler {
             
             // Display self-damage immediately for ram attacks
             if (result.selfHullDamage && result.selfHullDamage > 0) {
-                this.displayTextOverShip(this.travelMap.selectedShip, TRAVEL_MAP_CONFIG.floatingTextColors.selfDamage, `-${result.selfHullDamage}`, TRAVEL_MAP_CONFIG.floatingTextDuration, 0)
+                this.displayTextOverShip(this.travelMap.selectedShip, TRAVEL_MAP_CONFIG.floatingTextColors.selfTotalDamage, `-${result.selfHullDamage}`, TRAVEL_MAP_CONFIG.floatingTextDuration, 0)
             }
         }
         

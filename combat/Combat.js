@@ -319,7 +319,7 @@ class Combat {
      * Rams penetrate shields but also damage the attacker.
      * @param {Ship} attacker - The ramming ship
      * @param {Ship} defender - The ship being rammed
-     * @returns {Object} - Result of the ram {damage, selfDamage, destroyed, message}
+     * @returns {Object} - Result of the ram {damage, selfTotalDamage, destroyed, message}
      */
     executeRam(attacker, defender) {
         // Calculate ram damage based on engine power
@@ -328,17 +328,17 @@ class Combat {
         const damage = Math.ceil(baseDamage + (Math.random() * variance * 2 - variance));
         
         // Calculate self-damage (30% of ram damage)
-        const selfDamage = Math.ceil(damage * 0.3);
+        const selfTotalDamage = Math.ceil(damage * 0.3);
         
         // Apply damage to defender (penetrates shields)
         const defenderResult = this.applyDamage(defender, damage, true);
         
         // Apply self-damage to attacker
-        const attackerResult = this.applyDamage(attacker, selfDamage, true);
+        const attackerResult = this.applyDamage(attacker, selfTotalDamage, true);
         
         let message = `${attacker.name} rams ${defender.name}! `;
         message += `${defender.name} takes ${defenderResult.hullDamage} hull damage! `;
-        message += `${attacker.name} takes ${attackerResult.hullDamage} self-damage from the impact. `;
+        message += `${attacker.name} takes ${attackerResult.hullDamage} damage from the impact. `;
         
         if (defenderResult.destroyed) {
             message += `${defender.name} is destroyed! `;
@@ -349,7 +349,7 @@ class Combat {
         
         return {
             damage: defenderResult.totalDamage,
-            selfDamage: attackerResult.totalDamage,
+            selfTotalDamage: attackerResult.totalDamage,
             hullDamage: defenderResult.hullDamage,
             shieldsAbsorbed: defenderResult.shieldsAbsorbed,
             destroyed: defenderResult.destroyed,
