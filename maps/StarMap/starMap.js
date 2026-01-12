@@ -43,6 +43,7 @@ class StarMap {
         
         // Start continuous background star update loop (runs even when paused)
         this.animate()
+        this.togglePause(true) //force paused indicator to appear
         
         // REMOVED: FleetAI references
         // Set starMap reference for all fleet AIs

@@ -209,7 +209,7 @@ let currentMap;
 
 /**
  * Shows a map in the main UI container.
- * @param {BaseMap} map - The map to display
+ * @param {StarMap|TravelMap|BackgroundMap} map - The map to display
  */
 function showMap(map) {
     if (currentMap && currentMap.cleanup) currentMap.cleanup()
@@ -496,7 +496,7 @@ let currentModal = ce()
 function showModal(title = '', text = '', buttons = [['Continue', ()=>{}, false]], id = '', onClosePanel = null, dimBackgroundRatio = 0.55) {
     onClosePanel = null //danmod - this was ugly
     if (currentMap) {
-        currentMap.refresh()
+        //if (currentMap.refresh) currentMap.refresh()
         if (currentMap.togglePause) currentMap.togglePause(true)
     }
     // Close existing modal if open

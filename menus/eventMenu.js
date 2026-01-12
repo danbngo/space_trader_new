@@ -144,7 +144,7 @@ function checkPlayerStranded() {
     else if (noCredits) msg += `The operator complains bitterly after realizing you have no credits, but tows you anyway.<br/>`
     else msg += `The fee is ${creditCost}CR, but you only have ${gs.credits}CR.<br/>Grumbling, the operator confiscates your few remaining credits and tows you anyway.<br/>`
     msg += `You spend ${describeTimespan(dayCost/365)} being dragged through space.<br/>`
-    currentMap.refresh()
+    if (currentMap.refresh) currentMap.refresh()
 
     showModal(`Stranded`, msg, [['Continue', ()=>showPlanetMenu(towDestination)]])
     return true

@@ -260,9 +260,8 @@ function performLoad(saveName) {
             Object.assign(gs, loadedGs);
             
             // Refresh the map
-            if (currentMap) {
-                currentMap.refresh();
-            }
+            if (currentMap && currentMap.refresh) currentMap.refresh();
+            if (currentMap && currentMap.togglePause) currentMap.togglePause(true);
             
             showModal(
                 'Game Loaded',

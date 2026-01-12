@@ -126,10 +126,9 @@ class Encounter {
         this.combatEnabled = true
         
         closeModal()
-        if (currentMap && currentMap.togglePause && currentMap.refreshLogic) {
-            currentMap.togglePause(false)
-            currentMap.refreshLogic()
-        } else throw new Error('unexpected map while starting combat!')
+        if (currentMap && currentMap.togglePause) currentMap.togglePause(false)
+        if (currentMap && currentMap.refresh) currentMap.refresh()
+        if (currentMap && currentMap.refreshLogic) currentMap.refreshLogic()
     }
 
     /**
