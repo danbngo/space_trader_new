@@ -436,7 +436,7 @@ class StarMapBodiesHandler {
         const hasYCoord = selectedObject?.y !== undefined
         const canReach = selectedObject ? fleet.canReachDestination(selectedObject) : false
         
-        console.log('[DestinationLine] Checks:', {
+        /*console.log('[DestinationLine] Checks:', {
             hasSelectedObject,
             notSelectingFleet,
             hasXCoord,
@@ -444,7 +444,7 @@ class StarMapBodiesHandler {
             canReach,
             fleetLocation: fleet.location,
             selectedObjectName: selectedObject?.name || 'none'
-        })
+        })*/
         
         const shouldShowLine = hasSelectedObject && notSelectingFleet && hasXCoord && hasYCoord
         

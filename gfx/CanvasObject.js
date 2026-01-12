@@ -104,18 +104,20 @@ class CanvasObject {
         // For bitmap rendering
         this.src = src;
         this.image = null;
-        this.imageLoaded = false;
+        this.imageLoaded = null;
         if (src && typeof src === 'string') {
+            this.imageLoaded = false;
             this.image = new Image();
             this.image.onload = () => { this.imageLoaded = true; };
             this.image.src = src;
         } else if (src instanceof HTMLImageElement) {
+            this.imageLoaded = false;
             this.image = src;
             this.imageLoaded = src.complete;
         }
 
-        this.parallax = false
-        this.overlap = false
+        this.parallax = false;
+        this.overlap = false;
         this.mirror = false
         this.tintRatio = 0.5
         this.darkenRatio = 0

@@ -45,6 +45,7 @@ class CanvasWrapper {
         this.dragStartTime = 0;
         this.width = 0
         this.height = 0
+        this.scheduledRedraw = null;
         
         // Setup click detection
         this.canvas.addEventListener('click', (e) => this.handleClick(e));
@@ -63,9 +64,6 @@ class CanvasWrapper {
         this.maxFrameRate = MAX_FRAMES_PER_SECOND; //do not refresh more than 30 times per second
         this.lastRedrawAt = 0;
         this.fillColor = null
-
-        this.scheduledRedraw = false;
-        
         this.autoResize()
     }
     
@@ -181,8 +179,9 @@ class CanvasWrapper {
         const obj = new CanvasObject({ id, shape: SHAPES.Bitmap, x, y, src, size, minScreenSize, fillColor, angle, onClick, zIndex });
         obj.parallax = parallax
         obj.overlap = overlap
+        const bmp = this.addObject(obj)
         this.checkScheduleRedraw() //force an eventual redraw when adding bitmaps as they may load asynchronously
-        return this.addObject(obj)
+        return bmp
     }
     
     addEmptyTriangle(id = "", x = 0, y = 0, size = 0, minorSize = 0, minScreenSize = 0, strokeColor = COLORS.LightGray, angle = 0, lineWidth = 1, onClick = null) {
@@ -549,7 +548,15 @@ class CanvasWrapper {
     }
 
     checkScheduleRedraw() {
-        if (this.scheduledRedraw == true) return
+        // Early return if already checking
+        if (this.scheduledRedraw) {
+            return
+        }
+        
+        // Set lock to prevent concurrent check loops
+        this.scheduledRedraw = true
+        
+        console.log('checking if cvs needs to redraw due to image loading...')
         let allLoaded = true
 
         for (const obj of this.drawOrder) {
@@ -560,15 +567,18 @@ class CanvasWrapper {
             }
         }
 
+        console.log('all images loaded?', allLoaded)
+
         if (allLoaded) {
+            console.log('scheduling image redraw...')
+            this.scheduledRedraw = false // Release lock
             setTimeout(() => {
                 this.redraw(true)
             }, 1)
-            this.scheduledRedraw = false
             return
         }
-        this.scheduledRedraw = true
         setTimeout(() => {
+            this.scheduledRedraw = false // Release lock before recursing
             this.checkScheduleRedraw()
         }, 1)
     }

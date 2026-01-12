@@ -1,0 +1,31 @@
+
+AGENT CODING TIPS:
+
+-AI is fast at delivering new features but along the way, IT MAKES DESIGN CHOICES. usually those choices are not what i would've done.
+-it's best for me to lay the groundwork as much as possible when creating new features ESPECIALLY UI.
+AI is very good at replicating a template with minor deviations, ie "filling in the gaps" or "adding more of the same" from there.
+
+-never ever populate a file with like 20+ types (let alone infinity like the news folder) where 5 will do. odds are, you're going to be
+completely reworking the system in a few days or weeks anyway.
+
+-never do something counter intuitive. for example, creating your own renderer, let alone where rgba = 255,255,255,ratio. thats just asking 
+for bugs if you're going to use an agent to help you code.
+
+-dont do "token driven development". do one feature at a time. make sure that feature is working solidly and make sense. THEN move on to
+another feature. actually review the agent's code to make sure it isn't just creaing tech debt/mandatory refactor later.
+
+-a small investment up front is worth it. check the AI's work to make sure it isn't going off the rails. once it starts to GROK what you're doing
+the efficiency goes way up over the long term.
+
+
+
+PROJECT PLANNING TIPS:
+-get feedback early and often. timmi's one little comment about pixel art made me question a bunch of core assumptions about my game and
+ask questions that sorely needed to be asked like - what is my scope, what is my vision, what is the mvp, what is the player experience im going
+for, etc. i can't afford to NOT do things that would spark those considerations.
+
+-think about launch constantly. what's the MVP i need for launch. how is this feature helping me get to launch. is having this many files and
+"fleshed outness" taking me closer or further away from launch (when in doubt, cut)
+
+-CUT CONSTANTLY. only retain features you are POSITIVE are REQUIRED for launch. when in doubt, copy the simplest working iteration someone else
+already made. ie, if you're doing space trader, do space trader 1980 FIRST - THEN add more content.

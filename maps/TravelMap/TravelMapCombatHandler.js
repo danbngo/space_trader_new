@@ -65,8 +65,8 @@ class TravelMapCombatHandler {
         infoElement.appendChild(ce({
             children: [
                 `<u>${coloredName(selectedShip.fleet)} ${selectedShip.shipType.name}</u>`,
-                this.targetingMode ? `Hull: ${selectedShip.hull[0]}/${selectedShip.hull[1]} | 
-                Shields: ${selectedShip.shields[0]}/${selectedShip.shields[1]}` : ''
+                `Hull: ${selectedShip.hull[0]}/${selectedShip.hull[1]} | 
+                Shields: ${selectedShip.shields[0]}/${selectedShip.shields[1]}`
             ]
         }))
     }
@@ -395,21 +395,11 @@ class TravelMapCombatHandler {
         
         // Display laser beam if it's a laser attack, or animate ram
         if (attackType === 'laser') {
-            // Execute result immediately for laser attacks
-            gs.combat.executeResult(result)
-            
-            this.laserHandler.displayLaserBeam(this.travelMap.selectedShip, targetShip, [255, 0, 0, 1], 500)
-            
-            // Display damage text immediately for laser attacks
-            if (!result.success) {
-                this.displayDamageText(targetShip, 0, 0, false, true)
-            } else {
-                this.displayDamageText(targetShip, result.hullDamage || 0, result.shieldsAbsorbed || 0, result.destroyed)
-            }
+            // Pass result to animateLaser - it will execute and display damage text when laser hits
+            this.laserHandler.animateLaser(this.travelMap.selectedShip, targetShip, result)
         } else if (attackType === 'ram') {
             // Pass result to animateRam - it will execute and display damage text midway through animation
             this.ramHandler.animateRam(this.travelMap.selectedShip, targetShip, result)
-
         }
         
         // Deselect ship if it has no actions remaining

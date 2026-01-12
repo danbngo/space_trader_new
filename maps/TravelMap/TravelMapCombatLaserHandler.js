@@ -33,6 +33,22 @@ class TravelMapCombatLaserHandler {
     }
 
     /**
+     * Animates a laser attack from attacker to target
+     * @param {Ship} attacker - The ship firing the laser
+     * @param {Ship} target - The ship being targeted
+     * @param {Object} combatResult - The result of the laser attack
+     */
+    animateLaser(attacker, target, combatResult) {
+        const attackerObj = this.travelMap.cvs.getObject(`ship-${attacker.uuid}`)
+        const targetObj = this.travelMap.cvs.getObject(`ship-${target.uuid}`)
+        if (!attackerObj || !targetObj) {
+            console.warn('Could not find ship objects for laser animation')
+            return
+        }
+        this.travelMap.animations.push(new LaserAnim(attackerObj, targetObj, attacker, target, combatResult, this.travelMap))
+    }
+
+    /**
      * Displays a laser beam from attacker to target that disappears after a duration
      * @param {Ship} attacker - The ship firing the laser
      * @param {Ship} target - The ship being targeted
