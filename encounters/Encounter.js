@@ -364,12 +364,18 @@ class Encounter {
         const travelMap = currentMap && (currentMap instanceof TravelMap) ? currentMap : null
         if (travelMap && typeof travelMap.fadeOutEnemyShips === 'function') {
             travelMap.fadeOutEnemyShips(() => {
-                // After fade-out completes, fully end encounter
+                // After fade-out completes, fully end encounter and reset ship configs
                 gs.encounter = undefined
+                if (travelMap && typeof travelMap.resetNPCShipsConfig === 'function') {
+                    travelMap.resetNPCShipsConfig()
+                }
             })
         } else {
             // No fade-out available, end immediately
             gs.encounter = undefined
+            if (travelMap && typeof travelMap.resetNPCShipsConfig === 'function') {
+                travelMap.resetNPCShipsConfig()
+            }
         }
     }
 
