@@ -307,11 +307,6 @@ class Encounter {
                     let payMsg = `You pay the ${totalBounty}CR fine in full.<br/>`
                     payMsg += `Your record on ${coloredName(planet)} is cleared.<br/>`
                     payMsg += this.conductRepairs()
-                    
-                    // Transport to planet
-                    gs.destination = null
-                    gs.travelYearsRemaining = null
-                    gs.previousLocation = null
                     gs.fleet.dock(planet)
                     
                     showModal('Fine Paid', payMsg, [['Continue', ()=>this.endEncounter()]])
@@ -331,10 +326,6 @@ class Encounter {
                 jailMsg += `Your record is cleared, but you've lost valuable time.<br/>`
                 jailMsg += this.conductRepairs()
                 
-                // Transport to planet
-                gs.destination = null
-                gs.travelYearsRemaining = null
-                gs.previousLocation = null
                 gs.fleet.dock(planet)
                 
                 showModal('Released', jailMsg, [['Continue', ()=>this.endEncounter()]])
@@ -348,9 +339,6 @@ class Encounter {
             
             // Transport to planet
             gs.fleet.dock(planet)
-            gs.destination = null
-            gs.travelYearsRemaining = null
-            gs.previousLocation = null
             
             showModal('Released', msg, [['Continue', ()=>this.endEncounter()]])
         }

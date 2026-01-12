@@ -60,6 +60,12 @@ class Fleet extends SpaceObject {
      */
     dock(planet) {
         console.log(`🚢 ${this.name} ${this.uuid} is docking at ${planet.name} ${planet.uuid}`);
+        gs.previousLocation = gs.fleet.location
+        gs.destination = null
+        gs.travelYearsRemaining = null
+        gs.travelProgress = 0
+        gs.travelStartYear = gs.year
+        
         this.location = planet
         this.x = planet.x
         this.y = planet.y
@@ -88,6 +94,7 @@ class Fleet extends SpaceObject {
                 mission.onPlayerVisitLocation(planet)
             }
         }
+        if (currentMap && !(currentMap instanceof StarMap)) showStarMap(planet)
     }
 
     // REMOVED: Route

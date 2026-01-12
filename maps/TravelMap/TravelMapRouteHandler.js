@@ -95,20 +95,9 @@ class TravelMapRouteHandler {
      */
     handleTravelComplete(dockAt = gs.destination) {
         console.log('Travel completed - docking at', dockAt)
-        
         // Dock at destination
         gs.fleet.dock(dockAt)
         
-        // Clear travel state
-        gs.previousLocation = null
-        gs.destination = null
-        gs.travelYearsRemaining = null
-        gs.travelProgress = null
-        gs.travelStartYear = null
-        gs.x = null
-        gs.y = null
-        
-        showStarMap(dockAt)
     }
 
     /**

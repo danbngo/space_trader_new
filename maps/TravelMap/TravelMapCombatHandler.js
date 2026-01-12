@@ -210,7 +210,7 @@ class TravelMapCombatHandler {
         // Check if combat should end first
         if (gs.combat.result) {
             console.log('Combat has ended with result:', gs.combat.result)
-            this.showCombatEndModal()
+            gs.encounter.endCombat()
             return
         }
         
@@ -256,7 +256,7 @@ class TravelMapCombatHandler {
             // Check if combat ended
             if (gs.combat.result) {
                 console.log('Combat ended after enemy turn with result:', gs.combat.result)
-                this.showCombatEndModal()
+                gs.encounter.endCombat()
                 return
             }
             
@@ -309,34 +309,6 @@ class TravelMapCombatHandler {
             // Animation complete, process next action
             this.processNextEnemyAction()
         }
-    }
-
-    /**
-     * Shows combat end modal based on encounter result
-     */
-    showCombatEndModal() {
-        if (!gs.combat.result) return
-        
-        let message = ''
-        if (gs.combat.result === ENCOUNTER_RESULTS.Victory) {
-            message = 'Victory! All enemy ships have been destroyed or fled.'
-        } else if (gs.combat.result === ENCOUNTER_RESULTS.Defeat) {
-            message = 'Defeat! All your ships have been destroyed or fled.'
-        } else if (gs.combat.result === ENCOUNTER_RESULTS.Escaped) {
-            message = 'You have successfully escaped!'
-        } else {
-            message = 'Combat ended.'
-        }
-        
-        // Show end modal after a delay
-        setTimeout(() => {
-            showModal('Combat Ended', message, [
-                ['Continue', () => {
-                    this.travelMap.resetNPCShipsConfig()
-                    gs.encounter.endCombat()
-                }]
-            ])
-        }, 1500)
     }
 
     /**
@@ -525,7 +497,7 @@ class TravelMapCombatHandler {
             // If all enemies are disabled/escaped (victory), end player turn immediately
             if (gs.combat.result === ENCOUNTER_RESULTS.Victory) {
                 console.log('All enemies disabled - ending combat')
-                this.showCombatEndModal()
+                gs.encounter.endCombat()
                 return
             }
             
