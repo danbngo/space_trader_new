@@ -94,15 +94,23 @@ class TravelMapCombatHandler {
         }
         
         // Update hover arrow (yellow/orange, for hovered enemy ship)
+        //console.log('updateWidgets - hoveredShip check:', hoveredShip ? hoveredShip.name : 'null')
+        //console.log('updateWidgets - in combat:', !!gs.combat)
+        //console.log('updateWidgets - is hoveredShip an ally:', hoveredShip ? gs.fleet.ships.includes(hoveredShip) : 'N/A')
+        
         if (!hoveredShip || !gs.combat || gs.fleet.ships.includes(hoveredShip)) {
             // Remove hover arrow if not hovering, not in combat, or hovering ally
+            //console.log('updateWidgets - Removing/skipping hover arrow')
             const existingHoverArrow = this.travelMap.cvs.getObject(hoverArrowId)
             if (existingHoverArrow) {
+                console.log('updateWidgets - Deleting existing hover arrow')
                 this.travelMap.cvs.deleteObject(hoverArrowId)
             }
         } else {
+            console.log('updateWidgets - Should show hover arrow for:', hoveredShip.name)
             // Get hovered ship's canvas object to position arrow
             const hoveredShipObj = this.travelMap.cvs.getObject(`ship-${hoveredShip.uuid}`)
+            console.log('updateWidgets - hoveredShipObj found:', !!hoveredShipObj)
             if (hoveredShipObj) {
                 // Animate position and brightness using time-based oscillation
                 const time = Date.now()
@@ -227,8 +235,14 @@ class TravelMapCombatHandler {
             }))
             
             // Show hit chance if hovering a valid target
+            console.log('createActionButtons - hoveredShip:', this.hoveredShip ? this.hoveredShip.name : 'null')
+            console.log('createActionButtons - targetedShips has hoveredShip:', this.hoveredShip ? this.targetedShips.has(this.hoveredShip) : 'null')
+            console.log('createActionButtons - targetingMode:', targetingMode)
+            
             if (this.hoveredShip && this.targetedShips.has(this.hoveredShip)) {
+                console.log('createActionButtons - Should show hit chance display')
                 if (targetingMode === 'laser' || targetingMode === 'ram') {
+                    console.log('createActionButtons - Calculating hit chance for:', targetingMode)
                     // Calculate hit chance for this attack
                     let hitChance = 0
                     if (targetingMode === 'laser') {
@@ -677,8 +691,20 @@ class TravelMapCombatHandler {
      * @param {Ship|null} ship - The ship being hovered over, or null if no longer hovering
      */
     onHoverShip(ship) {
+        console.log('=== onHoverShip called ===')
+        console.log('Ship:', ship ? ship.name : 'null')
+        console.log('Ship fleet:', ship ? ship.fleet?.name : 'null')
+        console.log('Is enemy:', ship ? !gs.fleet.ships.includes(ship) : 'null')
+        console.log('Current hoveredShip:', this.hoveredShip ? this.hoveredShip.name : 'null')
+        console.log('targetingMode:', this.targetingMode)
+        console.log('targetedShips size:', this.targetedShips.size)
+        console.log('Is in targetedShips:', ship ? this.targetedShips.has(ship) : 'null')
+        
         this.hoveredShip = ship
+        console.log('Set hoveredShip to:', this.hoveredShip ? this.hoveredShip.name : 'null')
+        
         this.travelMap.updateUIPanel()
+        console.log('Called updateUIPanel()')
     }
 
     /**

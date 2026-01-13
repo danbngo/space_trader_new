@@ -105,7 +105,13 @@ class AbandonedShipEncounter extends Encounter {
         
         // Generate loot from random cargo types
         const loot = new CountsMap()
-        const availableCargoTypes = CARGO_TYPES_ALL.filter(ct => !ct.illegal) // No illegal cargo in abandoned ships
+        
+        // Filter cargo: 30% chance for illegal goods, 0% chance for relics
+        const availableCargoTypes = CARGO_TYPES_ALL.filter(ct => {
+            if (ct == CARGO_TYPES.RELICS) return false // 0% chance for relics
+            if (ct.illegal) return Math.random() < 0.3 // 30% chance for illegal goods
+            return true // 100% chance for normal goods
+        })
         
         for (let i = 0; i < lootAmt; i++) {
             const ct = rndMember(availableCargoTypes)
