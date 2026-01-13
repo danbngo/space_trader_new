@@ -126,6 +126,45 @@ class Combat {
     }
 
     /**
+     * Get the visual row of a ship based on its index in fleet.ships array
+     * Pattern: 0=middle, 1=up 1, 2=down 1, 3=up 2, 4=down 2, etc.
+     * @param {Ship} ship - The ship to get the row for
+     * @returns {number} - Row number (0=middle, positive=up, negative=down)
+     */
+    getRow(ship) {
+        // Find which fleet this ship belongs to
+        let index = this.playerFleet.ships.indexOf(ship)
+        if (index === -1) {
+            index = this.enemyFleet.ships.indexOf(ship)
+        }
+        if (index === -1) {
+            return 0 // Ship not found, return middle
+        }
+        
+        // Convert index to visual row: 0, +1, -1, +2, -2, +3, -3, ...
+        if (index === 0) return 0
+        if (index % 2 === 1) {
+            // Odd indices go up: 1→+1, 3→+2, 5→+3
+            return Math.ceil(index / 2)
+        } else {
+            // Even indices go down: 2→-1, 4→-2, 6→-3
+            return -(index / 2)
+        }
+    }
+
+    /**
+     * Get the visual row difference between two ships
+     * @param {Ship} ship - First ship
+     * @param {Ship} enemyShip - Second ship
+     * @returns {number} - Absolute difference between their rows
+     */
+    getRowDifference(ship, enemyShip) {
+        const row1 = this.getRow(ship)
+        const row2 = this.getRow(enemyShip)
+        return Math.abs(row1 - row2)
+    }
+
+    /**
      * Check if current turn is complete
      * @returns {boolean}
      */
@@ -223,20 +262,31 @@ class Combat {
     }
 
     /**
-     * Calculates the hit chance for an attack based on attacker and defender stats.
+     * Calculates the hit chance for a laser attack based on attacker and defender stats.
      * @param {Ship} attacker - The attacking ship
      * @param {Ship} defender - The defending ship
      * @returns {number} - Hit chance from 0 to 1
      */
     calculateHitChance(attacker, defender) {
-        let baseChance = 0.7; // 70% base hit chance
+        const rowDiff = this.getRowDifference(attacker, defender)
         
-        // Radar helps hit chance
-        if (attacker.radars > 0) {
-            baseChance += Math.min(0.15, attacker.radars * 0.01); // Up to +15% from radars
-        }
+        // Base hit chance varies with row difference (interpolate between min and max)
+        const minChance = COMBAT_LASER_HIT_CHANCE_AT_MIN_ROW_DIFFERENCE
+        const maxChance = COMBAT_LASER_HIT_CHANCE_AT_MAX_ROW_DIFFERENCE
+        const maxRowDiff = COMBAT_LASER_MAX_ROW_DIFFERENCE
         
-        return Math.max(0.1, Math.min(0.95, baseChance)); // Clamp between 10% and 95%
+        // Linear interpolation: closer targets = higher hit chance
+        const baseChance = minChance - ((minChance - maxChance) * (rowDiff / maxRowDiff))
+        
+        // Radar reduces miss chance
+        // Formula: new_miss_chance = miss_chance * (1 - (radars / (radars + HALVED_AT_X)))
+        // At X radars: miss reduced by 50%, at 2X: 66%, at 3X: 75%, etc.
+        const missChance = 1 - baseChance
+        const radarReduction = attacker.radars / (attacker.radars + COMBAT_LASER_MISS_CHANCE_HALVED_AT_X_RADARS)
+        const newMissChance = missChance * (1 - radarReduction)
+        const finalChance = 1 - newMissChance
+        
+        return Math.max(0.05, Math.min(0.95, finalChance)) // Clamp between 5% and 95%
     }
 
     /**
@@ -298,6 +348,17 @@ class Combat {
             };
         }
         
+        // Check if target is within laser range
+        const rowDiff = this.getRowDifference(attacker, defender)
+        if (rowDiff > COMBAT_LASER_MAX_ROW_DIFFERENCE) {
+            return {
+                hit: false,
+                damage: 0,
+                destroyed: false,
+                message: `${attacker.name} cannot target ${defender.name} - too far away!`
+            };
+        }
+        
         // Calculate hit chance
         const hitChance = this.calculateHitChance(attacker, defender);
         const hit = Math.random() < hitChance;
@@ -311,10 +372,9 @@ class Combat {
             };
         }
         
-        // Calculate damage based on laser power
-        const baseDamage = attacker.lasers * 0.5; // 50% of lasers as base damage
-        const variance = baseDamage * 0.3; // ±30% variance
-        const damage = Math.ceil(baseDamage + (Math.random() * variance * 2 - variance));
+        // Calculate damage based on laser power (up to 100% of laser value, min 1)
+        const maxDamage = attacker.lasers * COMBAT_MAX_LASER_DAMAGE_PER_LASER_POINT
+        const damage = Math.max(1, Math.ceil(Math.random() * maxDamage));
         
         // Calculate damage (without applying)
         const result = this.calculateDamage(defender, damage, false);
@@ -348,10 +408,43 @@ class Combat {
      * @returns {Object} - Result of the ram {damage, selfTotalDamage, destroyed, message}
      */
     calculateRam(attacker, defender) {
-        // Calculate ram damage based on engine power
-        const baseDamage = attacker.engine; // Engine * 2 as ram damage
-        const variance = baseDamage * 0.2; // ±20% variance
-        const damage = Math.ceil(baseDamage + (Math.random() * variance * 2 - variance));
+        // Check if target is directly opposite (row difference = 0)
+        const rowDiff = this.getRowDifference(attacker, defender)
+        if (rowDiff > COMBAT_RAM_MAX_ROW_DIFFERENCE) {
+            return {
+                damage: 0,
+                selfTotalDamage: 0,
+                hullDamage: 0,
+                shieldsAbsorbed: 0,
+                destroyed: false,
+                selfDestroyed: false,
+                selfHullDamage: 0,
+                message: `${attacker.name} cannot ram ${defender.name} - not directly opposite!`
+            };
+        }
+        
+        // Calculate ram hit chance based on engine power
+        // Higher engine = higher chance to connect the ram
+        const engineRatio = attacker.engine / Math.max(1, defender.engine)
+        const hitChance = COMBAT_RAM_HIT_CHANCE_AT_SAME_ENGINE_POWER * engineRatio
+        const clampedHitChance = Math.max(0.1, Math.min(0.9, hitChance))
+        
+        if (Math.random() >= clampedHitChance) {
+            return {
+                damage: 0,
+                selfTotalDamage: 0,
+                hullDamage: 0,
+                shieldsAbsorbed: 0,
+                destroyed: false,
+                selfDestroyed: false,
+                selfHullDamage: 0,
+                message: `${attacker.name} attempts to ram ${defender.name} but fails to connect!`
+            };
+        }
+        
+        // Calculate ram damage based on attacker's max hull (up to 25% of max hull, min 1)
+        const maxDamage = attacker.hull[1] * COMBAT_MAX_RAM_DAMAGE_PER_MAX_HULL_POINT
+        const damage = Math.max(1, Math.ceil(Math.random() * maxDamage))
         
         // Calculate self-damage (30% of ram damage)
         const selfTotalDamage = Math.ceil(damage * 0.3);
@@ -391,34 +484,38 @@ class Combat {
      * @returns {Object} - Result {escaped, message}
      */
     calculateFlee(ship, enemyIsRamming = false) {
-        // Find the fleet index of this ship
-        const playerFleet = gs.combat.playerFleet.ships
-        const enemyFleet = gs.combat.enemyFleet.ships
-        const isPlayer = playerFleet.includes(ship)
-        const fleetIndex = isPlayer ? playerFleet.indexOf(ship) : enemyFleet.indexOf(ship)
+        // Check if any enemy is in the same row (row difference = 0)
+        const opposingFleet = this.calcOpposingFleet(ship.fleet || gs.fleet)
+        const enemiesInSameRow = opposingFleet.ships.filter(enemyShip => {
+            if (enemyShip.disabled || enemyShip.escaped) return false
+            const rowDiff = this.getRowDifference(ship, enemyShip)
+            return rowDiff === 0
+        })
         
-        // Find the enemy ship "across from" this ship (same index in opposing fleet)
-        const opposingFleet = isPlayer ? enemyFleet : playerFleet
-        const opposingShip = opposingFleet[fleetIndex]
-        
-        // If no ship is across from us (or they're disabled/escaped), auto-succeed
-        if (!opposingShip || opposingShip.disabled || opposingShip.escaped) {
+        // If no enemy in same row, automatically escape
+        if (enemiesInSameRow.length === 0) {
             return {
                 escaped: true,
                 message: `${ship.name} successfully escapes from combat!`
             }
         }
         
-        // Base flee chance is 50%, modified by engine differential
-        const engineDiff = ship.engine - opposingShip.engine
-        let fleeChance = 0.5 + (engineDiff * 0.02) // +2% per engine point difference
+        // Calculate flee chance based on engine power relative to closest enemy
+        // Use the strongest enemy in the same row
+        const strongestEnemy = enemiesInSameRow.reduce((strongest, enemy) => 
+            enemy.engine > strongest.engine ? enemy : strongest
+        )
+        
+        // Base chance with equal engines is 50%, scales with engine ratio
+        const engineRatio = ship.engine / Math.max(1, strongestEnemy.engine)
+        let fleeChance = COMBAT_FLEE_CHANCE_ENEMY_IN_SAME_ROW_WITH_SAME_ENGINE * engineRatio
         
         // Enemy ramming makes it harder to flee
         if (enemyIsRamming) {
             fleeChance *= 0.5 // 50% reduction if enemy rams
         }
         
-        fleeChance = Math.max(0.1, Math.min(0.9, fleeChance)) // Clamp between 10% and 90%
+        fleeChance = Math.max(0.05, Math.min(0.95, fleeChance)) // Clamp between 5% and 95%
         
         const escaped = Math.random() < fleeChance
         
@@ -430,13 +527,13 @@ class Combat {
         } else {
             return {
                 escaped: false,
-                message: `${ship.name} attempts to flee but fails!`
+                message: `${ship.name} attempts to flee but ${strongestEnemy.name} blocks the escape!`
             }
         }
     }
 
     /**
-     * Calculates shield recharge amount based on engine power without applying it.
+     * Calculates shield recharge amount based on max shield capacity without applying it.
      * @param {Ship} ship - The ship recharging shields
      * @returns {Object} - Result {amount, message}
      */
@@ -448,8 +545,9 @@ class Combat {
             };
         }
         
-        // Recharge amount based on engine power (20% of engine per turn)
-        const rechargeAmount = Math.ceil(ship.engine * 0.2);
+        // Recharge amount based on max shields (up to 25% of max shields, min 1)
+        const maxRecharge = ship.shields[1] * COMBAT_MAX_RECHARGE_PER_MAX_SHIELD_POINT
+        const rechargeAmount = Math.max(1, Math.ceil(maxRecharge))
         const actualRecharge = Math.min(rechargeAmount, ship.shields[1] - ship.shields[0]);
         
         return {

@@ -11,6 +11,8 @@ TODO:
 
 
 TODO NOT SURE:
+-add all missing graphics - suns, planets, asteroids, ship types
+-add asteroids encounter
 -revert Civilization class and only use encounter weights, cargo type weights and cargo type prices
  -i am not sure i want to do this because the existing system BASICALLY ALREADY IS THIS, it just uses fancier terms for everything.
  -instead, we could rework the civ menu to display in more raw, gamified terms

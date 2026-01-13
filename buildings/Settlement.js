@@ -29,7 +29,7 @@ class Settlement {
         /** @type {Courthouse} */
         this.courthouse = courthouse
         /** @type {Bank} */
-        this.bank = null
+        this.bank = bank
         
         gameRegistry.registerSettlement(this)
     }
