@@ -23,6 +23,7 @@ const TRAVEL_MAP_CONFIG = {
     thrusterSizeMultiplier: 0.2,
     thrusterFlickerMin: 0.9,
     thrusterFlickerMax: 1.0,
+    thrusterFadeDuration: 300, // ms - fade in/out duration for thrusters
     
     // Animation
     enemyFadeInDuration: 1000, // ms - fade-in duration for enemy ships

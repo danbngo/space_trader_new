@@ -110,7 +110,22 @@ function showPlanetMenu(planet = new Planet()) {
         const firstChild = planet.children[0];
         if (firstChild && firstChild instanceof Moon) options.push(["Moons", () => showPlanetMenu(firstChild), !hasVisited, notVisitedMessage]);
     }
-    options.push([isDocked ? "Depart" : "Stop Scanning", () => closeModal()]);
+    
+    // Handle depart button with warnings for unrepaired/unfueled ships
+    const handleDepart = () => {
+        if (isDocked && settlement?.shipyard) {
+            const needsRepair = gs.fleet.ships.some(s => s.hull[0] < s.hull[1])
+            const needsFuel = gs.fleet.fuel < gs.fleet.totalFuelCapacity
+            
+            if (needsRepair || needsFuel) {
+                showDepartureWarningModal(planet, settlement.shipyard)
+                return
+            }
+        }
+        closeModal()
+    }
+    
+    options.push([isDocked ? "Depart" : "Stop Scanning", handleDepart]);
     
     // Use appropriate title based on visit status
     const menuTitle = hasVisited ? coloredName(planet) : `Scanning Unknown ${planet.objectType.name}`
@@ -314,4 +329,94 @@ function showPlanetClimateMenu(planet = new Planet()) {
         ["News", () => showPlanetNewsMenu(planet)],
         ["Back", () => showPlanetMenu(planet)]
     ], 'planet_climate', (nextPlanet) => showPlanetClimateMenu(nextPlanet));
+}
+
+/**
+ * Shows a warning modal when departing with unrepaired or unfueled ships
+ * @param {Planet} planet - The planet being departed from
+ * @param {Shipyard} shipyard - The shipyard at this planet
+ */
+function showDepartureWarningModal(planet, shipyard) {
+    const {fleet} = gs
+    
+    // Calculate repair needs
+    const damagedShips = fleet.ships.filter(s => s.hull[0] < s.hull[1])
+    const totalRepairCost = damagedShips.reduce((total, ship) => {
+        const damageAmount = ship.hull[1] - ship.hull[0]
+        return total + shipyard.calculateRepairCost(ship, damageAmount)
+    }, 0)
+    
+    // Calculate fuel needs
+    const fuelNeeded = fleet.totalFuelCapacity - fleet.fuel
+    const refuelCost = fuelNeeded > 0 ? shipyard.calcRefuelCost(fleet) : 0
+    
+    // Build warning message
+    let msg = colorSpan('⚠️ Warning ⚠️<br/>', COLORS.Orange)
+    msg += '<br/>'
+    
+    if (damagedShips.length > 0) {
+        msg += `You have ${damagedShips.length} damaged ship${damagedShips.length > 1 ? 's' : ''}:<br/>`
+        damagedShips.forEach(ship => {
+            const damage = ship.hull[1] - ship.hull[0]
+            msg += `• ${coloredName(ship)}: ${ship.hull[0]}/${ship.hull[1]} hull (-${damage})<br/>`
+        })
+        msg += `<br/>`
+    }
+    
+    if (fuelNeeded > 0) {
+        msg += `Your fleet fuel: ${Math.floor(fleet.fuel)}/${fleet.totalFuelCapacity}<br/> | Fuel needed: ${Math.floor(fuelNeeded)}<br/>`
+    }
+    
+    msg += `Would you like to repair and refuel before departing?<br/>`
+    
+    // Determine button states
+    const canAffordRepair = gs.credits >= totalRepairCost
+    const canAffordRefuel = gs.credits >= refuelCost
+    const needsRepair = damagedShips.length > 0
+    const needsRefuel = fuelNeeded > 0
+    
+    // Build disabled reasons
+    let repairDisabledReason = ''
+    if (!needsRepair) repairDisabledReason = 'No ships need repair'
+    else if (!canAffordRepair) repairDisabledReason = `Not enough credits (need ${totalRepairCost}CR, have ${gs.credits}CR)`
+    
+    let refuelDisabledReason = ''
+    if (!needsRefuel) refuelDisabledReason = 'Fuel tank is full'
+    else if (!canAffordRefuel) refuelDisabledReason = `Not enough credits (need ${refuelCost}CR, have ${gs.credits}CR)`
+    
+    // Repair all function
+    const repairAll = () => {
+        if (!canAffordRepair || !needsRepair) return
+        
+        damagedShips.forEach(ship => {
+            const damageAmount = ship.hull[1] - ship.hull[0]
+            const cost = shipyard.calculateRepairCost(ship, damageAmount)
+            gs.credits -= cost
+            ship.hull[0] = ship.hull[1]
+        })
+        
+        // Refresh the modal to show updated state
+        showDepartureWarningModal(planet, shipyard)
+    }
+    
+    // Refuel all function
+    const refuelAll = () => {
+        if (!canAffordRefuel || !needsRefuel) return
+        
+        gs.credits -= refuelCost
+        fleet.fuel = fleet.totalFuelCapacity
+        
+        // Refresh the modal to show updated state
+        showDepartureWarningModal(planet, shipyard)
+    }
+    
+    /** @type {ButtonData[]} */
+    const buttons = [
+        ['Repair All' + (needsRepair ? ` (${totalRepairCost}CR)` : ''), repairAll, !needsRepair || !canAffordRepair, repairDisabledReason],
+        ['Refuel All' + (needsRefuel ? ` (${refuelCost}CR)` : ''), refuelAll, !needsRefuel || !canAffordRefuel, refuelDisabledReason],
+        ['Depart', () => closeModal()],
+        ['Cancel', () => showPlanetMenu(planet)]
+    ]
+    
+    showModal('Departure Check', msg, buttons)
 }

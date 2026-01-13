@@ -3,10 +3,10 @@ DONE:
 -tow ship not working
 -handle player ships fleeing
 -check if player ships (non disabled) have enough room for cargo after a battle, if not dump some
+-which ship player has selected is not obvious enough - needs an arrow
 
 TODO:
 -courthouse needs prettier
--which ship player has selected is not obvious enough - needs an arrow
 -the ENTIRETY of combat.js needs to be tweaked, rebalanced
 
 

@@ -9,6 +9,9 @@ class TravelMapShipHandler {
         this.travelMap = travelMap
         this.shipJitterOffsets = new Map()
         
+        /** @type {Map<string, {opacity: number, targetOpacity: number, lastUpdateTime: number}>} */
+        this.thrusterFadeStates = new Map()
+        
         /** @type {ShipGroupConfig} */
         this.playerShipGroupConfig = {
             fadedIn: false,
@@ -217,10 +220,55 @@ class TravelMapShipHandler {
     updateThruster(ship, x, y, shipSize, shipGroupConfig) {
         const thrusterObj = this.travelMap.cvs.getObject(`thruster-${ship.uuid}`)
         if (!thrusterObj) return
-        if (ship.disabled) {
+        
+        // Determine if thruster should be visible
+        const shouldBeVisible = !gs.encounter && !ship.disabled
+        
+        // Get or initialize fade state
+        const thrusterId = ship.uuid
+        if (!this.thrusterFadeStates.has(thrusterId)) {
+            this.thrusterFadeStates.set(thrusterId, {
+                opacity: shouldBeVisible ? 1 : 0,
+                targetOpacity: shouldBeVisible ? 1 : 0,
+                lastUpdateTime: Date.now()
+            })
+        }
+        
+        const fadeState = this.thrusterFadeStates.get(thrusterId)
+        const targetOpacity = shouldBeVisible ? 1 : 0
+        
+        // Update target if it changed
+        if (fadeState.targetOpacity !== targetOpacity) {
+            fadeState.targetOpacity = targetOpacity
+            fadeState.lastUpdateTime = Date.now()
+        }
+        
+        // Animate opacity towards target
+        const now = Date.now()
+        const elapsed = now - fadeState.lastUpdateTime
+        const fadeDuration = TRAVEL_MAP_CONFIG.thrusterFadeDuration
+        
+        if (fadeState.opacity !== fadeState.targetOpacity) {
+            const fadeSpeed = (1 / fadeDuration) * elapsed
+            if (fadeState.targetOpacity > fadeState.opacity) {
+                // Fading in
+                fadeState.opacity = Math.min(fadeState.opacity + fadeSpeed, fadeState.targetOpacity)
+            } else {
+                // Fading out
+                fadeState.opacity = Math.max(fadeState.opacity - fadeSpeed, fadeState.targetOpacity)
+            }
+            fadeState.lastUpdateTime = now
+        }
+        
+        // Hide completely if fully faded out
+        if (fadeState.opacity <= 0) {
             thrusterObj.visible = false
             return
         }
+        
+        // Show thruster if fading in or visible
+        thrusterObj.visible = true
+        
         // Calculate flicker
         const flickerRange = TRAVEL_MAP_CONFIG.thrusterFlickerMax - TRAVEL_MAP_CONFIG.thrusterFlickerMin
         const thrusterFlicker = TRAVEL_MAP_CONFIG.thrusterFlickerMin + Math.random() * flickerRange
@@ -230,8 +278,8 @@ class TravelMapShipHandler {
         thrusterObj.size = thrusterSize / 2
         thrusterObj.minorSize = thrusterSize
         
-        // Update color with flicker
-        const thrusterColor = [255, Math.floor(150 * thrusterFlicker), 0, shipGroupConfig.opacity * thrusterFlicker]
+        // Update color with flicker and fade opacity
+        const thrusterColor = [255, Math.floor(150 * thrusterFlicker), 0, shipGroupConfig.opacity * thrusterFlicker * fadeState.opacity]
         thrusterObj.fillColor = thrusterColor
         
         // Update position
