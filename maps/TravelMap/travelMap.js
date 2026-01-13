@@ -100,6 +100,12 @@ class TravelMap {
             }
         }
         this.handleAnimations() //must go after other updates to ensure ship positions are correct
+        
+        // Update combat widgets (selection arrows, etc)
+        if (gs.combat) {
+            this.combatHandler.updateWidgets()
+        }
+        
         this.cvs.redraw(true)
         requestAnimationFrame(() => this.tick())
     }

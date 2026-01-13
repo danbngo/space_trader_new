@@ -6,13 +6,18 @@ DONE:
 
 TODO:
 -courthouse needs prettier
--revert Civilization class and only use encounter weights, cargo type weights and cargo type prices
--rejigger all news events to use these properties
 -which ship player has selected is not obvious enough - needs an arrow
--simplify the news system
 -the ENTIRETY of combat.js needs to be tweaked, rebalanced
 
 
+TODO NOT SURE:
+-revert Civilization class and only use encounter weights, cargo type weights and cargo type prices
+ -i am not sure i want to do this because the existing system BASICALLY ALREADY IS THIS, it just uses fancier terms for everything.
+ -instead, we could rework the civ menu to display in more raw, gamified terms
+-simplify the news system
+-rejigger all news events to use these properties
+ -i do think the # of the news events could be reduced by a lot, but not sure what effect it will have on gameplay - needs testing.
+  for all i know the existing system is fine.
 
 TODO OPTIONAL:
 -planetMap! shows the moons, where each building is and causes the player ship to move around to use buildings

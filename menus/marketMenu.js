@@ -141,23 +141,23 @@ function showMarketMenu(market = new Market()) {
         }
         
         // Build description of what's being sold
-        let description = 'You are about to sell the following cargo:<br/><br/>'
+        let description = 'Sell the following?<br/><br/>'
         for (const ct of cargoToSell.keys) {
             const amount = cargoToSell.getAmount(ct)
             const price = sellPrices.getAmount(ct)
             const lineTotal = amount * price
-            description += `${ct.symbol} ${coloredName(ct)}: ${amount} units @ ${price}CR = ${lineTotal}CR<br/>`
+            description += `${coloredName(ct)}: ${amount} units @ ${price}CR = ${lineTotal}CR<br/>`
         }
         
         const officersShare = gs.fleet.calcTotalCRShare(totalSalePrice, true)
         const finalSale = totalSalePrice - officersShare
         
-        description += `<br/>Total Sale: ${totalSalePrice}CR<br/>`
+        description += `Total Sale: ${totalSalePrice}CR<br/>`
         if (officersShare > 0) {
             description += `Officers' Share: -${officersShare}CR<br/>`
             description += `Your Net Gain: ${finalSale}CR<br/>`
         }
-        description += `<br/>Your Credits After: ${gs.credits + finalSale}CR<br/>`
+        description += `Your Credits After Sale: ${gs.credits + finalSale}CR<br/>`
         
         const confirmSellAll = () => {
             // Execute all sales
@@ -188,15 +188,12 @@ function showMarketMenu(market = new Market()) {
         const currentCargoTotal = fleet.cargo.total;
         const maxCargoSpace = fleet.totalCargoSpace;
     
-        const titleEl = ce({children: ['Sell ', coloredName(ct)], style: {whiteSpace: 'nowrap'}});
-        
         // Create hoverable label for "How many X"
-        const labelCargoSpan = ce({tag: 'span', innerHTML: coloredName(ct)});
-        createPopoverElement(labelCargoSpan, ct.description);
+        createPopoverElement(coloredName(ct), ct.description);
         
         showSliderModal(
-            1, sellableAmount, titleEl, 
-            ce({children: ['How many ', labelCargoSpan, ' would you like to sell?']}),
+            1, sellableAmount, `Sell ${coloredName(ct)}`, 
+            ce({children: [`How many ${coloredName(ct)} would you like to sell?`]}),
             (amt)=>{
                 const totalSalePrice = amt*sellPrice
                 const officersShare = gs.fleet.calcTotalCRShare(totalSalePrice, true)
@@ -220,18 +217,12 @@ function showMarketMenu(market = new Market()) {
         const maxCargoSpace = fleet.totalCargoSpace;
         
         // Create hoverable cargo name
-        const cargoNameSpan = ce({tag: 'span', innerHTML: coloredName(ct)});
-        createPopoverElement(cargoNameSpan, ct.description);
-        
-        const titleEl = ce({children: ['Buy ', cargoNameSpan], style: {whiteSpace: 'nowrap'}});
-        
-        // Create hoverable label for "How many X"
-        const labelCargoSpan = ce({tag: 'span', innerHTML: coloredName(ct)});
-        createPopoverElement(labelCargoSpan, ct.description);
+        createPopoverElement(coloredName(ct), ct.description);
+        createPopoverElement(coloredName(ct), ct.description);
         
         showSliderModal(
-            1, buyableAmount, titleEl, 
-            ce({children: ['How many ', labelCargoSpan, ' would you like to buy?']}),
+            1, buyableAmount, `Buy ${coloredName(ct)}`, 
+            ce({children: [`How many ${coloredName(ct)} would you like to buy?`]}),
             (amt)=>{
                 const totalPrice = amt * buyPrice;
                 return ce({children: [

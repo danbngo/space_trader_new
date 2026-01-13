@@ -20,6 +20,65 @@ class TravelMapCombatHandler {
     }
 
     /**
+     * Updates visual widgets like selection arrows
+     */
+    updateWidgets() {
+        const {selectedShip} = this.travelMap
+        const arrowId = 'selection-arrow'
+        
+        // Remove arrow if no ship selected or not in combat
+        if (!selectedShip || !gs.combat) {
+            const existingArrow = this.travelMap.cvs.getObject(arrowId)
+            if (existingArrow) {
+                this.travelMap.cvs.deleteObject(arrowId)
+            }
+            return
+        }
+        
+        // Get ship's canvas object to position arrow
+        const shipObj = this.travelMap.cvs.getObject(`ship-${selectedShip.uuid}`)
+        if (!shipObj) return
+        
+        // Determine if this is a player ship or enemy ship
+        const isPlayerShip = gs.fleet.ships.includes(selectedShip)
+        
+        // Position arrow to the left of player ships, right of enemy ships
+        const arrowSize = 30
+        const arrowDistance = 60 // Distance from ship center
+        let arrowX, arrowAngle
+        
+        if (isPlayerShip) {
+            // Arrow to the left, pointing right (→)
+            arrowX = shipObj.x - arrowDistance
+            arrowAngle = 0 // Points right
+        } else {
+            // Arrow to the right, pointing left (←)
+            arrowX = shipObj.x + arrowDistance
+            arrowAngle = Math.PI // Points left
+        }
+        
+        // Create or update arrow
+        const existingArrow = this.travelMap.cvs.getObject(arrowId)
+        if (existingArrow) {
+            existingArrow.x = arrowX
+            existingArrow.y = shipObj.y
+            existingArrow.angle = arrowAngle
+        } else {
+            this.travelMap.cvs.addFilledTriangle(
+                arrowId,
+                arrowX,
+                shipObj.y,
+                arrowSize,
+                arrowSize,
+                3, // minScreenSize
+                COLORS.Green,
+                arrowAngle,
+                null
+            )
+        }
+    }
+
+    /**
      * Creates the UI panel at the bottom with action buttons
      * @returns {HTMLElement}
      */

@@ -154,7 +154,7 @@ function createSellShipMenu(ships = [], shipyard = new Shipyard(), onSelectShip 
         createPopoverElement(headerRow.cells[3], SHIP_STATS.SHIELDS.description); // Shields
         createPopoverElement(headerRow.cells[4], SHIP_STATS.LASERS.description); // Lasers
         createPopoverElement(headerRow.cells[5], SHIP_STATS.ENGINES.description); // Engine
-        createPopoverElement(headerRow.cells[6], SHIP_STATS.FUEL.description); // Fuel
+        createPopoverElement(headerRow.cells[6], SHIP_STATS.FUEL_CAPACITY.description); // Fuel
         createPopoverElement(headerRow.cells[7], SHIP_STATS.CARGO_CAPACITY.description); // Cargo Space
         createPopoverElement(headerRow.cells[8], 'The total cost to fully repair this ship at this shipyard'); // Repair Cost
         if (headerRow.cells[9]) createPopoverElement(headerRow.cells[9], 'Price the shipyard will pay you for this ship');

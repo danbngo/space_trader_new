@@ -18,6 +18,7 @@ const SHIP_STATS = {
     ENGINES: new ShipStat('Engines', '🚀', COLORS.LightGreen, 'The propulsion system affecting movement speed and maneuverability. Better engines allow faster travel and tactical positioning in combat.'),
     RADARS: new ShipStat('Radars', '📡', COLORS.Yellow, 'Sensor systems that determine detection and weapon range. Higher radar increases the distance at which you can detect ships, anomalies, and engage targets.'),
     CARGO_CAPACITY: new ShipStat('Cargo Capacity', '📦', COLORS.Orange, 'The total amount of cargo the ship can hold. Determines how many goods and resources can be transported for trade.'),
+    FUEL_CAPACITY: new ShipStat('Fuel Capacity', '⛽', COLORS.LightYellow, 'The amount of fuel the ship can store. Determines how far the ship can travel before needing to refuel.'),
 }
 
 const SHIP_STATS_ALL = Object.values(SHIP_STATS)
