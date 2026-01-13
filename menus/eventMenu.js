@@ -148,3 +148,29 @@ function handlePlayerStranded() {
     showModal(`Stranded`, msg, [['Continue', ()=>gs.fleet.dock(towDestination)]])
     return true
 }
+
+function handlePlayerOverloaded() {
+    const {fleet} = gs
+    
+    // Check if player is actually overloaded
+    if (fleet.cargo.total <= fleet.totalCargoSpace) {
+        return false
+    }
+    
+    const excessCargo = fleet.cargo.total - fleet.totalCargoSpace
+    
+    let msg = `Your cargo hold is overloaded!<br/>`
+    msg += `Current cargo: ${fleet.cargo.total} / ${fleet.totalCargoSpace}<br/>`
+    msg += `You must dump at least ${excessCargo} units of cargo before you can continue.<br/>`
+    
+    if (!currentMap || (!(currentMap instanceof StarMap))) {
+        showStarMap()
+    }
+    else if (currentMap.refresh) currentMap.refresh()
+    
+    // Show loot menu with empty loot (only dumping, no taking)
+    const emptyLoot = new CountsMap()
+    showLootMenu(emptyLoot, true) // Pass true to indicate overloaded mode
+    
+    return true
+}

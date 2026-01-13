@@ -1,10 +1,12 @@
 DONE:
 -pirates seem to have wrong effect on reputation
+-tow ship not working
 
 TODO:
 -courthouse needs prettier
+-revert Civilization class and only use encounter weights, cargo type weights and cargo type prices
+-rejigger all news events to use these properties
 -which ship player has selected is not obvious enough - needs an arrow
--tow ship not working
 -check if player ships (non disabled) have enough room for cargo after a battle, if not dump some
 -handle player ships fleeing
 -simplify the news system

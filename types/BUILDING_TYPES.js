@@ -67,5 +67,6 @@ const BUILDING_TYPES = {
     SHIPYARD: new BuildingType('Shipyard', COLORS.Gray, RANK_TYPES.NO_RANK, 20*1000),
     MARKET: new BuildingType('Market', COLORS.Yellow, RANK_TYPES.VISA, 30*1000),
     GUILD: new BuildingType('Guild', COLORS.Purple, RANK_TYPES.CITIZEN, 10*1000),
+    BANK: new BuildingType('Bank', COLORS.Green, RANK_TYPES.ELITE, 50*1000),
 }
 const BUILDING_TYPES_ALL = Object.values(BUILDING_TYPES)

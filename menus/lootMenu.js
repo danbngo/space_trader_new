@@ -22,9 +22,9 @@ function createLootCargoTable(playerCargo = new CountsMap(), loot = new CountsMa
  * Displays the loot menu for taking or dumping cargo after combat.
  * @param {CountsMap} loot - The available loot to collect.
  */
-function showLootMenu(loot = new CountsMap()) {
+function showLootMenu(loot = new CountsMap(), overloadedMode = false) {
     const {fleet} = gs;
-    const reloadMenu = ()=>showLootMenu(loot)
+    const reloadMenu = ()=>showLootMenu(loot, overloadedMode)
 
     function takeCargo(ct = CARGO_TYPES_ALL[0], amt = 0) {
         fleet.cargo.increment(ct, amt)
@@ -111,12 +111,19 @@ function showLootMenu(loot = new CountsMap()) {
         ]
     })
 
+    const isOverloaded = fleet.cargo.total > fleet.totalCargoSpace
+    const continueDisabledReason = isOverloaded ? `Must dump ${fleet.cargo.total - fleet.totalCargoSpace} more units of cargo` : ''
+    const continueHandler = ()=>{
+        if (gs.encounter) gs.encounter.endEncounter()
+        closeModal()
+    }
+
     showModal(
-        `Loot Cargo`,
+        overloadedMode ? `Overloaded - Dump Cargo` : `Loot Cargo`,
         infoContainer,
         [
             ['Take All', ()=>takeAllLoot(), fleet.availableCargoSpace == 0 || loot.total == 0],
-            ['Continue', ()=>gs.encounter.endEncounter()]
+            ['Continue', continueHandler, isOverloaded, continueDisabledReason]
         ],
         'loot_panel'
     );

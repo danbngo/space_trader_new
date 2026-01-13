@@ -43,56 +43,56 @@ const GT = {
     ARISTOCRACY: new GovernmentType(
         'Aristocracy',
         COLORS.LightPurple,
-        [BUILDING_TYPES.GUILD],
+        [],
         'Rule by hereditary nobility. Elite classes control wealth and power.',
         {prestige: 1, wealth: 1}
     ),
     COMMUNISM: new GovernmentType(
         'Communism',
         COLORS.LightRed,
-        [BUILDING_TYPES.BANK, BUILDING_TYPES.BLACK_MARKET, BUILDING_TYPES.CASINO],
-        'Collective ownership of resources. No private banking or gambling, minimal merchant activity.',
+        [BUILDING_TYPES.BANK],
+        'Collective ownership of resources.',
         {industry: 1, security: 1},
     ),
     CORPORATISM: new GovernmentType(
         'Corporatism',
         COLORS.LightYellow,
         [],
-        'Rule by corporate entities. All store fees doubled, profit-driven policies.',
+        'Rule by corporate entities.',
         {wealth: 1, economy: 1}
     ),
     THEOCRACY: new GovernmentType(
         'Theocracy',
         COLORS.White,
-        [BUILDING_TYPES.CYBER_SURGEON, BUILDING_TYPES.GENETICIST, BUILDING_TYPES.CASINO],
-        'Rule by religious authority. Cybernetic enhancement, genetic modification, and gambling forbidden.',
+        [],
+        'Rule by religious authority.',
         {population: 1, culture: 1}
     ),
     TECHNOCRACY: new GovernmentType(
         'Technocracy',
         COLORS.LightCyan,
-        [BUILDING_TYPES.TEMPLE],
+        [],
         'Rule by technical experts. Science and efficiency prioritized over faith.',
         {technology: 1, education: 1}
     ),
     POLICE_STATE: new GovernmentType(
         'Police State',
         COLORS.Brown,
-        [BUILDING_TYPES.BLACK_MARKET, BUILDING_TYPES.CASINO],
+        [],
         'Authoritarian surveillance state. Heavy security presence, limited criminal activity.',
         {security: 1, army: 1}
     ),
     ANARCHY: new GovernmentType(
         'Anarchy',
         COLORS.LightGreen,
-        [BUILDING_TYPES.COURTHOUSE, BUILDING_TYPES.PALACE, BUILDING_TYPES.ACADEMY],
+        [BUILDING_TYPES.COURTHOUSE],
         'Absence of formal government. No police or military, maximum individual freedom.',
         {culture: 1, crime: 1}
     ),
     PUPPET_STATE: new GovernmentType(
         'Puppet State',
         COLORS.LightGray,
-        [BUILDING_TYPES.PALACE],
+        [],
         'Nominally independent but controlled by external power.',
         {corruption: 1, taxes: 1}
     ),

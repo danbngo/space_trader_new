@@ -3,6 +3,7 @@ const buildingHandlerMapping = [
     {type: BUILDING_TYPES.SHIPYARD, prop: 'shipyard', menu: (b) => showShipyardSellMenu(b)},
     {type: BUILDING_TYPES.MARKET, prop: 'market', menu: (b) => showMarketMenu(b)},
     {type: BUILDING_TYPES.GUILD, prop: 'guild', menu: (b) => showGuildMenu(b)},
+    {type: BUILDING_TYPES.BANK, prop: 'bank', menu: (b) => showBankMenu(b)},
 ]
 
 /**
