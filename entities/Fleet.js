@@ -252,6 +252,10 @@ class Fleet extends SpaceObject {
         return this.officers.length + (this.captain !== undefined ? 1 : 0)
     }
 
+    get overburdened() {
+        return this.cargo.total > this.totalCargoSpace
+    }
+
     /**
      * Adds a ship to the fleet.
      * @param {Ship} ship - The ship to add.

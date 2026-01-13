@@ -149,7 +149,7 @@ function handlePlayerStranded() {
     return true
 }
 
-function handlePlayerOverloaded() {
+function handlePlayerOverburdened() {
     const {fleet} = gs
     
     // Check if player is actually overloaded

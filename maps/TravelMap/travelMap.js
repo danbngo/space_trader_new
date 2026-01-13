@@ -84,23 +84,20 @@ class TravelMap {
     tick() {
         //console.log('STARTING TRAVEL MAP TICK')
         // Check if animation should continue
-        if (!this.isPaused) {
-            console.log('Travel map tick stopped')
-            return
-        }
-        if (!gs.encounter && gs.fleet.stranded) {
-            console.log("Travel map - doing nothing since player stranded. Tow ship logic should kick in.")
-            this.isPaused = true
-            handlePlayerStranded()
-            this.cleanupRemovedShips()
-            this.cvs.redraw()
-            return
-        }
         this.refresh()
         // Run tick logic for travel mode
-        if (this.currentUIState === 'travel' && gs.destination && gs.travelYearsRemaining !== null) {
+        if (!currentModal && this.currentUIState === 'travel' && gs.destination && gs.travelYearsRemaining !== null) {
             // && gs.travelYearsRemaining > 0 <-- dont include this check, we want to detect whether route is complete in the subclass
             this.routeHandler.tick()
+        }
+        else {
+            if (!gs.encounter && gs.fleet.stranded) {
+                console.log("Travel map - doing nothing since player stranded. Tow ship logic should kick in.")
+                handlePlayerStranded()
+            }
+            else if (!gs.encounter && gs.fleet.overburdened) {
+                handlePlayerOverburdened()
+            }
         }
         this.handleAnimations() //must go after other updates to ensure ship positions are correct
         this.cvs.redraw(true)
