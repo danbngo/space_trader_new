@@ -228,6 +228,11 @@ function getFadeToBlackElement() {
 function fadeToBlack(onComplete, duration = 400) {
     const fadeEl = getFadeToBlackElement()
     fadeEl.style.transition = `opacity ${duration}ms ease-in-out`
+    
+    // Force a reflow to ensure the browser sees the initial opacity: 0 state
+    // before we add the 'fading' class (which triggers opacity: 1)
+    void fadeEl.offsetHeight
+    
     fadeEl.classList.add('fading')
     
     setTimeout(() => {
