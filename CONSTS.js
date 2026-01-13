@@ -78,15 +78,15 @@ const MAX_FRAMES_PER_SECOND = 120
 const NEWS_MAX_AGE = 60
 
 const ENCOUNTER_BASE_FINE_ON_ATTACK =  1000 //if the enemy has positive reputationMultiplier, multiply bounty increase by this amount. otherwisee bounty increase is always 0
-const ENCOUNTER_MAX_BOUNTY_OR_JAIL_RATIO = 1 //if police or bounty hunters catch you, this happens to you
 const JAIL_DAYS_PER_1000CR_FINE = 5 //5 days of jail time per 1000CR of fine
 const ENCOUNTER_BASE_REPUTATION_EFFECT_ON_VICTORY = -5 //winning a battle grants you some notoriety if the target was good, fame if the target was bad
 const ENCOUNTER_BASE_REPUTATION_EFFECT_ON_NO_SURRENDER = -3 //this is applied as an inverse amount, ie, your rep shrinks by base/reputationMultiplier. surrendering to powerful foes is less shameful.
 const ENCOUNTER_BASE_REPUTATION_EFFECT_ON_ATTACK = -5 //attacking a fleet gains you notoriety if they're good and fame if they're bad
-const ENCOUNTER_MAX_CARGO_LOSS_PERCENT = 0.5
-const ENCOUNTER_MAX_CREDITS_LOSS_PERCENT = 0.5
-const ENCOUNTER_MAX_SHIPS_LOSS_PERCENT = 0.1
-const ENCOUNTER_FINE_FOR_RESISTING_POLICE = 1000
+//const ENCOUNTER_MAX_BOUNTY_OR_JAIL_RATIO = 0.5 //if police or bounty hunters catch you, they will force to to either pay CR or do jail time to clear this much of your bounty
+const ENCOUNTER_MAX_CARGO_LOSS_PERCENT = 0.5 //pirates will take UP TO this amount
+const ENCOUNTER_MAX_CREDITS_LOSS_PERCENT = 0.5 //pirates will take UP TO this amount
+const ENCOUNTER_MAX_SHIPS_LOSS_PERCENT = 0.1 //pirates will destroy UP TO this amount of your ships
+const ENCOUNTER_FINE_FOR_RESISTING_POLICE = 1000 //flat fine for resisting police
 
 const CIVILIZATION_BONUS_RATE_PER_YEAR = 0.1 //each year a democracy will MULTIPLY its economy by 1 + this, for instance
 

@@ -27,7 +27,7 @@ class Anim {
     }
     update(currentMs = Date.now()) {
         if (this.completed) return;
-        console.log('anim running, time:', currentMs, 'start:', this.startTime, 'duration:', this.durationMs);
+        //console.log('anim running, time:', currentMs, 'start:', this.startTime, 'duration:', this.durationMs);
         if (this.startTime === null) {
             this.startTime = currentMs;
         }

@@ -465,7 +465,9 @@ class Encounter {
         const escapedCargoSpace = escapedShips.reduce((total, ship) => total + ship.cargoSpace, 0)
         const availableCargoSpace = gs.fleet.totalCargoSpace - escapedCargoSpace
         
-        const maxCargoByPercent = Math.floor(gs.fleet.cargo.total * ENCOUNTER_MAX_CARGO_LOSS_PERCENT)
+        // Pirates take a random amount UP TO the maximum percent
+        const randomPercent = Math.random() * ENCOUNTER_MAX_CARGO_LOSS_PERCENT
+        const maxCargoByPercent = Math.floor(gs.fleet.cargo.total * randomPercent)
         const maxCargoByPirateSpace = pirateFleet.availableCargoSpace
         const maxCargoToTake = Math.min(maxCargoByPercent, maxCargoByPirateSpace)
         
@@ -510,7 +512,9 @@ class Encounter {
      * @returns {Object} - {taken, left, message}
      */
     piratesTakeCredits() {
-        const maxCredits = Math.floor(gs.credits * ENCOUNTER_MAX_CREDITS_LOSS_PERCENT)
+        // Pirates take a random amount UP TO the maximum percent
+        const randomPercent = Math.random() * ENCOUNTER_MAX_CREDITS_LOSS_PERCENT
+        const maxCredits = Math.floor(gs.credits * randomPercent)
         
         if (maxCredits <= 0) {
             return { taken: 0, left: gs.credits, message: '' }
@@ -532,7 +536,9 @@ class Encounter {
      */
     piratesTakeShips() {
         const eligibleShips = gs.fleet.ships.filter(s => !s.disabled && !s.escaped)
-        const maxShipsToTake = Math.floor(eligibleShips.length * ENCOUNTER_MAX_SHIPS_LOSS_PERCENT)
+        // Pirates take a random number UP TO the maximum percent
+        const randomPercent = Math.random() * ENCOUNTER_MAX_SHIPS_LOSS_PERCENT
+        const maxShipsToTake = Math.floor(eligibleShips.length * randomPercent)
         
         if (maxShipsToTake <= 0 || eligibleShips.length <= 1) {
             return { taken: 0, left: gs.fleet.ships.length, message: '' }
@@ -584,7 +590,9 @@ class Encounter {
             return { taken: 0, left: 0, bountyAdded: 0, message: '' }
         }
         
-        const maxCargoToTake = Math.floor(totalIllegalCargo * ENCOUNTER_MAX_CARGO_LOSS_PERCENT)
+        // Police find a random amount UP TO the maximum percent of illegal cargo
+        const randomPercent = Math.random() * ENCOUNTER_MAX_CARGO_LOSS_PERCENT
+        const maxCargoToTake = Math.floor(totalIllegalCargo * randomPercent)
         let cargoTaken = 0
         let bountyAdded = 0
         const confiscatedCargo = new CountsMap()
