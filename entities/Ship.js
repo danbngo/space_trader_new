@@ -51,6 +51,8 @@ class Ship {
         this.angle = Math.PI*2; //direction ship is facing in. it can only accelerate/decelerate and shoot in that direction
         /** @type {boolean} */
         this.escaped = false;
+        /** @type {number} - Visual row position (0=middle, positive=up, negative=down) */
+        this.rowIndex = 0;
         /** @type {AI_TYPES} */
         this.aiType = null
         /** @type {ShipModule[]} */

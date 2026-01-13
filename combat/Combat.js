@@ -126,30 +126,12 @@ class Combat {
     }
 
     /**
-     * Get the visual row of a ship based on its index in fleet.ships array
-     * Pattern: 0=middle, 1=up 1, 2=down 1, 3=up 2, 4=down 2, etc.
+     * Get the visual row of a ship based on its rowIndex property
      * @param {Ship} ship - The ship to get the row for
      * @returns {number} - Row number (0=middle, positive=up, negative=down)
      */
     getRow(ship) {
-        // Find which fleet this ship belongs to
-        let index = this.playerFleet.ships.indexOf(ship)
-        if (index === -1) {
-            index = this.enemyFleet.ships.indexOf(ship)
-        }
-        if (index === -1) {
-            return 0 // Ship not found, return middle
-        }
-        
-        // Convert index to visual row: 0, +1, -1, +2, -2, +3, -3, ...
-        if (index === 0) return 0
-        if (index % 2 === 1) {
-            // Odd indices go up: 1→+1, 3→+2, 5→+3
-            return Math.ceil(index / 2)
-        } else {
-            // Even indices go down: 2→-1, 4→-2, 6→-3
-            return -(index / 2)
-        }
+        return ship.rowIndex || 0
     }
 
     /**
@@ -263,25 +245,29 @@ class Combat {
 
     /**
      * Calculates the hit chance for a laser attack based on attacker and defender stats.
+     * Hit chance depends on attacker's distance from middle row (V-formation logic)
      * @param {Ship} attacker - The attacking ship
      * @param {Ship} defender - The defending ship
      * @returns {number} - Hit chance from 0 to 1
      */
     calculateHitChance(attacker, defender) {
-        const rowDiff = this.getRowDifference(attacker, defender)
+        // Base hit chance at middle row
+        const baseChance = COMBAT_HIT_CHANCE_AT_MIDDLE_ROW
         
-        // Base hit chance varies with row difference (interpolate between min and max)
-        const minChance = COMBAT_LASER_HIT_CHANCE_AT_MIN_ROW_DIFFERENCE
-        const maxChance = COMBAT_LASER_HIT_CHANCE_AT_MAX_ROW_DIFFERENCE
-        const maxRowDiff = COMBAT_LASER_MAX_ROW_DIFFERENCE
+        // Calculate attacker's distance from middle row (row 0)
+        const attackerRow = Math.abs(this.getRow(attacker))
         
-        // Linear interpolation: closer targets = higher hit chance
-        const baseChance = minChance - ((minChance - maxChance) * (rowDiff / maxRowDiff))
+        // Reduce hit chance based on distance from middle row
+        // At COMBAT_HIT_CHANCE_HALVED_AT_X_ROWS rows away: 50% reduction
+        // At 2X rows away: 75% reduction (quartered), at 3X: 87.5%, etc.
+        const rowDistanceFactor = attackerRow / COMBAT_HIT_CHANCE_HALVED_AT_X_ROWS
+        const hitChanceMultiplier = 1 / Math.pow(2, rowDistanceFactor)
+        const adjustedChance = baseChance * hitChanceMultiplier
         
         // Radar reduces miss chance
         // Formula: new_miss_chance = miss_chance * (1 - (radars / (radars + HALVED_AT_X)))
         // At X radars: miss reduced by 50%, at 2X: 66%, at 3X: 75%, etc.
-        const missChance = 1 - baseChance
+        const missChance = 1 - adjustedChance
         const radarReduction = attacker.radars / (attacker.radars + COMBAT_LASER_MISS_CHANCE_HALVED_AT_X_RADARS)
         const newMissChance = missChance * (1 - radarReduction)
         const finalChance = 1 - newMissChance
@@ -423,10 +409,14 @@ class Combat {
             };
         }
         
-        // Calculate ram hit chance based on engine power
-        // Higher engine = higher chance to connect the ram
+        // Calculate base hit chance based on attacker's distance from middle row
+        const attackerRow = Math.abs(this.getRow(attacker))
+        const rowDistanceFactor = attackerRow / COMBAT_HIT_CHANCE_HALVED_AT_X_ROWS
+        const baseHitChance = COMBAT_HIT_CHANCE_AT_MIDDLE_ROW * (1 / Math.pow(2, rowDistanceFactor))
+        
+        // Modify hit chance based on engine power ratio
         const engineRatio = attacker.engine / Math.max(1, defender.engine)
-        const hitChance = COMBAT_RAM_HIT_CHANCE_AT_SAME_ENGINE_POWER * engineRatio
+        const hitChance = baseHitChance * COMBAT_RAM_HIT_CHANCE_MODIFIER_AT_SAME_ENGINE_POWER * engineRatio
         const clampedHitChance = Math.max(0.1, Math.min(0.9, hitChance))
         
         if (Math.random() >= clampedHitChance) {
@@ -570,6 +560,42 @@ class Combat {
     }
 
     /**
+     * Calculates a reposition action where a ship swaps rows with a target
+     * @param {Ship} ship - The ship repositioning
+     * @param {Ship} target - The target ship to swap rows with
+     * @returns {Object} - Result {success, message}
+     */
+    calculateReposition(ship, target) {
+        // Check if target exists
+        if (!target) {
+            return {
+                success: false,
+                message: `${ship.name} needs a target to reposition!`
+            }
+        }
+        
+        // Check if target is within 1 row difference
+        const rowDiff = this.getRowDifference(ship, target)
+        if (rowDiff > 1) {
+            return {
+                success: false,
+                message: `${ship.name} cannot reposition - ${target.name} is too far away (${rowDiff} rows)!`
+            }
+        }
+        
+        // Can target any ship (including disabled/escaped, ally or enemy)
+        const shipRow = this.getRow(ship)
+        const targetRow = this.getRow(target)
+        
+        return {
+            success: true,
+            message: `${ship.name} repositions from row ${shipRow} to row ${targetRow}!`,
+            shipRow: shipRow,
+            targetRow: targetRow
+        }
+    }
+
+    /**
      * Calculates an action result without executing it
      * @param {Ship} ship - The ship performing the action
      * @param {string} action - 'laser', 'ram', 'evade', 'recharge', 'flee'
@@ -644,6 +670,18 @@ class Combat {
                     escaped: result.escaped
                 })
 
+            case 'reposition':
+                result = this.calculateReposition(ship, target)
+                return new CombatResult({
+                    attacker: ship,
+                    defender: target,
+                    action: 'reposition',
+                    success: result.success,
+                    message: result.message,
+                    shipRow: result.shipRow,
+                    targetRow: result.targetRow
+                })
+
             default:
                 return new CombatResult({
                     attacker: ship,
@@ -713,6 +751,18 @@ class Combat {
             case 'flee':
                 if (result.escaped && result.attacker) {
                     result.attacker.escaped = true
+                }
+                break
+                
+            case 'reposition':
+                if (result.success && result.attacker && result.defender) {
+                    // Swap row positions between attacker and defender
+                    const attackerFleet = result.attacker.fleet
+                    const defenderFleet = result.defender.fleet
+                    
+                    const tempRow = result.attacker.rowIndex
+                    attackerFleet.setRow(result.attacker, result.defender.rowIndex)
+                    defenderFleet.setRow(result.defender, tempRow)
                 }
                 break
         }

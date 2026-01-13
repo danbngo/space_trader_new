@@ -412,10 +412,10 @@ function showDepartureWarningModal(planet, shipyard) {
     
     /** @type {ButtonData[]} */
     const buttons = [
+        ['Cancel', () => showPlanetMenu(planet)],
         ['Repair All' + (needsRepair ? ` (${totalRepairCost}CR)` : ''), repairAll, !needsRepair || !canAffordRepair, repairDisabledReason],
         ['Refuel All' + (needsRefuel ? ` (${refuelCost}CR)` : ''), refuelAll, !needsRefuel || !canAffordRefuel, refuelDisabledReason],
         ['Depart', () => closeModal()],
-        ['Cancel', () => showPlanetMenu(planet)]
     ]
     
     showModal('Departure Check', msg, buttons)

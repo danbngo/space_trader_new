@@ -82,6 +82,7 @@ const MOVE_TYPES = Object.freeze({
     Recharge: 'Recharge',
     Ram: 'Ram',
     Flee: 'Flee',
+    Reposition: 'Reposition'
 })
 const MOVE_TYPES_ALL = Object.values(MOVE_TYPES)
 

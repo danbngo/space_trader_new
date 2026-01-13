@@ -16,7 +16,8 @@ class TravelMapCombatHandler {
         // Targeting state
         this.targetingShip = null
         this.targetedShips = new Set()
-        this.targetingMode = null // 'laser', 'ram', or null
+        this.targetingMode = null // 'laser', 'ram', 'reposition', or null
+        this.hoveredShip = null // Ship currently being hovered over
     }
 
     /**
@@ -24,71 +25,125 @@ class TravelMapCombatHandler {
      */
     updateWidgets() {
         const {selectedShip} = this.travelMap
-        const arrowId = 'selection-arrow'
+        const {hoveredShip} = this
+        const selectionArrowId = 'selection-arrow'
+        const hoverArrowId = 'hover-arrow'
         
-        // Remove arrow if no ship selected or not in combat
+        // Update selection arrow (green, for selected ship)
         if (!selectedShip || !gs.combat) {
-            const existingArrow = this.travelMap.cvs.getObject(arrowId)
+            const existingArrow = this.travelMap.cvs.getObject(selectionArrowId)
             if (existingArrow) {
-                this.travelMap.cvs.deleteObject(arrowId)
+                this.travelMap.cvs.deleteObject(selectionArrowId)
             }
-            return
+        } else {
+            // Get ship's canvas object to position arrow
+            const shipObj = this.travelMap.cvs.getObject(`ship-${selectedShip.uuid}`)
+            if (shipObj) {
+                // Determine if this is a player ship or enemy ship
+                const isPlayerShip = gs.fleet.ships.includes(selectedShip)
+                
+                // Animate position and brightness using time-based oscillation
+                const time = Date.now()
+                const positionOscillation = Math.sin(time / 400) * 15 // Oscillates ±15 pixels over ~0.8 seconds (2x faster)
+                const brightnessOscillation = Math.sin(time / 500) * 0.3 + 0.7 // Oscillates between 0.4 and 1.0 over 1 second (2x faster)
+                
+                // Position arrow to the left of player ships, right of enemy ships
+                const arrowSize = TRAVEL_MAP_CONFIG.selectionArrowSize
+                const arrowDistance = shipObj.size/2 + TRAVEL_MAP_CONFIG.selectionArrowDistance
+                let arrowX, arrowAngle
+                
+                if (isPlayerShip) {
+                    // Arrow to the left, pointing right (→), oscillates left-right
+                    arrowX = shipObj.x - arrowDistance + positionOscillation
+                    arrowAngle = 0 // Points right
+                } else {
+                    // Arrow to the right, pointing left (←), oscillates left-right
+                    arrowX = shipObj.x + arrowDistance + positionOscillation
+                    arrowAngle = Math.PI // Points left
+                }
+                
+                // Create animated green color with oscillating brightness
+                const animatedGreen = [
+                    Math.floor(COLORS.Green[0] * brightnessOscillation),
+                    Math.floor(COLORS.Green[1] * brightnessOscillation),
+                    Math.floor(COLORS.Green[2] * brightnessOscillation),
+                    1
+                ]
+                
+                // Create or update arrow
+                const existingArrow = this.travelMap.cvs.getObject(selectionArrowId)
+                if (existingArrow) {
+                    existingArrow.x = arrowX
+                    existingArrow.y = shipObj.y
+                    existingArrow.angle = arrowAngle
+                    existingArrow.fillColor = animatedGreen
+                } else {
+                    this.travelMap.cvs.addFilledTriangle(
+                        selectionArrowId,
+                        arrowX,
+                        shipObj.y,
+                        arrowSize,
+                        arrowSize,
+                        3, // minScreenSize
+                        animatedGreen,
+                        arrowAngle,
+                        null
+                    )
+                }
+            }
         }
         
-        // Get ship's canvas object to position arrow
-        const shipObj = this.travelMap.cvs.getObject(`ship-${selectedShip.uuid}`)
-        if (!shipObj) return
-        
-        // Determine if this is a player ship or enemy ship
-        const isPlayerShip = gs.fleet.ships.includes(selectedShip)
-        
-        // Animate position and brightness using time-based oscillation
-        const time = Date.now()
-        const positionOscillation = Math.sin(time / 400) * 15 // Oscillates ±15 pixels over ~0.8 seconds (2x faster)
-        const brightnessOscillation = Math.sin(time / 500) * 0.3 + 0.7 // Oscillates between 0.4 and 1.0 over 1 second (2x faster)
-        
-        // Position arrow to the left of player ships, right of enemy ships
-        const arrowSize = TRAVEL_MAP_CONFIG.selectionArrowSize
-        const arrowDistance = shipObj.size/2 + TRAVEL_MAP_CONFIG.selectionArrowDistance
-        let arrowX, arrowAngle
-        
-        if (isPlayerShip) {
-            // Arrow to the left, pointing right (→), oscillates left-right
-            arrowX = shipObj.x - arrowDistance + positionOscillation
-            arrowAngle = 0 // Points right
+        // Update hover arrow (yellow/orange, for hovered enemy ship)
+        if (!hoveredShip || !gs.combat || gs.fleet.ships.includes(hoveredShip)) {
+            // Remove hover arrow if not hovering, not in combat, or hovering ally
+            const existingHoverArrow = this.travelMap.cvs.getObject(hoverArrowId)
+            if (existingHoverArrow) {
+                this.travelMap.cvs.deleteObject(hoverArrowId)
+            }
         } else {
-            // Arrow to the right, pointing left (←), oscillates left-right
-            arrowX = shipObj.x + arrowDistance + positionOscillation
-            arrowAngle = Math.PI // Points left
-        }
-        
-        // Create animated green color with oscillating brightness
-        const animatedGreen = [
-            Math.floor(COLORS.Green[0] * brightnessOscillation),
-            Math.floor(COLORS.Green[1] * brightnessOscillation),
-            Math.floor(COLORS.Green[2] * brightnessOscillation),
-            1
-        ]
-        
-        // Create or update arrow
-        const existingArrow = this.travelMap.cvs.getObject(arrowId)
-        if (existingArrow) {
-            existingArrow.x = arrowX
-            existingArrow.y = shipObj.y
-            existingArrow.angle = arrowAngle
-            existingArrow.fillColor = animatedGreen
-        } else {
-            this.travelMap.cvs.addFilledTriangle(
-                arrowId,
-                arrowX,
-                shipObj.y,
-                arrowSize,
-                arrowSize,
-                3, // minScreenSize
-                animatedGreen,
-                arrowAngle,
-                null
-            )
+            // Get hovered ship's canvas object to position arrow
+            const hoveredShipObj = this.travelMap.cvs.getObject(`ship-${hoveredShip.uuid}`)
+            if (hoveredShipObj) {
+                // Animate position and brightness using time-based oscillation
+                const time = Date.now()
+                const positionOscillation = Math.sin(time / 400) * 15
+                const brightnessOscillation = Math.sin(time / 500) * 0.3 + 0.7
+                
+                // Position arrow to the right of enemy ships, pointing left (←)
+                const arrowSize = TRAVEL_MAP_CONFIG.selectionArrowSize
+                const arrowDistance = hoveredShipObj.size/2 + TRAVEL_MAP_CONFIG.selectionArrowDistance
+                const arrowX = hoveredShipObj.x + arrowDistance + positionOscillation
+                const arrowAngle = Math.PI // Points left
+                
+                // Create animated yellow/orange color with oscillating brightness
+                const animatedYellow = [
+                    Math.floor(255 * brightnessOscillation),
+                    Math.floor(200 * brightnessOscillation),
+                    Math.floor(0 * brightnessOscillation),
+                    1
+                ]
+                
+                // Create or update hover arrow
+                const existingHoverArrow = this.travelMap.cvs.getObject(hoverArrowId)
+                if (existingHoverArrow) {
+                    existingHoverArrow.x = arrowX
+                    existingHoverArrow.y = hoveredShipObj.y
+                    existingHoverArrow.angle = arrowAngle
+                    existingHoverArrow.fillColor = animatedYellow
+                } else {
+                    this.travelMap.cvs.addFilledTriangle(
+                        hoverArrowId,
+                        arrowX,
+                        hoveredShipObj.y,
+                        arrowSize,
+                        arrowSize,
+                        3, // minScreenSize
+                        animatedYellow,
+                        arrowAngle,
+                        null
+                    )
+                }
+            }
         }
     }
 
@@ -162,11 +217,42 @@ class TravelMapCombatHandler {
         
         // If in targeting mode, show targeting UI with cancel button
         if (targetingMode) {
-            const targetingLabel = targetingMode === 'laser' ? 'Targeting Laser' : 'Targeting Ram'
+            const targetingLabel = targetingMode === 'laser' ? 'Targeting Laser' : 
+                                  targetingMode === 'ram' ? 'Targeting Ram' :
+                                  targetingMode === 'reposition' ? 'Targeting Reposition' : 'Targeting'
+            
             buttonContainer.appendChild(ce({
                 innerHTML: `<strong>${targetingLabel}</strong> - Select a target`,
                 classNames: ['targeting-mode-label']
             }))
+            
+            // Show hit chance if hovering a valid target
+            if (this.hoveredShip && this.targetedShips.has(this.hoveredShip)) {
+                if (targetingMode === 'laser' || targetingMode === 'ram') {
+                    // Calculate hit chance for this attack
+                    let hitChance = 0
+                    if (targetingMode === 'laser') {
+                        hitChance = gs.combat.calculateHitChance(selectedShip, this.hoveredShip)
+                    } else if (targetingMode === 'ram') {
+                        // Calculate ram hit chance (includes position and engine factors)
+                        const attackerRow = Math.abs(gs.combat.getRow(selectedShip))
+                        const rowDistanceFactor = attackerRow / COMBAT_HIT_CHANCE_HALVED_AT_X_ROWS
+                        const baseHitChance = COMBAT_HIT_CHANCE_AT_MIDDLE_ROW * (1 / Math.pow(2, rowDistanceFactor))
+                        const engineRatio = selectedShip.engine / Math.max(1, this.hoveredShip.engine)
+                        hitChance = baseHitChance * COMBAT_RAM_HIT_CHANCE_MODIFIER_AT_SAME_ENGINE_POWER * engineRatio
+                        hitChance = Math.max(0.1, Math.min(0.9, hitChance))
+                    }
+                    
+                    const hitPercent = Math.round(hitChance * 100)
+                    buttonContainer.appendChild(ce({
+                        innerHTML: `<div style="margin-top: 8px; padding: 8px; background: rgba(0,0,0,0.3); border-radius: 4px;">
+                            Target: ${coloredName(this.hoveredShip)}<br/>
+                            Hit Chance: <span style="color: ${hitPercent >= 75 ? '#0f0' : hitPercent >= 50 ? '#ff0' : '#f80'}">${hitPercent}%</span>
+                        </div>`
+                    }))
+                }
+            }
+            
             buttonContainer.appendChild(ce({
                 tag: 'button',
                 innerHTML: 'Cancel',
@@ -230,6 +316,11 @@ class TravelMapCombatHandler {
             innerHTML: 'Flee',
             onClick: () => this.handleFlee()
         }))
+        buttonContainer.appendChild(ce({
+            tag: 'button',
+            innerHTML: 'Reposition',
+            onClick: () => this.handleReposition()
+        }))
         
         return buttonContainer
     }
@@ -264,6 +355,69 @@ class TravelMapCombatHandler {
         // Create flee animation to display the result
         const shipObj = this.travelMap.cvs.getObject(`ship-${selectedShip.uuid}`)
         this.travelMap.animations.push(new FleeAnim(shipObj, selectedShip, result, this.travelMap))
+        
+        // Deselect ship if it has no actions remaining
+        if (selectedShip.actionsRemaining <= 0) {
+            this.travelMap.selectedShip = null
+        }
+        
+        // Wait for animations then complete action
+        this.waitForAnimationsThenComplete()
+        this.travelMap.updateUIPanel()
+    }
+
+    /**
+     * Handles reposition action - enters targeting mode
+     */
+    handleReposition() {
+        const {selectedShip} = this.travelMap
+        if (!selectedShip) return
+        
+        // Enter targeting mode for reposition
+        this.targetingMode = 'reposition'
+        this.targetingShip = selectedShip
+        this.targetedShips.clear()
+        
+        // Populate valid targets: all ships (ally + enemy, including disabled) within 1 row
+        const allShips = [...gs.fleet.ships]
+        if (gs.encounter && gs.encounter.fleet && gs.encounter.fleet.ships) {
+            allShips.push(...gs.encounter.fleet.ships)
+        }
+        
+        allShips.forEach(ship => {
+            if (ship === selectedShip) return // Can't target self
+            const rowDiff = gs.combat.getRowDifference(selectedShip, ship)
+            if (rowDiff <= 1) {
+                this.targetedShips.add(ship)
+            }
+        })
+        
+        this.travelMap.updateUIPanel()
+    }
+
+    /**
+     * Executes reposition action with selected target
+     * @param {Ship} target - The ship to swap rows with
+     */
+    executeReposition(target) {
+        const {selectedShip} = this.travelMap
+        if (!selectedShip || !target) return
+        
+        // Calculate reposition result
+        const result = gs.combat.calculateAction(selectedShip, 'reposition', target)
+        selectedShip.actionsRemaining--
+        
+        // Get canvas objects for both ships
+        const shipObj = this.travelMap.cvs.getObject(`ship-${selectedShip.uuid}`)
+        const targetObj = this.travelMap.cvs.getObject(`ship-${target.uuid}`)
+        
+        // Create reposition animation
+        this.travelMap.animations.push(new RepositionAnim(shipObj, targetObj, selectedShip, target, result, this.travelMap))
+        
+        // Exit targeting mode
+        this.targetingMode = null
+        this.targetingShip = null
+        this.targetedShips.clear()
         
         // Deselect ship if it has no actions remaining
         if (selectedShip.actionsRemaining <= 0) {
@@ -519,6 +673,15 @@ class TravelMapCombatHandler {
     }
 
     /**
+     * Handles ship hover events
+     * @param {Ship|null} ship - The ship being hovered over, or null if no longer hovering
+     */
+    onHoverShip(ship) {
+        this.hoveredShip = ship
+        this.travelMap.updateUIPanel()
+    }
+
+    /**
      * Handles ship click events - both player and enemy ships
      * @param {Ship} ship - The ship that was clicked
      * @param {Object} shipGroupConfig - Configuration object with mirror flag
@@ -529,27 +692,39 @@ class TravelMapCombatHandler {
             // Enemy ship clicked
             console.log('Enemy ship clicked, targetingMode:', this.targetingMode)
             if (this.targetingMode) {
-                // Player is targeting this enemy ship for an attack
-                if (ship.disabled || !this.targetedShips.has(ship)) {
-                    return
+                // Handle different targeting modes
+                if (this.targetingMode === 'reposition') {
+                    // For reposition, can target any ship (including disabled)
+                    this.executeReposition(ship)
+                } else {
+                    // For attacks, ship must not be disabled and must be valid target
+                    if (ship.disabled || !this.targetedShips.has(ship)) {
+                        return
+                    }
+                    
+                    const attackType = this.targetingMode
+                    this.targetingMode = null // Clear targeting mode
+                    this.targetingShip = null
+                    this.targetedShips.clear()
+                    
+                    // Execute the attack
+                    this.performAttack(attackType, ship)
                 }
-                
-                const attackType = this.targetingMode
-                this.targetingMode = null // Clear targeting mode
-                this.targetingShip = null
-                this.targetedShips.clear()
-                
-                // Execute the attack
-                this.performAttack(attackType, ship)
             }
             else {
                 this.travelMap.selectedShip = ship
             }
         } else {
-            console.log('Setting selectedShip to:', ship.shipType.name)
-            this.travelMap.selectedShip = ship
-            
-            // Update UI panel to reflect selection
+            // Allied ship clicked
+            console.log('Allied ship clicked, targetingMode:', this.targetingMode)
+            if (this.targetingMode === 'reposition') {
+                // For reposition, can target any allied ship (including disabled)
+                this.executeReposition(ship)
+            } else {
+                // Normal selection
+                console.log('Setting selectedShip to:', ship.shipType.name)
+                this.travelMap.selectedShip = ship
+            }
         }
         this.travelMap.updateUIPanel()
     }

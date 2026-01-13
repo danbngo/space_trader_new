@@ -158,6 +158,8 @@ class TravelMapShipHandler {
                 // Set smaller hit radius for more precise clicking
                 shipObj.hitRadius = TRAVEL_MAP_CONFIG.shipHitRadius
                 shipObj.onClick = ()=>this.travelMap.combatHandler.onClickShip(ship, shipGroupConfig)
+                shipObj.onHover = ()=>this.travelMap.combatHandler.onHoverShip(ship)
+                shipObj.onHoverEnd = ()=>this.travelMap.combatHandler.onHoverShip(null)
             } else {
                 throw new Error('ship must have a shipshape')
             }
@@ -456,30 +458,18 @@ class TravelMapShipHandler {
         
         // Render each ship
         ships.forEach((ship, index) => {
-            // Flying V formation positioning
-            // ships[0] is lead (center), ships[1,2] are wing pair 1, ships[3,4] are wing pair 2
+            // Position based on ship's rowIndex property
             const shipSpacingX = TRAVEL_MAP_CONFIG.shipSpacingX
             const shipSpacingY = TRAVEL_MAP_CONFIG.shipSpacingY
-            let shipY = 0
-            let xDepthOffset = 0 // How far back from lead ship
             
-            if (index === 0) {
-                // Lead ship - centered
-                shipY = 0
-                xDepthOffset = 0
-            } else {
-                // Wing ships - alternate above/below, progressively further back
-                const pairIndex = Math.floor((index - 1) / 2) // 0 for ships[1,2], 1 for ships[3,4]
-                const isUpper = (index % 2 === 1) // ships[1,3] above, ships[2,4] below
-                
-                shipY = (isUpper ? -1 : 1) * shipSpacingY * (pairIndex + 1)
-                // For mirrored (enemy) ships, flip the depth offset direction
-                const depthDirection = config.mirror ? 1 : -1
-                xDepthOffset = depthDirection * shipSpacingX * 1.8 * (pairIndex + 1) // Each pair further back
-            }
+            // Use rowIndex for Y position (0=center, positive=up, negative=down)
+            const rowIndex = ship.rowIndex || 0
+            const shipY = -rowIndex * shipSpacingY // Negative because canvas Y increases downward
             
+            // X position: stagger ships slightly based on their position in array for depth
+            const depthDirection = config.mirror ? 1 : -1
+            const xDepthOffset = depthDirection * shipSpacingX * 0.3 * index
             const shipX = config.xOffset + xDepthOffset
-            // shipY already set above
             
             // Render ship (handles both creation and position updates, including jitter)
             this.renderShip(ship, shipX, shipY, config)

@@ -177,10 +177,10 @@ async function startNewGame() {
     )
 
     gs.fleet.addShip(playerShip)
-    //gs.fleet.addShip(playerShip2)
-    //gs.fleet.addShip(playerShip3)
-    //gs.fleet.addShip(playerShip4)
-    //gs.fleet.addShip(playerShip5)
+    gs.fleet.addShip(playerShip2)
+    gs.fleet.addShip(playerShip3)
+    gs.fleet.addShip(playerShip4)
+    gs.fleet.addShip(playerShip5)
 
     gs.fleet.addOfficer(captain)
     gs.fleet.fuel = gs.fleet.totalFuelCapacity // Start with full fuel tank

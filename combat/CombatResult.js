@@ -6,7 +6,7 @@ class CombatResult {
      * @param {Object} data
      * @param {Ship} data.attacker - The ship performing the action
      * @param {Ship} [data.defender] - The ship being targeted (if applicable)
-     * @param {string} data.action - The action type: 'laser', 'ram', 'evade', 'recharge', 'flee'
+     * @param {string} data.action - The action type: 'laser', 'ram', 'evade', 'recharge', 'flee', 'reposition'
      * @param {boolean} data.success - Whether the action succeeded
      * @param {string} data.message - Description of what happened
      * @param {number} [data.damage] - Damage dealt (if applicable)
@@ -18,6 +18,8 @@ class CombatResult {
      * @param {boolean} [data.destroyed] - Whether defender was destroyed
      * @param {boolean} [data.selfDestroyed] - Whether attacker destroyed themselves (for ram attacks)
      * @param {boolean} [data.escaped] - Whether attacker escaped
+     * @param {number} [data.shipRow] - Ship's row before reposition
+     * @param {number} [data.targetRow] - Target's row before reposition
      */
     constructor(data) {
         this.attacker = data.attacker
@@ -34,5 +36,7 @@ class CombatResult {
         this.destroyed = data.destroyed || false
         this.selfDestroyed = data.selfDestroyed || false
         this.escaped = data.escaped || false
+        this.shipRow = data.shipRow || 0
+        this.targetRow = data.targetRow || 0
     }
 }

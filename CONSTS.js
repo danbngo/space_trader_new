@@ -109,14 +109,14 @@ const TRAVEL_MAP_PROGRESS_PERCENT_PER_MS = 1/1000 // Progress percentage per mil
 
 const MAX_SHIPS_PER_FLEET = 7
 
+const COMBAT_HIT_CHANCE_AT_MIDDLE_ROW = 0.75 //at min row difference, 75% base chance to hit
+const COMBAT_HIT_CHANCE_HALVED_AT_X_ROWS = 3 //at 3 rows away from the middle row, chance to hit with ram OR laser is halved. 6 rows away = quartered, etc.
 const COMBAT_RAM_MAX_ROW_DIFFERENCE = 0 //can only ram if opponent is directly opposite
 const COMBAT_LASER_MAX_ROW_DIFFERENCE = 2 //can shoot up to 2 rows "away"
-const COMBAT_LASER_HIT_CHANCE_AT_MIN_ROW_DIFFERENCE = 0.75 //at min row difference, 75% base chance to hit
-const COMBAT_LASER_HIT_CHANCE_AT_MAX_ROW_DIFFERENCE = 0.25 //at max row difference, 25% base chance to hit
 const COMBAT_LASER_MISS_CHANCE_HALVED_AT_X_RADARS = 25 //having 25 radars means miss chance is reduced by 50% of what it would have been. 50 radars = 75% reduction, etc. this is applied after the above props.
 const COMBAT_FLEE_CHANCE_NO_ENEMY_IN_SAME_ROW = 1 //can always flee if no enemy opposite us
-const COMBAT_FLEE_CHANCE_ENEMY_IN_SAME_ROW_WITH_SAME_ENGINE = 0.5 //50% chance if enemy has same engine power, 25% chance if they have 2x our engine, etc.
-const COMBAT_RAM_HIT_CHANCE_AT_SAME_ENGINE_POWER = 0.5 //50% chance if enemy has same engine power, 25% chance if they have 2x our engine, etc.
+const COMBAT_FLEE_CHANCE_ENEMY_IN_SAME_ROW_WITH_SAME_ENGINE = 0.5 //50% chance if enemy has same engine power, 25% chance if they have 2x our engine, etc. these attempts are unaffected by COMBAT_HIT_CHANCE
+const COMBAT_RAM_HIT_CHANCE_MODIFIER_AT_SAME_ENGINE_POWER = 1 //100% chance if enemy has same engine power, 50% chance if they have 2x our engine, etc. note: this is applied AFTER COMBAT_HIT_CHANCE
 const COMBAT_MAX_RAM_DAMAGE_PER_MAX_HULL_POINT = 0.25 //do up to 25% of our max hull damage when ramming, min 1 damage
 const COMBAT_MAX_LASER_DAMAGE_PER_LASER_POINT = 1 //do up to 100% of our max laser damage when shooting, min 1 damage
 const COMBAT_MAX_RECHARGE_PER_MAX_SHIELD_POINT = 0.25 //recharge up to 25% of our shields when recharging, min 1 recharged shield

@@ -260,10 +260,25 @@ class Fleet extends SpaceObject {
      * Adds a ship to the fleet.
      * @param {Ship} ship - The ship to add.
      */
-    addShip(ship ) {
+    addShip(ship) {
         if (!this.flagship) this.flagship = ship
         this.ships.push(ship)
         ship.fleet = this
+        
+        // Assign default row position (next available row)
+        const existingRows = this.ships.filter(s => s !== ship).map(s => s.rowIndex).sort((a, b) => a - b)
+        let targetRow = 0
+        
+        // Find next available row using the alternating pattern: 0, +1, -1, +2, -2, ...
+        for (let i = 0; i < 100; i++) {
+            const testRow = i === 0 ? 0 : (i % 2 === 1 ? Math.ceil(i / 2) : -(i / 2))
+            if (!existingRows.includes(testRow)) {
+                targetRow = testRow
+                break
+            }
+        }
+        
+        this.setRow(ship, targetRow)
     }
 
     removeShip(ship) {
@@ -276,6 +291,43 @@ class Fleet extends SpaceObject {
             this.ships.splice(index, 1);
             ship.fleet = null;
         }
+    }
+
+    /**
+     * Sets a ship's row position and rationalizes fleet positioning
+     * @param {Ship} ship - The ship to reposition
+     * @param {number} rowIndex - The target row (0=middle, positive=up, negative=down)
+     */
+    setRow(ship, rowIndex) {
+        if (!this.ships.includes(ship)) {
+            console.error('Cannot set row for ship not in fleet:', ship.name)
+            return
+        }
+        
+        ship.rowIndex = rowIndex
+        this.rationalizeShipPositions()
+    }
+
+    /**
+     * Reorganizes ships array so order matches visual display logic:
+     * Ship at row 0 first, then alternating between positive and negative rows
+     * Example order: row 0, row +1, row -1, row +2, row -2, row +3, row -3, ...
+     */
+    rationalizeShipPositions() {
+        // Sort ships by rowIndex using the display priority pattern
+        this.ships.sort((a, b) => {
+            const rowA = a.rowIndex
+            const rowB = b.rowIndex
+            
+            // Convert rowIndex to priority (0 has highest priority)
+            const getPriority = (row) => {
+                if (row === 0) return 0
+                if (row > 0) return row * 2 - 1  // +1→1, +2→3, +3→5
+                return Math.abs(row) * 2          // -1→2, -2→4, -3→6
+            }
+            
+            return getPriority(rowA) - getPriority(rowB)
+        })
     }
 
 
