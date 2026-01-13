@@ -84,6 +84,14 @@ function showMarketMenu(market = new Market()) {
     const buyPrices = market.calcCargoBuyPrices()
     const sellPrices = market.calcCargoSellPrices()
     const reloadMenu = ()=>showMarketMenu(market)
+    // Check if player has any cargo that can be sold
+    const hasSellableCargo = CARGO_TYPES_ALL.some(ct => {
+        const playerAmount = fleet.cargo.getAmount(ct)
+        if (playerAmount <= 0) return false
+        const sellPrice = sellPrices.getAmount(ct)
+        const marketAffordableAmount = Math.floor(market.credits / sellPrice)
+        return Math.min(playerAmount, marketAffordableAmount) > 0
+    }) 
     
     // Check access
     const accessDeniedReason = BuildingType.getAccessDeniedReason(planet, market)
@@ -107,6 +115,70 @@ function showMarketMenu(market = new Market()) {
         reloadMenu()
     }
 
+    function showSellAllConfirmation() {
+        // Calculate what can be sold
+        const cargoToSell = new CountsMap()
+        let totalSalePrice = 0
+        
+        for (const ct of CARGO_TYPES_ALL) {
+            const playerAmount = fleet.cargo.getAmount(ct)
+            if (playerAmount <= 0) continue
+            
+            const sellPrice = sellPrices.getAmount(ct)
+            const marketAffordableAmount = Math.floor(market.credits / sellPrice)
+            const sellableAmount = Math.min(playerAmount, marketAffordableAmount)
+            
+            if (sellableAmount > 0) {
+                cargoToSell.increment(ct, sellableAmount)
+                totalSalePrice += sellableAmount * sellPrice
+            }
+        }
+        
+        // Check if anything can be sold
+        if (cargoToSell.total === 0) {
+            showModal('Cannot Sell', 'You have no cargo that the market can afford to buy.', [['OK', reloadMenu]])
+            return
+        }
+        
+        // Build description of what's being sold
+        let description = 'You are about to sell the following cargo:<br/><br/>'
+        for (const ct of cargoToSell.keys) {
+            const amount = cargoToSell.getAmount(ct)
+            const price = sellPrices.getAmount(ct)
+            const lineTotal = amount * price
+            description += `${ct.symbol} ${coloredName(ct)}: ${amount} units @ ${price}CR = ${lineTotal}CR<br/>`
+        }
+        
+        const officersShare = gs.fleet.calcTotalCRShare(totalSalePrice, true)
+        const finalSale = totalSalePrice - officersShare
+        
+        description += `<br/>Total Sale: ${totalSalePrice}CR<br/>`
+        if (officersShare > 0) {
+            description += `Officers' Share: -${officersShare}CR<br/>`
+            description += `Your Net Gain: ${finalSale}CR<br/>`
+        }
+        description += `<br/>Your Credits After: ${gs.credits + finalSale}CR<br/>`
+        
+        const confirmSellAll = () => {
+            // Execute all sales
+            for (const ct of cargoToSell.keys) {
+                const amount = cargoToSell.getAmount(ct)
+                const salePrice = amount * sellPrices.getAmount(ct)
+                
+                gs.credits += salePrice - gs.fleet.calcTotalCRShare(salePrice, true)
+                market.credits -= salePrice
+                fleet.cargo.increment(ct, -amount)
+                market.cargo.increment(ct, amount)
+            }
+            reloadMenu()
+        }
+        
+        showModal('Sell All Cargo', description, [
+            ['Confirm', confirmSellAll],
+            ['Cancel', reloadMenu]
+        ])
+    }
+
     //TODO: when player clicks buy or sell, open a NEW modal and then let him use a slider to select the actual amt
     //TODO: colorize buy and sell penalties
     
@@ -115,7 +187,7 @@ function showMarketMenu(market = new Market()) {
         const currentCredits = gs.credits;
         const currentCargoTotal = fleet.cargo.total;
         const maxCargoSpace = fleet.totalCargoSpace;
-        
+    
         const titleEl = ce({children: ['Sell ', coloredName(ct)], style: {whiteSpace: 'nowrap'}});
         
         // Create hoverable label for "How many X"
@@ -189,10 +261,30 @@ function showMarketMenu(market = new Market()) {
         const canBuy = canAccess && isDocked && buyableAmount > 0
         const canSell = canAccess && isDocked && sellableAmount > 0
         
+        // Build disabled reasons
+        let buyDisabledReason = ''
+        if (!canAccess) buyDisabledReason = accessDeniedReason
+        else if (!isDocked) buyDisabledReason = 'Must be docked to trade'
+        else if (marketAmount <= 0) buyDisabledReason = 'Market has none in stock'
+        else if (remainingCargoSpace <= 0) buyDisabledReason = 'No cargo space available'
+        else if (playerAffordableAmount <= 0) buyDisabledReason = 'Cannot afford any'
+        
+        let sellDisabledReason = ''
+        if (!canAccess) sellDisabledReason = accessDeniedReason
+        else if (!isDocked) sellDisabledReason = 'Must be docked to trade'
+        else if (playerAmount <= 0) sellDisabledReason = 'You have none to sell'
+        else if (marketAffordableAmount <= 0) sellDisabledReason = 'Market cannot afford to buy'
+        
+        let sellAllDisabledReason = ''
+        if (!canAccess) sellAllDisabledReason = accessDeniedReason
+        else if (!isDocked) sellAllDisabledReason = 'Must be docked to trade'
+        else if (!hasSellableCargo) sellAllDisabledReason = 'No cargo to sell'
+        
         /** @type {ButtonData[]} */
         const buttons = [
-            ['Buy', ()=>showBuyCargoSlider(ct, buyableAmount, buyPrice), !canBuy],
-            ['Sell', ()=>showSellCargoSlider(ct, sellableAmount, sellPrice), !canSell],
+            ['Buy', ()=>showBuyCargoSlider(ct, buyableAmount, buyPrice), !canBuy, buyDisabledReason],
+            ['Sell', ()=>showSellCargoSlider(ct, sellableAmount, sellPrice), !canSell, sellDisabledReason],
+            ['Sell All', ()=>showSellAllConfirmation(), !canAccess || !isDocked || !hasSellableCargo, sellAllDisabledReason],
             ['Back', ()=>showPlanetMenu(planet)],
         ]
         refreshPanelButtons('market_panel', buttons)
@@ -206,11 +298,20 @@ function showMarketMenu(market = new Market()) {
         ]
     })
 
+    // Build disabled reason for main Sell All button
+    let mainSellAllDisabledReason = ''
+    if (!canAccess) mainSellAllDisabledReason = accessDeniedReason
+    else if (!isDocked) mainSellAllDisabledReason = 'Must be docked to trade'
+    else if (!hasSellableCargo) mainSellAllDisabledReason = 'No cargo to sell'
+
     showPlanetModal(
         planet,
         `${coloredName(planet)} - Market`,
         infoContainer,
-        [['Back', ()=>showPlanetMenu(planet)]],
+        [
+            ['Sell All', ()=>showSellAllConfirmation(), !canAccess || !isDocked || !hasSellableCargo, mainSellAllDisabledReason],
+            ['Back', ()=>showPlanetMenu(planet)]
+        ],
         'market_panel',
         (nextPlanet) => {
             const nextMarket = nextPlanet.settlement?.market;
