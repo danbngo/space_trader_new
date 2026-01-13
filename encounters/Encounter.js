@@ -343,41 +343,11 @@ class Encounter {
             return
         }
         
-        // Calculate total bounty/fine
-        const totalBounty = gs.captain.bounty.getAmount(planet)
-        
-        // Confiscate all cargo
-        const totalCargo = gs.fleet.cargo.total
-        const confiscatedCargo = gs.fleet.cargo.clone()
-        gs.fleet.cargo.clear()
-        
-        // Separate out illegal cargo
-        const illegalCargo = new CountsMap()
-        for (const cargoType of confiscatedCargo.keys) {
-            if (cargoType.illegal) {
-                illegalCargo.increment(cargoType, confiscatedCargo.getAmount(cargoType))
-            }
-        }
-        const hasIllegalCargo = illegalCargo.total > 0
-        
-        // Calculate jail time
-        const jailDays = Math.ceil((totalBounty / 1000) * JAIL_DAYS_PER_1000CR_FINE)
-        const jailYears = jailDays / 365
-        
         let msg = `The authorities board your vessels and conduct a thorough inspection.<br/>`
         
-        if (totalCargo > 0) {
-            msg += `All ${totalCargo} units of cargo are confiscated as evidence.<br/>`
-        }
-        
-        if (hasIllegalCargo) {
-            msg += `<span style="color: rgb(${COLORS.Red.join(',')})">They discover ${illegalCargo.total} units of illegal contraband!</span><br/>`
-            let illegalList = []
-            for (const cargoType of illegalCargo.keys) {
-                illegalList.push(`${cargoType.symbol} ${coloredName(cargoType)} (${illegalCargo.getAmount(cargoType)})`)
-            }
-            msg += `Illegal items: ${illegalList.join(', ')}<br/>`
-        }
+        // Use helper function to confiscate illegal cargo (up to ENCOUNTER_MAX_CARGO_LOSS_PERCENT)
+        const cargoResult = this.policeTakeCargo(planet)
+        msg += cargoResult.message
         
         if (disabledPlayerShips.length > 0) {
             msg += `${disabledPlayerShips.length} of your ships were disabled and require repairs.<br/>`
@@ -385,7 +355,13 @@ class Encounter {
         
         msg += `<br/>You are transported to ${coloredName(planet)} to face justice.<br/>`
         
+        // Calculate total bounty/fine (including newly added bounty from cargo confiscation)
+        const totalBounty = gs.captain.bounty.getAmount(planet)
+        
         if (totalBounty > 0) {
+            const jailDays = Math.ceil((totalBounty / 1000) * JAIL_DAYS_PER_1000CR_FINE)
+            const jailYears = jailDays / 365
+            
             msg += `<br/>Your outstanding fine: <span style="color: rgb(${COLORS.Red.join(',')})">${totalBounty}CR</span><br/>`
             msg += `Prison sentence: ${jailDays} days (${roundToPlaces(jailYears, 2)} years)<br/>`
             msg += `<br/>How do you wish to resolve this?<br/>`
@@ -396,10 +372,10 @@ class Encounter {
             // Option to pay fine
             if (gs.credits >= totalBounty) {
                 buttons.push(['Pay Fine', ()=>{
-                    gs.credits -= totalBounty
-                    gs.captain.bounty.increment(planet, -totalBounty)
+                    // Use helper function to confiscate credits up to bounty
+                    const creditsResult = this.policeTakeCredits(planet, false)
                     
-                    let payMsg = `You pay the ${totalBounty}CR fine in full.<br/>`
+                    let payMsg = `You pay the ${creditsResult.taken}CR fine in full.<br/>`
                     payMsg += `Your record on ${coloredName(planet)} is cleared.<br/>`
                     payMsg += this.conductRepairs()
                     gs.fleet.dock(planet)
@@ -429,7 +405,7 @@ class Encounter {
             showModal('Authorities', msg, buttons)
         } else {
             msg += `<br/>Surprisingly, you have no outstanding fines.<br/>`
-            msg += `After confiscating your cargo, they release you with a stern warning.<br/>`
+            msg += `After their inspection, they release you with a stern warning.<br/>`
             msg += this.conductRepairs()
             
             // Transport to planet
@@ -447,58 +423,21 @@ class Encounter {
         let msg = `You signal surrender to the ${coloredName(enemyFleet)}.<br/>`
         msg += `They board your vessels with weapons drawn...<br/><br/>`
         
-        // Track what was actually stolen
-        let stolenCargo = 0
-        let stolenCredits = 0
-        let stolenShipsCount = 0
+        // Take cargo, credits, and ships using helper functions
+        const cargoResult = this.piratesTakeCargo(enemyFleet)
+        const creditsResult = this.piratesTakeCredits()
+        const shipsResult = this.piratesTakeShips()
         
-        // Take ALL cargo
-        const totalCargo = gs.fleet.cargo.total
-        if (totalCargo > 0) {
-            stolenCargo = totalCargo
-            msg += `The ${coloredName(enemyFleet)} strip your cargo holds completely!<br/>`
-            msg += `All ${totalCargo} units of cargo are taken.<br/>`
-            gs.fleet.cargo.clear()
-        }
-        
-        // Take ALL credits
-        const totalCredits = gs.credits
-        if (totalCredits > 0) {
-            stolenCredits = totalCredits
-            msg += `They plunder your credit accounts: ${totalCredits}CR stolen!<br/>`
-            gs.credits = 0
-        }
-        
-        // Randomly take ships (50% chance per ship, but leave at least 1)
-        const shipsToSteal = []
-        for (const ship of gs.fleet.ships) {
-            // Always keep at least one ship
-            if (gs.fleet.ships.length - shipsToSteal.length <= 1) break
-            
-            if (Math.random() < 0.5) {
-                shipsToSteal.push(ship)
-            }
-        }
-        
-        if (shipsToSteal.length > 0) {
-            stolenShipsCount = shipsToSteal.length
-            msg += `<br/>The ${coloredName(enemyFleet)} eye your vessels greedily...<br/>`
-            msg += `They seize ${shipsToSteal.length} of your ships!<br/>`
-            
-            for (const ship of shipsToSteal) {
-                msg += `- ${coloredName(ship)}<br/>`
-                gs.fleet.removeShip(ship)
-            }
-            
-            msg += `<br/>`
-        }
+        msg += cargoResult.message
+        msg += creditsResult.message
+        msg += shipsResult.message
         
         if (disabledPlayerShips.length > 0) {
             msg += `${disabledPlayerShips.length} of your ships were disabled in the fighting.<br/>`
         }
         
         // Check if anything was actually stolen
-        const anythingStolen = stolenCargo > 0 || stolenCredits > 0 || stolenShipsCount > 0
+        const anythingStolen = cargoResult.taken > 0 || creditsResult.taken > 0 || shipsResult.taken > 0
         
         if (anythingStolen) {
             msg += `<br/>The ${coloredName(enemyFleet)} leave you with the bare minimum to survive.<br/>`
@@ -516,6 +455,220 @@ class Encounter {
         showModal('Plundered', msg, [['Continue', ()=>this.endEncounter()]])
     }
 
+    /**
+     * Pirates take cargo from player fleet
+     * @param {Fleet} pirateFleet - The pirate fleet
+     * @returns {Object} - {taken, left, message}
+     */
+    piratesTakeCargo(pirateFleet) {
+        const escapedShips = gs.fleet.ships.filter(s => s.escaped)
+        const escapedCargoSpace = escapedShips.reduce((total, ship) => total + ship.cargoSpace, 0)
+        const availableCargoSpace = gs.fleet.totalCargoSpace - escapedCargoSpace
+        
+        const maxCargoByPercent = Math.floor(gs.fleet.cargo.total * ENCOUNTER_MAX_CARGO_LOSS_PERCENT)
+        const maxCargoByPirateSpace = pirateFleet.availableCargoSpace
+        const maxCargoToTake = Math.min(maxCargoByPercent, maxCargoByPirateSpace)
+        
+        if (maxCargoToTake <= 0 || gs.fleet.cargo.total <= 0) {
+            return { taken: 0, left: gs.fleet.cargo.total, message: '' }
+        }
+        
+        // Pirates prefer more valuable cargo
+        const cargoTypesSorted = gs.fleet.cargo.keys.sort((a, b) => b.value - a.value)
+        const stolenCargo = new CountsMap()
+        let cargoTaken = 0
+        
+        for (const cargoType of cargoTypesSorted) {
+            if (cargoTaken >= maxCargoToTake) break
+            
+            const available = gs.fleet.cargo.getAmount(cargoType)
+            const toTake = Math.min(available, maxCargoToTake - cargoTaken)
+            
+            if (toTake > 0) {
+                stolenCargo.increment(cargoType, toTake)
+                gs.fleet.cargo.increment(cargoType, -toTake)
+                cargoTaken += toTake
+            }
+        }
+        
+        const cargoLeft = gs.fleet.cargo.total
+        let msg = ''
+        
+        if (cargoTaken > 0) {
+            msg += `The ${coloredName(pirateFleet)} hurriedly toss ${cargoTaken} units of cargo into their holds`
+            if (cargoLeft > 0) {
+                msg += `, leaving ${cargoLeft} units behind`
+            }
+            msg += `.<br/>`
+        }
+        
+        return { taken: cargoTaken, left: cargoLeft, message: msg }
+    }
+
+    /**
+     * Pirates take credits from player
+     * @returns {Object} - {taken, left, message}
+     */
+    piratesTakeCredits() {
+        const maxCredits = Math.floor(gs.credits * ENCOUNTER_MAX_CREDITS_LOSS_PERCENT)
+        
+        if (maxCredits <= 0) {
+            return { taken: 0, left: gs.credits, message: '' }
+        }
+        
+        gs.credits -= maxCredits
+        
+        let msg = `They plunder your credit accounts: ${maxCredits}CR stolen!<br/>`
+        if (gs.credits > 0) {
+            msg = `They plunder ${maxCredits}CR from your credit accounts, but overlook ${gs.credits}CR.<br/>`
+        }
+        
+        return { taken: maxCredits, left: gs.credits, message: msg }
+    }
+
+    /**
+     * Pirates take ships from player fleet
+     * @returns {Object} - {taken, left, message}
+     */
+    piratesTakeShips() {
+        const eligibleShips = gs.fleet.ships.filter(s => !s.disabled && !s.escaped)
+        const maxShipsToTake = Math.floor(eligibleShips.length * ENCOUNTER_MAX_SHIPS_LOSS_PERCENT)
+        
+        if (maxShipsToTake <= 0 || eligibleShips.length <= 1) {
+            return { taken: 0, left: gs.fleet.ships.length, message: '' }
+        }
+        
+        const shipsToSteal = []
+        const numToTake = Math.min(maxShipsToTake, eligibleShips.length - 1) // Always leave at least 1
+        
+        for (let i = 0; i < numToTake; i++) {
+            const ship = eligibleShips[i]
+            shipsToSteal.push(ship)
+        }
+        
+        let msg = ''
+        if (shipsToSteal.length > 0) {
+            msg += `<br/>The ${coloredName(this.fleet)} eye your vessels greedily...<br/>`
+            msg += `They seize ${shipsToSteal.length} of your ships!<br/>`
+            
+            for (const ship of shipsToSteal) {
+                msg += `- ${coloredName(ship)}<br/>`
+                gs.fleet.removeShip(ship)
+            }
+            
+            msg += `<br/>`
+        }
+        
+        return { taken: shipsToSteal.length, left: gs.fleet.ships.length, message: msg }
+    }
+
+    /**
+     * Police take illegal cargo from player fleet
+     * @param {Planet} planet - The planet for bounty calculation
+     * @returns {Object} - {taken, left, bountyAdded, message}
+     */
+    policeTakeCargo(planet) {
+        const escapedShips = gs.fleet.ships.filter(s => s.escaped)
+        const escapedCargoSpace = escapedShips.reduce((total, ship) => total + ship.cargoSpace, 0)
+        
+        // Get all illegal cargo
+        const illegalCargo = new CountsMap()
+        for (const cargoType of gs.fleet.cargo.keys) {
+            if (cargoType.illegal) {
+                illegalCargo.increment(cargoType, gs.fleet.cargo.getAmount(cargoType))
+            }
+        }
+        
+        const totalIllegalCargo = illegalCargo.total
+        if (totalIllegalCargo <= 0) {
+            return { taken: 0, left: 0, bountyAdded: 0, message: '' }
+        }
+        
+        const maxCargoToTake = Math.floor(totalIllegalCargo * ENCOUNTER_MAX_CARGO_LOSS_PERCENT)
+        let cargoTaken = 0
+        let bountyAdded = 0
+        const confiscatedCargo = new CountsMap()
+        
+        for (const cargoType of illegalCargo.keys) {
+            if (cargoTaken >= maxCargoToTake) break
+            
+            const available = illegalCargo.getAmount(cargoType)
+            const toTake = Math.min(available, maxCargoToTake - cargoTaken)
+            
+            if (toTake > 0) {
+                confiscatedCargo.increment(cargoType, toTake)
+                gs.fleet.cargo.increment(cargoType, -toTake)
+                bountyAdded += cargoType.value * toTake
+                cargoTaken += toTake
+            }
+        }
+        
+        // Add bounty for confiscated illegal cargo
+        if (planet && bountyAdded > 0) {
+            gs.captain.bounty.increment(planet, bountyAdded)
+        }
+        
+        const cargoLeft = totalIllegalCargo - cargoTaken
+        let msg = ''
+        
+        if (cargoTaken > 0) {
+            let illegalList = []
+            for (const cargoType of confiscatedCargo.keys) {
+                illegalList.push(`${cargoType.symbol} ${coloredName(cargoType)} (${confiscatedCargo.getAmount(cargoType)})`)
+            }
+            
+            msg += `<span style="color: rgb(${COLORS.Red.join(',')})">They discover ${cargoTaken} units of illegal contraband!</span><br/>`
+            msg += `Contraband found: ${illegalList.join(', ')}<br/>`
+            
+            if (cargoLeft > 0) {
+                msg += `Fortunately, they overlook ${cargoLeft} units of illegal cargo still hidden in your holds.<br/>`
+            }
+            
+            if (bountyAdded > 0) {
+                msg += `Fine issued: <span style="color: rgb(${COLORS.Red.join(',')})">${bountyAdded}CR</span><br/>`
+            }
+        }
+        
+        return { taken: cargoTaken, left: cargoLeft, bountyAdded, message: msg }
+    }
+
+    /**
+     * Police take credits from player
+     * @param {Planet} planet - The planet for bounty tracking
+     * @param {boolean} resisted - Whether player resisted search/arrest
+     * @returns {Object} - {taken, bountyReduced, message}
+     */
+    policeTakeCredits(planet, resisted = false) {
+        let totalTaken = 0
+        let bountyReduced = 0
+        let msg = ''
+        
+        // Initial fine for resisting
+        if (resisted) {
+            const resistFine = Math.min(ENCOUNTER_FINE_FOR_RESISTING_POLICE, gs.credits)
+            if (resistFine > 0) {
+                gs.credits -= resistFine
+                totalTaken += resistFine
+                msg += `Fine for resisting: ${resistFine}CR<br/>`
+            }
+        }
+        
+        // Confiscate additional credits up to total bounty
+        if (planet) {
+            const totalBounty = gs.captain.bounty.getAmount(planet)
+            const maxAdditionalCredits = Math.min(totalBounty, gs.credits)
+            
+            if (maxAdditionalCredits > 0) {
+                gs.credits -= maxAdditionalCredits
+                gs.captain.bounty.increment(planet, -maxAdditionalCredits)
+                totalTaken += maxAdditionalCredits
+                bountyReduced = maxAdditionalCredits
+                msg += `Credits confiscated to pay bounty: ${maxAdditionalCredits}CR<br/>`
+            }
+        }
+        
+        return { taken: totalTaken, bountyReduced, message: msg }
+    }
 
     /**
      * Ends the current encounter and returns to the star map.

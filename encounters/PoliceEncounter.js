@@ -106,13 +106,10 @@ class PoliceEncounter extends Encounter {
         const fleetName = coloredName(this.fleet)
         const planet = this.planet
         
-        // Calculate bounty based on cargo value
-        let totalBounty = 0
+        // Build list of illegal cargo for display
         let illegalList = []
         for (const cargoType of illegalCargo.keys) {
             const amount = illegalCargo.getAmount(cargoType)
-            const value = cargoType.value * amount
-            totalBounty += value
             illegalList.push(`${cargoType.symbol} ${coloredName(cargoType)} (${amount})`)
         }
         
@@ -120,11 +117,7 @@ class PoliceEncounter extends Encounter {
         msg += `The officers have discovered illegal cargo in your holds:<br/>`
         msg += `${illegalList.join(', ')}<br/><br/>`
         msg += `"You're under arrest for smuggling prohibited materials!"<br/>`
-        
-        if (planet) {
-            gs.captain.bounty.increment(planet, totalBounty)
-            msg += `<br/>Fine issued: <span style="color: rgb(${COLORS.Red.join(',')})">${totalBounty}CR</span><br/>`
-        }
+        msg += `<br/><span style="color: rgb(${COLORS.Yellow.join(',')})">The authorities will confiscate contraband and assess fines when you're processed.</span><br/>`
         
         showModal('Contraband Found', msg, [['Continue', () => this.showPlayerSurrenderedToAuthoritiesModal()]], '', null, 0)
     }

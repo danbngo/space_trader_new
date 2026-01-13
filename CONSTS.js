@@ -83,6 +83,10 @@ const JAIL_DAYS_PER_1000CR_FINE = 5 //5 days of jail time per 1000CR of fine
 const ENCOUNTER_BASE_REPUTATION_EFFECT_ON_VICTORY = -5 //winning a battle grants you some notoriety if the target was good, fame if the target was bad
 const ENCOUNTER_BASE_REPUTATION_EFFECT_ON_NO_SURRENDER = -3 //this is applied as an inverse amount, ie, your rep shrinks by base/reputationMultiplier. surrendering to powerful foes is less shameful.
 const ENCOUNTER_BASE_REPUTATION_EFFECT_ON_ATTACK = -5 //attacking a fleet gains you notoriety if they're good and fame if they're bad
+const ENCOUNTER_MAX_CARGO_LOSS_PERCENT = 0.5
+const ENCOUNTER_MAX_CREDITS_LOSS_PERCENT = 0.5
+const ENCOUNTER_MAX_SHIPS_LOSS_PERCENT = 0.1
+const ENCOUNTER_FINE_FOR_RESISTING_POLICE = 1000
 
 const CIVILIZATION_BONUS_RATE_PER_YEAR = 0.1 //each year a democracy will MULTIPLY its economy by 1 + this, for instance
 
