@@ -127,6 +127,7 @@ function generateSettlement(planet) {
     
     const shipyard = new Shipyard(planet)
     const market =  new Market(planet)
+    const courthouse = new Courthouse(planet)
     const guild =  new Guild(planet)    
 
     console.log('disabling some buildings...')
@@ -170,6 +171,7 @@ function generateSettlement(planet) {
         settlementType, 
         shipyard, 
         market, 
-        guild
+        guild,
+        courthouse
     })
 }
