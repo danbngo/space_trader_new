@@ -1,20 +1,22 @@
 DONE:
 -pirates seem to have wrong effect on reputation
 -tow ship not working
+-handle player ships fleeing
+-check if player ships (non disabled) have enough room for cargo after a battle, if not dump some
 
 TODO:
 -courthouse needs prettier
 -revert Civilization class and only use encounter weights, cargo type weights and cargo type prices
 -rejigger all news events to use these properties
 -which ship player has selected is not obvious enough - needs an arrow
--check if player ships (non disabled) have enough room for cargo after a battle, if not dump some
--handle player ships fleeing
 -simplify the news system
 -the ENTIRETY of combat.js needs to be tweaked, rebalanced
 
+
+
+TODO OPTIONAL:
 -planetMap! shows the moons, where each building is and causes the player ship to move around to use buildings
 -in general, add some modules that do things other than grant new moves-regen, etc. or other ways to upgrade ships.
-
 take on bounty missions ?? letter of marque??
 -make the officer's bounties, infamy, fame etc have an effect on the players encounters
 
