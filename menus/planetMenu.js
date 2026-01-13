@@ -350,9 +350,18 @@ function showDepartureWarningModal(planet, shipyard) {
     const fuelNeeded = fleet.totalFuelCapacity - fleet.fuel
     const refuelCost = fuelNeeded > 0 ? shipyard.calcRefuelCost(fleet) : 0
     
+    // Determine if anything needs attention
+    const hasIssues = damagedShips.length > 0 || fuelNeeded > 0
+    
     // Build warning message
-    let msg = colorSpan('⚠️ Warning ⚠️<br/>', COLORS.Orange)
-    msg += '<br/>'
+    let msg = ''
+    if (hasIssues) {
+        msg += colorSpan('⚠️ Warning ⚠️<br/>', COLORS.Orange)
+        msg += '<br/>'
+    } else {
+        msg += colorSpan('✓ Ready to Depart<br/>', COLORS.Green)
+        msg += '<br/>'
+    }
     
     if (damagedShips.length > 0) {
         msg += `You have ${damagedShips.length} damaged ship${damagedShips.length > 1 ? 's' : ''}:<br/>`
@@ -365,9 +374,19 @@ function showDepartureWarningModal(planet, shipyard) {
     
     if (fuelNeeded > 0) {
         msg += `Your fleet fuel: ${Math.floor(fleet.fuel)}/${fleet.totalFuelCapacity}<br/> | Fuel needed: ${Math.floor(fuelNeeded)}<br/>`
+        msg += `<br/>`
     }
     
-    msg += `Would you like to repair and refuel before departing?<br/>`
+    // Dynamic message based on state
+    if (damagedShips.length > 0 && fuelNeeded > 0) {
+        msg += `Would you like to repair and refuel before departing?<br/>`
+    } else if (damagedShips.length > 0) {
+        msg += `Would you like to repair before departing?<br/>`
+    } else if (fuelNeeded > 0) {
+        msg += `Would you like to refuel before departing?<br/>`
+    } else {
+        msg += `Your fleet is ready to depart!<br/>`
+    }
     
     // Determine button states
     const canAffordRepair = gs.credits >= totalRepairCost
