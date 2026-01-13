@@ -231,7 +231,7 @@ class CanvasWrapper {
     
     /**
      * @param {string | CanvasObject} id 
-     * @returns 
+     * @returns {CanvasObject|null}
      */
     getObject(id = "") {
         if (id instanceof CanvasObject) return id

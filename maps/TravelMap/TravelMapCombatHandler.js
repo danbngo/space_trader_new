@@ -42,20 +42,33 @@ class TravelMapCombatHandler {
         // Determine if this is a player ship or enemy ship
         const isPlayerShip = gs.fleet.ships.includes(selectedShip)
         
+        // Animate position and brightness using time-based oscillation
+        const time = Date.now()
+        const positionOscillation = Math.sin(time / 400) * 15 // Oscillates ±15 pixels over ~0.8 seconds (2x faster)
+        const brightnessOscillation = Math.sin(time / 500) * 0.3 + 0.7 // Oscillates between 0.4 and 1.0 over 1 second (2x faster)
+        
         // Position arrow to the left of player ships, right of enemy ships
-        const arrowSize = 30
-        const arrowDistance = 60 // Distance from ship center
+        const arrowSize = TRAVEL_MAP_CONFIG.selectionArrowSize
+        const arrowDistance = shipObj.size/2 + TRAVEL_MAP_CONFIG.selectionArrowDistance
         let arrowX, arrowAngle
         
         if (isPlayerShip) {
-            // Arrow to the left, pointing right (→)
-            arrowX = shipObj.x - arrowDistance
+            // Arrow to the left, pointing right (→), oscillates left-right
+            arrowX = shipObj.x - arrowDistance + positionOscillation
             arrowAngle = 0 // Points right
         } else {
-            // Arrow to the right, pointing left (←)
-            arrowX = shipObj.x + arrowDistance
+            // Arrow to the right, pointing left (←), oscillates left-right
+            arrowX = shipObj.x + arrowDistance + positionOscillation
             arrowAngle = Math.PI // Points left
         }
+        
+        // Create animated green color with oscillating brightness
+        const animatedGreen = [
+            Math.floor(COLORS.Green[0] * brightnessOscillation),
+            Math.floor(COLORS.Green[1] * brightnessOscillation),
+            Math.floor(COLORS.Green[2] * brightnessOscillation),
+            1
+        ]
         
         // Create or update arrow
         const existingArrow = this.travelMap.cvs.getObject(arrowId)
@@ -63,6 +76,7 @@ class TravelMapCombatHandler {
             existingArrow.x = arrowX
             existingArrow.y = shipObj.y
             existingArrow.angle = arrowAngle
+            existingArrow.fillColor = animatedGreen
         } else {
             this.travelMap.cvs.addFilledTriangle(
                 arrowId,
@@ -71,7 +85,7 @@ class TravelMapCombatHandler {
                 arrowSize,
                 arrowSize,
                 3, // minScreenSize
-                COLORS.Green,
+                animatedGreen,
                 arrowAngle,
                 null
             )

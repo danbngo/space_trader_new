@@ -58,4 +58,8 @@ const TRAVEL_MAP_CONFIG = {
         shieldHeal: [0, 150, 255, 1],     // Blue
         hullHeal: [0, 255, 100, 1],       // Green
     },
+    
+    // Selection arrow indicator
+    selectionArrowSize: 30,      // Size of the arrow triangle
+    selectionArrowDistance: 15,  // Distance from ship center
 }

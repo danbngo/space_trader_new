@@ -9,9 +9,9 @@ class CanvasObject {
     * @param {number} [params.minorSize]
     * @param {number} [params.angle]
     * @param {string | null} [params.textContent]
-    * @param {function(CanvasObject):void | null} [params.onClick]
-    * @param {function(CanvasObject):void | null} [params.onHover]
-    * @param {function(CanvasObject):void | null} [params.onHoverEnd]
+    * @param {(function(CanvasObject):void) | (function():void) | null} [params.onClick]
+    * @param {(function(CanvasObject):void) | (function():void) | null} [params.onHover]
+    * @param {(function(CanvasObject):void) | (function():void) | null} [params.onHoverEnd]
     * @param {number} [params.x2]
     * @param {number} [params.y2]
     * @param {number} [params.lineWidth]
@@ -76,8 +76,11 @@ class CanvasObject {
         this.strokeColor = strokeColor ? [...strokeColor] : null;
         
         this.textContent = textContent;
+        /** @type {(function(CanvasObject):void) | (function():void) | null} */
         this.onClick = onClick;
+        /** @type {(function(CanvasObject):void) | (function():void) | null} */
         this.onHover = onHover;
+        /** @type {(function(CanvasObject):void) | (function():void) | null} */
         this.onHoverEnd = onHoverEnd;
         this.fontModifier = fontModifier;
         

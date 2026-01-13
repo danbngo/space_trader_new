@@ -130,7 +130,7 @@ class StarMapBodiesHandler {
                     unknownObj.strokeColor = COLORS.White
                     unknownObj.lineWidth = 1
                 }
-                unknownObj.onHoverEnd()
+                unknownObj.onHoverEnd(null)
             }
             
             // Show star only if discovered or in vision range
@@ -230,7 +230,7 @@ class StarMapBodiesHandler {
                                 obj3.lineWidth = (body == selectedObject) ? 2 : 1
                             }
                         }
-                        obj.onHoverEnd()
+                        obj.onHoverEnd(null)
                     }
                 } else {
                     // No labels - just handle hover on planet
@@ -242,7 +242,7 @@ class StarMapBodiesHandler {
                         planetObj.strokeColor = (body == selectedObject) ? COLORS.Green : COLORS.Black
                         planetObj.lineWidth = (body == selectedObject) ? 2 : 1
                     }
-                    planetObj.onHoverEnd()
+                    planetObj.onHoverEnd(null)
                 }
             }
             
@@ -262,7 +262,7 @@ class StarMapBodiesHandler {
                     unknownObj.strokeColor = COLORS.White
                     unknownObj.lineWidth = 1
                 }
-                unknownObj.onHoverEnd()
+                unknownObj.onHoverEnd(null)
             }
             
             // Show planet only if discovered or in vision range
@@ -366,7 +366,7 @@ class StarMapBodiesHandler {
                             obj3.lineWidth = (station == selectedObject) ? 2 : 1
                         }
                     }
-                    obj.onHoverEnd()
+                    obj.onHoverEnd(null)
                 }
             }
             
@@ -384,7 +384,7 @@ class StarMapBodiesHandler {
                     unknownObj.strokeColor = COLORS.White
                     unknownObj.lineWidth = 1
                 }
-                unknownObj.onHoverEnd()
+                unknownObj.onHoverEnd(null)
             }
             
             // Show station only if discovered or in vision range
