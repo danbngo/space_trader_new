@@ -26,9 +26,9 @@ class RamAnimation extends Anim {
         console.log('RAM ANIM PROPS:', attackerShipObj, targetShipObj, startX, targetX, midpointX)
         
         super(
-            2000,
+            1333, // 1.5x faster than original 2000ms
             (progressRatio) => {
-                console.log('Ram animation progress:', progressRatio, attackerShipObj, targetShipObj)
+                //console.log('Ram animation progress:', progressRatio, attackerShipObj, targetShipObj)
                 if (!attackerShipObj) return
                 
                 // Execute damage and display text at 30% progress (at the end of the forward surge)

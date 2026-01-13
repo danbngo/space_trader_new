@@ -24,7 +24,7 @@ class LaserAnim extends Anim {
         attackingShip.acting = true
         
         super(
-            1000, // 1 second total duration
+            667, // 1.5x faster than original 1000ms
             (progressRatio) => {
                 // Execute damage when laser reaches target (at 25% progress)
                 if (!damageExecuted && progressRatio >= 0.25) {

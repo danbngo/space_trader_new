@@ -56,7 +56,7 @@ class TravelMapCombatHandler {
         const {selectedShip} = this.travelMap
         console.log('updating ship info:',infoElement, selectedShip)
         if (!selectedShip) {
-            infoElement.innerHTML = ''
+            infoElement.innerHTML = this.travelMap.animations.length > 0 ? '' : '(Select a ship)'
             return
         }
         

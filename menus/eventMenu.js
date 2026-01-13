@@ -97,10 +97,7 @@ function rollEncounterPlanet(encounterType, previousLocation, destination, fleet
     return planets[selectedIndex]
 }
 
-function checkPlayerStranded() {
-    if (!gs.fleet.stranded) return false
-    console.log('checkPlayerStranded');
-    
+function handlePlayerStranded() {
     // Find the last visited planet (most recent year in lastVisitedDates)
     let towDestination = null
     let mostRecentYear = -Infinity
@@ -144,8 +141,10 @@ function checkPlayerStranded() {
     else if (noCredits) msg += `The operator complains bitterly after realizing you have no credits, but tows you anyway.<br/>`
     else msg += `The fee is ${creditCost}CR, but you only have ${gs.credits}CR.<br/>Grumbling, the operator confiscates your few remaining credits and tows you anyway.<br/>`
     msg += `You spend ${describeTimespan(dayCost/365)} being dragged through space.<br/>`
-    if (currentMap.refresh) currentMap.refresh()
-
-    showModal(`Stranded`, msg, [['Continue', ()=>showPlanetMenu(towDestination)]])
+    if (!currentMap || (!(currentMap instanceof StarMap))) {
+        showStarMap()
+    }
+    else if (currentMap.refresh) currentMap.refresh()
+    showModal(`Stranded`, msg, [['Continue', ()=>gs.fleet.dock(towDestination)]])
     return true
 }

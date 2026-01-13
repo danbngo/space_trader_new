@@ -95,6 +95,7 @@ class Fleet extends SpaceObject {
             }
         }
         if (currentMap && currentMap instanceof TravelMap) showStarMap(planet)
+        showPlanetMenu(planet)
     }
 
     // REMOVED: Route

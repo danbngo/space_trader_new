@@ -691,7 +691,7 @@ class Encounter {
         }
 
         if (currentModal) closeModal()
-        if (!gs.location) checkPlayerStranded() //dont check this if player already docked (likely involuntarily)
+        //if (!gs.location) checkPlayerStranded() //dont check this if player already docked (likely involuntarily)
         
         // Trigger fade-out animation if travel map exists
         const travelMap = currentMap && (currentMap instanceof TravelMap) ? currentMap : null

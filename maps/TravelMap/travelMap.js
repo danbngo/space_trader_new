@@ -26,7 +26,7 @@ class TravelMap {
         // Track UI state to detect changes
         this.previousUIState = null
         this.currentUIState = 'travel'
-        this.isAnimating = true
+        this.isPaused = true
         
         // Initialize handlers
         this.combatHandler = new TravelMapCombatHandler(this)
@@ -84,8 +84,16 @@ class TravelMap {
     tick() {
         //console.log('STARTING TRAVEL MAP TICK')
         // Check if animation should continue
-        if (!this.isAnimating) {
+        if (!this.isPaused) {
             console.log('Travel map tick stopped')
+            return
+        }
+        if (!gs.encounter && gs.fleet.stranded) {
+            console.log("Travel map - doing nothing since player stranded. Tow ship logic should kick in.")
+            this.isPaused = true
+            handlePlayerStranded()
+            this.cleanupRemovedShips()
+            this.cvs.redraw()
             return
         }
         this.refresh()
@@ -219,7 +227,7 @@ class TravelMap {
     cleanup() {
         console.log('CLEANUP CALLED ON TRAVEL MAP')
         // Stop animation loop
-        this.isAnimating = false
+        this.isPaused = false
         // Remove resize listener
         if (this.resizeHandler) {
             window.removeEventListener("resize", this.resizeHandler)
