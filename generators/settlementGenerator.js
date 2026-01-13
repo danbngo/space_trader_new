@@ -128,7 +128,8 @@ function generateSettlement(planet) {
     const shipyard = new Shipyard(planet)
     const market =  new Market(planet)
     const courthouse = new Courthouse(planet)
-    const guild =  new Guild(planet)    
+    const guild =  new Guild(planet)
+    const bank = new Bank(planet)
 
     console.log('disabling some buildings...')
 
@@ -140,7 +141,7 @@ function generateSettlement(planet) {
                           planet.objectType == OBJECT_TYPES.MOON || planet.objectType == OBJECT_TYPES.DWARF_PLANET ? 0.4 :
                           0.8
     // Only Shipyard, Market, Guild remain functional
-    const buildings = [shipyard, market, guild].filter(b => b !== null)
+    const buildings = [shipyard, market, guild, courthouse, bank]
     
     // First pass: randomly disable buildings
     for (const building of buildings) {
@@ -172,6 +173,7 @@ function generateSettlement(planet) {
         shipyard, 
         market, 
         guild,
-        courthouse
+        courthouse,
+        bank
     })
 }

@@ -11,8 +11,9 @@ class Settlement {
      * @param {Market} params.market - The market building.
      * @param {Guild} params.guild - The guild building.
      * @param {Courthouse} params.courthouse - The courthouse building.
+     * @param {Bank} params.bank - The bank building.
      */
-    constructor({planet = new Planet(), settlementType = null, shipyard = null, market = null, guild = null, courthouse = null}) {
+    constructor({planet = new Planet(), settlementType = null, shipyard = null, market = null, guild = null, courthouse = null, bank=null}) {
         /** @type {string} */
         this.uuid = generateUUID('settlement_')
         /** @type {Planet} */
@@ -27,11 +28,13 @@ class Settlement {
         this.guild = guild;
         /** @type {Courthouse} */
         this.courthouse = courthouse
+        /** @type {Bank} */
+        this.bank = null
         
         gameRegistry.registerSettlement(this)
     }
     get buildings() {
-        return [this.guild, this.market, this.shipyard, this.courthouse]
+        return [this.guild, this.market, this.shipyard, this.courthouse, this.bank].filter(b=>b!=null)
     }
     get damagableBuildings() {
         return this.buildings.filter(b=>(b.exists && b.level > 0))
@@ -48,7 +51,7 @@ class Settlement {
     clone() {
         return new Settlement({
             // @ts-ignore
-            planet: this.planet, settlementType: this.settlementType, courthouse: this.courthouse ? this.courthouse.clone() : null, shipyard: this.shipyard ? this.shipyard.clone() : null, market: this.market ? this.market.clone() : null, guild: this.guild ? this.guild.clone() : null
+            planet: this.planet, settlementType: this.settlementType, bank: this.bank ? this.bank.clone() : null, courthouse: this.courthouse ? this.courthouse.clone() : null, shipyard: this.shipyard ? this.shipyard.clone() : null, market: this.market ? this.market.clone() : null, guild: this.guild ? this.guild.clone() : null
         })
     }
 }
