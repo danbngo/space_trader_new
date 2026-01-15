@@ -22,7 +22,6 @@
  * @constructor
  * @param {string} name - The name of the ship type.
  * @param {string} description - A description of the ship type.
- * @param {SHAPES} shape - The shape of the ship.
  * @param {number} hull - The hull strength of the ship.
  * @param {number} shields - The shield strength of the ship.
  * @param {number} lasers - The laser power of the ship.
@@ -35,10 +34,9 @@
  * @returns {ShipType} The created ShipType instance.
  */
 class ShipType {
-    constructor(name = '', description = '', shape, hull = 1, shields = 1, lasers = 1, engine = 1, cargoSpace = 1, radars = 1, fuelCapacity = 1, modules = [], moduleSlots = 0) {
+    constructor(name = '', description = '', hull = 1, shields = 1, lasers = 1, engine = 1, cargoSpace = 1, radars = 1, fuelCapacity = 1, modules = [], moduleSlots = 0) {
         this.name = name
         this.description = description
-        this.shape = shape; // Legacy shape enum (deprecated)
         this.shipShape = null; // Function that generates polygon vertices
         this.hull = hull
         this.shields = shields
@@ -54,13 +52,13 @@ class ShipType {
 }
 
 const SHIP_TYPES = {
-    COURIER: new ShipType('Courier', 'Nimble dispatch vessel built for speed. Light armor, high velocity.', null, 0.25, 0.25, 0.25, 2, 1, 1, 3, [], 2),
-    HAULER: new ShipType('Hauler', 'Industrial freighter with expansive cargo bays. Poor defenses, excellent capacity.', null, 1, 0.25, 0.25, 1.5, 4, 0.5, 2, [], 2),
-    TANKER: new ShipType('Tanker', 'Deep-range transport with extended fuel reserves. Sluggish but tireless.', null, 2, 0.25, 0.5, 0.5, 2, 1, 4, [], 2),
-    SCOUT: new ShipType('Scout', 'Advanced recon platform with long-range sensors. Fast and perceptive.', null, 0.5, 0.5, 0.5, 3, 0.5, 3, 1.5, [], 1),
-    BATTLESHIP: new ShipType('Battleship', 'Heavy warship bristling with weapons and reinforced plating. Slow but devastating.', null, 3, 2, 2, 1, 2, 1.5, 1.5, [], 1),
-    INTERCEPTOR: new ShipType('Interceptor', 'Pursuit specialist equipped with grappling systems. Built to catch and disable.', null, 1.5, 1.5, 1.5, 2, 0.25, 2, 0.5, [], 2),
-    RAIDER: new ShipType('Raider', 'Strike fighter designed for aggressive maneuvers. Fast attack, minimal endurance.', null, 1, 2, 2, 2, 0.5, 0.5, 0.5, [], 1),
+    COURIER: new ShipType('Courier', 'Nimble dispatch vessel built for speed. Light armor, high velocity.', 0.25, 0.25, 0.25, 2, 1, 1, 3, [], 2),
+    HAULER: new ShipType('Hauler', 'Industrial freighter with expansive cargo bays. Poor defenses, excellent capacity.', 1, 0.25, 0.25, 1.5, 4, 0.5, 2, [], 2),
+    TANKER: new ShipType('Tanker', 'Deep-range transport with extended fuel reserves. Sluggish but tireless.', 2, 0.25, 0.5, 0.5, 2, 1, 4, [], 2),
+    SCOUT: new ShipType('Scout', 'Advanced recon platform with long-range sensors. Fast and perceptive.', 0.5, 0.5, 0.5, 3, 0.5, 3, 1.5, [], 1),
+    BATTLESHIP: new ShipType('Battleship', 'Heavy warship bristling with weapons and reinforced plating. Slow but devastating.', 3, 2, 2, 1, 2, 1.5, 1.5, [], 1),
+    INTERCEPTOR: new ShipType('Interceptor', 'Pursuit specialist equipped with grappling systems. Built to catch and disable.', 1.5, 1.5, 1.5, 2, 0.25, 2, 0.5, [], 2),
+    RAIDER: new ShipType('Raider', 'Strike fighter designed for aggressive maneuvers. Fast attack, minimal endurance.', 1, 2, 2, 2, 0.5, 0.5, 0.5, [], 1),
 }
 
 const SHIP_TYPES_ALL = Object.values(SHIP_TYPES)
@@ -76,7 +74,10 @@ SHIP_TYPES.RAIDER.shipShape = SHIP_SHAPES.COURIER
 
 
 const ASTEROID_SHIP_TYPES = {
-    ASTEROID: new ShipType('Asteroid', 'Rocky space debris drifting through the void, can be mined for valuable minerals.', null, 0.2, 0, 0, 0.25, 0.5, 1, 1, [], 0),
+    ASTEROID: new ShipType('Asteroid', 'Rocky space debris drifting through the void, can be mined for valuable minerals.', 2, 0, 0, 2, 0.5, 0, 0, [], 0),
 }
+
+ASTEROID_SHIP_TYPES.ASTEROID.shipShape = SHIP_SHAPES.COURIER
+
 
 const ASTEROID_SHIP_TYPES_ALL = Object.values(ASTEROID_SHIP_TYPES)

@@ -45,9 +45,9 @@ const ENCOUNTER_TYPES = {
     PIRATES: new EncounterType('Pirates', 0, COLORS.Red, 'You encountered: pirates.', FLEET_TYPES.PIRATES, PiratesEncounter, -2, false),
     POLICE: new EncounterType('Police', 0, COLORS.Blue, 'You encountered: police.', FLEET_TYPES.POLICE, PoliceEncounter, 2, false),
     //SOLDIERS: new EncounterType('Soldiers', COLORS.LightGreen, 'You encountered: soldiers.', FLEET_TYPES.SOLDIERS, SoldiersEncounter, 3, false),
-    ABANDONED_SHIP: new EncounterType('Abandoned Ship', 1.0, COLORS.Gray, 'You encountered: an abandoned ship.', PSEUDO_FLEET_TYPES.ABANDONED_SHIP, AbandonedShipEncounter, 0, false),
+    ABANDONED_SHIP: new EncounterType('Abandoned Ship', 0, COLORS.Gray, 'You encountered: an abandoned ship.', PSEUDO_FLEET_TYPES.ABANDONED_SHIP, AbandonedShipEncounter, 0, false),
     //ASTEROIDS_STORM: new EncounterType('Asteroid Storm', COLORS.Gray, 'You encountered: an asteroid storm.', PSEUDO_FLEET_TYPES.ASTEROIDS_STORM, AsteroidsStormEncounter, 0, false),
-    //ASTEROIDS_CALM: new EncounterType('Asteroid Field', COLORS.Gray, 'You encountered: an asteroid field.', PSEUDO_FLEET_TYPES.ASTEROIDS_CALM, AsteroidsCalmEncounter, 0, false),
+    ASTEROIDS_CALM: new EncounterType('Asteroid Field', 1.0, COLORS.Gray, 'You encountered: an asteroid field.', PSEUDO_FLEET_TYPES.ASTEROIDS_CALM, AsteroidsCalmEncounter, 0, false),
 }
 const ENCOUNTER_TYPES_ALL = Object.values(ENCOUNTER_TYPES)
 
