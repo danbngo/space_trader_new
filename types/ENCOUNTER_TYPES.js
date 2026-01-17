@@ -47,7 +47,7 @@ const ENCOUNTER_TYPES = {
     //SOLDIERS: new EncounterType('Soldiers', COLORS.LightGreen, 'You encountered: soldiers.', FLEET_TYPES.SOLDIERS, SoldiersEncounter, 3, false),
     ABANDONED_SHIP: new EncounterType('Abandoned Ship', 0, COLORS.Gray, 'You encountered: an abandoned ship.', PSEUDO_FLEET_TYPES.ABANDONED_SHIP, AbandonedShipEncounter, 0, false),
     //ASTEROIDS_STORM: new EncounterType('Asteroid Storm', COLORS.Gray, 'You encountered: an asteroid storm.', PSEUDO_FLEET_TYPES.ASTEROIDS_STORM, AsteroidsStormEncounter, 0, false),
-    ASTEROIDS_CALM: new EncounterType('Asteroid Field', 1.0, COLORS.Gray, 'You encountered: an asteroid field.', PSEUDO_FLEET_TYPES.ASTEROIDS_CALM, AsteroidsCalmEncounter, 0, false),
+    //ASTEROIDS_CALM: new EncounterType('Asteroid Field', 1.0, COLORS.Gray, 'You encountered: an asteroid field.', PSEUDO_FLEET_TYPES.ASTEROIDS_CALM, AsteroidsCalmEncounter, 0, false),
 }
 const ENCOUNTER_TYPES_ALL = Object.values(ENCOUNTER_TYPES)
 

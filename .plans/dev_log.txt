@@ -1,3 +1,167 @@
+
+
+1.16.26
+
+so what would i do? starting from scratch
+"work your way back from the player towards the systems, not outwards from the systems towards the player"
+START WITH JUST TRADING AND ROGUELIKE MECHANICS.
+then implement things one by one
+make planet traits have impacts on landing/docking (+danger, etc)
+make governments control what market, shipyard are able to do and how they work
+make cargo types function differently somehow
+make encounter weights a direct, viewable property of planets
+instead of "time", the player has to send money back in increments to save his homeworld.
+if not, game over
+
+
+~~
+
+
+been a bit down in the dumps, because i had to cut a lot of content from my game. it doesnt feel like the same game i was trying to build now.
+is it closer to the og space trader? oh hell yeah, but that wasn't REALLY what i set out to do... i wanted to have something more like
+EVE online, single player, text based (minimal graphics for the plebs)
+
+and then i rightly pointed out to myself: that won't sell. that won't make for a good gameplay experience. of the 2 points, the latter hits
+harder. at some point i forgot there was this thing called players.
+
+but not to wallow in that- the point is, i was depressed over that. but i think i understand how to fix it now... i had to return to the source.
+what DOES space trader feel like to play? through the lens of "what do i care about as a player?"
+
+and from there it's obvious.
+
+creating a game is not about throwing things together. that's the same as throwing chocolate or steak mignon into applesauce. 
+are they good things? yes. do they go together good with applesauce? fuck no. will they confuse the shit out of the person eating the
+applesauce? yes. 
+
+like it or not, game dev is a lot like cooking. there are fucking RECIPES. you don't alter the recipe much if you want people to understand
+your food... ENJOY your food. there's a time and place to experiment, and that's done cautiously, one thing at a time usually. not a ...
+wild zany fricasse of every conceivable ingredient and spice. that's not originality, that's the same as throwing a bunch of paint together
+you ALWAYS get the same gray soupy mess if you do that. and people been making grey soupy messes since time immemorial.
+even fucking ARCADE GAMES IN THE 70s had games that were too conceptual, trying to do too many things at once.
+
+in other words, the process of discovering fun.. involves trial and error. any deviation (and i do mean any) off the beaten path runs the risk
+of destroying fun, the same way you can destroy a recipe, or a painting, with one fatal stroke. one thing that doesn't need to be there.
+and sure, people will still eat or, or look at it, and probably even enjoy themselves if you only took the one wrong turn.
+or added the one unnecessary ingredient. or the one feature that didn't really enhance any of the others.
+
+you can get away with one. but two? three? then you're in gray soupy mess territory. anything that isn't stroking that fun center in the brain
+is a gray soupy mess. it's postmodern art. getting high on its own farts instead of trying to deliver something beautiful and real and...
+SPARING.
+
+that's the word of the day - sparing. 
+
+having said that, life sucks if you JUST stay on the beaten path, JUST stick to the known recipes, because how the fuck do any new recipes
+ever get created? but it takes HUMILITY. it takes understanding the audience, what a game IS, what gamers are, what the process of enjoying
+a game is. how RARE true enjoyment, true art, true perfection, a true enhancement or breakthrough really is in this world of gray soup.
+
+that's PART of the joy, really.. fun is elusive. just like inspiration is inexplicable. they are 2 sides of a coin, and the interestingness
+of life is how to appease one without fully pissing off the other, like having a wife and a mistress. (lol)
+
+what is all this circling around?
+
+you had a good idea to cut, but now that you cut, you should really just raze everything to the ground and start over with a new philosophical
+principle in mind... 
+
+1: "what does not immediately impact and ENHANCE the core loop, doesn't need to be in the game".
+
+but there is a light that is the beneficent cousin of that darkness... 
+
+2: "your job as the dev is to impact and ENHANCE the core loop, refract its light, as much as is humanly feasible".
+
+THAT's why the civ stats need to go. not necessarily because they're bad on their own. but because they GET IN THE WAY of something much better.
+
+the question is -- how do i make the player care about this feature (without bludgeoning him over the head with it)
+the answer -- tie it into the core loop in a way that's thematic and feels right. feels like it belongs. or at least has a place.
+
+for instance, governments - what do they effect? news. stats. and what do those effect? encounter weights. price and demand.
+
+so basically you have a stat, that effects 2 systems, that in turn effect OTHER stats, that finally effect the core loop.
+
+that is wrong. 
+
+3: "every system that exists must interface as DIRECTLY with the core loop as is humanly feasible".
+
+in an rpg, the sky is basically the limit. your core loop is "living the life of an epic fantasy adventurer", and so anything that an epic fantasy
+adventurer might do - forge weapons and armor, go on quests, fight demons, "level up", train, recruit allies - fits in the core loop.
+
+but space trader is no fucking rpg. it's a simulator. a trading, exploring, spacefaring, pirating... but mostly TRADING... simulator. 
+hence the fucking name "SPACE TRADER"
+
+would a merchant in a particularly unscrupulous or roughshod time period do all of the above? YES. even mining, possibly yes.
+and buying stuff, and visiting banks... yes and yes. getting rank-ups so he can get more rare goods and beat the tax system... YES.
+hire mercenaries and shit to guard his cargo? yes.
+
+getting fucking neuro implants and weapons so he can fight people up close? not really bro. just cruising around the system saying hi to
+random ships? not really. those things COULD HAVE BEEN IN THE GAME, but did they fit in the core loop? not really.
+
+and get what i'm saying, core loop does not equal theme. i get that it sounds like i'm describing theme, but i'm not. we're talking about the
+fun. the ephemeral, ineffable, hard to explain but you know it when you see it - just like you know great food when you taste it - fun.
+part of fun is having extras, but mostly, it's about having a predictable understandable unit of something you've seen enough times to 
+understand - and hence, enough to appreciate a twist of novelty added on top.
+
+why do people salt meat? because meat tastes kinda salty, and salt enhances it even more. black pepper too. certain things complement each
+other. cyber modules, etc would've made sense IN A ROLEPLAYING game where you're a space ADVENTURER. this is not a rpg, this is a sim.
+
+the point i'm making... is a little divergent from everything i've said so far. i've made it sound like this is all a process of deciding
+what to put in, and what not. and to some extent that's true. cyber modules, no way did those belong whatsoever. the 2d realtime map SUPER
+didn't belong at all. really complex news that "draws you in" roleplay style doesn't belong.
+
+but the point is, the things that DO belong? it's not just about having them there and having them effect things (ie, effect a system,
+which effect stats, which effect enocunters, which in turn effect the player). at that point, does anyone remember or care what all
+the upstream effects were?
+
+no, things need to have IMMEDIATE impact on the core loop if at ALL possible. yes, in skyrim you can collect ingredients, to forge
+your weapon, to then enchant your weapon, which you can THEN fight enemies with - and if fighting enemies was the core loop, somewhere along 
+the line this would've been too much. 
+
+but remember - the core loop is BEING A FANTASY HERO, and he would do all those things - and it's enjoyable to do all those things
+and not be fighting the entire time.
+
+but, what skyrim did RIGHT was not make items have durability, and not make them have all these intense granular stats... because we -want-
+the player focused on the experience of adventuring. the epic stuff. the hero stuff. not the grind-y stuff. 
+
+and in space trader, WE WANT THE PLAYER FOCUSED ON MERCHANT-Y stuff. agonizing over trade routes, costs, prices. figuring out just how much
+hired muscle he needs to make it to the next system. talking his way out of fights, but fighting when he absolutely must. deciding
+when to smuggle and when to keep his nose clean. etc.
+
+IF A SYSTEM DOESN'T CONTRIBUTE TO THAT OR ENHANCE IT IN SOME WAY, IT SHOULDN'T EXIST - 
+BUT
+IF A SYSTEM IS NOTICEABLY MISSING WHICH COULD CONTRIBUTE TO THAT OR ENHANCE IT IN SOME WAY, IT -SHOULD- EXIST NO MATTER WHAT!
+
+this is --very-- similar to the concept of "your food lacks soul." chili wouldnt taste the same without some dark, bitter, acidy, musky pepper.
+granted, it probably took someone a long time to figure that out, but once they did. chili became 10x better.
+
+and players can detect this, at times. how many people wanted a horse mod for morrowind, or good ranged weapons? and sure enough, in the 
+next iterations the devs delivered because as a player you can FEEL the absence of these things that feel like they SHOULD exist in the game.
+
+and this is exactly what i'm trying to drill home and what you got wrong previously... you need to be playing the game, or a similar game,
+and feeling out what should and shouldn't be there and develop on the basis of THAT... because with THAT, the need to make everything
+about the core experience is obvious. from a player's perspective - the guy EATING the actual food - it's always obvious when something's
+overwhelming, or muddled, or missing a piece, or "lacking soul".
+
+an example-
+in this game, there's governments. WHO THE FUCK CARES ABOUT THOSE. in space trader you barely notice them at all. what do you do?
+you go straight to the market or the shipyard.
+so guess what? the GOVERNMENT SHOULD BE the market or shipyard. ie, a "primitive" type planet only allows barter. a communist planet
+refuels/stocks you for free, but also taxes you. a corporatist planet ... idk, does something zany market related. the democracy is the 
+"vanilla" one. etc, etc.
+
+that is an inifinitely better mechanic than having stats, that effect stats, that... and you know it. you fucking KNOW IT.
+
+and the point is not just that one little example, it's the whole thing. the whole thing could benefit from you going in with your magnifying
+lens and asking, what would i have built this like if i'd been THINKING from the start of this shit about how we make mechanics that
+-force the player to care, and if he then finds them annoying, odds are it's a bad mechanic
+-tie into the main gameplay loop, experience, concept DIRECTLY. not through adjacent stats/systems.
+-each do something UNIQUE and PALPABLE.
+
+cargo types need this question to be asked. the recruiting system needs this question to be asked. ship types and stats need to be examined.
+the news system itself needs to be examined. everything needs to be turned upside down and given the "FORCE the player to care about this
+IMMEDIATELY and if he still can't/doesn't want to, get rid of it, but also make sure everything that a real space trader (like a movie about
+an epic space trader, not a literal space trader using the bathroom and doing mundant shit all day) WOULD be forced to care about has
+some in-game equivalent" treatment.
+
+
+
 1.10.16
 
 ive learned a great deal about how to use agents, how to game dev, how to do this and that.
@@ -6,3 +170,4 @@ actually experience it for myself
 
 lessons learned
 
+<i put all these in dev_tips>

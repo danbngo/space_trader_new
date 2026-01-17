@@ -29,3 +29,25 @@ for, etc. i can't afford to NOT do things that would spark those considerations.
 
 -CUT CONSTANTLY. only retain features you are POSITIVE are REQUIRED for launch. when in doubt, copy the simplest working iteration someone else
 already made. ie, if you're doing space trader, do space trader 1980 FIRST - THEN add more content.
+
+
+
+GAME DEV THEORY TIPS:
+
+do not design a series of systems and plop the player into what you built.
+design an experience for the player and drop in systems that he wishes were there.
+you don't need to color in the back of the scenery.
+
+#1 rule: what does not immediately impact, enhance, and fit into the core experience, doesn't need to be in the game
+#1 rule inverted: your job as the dev is to enhance and diversify the core experience, refract its light, as much as is humanly feasible
+
+downstream realizations:
+-every system that bothers to exist must interface as DIRECTLY with the core loop as is humanly feasible
+-every system that exists should hit hard. force the player to care, and if he still doesn't want to care, odds are it's a bad mechanic
+-every system that exists should be as unique and distinct from the others as possible. cardinality>>>>similarity.
+-AVOID META SYSTEMS! AVOID STATS IMPACTING STATS!
+
+chatgpt phrases as:
+If a system does not create an immediate, legible decision for the player, it does not exist.
+(this is even more brutal than "it should not exist", because yes, to the player, it already fucking doesnt. so you may as well
+just get rid of it in actuality since they already did cognitively)
